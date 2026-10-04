@@ -1,0 +1,88 @@
+name: Backtest Tokyo Kyoto Stage A weather
+
+on:
+  pull_request:
+    paths:
+      - 'baba_models_v2/jma_weather.py'
+      - 'baba_models_v2/test_jma_weather.py'
+      - 'baba_models_v2/stage_a_weather_model.py'
+      - '.github/workflows/backtest-tokyo-kyoto-stage-a-weather.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weather-backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check pytest requests beautifulsoup4 pypdf numpy
+      - name: Test JMA parser
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_jma_weather.py test_jra_observations.py
+      - name: Collect JRA observations
+        run: |
+          python baba_models_v2/jra_observations.py --track tokyo --from-year 2018 --to-year 2026 --output tmp/stage_a/tokyo_observations.csv
+          python baba_models_v2/jra_observations.py --track kyoto --from-year 2023 --to-year 2026 --output tmp/stage_a/kyoto_observations.csv
+      - name: Validate observations
+        run: |
+          python baba_models_v2/validate_observations.py --input tmp/stage_a/tokyo_observations.csv --track tokyo --min-rows 100 --min-race-days 60
+          python baba_models_v2/validate_observations.py --input tmp/stage_a/kyoto_observations.csv --track kyoto --min-rows 60 --min-race-days 40
+      - name: Collect JMA hourly weather
+        run: |
+          python baba_models_v2/jma_weather.py --track tokyo --observations tmp/stage_a/tokyo_observations.csv --output tmp/stage_a/tokyo_weather.csv --workers 5
+          python baba_models_v2/jma_weather.py --track kyoto --observations tmp/stage_a/kyoto_observations.csv --output tmp/stage_a/kyoto_weather.csv --workers 5
+      - name: Run leakage-safe Stage A backtests
+        run: |
+          for track in tokyo kyoto; do
+            for surface in turf dirt; do
+              python baba_models_v2/stage_a_weather_model.py \
+                --track ${track} --surface ${surface} \
+                --observations tmp/stage_a/${track}_observations.csv \
+                --weather tmp/stage_a/${track}_weather.csv \
+                --metrics tmp/stage_a/${track}_${surface}_weather_metrics.json \
+                --predictions tmp/stage_a/${track}_${surface}_weather_predictions.csv
+            done
+          done
+      - name: Summarize baseline improvements
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('tmp/stage_a')
+          summary={'schema_version':1,'model':'ridge-delta-v0.1','results':{}}
+          for track in ('tokyo','kyoto'):
+              summary['results'][track]={}
+              for surface in ('turf','dirt'):
+                  data=json.loads((root/f'{track}_{surface}_weather_metrics.json').read_text(encoding='utf-8'))
+                  forward=data['backtest']['forward']
+                  loyo=data['backtest']['loyo']
+                  summary['results'][track][surface]={
+                      'usable_pairs':data['audit']['usable_pairs'],
+                      'forward_n':forward['model']['n'],
+                      'forward_mae':forward['model']['mae'],
+                      'forward_baseline_mae':forward['baseline']['mae'],
+                      'forward_mae_improvement_pct':forward['mae_improvement_vs_baseline_pct'],
+                      'forward_rmse_improvement_pct':forward['rmse_improvement_vs_baseline_pct'],
+                      'forward_wet_n':forward['wet']['model']['n'],
+                      'forward_wet_mae':forward['wet']['model']['mae'],
+                      'forward_wet_baseline_mae':forward['wet']['baseline']['mae'],
+                      'loyo_mae':loyo['model']['mae'],
+                      'loyo_baseline_mae':loyo['baseline']['mae'],
+                      'loyo_mae_improvement_pct':loyo['mae_improvement_vs_baseline_pct'],
+                  }
+          (root/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(summary,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokyo-kyoto-stage-a-weather-v1
+          path: tmp/stage_a
+          if-no-files-found: error
+          retention-days: 30
