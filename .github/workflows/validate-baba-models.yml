@@ -1,0 +1,38 @@
+name: Validate baba models
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'baba_models_v2/**'
+      - 'docs/baba-models.html'
+      - 'docs/data/baba_model_registry.json'
+      - '.github/workflows/validate-baba-models.yml'
+  pull_request:
+    paths:
+      - 'baba_models_v2/**'
+      - 'docs/baba-models.html'
+      - 'docs/data/baba_model_registry.json'
+      - '.github/workflows/validate-baba-models.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate registry and promotion guardrails
+        run: python baba_models_v2/validate_registry.py
+      - name: Run additive-layer smoke tests
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_smoke.py
+      - name: Verify dashboard data is generated from registry
+        run: |
+          python baba_models_v2/build_dashboard_data.py
+          git diff --exit-code -- docs/data/baba_model_registry.json
