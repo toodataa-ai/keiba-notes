@@ -10,10 +10,10 @@
     html,body{margin:0;padding:0;background:#e5e7eb;color:#111827;font-family:"Meiryo UI","Meiryo","Noto Sans CJK JP",sans-serif}
     .archive-note{max-width:960px;margin:16px auto;padding:12px 16px;border-radius:12px;background:#111827;color:#fff;font-size:14px;line-height:1.6}
     .archive-note strong{display:block;font-size:16px}
-    .archive-page{width:210mm;height:297mm;margin:14px auto;background:#fff;padding:7mm 5mm;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.12)}
-    .archive-page pre{margin:0;white-space:pre;font-family:"Noto Sans Mono CJK JP","Meiryo UI","Meiryo",monospace;font-size:7pt;line-height:1.32;color:#111827}
-    @media(max-width:760px){.archive-note{margin:10px}.archive-page{width:100%;height:auto;min-height:0;margin:10px 0;padding:14px 10px;overflow:auto;box-shadow:none}.archive-page pre{font-size:11px;line-height:1.5;min-width:720px}}
-    @media print{html,body{background:#fff}.archive-note{display:none}.archive-page{margin:0;box-shadow:none;break-inside:avoid}.archive-page:not(:last-child){break-after:page}.archive-page pre{font-size:7pt;line-height:1.32}}
+    .archive-page{width:210mm;height:297mm;margin:14px auto;background:#fff;padding:8mm;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+    .archive-page pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:"Noto Sans Mono CJK JP","Meiryo UI","Meiryo",monospace;font-size:11pt;line-height:1.32;color:#111827}
+    @media(max-width:760px){.archive-note{margin:10px}.archive-page{width:100%;height:auto;min-height:0;margin:10px 0;padding:14px 10px;overflow:auto;box-shadow:none}.archive-page pre{font-size:11px;line-height:1.5;min-width:0}}
+    @media print{html,body{background:#fff}.archive-note{display:none}.archive-page{margin:0;box-shadow:none;break-inside:avoid}.archive-page:not(:last-child){break-after:page}.archive-page pre{font-size:11pt;line-height:1.32}}
   </style>
 </head>
 <body>
@@ -1440,5 +1440,33 @@ v2.8直接実績/復活監査       追加監査                馬券追加層�
 
 
 第61回 京都大賞典 / 全頭診断                                             horse 18 / 18</pre></section></main>
+  <script>
+    window.fitArchivePages = () => {
+      const maxPt = 11;
+      const minPt = 9.5;
+      const stepPt = 0.1;
+      for (const section of document.querySelectorAll('.archive-page')) {
+        const pre = section.querySelector('pre');
+        if (!pre) continue;
+        const style = getComputedStyle(section);
+        const availableHeight = section.clientHeight
+          - parseFloat(style.paddingTop || '0')
+          - parseFloat(style.paddingBottom || '0');
+        let pt = maxPt;
+        pre.style.fontSize = pt + 'pt';
+        while (pre.scrollHeight > availableHeight + 1 && pt > minPt) {
+          pt = Math.max(minPt, +(pt - stepPt).toFixed(1));
+          pre.style.fontSize = pt + 'pt';
+        }
+        section.dataset.renderFontPt = pt.toFixed(1);
+      }
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', window.fitArchivePages);
+    } else {
+      window.fitArchivePages();
+    }
+    window.addEventListener('load', window.fitArchivePages);
+  </script>
 </body>
 </html>
