@@ -27,6 +27,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check pytest
       - name: Validate registry and promotion guardrails
         run: python baba_models_v2/validate_registry.py
       - name: Run additive-layer smoke tests
