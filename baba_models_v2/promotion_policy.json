@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "policy_version": "1.0",
+  "description": "Initial conservative promotion policy for JRA track-condition models. Candidate generation is automatic; production activation always requires class-C approval.",
+  "allowed_statuses": ["pilot", "backtesting", "candidate", "validated", "degraded", "retired"],
+  "stage_a": {
+    "target": "next official morning moisture level",
+    "validation": ["leave-one-year-out", "time-series-holdout"],
+    "minimums": {
+      "independent_samples": 24,
+      "calendar_years": 3,
+      "wet_samples": 6
+    },
+    "required_metrics": ["mae", "rmse", "within_1_0pt"],
+    "promotion_rules": {
+      "mae_improvement_vs_baseline_pct_min": 5.0,
+      "rmse_improvement_vs_baseline_pct_min": 3.0,
+      "wet_mae_degradation_vs_baseline_pct_max": 10.0,
+      "leakage_audit_required": true,
+      "reproducible_backtest_required": true
+    }
+  },
+  "stage_b": {
+    "target": "official JRA condition label at race time: 良/稍重/重/不良",
+    "note": "Race-time moisture is not treated as ground truth when no official race-time moisture label exists.",
+    "validation": ["grouped-by-meeting-day-holdout", "forward-time-holdout"],
+    "minimums": {
+      "labelled_races": 80,
+      "independent_meeting_days": 12,
+      "calendar_years": 2,
+      "rain_transition_days": 6
+    },
+    "required_metrics": ["multiclass_log_loss", "brier_score", "top1_accuracy", "adjacent_class_accuracy", "calibration_error"],
+    "promotion_rules": {
+      "log_loss_improvement_vs_current_heuristic_pct_min": 5.0,
+      "brier_improvement_vs_current_heuristic_pct_min": 5.0,
+      "rain_transition_brier_degradation_pct_max": 10.0,
+      "leakage_audit_required": true,
+      "reproducible_backtest_required": true
+    }
+  },
+  "production_activation": {
+    "candidate_generation": "class-B automatic",
+    "candidate_to_validated": "class-C approval required",
+    "replace_existing_validated_model": "class-C approval required",
+    "automatic_router_change": false,
+    "automatic_rollback": false
+  }
+}
