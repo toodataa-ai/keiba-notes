@@ -130,8 +130,6 @@ def _dates_for_header(start: date, end: date, weekdays: list[str]) -> list[date]
         if WEEKDAY_JA[d.weekday()] in weekdays:
             dates.append(d)
         d += timedelta(days=1)
-    # Header order is chronological in JRA legacy tables. If a repeated weekday ever
-    # appears in one range, preserve date order rather than guessing from positions.
     return dates
 
 
@@ -142,9 +140,86 @@ def _numbers_after(line: str, marker: str) -> list[float]:
     return [float(x) for x in re.findall(r"\d+(?:\.\d+)?", tail)]
 
 
+def _moisture_series(lines: list[str], n_dates: int):
+    turf_goal = turf_corner = dirt_goal = dirt_corner = None
+    for line in lines:
+        if "芝コース含水率" in line and "ゴール前" in line:
+            turf_goal = _numbers_after(line, "ゴール前")
+        elif "4コーナー" in line and turf_corner is None:
+            turf_corner = _numbers_after(line, "4コーナー")
+        elif "ダートコース含水率" in line and "ゴール前" in line:
+            dirt_goal = _numbers_after(line, "ゴール前")
+        elif "4コーナー" in line and turf_corner is not None and dirt_corner is None:
+            dirt_corner = _numbers_after(line, "4コーナー")
+    series = [turf_goal, turf_corner, dirt_goal, dirt_corner]
+    if any(v is None or len(v) != n_dates for v in series):
+        return None
+    return turf_goal, turf_corner, dirt_goal, dirt_corner
+
+
+def _grouped_rows(text: str, *, year: int, track: str, meeting: int, source_url: str) -> list[Observation]:
+    """Parse 2020s grouped tables such as `第1日・第2日(2023年4月21日~23日)`.
+
+    The first date is the pre-race measurement (normally Friday); the remaining
+    dates correspond in order to the day numbers listed in the heading.
+    """
+    text = norm(text)
+    range_re = re.compile(
+        r"(?P<daypart>第\s*\d+\s*日(?:\s*・\s*第\s*\d+\s*日)*)\s*"
+        r"\(\s*(?P<year>\d{4})年\s*(?P<sm>\d{1,2})月\s*(?P<sd>\d{1,2})日\s*"
+        r"[~〜～]\s*(?:(?P<em>\d{1,2})月)?\s*(?P<ed>\d{1,2})日\s*\)"
+    )
+    matches = list(range_re.finditer(text))
+    rows: list[Observation] = []
+    for i, rm in enumerate(matches):
+        block = text[rm.end(): matches[i + 1].start() if i + 1 < len(matches) else len(text)]
+        sm, sd = int(rm.group("sm")), int(rm.group("sd"))
+        em = int(rm.group("em")) if rm.group("em") else sm
+        ed = int(rm.group("ed"))
+        start, end = date(year, sm, sd), date(year, em, ed)
+        lines = [x.strip() for x in block.splitlines() if x.strip()]
+        header = next((x for x in lines if "曜日" in x), None)
+        if not header:
+            continue
+        weekdays = re.findall(r"([月火水木金土日])曜日", header)
+        dates = _dates_for_header(start, end, weekdays)
+        if len(dates) != len(weekdays):
+            continue
+        moisture = _moisture_series(lines, len(dates))
+        if moisture is None:
+            continue
+        turf_goal, turf_corner, dirt_goal, dirt_corner = moisture
+
+        cushion = None
+        for line in lines:
+            if not re.fullmatch(r"(?:\d+(?:\.\d+)?\s*)+", line):
+                continue
+            vals = [float(x) for x in re.findall(r"\d+(?:\.\d+)?", line)]
+            if len(vals) == len(dates) and all(4.0 <= x <= 20.0 for x in vals):
+                cushion = vals
+                break
+
+        day_numbers = [int(x) for x in re.findall(r"第\s*(\d+)\s*日", rm.group("daypart"))]
+        if len(day_numbers) != max(0, len(dates) - 1):
+            continue
+        for idx, d in enumerate(dates):
+            dayno = None if idx == 0 else day_numbers[idx - 1]
+            rows.append(Observation(
+                year=year, track=track, meeting=meeting, source_url=source_url,
+                observed_date=d.isoformat(), weekday=WEEKDAY_JA[d.weekday()], day_number=dayno,
+                race_day=idx > 0, race_day_inferred=False,
+                course=None, cushion_time=None,
+                cushion_value=(cushion[idx] if cushion is not None else None), moisture_time=None,
+                turf_goal=turf_goal[idx], turf_corner=turf_corner[idx],
+                dirt_goal=dirt_goal[idx], dirt_corner=dirt_corner[idx],
+                source_format="grouped",
+            ))
+    return rows
+
+
 def _legacy_rows(text: str, *, year: int, track: str, meeting: int, source_url: str) -> list[Observation]:
     text = norm(text)
-    # Legacy JRA PDFs used both "...日の含水率" and "...日の気象状況" for the
+    # 2018-2019 PDFs used both "...日の含水率" and "...日の気象状況" for the
     # same moisture table layout. Cross-month ranges are also supported.
     range_re = re.compile(
         r"(?P<year>\d{4})年\s*(?P<sm>\d{1,2})月\s*(?P<sd>\d{1,2})日から"
@@ -167,28 +242,15 @@ def _legacy_rows(text: str, *, year: int, track: str, meeting: int, source_url: 
         dates = _dates_for_header(start, end, weekdays)
         if len(dates) != len(weekdays):
             continue
-
-        turf_goal = turf_corner = dirt_goal = dirt_corner = None
-        for line in lines:
-            if "芝コース含水率" in line and "ゴール前" in line:
-                turf_goal = _numbers_after(line, "ゴール前")
-            elif "4コーナー" in line and turf_corner is None:
-                turf_corner = _numbers_after(line, "4コーナー")
-            elif "ダートコース含水率" in line and "ゴール前" in line:
-                dirt_goal = _numbers_after(line, "ゴール前")
-            elif "4コーナー" in line and turf_corner is not None and dirt_corner is None:
-                dirt_corner = _numbers_after(line, "4コーナー")
-
-        series = [turf_goal, turf_corner, dirt_goal, dirt_corner]
-        if any(v is None or len(v) != len(dates) for v in series):
+        moisture = _moisture_series(lines, len(dates))
+        if moisture is None:
             continue
-        assert turf_goal is not None and turf_corner is not None and dirt_goal is not None and dirt_corner is not None
+        turf_goal, turf_corner, dirt_goal, dirt_corner = moisture
         for idx, d in enumerate(dates):
-            wd = WEEKDAY_JA[d.weekday()]
             rows.append(Observation(
                 year=year, track=track, meeting=meeting, source_url=source_url,
-                observed_date=d.isoformat(), weekday=wd, day_number=None,
-                race_day=(wd != "金"), race_day_inferred=True,
+                observed_date=d.isoformat(), weekday=WEEKDAY_JA[d.weekday()], day_number=None,
+                race_day=idx > 0, race_day_inferred=True,
                 course=None, cushion_time=None, cushion_value=None, moisture_time=None,
                 turf_goal=turf_goal[idx], turf_corner=turf_corner[idx],
                 dirt_goal=dirt_goal[idx], dirt_corner=dirt_corner[idx],
@@ -202,6 +264,9 @@ def parse_pdf_text(text: str, *, year: int, track: str, meeting: int, source_url
     modern = _modern_rows(normalized, year=year, track=track, meeting=meeting, source_url=source_url)
     if modern:
         return modern
+    grouped = _grouped_rows(normalized, year=year, track=track, meeting=meeting, source_url=source_url)
+    if grouped:
+        return grouped
     return _legacy_rows(normalized, year=year, track=track, meeting=meeting, source_url=source_url)
 
 
@@ -217,7 +282,6 @@ def collect(years: Iterable[int], track: str, session: requests.Session | None =
             if not rows:
                 raise RuntimeError(f"parsed zero rows: {url}")
             out.extend(rows)
-    # Date + meeting de-duplication is deliberate; archive PDFs can be rediscovered through aliases.
     unique = {(r.observed_date, r.meeting, r.track): r for r in out}
     return sorted(unique.values(), key=lambda r: (r.observed_date, r.meeting))
 
@@ -225,7 +289,7 @@ def collect(years: Iterable[int], track: str, session: requests.Session | None =
 def write_csv(rows: Iterable[Observation], path: Path) -> None:
     rows = list(rows)
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = list(asdict(rows[0]).keys()) if rows else [f.name for f in Observation.__dataclass_fields__.values()]
+    fields = list(asdict(rows[0]).keys()) if rows else list(Observation.__dataclass_fields__)
     with path.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
