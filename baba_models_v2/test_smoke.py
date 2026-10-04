@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 from predict import supported_tracks, condition_probs, update_to_race_time
 from promotion import stage_a_candidate, stage_b_candidate
 
@@ -56,6 +59,25 @@ def test_stage_a_candidate_can_pass_when_all_guardrails_pass():
     )
     assert ok is True
     assert gaps == []
+
+
+def test_registered_stage_a_candidates_really_pass_policy_and_are_not_routed():
+    registry = json.loads(Path("model_registry.json").read_text(encoding="utf-8"))
+    candidates = [m for m in registry["models"] if m["stage_a"]["status"] == "candidate"]
+    assert {(m["track"], m["surface"]) for m in candidates} == {
+        ("tokyo", "turf"), ("tokyo", "dirt"), ("kyoto", "turf"), ("kyoto", "dirt")
+    }
+    for model in candidates:
+        ok, gaps = stage_a_candidate(
+            model["stage_a"]["metrics"],
+            model["data"],
+            model["stage_a"].get("audits"),
+        )
+        assert ok is True, f"{model['track']}/{model['surface']} candidate gaps: {gaps}"
+        assert gaps == []
+        assert model["status"] == "backtesting"
+        assert model["stage_b"]["status"] == "pilot"
+        assert model["routing"]["production"] is False
 
 
 def test_stage_b_candidate_never_passes_without_official_label_metrics():

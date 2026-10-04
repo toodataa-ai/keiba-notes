@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-05",
+  "model": "ridge-delta-v0.1 + training-envelope-guard",
+  "artifact_sha256": "e1920e9c11f545fb36b62d81b89484ff68572497d6731b47e2705f844652cd86",
+  "feature_policy": {
+    "target_cutoff_local": "04:00",
+    "window_start_local": "06:00 on previous official observation date",
+    "wet_threshold_mm": 1.0,
+    "guardrail": "clip prediction to min/max target moisture observed in each training fold",
+    "future_information_used": false
+  },
+  "weather_stations": {
+    "tokyo": {"rain_primary":"府中 AMeDAS (44/1133)","full":"府中 AMeDAS (44/1133)"},
+    "kyoto": {"rain_primary":"長岡京 AMeDAS (61/1025)","full":"京田辺 AMeDAS (61/0598)","rain_secondary":"京田辺 AMeDAS (61/0598)"}
+  },
+  "results": {
+    "tokyo": {
+      "turf": {
+        "usable_pairs": 354,
+        "forward": {"n":292,"mae":0.8915325934918805,"rmse":1.1639294257463921,"within_1_0pt":0.6746575342465754,"max_abs_error":4.400975720333188,"baseline_mae":1.2669520547945206,"baseline_rmse":1.7856184416549024,"mae_improvement_pct":29.63170231122338,"rmse_improvement_pct":34.81645358301362,"wet_n":73,"wet_mae":1.2382218105761282,"wet_baseline_mae":2.0554794520547945},
+        "loyo": {"n":354,"mae":0.8816567505958266,"rmse":1.1885092034225266,"baseline_mae":1.3298022598870056,"mae_improvement_pct":33.70016150591128},
+        "guardrail_applied_forward": 1
+      },
+      "dirt": {
+        "usable_pairs": 354,
+        "forward": {"n":292,"mae":1.1231701982075553,"rmse":1.4829147493079777,"within_1_0pt":0.5342465753424658,"max_abs_error":7.142235933651598,"baseline_mae":1.9445205479452055,"baseline_rmse":2.9677634445847767,"mae_improvement_pct":42.23922193085485,"rmse_improvement_pct":50.03258254919795,"wet_n":73,"wet_mae":1.7015059992958597,"wet_baseline_mae":3.8061643835616437},
+        "loyo": {"n":354,"mae":1.1178151644420051,"rmse":1.5884585980058463,"baseline_mae":2.055225988700565,"mae_improvement_pct":45.61108264552679},
+        "guardrail_applied_forward": 3
+      }
+    },
+    "kyoto": {
+      "turf": {
+        "usable_pairs": 155,
+        "forward": {"n":66,"mae":0.71613968278184,"rmse":0.8449886485769841,"within_1_0pt":0.6666666666666666,"max_abs_error":1.6243300529659601,"baseline_mae":1.0015151515151517,"baseline_rmse":1.3897078393633242,"mae_improvement_pct":28.49437358002809,"rmse_improvement_pct":39.196669642152685,"wet_n":14,"wet_mae":1.0017135062229503,"wet_baseline_mae":1.6928571428571433},
+        "loyo": {"n":155,"mae":0.6688934013228321,"rmse":0.870883707703444,"baseline_mae":0.9529032258064517,"mae_improvement_pct":29.804687064970224},
+        "guardrail_applied_forward": 0
+      },
+      "dirt": {
+        "usable_pairs": 155,
+        "forward": {"n":66,"mae":1.2341229316297648,"rmse":1.7105514437642364,"within_1_0pt":0.5454545454545454,"max_abs_error":5.359379680188841,"baseline_mae":2.2257575757575756,"baseline_rmse":3.773090526506371,"mae_improvement_pct":44.55267972255651,"rmse_improvement_pct":54.66444730791835,"wet_n":14,"wet_mae":2.534801367725067,"wet_baseline_mae":6.114285714285714},
+        "loyo": {"n":155,"mae":1.0814444599515334,"rmse":1.4706334493592321,"baseline_mae":2.1190322580645162,"mae_improvement_pct":48.965172387734},
+        "guardrail_applied_forward": 0
+      }
+    }
+  },
+  "promotion_interpretation": {
+    "tokyo_turf_stage_a": "candidate-eligible",
+    "tokyo_dirt_stage_a": "candidate-eligible",
+    "kyoto_turf_stage_a": "candidate-eligible",
+    "kyoto_dirt_stage_a": "candidate-eligible",
+    "overall_models": "remain backtesting because Stage B is still pilot",
+    "production_router_changed": false
+  }
+}
