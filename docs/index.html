@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Keiba Forecast Archive</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">KEIBA NOTES</p>
+      <h1>競馬予想・成績アーカイブ</h1>
+      <p class="lead">予想時点の印・PDF・レース結果・回顧・使用プロンプト版を時系列で保存します。</p>
+      <div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="stats" aria-label="累計成績">
+      <article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article>
+      <article><span class="label">◎勝率</span><strong id="statWinRate">—</strong></article>
+      <article><span class="label">◎複勝率</span><strong id="statPlaceRate">—</strong></article>
+      <article><span class="label">馬券的中率</span><strong id="statTicketRate">—</strong></article>
+      <article><span class="label">回収率</span><strong id="statROI">—</strong></article>
+    </section>
+
+    <section class="section-head">
+      <div>
+        <p class="eyebrow dark">ARCHIVE</p>
+        <h2>予想履歴</h2>
+      </div>
+      <div class="filters">
+        <select id="statusFilter" aria-label="状態で絞り込み">
+          <option value="all">すべて</option>
+          <option value="predicted">予想済み</option>
+          <option value="reviewed">回顧済み</option>
+        </select>
+      </div>
+    </section>
+
+    <div id="raceList" class="race-list"><p class="muted">読み込み中…</p></div>
+  </main>
+
+  <footer class="wrap footer">
+    <p>STEP1の印確定後にSTEP2でオッズ評価を行い、結果確定後に回顧を追記します。</p>
+  </footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>
