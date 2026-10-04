@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>JRAメイン予想・成績アーカイブ</title>
-  <link rel="stylesheet" href="assets/style.css?v=20261004-1534">
+  <link rel="stylesheet" href="assets/style.css?v=20261004-process1">
 </head>
 <body>
   <header class="hero">
@@ -15,6 +15,43 @@
       <p class="eyebrow">KEIBA NOTES / JRA MAIN RACES</p>
       <h1>JRAメイン予想・成績アーカイブ</h1>
       <p class="lead">JRA中央競馬の各開催日メインレースだけを対象に、予想・PDF・結果・回顧・使用プロンプト版を保存します。海外競馬・地方競馬は成績集計と改善学習の対象外です。</p>
+
+      <section class="improvement-cycle" aria-labelledby="cycleTitle">
+        <div class="cycle-intro">
+          <p class="eyebrow">HOW IT IMPROVES</p>
+          <h2 id="cycleTitle">予測精度を高めていく改善サイクル</h2>
+          <p>予想を出して終わりではなく、結果を記録し、外れ方まで検証して、次のプロンプトへ反映します。変更内容は版ごとに残し、次のレースで再検証します。</p>
+        </div>
+        <ol class="cycle-steps">
+          <li class="cycle-step">
+            <span class="cycle-number">1</span>
+            <strong>予想する</strong>
+            <span>最新プロンプトと同じ評価軸で全頭を分析</span>
+          </li>
+          <li class="cycle-step">
+            <span class="cycle-number">2</span>
+            <strong>結果を記録</strong>
+            <span>印・着順・馬券収支を予想時の情報とセットで保存</span>
+          </li>
+          <li class="cycle-step">
+            <span class="cycle-number">3</span>
+            <strong>反省・誤差分析</strong>
+            <span>見落とし、過大評価・過小評価、展開差などを分解</span>
+          </li>
+          <li class="cycle-step">
+            <span class="cycle-number">4</span>
+            <strong>プロンプト改良</strong>
+            <span>再発防止ルールを追加し、変更理由と内容を版管理</span>
+          </li>
+          <li class="cycle-step">
+            <span class="cycle-number">5</span>
+            <strong>次レースで再検証</strong>
+            <span>改良版を適用し、精度・回収率の変化を継続観測</span>
+          </li>
+        </ol>
+        <p class="cycle-loop"><span aria-hidden="true">↻</span> このサイクルをレースごとに繰り返し、予想ロジックを継続的に改善します。</p>
+      </section>
+
       <div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div>
     </div>
   </header>
