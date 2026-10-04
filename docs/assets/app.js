@@ -29,14 +29,40 @@ function periodText(mode,key,rows){
   return key;
 }
 
+function renderPromptHistory(history,prompt){
+  const root=document.getElementById('promptHistoryList');
+  const count=document.getElementById('promptHistoryCount');
+  if(!root) return;
+  const entries=[...(history?.entries||[])].sort((a,b)=>`${b.date||''}-${b.version||''}`.localeCompare(`${a.date||''}-${a.version||''}`));
+  if(count) count.textContent=entries.length?`（${entries.length}件）`:'';
+  if(!entries.length){root.innerHTML='<p class="muted">改良履歴はまだ登録されていません。</p>';return;}
+  root.innerHTML=entries.map(e=>{
+    const changes=Array.isArray(e.changes)&&e.changes.length
+      ?`<ul class="prompt-change-list">${e.changes.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`
+      :'<p class="prompt-history-empty">この版の具体的な改良点は履歴導入時点では未登録です。</p>';
+    const note=e.history_note?`<p class="prompt-history-note">${esc(e.history_note)}</p>`:'';
+    const reason=e.reason?`<p class="prompt-history-reason"><b>改良理由：</b>${esc(e.reason)}</p>`:'';
+    const path=e.path?`<a class="prompt-file-link" href="${esc(encodeURI(`https://github.com/toodataa-ai/keiba-notes/blob/main/${e.path}`))}" target="_blank" rel="noopener">プロンプト本文を見る</a>`:'';
+    const latest=e.version===prompt?.version?'<span class="prompt-latest">最新版</span>':'';
+    return `<article class="prompt-history-item">
+      <div class="prompt-history-head"><div><span class="prompt-version">${esc(e.version||'—')}</span>${latest}<span class="prompt-history-date">${esc(e.date||'')}</span></div>${path}</div>
+      <p class="prompt-history-summary">${esc(e.summary||'')}</p>
+      ${changes}${reason}${note}
+    </article>`;
+  }).join('');
+}
+
 async function load(){
-  const [raceRes,promptRes]=await Promise.all([
+  const [raceRes,promptRes,historyRes]=await Promise.all([
     fetch('data/races.json',{cache:'no-store'}),
-    fetch('data/latest_prompt.json',{cache:'no-store'})
+    fetch('data/latest_prompt.json',{cache:'no-store'}),
+    fetch('data/prompt_history.json',{cache:'no-store'})
   ]);
   const db=await raceRes.json();
   const prompt=await promptRes.json();
+  const history=historyRes.ok?await historyRes.json():{entries:[]};
   document.getElementById('promptBadge').textContent=`最新版プロンプト ${prompt.version}`;
+  renderPromptHistory(history,prompt);
 
   const allRaces=(db.races||[]).filter(r=>r.scope==='jra-main');
   const periodMode=document.getElementById('periodMode');
