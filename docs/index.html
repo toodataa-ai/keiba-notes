@@ -3,27 +3,48 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Keiba Forecast Archive</title>
+  <title>JRAメイン予想・成績アーカイブ</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">KEIBA NOTES</p>
-      <h1>競馬予想・成績アーカイブ</h1>
-      <p class="lead">予想時点の印・PDF・レース結果・回顧・使用プロンプト版を時系列で保存します。</p>
+      <p class="eyebrow">KEIBA NOTES / JRA MAIN RACES</p>
+      <h1>JRAメイン予想・成績アーカイブ</h1>
+      <p class="lead">JRA中央競馬の各開催日メインレースだけを対象に、予想・PDF・結果・回顧・使用プロンプト版を保存します。海外競馬・地方競馬は成績集計と改善学習の対象外です。</p>
       <div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="stats" aria-label="累計成績">
-      <article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article>
-      <article><span class="label">◎勝率</span><strong id="statWinRate">—</strong></article>
-      <article><span class="label">◎複勝率</span><strong id="statPlaceRate">—</strong></article>
-      <article><span class="label">馬券的中率</span><strong id="statTicketRate">—</strong></article>
-      <article><span class="label">回収率</span><strong id="statROI">—</strong></article>
+    <section class="period-panel">
+      <div>
+        <p class="eyebrow dark">PERIOD</p>
+        <h2>集計期間</h2>
+      </div>
+      <div class="period-controls">
+        <select id="periodMode" aria-label="期間単位">
+          <option value="all">全期間</option>
+          <option value="year">年別</option>
+          <option value="month">月別</option>
+          <option value="week">開催週別</option>
+        </select>
+        <select id="periodValue" aria-label="期間" disabled>
+          <option value="all">全期間</option>
+        </select>
+      </div>
+      <p id="periodLabel" class="period-label">全期間</p>
     </section>
+
+    <section class="stats" aria-label="期間成績">
+      <article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article>
+      <article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article>
+      <article><span class="label">回収率</span><strong id="statROI">—</strong></article>
+      <article><span class="label">収支</span><strong id="statProfit">—</strong></article>
+      <article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article>
+    </section>
+
+    <section id="legacyNote" class="legacy-note" hidden></section>
 
     <section class="section-head">
       <div>
@@ -34,7 +55,7 @@
         <select id="statusFilter" aria-label="状態で絞り込み">
           <option value="all">すべて</option>
           <option value="predicted">予想済み</option>
-          <option value="reviewed">回顧済み</option>
+          <option value="reviewed">回顧・成績確定</option>
         </select>
       </div>
     </section>
@@ -43,7 +64,7 @@
   </main>
 
   <footer class="wrap footer">
-    <p>STEP1の印確定後にSTEP2でオッズ評価を行い、結果確定後に回顧を追記します。</p>
+    <p>対象はJRAメインレースのみ。土日だけでなく、祝日月曜などJRA開催がある日は同じ運用で集計します。</p>
   </footer>
   <script src="assets/app.js"></script>
 </body>
