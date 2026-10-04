@@ -1,0 +1,33 @@
+name: Validate prompt history
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - '競馬予想_完全版プロンプト_*.txt'
+      - '.github/scripts/validate-prompt-history.mjs'
+      - '.github/workflows/validate-prompt-history.yml'
+  pull_request:
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - '競馬予想_完全版プロンプト_*.txt'
+      - '.github/scripts/validate-prompt-history.mjs'
+      - '.github/workflows/validate-prompt-history.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate latest prompt and history
+        run: node .github/scripts/validate-prompt-history.mjs
