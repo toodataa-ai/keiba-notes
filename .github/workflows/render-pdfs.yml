@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'docs/reports/**.html'
+      - 'docs/full-reports/**'
+      - 'docs/data/races.json'
       - 'docs/assets/**'
       - '.github/scripts/render-pdfs.mjs'
       - '.github/workflows/render-pdfs.yml'
@@ -36,23 +38,25 @@ jobs:
           npm init -y
           npm install playwright
           npx playwright install --with-deps chromium
-      - name: Render PDFs
+      - name: Restore, validate and render complete reports
         run: node .github/scripts/render-pdfs.mjs
-      - name: Commit generated PDFs safely
+      - name: Commit complete reports and PDFs safely
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -rf /tmp/generated-pdfs
-          mkdir -p /tmp/generated-pdfs
+          rm -rf /tmp/generated-reports /tmp/generated-pdfs
+          mkdir -p /tmp/generated-reports /tmp/generated-pdfs
+          cp -a docs/reports/. /tmp/generated-reports/
           cp -a docs/pdfs/. /tmp/generated-pdfs/
           git fetch origin main
           git reset --hard origin/main
-          mkdir -p docs/pdfs
+          mkdir -p docs/reports docs/pdfs
+          cp -a /tmp/generated-reports/. docs/reports/
           cp -a /tmp/generated-pdfs/. docs/pdfs/
-          git add docs/pdfs
+          git add docs/reports docs/pdfs
           if git diff --cached --quiet; then
-            echo "No PDF changes"
+            echo "No complete report/PDF changes"
           else
-            git commit -m "Render prediction PDFs"
+            git commit -m "Render complete prediction reports and PDFs"
             git push origin HEAD:main
           fi
