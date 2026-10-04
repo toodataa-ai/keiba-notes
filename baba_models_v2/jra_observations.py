@@ -144,10 +144,11 @@ def _numbers_after(line: str, marker: str) -> list[float]:
 
 def _legacy_rows(text: str, *, year: int, track: str, meeting: int, source_url: str) -> list[Observation]:
     text = norm(text)
-    # Locate each date-range block. Both "1月25日から27日" and cross-month forms are accepted.
+    # Legacy JRA PDFs used both "...日の含水率" and "...日の気象状況" for the
+    # same moisture table layout. Cross-month ranges are also supported.
     range_re = re.compile(
         r"(?P<year>\d{4})年\s*(?P<sm>\d{1,2})月\s*(?P<sd>\d{1,2})日から"
-        r"(?:(?P<em>\d{1,2})月)?\s*(?P<ed>\d{1,2})日の含水率"
+        r"(?:(?P<em>\d{1,2})月)?\s*(?P<ed>\d{1,2})日の(?:含水率|気象状況)"
     )
     matches = list(range_re.finditer(text))
     rows: list[Observation] = []
