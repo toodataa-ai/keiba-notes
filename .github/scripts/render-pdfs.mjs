@@ -125,6 +125,12 @@ function validateFullReport(race) {
 
 for (const race of races) validateFullReport(race);
 
+const rendererVersion = execFileSync('python3', ['-m', 'weasyprint', '--version'], { encoding: 'utf8' }).trim();
+if (!rendererVersion.includes('68.0')) {
+  throw new Error(`Official PDF renderer must be WeasyPrint 68.0; found: ${rendererVersion}`);
+}
+console.log(`Using canonical renderer: ${rendererVersion}`);
+
 function pdfPageCount(pdfPath) {
   const info = execFileSync('pdfinfo', [pdfPath], { encoding: 'utf8' });
   const match = info.match(/^Pages:\s+(\d+)/m);
@@ -139,8 +145,16 @@ if (!files.length) {
 }
 
 for (const file of files) {
+  const slug = file.replace(/\.html$/, '');
+  const race = racesById.get(slug);
+  if (!race?.pdf) {
+    console.log(`Skipping unmanaged report ${file}; existing PDF is left unchanged`);
+    continue;
+  }
+
   const reportPath = path.join(reportsDir, file);
-  const out = path.join(pdfDir, file.replace(/\.html$/, '.pdf'));
+  const out = path.resolve('docs', race.pdf);
+  fs.mkdirSync(path.dirname(out), { recursive: true });
 
   // The authored originals were rendered with WeasyPrint 68. Render the authored
   // HTML directly so its CSS colors, type sizes, tables and fixed A4 layout survive.
@@ -149,10 +163,8 @@ for (const file of files) {
     maxBuffer: 20 * 1024 * 1024
   });
 
-  const slug = file.replace(/\.html$/, '');
-  const race = racesById.get(slug);
   const renderedPages = pdfPageCount(out);
-  if (race?.full_report_pages && renderedPages !== race.full_report_pages) {
+  if (race.full_report_pages && renderedPages !== race.full_report_pages) {
     throw new Error(`${slug}: rendered PDF pages ${renderedPages} != expected ${race.full_report_pages}`);
   }
   console.log(`Rendered ${out} with WeasyPrint 68 (${renderedPages} pages)`);
