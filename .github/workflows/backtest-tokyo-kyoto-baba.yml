@@ -1,0 +1,74 @@
+name: Backtest Tokyo Kyoto baba data
+
+on:
+  pull_request:
+    paths:
+      - 'baba_models_v2/jra_observations.py'
+      - 'baba_models_v2/stage_a_baseline.py'
+      - 'baba_models_v2/validate_observations.py'
+      - 'baba_models_v2/test_jra_observations.py'
+      - '.github/workflows/backtest-tokyo-kyoto-baba.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect-and-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check pytest requests beautifulsoup4 pypdf
+      - name: Test old and new JRA PDF formats
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_jra_observations.py
+      - name: Collect Tokyo official observations 2018-2026
+        run: python baba_models_v2/jra_observations.py --track tokyo --from-year 2018 --to-year 2026 --output tmp/baba/tokyo_observations.csv
+      - name: Validate Tokyo observations
+        run: python baba_models_v2/validate_observations.py --input tmp/baba/tokyo_observations.csv --track tokyo --min-rows 100 --min-race-days 60
+      - name: Collect Kyoto current-regime observations 2023-2026
+        run: python baba_models_v2/jra_observations.py --track kyoto --from-year 2023 --to-year 2026 --output tmp/baba/kyoto_observations.csv
+      - name: Validate Kyoto observations
+        run: python baba_models_v2/validate_observations.py --input tmp/baba/kyoto_observations.csv --track kyoto --min-rows 60 --min-race-days 40
+      - name: Build persistence baselines
+        run: |
+          for track in tokyo kyoto; do
+            for surface in turf dirt; do
+              python baba_models_v2/stage_a_baseline.py \
+                --input tmp/baba/${track}_observations.csv \
+                --surface ${surface} \
+                --metrics tmp/baba/${track}_${surface}_baseline_metrics.json \
+                --pairs tmp/baba/${track}_${surface}_baseline_pairs.csv
+            done
+          done
+      - name: Write collection manifest
+        run: |
+          python - <<'PY'
+          import csv, json
+          from pathlib import Path
+          root=Path('tmp/baba')
+          manifest={'schema_version':1,'generated_by':'backtest-tokyo-kyoto-baba.yml','datasets':{}}
+          for track in ('tokyo','kyoto'):
+              p=root/f'{track}_observations.csv'
+              rows=list(csv.DictReader(p.open(encoding='utf-8')))
+              manifest['datasets'][track]={
+                  'rows':len(rows),
+                  'race_days':sum(r['race_day'].lower() in {'true','1'} for r in rows),
+                  'date_from':min(r['observed_date'] for r in rows),
+                  'date_to':max(r['observed_date'] for r in rows),
+                  'source_formats':sorted(set(r['source_format'] for r in rows)),
+                  'meetings':len(set((r['year'],r['meeting']) for r in rows)),
+              }
+          (root/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(manifest,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokyo-kyoto-baba-observations
+          path: tmp/baba
+          if-no-files-found: error
+          retention-days: 30
