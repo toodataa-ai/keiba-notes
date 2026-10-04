@@ -103,14 +103,14 @@ async function load(){
     if(!rows.length){root.innerHTML='<p class="muted">該当するJRAメイン予想はありません。</p>';return;}
     root.innerHTML=rows.map(r=>{
       const p=r.performance;
-      const result=p?`<div class="result-box"><b>${r.result?.summary?esc(r.result.summary):'成績確定'}</b><br>馬券: ${p.ticket_hit?'的中':'不的中'} / 投資 ${yen(Number(p.stake_yen||0))} / 払戻 ${yen(Number(p.payout_yen||0))} / 収支 <span class="${Number(p.profit_yen)>0?'positive':Number(p.profit_yen)<0?'negative':''}">${yen(Number(p.profit_yen??(Number(p.payout_yen||0)-Number(p.stake_yen||0))))}</span></div>`:'';
+      const result=p?`<details class="result-disclosure"><summary>結果を見る</summary><div class="result-box"><b>${r.result?.summary?esc(r.result.summary):'成績確定'}</b><br>馬券: ${p.ticket_hit?'的中':'不的中'} / 投資 ${yen(Number(p.stake_yen||0))} / 払戻 ${yen(Number(p.payout_yen||0))} / 収支 <span class="${Number(p.profit_yen)>0?'positive':Number(p.profit_yen)<0?'negative':''}">${yen(Number(p.profit_yen??(Number(p.payout_yen||0)-Number(p.stake_yen||0))))}</span></div></details>`:'';
       const marks=r.marks?`<div class="marks"><span class="mark"><b>◎</b>${esc(r.marks.win||'—')}</span><span class="mark"><b>○</b>${esc(r.marks.second||'—')}</span><span class="mark"><b>▲</b>${esc(r.marks.third||'—')}</span></div>`:'';
       const links=[];
-      if(r.report) links.push(`<a class="btn" href="${encodeURI(r.report)}">予想・回顧を見る</a>`);
+      if(r.report) links.push(`<a class="btn" href="${encodeURI(r.report)}">予想詳細を見る</a>`);
       if(r.pdf) links.push(`<a class="btn secondary" href="${encodeURI(r.pdf)}">PDF</a>`);
       const actions=links.length?`<div class="actions">${links.join('')}</div>`:`<div class="legacy-source">過去の成績一覧から移行した記録</div>`;
       return `<article class="race-card">
-        <div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race)}</h3></div><span class="status ${r.status==='reviewed'?'reviewed':''}">${r.status==='reviewed'?'成績確定':'予想済み'}</span></div>
+        <div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race)}</h3></div><span class="status ${r.status==='reviewed'?'reviewed':''}">${r.status==='reviewed'?'結果登録済み':'予想済み'}</span></div>
         ${marks}${result}${actions}
       </article>`;
     }).join('');
