@@ -36,15 +36,19 @@
       <p id="periodLabel" class="period-label">全期間</p>
     </section>
 
-    <section class="stats" aria-label="期間成績">
-      <article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article>
-      <article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article>
-      <article><span class="label">回収率</span><strong id="statROI">—</strong></article>
-      <article><span class="label">収支</span><strong id="statProfit">—</strong></article>
-      <article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article>
-    </section>
-
-    <section id="legacyNote" class="legacy-note" hidden></section>
+    <details class="performance-disclosure">
+      <summary>この期間の成績を見る</summary>
+      <div class="performance-body">
+        <section class="stats" aria-label="期間成績">
+          <article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article>
+          <article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article>
+          <article><span class="label">回収率</span><strong id="statROI">—</strong></article>
+          <article><span class="label">収支</span><strong id="statProfit">—</strong></article>
+          <article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article>
+        </section>
+        <section id="legacyNote" class="legacy-note" hidden></section>
+      </div>
+    </details>
 
     <section class="section-head">
       <div>
