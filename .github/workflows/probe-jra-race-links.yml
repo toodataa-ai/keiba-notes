@@ -3,6 +3,7 @@ name: Probe JRA race links
 on:
   push:
     branches: ['feature/tokyo-kyoto-stage-b-labels-v1']
+  pull_request:
   workflow_dispatch:
 
 permissions:
