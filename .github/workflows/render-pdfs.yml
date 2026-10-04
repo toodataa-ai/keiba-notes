@@ -13,11 +13,17 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: render-pdfs-main
+  cancel-in-progress: false
+
 jobs:
   render:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -37,5 +43,6 @@ jobs:
             echo "No PDF changes"
           else
             git commit -m "Render prediction PDFs"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
