@@ -1,12 +1,22 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "updated_at": "2026-10-04T15:34:00+09:00",
+  "policy": {
+    "required_on_prompt_update": true,
+    "required_fields": ["version", "date", "path", "summary", "changes", "reason"],
+    "rule": "Whenever the canonical prediction prompt is improved or its version changes, append a history entry in the same update. Record what changed and why. Do not overwrite old entries.",
+    "display": "The GitHub Pages archive reads this file and shows the history to users."
+  },
   "entries": [
     {
       "version": "v2.8",
       "date": "2026-10-03",
       "path": "競馬予想_完全版プロンプト_v2.8.txt",
       "source": "baseline",
-      "summary": "Web archive automation baseline. v2.8 remains the canonical prediction prompt."
+      "summary": "プロンプト改良履歴の管理開始時点における基準版。v2.8を現行の正式プロンプトとして登録。",
+      "changes": [],
+      "reason": "今後のプロンプト改良内容を版ごとに追跡・参照できるようにするため、既存のv2.8を履歴の起点として登録。",
+      "history_note": "v2.8以前の各版については、今回の履歴機能導入時点では改良点の詳細を遡及登録していません。次回の版更新から、具体的な変更点を必ずchangesに記録します。"
     }
   ]
 }
