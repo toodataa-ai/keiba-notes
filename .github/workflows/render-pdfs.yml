@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'docs/reports/**.html'
+      - 'docs/styled-report-sources/**'
       - 'docs/full-reports/**'
       - 'docs/data/races.json'
       - 'docs/assets/**'
@@ -30,17 +31,18 @@ jobs:
         run: |
           git fetch origin main
           git reset --hard origin/main
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: '22'
-      - name: Install Playwright
+          python-version: '3.12'
+      - name: Install canonical PDF renderer
         run: |
-          npm init -y
-          npm install playwright
-          npx playwright install --with-deps chromium
-      - name: Restore, validate and render complete reports
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk poppler-utils
+          python3 -m pip install 'weasyprint==68.0'
+          python3 -m weasyprint --version
+      - name: Restore, validate and render authored reports
         run: node .github/scripts/render-pdfs.mjs
-      - name: Commit complete reports and PDFs safely
+      - name: Commit authored reports and PDFs safely
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -55,8 +57,8 @@ jobs:
           cp -a /tmp/generated-pdfs/. docs/pdfs/
           git add docs/reports docs/pdfs
           if git diff --cached --quiet; then
-            echo "No complete report/PDF changes"
+            echo "No authored report/PDF changes"
           else
-            git commit -m "Render complete prediction reports and PDFs"
+            git commit -m "Render authored prediction reports and PDFs"
             git push origin HEAD:main
           fi
