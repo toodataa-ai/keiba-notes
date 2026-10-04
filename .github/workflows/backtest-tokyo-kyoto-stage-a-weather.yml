@@ -6,6 +6,7 @@ on:
       - 'baba_models_v2/jma_weather.py'
       - 'baba_models_v2/test_jma_weather.py'
       - 'baba_models_v2/stage_a_weather_model.py'
+      - 'baba_models_v2/stage_a_guardrail.py'
       - '.github/workflows/backtest-tokyo-kyoto-stage-a-weather.yml'
   workflow_dispatch:
 
@@ -48,34 +49,51 @@ jobs:
                 --weather tmp/stage_a/${track}_weather.csv \
                 --metrics tmp/stage_a/${track}_${surface}_weather_metrics.json \
                 --predictions tmp/stage_a/${track}_${surface}_weather_predictions.csv
+              python baba_models_v2/stage_a_guardrail.py \
+                --input tmp/stage_a/${track}_${surface}_weather_predictions.csv \
+                --metrics tmp/stage_a/${track}_${surface}_guard_metrics.json \
+                --output tmp/stage_a/${track}_${surface}_guard_predictions.csv
             done
           done
-      - name: Summarize baseline improvements
+      - name: Summarize guarded baseline improvements
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           root=Path('tmp/stage_a')
-          summary={'schema_version':1,'model':'ridge-delta-v0.1','results':{}}
+          def imp(base,model):
+              return None if base in (None,0) or model is None else (base-model)/base*100
+          summary={'schema_version':2,'model':'ridge-delta-v0.1 + training-envelope-guard','results':{}}
           for track in ('tokyo','kyoto'):
               summary['results'][track]={}
               for surface in ('turf','dirt'):
-                  data=json.loads((root/f'{track}_{surface}_weather_metrics.json').read_text(encoding='utf-8'))
-                  forward=data['backtest']['forward']
-                  loyo=data['backtest']['loyo']
+                  raw=json.loads((root/f'{track}_{surface}_weather_metrics.json').read_text(encoding='utf-8'))
+                  guard=json.loads((root/f'{track}_{surface}_guard_metrics.json').read_text(encoding='utf-8'))
+                  f=guard['forward']; l=guard['loyo']
+                  fb=f['all']['baseline']; fm=f['all']['guarded_model']; fw=f['wet']
+                  lb=l['all']['baseline']; lm=l['all']['guarded_model']
                   summary['results'][track][surface]={
-                      'usable_pairs':data['audit']['usable_pairs'],
-                      'forward_n':forward['model']['n'],
-                      'forward_mae':forward['model']['mae'],
-                      'forward_baseline_mae':forward['baseline']['mae'],
-                      'forward_mae_improvement_pct':forward['mae_improvement_vs_baseline_pct'],
-                      'forward_rmse_improvement_pct':forward['rmse_improvement_vs_baseline_pct'],
-                      'forward_wet_n':forward['wet']['model']['n'],
-                      'forward_wet_mae':forward['wet']['model']['mae'],
-                      'forward_wet_baseline_mae':forward['wet']['baseline']['mae'],
-                      'loyo_mae':loyo['model']['mae'],
-                      'loyo_baseline_mae':loyo['baseline']['mae'],
-                      'loyo_mae_improvement_pct':loyo['mae_improvement_vs_baseline_pct'],
+                      'usable_pairs':raw['audit']['usable_pairs'],
+                      'feature_cutoff_local':raw['audit']['feature_cutoff_local'],
+                      'forward_n':fm['n'],
+                      'forward_mae':fm['mae'],
+                      'forward_rmse':fm['rmse'],
+                      'forward_within_1_0pt':fm['within_1_0pt'],
+                      'forward_max_abs_error':fm['max_abs_error'],
+                      'forward_baseline_mae':fb['mae'],
+                      'forward_baseline_rmse':fb['rmse'],
+                      'forward_mae_improvement_pct':imp(fb['mae'],fm['mae']),
+                      'forward_rmse_improvement_pct':imp(fb['rmse'],fm['rmse']),
+                      'forward_wet_n':fw['guarded_model']['n'],
+                      'forward_wet_mae':fw['guarded_model']['mae'],
+                      'forward_wet_baseline_mae':fw['baseline']['mae'],
+                      'guardrail_applied_forward':f['guardrail_applied'],
+                      'loyo_n':lm['n'],
+                      'loyo_mae':lm['mae'],
+                      'loyo_rmse':lm['rmse'],
+                      'loyo_baseline_mae':lb['mae'],
+                      'loyo_mae_improvement_pct':imp(lb['mae'],lm['mae']),
+                      'guardrail_applied_loyo':l['guardrail_applied'],
                   }
           (root/'summary.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           print(json.dumps(summary,ensure_ascii=False,indent=2))
