@@ -11,6 +11,14 @@
   <link rel="stylesheet" href="assets/brand.css?v=20261005-logo1">
   <link rel="stylesheet" href="assets/schedule.css?v=20261005-schedule1">
   <link rel="stylesheet" href="assets/disclosure.css?v=20261005-collapse1">
+  <style>
+    .hero-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px;max-width:760px}
+    .hero-nav-link{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border-radius:10px;background:#fff;color:#17212b;font-weight:700;text-decoration:none;box-sizing:border-box}
+    .hero-nav-label{display:flex;align-items:center;gap:8px;min-width:0}
+    .hero-nav-new{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#d8b35a;color:#17212b;font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1}
+    .hero-nav-arrow{flex:0 0 auto;font-weight:500}
+    @media(max-width:640px){.hero-nav{grid-template-columns:1fr;max-width:none}.hero-nav-link{width:100%;min-height:54px}}
+  </style>
 </head>
 <body>
   <header class="hero">
@@ -19,11 +27,11 @@
       <h1 class="brand-title brand-lockup" aria-label="競馬予想精度向上AI"><span class="brand-track" aria-hidden="true"></span><span class="brand-word">競馬予想精度向上</span><span class="brand-ai">AI</span></h1>
       <p class="brand-subtitle">予想・検証・改善を繰り返し、予測精度を高める。</p>
       <p class="lead">JRA中央競馬の各開催日メインレースだけを対象に、AIによる予想・PDF・結果・回顧・使用プロンプト版を保存し、検証結果を次の予測へ反映します。海外競馬・地方競馬は成績集計と改善学習の対象外です。</p>
-      <nav aria-label="仕組み・検証ページ" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px">
-        <a href="roadmap.html" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#d8b35a;color:#17212b;font-weight:800;text-decoration:none">今後のブラッシュアップ思想 →</a>
-        <a href="methodology.html" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#fff;color:#17212b;font-weight:700;text-decoration:none">予想ロジックと検証思想 →</a>
-        <a href="baba-models.html" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#fff;color:#17212b;font-weight:700;text-decoration:none">馬場予測モデル・根拠 →</a>
-        <a href="e2e.html" style="display:inline-block;padding:10px 14px;border-radius:10px;background:#fff;color:#17212b;font-weight:700;text-decoration:none">E2E検証を見る →</a>
+      <nav class="hero-nav" aria-label="仕組み・検証ページ">
+        <a class="hero-nav-link" href="roadmap.html"><span class="hero-nav-label"><span class="hero-nav-new">NEW</span><span>今後のブラッシュアップ思想</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="methodology.html"><span class="hero-nav-label"><span>予想ロジックと検証思想</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="baba-models.html"><span class="hero-nav-label"><span>馬場予測モデル・根拠</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="e2e.html"><span class="hero-nav-label"><span>E2E検証を見る</span></span><span class="hero-nav-arrow">→</span></a>
       </nav>
 
       <section class="improvement-cycle" aria-labelledby="cycleTitle">
