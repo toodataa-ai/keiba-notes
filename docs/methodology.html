@@ -6,7 +6,7 @@
   <meta name="description" content="競馬予想精度向上AIが、馬場・展開・上がり・能力・期待値をどう分解し、発走前スナップショットとE2E検証で改善しているかを解説します。">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>予想ロジックと検証思想 | 競馬予想精度向上AI</title>
-  <link rel="stylesheet" href="assets/methodology.css?v=20261006-1">
+  <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
 </head>
 <body>
 <header class="method-hero">
@@ -31,13 +31,15 @@
 <main class="wrap article">
   <section class="toc" aria-labelledby="tocTitle">
     <h2 id="tocTitle">このページの読み方</h2>
+    <p class="toc-note">競馬以外の統計・AI・開発用語は、初出で短く説明します。分からない言葉は <a href="#glossary">用語集</a> から引けます。</p>
     <div class="toc-grid">
       <a href="#philosophy">01　強さと買いやすさを分ける</a><a href="#axes">02　①〜⑨を分解して見る</a>
       <a href="#track">03　馬場は「良・稍重」だけではない</a><a href="#time">04　時計をそのまま比べない</a>
       <a href="#aci">05　33秒台を盲信しない ACI</a><a href="#repro">06　「ムラ馬」を心理で決めつけない</a>
       <a href="#uncertainty">07　展開と不確実性を扱う</a><a href="#betting">08　強い馬と買う馬を分ける</a>
       <a href="#e2e">09　後出しを防ぐE2E検証</a><a href="#improve">10　改善そのものを管理する</a>
-      <a href="#limits">11　まだ解けていない問題</a><a href="#links">12　実データを見る</a>
+      <a href="#limits">11　まだ解けていない問題</a><a href="#glossary">12　用語集</a>
+      <a href="#links">13　実データを見る</a>
     </div>
   </section>
 
@@ -74,18 +76,18 @@
     <div class="question">同じ「稍重」なのに、なぜ高速決着の日と消耗戦の日があるのか？</div>
     <p class="answer">含水量だけでは馬場の反発や傷み方を説明できないからです。そこで芝では、公式の良・稍重・重・不良に加えて、内部的に「高速乾燥型」「標準型」「高速湿潤型」「低反発湿潤型」「掘れ・荒れ型」を考えます。</p>
     <div class="flow" aria-label="馬場予測フロー">
-      <div class="flow-step"><small>STAGE A</small><b>朝の状態を予測</b><br>前日含水率・降雨・気象から推定</div><div class="flow-arrow">→</div>
-      <div class="flow-step"><small>OFFICIAL ANCHOR</small><b>JRA実測で更新</b><br>当日含水率・クッション値</div><div class="flow-arrow">→</div>
-      <div class="flow-step"><small>STAGE B</small><b>発走時へ更新</b><br>雨・乾燥時間・風・日照を反映</div><div class="flow-arrow">→</div>
+      <div class="flow-step"><small>STAGE A</small><b>朝の状態を予測</b><br>前日含水率・降雨・気象から当日朝を推定する段階</div><div class="flow-arrow">→</div>
+      <div class="flow-step"><small>OFFICIAL ANCHOR</small><b>JRA実測で更新</b><br>当日含水率・クッション値を基準点にする</div><div class="flow-arrow">→</div>
+      <div class="flow-step"><small>STAGE B</small><b>発走時へ更新</b><br>朝の実測から雨・乾燥時間・風・日照で発走時を推定</div><div class="flow-arrow">→</div>
       <div class="flow-step"><small>RACE-DAY EVIDENCE</small><b>当日実戦で監査</b><br>時計・位置・進路を分離</div>
     </div>
-    <p>さらに「高速＝前有利」とも決めません。<strong>時計速度、位置取り、進路</strong>を別変数として扱います。高速馬場でも差しが届く日はあり、低速馬場でも前が止まらない日はあります。</p>
+    <p>さらに「高速＝前有利」とも決めません。<strong>時計速度、位置取り、進路</strong>を別変数として扱います。ここでいう<strong>バイアス</strong>は「その日の馬場で、どんな位置・進路・時計の出方が有利だったかという偏り」のことです。高速馬場でも差しが届く日はあり、低速馬場でも前が止まらない日はあります。</p>
     <div class="data-note"><strong>ここがポイント：</strong>馬場状態を1個のラベルに圧縮しないこと。水分、反発、走行による傷み、当日のレース傾向を分けることで、「稍重」の中身を読むことを目指します。</div>
   </section>
 
   <section class="chapter anchor" id="time">
     <div class="chapter-head"><div class="chapter-no">04</div><div><h2>1分45秒0と1分45秒5。速い方が上とは限らない</h2><p class="chapter-lead">時計は条件を揃えて初めて意味を持ちます。</p></div></div>
-    <p class="answer">競馬場、走路、距離、馬場、当日の時計速度、斤量、ペース、位置取り、相手関係が違う生時計をそのまま並べると、簡単に誤判定します。そのため本システムは「同条件直接実績」をまず抽出し、その上で近似条件をまとめた内部指標「類似条件Time Index」を使います。</p>
+    <p class="answer">競馬場、走路、距離、馬場、当日の時計速度、斤量、ペース、位置取り、相手関係が違う生時計をそのまま並べると、簡単に誤判定します。そのため本システムは「同条件直接実績」をまず抽出し、その上で近似条件をまとめた内部指標 <a class="term" href="#term-time-index">「類似条件Time Index」</a> を使います。これは、条件差をならして「その走りがどの程度の水準だったか」を比較しやすくするための内部時計評価です。</p>
     <div class="example-grid">
       <div class="example warn"><h3>生時計だけなら</h3><p>A馬：東京芝1800m 1:44.8</p><p>B馬：中山芝1800m 1:45.4</p><p class="micro">→ A馬が0.6秒速い、と言いたくなる。</p></div>
       <div class="example good"><h3>条件を分解すると</h3><p>A馬：高速馬場・軽斤量・スロー</p><p>B馬：低速馬場・重斤量・前傾戦</p><p class="micro">→ B馬の方が内容的に高水準という可能性がある。</p></div>
@@ -94,13 +96,13 @@
   </section>
 
   <section class="chapter anchor" id="aci">
-    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>上がり33.1秒を見ても、すぐには褒めない</h2><p class="chapter-lead">補正上がり3F指数 ACI は、「その状況で期待以上の脚を使ったか」を見ます。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>上がり33.1秒を見ても、すぐには褒めない</h2><p class="chapter-lead"><a class="term" href="#term-aci">ACI（Adjusted Closing Index / 補正上がり3F指数）</a>は、「その状況で期待以上の脚を使ったか」を見る本プロジェクト独自の指標です。</p></div></div>
     <div class="question">後方から上がり最速33.1秒の8着と、4角2番手から33.6秒の1着。末脚が強いのはどちら？</div>
-    <p class="answer">絶対時計だけでは答えられません。後方待機は道中で脚を温存しやすく、前で競馬した馬は早い段階から負荷を受けています。ACIは、同一レース内の上がり平均との差をロバストに標準化し、さらに4角位置による脚の温存差を補正して、末脚の「内容」を比較します。</p>
+    <p class="answer">絶対時計だけでは答えられません。後方待機は道中で脚を温存しやすく、前で競馬した馬は早い段階から負荷を受けています。ACIは、同一レース内の上がり平均との差を<strong>外れ値の影響を受けにくい方法で標準化</strong>し、さらに4角位置による脚の温存差を補正して、末脚の「内容」を比較します。</p>
     <div class="formula"><span class="dim">考え方：</span><br>ACI ≒ レース内での相対上がり性能 ＋ 4角位置補正<br><span class="dim">代表値：</span> 単発MAXではなく、原則として直近3走ACI中央値</div>
-    <p>さらに、競馬場・走路・距離帯によって、末脚に求められる性質が違うことも解釈します。現在は <b>sharp_closing</b>（鋭い末脚寄り）、<b>balanced</b>、<b>sustained_position</b>（位置・持続力寄り）の3タイプを使います。</p>
+    <p>さらに、競馬場・走路・距離帯によって、末脚に求められる性質が違うことも解釈します。現在は <b>sharp_closing</b>（鋭い末脚寄り）、<b>balanced</b>（中間型）、<b>sustained_position</b>（位置・持続力寄り）の3タイプを使います。</p>
     <div class="myth"><div class="myth-title">重要：sustained_position ≠ 遅い上がりほど偉い</div><div class="myth-body">「上がりがかかるコースだから35秒台を高評価する」という意味ではありません。鋭い上がりの比重を下げ、前半の負荷を受けながら止まりにくかったか、位置を取りながら持続できたかを相対的に重く見る、という意味です。</div></div>
-    <div class="data-note"><strong>バックテスト：</strong>ACI系の検証は2015〜2018年をfit、2019〜2021年を次走testとして、7,740レース・105,423走で実施。直近3走ACI中央値は次走Top3判別AUC 0.6611、ACI1位馬の次走勝率17.73%を記録しました。一方、コース需要型で機械的に置換する方式は悪化したため不採用にしています。</div>
+    <div class="data-note"><strong>バックテスト：</strong>ACI系の検証は2015〜2018年をfit（係数などを決める学習期間）、2019〜2021年をtest（学習に使わず性能を確かめる検証期間）として、7,740レース・105,423走で実施。直近3走ACI中央値は次走Top3判別 <a class="term" href="#term-auc">AUC</a> 0.6611、ACI1位馬の次走勝率17.73%を記録しました。AUCは0.5前後ならランダムに近く、1.0に近いほど順位付けの識別力が高い指標です。一方、コース需要型で機械的に置換する方式は悪化したため不採用にしています。</div>
   </section>
 
   <section class="chapter anchor" id="repro">
@@ -118,7 +120,7 @@
     <p class="answer">発走時馬場は「良100%」のように決め打ちせず、良・稍重・重・不良の確率を合計100%で持ちます。展開もS/M/M-H/Hで整理し、ハナ必須馬、番手可、譲歩可能性、競り合い確率を明示します。</p>
     <div class="formula">例：発走時馬場予測<br>良 55% / 稍重 35% / 重 9% / 不良 1%<br><span class="dim">→ 本線は良でも、稍重シナリオを捨てない。</span></div>
     <p>ここで大事なのが「未知＝不適性」にしないことです。初コース、初距離、初馬場は情報不足であって、弱い証拠ではありません。未知は主に再現信頼度へ反映し、経験がないだけで能力を大幅に下げないようにします。</p>
-    <div class="myth"><div class="myth-title">現在の課題</div><div class="myth-body">馬場は確率分布まで進んでいますが、展開はまだ完全な確率シナリオモデルにはなっていません。将来的にはS 15% / M 45% / M-H 30% / H 10%のように複数展開を重み付けし、各馬の「展開ロバスト性」を測る余地があります。</div></div>
+    <div class="myth"><div class="myth-title">現在の課題</div><div class="myth-body">馬場は確率分布まで進んでいますが、展開はまだ完全な確率シナリオモデルにはなっていません。将来的にはS 15% / M 45% / M-H 30% / H 10%のように複数展開を重み付けし、各馬の「展開ロバスト性（展開が多少変わっても評価が崩れにくい度合い）」を測る余地があります。</div></div>
   </section>
 
   <section class="chapter anchor" id="betting">
@@ -128,51 +130,74 @@
       <div class="layer"><h3>Layer 2　期待値追加</h3><p>条件一致馬、反発候補、直接実績がある低人気馬など、能力評価に対して市場価格がズレている候補を追加します。</p></div>
     </div>
     <p>つまり、<strong>「最も勝つ可能性が高い馬」と「最も買いたい馬」は別</strong>です。◎が1.5倍なら能力評価は◎のままでも、単勝は見送ることがあります。逆に△でも価格が十分に高ければ、買い目の相手として価値が出ることがあります。</p>
-    <div class="myth"><div class="myth-title">ただし、まだ「真のEVモデル」ではない</div><div class="myth-body">現状は想定勝率の厳密な校正モデルが未完成です。将来的に勝率・3着内率を校正できれば、EV = 推定確率 × オッズとして、馬連・ワイド・三連系までより定量的に評価できるようになります。</div></div>
+    <div class="myth"><div class="myth-title">ただし、まだ「真のEVモデル」ではない</div><div class="myth-body"><a class="term" href="#term-ev">EV（Expected Value / 期待値）</a>は、確率と配当を合わせた「長期的にどれくらい戻る見込みか」という考え方です。単勝なら概念上 <b>推定勝率 × オッズ</b> で見られ、1.0を上回れば理論上プラス期待です。現状は想定勝率の厳密な<a class="term" href="#term-calibration">確率校正</a>モデルが未完成なので、まだ完全な数理EVモデルではありません。</div></div>
   </section>
 
   <section class="chapter anchor" id="e2e">
-    <div class="chapter-head"><div class="chapter-no">09</div><div><h2>「結果を知ってから賢くなったAI」を防ぐ</h2><p class="chapter-lead">E2E検証の主役は精度指標より、まず“発走前に予想が存在した証拠”です。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">09</div><div><h2>「結果を知ってから賢くなったAI」を防ぐ</h2><p class="chapter-lead"><a class="term" href="#term-e2e">E2E（End-to-End）検証</a>は、情報収集→予想→買い目→結果→採点まで、予想システム全体を一本につないで検証する方法です。</p></div></div>
     <div class="question">新しいプロンプトを過去レースに使って当たった。それで改善したと言える？</div>
-    <p class="answer">言い切れません。過去レースを知っているモデルが、結果を完全に忘れて再予想したことを証明するのは難しいからです。そこで正式比較では、レース前に予想ファイルをGitHubへ保存し、そのコミットSHAをproofとして固定します。</p>
+    <p class="answer">言い切れません。過去レースを知っているモデルが、結果を完全に忘れて再予想したことを証明するのは難しいからです。そこで正式比較では、レース前に予想ファイルをGitHubへ保存し、そのコミットSHA（その時点の内容を一意に識別するID）をproofとして固定します。</p>
     <div class="proof-timeline">
-      <div class="proof-item"><b>1. 同じ発走前情報</b>比較する版に同じcutoffとソース集合を与える。</div>
-      <div class="proof-item"><b>2. 版ごとに予想</b>v3.0とv3.1をshadowで独立実行。</div>
-      <div class="proof-item"><b>3. Git proof</b>発走前コミットSHAで予想を凍結。</div>
+      <div class="proof-item"><b>1. 同じ発走前情報</b>比較する版に同じ<a class="term" href="#term-cutoff">cutoff</a>（情報を使ってよい締切時刻）とソース集合を与える。</div>
+      <div class="proof-item"><b>2. 版ごとに予想</b>v3.0とv3.1を<a class="term" href="#term-shadow">shadow</a>（公式予想に影響しない並走評価）で独立実行。</div>
+      <div class="proof-item"><b>3. Git proof</b>発走前コミットSHAで予想を凍結し、「レース前に存在した」ことを証明。</div>
       <div class="proof-item"><b>4. 結果を別結合</b>予想ファイルは編集せず、結果だけ別ファイルで追加。</div>
-      <div class="proof-item"><b>5. 同条件で採点</b>命中・順位・Brier・ROI等を共通計算。</div>
+      <div class="proof-item"><b>5. 同条件で採点</b>命中・順位・Brier Score・ROI等を共通計算。</div>
     </div>
     <div class="grade-grid">
-      <div class="grade grade-a"><strong>Grade A</strong><p>prospective_strict。発走前Git proofあり。正式な版比較・改善根拠。</p></div>
-      <div class="grade grade-b"><strong>Grade B</strong><p>historical_replay。過去レース後追い。研究材料には使うが昇格根拠には単独使用しない。</p></div>
-      <div class="grade grade-s"><strong>Synthetic</strong><p>計算器やCIの動作確認専用。競馬成績には数えない。</p></div>
+      <div class="grade grade-a"><strong>Grade A</strong><p><b>prospective_strict</b>。未来のレースを本当に発走前に保存し、Git proofがあるもの。正式な版比較・改善根拠に使います。</p></div>
+      <div class="grade grade-b"><strong>Grade B</strong><p><b>historical_replay</b>。過去レースを発走前情報だけで後から再現したもの。研究材料には使いますが、モデルが結果を既知の可能性があるため単独では昇格根拠にしません。</p></div>
+      <div class="grade grade-s"><strong>Synthetic</strong><p>人工データで計算器やCI（自動テスト）の動作を確認するもの。競馬成績には数えません。</p></div>
     </div>
-    <p>さらに、各プロンプト版が参照するbase promptやACI profile等をGit blob SHAで固定したmanifestを持ちます。これにより、同じ「v3.1」という名前のまま依存ファイルだけ後から変わることも検出できます。</p>
-    <div class="data-note"><strong>採点対象：</strong>◎勝率、◎3着内率、◎○▲のTop3捕捉、勝ち馬捕捉、STEP1順位、確率がある場合のBrier / Log Loss、馬場予測、展開予測、馬券ROI。ROIだけで優劣を決めないのも重要なルールです。</div>
+    <p>さらに、各プロンプト版が参照するbase promptやACI profile等をGit blob SHAで固定した<a class="term" href="#term-manifest">manifest</a>を持ちます。manifestは「この版がどのファイルの、どの内容を使ったか」を固定する部品表です。これにより、同じ「v3.1」という名前のまま依存ファイルだけ後から変わることも検出できます。</p>
+    <div class="data-note"><strong>採点対象：</strong>◎勝率、◎3着内率、◎○▲のTop3捕捉、勝ち馬捕捉、STEP1順位、確率がある場合の <a class="term" href="#term-brier">Brier Score</a> / <a class="term" href="#term-logloss">Log Loss</a>、馬場予測、展開予測、馬券<a class="term" href="#term-roi">ROI</a>。Brier Scoreは確率予測のズレを測り低いほど良く、Log Lossは「自信満々の外れ」を強く罰する指標です。ROIだけで優劣を決めないのも重要なルールです。</div>
   </section>
 
   <section class="chapter anchor" id="improve">
     <div class="chapter-head"><div class="chapter-no">10</div><div><h2>改善にも、暴走防止のルールがいる</h2><p class="chapter-lead">一度外れたから新ルールを足す、を繰り返すと過学習します。</p></div></div>
-    <p class="answer">そこで週次改善はA/B/Cの承認クラスで管理しています。変更の大きさと証拠の強さを分け、弱い根拠で評価思想を変えないようにします。</p>
+    <p class="answer"><a class="term" href="#term-overfit">過学習</a>とは、過去の特定レースに合わせすぎて、その過去には強いが新しいレースでは弱くなることです。そこで週次改善はA/B/Cの承認クラスで管理しています。変更の大きさと証拠の強さを分け、弱い根拠で評価思想を変えないようにします。</p>
     <div class="governance">
       <div class="gov"><span class="badge">A</span><h3>自動承認</h3><p>誤字、説明、監査強化、非破壊的な微調整、可視化。</p></div>
       <div class="gov"><span class="badge">B</span><h3>条件付き自動</h3><p>重み変更、新監査、モデル更新。複数レースやバックテスト等の再現性が必要。</p></div>
       <div class="gov"><span class="badge">C</span><h3>人間承認</h3><p>評価思想、STEP構造、大幅重み変更、トレードオフのある変更。</p></div>
     </div>
+    <div class="data-note"><strong>混同注意：</strong>ここでいう改善承認の「A/B/C」と、前章のE2Eデータ品質「Grade A / Grade B」は別制度です。前者は<strong>変更してよいか</strong>、後者は<strong>その検証データをどこまで信頼できるか</strong>を表します。</div>
     <p>もう一つの原則は、<strong>「改善履歴は増やす。実行プロンプトは増やし続けない」</strong>です。同じ意味のルールは追記せず統合・置換し、旧版は履歴として残します。プロンプト自体が巨大化して重要ルールが埋もれるのを防ぎます。</p>
-    <div class="formula"><span class="dim">改善サイクル</span><br>予想 → 発走前固定 → 結果 → 回顧 → 改善候補 → 証拠評価 → 新版 / no_change → 次レースで再検証</div>
+    <div class="formula"><span class="dim">改善サイクル</span><br>予想 → 発走前固定 → 結果 → 回顧 → 改善候補 → 証拠評価 → 新版 / no_change（変更なし） → 次レースで再検証</div>
   </section>
 
   <section class="chapter anchor" id="limits">
     <div class="chapter-head"><div class="chapter-no">11</div><div><h2>まだ解けていない問題も、公開する</h2><p class="chapter-lead">完成した予想法ではなく、検証可能な研究プロジェクトとして扱っています。</p></div></div>
     <div class="limits">
-      <div class="limit"><b>① ①〜⑨から勝率への変換が未校正</b>評価は精密でも、A+が勝率何%かはまだ統計的に固定されていません。これが次の大きな研究テーマです。</div>
+      <div class="limit"><b>① ①〜⑨から勝率への変換が未校正</b>評価は精密でも、A+が勝率何%かはまだ統計的に固定されていません。<a class="term" href="#term-calibration">Calibration（確率校正）</a>が次の大きな研究テーマです。</div>
       <div class="limit"><b>② 展開の確率分布が未完成</b>S/M/M-H/Hは使っていますが、複数シナリオを確率加重するところまでは未完成です。</div>
       <div class="limit"><b>③ ACIは相対指標</b>同一レース内での末脚比較には強い一方、弱いメンバー内の高ACIと強いメンバー内の高ACIを同じ絶対能力とはみなしません。Time Indexやクラス評価で補完しています。</div>
       <div class="limit"><b>④ 成長曲線の明示モデルが弱い</b>特に2・3歳馬では「今の能力」だけでなく、能力がどの速度で伸びているかを別に捉える余地があります。</div>
       <div class="limit"><b>⑤ E2Eはデータを貯めている途中</b>新しいGrade A比較は未来のレースでしか増やせません。20レース未満では「改善確認済み」とは判定しません。</div>
     </div>
     <p>弱点を隠さないのは、予想の信頼性を下げるためではありません。<strong>何が分かっていて、何がまだ仮説なのかを区別すること自体が、検証可能な予想の条件</strong>だと考えているからです。</p>
+  </section>
+
+  <section class="chapter anchor glossary" id="glossary">
+    <div class="chapter-head"><div class="chapter-no">12</div><div><h2>用語集</h2><p class="chapter-lead">このサイト独自の用語と、統計・AI・開発で使う言葉を、競馬ファン向けに短く整理します。</p></div></div>
+    <div class="glossary-grid">
+      <div class="glossary-item" id="term-aci"><h3>ACI</h3><p><b>Adjusted Closing Index / 補正上がり3F指数。</b>単純な上がり秒数ではなく、同一レース内の相対上がりと4角位置を補正して末脚の内容を見る、本プロジェクト独自指標。</p></div>
+      <div class="glossary-item" id="term-time-index"><h3>Time Index</h3><p>競馬場・距離・馬場・斤量・ペースなど条件差を考慮し、生時計をそのまま比べないための内部時計評価。ACIとは別物で、レース全体の走破性能を見る側。</p></div>
+      <div class="glossary-item" id="term-auc"><h3>AUC</h3><p>順位付けの識別力を見る統計指標。ざっくり言えば「好走する馬を上に並べられているか」。0.5前後はランダムに近く、1.0に近いほど識別力が高い。</p></div>
+      <div class="glossary-item" id="term-e2e"><h3>E2E</h3><p><b>End-to-End。</b>一部分だけでなく、情報収集→予想→買い目→結果→採点までシステム全体を通して検証すること。</p></div>
+      <div class="glossary-item" id="term-cutoff"><h3>cutoff</h3><p>予想で使用してよい情報の締切時刻。たとえば「当日8:00 cutoff」なら、それより後に公開された情報は検証用予想へ入れない。</p></div>
+      <div class="glossary-item" id="term-shadow"><h3>shadow予想</h3><p>公式予想やユーザー向け買い目を変更せず、比較・研究のためだけに裏側で並走させる別バージョンの予想。</p></div>
+      <div class="glossary-item" id="term-manifest"><h3>manifest</h3><p>あるプロンプト版が、どの本体・設定・モデルを使ったかを固定する「部品表」。同じ版名の中身が後から変わることを防ぐ。</p></div>
+      <div class="glossary-item"><h3>commit SHA / blob SHA</h3><p>GitHub上の状態やファイル内容を一意に識別するID。発走前の予想をSHAで固定することで、後から書き換えた予想を同じものとして扱えなくする。</p></div>
+      <div class="glossary-item" id="term-brier"><h3>Brier Score</h3><p>確率予測と実際の結果のズレを測る指標。低いほど良い。「勝率70%」のような確率が本当に妥当だったかを評価する。</p></div>
+      <div class="glossary-item" id="term-logloss"><h3>Log Loss</h3><p>確率予測の誤りを測る指標で、低いほど良い。特に「95%で勝つ」と強く言ったのに負けたような、自信過剰の外れを大きく罰する。</p></div>
+      <div class="glossary-item" id="term-calibration"><h3>Calibration / 確率校正</h3><p>「勝率20%と予測した馬が、長期的に本当に約20%勝つ」状態へ確率を整えること。印の精度と、確率の正しさは別問題。</p></div>
+      <div class="glossary-item" id="term-ev"><h3>EV / 期待値</h3><p><b>Expected Value。</b>確率と配当を組み合わせた長期的な見込み。単勝なら概念上「推定勝率 × オッズ」で考え、1.0超なら理論上プラス期待。</p></div>
+      <div class="glossary-item" id="term-roi"><h3>ROI / 回収率</h3><p><b>Return on Investment。</b>投資額に対して何%戻ったか。競馬では「払戻 ÷ 投資 × 100」。100%超ならその期間はプラス収支。</p></div>
+      <div class="glossary-item" id="term-overfit"><h3>過学習</h3><p>過去の特定事例に合わせすぎて、未知のレースへの適応力が落ちること。一度の外れごとに専用ルールを増やすと起こりやすい。</p></div>
+      <div class="glossary-item"><h3>Grade A / Grade B</h3><p>E2E検証データの信頼度区分。Grade Aは本当に発走前に保存された未来予想、Grade Bは過去レースの再現。改善承認のA/B/Cとは別制度。</p></div>
+      <div class="glossary-item"><h3>S / M / M-H / H</h3><p>想定ペース。S=スロー、M=平均、M-H=平均より速め、H=ハイペース。現状は主シナリオ表示が中心で、将来は確率分布化を検討。</p></div>
+    </div>
   </section>
 
   <section class="links-panel anchor" id="links">
