@@ -29,9 +29,20 @@ It is **not** proof that one prompt version predicts the future better. Past res
 9. Record anomalies in `e2e_validation/campaigns/2026-fall-historical-replay-findings.json`.
 10. Update the campaign race status to `complete`, `blocked`, or `partial`.
 
+### Timestamp convention for Grade B
+
+The current E2E schema uses `generated_at` as the simulated prediction timestamp and validates it against the case cutoff. For a historical replay, set:
+
+- `generated_at` = the campaign `cutoff_at` (simulated prediction time)
+- `information_cutoff_at` = the campaign `cutoff_at`
+- `replay_generated_at` = the real current time when the replay was executed
+- `replay_grade` = `historical_replay`
+
+This convention keeps the existing evaluator compatible while preserving the real replay execution time explicitly. If this dual-time convention causes confusion or bugs during the campaign, record it as `pipeline_bug` and revise the schema after the campaign rather than silently hiding it.
+
 ## Required anomaly categories
 
-- `pipeline_bug`: evaluator, schema, path, action, parser, or result-join bug
+- `pipeline_bug`: evaluator, schema, path, action, parser, timestamp semantics, or result-join bug
 - `missing_data`: necessary pre-race data cannot be reconstructed reliably
 - `source_timestamp_gap`: source can be found but its availability by cutoff cannot be established
 - `settlement_ambiguity`: bet/result pairing cannot be uniquely settled
