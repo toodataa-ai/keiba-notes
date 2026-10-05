@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="競馬予想精度向上AIが、これまで何を改善し、今後どの順番で何を検証し、どの条件で本番採用するのか。馬場予測、展開、ACI、再現性、E2E、確率校正、出力品質までを一つの改善思想として公開します。">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>今後のブラッシュアップ思想 | 競馬予想精度向上AI</title>
+  <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
+  <link rel="stylesheet" href="assets/roadmap.css?v=20261006-1">
+</head>
+<body>
+<header class="method-hero roadmap-hero">
+  <div class="wrap">
+    <nav class="method-nav" aria-label="ページナビゲーション">
+      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
+      <div class="method-nav-links"><a href="methodology.html">予想ロジック</a><a href="baba-models.html">馬場モデル</a><a href="e2e.html">E2E検証</a><a href="index.html">予想アーカイブ</a></div>
+    </nav>
+    <div class="hero-copy">
+      <p class="kicker">IMPROVEMENT PHILOSOPHY / ROADMAP / GOVERNANCE</p>
+      <h1>改善は、足すことではない。<br>測って、捨てて、残すこと。</h1>
+      <p class="hero-deck">このページは「次にどんな機能を付けるか」の一覧ではありません。予想精度を高めるために、何を仮説として立て、どう検証し、どこまで自動化し、どの条件を満たしたら本番へ採用するか。その判断基準を、これまでの改善履歴と今後の方向性をつないで公開する読み物です。</p>
+      <div class="hero-thesis">目標は、ルールを増やし続けることではありません。<strong>予測時点で使える情報を取りこぼさず、結果リークを防ぎ、改善したつもりの改悪を検出し、効いた部分だけを残す</strong>ことです。</div>
+      <div class="status-strip" aria-label="現在地">
+        <div class="status-card"><small>CURRENT PROMPT</small><strong id="roadPrompt">確認中…</strong><span>正式な最新版ポインタから取得</span></div>
+        <div class="status-card"><small>TRACK MODELS</small><strong id="roadModels">確認中…</strong><span>JRA10場 × 芝/ダート</span></div>
+        <div class="status-card"><small>STAGE A CANDIDATES</small><strong id="roadCandidates">確認中…</strong><span>本番未接続の候補</span></div>
+        <div class="status-card"><small>GRADE A E2E</small><strong id="roadE2E">確認中…</strong><span>発走前proof付き正式比較</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap article">
+  <section class="toc" aria-labelledby="tocTitle">
+    <h2 id="tocTitle">このページで分かること</h2>
+    <p class="toc-note">「実装済み」「検証中」「これから」を混ぜず、改善の採否まで含めて整理しています。</p>
+    <div class="toc-grid">
+      <a href="#thesis">01　ブラッシュアップの基本思想</a><a href="#history">02　ここまでに何を改善したか</a>
+      <a href="#cycle">03　改善を本番へ入れるまで</a><a href="#track">04　馬場予測を全10場へ育てる</a>
+      <a href="#bias">05　当日バイアスを三つに分ける</a><a href="#pace">06　展開を単一シナリオから確率へ</a>
+      <a href="#ability">07　能力比較を条件差から解放する</a><a href="#reliability">08　能力と再現性を分離する</a>
+      <a href="#jockey">09　騎手を馬質から分離して測る</a><a href="#probability">10　確率校正と期待値を強くする</a>
+      <a href="#e2e">11　E2Eで改悪を止める</a><a href="#prompt">12　プロンプトを肥大化させない</a>
+      <a href="#output">13　読みやすさも品質として守る</a><a href="#guardrails">14　やらないことを明文化する</a>
+      <a href="#sequence">15　今後の優先順位</a><a href="#links">16　実データを見る</a>
+    </div>
+  </section>
+
+  <section class="manifesto anchor" id="thesis">
+    <p class="kicker">CORE THESIS</p>
+    <h2>予想ロジックは「正しそう」ではなく「比較できる」状態にする</h2>
+    <p>競馬予想には、もっともらしい説明をいくらでも後付けできます。だから本システムでは、改善案を思いついた時点をゴールにしません。変更前と変更後を同じ条件で比較し、改善しなければ捨てます。実際にACI v1.1では、コース需要型の過去走ACIへ機械的に置き換える案や、再現性ペナルティを直接ランキングへ差し引く案はバックテストで悪化したため不採用にし、<strong>解釈レイヤーと再現信頼度だけを部分採用</strong>しました。</p>
+  </section>
+
+  <section class="chapter anchor" id="history">
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>これまでの改善は、一本の流れにつながっている</h2><p class="chapter-lead">「新しい機能を増やした歴史」ではなく、「誤差の原因を分解してきた歴史」です。</p></div></div>
+    <div class="phase-grid">
+      <article class="phase done"><span class="phase-label">実装済み / v2.8まで</span><h3>能力と価格を分離</h3><p>STEP1で能力・適性を評価して印を固定し、STEP2でのみオッズと期待値を扱う二層構造を確立。同条件直接実績、条件変化による復活候補、時計・位置・進路のバイアス分離も導入。</p></article>
+      <article class="phase done"><span class="phase-label">実装済み / v2.9</span><h3>「見た」から「評価へ伝播した」へ</h3><p>当日馬場情報の鮮度、直接実績・復活候補のABC評価と印への伝播、基礎能力と今回期待性能の分離、複数の小さな不利が重なる複合リスクを監査。</p></article>
+      <article class="phase done"><span class="phase-label">実装済み / v3.0</span><h3>ルールを増やさず整理</h3><p>意味を変えずに要件IDで再構成。v2.9の要件群をカバレッジ監査し、欠落ゼロを確認。以後は同義ルールを追記せず既存要件へ統合する方式へ移行。</p></article>
+      <article class="phase done"><span class="phase-label">実装済み / v3.1</span><h3>ACIと再現信頼度を部分採用</h3><p>上がり3Fを絶対時計でなく相対値＋4角位置補正で扱い、競馬場の要求特性を解釈レイヤーに追加。能力そのものと「今回も出せる確からしさ」を分離。</p></article>
+      <article class="phase now"><span class="phase-label">検証中</span><h3>馬場20モデルを独立育成</h3><p>10競馬場×芝/ダートを別モデルとして管理。既存中山・阪神を壊さず、東京・京都などをStage A Candidateまで進め、本番接続は承認制。</p></article>
+      <article class="phase now"><span class="phase-label">検証中</span><h3>E2Eで予想全体を比較</h3><p>部分指標ではなく、情報取得→STEP1→STEP2→結果→採点までを同一条件で比較。Grade B歴史再現でパイプラインを先に壊し、Grade A実戦データを積む。</p></article>
+    </div>
+    <div class="callout"><b>共通している考え方：</b>「新しい情報を加えれば精度が上がる」とは考えません。情報を分解し、評価の伝播を確認し、結果リークを防ぎ、改善効果を測定してから採用します。</div>
+  </section>
+
+  <section class="chapter anchor" id="cycle">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>改善案は、すぐ本番に入れない</h2><p class="chapter-lead">仮説→隔離実装→バックテスト→候補化→承認→実戦監視、の順で進めます。</p></div></div>
+    <div class="roadmap-flow" aria-label="改善フロー">
+      <div class="roadmap-step"><b>1. 誤差を観察</b>外れ方・不足情報を分類</div>
+      <div class="roadmap-step"><b>2. 仮説化</b>何を変えれば改善するか限定</div>
+      <div class="roadmap-step"><b>3. 隔離実装</b>既存本線を壊さず追加</div>
+      <div class="roadmap-step"><b>4. 検証</b>時系列・LOYO・E2Eで比較</div>
+      <div class="roadmap-step"><b>5. Candidate</b>数値基準を満たした候補</div>
+      <div class="roadmap-step"><b>6. 承認</b>本番接続は人が判断</div>
+      <div class="roadmap-step"><b>7. 監視</b>実戦で劣化・偏りを確認</div>
+    </div>
+    <div class="principles">
+      <div class="principle"><h3>非破壊を優先</h3><p>新モデルは追加レイヤーとして育て、既存Validatedモデルや本番ルータを勝手に置換しません。</p></div>
+      <div class="principle"><h3>自動化はCandidateまで</h3><p>機械判定で候補を作ることは自動化しても、Candidate→Validatedや本番置換は明示承認を必要とします。</p></div>
+      <div class="principle"><h3>単発結果で変えない</h3><p>一つのレースの的中・外れだけで重みやルールを変えず、複数ケースで再現する誤差かを確認します。</p></div>
+      <div class="principle"><h3>採用しない結果も資産</h3><p>精度が悪化した案を消さず、なぜ棄却したかを残すことで、同じ失敗を別名で繰り返さないようにします。</p></div>
+    </div>
+  </section>
+
+  <section class="chapter anchor" id="track">
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>最優先は、馬場予測を「全10場で使える」から「全10場で検証済み」へ進めること</h2><p class="chapter-lead">20モデルを作ること自体ではなく、Stage AとStage Bを別々に検証し、発走時の不確実性を正しく出すことが目的です。</p></div></div>
+    <div class="priority-list">
+      <div class="priority"><div class="priority-tag">STAGE A</div><div><h3>前日・前々日 → 当日朝</h3><p>競馬場ごとの含水率特性と気象応答を学習し、JRA公式の当日朝含水率を予測します。</p><ul><li>競馬場・芝/ダートを独立モデル化</li><li>Leave-One-Year-Outまたは前向き時系列ホールドアウト</li><li>MAE / RMSE / ±1pt以内率だけでなく雨天ケースを別監査</li><li>naive baselineを明確に上回ることを昇格条件にする</li></ul></div></div>
+      <div class="priority"><div class="priority-tag">STAGE B</div><div><h3>朝のJRA実測 → 各レース発走時</h3><p>ここが今後の重点です。発走時含水率には公式の正解ラベルがないため、架空の教師値を作らず、JRA公式の「良・稍重・重・不良」を確率予測します。</p><ul><li>降雨、雨上がり経過時間、気温、風、日照、開催中の変化を入力</li><li>Log Loss / Brier Score / Calibrationで現行heuristicと比較</li><li>雨天遷移日を独立監査</li><li>確率分布として予想本体へ渡し、「本線馬場」と不確実性を分ける</li></ul></div></div>
+      <div class="priority"><div class="priority-tag">DRIFT</div><div><h3>季節・改修・開催進行でモデルが古くなることを前提にする</h3><p>京都改修後のような構造変化、開催後半の傷み、季節差を同一分布として扱いません。Validated後も、期間別誤差を監視して degraded 判定できる設計へ進めます。</p></div></div>
+    </div>
+    <div class="live-roadmap">
+      <div class="live-box"><small>MODEL REGISTRY</small><strong id="modelValidated">—</strong><span>Validated / 20</span></div>
+      <div class="live-box"><small>BACKTESTING</small><strong id="modelBacktesting">—</strong><span>本番未接続</span></div>
+      <div class="live-box"><small>PILOT</small><strong id="modelPilot">—</strong><span>まだ検証不足</span></div>
+    </div>
+  </section>
+
+  <section class="chapter anchor" id="bias">
+    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>当日バイアスは「内有利・前有利」で終わらせない</h2><p class="chapter-lead">すでに分離した三つのバイアスを、今後は確信度付きの入力へ育てます。</p></div></div>
+    <div class="axioms">
+      <div class="axiom"><b>時計速度</b>その日の走破時計が標準より速いか遅いか。高速＝前有利とは限りません。</div>
+      <div class="axiom"><b>位置取り</b>逃げ・先行・中団・後方のどこが相対的に残りやすいか。</div>
+      <div class="axiom"><b>進路</b>内・中・外、直線の通過位置に偏りがあるか。</div>
+    </div>
+    <p>今後は、当日何レース観測したか、同じ芝/ダート・近い距離の証拠が何本あるかを使って<strong>「バイアスそのもの」と「そのバイアスを信じてよい度合い」</strong>を分離します。2レースだけの傾向を強い補正として使うことを避け、時間とともに更新する入力へ進化させます。</p>
+  </section>
+
+  <section class="chapter anchor" id="pace">
+    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>展開は「Mペース予想」一個ではなく、複数シナリオの確率で扱う</h2><p class="chapter-lead">逃げ候補の頭数だけでなく、ハナ意思・競り合い・隊列崩壊の可能性を分けます。</p></div></div>
+    <p>これまでの改善で「先行馬が多い＝ハイペース」と短絡しない方向へ進めてきました。次は、S/M/M-H/Hの一つを断定するのではなく、各シナリオの確率と、そのシナリオごとに得をする馬を持つ構造へ進めます。</p>
+    <div class="example-grid">
+      <div class="example good"><h3>目指す形</h3><p>スロー 15% / ミドル 45% / M-H 30% / ハイ 10%</p><p class="micro">各シナリオで位置取り、脚の使い方、差し届き確率を再評価。</p></div>
+      <div class="example warn"><h3>避ける形</h3><p>「逃げ馬4頭だからハイ」「逃げ馬1頭だからスロー」と機械的に決定。</p><p class="micro">騎手の意思、枠、テン速度、近走の逃げ失敗まで見ずに断定しない。</p></div>
+    </div>
+  </section>
+
+  <section class="chapter anchor" id="ability">
+    <div class="chapter-head"><div class="chapter-no">07</div><div><h2>生時計・上がり順位から、条件調整された能力表現へ</h2><p class="chapter-lead">Time IndexとACIは役割を分け、同じ強さを二重加点しないことが重要です。</p></div></div>
+    <div class="layers">
+      <div class="layer"><h3>類似条件 Time Index</h3><p>競馬場、走路、距離、馬場、斤量、ペースなどを揃え、生時計の単純比較を避けます。まず同条件直接実績を優先し、その次に近い条件を使います。</p></div>
+      <div class="layer"><h3>ACI</h3><p>上がり3Fを同一レース内の相対値と4角位置で補正し、鋭い末脚の価値と、そのコースで末脚へどれだけ依存するかを分けて解釈します。</p></div>
+    </div>
+    <p>今後は、この二つを一つの総合点へ乱暴に足すのではなく、<strong>能力の証拠・脚質適性・コース要求・再現性</strong>のどこを説明する指標なのかを固定します。またGrade Bストレステストで露出した、履歴が薄い2歳・3歳馬の<strong>成長曲線</strong>も独立課題として扱います。</p>
+  </section>
+
+  <section class="chapter anchor" id="reliability">
+    <div class="chapter-head"><div class="chapter-no">08</div><div><h2>「強い」と「今回もその強さを出せる」は別の変数にする</h2><p class="chapter-lead">心理を推測せず、客観的な性能変動を再現信頼度として扱います。</p></div></div>
+    <div class="axioms">
+      <div class="axiom"><b>ピーク能力</b>条件が噛み合ったときに到達できる上限。</div>
+      <div class="axiom"><b>現在値</b>近走、調教、ローテ、条件変化を踏まえた今の能力水準。</div>
+      <div class="axiom"><b>再現信頼度</b>近い能力を今回も発揮する確からしさ。ACI等の客観的なばらつきを利用。</div>
+    </div>
+    <p>再現性が低い馬を一律に減点するのではなく、本命の信頼度、相手候補の幅、シナリオ依存性へ反映します。v3.1で「再現性ペナルティをランキングから直接差し引く」方式を棄却したのは、この思想を守るためです。</p>
+  </section>
+
+  <section class="chapter anchor" id="jockey">
+    <div class="chapter-head"><div class="chapter-no">09</div><div><h2>騎手評価は「有名・上手い」から、条件別の上振れ・下振れへ</h2><p class="chapter-lead">騎手格言は入口にすぎず、対象場・走路・距離・脚質・馬質を補正して評価します。</p></div></div>
+    <p>既存の⑧騎手では、格言だけでなく競馬場・走路・距離の実績、全国平均との差、馬との相性、継続騎乗、想定展開への適合を扱います。今後はさらに、<strong>馬質に恵まれているから勝っているのか、同等馬質でも結果を上積みしているのか</strong>を分離し、条件別の寄与を小さくても再現可能な補正として扱う方向へ進めます。</p>
+  </section>
+
+  <section class="chapter anchor" id="probability">
+    <div class="chapter-head"><div class="chapter-no">10</div><div><h2>印の精度だけでなく、「確率の正しさ」を測る</h2><p class="chapter-lead">期待値評価を強くするには、勝率・3着内率のCalibrationが必要です。</p></div></div>
+    <p>◎○▲が当たったかだけでは、どれほど自信があったのかを評価できません。将来は各馬の勝率・3着内率、馬場状態、展開シナリオの確率をより一貫して出し、Brier Score・Log Loss・Calibration Errorで測ります。</p>
+    <table class="metric-table">
+      <thead><tr><th>見るもの</th><th>主な指標</th><th>理由</th></tr></thead>
+      <tbody>
+        <tr><td>能力順位</td><td>◎勝率、◎3着内率、Top3捕捉率、勝ち馬Top3印率</td><td>STEP1の純粋な順位品質を見る</td></tr>
+        <tr><td>確率</td><td>Brier Score / Log Loss / Calibration</td><td>「60%と言ったものが本当に約60%起きるか」を測る</td></tr>
+        <tr><td>馬券</td><td>ROI、投資額、払戻、収支</td><td>STEP2の価格判断を見る。ただし分散が大きいので単独判定しない</td></tr>
+        <tr><td>条件別安定性</td><td>場・距離・馬場・脚質・人気帯別</td><td>全体平均に隠れた弱点を見つける</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="chapter anchor" id="e2e">
+    <div class="chapter-head"><div class="chapter-no">11</div><div><h2>E2Eは「当たったか」より、「改善したと言ってよいか」を判定する装置</h2><p class="chapter-lead">部分指標だけ改善して全体予想が悪化することを防ぎます。</p></div></div>
+    <div class="grade-grid">
+      <div class="grade grade-a"><strong>Grade A</strong><p><b>prospective_strict</b><br>発走前に予想をGitへ保存し、そのcommit SHAをproofにする正式比較。プロンプト昇格の中心証拠。</p></div>
+      <div class="grade grade-b"><strong>Grade B</strong><p><b>historical_replay</b><br>過去レースを時点情報だけで再構成。パイプライン・盲点・不安定性の発見に使うが、単独で昇格根拠にしない。</p></div>
+      <div class="grade grade-s"><strong>Synthetic</strong><p>CI・計算ロジックの動作確認専用。実予想の成績には一切含めない。</p></div>
+    </div>
+    <p>現在は24レースのGrade Bストレステストを通じて、データ欠落、timestamp semantics、version再現性、結果結合、条件別盲点を先に洗い出す段階です。その後、同一レースでbaseline版とcandidate版のGrade Aを積み、十分な共通ケースが揃ってから比較します。</p>
+  </section>
+
+  <section class="chapter anchor" id="prompt">
+    <div class="chapter-head"><div class="chapter-no">12</div><div><h2>プロンプトは、改善のたびに長くしない</h2><p class="chapter-lead">v3.0以降は「追記」ではなく「要件IDへ統合」、v3.1は差分モジュール化へ進みました。</p></div></div>
+    <p>ルールが増え続けると、処理時間だけでなく、重要ルールの埋没、同義ルールの矛盾、保守不能化が起きます。そこで今後は、次の運用を続けます。</p>
+    <div class="principles">
+      <div class="principle"><h3>意味を変えない圧縮</h3><p>既存要件のカバレッジを監査してから構造整理する。短くするためにルールを落とさない。</p></div>
+      <div class="principle"><h3>差分モジュール</h3><p>大きな基礎版を毎回複製せず、新規採用部分だけを差分として管理する。</p></div>
+      <div class="principle"><h3>最新版ポインタ</h3><p>ファイル名順で最新版を推測せず、latest_prompt.jsonを正本として解決する。</p></div>
+      <div class="principle"><h3>変更理由を残す</h3><p>version、変更点、理由、棄却案、根拠をprompt_historyへ追記し、過去履歴を上書きしない。</p></div>
+    </div>
+  </section>
+
+  <section class="chapter anchor" id="output">
+    <div class="chapter-head"><div class="chapter-no">13</div><div><h2>分析が正しくても、読めなければ品質不足</h2><p class="chapter-lead">HTML/PDFの可読性・完全性・検品も、予想プロセスの一部として固定します。</p></div></div>
+    <p>完全版では、A4縦1カラム、1頭1ページ、本文・表とも約13pt、Meiryo UI、ABC評価色、印順の全頭診断、馬場確率・隊列・根拠の明示を維持します。要約版への意図しない縮退、文字の過度な縮小、PDF化による崩れを防ぎ、全ページ画像検品まで含めて「成果物が完成した」とみなします。</p>
+    <div class="callout"><b>今後の可視化：</b>予想PDFだけでなく、サイト側でも「どのモデルを使ったか」「そのモデルはValidatedかPilotか」「どのデータが不足しているか」「どの改善が採用／棄却されたか」を追える状態を広げます。</div>
+  </section>
+
+  <section class="chapter anchor" id="guardrails">
+    <div class="chapter-head"><div class="chapter-no">14</div><div><h2>精度向上のために、あえて「やらないこと」を固定する</h2><p class="chapter-lead">自由度を増やしすぎると、後付け説明と過学習が増えます。</p></div></div>
+    <div class="guardrails">
+      <div class="guardrail"><b>結果を知った情報を混ぜない</b><span>発走後の記事、払戻、回顧、将来更新されたデータを予想時点の入力へ逆流させない。</span></div>
+      <div class="guardrail"><b>オッズでSTEP1の印を動かさない</b><span>人気と能力を混ぜない。価格判断はSTEP2に限定する。</span></div>
+      <div class="guardrail"><b>生時計を単純比較しない</b><span>場・距離・馬場・斤量・ペースが違う時計をそのまま能力順位にしない。</span></div>
+      <div class="guardrail"><b>発走時含水率を捏造しない</b><span>公式正解ラベルがない値を教師データとして扱わない。</span></div>
+      <div class="guardrail"><b>馬の心理を能力変数にしない</b><span>「気分屋」「やる気」ではなく、客観的な性能変動と再現性だけを扱う。</span></div>
+      <div class="guardrail"><b>単発レースでルールを変えない</b><span>一回の成功・失敗を一般化せず、複数ケース・条件別に再現するか確認する。</span></div>
+      <div class="guardrail"><b>Candidateを自動で本番へ入れない</b><span>自動化は評価まで。本番接続、Validated化、既存モデル置換は承認制を維持する。</span></div>
+      <div class="guardrail"><b>ROIだけで優劣を決めない</b><span>馬券収支は分散が大きいため、能力順位・確率校正・条件別安定性と併記する。</span></div>
+    </div>
+  </section>
+
+  <section class="chapter anchor" id="sequence">
+    <div class="chapter-head"><div class="chapter-no">15</div><div><h2>今後は、この順番でブラッシュアップする</h2><p class="chapter-lead">精度へ直結しやすく、かつ検証可能なものから優先します。</p></div></div>
+    <div class="timeline">
+      <div class="timeline-row"><div class="when">NOW / 最優先</div><p><strong>馬場モデルのStage B検証</strong>。東京・京都Stage A Candidateの次に、レース時点の公式馬場状態を教師ラベルにした確率校正を整備。並行して残り競馬場のStage Aデータセットを構築。</p></div>
+      <div class="timeline-row"><div class="when">NOW / 並行</div><p><strong>Grade B 24レースのE2Eストレステスト完遂</strong>。精度競争ではなく、リーク・再現性・データ欠落・条件別盲点を洗い出し、Grade A運用を壊れにくくする。</p></div>
+      <div class="timeline-row"><div class="when">NEXT</div><p><strong>当日バイアスと展開の確率化</strong>。時計速度・位置・進路の確信度と、S/M/M-H/Hのシナリオ分布を予想本体へ接続。</p></div>
+      <div class="timeline-row"><div class="when">NEXT</div><p><strong>能力・再現性・成長の分離</strong>。Time Index / ACIの重複加点を監査し、2歳・3歳の成長曲線、長距離・道悪など条件別の再現性を追加検証。</p></div>
+      <div class="timeline-row"><div class="when">THEN</div><p><strong>勝率・3着内率のCalibration</strong>を本格運用。Grade A共通ケースを蓄積し、印だけでなく確率の質を版間比較できる状態へ。</p></div>
+      <div class="timeline-row"><div class="when">CONTINUOUS</div><p><strong>モデル劣化監視と説明可能性</strong>。季節・改修・開催進行によるdriftを検出し、Validatedでも必要ならdegradedへ戻す。サイトでは根拠と不足条件を常時可視化。</p></div>
+    </div>
+    <div class="roadmap-footer-note"><strong>「完成版」は作らない。</strong>競馬場、馬場、馬、騎手、レース構成は変化します。したがって目指すのは、永遠に固定された最終ロジックではなく、変更を安全に試し、悪化を止め、良化だけを残せる更新系です。</div>
+  </section>
+
+  <section class="links-panel anchor" id="links">
+    <h2>思想だけでなく、現在の実データも公開する</h2>
+    <p>このページの内容は宣言だけで終わらせず、モデル状態、E2E比較、プロンプト履歴、実際の予想アーカイブと接続します。</p>
+    <div class="cta-row">
+      <a class="cta gold" href="baba-models.html">馬場モデルの現在地を見る</a>
+      <a class="cta" href="e2e.html">E2E検証を見る</a>
+      <a class="cta" href="methodology.html">予想ロジックを読む</a>
+      <a class="cta" href="index.html">予想・回顧アーカイブへ</a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">競馬予想精度向上AI — 改善案は、検証できる形にしてから採用する。対象成績はJRA各開催日のメインレース。海外競馬・地方競馬は成績集計と改善学習の対象外です。</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+async function json(path){const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));return r.json()}
+async function loadRoadmapStatus(){
+  try{const p=await json('data/latest_prompt.json');$('#roadPrompt').textContent=p.version||'—'}catch(e){$('#roadPrompt').textContent='取得失敗'}
+  try{
+    const d=await json('data/baba_model_registry.json');
+    const models=d.models||[];const counts={};for(const m of models)counts[m.status]=(counts[m.status]||0)+1;
+    const candidates=models.filter(m=>m.stage_a&&m.stage_a.status==='candidate').length;
+    $('#roadModels').textContent=`${models.length} models`;
+    $('#roadCandidates').textContent=`${candidates} Stage A`;
+    $('#modelValidated').textContent=counts.validated||0;
+    $('#modelBacktesting').textContent=counts.backtesting||0;
+    $('#modelPilot').textContent=counts.pilot||0;
+  }catch(e){$('#roadModels').textContent='取得失敗';$('#roadCandidates').textContent='—'}
+  try{const e=await json('data/e2e_status.json');$('#roadE2E').textContent=`${e.case_counts?.strict??0} cases`}catch(err){$('#roadE2E').textContent='取得失敗'}
+}
+loadRoadmapStatus();
+</script>
+</body>
+</html>
