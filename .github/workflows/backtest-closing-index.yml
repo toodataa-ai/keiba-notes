@@ -1,4 +1,4 @@
-name: Backtest closing index v1
+name: Backtest closing index v1.1
 
 on:
   push:
@@ -35,23 +35,22 @@ jobs:
         working-directory: closing_index_v1
         run: pytest -q
 
-      - name: Run leakage-safe next-start backtest
+      - name: Run leakage-safe ACI v1.1 next-start backtest
         run: |
-          python closing_index_v1/backtest.py \
+          python closing_index_v1/backtest_v1_1.py \
             --data-start-year 2014 \
             --fit-start-year 2015 \
             --fit-end-year 2018 \
             --test-start-year 2019 \
             --test-end-year 2021 \
-            --output closing_index_v1/backtest_result.json \
-            --model-output closing_index_v1/model_params.json
+            --output closing_index_v1/backtest_result_v1_1.json \
+            --model-output closing_index_v1/model_params_v1_1.json
 
-      - name: Upload backtest result and fitted model
+      - name: Upload ACI v1.1 backtest result and fitted model
         uses: actions/upload-artifact@v4
         with:
-          name: closing-index-v1-backtest
+          name: closing-index-v1-1-backtest
           path: |
-            closing_index_v1/backtest_result.json
-            closing_index_v1/model_params.json
+            closing_index_v1/backtest_result_v1_1.json
+            closing_index_v1/model_params_v1_1.json
           if-no-files-found: error
-          # Keep the fitted coefficients together with the validation result.
