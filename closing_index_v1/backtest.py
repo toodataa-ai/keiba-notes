@@ -93,20 +93,16 @@ def prepare_dataset(
     return enriched
 
 
-def _rank_feature(group: pd.DataFrame, score_col: str) -> pd.Series:
-    return group[score_col].rank(ascending=False, method="average")
-
-
 def evaluate_feature(df: pd.DataFrame, score_col: str) -> Dict[str, float]:
     work = df.copy()
-    work["feature_rank"] = work.groupby("レースID", group_keys=False).apply(
-        lambda g: _rank_feature(g, score_col), include_groups=False
-    ).reset_index(level=0, drop=True)
+    work["feature_rank"] = work.groupby("レースID")[score_col].rank(
+        ascending=False, method="average"
+    )
 
     # top-1 / top-3 はレース単位で評価。
     race_rows: List[dict] = []
     for _, race in work.groupby("レースID", sort=False):
-        race = race.sort_values("feature_rank")
+        race = race.sort_values(["feature_rank", score_col], ascending=[True, False])
         top1 = race.iloc[0]
         selected3 = set(race.head(3).index)
         actual_top3 = set(race[race["着順"] <= 3].index)
@@ -123,7 +119,13 @@ def evaluate_feature(df: pd.DataFrame, score_col: str) -> Dict[str, float]:
             }
         )
     race_df = pd.DataFrame(race_rows)
-    auc = roc_auc_score(work["target_top3"], work[score_col]) if work["target_top3"].nunique() > 1 else np.nan
+    if race_df.empty:
+        raise ValueError(f"No eligible races for {score_col}")
+    auc = (
+        roc_auc_score(work["target_top3"], work[score_col])
+        if work["target_top3"].nunique() > 1
+        else np.nan
+    )
     return {
         "rows": int(len(work)),
         "races": int(len(race_df)),
@@ -198,12 +200,16 @@ def decision(metrics: Dict[str, Dict[str, float]], segments: Dict[str, dict]) ->
             - seg["prev_race_relative_z"]["top3_capture_rate"]
         )
         if delta < -0.01:
-            surface_harm.append({"surface": surface, "top3_capture_delta": round(delta, 6)})
+            surface_harm.append(
+                {"surface": surface, "top3_capture_delta": round(delta, 6)}
+            )
     candidate = positive >= 2 and not surface_harm
     return {
         "integration_candidate": bool(candidate),
         "positive_core_metrics": int(positive),
-        "delta_prev_aci_vs_prev_race_relative_z": {k: round(v, 6) for k, v in improvements.items()},
+        "delta_prev_aci_vs_prev_race_relative_z": {
+            k: round(v, 6) for k, v in improvements.items()
+        },
         "material_surface_harm": surface_harm,
         "rule": "candidate if >=2/4 core metrics improve and neither turf nor dirt loses >1pp top3 capture",
     }
@@ -221,7 +227,9 @@ def main() -> None:
 
     df = load_data(args.data_start_year, args.test_end_year)
     enriched = prepare_dataset(df, args.fit_start_year, args.fit_end_year)
-    test = enriched[enriched["year"].between(args.test_start_year, args.test_end_year)].copy()
+    test = enriched[
+        enriched["year"].between(args.test_start_year, args.test_end_year)
+    ].copy()
 
     metrics = evaluate_all(test)
     segments = evaluate_segments(test)
