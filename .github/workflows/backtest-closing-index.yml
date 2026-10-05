@@ -1,6 +1,11 @@
 name: Backtest closing index v1
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'closing_index_v1/**'
+      - '.github/workflows/backtest-closing-index.yml'
   pull_request:
     paths:
       - 'closing_index_v1/**'
