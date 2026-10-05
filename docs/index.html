@@ -12,6 +12,11 @@
   <link rel="stylesheet" href="assets/schedule.css?v=20261005-schedule1">
   <link rel="stylesheet" href="assets/disclosure.css?v=20261005-collapse1">
   <style>
+    .lab-signature{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:#d7d8dd;font-size:12px;font-weight:700;line-height:1.4}
+    .lab-signature::before{content:"";flex:0 0 auto;width:24px;height:2px;border-radius:999px;background:#c61d31;box-shadow:0 0 10px rgba(198,29,49,.28)}
+    .lab-signature-name{letter-spacing:.025em}
+    .lab-signature-cycle{display:inline-flex;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,.16);color:#92959e;font-size:10px;font-weight:700;letter-spacing:.035em}
+    .lab-signature-cycle b{color:#c61d31;font-weight:900}
     .hero-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px;max-width:760px}
     .hero-nav-link{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#f7f7f8;color:#17171a;font-weight:700;text-decoration:none;box-sizing:border-box;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
     .hero-nav-link:hover{border-color:#c61d31;box-shadow:0 0 0 2px rgba(198,29,49,.12);transform:translateY(-1px)}
@@ -19,13 +24,13 @@
     .hero-nav-new{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#c61d31;color:#fff;font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1}
     .hero-nav-arrow{flex:0 0 auto;font-weight:800;color:#b5172a}
     .hero-prompt-status{margin-top:14px}
-    @media(max-width:640px){.hero-nav{grid-template-columns:1fr;max-width:none}.hero-nav-link{width:100%;min-height:54px}}
+    @media(max-width:640px){.lab-signature{align-items:flex-start;gap:8px;flex-wrap:wrap}.lab-signature::before{margin-top:7px}.lab-signature-cycle{width:100%;margin-left:32px;padding-left:0;border-left:0}.hero-nav{grid-template-columns:1fr;max-width:none}.hero-nav-link{width:100%;min-height:54px}}
   </style>
 </head>
 <body>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow hero-kicker">AI-DRIVEN RACING PREDICTION RESEARCH LAB / PREDICT · VALIDATE · IMPROVE</p>
+      <div class="lab-signature" aria-label="AI Racing Prediction Research Lab / Predict, Validate, Improve"><span class="lab-signature-name">AI Racing Prediction Research Lab</span><span class="lab-signature-cycle">Predict <b>→</b> Validate <b>→</b> Improve</span></div>
       <h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja">研究所</span><span class="brand-lab-en">RESEARCH LAB</span></span></h1>
       <p class="brand-subtitle">AIで予想し、検証し、改善する。予測精度を育て続ける。</p>
       <p class="lead">JRAメインレースを対象に、AIを使って予想・検証・回顧を行い、結果と誤差を次のロジック改善へ反映します。予想体系そのものをAI駆動で継続的にブラッシュアップしていきます。</p>
