@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="E0/E1/E2 Experience RegimeのShadow検証。経験量による予測誤差と不確実性を、本番予想へ影響させずに検証します。">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Experience Regime E0/E1/E2 | 競馬予想精度向上AI</title>
+  <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
+  <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
+</head>
+<body>
+<header class="method-hero roadmap-hero">
+  <div class="wrap">
+    <nav class="method-nav" aria-label="ページナビゲーション">
+      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
+      <div class="method-nav-links"><a href="roadmap.html">ブラッシュアップ思想</a><a href="methodology.html">予想ロジック</a><a href="e2e.html">E2E検証</a><a href="index.html">予想アーカイブ</a></div>
+    </nav>
+    <div class="hero-copy">
+      <p class="kicker">SHADOW RESEARCH / EXPERIENCE REGIME</p>
+      <h1>経験量が違う馬を、<br>同じ確信度で扱わない。</h1>
+      <p class="hero-deck">E0/E1/E2は、キャリアの浅さによる不確実性を分離して測る研究レイヤーです。現段階では本番の順位・印・買い目を一切変更せず、発走前に経験量を保存して結果との誤差だけを検証します。</p>
+      <div class="hero-thesis"><strong>2026年10月10日からJRA各開催日の11RでShadow観測を開始。</strong> 本番採用は、十分なGrade Aデータと条件別安定性を確認した後に別承認します。</div>
+      <div class="status-strip" aria-label="現在地">
+        <div class="status-card"><small>MODE</small><strong>SHADOW</strong><span>本番予想への影響なし</span></div>
+        <div class="status-card"><small>START</small><strong>2026-10-10</strong><span>Grade A収集開始</span></div>
+        <div class="status-card"><small>COVERAGE</small><strong id="coverage">確認中…</strong><span>Experience付き予想</span></div>
+        <div class="status-card"><small>OBSERVATIONS</small><strong id="observations">確認中…</strong><span>E0/E1/E2合計</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap article">
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>E0 / E1 / E2とは</h2><p class="chapter-lead">発走前の通算出走数だけで機械分類します。</p></div></div>
+    <div class="axioms">
+      <div class="axiom"><b>E0</b>0戦。実戦データがなく、能力推定の不確実性が最も大きい群。</div>
+      <div class="axiom"><b>E1</b>1〜3戦。実績はあるがサンプルが少なく、一走の内容へ引っ張られやすい群。</div>
+      <div class="axiom"><b>E2</b>4戦以上。現行の過去走ベース評価を比較的安定して適用できる群。</div>
+    </div>
+    <p>年齢、人気、血統、調教、評判などでRegimeを変更しません。まず「経験量」という一つの要因だけを分離し、その後に能力推定の不確実性へどう接続すべきかを検証します。</p>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>なぜ最初から補正しないのか</h2><p class="chapter-lead">もっともらしい固定加点・減点を避けるためです。</p></div></div>
+    <p>現段階ではE0だから減点、E1だから加点、といったルールを作りません。v3.1のSTEP1順位・◎○▲△×・ABC評価・STEP2・買い目はそのまま保存し、結果確定後にRegime別の誤差を観測します。</p>
+    <div class="callout"><b>Shadow原則：</b>観測 → 誤差分解 → 十分なサンプル → μ/σやshrinkageのChallenger設計 → E2E比較 → 承認、の順で進めます。</div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>何を測るか</h2><p class="chapter-lead">的中率だけでなく、順位と確率のズレをRegimeごとに分解します。</p></div></div>
+    <table class="metric-table">
+      <thead><tr><th>観測項目</th><th>目的</th></tr></thead>
+      <tbody>
+        <tr><td>実勝率・実3着内率</td><td>Regimeごとの基礎的な結果分布を確認</td></tr>
+        <tr><td>STEP1平均順位・◎○▲選出率</td><td>現行ロジックが経験の浅い馬を過大／過小評価していないか確認</td></tr>
+        <tr><td>予測勝率・3着内率</td><td>確率出力があるケースで確信度の偏りを確認</td></tr>
+        <tr><td>Brier score</td><td>E0/E1/E2別に確率校正誤差を比較</td></tr>
+        <tr><td>coverage</td><td>発走前のExperience情報が欠落なく保存されたか監査</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>本番採用の最低条件</h2><p class="chapter-lead">サンプルが揃っても自動採用はしません。</p></div></div>
+    <div class="principles">
+      <div class="principle"><h3>Grade A 20レース</h3><p>発走前proof付きの実戦ケースを最低20レース蓄積。</p></div>
+      <div class="principle"><h3>E0 30頭 / E1 60頭 / E2 100頭</h3><p>Regime別に最低観測数を満たす。</p></div>
+      <div class="principle"><h3>Historical replay併用</h3><p>実戦だけでなく過去再現でも構造的な偏りを確認。</p></div>
+      <div class="principle"><h3>E2を壊さない</h3><p>浅いキャリアの改善と引き換えに、既走馬の精度をmaterialに悪化させない。</p></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>公開範囲</h2><p class="chapter-lead">研究の存在と集計進捗は公開し、正式予想とは分離します。</p></div></div>
+    <p>正式な予想ページには個別馬のShadow診断を表示しません。このページでは研究目的、分類定義、集計レベルの進捗、採用・棄却判断を公開します。将来、Experience Regimeが順位を変えるChallengerへ進む場合は、その予想出力の保管・公開方法を改めて分離します。</p>
+  </section>
+
+  <section class="links-panel">
+    <h2>ブラッシュアップ全体の中で見る</h2>
+    <div class="cta-row"><a class="cta gold" href="roadmap.html">今後のブラッシュアップ思想へ</a><a class="cta" href="e2e.html">E2E検証を見る</a><a class="cta" href="index.html">正式予想アーカイブへ</a></div>
+  </section>
+</main>
+
+<footer class="wrap foot">Experience Regime E0/E1/E2 — Shadow observation only. Production ranking and betting decisions are unchanged during the observation phase.</footer>
+<script>
+async function load(){
+  try{
+    const r=await fetch('data/experience_regime_status.json',{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));
+    const d=await r.json();const versions=Object.values(d.versions||{});
+    let entries=0,covered=0,obs=0;
+    for(const v of versions){entries+=v.coverage?.prediction_entries||0;covered+=v.coverage?.entries_with_experience||0;for(const x of Object.values(v.regimes||{}))obs+=x.horses||x.observations||x.count||0}
+    document.querySelector('#coverage').textContent=entries?`${covered}/${entries}`:'0 cases';
+    document.querySelector('#observations').textContent=String(obs||0);
+  }catch(e){document.querySelector('#coverage').textContent='取得失敗';document.querySelector('#observations').textContent='—'}
+}
+load();
+</script>
+</body>
+</html>
