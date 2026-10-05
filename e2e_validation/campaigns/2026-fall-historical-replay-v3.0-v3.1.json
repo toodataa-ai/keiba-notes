@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "campaign_id": "2026-fall-historical-replay-v3.0-v3.1",
+  "grade": "historical_replay",
+  "purpose": "Stress-test the E2E pipeline, identify missing pre-race data, schema/settlement failures, and suspicious evaluation behavior. This campaign is not Grade A evidence and must not be used alone for prompt promotion.",
+  "versions": ["v3.0", "v3.1"],
+  "information_cutoff_policy": "08:00 Asia/Tokyo on race day for both versions; use the same pre-race source set where possible; never use race result/review/post-race sources until both prediction snapshots are saved.",
+  "selection_policy": "24 JRA main races spanning Sapporo/Nakayama/Hanshin/Tokyo/Kyoto, turf/dirt, 1200-2600m, 2yo/G1/G2/G3/L/OP/3-win class, including wet-weather periods where available.",
+  "batch_size": 6,
+  "status": "pending",
+  "created_at": "2026-10-06T05:55:00+09:00",
+  "races": [
+    {"batch":1,"race_id":"2026-09-05-keisei-autumn-handicap","date":"2026-09-05","venue":"中山","race":"京成杯オータムハンデキャップ","surface":"芝","distance_m":1600,"scheduled_post":"15:45","cutoff_at":"2026-09-05T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0905.html","status":"pending"},
+    {"batch":1,"race_id":"2026-09-05-enif-stakes","date":"2026-09-05","venue":"阪神","race":"エニフステークス","surface":"ダート","distance_m":1400,"scheduled_post":"15:30","cutoff_at":"2026-09-05T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0905.html","status":"pending"},
+    {"batch":1,"race_id":"2026-09-05-sapporo-2yo-stakes","date":"2026-09-05","venue":"札幌","race":"札幌2歳ステークス","surface":"芝","distance_m":1800,"scheduled_post":"15:20","cutoff_at":"2026-09-05T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0905.html","status":"pending"},
+    {"batch":1,"race_id":"2026-09-06-shion-stakes","date":"2026-09-06","venue":"中山","race":"紫苑ステークス","surface":"芝","distance_m":2000,"scheduled_post":"15:45","cutoff_at":"2026-09-06T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0906.html","status":"pending"},
+    {"batch":1,"race_id":"2026-09-06-centaur-stakes","date":"2026-09-06","venue":"阪神","race":"セントウルステークス","surface":"芝","distance_m":1200,"scheduled_post":"15:30","cutoff_at":"2026-09-06T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0906.html","status":"pending"},
+    {"batch":1,"race_id":"2026-09-06-tancho-stakes","date":"2026-09-06","venue":"札幌","race":"丹頂ステークス","surface":"芝","distance_m":2600,"scheduled_post":"15:20","cutoff_at":"2026-09-06T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0906.html","status":"pending"},
+
+    {"batch":2,"race_id":"2026-09-12-radio-nippon-sho","date":"2026-09-12","venue":"中山","race":"ラジオ日本賞","surface":"ダート","distance_m":1200,"scheduled_post":"15:30","cutoff_at":"2026-09-12T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0912.html","status":"pending"},
+    {"batch":2,"race_id":"2026-09-12-challenge-cup","date":"2026-09-12","venue":"阪神","race":"チャレンジカップ","surface":"芝","distance_m":2000,"scheduled_post":"15:45","cutoff_at":"2026-09-12T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0912.html","status":"pending"},
+    {"batch":2,"race_id":"2026-09-13-st-lite-kinen","date":"2026-09-13","venue":"中山","race":"セントライト記念","surface":"芝","distance_m":2200,"scheduled_post":"15:45","cutoff_at":"2026-09-13T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0913.html","status":"pending"},
+    {"batch":2,"race_id":"2026-09-13-rose-stakes","date":"2026-09-13","venue":"阪神","race":"ローズステークス","surface":"芝","distance_m":1800,"scheduled_post":"15:30","cutoff_at":"2026-09-13T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0913.html","status":"pending"},
+    {"batch":2,"race_id":"2026-09-19-nagatsuki-stakes","date":"2026-09-19","venue":"中山","race":"ながつきステークス","surface":"ダート","distance_m":1800,"scheduled_post":"15:45","cutoff_at":"2026-09-19T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0919.html","status":"pending"},
+    {"batch":2,"race_id":"2026-09-19-osaka-sports-hai","date":"2026-09-19","venue":"阪神","race":"大阪スポーツ杯","surface":"ダート","distance_m":1400,"scheduled_post":"15:30","cutoff_at":"2026-09-19T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0919.html","status":"pending"},
+
+    {"batch":3,"race_id":"2026-09-20-all-comers","date":"2026-09-20","venue":"中山","race":"オールカマー","surface":"芝","distance_m":2200,"scheduled_post":"15:45","cutoff_at":"2026-09-20T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0920.html","status":"pending"},
+    {"batch":3,"race_id":"2026-09-20-dotonbori-stakes","date":"2026-09-20","venue":"阪神","race":"道頓堀ステークス","surface":"芝","distance_m":1200,"scheduled_post":"15:30","cutoff_at":"2026-09-20T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0920.html","status":"pending"},
+    {"batch":3,"race_id":"2026-09-21-jra-anniversary-stakes","date":"2026-09-21","venue":"中山","race":"JRAアニバーサリーステークス","surface":"ダート","distance_m":1800,"scheduled_post":"15:30","cutoff_at":"2026-09-21T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0921.html","status":"pending"},
+    {"batch":3,"race_id":"2026-09-21-kobe-shimbun-hai","date":"2026-09-21","venue":"阪神","race":"神戸新聞杯","surface":"芝","distance_m":2400,"scheduled_post":"15:45","cutoff_at":"2026-09-21T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0921.html","status":"pending"},
+    {"batch":3,"race_id":"2026-09-26-shufu-stakes","date":"2026-09-26","venue":"中山","race":"秋風ステークス","surface":"芝","distance_m":1600,"scheduled_post":"15:30","cutoff_at":"2026-09-26T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0926.html","status":"pending"},
+    {"batch":3,"race_id":"2026-09-26-sirius-stakes","date":"2026-09-26","venue":"阪神","race":"シリウスステークス","surface":"ダート","distance_m":2000,"scheduled_post":"15:45","cutoff_at":"2026-09-26T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0926.html","status":"pending"},
+
+    {"batch":4,"race_id":"2026-09-27-sprinters-stakes","date":"2026-09-27","venue":"中山","race":"スプリンターズステークス","surface":"芝","distance_m":1200,"scheduled_post":"15:40","cutoff_at":"2026-09-27T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0927.html","status":"pending"},
+    {"batch":4,"race_id":"2026-09-27-port-island-stakes","date":"2026-09-27","venue":"阪神","race":"ポートアイランドステークス","surface":"芝","distance_m":1600,"scheduled_post":"15:20","cutoff_at":"2026-09-27T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/9/0927.html","status":"pending"},
+    {"batch":4,"race_id":"2026-10-03-green-channel-cup","date":"2026-10-03","venue":"東京","race":"グリーンチャンネルカップ","surface":"ダート","distance_m":1600,"scheduled_post":"15:45","cutoff_at":"2026-10-03T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/10/1003.html","status":"pending"},
+    {"batch":4,"race_id":"2026-10-03-opal-stakes","date":"2026-10-03","venue":"京都","race":"オパールステークス","surface":"芝","distance_m":1200,"scheduled_post":"15:30","cutoff_at":"2026-10-03T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/10/1003.html","status":"pending"},
+    {"batch":4,"race_id":"2026-10-04-mainichi-okan","date":"2026-10-04","venue":"東京","race":"毎日王冠","surface":"芝","distance_m":1800,"scheduled_post":"15:45","cutoff_at":"2026-10-04T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/10/1004.html","status":"pending"},
+    {"batch":4,"race_id":"2026-10-04-kyoto-daishoten","date":"2026-10-04","venue":"京都","race":"京都大賞典","surface":"芝","distance_m":2400,"scheduled_post":"15:30","cutoff_at":"2026-10-04T08:00:00+09:00","program_url":"https://www.jra.go.jp/keiba/calendar2026/2026/10/1004.html","status":"pending"}
+  ]
+}
