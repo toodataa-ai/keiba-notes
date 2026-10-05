@@ -7,16 +7,17 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>AIによる競馬予想精度向上研究所 | JRA予想検証アーカイブ</title>
-  <link rel="stylesheet" href="assets/style.css?v=20261004-review1">
-  <link rel="stylesheet" href="assets/brand.css?v=20261006-lab2">
+  <link rel="stylesheet" href="assets/style.css?v=20261006-red1">
+  <link rel="stylesheet" href="assets/brand.css?v=20261006-ai1">
   <link rel="stylesheet" href="assets/schedule.css?v=20261005-schedule1">
   <link rel="stylesheet" href="assets/disclosure.css?v=20261005-collapse1">
   <style>
     .hero-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px;max-width:760px}
-    .hero-nav-link{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border-radius:10px;background:#fff;color:#17212b;font-weight:700;text-decoration:none;box-sizing:border-box}
+    .hero-nav-link{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#f7f7f8;color:#17171a;font-weight:700;text-decoration:none;box-sizing:border-box;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
+    .hero-nav-link:hover{border-color:#c61d31;box-shadow:0 0 0 2px rgba(198,29,49,.12);transform:translateY(-1px)}
     .hero-nav-label{display:flex;align-items:center;gap:8px;min-width:0}
-    .hero-nav-new{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#d8b35a;color:#17212b;font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1}
-    .hero-nav-arrow{flex:0 0 auto;font-weight:500}
+    .hero-nav-new{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#c61d31;color:#fff;font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1}
+    .hero-nav-arrow{flex:0 0 auto;font-weight:800;color:#b5172a}
     .hero-prompt-status{margin-top:14px}
     @media(max-width:640px){.hero-nav{grid-template-columns:1fr;max-width:none}.hero-nav-link{width:100%;min-height:54px}}
   </style>
