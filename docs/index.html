@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/style.css?v=20261004-review1">
   <link rel="stylesheet" href="assets/brand.css?v=20261005-logo1">
   <link rel="stylesheet" href="assets/schedule.css?v=20261005-schedule1">
+  <link rel="stylesheet" href="assets/disclosure.css?v=20261005-collapse1">
 </head>
 <body>
   <header class="hero">
@@ -34,27 +35,57 @@
           <li class="cycle-step"><span class="cycle-number">5</span><strong>次レースで再検証</strong><span>改良版を適用し、精度・回収率の変化を継続観測</span></li>
         </ol>
         <p class="cycle-loop"><span aria-hidden="true">↻</span> このサイクルをレースごとに繰り返し、予想ロジックを継続的に改善します。</p>
+        <div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div>
       </section>
-      <div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div>
     </div>
   </header>
   <main class="wrap">
-    <section class="schedule-panel" aria-labelledby="scheduleTitle">
-      <div class="schedule-head">
-        <div><p class="eyebrow dark">UPCOMING</p><h2 id="scheduleTitle">今後の予測・回顧予定</h2></div>
-        <p id="scheduleUpdated" class="schedule-updated"></p>
+    <details class="content-disclosure" id="upcomingDisclosure">
+      <summary>
+        <span class="content-summary-main"><span class="eyebrow dark">UPCOMING</span><strong id="scheduleTitle">今後の予測・回顧予定</strong></span>
+        <span class="content-summary-note">レース名・発走時刻・予測／回顧予定</span>
+      </summary>
+      <div class="content-disclosure-body">
+        <section class="schedule-panel" aria-labelledby="scheduleTitle">
+          <div class="schedule-head"><p id="scheduleUpdated" class="schedule-updated"></p></div>
+          <p class="schedule-copy">JRA各開催日のメインレース（11R）を対象に、予測から結果確認・回顧までの予定を表示します。</p>
+          <div class="schedule-policy"><span class="schedule-chip prediction">予測：当日午前</span><span class="schedule-chip review">回顧：結果確定後〜当日夜</span></div>
+          <div id="upcomingSchedule"><p class="muted">今後の予定を読み込み中…</p></div>
+          <details id="scheduleMore" class="schedule-more" hidden><summary>その先の予定も見る</summary><div id="scheduleMoreList"></div></details>
+          <p class="schedule-note">JRAの事前番組を基に掲載しています。出走馬・レース順・発走時刻などは変更される場合があり、当週木曜16時頃の出馬表を基準に最終確認します。</p>
+        </section>
       </div>
-      <p class="schedule-copy">JRA各開催日のメインレース（11R）を対象に、予測から結果確認・回顧までの予定を表示します。</p>
-      <div class="schedule-policy"><span class="schedule-chip prediction">予測：当日午前</span><span class="schedule-chip review">回顧：結果確定後〜当日夜</span></div>
-      <div id="upcomingSchedule"><p class="muted">今後の予定を読み込み中…</p></div>
-      <details id="scheduleMore" class="schedule-more" hidden><summary>その先の予定も見る</summary><div id="scheduleMoreList"></div></details>
-      <p class="schedule-note">JRAの事前番組を基に掲載しています。出走馬・レース順・発走時刻などは変更される場合があり、当週木曜16時頃の出馬表を基準に最終確認します。</p>
-    </section>
-    <section class="period-panel"><div><p class="eyebrow dark">PERIOD</p><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
-    <details class="performance-disclosure"><summary>この期間の成績を見る</summary><div class="performance-body"><section class="stats" aria-label="期間成績"><article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article><article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article><article><span class="label">回収率</span><strong id="statROI">—</strong></article><article><span class="label">収支</span><strong id="statProfit">—</strong></article><article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article></section><section id="legacyNote" class="legacy-note" hidden></section></div></details>
-    <details class="prompt-history-disclosure"><summary>プロンプト改良履歴を見る <span id="promptHistoryCount"></span></summary><div class="prompt-history-body"><p class="prompt-history-policy">プロンプトを改良したときは、版番号だけでなく「何を変えたか」「なぜ変えたか」を履歴として残します。過去の履歴は上書きせず保存します。</p><div id="promptHistoryList"><p class="muted">読み込み中…</p></div></div></details>
-    <section class="section-head"><div><p class="eyebrow dark">ARCHIVE</p><h2>予想履歴</h2></div><div class="filters"><select id="statusFilter" aria-label="状態で絞り込み"><option value="all">すべて</option><option value="predicted">予想済み</option><option value="reviewed">結果登録済み</option></select></div></section>
-    <div id="raceList" class="race-list"><p class="muted">読み込み中…</p></div>
+    </details>
+
+    <details class="content-disclosure" id="performanceDisclosure">
+      <summary>
+        <span class="content-summary-main"><span class="eyebrow dark">PERFORMANCE</span><strong>成績・集計期間</strong></span>
+        <span class="content-summary-note">的中率・回収率・収支・◎成績</span>
+      </summary>
+      <div class="content-disclosure-body">
+        <section class="period-panel"><div><p class="eyebrow dark">PERIOD</p><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
+        <details class="performance-disclosure"><summary>この期間の成績を見る</summary><div class="performance-body"><section class="stats" aria-label="期間成績"><article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article><article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article><article><span class="label">回収率</span><strong id="statROI">—</strong></article><article><span class="label">収支</span><strong id="statProfit">—</strong></article><article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article></section><section id="legacyNote" class="legacy-note" hidden></section></div></details>
+      </div>
+    </details>
+
+    <details class="content-disclosure prompt-history-disclosure">
+      <summary>
+        <span class="content-summary-main"><span class="eyebrow dark">PROMPT</span><strong>プロンプト改良履歴 <span id="promptHistoryCount"></span></strong></span>
+        <span class="content-summary-note">変更内容・理由・版管理</span>
+      </summary>
+      <div class="prompt-history-body"><p class="prompt-history-policy">プロンプトを改良したときは、版番号だけでなく「何を変えたか」「なぜ変えたか」を履歴として残します。過去の履歴は上書きせず保存します。</p><div id="promptHistoryList"><p class="muted">読み込み中…</p></div></div>
+    </details>
+
+    <details class="content-disclosure archive-disclosure" id="archiveDisclosure">
+      <summary>
+        <span class="content-summary-main"><span class="eyebrow dark">ARCHIVE</span><strong>予想履歴</strong></span>
+        <span class="content-summary-note">過去の予想・PDF・結果・回顧</span>
+      </summary>
+      <div class="content-disclosure-body">
+        <section class="section-head"><div><p class="eyebrow dark">ARCHIVE</p><h2>予想履歴</h2></div><div class="filters"><select id="statusFilter" aria-label="状態で絞り込み"><option value="all">すべて</option><option value="predicted">予想済み</option><option value="reviewed">結果登録済み</option></select></div></section>
+        <div id="raceList" class="race-list"><p class="muted">読み込み中…</p></div>
+      </div>
+    </details>
   </main>
   <footer class="wrap footer"><p>対象はJRAメインレースのみ。土日だけでなく、祝日月曜などJRA開催がある日は同じ運用で集計します。</p></footer>
   <script src="assets/schedule.js?v=20261005-schedule1"></script>
