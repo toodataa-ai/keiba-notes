@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "race_id": "YYYY-MM-DD-race-slug",
+  "prompt_version": "v3.1",
+  "prompt_manifest": "e2e_validation/manifests/v3.1.json",
+  "generated_at": "YYYY-MM-DDTHH:MM:SS+09:00",
+  "information_cutoff_at": "YYYY-MM-DDTHH:MM:SS+09:00",
+  "marks": {"win": 0, "second": 0, "third": 0},
+  "step1_ranking": [],
+  "track": {
+    "going_probabilities": {"良": 0.0, "稍重": 0.0, "重": 0.0, "不良": 0.0}
+  },
+  "pace": {
+    "label": "M"
+  },
+  "bets": [
+    {"id": "b001", "type": "win", "selection": [0], "stake_yen": 100}
+  ],
+  "sources": [
+    {"name": "source name", "url": "https://example.invalid", "published_at": "YYYY-MM-DDTHH:MM:SS+09:00"}
+  ],
+  "note": "probabilities.win/top3 and pace.probabilities are optional until calibrated probability output is implemented. Never add race results to this file."
+}

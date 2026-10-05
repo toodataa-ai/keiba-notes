@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "race_id": "synthetic-smoke-001",
+  "prompt_version": "v3.1",
+  "prompt_manifest": "e2e_validation/manifests/v3.1.json",
+  "generated_at": "2026-01-01T14:31:00+09:00",
+  "information_cutoff_at": "2026-01-01T14:25:00+09:00",
+  "marks": {"win": 2, "second": 1, "third": 4},
+  "step1_ranking": [2, 1, 4, 3, 5],
+  "probabilities": {
+    "win": {"1": 0.15, "2": 0.40, "3": 0.10, "4": 0.20, "5": 0.15},
+    "top3": {"1": 0.70, "2": 0.80, "3": 0.35, "4": 0.70, "5": 0.45}
+  },
+  "track": {"going_probabilities": {"良": 0.70, "稍重": 0.20, "重": 0.08, "不良": 0.02}},
+  "pace": {"probabilities": {"S": 0.15, "M": 0.60, "M-H": 0.20, "H": 0.05}},
+  "bets": [
+    {"id": "v31-b1", "type": "win", "selection": [2], "stake_yen": 100},
+    {"id": "v31-b2", "type": "wide", "selection": [1, 2], "stake_yen": 100}
+  ],
+  "sources": [
+    {"name": "synthetic pre-race input", "published_at": "2026-01-01T14:00:00+09:00"}
+  ]
+}
