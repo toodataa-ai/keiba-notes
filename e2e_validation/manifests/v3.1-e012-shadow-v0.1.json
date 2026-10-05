@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.1+e012-shadow-v0.1",
+  "source_commit": "8915fa2e64ee7980ca8d7a8d0bb1026384b79607",
+  "components": [
+    {
+      "path": "競馬予想_完全版プロンプト_v3.0.txt",
+      "git_blob_sha": "8cb18e5cd2bab88bfaf5a04f103a402acb9aac90",
+      "role": "base_prompt"
+    },
+    {
+      "path": "closing_index_v1/production_profile_v1_1.json",
+      "git_blob_sha": "a72db216545cc481644c8f066b52e66c9b0083eb",
+      "role": "aci_production_profile"
+    },
+    {
+      "path": "closing_index_v1/adoption_decision_v1_1.json",
+      "git_blob_sha": "831bebfb4133856bd9284901594ecea30cc7ba27",
+      "role": "aci_adoption_decision"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.1.txt",
+      "git_blob_sha": "688ff0c06a441ca2634c73810aa2708bcbdec949",
+      "role": "delta_prompt"
+    },
+    {
+      "path": "experience_regime_v1/shadow_prompt_v0_1.txt",
+      "git_blob_sha": "7678853a0dade741b8a905d84a5546503093ee6e",
+      "role": "shadow_experience_collection"
+    }
+  ],
+  "production_effect": false,
+  "note": "Research-only shadow manifest. It records E0/E1/E2 metadata but must not alter v3.1 STEP1 ranking, marks, STEP2 or bets."
+}
