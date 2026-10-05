@@ -1,0 +1,82 @@
+{
+  "model": "Adjusted Closing Index v1.1",
+  "decision": "partial_adoption",
+  "approved_by_user": true,
+  "decision_date": "2026-10-06",
+  "evidence": {
+    "fit_period": [2015, 2018],
+    "test_period": [2019, 2021],
+    "rows": 105423,
+    "races": 7740,
+    "baseline_prev3_aci_median": {
+      "auc_top3": 0.661077,
+      "top1_win_rate": 0.177261,
+      "top1_top3_rate": 0.409819,
+      "top3_capture_rate": 0.378768,
+      "winner_mean_rank": 5.13385
+    },
+    "experimental_same_demand_replacement": {
+      "auc_top3": 0.648848,
+      "top1_win_rate": 0.164729,
+      "top1_top3_rate": 0.396253,
+      "top3_capture_rate": 0.365935,
+      "winner_mean_rank": 5.3323,
+      "delta_auc_top3_vs_baseline": -0.012229,
+      "delta_top3_capture_vs_baseline": -0.012833
+    },
+    "experimental_confidence_adjusted_replacement": {
+      "auc_top3": 0.649456,
+      "top1_win_rate": 0.166279,
+      "top1_top3_rate": 0.40168,
+      "top3_capture_rate": 0.367959,
+      "winner_mean_rank": 5.332494,
+      "delta_auc_top3_vs_baseline": -0.011621,
+      "delta_top3_capture_vs_baseline": -0.010809
+    },
+    "reproducibility_signal": {
+      "low": {
+        "races": 3457,
+        "top1_win_rate": 0.157362,
+        "top1_top3_rate": 0.369685,
+        "mean_score": 48.321
+      },
+      "mid": {
+        "races": 2163,
+        "top1_win_rate": 0.149792,
+        "top1_top3_rate": 0.38835,
+        "mean_score": 72.697
+      },
+      "high": {
+        "races": 2120,
+        "top1_win_rate": 0.191981,
+        "top1_top3_rate": 0.447642,
+        "mean_score": 88.063
+      },
+      "high_minus_low_top1_top3": 0.077957
+    }
+  },
+  "adopted": [
+    "Keep race-relative, 4th-corner-position-adjusted ACI as an internal closing-performance signal.",
+    "Keep prev3_aci_median as the primary ACI ability/repetition baseline; do not replace it with same-demand median.",
+    "Use course/surface/distance demand type only to interpret what kind of performance is required: sharp_closing, balanced, or sustained_position.",
+    "sustained_position never means that a slower last-3F time is inherently better; it means sharp last-3F receives less weight while position, sustained speed and deceleration resistance receive relatively more weight.",
+    "Use reproducibility as a confidence/current-value modifier. Large objective volatility lowers reproducibility confidence but does not erase peak ability.",
+    "Treat psychological labels such as mood as unsupported unless objective pre-race evidence exists; performance volatility is the modelled observable.",
+    "Prediction-time pace S/M/M-H/H and current track condition override historical course averages when they conflict."
+  ],
+  "rejected": [
+    "Do not mechanically replace prev3_aci_median with same-demand ACI median: next-start validation deteriorated.",
+    "Do not rank horses with confidence_adjusted_aci_v11 or subtract a numerical volatility penalty directly from peak ability: next-start validation deteriorated.",
+    "Do not create a public 10th evaluation axis for ACI.",
+    "Do not double-count the same closing-performance evidence in pace, ability and Time Index."
+  ],
+  "production_files": {
+    "profile": "closing_index_v1/production_profile_v1_1.json",
+    "implementation": "closing_index_v1/closing_index_v1_1.py",
+    "backtest": "closing_index_v1/backtest_v1_1.py",
+    "tests": "closing_index_v1/test_closing_index_v1_1.py",
+    "workflow_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/37344803904",
+    "artifact_id": 11359954914,
+    "artifact_sha256": "bf58c20f75abb1c68d3273b090452dc6d6597a1f6b9f795e49f5cddbf5872d1f"
+  }
+}
