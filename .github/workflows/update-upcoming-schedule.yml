@@ -1,0 +1,50 @@
+name: Validate upcoming race schedule
+
+on:
+  pull_request:
+    paths:
+      - 'docs/data/upcoming_schedule.json'
+      - 'docs/assets/schedule.js'
+      - 'docs/assets/schedule.css'
+      - 'docs/index.html'
+      - '.github/workflows/update-upcoming-schedule.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate schedule JSON syntax
+        run: python -m json.tool docs/data/upcoming_schedule.json > /dev/null
+      - name: Validate schedule structure
+        run: |
+          python - <<'PY'
+          import json, re
+          from datetime import date
+          from pathlib import Path
+
+          p = Path('docs/data/upcoming_schedule.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          assert data.get('schema_version') == 1
+          assert isinstance(data.get('days'), list) and data['days']
+          dates = [d['date'] for d in data['days']]
+          assert dates == sorted(dates), 'days must be sorted'
+          assert len(dates) == len(set(dates)), 'duplicate dates'
+          for day in data['days']:
+              date.fromisoformat(day['date'])
+              assert isinstance(day.get('races'), list) and day['races']
+              for r in day['races']:
+                  assert r.get('track')
+                  assert r.get('race')
+                  assert re.fullmatch(r'\d{2}:\d{2}', r.get('post_time',''))
+                  assert r.get('source_url','').startswith('https://www.jra.go.jp/')
+          print(f"schedule OK: {len(data['days'])} days / {sum(len(d['races']) for d in data['days'])} races")
+          PY
