@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "mode": "report_only",
-  "baseline_version": "v3.1",
-  "candidate_version": null,
+  "baseline_version": "v3.0",
+  "candidate_version": "v3.1",
   "strict_grades": ["prospective_strict"],
   "non_promotion_grades": ["historical_replay", "synthetic"],
   "minimum_strict_shared_cases": 20,
@@ -30,5 +30,5 @@
     "top3_brier",
     "roi_pct"
   ],
-  "promotion_policy": "No automatic prompt promotion in v1. Grade A paired evidence is reported to the weekly improvement process after the minimum shared-case threshold is met. ROI must never be the sole promotion criterion."
+  "promotion_policy": "No automatic prompt promotion in v1. v3.0 is the initial prospective baseline and v3.1 is the initial shadow candidate. Grade A paired evidence is reported after the minimum shared-case threshold is met. ROI must never be the sole promotion criterion."
 }
