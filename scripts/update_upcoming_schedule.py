@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 TRACKS = ("札幌", "函館", "福島", "新潟", "東京", "中山", "中京", "京都", "阪神", "小倉")
 TRACK_RE = re.compile(rf"^\d+回({'|'.join(TRACKS)})\d+日$")
 TIME_RE = re.compile(r"^(\d{1,2})時(\d{2})分$")
-USER_AGENT = "keiba-notes schedule updater/1.0"
+USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
 BASE = "https://www.jra.go.jp/keiba/calendar{year}/{year}/{month}/{mmdd}.html"
 
 
@@ -74,8 +74,18 @@ def parse_main_races(html: str, url: str) -> list[dict[str, str]]:
 
 def fetch_day(session: requests.Session, day: datetime) -> list[dict[str, str]]:
     url = page_url(day)
-    r = session.get(url, timeout=25, headers={"User-Agent": USER_AGENT})
-    if r.status_code == 404:
+    r = session.get(
+        url,
+        timeout=25,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept-Language": "ja,en-US;q=0.8,en;q=0.6",
+            "Referer": f"https://www.jra.go.jp/keiba/calendar{day.year}/",
+        },
+    )
+    # JRA can return 403 as well as 404 for dates that do not have a published
+    # race-program page. Treat both as "no scheduled meeting on this date".
+    if r.status_code in {403, 404}:
         return []
     r.raise_for_status()
     if not r.encoding or r.encoding.lower() == "iso-8859-1":
