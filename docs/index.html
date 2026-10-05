@@ -17,16 +17,8 @@
     .hero-nav-label{display:flex;align-items:center;gap:8px;min-width:0}
     .hero-nav-new{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#d8b35a;color:#17212b;font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1}
     .hero-nav-arrow{flex:0 0 auto;font-weight:500}
-    .improvement-summary{margin-top:28px;padding:18px 20px 16px;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:rgba(255,255,255,.035)}
-    .improvement-summary h2{margin:4px 0 7px;font-size:clamp(20px,3vw,25px);line-height:1.35}
-    .improvement-summary-copy{margin:0;color:#cfd8e5;line-height:1.7;font-size:14px}
-    .improvement-mini-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:8px;margin:15px 0 13px}
-    .improvement-mini-step{padding:10px 8px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(9,20,38,.48);text-align:center;color:#fff;font-weight:800;font-size:14px;white-space:nowrap}
-    .improvement-mini-arrow{color:#9eabbc;font-weight:900;text-align:center}
-    .improvement-detail-link{display:inline-flex;align-items:center;gap:6px;color:#f0d178;text-decoration:none;font-size:13px;font-weight:800}
-    .improvement-detail-link:hover{text-decoration:underline}
-    .improvement-summary .prompt-badge{margin-top:13px}
-    @media(max-width:640px){.hero-nav{grid-template-columns:1fr;max-width:none}.hero-nav-link{width:100%;min-height:54px}.improvement-summary{padding:16px 14px 14px}.improvement-mini-flow{gap:4px}.improvement-mini-step{padding:9px 4px;font-size:12px}.improvement-mini-arrow{font-size:12px}.improvement-summary-copy{font-size:13px}}
+    .hero-prompt-status{margin-top:14px}
+    @media(max-width:640px){.hero-nav{grid-template-columns:1fr;max-width:none}.hero-nav-link{width:100%;min-height:54px}}
   </style>
 </head>
 <body>
@@ -40,20 +32,7 @@
         <a class="hero-nav-link" href="methodology.html"><span class="hero-nav-label"><span>予想ロジックと検証思想</span></span><span class="hero-nav-arrow">→</span></a>
         <a class="hero-nav-link" href="roadmap.html"><span class="hero-nav-label"><span class="hero-nav-new">NEW</span><span>今後のブラッシュアップ思想</span></span><span class="hero-nav-arrow">→</span></a>
       </nav>
-
-      <section class="improvement-summary" aria-labelledby="cycleTitle">
-        <p class="eyebrow">HOW IT IMPROVES</p>
-        <h2 id="cycleTitle">予想・検証・改善を繰り返す</h2>
-        <p class="improvement-summary-copy">予想を出して終わりではなく、結果と外れ方を検証し、改善効果を確認しながら次の予想へ反映します。</p>
-        <div class="improvement-mini-flow" aria-label="改善の基本サイクル">
-          <div class="improvement-mini-step">予想</div><div class="improvement-mini-arrow">→</div>
-          <div class="improvement-mini-step">検証</div><div class="improvement-mini-arrow">→</div>
-          <div class="improvement-mini-step">改善</div><div class="improvement-mini-arrow">→</div>
-          <div class="improvement-mini-step">再検証</div>
-        </div>
-        <a class="improvement-detail-link" href="roadmap.html">改善の考え方を詳しく見る →</a>
-        <div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div>
-      </section>
+      <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
     </div>
   </header>
   <main class="wrap">
