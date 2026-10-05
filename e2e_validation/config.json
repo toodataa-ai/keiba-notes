@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "mode": "report_only",
+  "baseline_version": "v3.1",
+  "candidate_version": null,
+  "strict_grades": ["prospective_strict"],
+  "non_promotion_grades": ["historical_replay", "synthetic"],
+  "minimum_strict_shared_cases": 20,
+  "minimum_condition_coverage": {
+    "turf": 6,
+    "dirt": 6,
+    "venues": 4
+  },
+  "hard_failures": [
+    "prediction_after_cutoff",
+    "information_after_cutoff",
+    "proof_commit_after_cutoff",
+    "prediction_missing_from_proof_commit",
+    "race_id_mismatch",
+    "prompt_version_mismatch",
+    "invalid_probability_distribution"
+  ],
+  "comparison_metrics": [
+    "honmei_win_rate",
+    "honmei_top3_rate",
+    "top3_marks_capture_rate",
+    "winner_in_top3_marks_rate",
+    "win_brier",
+    "win_log_loss",
+    "top3_brier",
+    "roi_pct"
+  ],
+  "promotion_policy": "No automatic prompt promotion in v1. Grade A paired evidence is reported to the weekly improvement process after the minimum shared-case threshold is met. ROI must never be the sole promotion criterion."
+}
