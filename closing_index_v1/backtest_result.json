@@ -1,0 +1,100 @@
+{
+  "model": "Adjusted Closing Index v1",
+  "dataset": "takamotoki/jra-horse-racing-dataset",
+  "source_file": "19860105-20210731_race_result.csv",
+  "data_start_year": 2014,
+  "position_adjustment_fit_period": [2015, 2018],
+  "test_period": [2019, 2021],
+  "methodology": "next-start backtest; prior-race features only; common eligible runner set per race",
+  "metrics": {
+    "prev_last3f_seconds": {
+      "rows": 105423,
+      "races": 7740,
+      "auc_top3": 0.564842,
+      "top1_win_rate": 0.114599,
+      "top1_top3_rate": 0.301938,
+      "top3_capture_rate": 0.294789,
+      "winner_mean_rank": 6.080749,
+      "top3_mean_rank": 6.35801
+    },
+    "prev_race_relative_z": {
+      "rows": 105423,
+      "races": 7740,
+      "auc_top3": 0.637252,
+      "top1_win_rate": 0.153747,
+      "top1_top3_rate": 0.381525,
+      "top3_capture_rate": 0.349612,
+      "winner_mean_rank": 5.508075,
+      "top3_mean_rank": 5.821275
+    },
+    "prev_aci": {
+      "rows": 105423,
+      "races": 7740,
+      "auc_top3": 0.653216,
+      "top1_win_rate": 0.165245,
+      "top1_top3_rate": 0.399483,
+      "top3_capture_rate": 0.36727,
+      "winner_mean_rank": 5.280556,
+      "top3_mean_rank": 5.65997
+    },
+    "prev3_aci_median": {
+      "rows": 105423,
+      "races": 7740,
+      "auc_top3": 0.661077,
+      "top1_win_rate": 0.177261,
+      "top1_top3_rate": 0.409819,
+      "top3_capture_rate": 0.378768,
+      "winner_mean_rank": 5.13385,
+      "top3_mean_rank": 5.559475
+    }
+  },
+  "segments": {
+    "turf": {
+      "prev_race_relative_z": {"races": 3675, "auc_top3": 0.634813, "top1_win_rate": 0.157551, "top3_capture_rate": 0.355374, "winner_mean_rank": 5.397959},
+      "prev_aci": {"races": 3675, "auc_top3": 0.659848, "top1_win_rate": 0.177143, "top3_capture_rate": 0.383401, "winner_mean_rank": 5.057551},
+      "prev3_aci_median": {"races": 3675, "auc_top3": 0.674365, "top1_win_rate": 0.190204, "top3_capture_rate": 0.401633, "winner_mean_rank": 4.905986}
+    },
+    "dirt": {
+      "prev_race_relative_z": {"races": 4065, "auc_top3": 0.639174, "top1_win_rate": 0.150308, "top3_capture_rate": 0.344403, "winner_mean_rank": 5.607626},
+      "prev_aci": {"races": 4065, "auc_top3": 0.647047, "top1_win_rate": 0.15449, "top3_capture_rate": 0.352686, "winner_mean_rank": 5.482165},
+      "prev3_aci_median": {"races": 4065, "auc_top3": 0.649278, "top1_win_rate": 0.16556, "top3_capture_rate": 0.358098, "winner_mean_rank": 5.339852}
+    },
+    "sprint_1400": {
+      "prev_race_relative_z": {"races": 2913, "auc_top3": 0.619979, "top1_win_rate": 0.128733, "top3_capture_rate": 0.310219, "winner_mean_rank": 6.119293},
+      "prev_aci": {"races": 2913, "auc_top3": 0.648296, "top1_win_rate": 0.147957, "top3_capture_rate": 0.340199, "winner_mean_rank": 5.679025},
+      "prev3_aci_median": {"races": 2913, "auc_top3": 0.650239, "top1_win_rate": 0.152763, "top3_capture_rate": 0.346722, "winner_mean_rank": 5.645211}
+    },
+    "mile_1800": {
+      "prev_race_relative_z": {"races": 3250, "auc_top3": 0.646751, "top1_win_rate": 0.166462, "top3_capture_rate": 0.363385, "winner_mean_rank": 5.254308},
+      "prev_aci": {"races": 3250, "auc_top3": 0.654088, "top1_win_rate": 0.172308, "top3_capture_rate": 0.375897, "winner_mean_rank": 5.137231},
+      "prev3_aci_median": {"races": 3250, "auc_top3": 0.663032, "top1_win_rate": 0.190769, "top3_capture_rate": 0.385231, "winner_mean_rank": 4.936308}
+    },
+    "middle_2200": {
+      "prev_race_relative_z": {"races": 1206, "auc_top3": 0.645437, "top1_win_rate": 0.165837, "top3_capture_rate": 0.385849, "winner_mean_rank": 5.060531},
+      "prev_aci": {"races": 1206, "auc_top3": 0.654384, "top1_win_rate": 0.178275, "top3_capture_rate": 0.393311, "winner_mean_rank": 4.961028},
+      "prev3_aci_median": {"races": 1206, "auc_top3": 0.67286, "top1_win_rate": 0.191542, "top3_capture_rate": 0.417358, "winner_mean_rank": 4.666667}
+    },
+    "staying_2400plus": {
+      "prev_race_relative_z": {"races": 371, "auc_top3": 0.658456, "top1_win_rate": 0.199461, "top3_capture_rate": 0.420485, "winner_mean_rank": 4.386792},
+      "prev_aci": {"races": 371, "auc_top3": 0.659408, "top1_win_rate": 0.196765, "top3_capture_rate": 0.419587, "winner_mean_rank": 4.446092},
+      "prev3_aci_median": {"races": 371, "auc_top3": 0.671756, "top1_win_rate": 0.204852, "top3_capture_rate": 0.448338, "winner_mean_rank": 4.367925}
+    }
+  },
+  "decision": {
+    "integration_candidate": true,
+    "positive_core_metrics": 4,
+    "delta_prev_aci_vs_prev_race_relative_z": {
+      "auc_top3": 0.015964,
+      "top1_win_rate": 0.011498,
+      "top3_capture_rate": 0.017658,
+      "winner_mean_rank": 0.227519
+    },
+    "material_surface_harm": [],
+    "rule": "candidate if >=2/4 core metrics improve and neither turf nor dirt loses >1pp top3 capture"
+  },
+  "limitations": [
+    "v1 does not yet use race sectional/laptime data for explicit pace correction",
+    "horse identity uses horse name because this public race-result file has no separate horse ID column",
+    "dataset ends 2021-07-31 and is used for structural validation, not current-form calibration"
+  ]
+}

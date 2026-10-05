@@ -11,6 +11,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 from closing_index import (
+    PositionAdjustmentModel,
     add_prior_features,
     add_race_relative_features,
     apply_aci,
@@ -62,7 +63,6 @@ def load_data(start_year: int, end_year: int) -> pd.DataFrame:
     df["4コーナー"] = pd.to_numeric(df["4コーナー"], errors="coerce")
     df["距離(m)"] = pd.to_numeric(df["距離(m)"], errors="coerce")
 
-    # 平地のみ。障害区分が空で、芝/ダートが明確、正常完走している行を使う。
     flat = df["障害区分"].isna() | (df["障害区分"].astype(str).str.strip() == "")
     surface = df["芝・ダート区分"].astype(str).str.contains("芝|ダ", regex=True)
     valid = (
@@ -82,7 +82,7 @@ def prepare_dataset(
     df: pd.DataFrame,
     fit_start: int,
     fit_end: int,
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, PositionAdjustmentModel]:
     enriched = add_race_relative_features(df)
     train = enriched[enriched["year"].between(fit_start, fit_end)]
     model = fit_position_adjustment(train)
@@ -90,7 +90,70 @@ def prepare_dataset(
     enriched = add_prior_features(enriched)
     enriched["target_top3"] = (enriched["着順"] <= 3).astype(int)
     enriched["target_win"] = (enriched["着順"] == 1).astype(int)
-    return enriched
+    return enriched, model
+
+
+def serialize_model(
+    model: PositionAdjustmentModel,
+    fit_start: int,
+    fit_end: int,
+) -> dict:
+    return {
+        "model": "Adjusted Closing Index v1 position adjustment",
+        "version": "v1",
+        "fit_period": [fit_start, fit_end],
+        "source_dataset": DATASET,
+        "formula": {
+            "raw_close_z": "(race_median_last3f - horse_last3f) / robust_race_scale",
+            "robust_race_scale": "max(1.4826 * MAD(last3f), fallback_sample_std, 0.15)",
+            "corner4_pct": "(corner4_rank - 1) / max(field_size - 1, 1)",
+            "adjusted_close_z": "raw_close_z - expected_position_z",
+            "aci": "clip(100 + 10 * adjusted_close_z, 70, 130)"
+        },
+        "distance_bands": {
+            "sprint_1400": "<=1400m",
+            "mile_1800": "1401-1800m",
+            "middle_2200": "1801-2200m",
+            "staying_2400plus": ">2200m"
+        },
+        "position_bands": {
+            "front": "0-20%",
+            "stalk": "20-40%",
+            "mid": "40-65%",
+            "rear": "65-100%"
+        },
+        "exact": [
+            {
+                "surface": key[0],
+                "distance_band": key[1],
+                "position_band": key[2],
+                "expected_raw_close_z": round(value, 9)
+            }
+            for key, value in sorted(model.exact.items())
+        ],
+        "surface_position_fallback": [
+            {
+                "surface": key[0],
+                "position_band": key[1],
+                "expected_raw_close_z": round(value, 9)
+            }
+            for key, value in sorted(model.surface_position.items())
+        ],
+        "position_only_fallback": [
+            {
+                "position_band": key,
+                "expected_raw_close_z": round(value, 9)
+            }
+            for key, value in sorted(model.position_only.items())
+        ],
+        "global_mean": round(model.global_mean, 9),
+        "fallback_order": [
+            "surface+distance_band+position_band",
+            "surface+position_band",
+            "position_band",
+            "global_mean"
+        ]
+    }
 
 
 def evaluate_feature(df: pd.DataFrame, score_col: str) -> Dict[str, float]:
@@ -99,7 +162,6 @@ def evaluate_feature(df: pd.DataFrame, score_col: str) -> Dict[str, float]:
         ascending=False, method="average"
     )
 
-    # top-1 / top-3 はレース単位で評価。
     race_rows: List[dict] = []
     for _, race in work.groupby("レースID", sort=False):
         race = race.sort_values(["feature_rank", score_col], ascending=[True, False])
@@ -149,7 +211,6 @@ def evaluate_all(test: pd.DataFrame) -> Dict[str, Dict[str, float]]:
     for _, (col, values) in score_defs.items():
         work[col] = values
 
-    # 比較を公平にするため、全方式で値が揃う同じ馬・同じレースだけ使う。
     common_cols = [v[0] for v in score_defs.values()]
     work = work.dropna(subset=common_cols).copy()
     race_counts = work.groupby("レースID").size()
@@ -223,10 +284,11 @@ def main() -> None:
     p.add_argument("--test-start-year", type=int, default=2019)
     p.add_argument("--test-end-year", type=int, default=2021)
     p.add_argument("--output", default="closing_index_v1/backtest_result.json")
+    p.add_argument("--model-output", default="closing_index_v1/model_params.json")
     args = p.parse_args()
 
     df = load_data(args.data_start_year, args.test_end_year)
-    enriched = prepare_dataset(df, args.fit_start_year, args.fit_end_year)
+    enriched, model = prepare_dataset(df, args.fit_start_year, args.fit_end_year)
     test = enriched[
         enriched["year"].between(args.test_start_year, args.test_end_year)
     ].copy()
@@ -253,7 +315,20 @@ def main() -> None:
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    model_out = Path(args.model_output)
+    model_out.parent.mkdir(parents=True, exist_ok=True)
+    model_out.write_text(
+        json.dumps(
+            serialize_model(model, args.fit_start_year, args.fit_end_year),
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
     print(json.dumps(result, ensure_ascii=False, indent=2))
+    print("MODEL_PARAMS_PATH=" + str(model_out))
     print("BACKTEST_DECISION=" + json.dumps(result["decision"], ensure_ascii=False))
 
 
