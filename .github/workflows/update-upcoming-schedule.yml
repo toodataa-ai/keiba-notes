@@ -1,0 +1,44 @@
+name: Update upcoming race schedule
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/update_upcoming_schedule.py'
+      - 'docs/assets/schedule.js'
+      - 'docs/assets/schedule.css'
+      - 'docs/index.html'
+      - '.github/workflows/update-upcoming-schedule.yml'
+  schedule:
+    - cron: '15 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Build upcoming JRA main-race schedule
+        run: python scripts/update_upcoming_schedule.py --output docs/data/upcoming_schedule.json --days 35 --min-races 4
+      - name: Validate schedule JSON
+        run: python -m json.tool docs/data/upcoming_schedule.json > /dev/null
+      - name: Commit refreshed schedule
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/data/upcoming_schedule.json
+          if git diff --cached --quiet; then
+            echo 'No schedule changes'
+          else
+            git commit -m 'Refresh upcoming JRA prediction schedule'
+            git push
+          fi
