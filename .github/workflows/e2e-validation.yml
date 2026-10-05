@@ -5,12 +5,15 @@ on:
   pull_request:
     paths:
       - 'e2e_validation/**'
+      - 'experience_regime_v1/**'
       - '.github/workflows/e2e-validation.yml'
       - 'docs/data/e2e_status.json'
+      - 'docs/data/experience_regime_status.json'
   push:
     branches: [main]
     paths:
       - 'e2e_validation/**'
+      - 'experience_regime_v1/**'
       - '.github/workflows/e2e-validation.yml'
 
 permissions:
@@ -32,7 +35,9 @@ jobs:
         run: python e2e_validation/validate_manifests.py
 
       - name: Unit tests
-        run: python -m unittest e2e_validation.test_evaluate -v
+        run: |
+          python -m unittest e2e_validation.test_evaluate -v
+          python -m unittest experience_regime_v1.test_model -v
 
       - name: Smoke E2E evaluator
         run: |
@@ -40,28 +45,42 @@ jobs:
             --cases e2e_validation/fixtures \
             --output /tmp/e2e-smoke.json
 
+      - name: Smoke experience-regime analyzer
+        run: |
+          python experience_regime_v1/analyze.py \
+            --cases e2e_validation/fixtures \
+            --output /tmp/experience-regime-smoke.json
+
       - name: Evaluate real E2E cases
         run: |
           python e2e_validation/evaluate.py \
             --cases e2e_validation/cases \
             --output docs/data/e2e_status.json
 
-      - name: Upload E2E report
+      - name: Evaluate E0 E1 E2 shadow diagnostics
+        run: |
+          python experience_regime_v1/analyze.py \
+            --cases e2e_validation/cases \
+            --output docs/data/experience_regime_status.json
+
+      - name: Upload validation reports
         uses: actions/upload-artifact@v4
         with:
           name: e2e-validation-report
-          path: docs/data/e2e_status.json
+          path: |
+            docs/data/e2e_status.json
+            docs/data/experience_regime_status.json
           if-no-files-found: error
 
       - name: Publish status JSON on main
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if git diff --quiet -- docs/data/e2e_status.json; then
-            echo 'No E2E status change.'
+          if git diff --quiet -- docs/data/e2e_status.json docs/data/experience_regime_status.json; then
+            echo 'No validation status change.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/data/e2e_status.json
+          git add docs/data/e2e_status.json docs/data/experience_regime_status.json
           git commit -m 'Update E2E validation status'
           git push
