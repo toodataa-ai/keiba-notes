@@ -7,7 +7,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>今後のブラッシュアップ思想 | 競馬予想精度向上AI</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
-  <link rel="stylesheet" href="assets/roadmap.css?v=20261006-1">
+  <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
 </head>
 <body>
 <header class="method-hero roadmap-hero">
@@ -37,7 +37,7 @@
     <p class="toc-note">「実装済み」「検証中」「これから」を混ぜず、改善の採否まで含めて整理しています。</p>
     <div class="toc-grid">
       <a href="#thesis">01　ブラッシュアップの基本思想</a><a href="#history">02　ここまでに何を改善したか</a>
-      <a href="#cycle">03　改善を本番へ入れるまで</a><a href="#track">04　馬場予測を全10場へ育てる</a>
+      <a href="#cycle">03　日々の改善と本番採用まで</a><a href="#track">04　馬場予測を全10場へ育てる</a>
       <a href="#bias">05　当日バイアスを三つに分ける</a><a href="#pace">06　展開を単一シナリオから確率へ</a>
       <a href="#ability">07　能力比較を条件差から解放する</a><a href="#reliability">08　能力と再現性を分離する</a>
       <a href="#jockey">09　騎手を馬質から分離して測る</a><a href="#probability">10　確率校正と期待値を強くする</a>
@@ -67,7 +67,18 @@
   </section>
 
   <section class="chapter anchor" id="cycle">
-    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>改善案は、すぐ本番に入れない</h2><p class="chapter-lead">仮説→隔離実装→バックテスト→候補化→承認→実戦監視、の順で進めます。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>改善は、レースごとの循環と、本番採用のガードを分ける</h2><p class="chapter-lead">トップページで示している基本思想を、ここでは実際の運用レベルまで展開します。</p></div></div>
+    <h3 class="cycle-subhead">まず、日々の基本サイクル</h3>
+    <p>予想を出して終わりではなく、結果を記録し、外れ方まで検証して、次の改善へつなげます。変更内容は版ごとに残し、次のレースで再検証します。</p>
+    <div class="daily-cycle" aria-label="日々の改善サイクル">
+      <div class="daily-cycle-step"><span class="daily-cycle-no">1</span><b>予想する</b><span>最新プロンプトと同じ評価軸で全頭を分析</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">2</span><b>結果を記録</b><span>印・着順・馬券収支を予想時の情報とセットで保存</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">3</span><b>反省・誤差分析</b><span>見落とし、過大評価・過小評価、展開差などを分解</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">4</span><b>プロンプト改良</b><span>再発防止ルールを検討し、変更理由と内容を版管理</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>次レースで再検証</b><span>改良版を適用し、精度・回収率・誤差の変化を継続観測</span></div>
+    </div>
+    <h3 class="cycle-subhead">改善案を本番へ入れるときは、さらに厳しくする</h3>
+    <p>日々の反省で見つけた改善案を、そのまま本番へ入れるわけではありません。仮説化し、既存本線から隔離して検証し、候補化・承認・実戦監視まで通します。</p>
     <div class="roadmap-flow" aria-label="改善フロー">
       <div class="roadmap-step"><b>1. 誤差を観察</b>外れ方・不足情報を分類</div>
       <div class="roadmap-step"><b>2. 仮説化</b>何を変えれば改善するか限定</div>
