@@ -43,11 +43,14 @@ jobs:
             --fit-end-year 2018 \
             --test-start-year 2019 \
             --test-end-year 2021 \
-            --output closing_index_v1/backtest_result.json
+            --output closing_index_v1/backtest_result.json \
+            --model-output closing_index_v1/model_params.json
 
-      - name: Upload backtest result
+      - name: Upload backtest result and fitted model
         uses: actions/upload-artifact@v4
         with:
           name: closing-index-v1-backtest
-          path: closing_index_v1/backtest_result.json
+          path: |
+            closing_index_v1/backtest_result.json
+            closing_index_v1/model_params.json
           if-no-files-found: error
