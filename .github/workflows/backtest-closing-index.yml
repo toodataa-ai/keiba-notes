@@ -1,0 +1,54 @@
+name: Backtest closing index v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'closing_index_v1/**'
+      - '.github/workflows/backtest-closing-index.yml'
+  pull_request:
+    paths:
+      - 'closing_index_v1/**'
+      - '.github/workflows/backtest-closing-index.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy scikit-learn pytest kagglehub
+
+      - name: Unit tests
+        working-directory: closing_index_v1
+        run: pytest -q
+
+      - name: Run leakage-safe next-start backtest
+        run: |
+          python closing_index_v1/backtest.py \
+            --data-start-year 2014 \
+            --fit-start-year 2015 \
+            --fit-end-year 2018 \
+            --test-start-year 2019 \
+            --test-end-year 2021 \
+            --output closing_index_v1/backtest_result.json
+
+      - name: Upload backtest result
+        uses: actions/upload-artifact@v4
+        with:
+          name: closing-index-v1-backtest
+          path: closing_index_v1/backtest_result.json
+          if-no-files-found: error
