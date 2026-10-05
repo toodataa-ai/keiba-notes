@@ -7,6 +7,14 @@
   "information_cutoff_at": "YYYY-MM-DDTHH:MM:SS+09:00",
   "marks": {"win": 0, "second": 0, "third": 0},
   "step1_ranking": [],
+  "experience": {
+    "model_version": "e012-shadow-v0.1",
+    "horses": {
+      "1": {"starts_before_race": 0, "regime": "E0"},
+      "2": {"starts_before_race": 2, "regime": "E1"},
+      "3": {"starts_before_race": 7, "regime": "E2"}
+    }
+  },
   "track": {
     "going_probabilities": {"良": 0.0, "稍重": 0.0, "重": 0.0, "不良": 0.0}
   },
@@ -19,5 +27,5 @@
   "sources": [
     {"name": "source name", "url": "https://example.invalid", "published_at": "YYYY-MM-DDTHH:MM:SS+09:00"}
   ],
-  "note": "probabilities.win/top3 and pace.probabilities are optional until calibrated probability output is implemented. Never add race results to this file."
+  "note": "From 2026-10-10, prospective_strict JRA main-race snapshots must preserve pre-race starts_before_race and E0/E1/E2 regime for every runner. The experience block is shadow observation only and must not change v3.1 marks/ranking. probabilities.win/top3 and pace.probabilities remain optional until calibrated output is implemented. Never add race results to this file."
 }
