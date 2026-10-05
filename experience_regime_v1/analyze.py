@@ -5,7 +5,7 @@ import argparse
 import json
 import sys
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Dict, List
 
@@ -29,10 +29,42 @@ def discover_cases(cases_dir: Path) -> List[Path]:
     return sorted(cases_dir.rglob("case.json"))
 
 
+def load_collection_policy(repo_root: Path) -> dict:
+    cfg = read_json(repo_root / "experience_regime_v1/config.json")
+    collection = cfg.get("collection") or {}
+    required_from_raw = collection.get("required_from")
+    required_from = date.fromisoformat(required_from_raw) if required_from_raw else None
+    return {
+        "required_from": required_from,
+        "required_from_raw": required_from_raw,
+        "required_grades": set(collection.get("required_grades") or []),
+        "scope": collection.get("scope"),
+        "publish_per_horse_shadow_on_site": bool(
+            collection.get("publish_per_horse_shadow_on_site", False)
+        ),
+        "public_disclosure": collection.get("public_disclosure"),
+    }
+
+
+def collection_required(case: dict, grade: str, cutoff: datetime, policy: dict) -> bool:
+    required_from = policy.get("required_from")
+    if required_from is None or grade not in policy.get("required_grades", set()):
+        return False
+    raw = case.get("date")
+    case_date = date.fromisoformat(raw) if raw else cutoff.date()
+    return case_date >= required_from
+
+
 def run(repo_root: Path, cases_dir: Path) -> dict:
+    policy = load_collection_policy(repo_root)
     rows_by_version: Dict[str, List[dict]] = defaultdict(list)
     coverage_by_version: Dict[str, dict] = defaultdict(
-        lambda: {"prediction_entries": 0, "entries_with_experience": 0, "missing_experience": 0}
+        lambda: {
+            "prediction_entries": 0,
+            "entries_with_experience": 0,
+            "missing_experience": 0,
+            "required_entries": 0,
+        }
     )
     errors: List[dict] = []
 
@@ -43,6 +75,7 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
             if grade not in VALID_GRADES:
                 raise ValidationError(f"invalid grade: {grade}")
             cutoff = parse_dt(case.get("cutoff_at"))
+            is_required = collection_required(case, grade, cutoff, policy)
             result_path = case.get("result_path")
             if not result_path:
                 raise ValidationError("case.result_path is required")
@@ -51,6 +84,8 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
             for spec in case.get("predictions", []):
                 version = spec.get("version", "unknown")
                 coverage_by_version[version]["prediction_entries"] += 1
+                if is_required:
+                    coverage_by_version[version]["required_entries"] += 1
                 try:
                     prediction, _proof = load_prediction(repo_root, spec, grade, cutoff)
                     rows = build_horse_rows(prediction, result)
@@ -59,6 +94,12 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
                         rows_by_version[version].extend(rows)
                     else:
                         coverage_by_version[version]["missing_experience"] += 1
+                        if is_required:
+                            raise ExperienceValidationError(
+                                "experience_required_after_start_date: "
+                                f"grade={grade} date={case.get('date') or cutoff.date().isoformat()} "
+                                f"required_from={policy['required_from_raw']}"
+                            )
                 except (ValidationError, ExperienceValidationError) as exc:
                     errors.append(
                         {
@@ -69,7 +110,7 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
                             "error": str(exc),
                         }
                     )
-        except ValidationError as exc:
+        except (ValidationError, ValueError) as exc:
             errors.append(
                 {
                     "case": str(case_path.relative_to(repo_root)),
@@ -86,7 +127,11 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
         coverage = dict(coverage_by_version[version])
         total = coverage["prediction_entries"]
         covered = coverage["entries_with_experience"]
+        required = coverage["required_entries"]
         coverage["coverage_rate"] = round(covered / total, 6) if total else None
+        coverage["required_coverage_rate"] = (
+            round(covered / required, 6) if required else None
+        )
         versions[version] = {
             "coverage": coverage,
             "regimes": aggregate_rows(rows_by_version.get(version, [])),
@@ -98,6 +143,15 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "mode": "shadow_observation_only",
         "production_effect": False,
+        "collection": {
+            "required_from": policy["required_from_raw"],
+            "required_grades": sorted(policy["required_grades"]),
+            "scope": policy["scope"],
+            "publish_per_horse_shadow_on_site": policy[
+                "publish_per_horse_shadow_on_site"
+            ],
+            "public_disclosure": policy["public_disclosure"],
+        },
         "definitions": {
             "E0": "0 starts before race",
             "E1": "1-3 starts before race",
@@ -106,7 +160,8 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
         "versions": versions,
         "errors": errors,
         "interpretation": {
-            "missing_experience_is_not_a_validation_failure": True,
+            "missing_experience_before_collection_start_is_allowed": True,
+            "missing_required_experience_is_validation_failure": True,
             "no_ranking_or_mark_change": True,
             "no_automatic_promotion": True,
             "next_step": "Accumulate regime coverage, then estimate uncertainty/shrinkage as a separate challenger.",
