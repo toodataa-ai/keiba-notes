@@ -3,25 +3,78 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>馬場予測モデル | 競馬予想精度向上AI</title>
-<style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:#f4f6f8;color:#17212b}main{max-width:1120px;margin:auto;padding:24px 16px 56px}a{color:#075985}.top{display:flex;justify-content:space-between;gap:16px;align-items:center}.hero,.card{background:#fff;border:1px solid #dce3e8;border-radius:16px;padding:20px;margin:16px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.track{font-weight:800;font-size:22px}.surface{border-top:1px solid #e5e7eb;padding-top:12px;margin-top:12px}.surface:first-of-type{border-top:0}.surface-title{display:flex;justify-content:space-between;gap:8px;align-items:center}.status{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#e5e7eb}.validated{background:#dcfce7}.candidate{background:#dbeafe}.backtesting{background:#fef3c7}.pilot{background:#fff3cd}.degraded{background:#fee2e2}.retired{background:#e5e7eb}.small{font-size:13px;color:#53606d}.metric{font-size:28px;font-weight:800}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.metrics div{background:#f8fafc;border-radius:10px;padding:8px}.metrics strong{display:block;font-size:18px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:720px}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}th{font-size:12px;color:#53606d}.note{border-left:4px solid #f59e0b;padding-left:12px}.legend{display:flex;gap:8px;flex-wrap:wrap}.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.summary div{background:#f8fafc;border-radius:12px;padding:12px}.summary strong{display:block;font-size:26px}.gaps{margin:8px 0 0;padding-left:18px}.stage-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.baseline-note{border-left:3px solid #64748b;padding-left:9px;margin:10px 0}.candidate-note{border-left:3px solid #2563eb;padding-left:9px;margin:10px 0}.error{background:#fee2e2;border:1px solid #fecaca;padding:12px;border-radius:10px}.sectiontitle{margin-bottom:6px}@media(max-width:520px){.top{display:block}.hero,.card{padding:16px}.metric{font-size:24px}.metrics{grid-template-columns:1fr 1fr}}
-</style>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>馬場状態予測の研究 | 競馬予想精度向上AI</title>
+<link rel="stylesheet" href="assets/methodology.css?v=20261007-1">
+<link rel="stylesheet" href="assets/research-dashboard.css?v=20261007-1">
 <style id="simple-home-navigation-style">
-.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
-.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
-.simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
-.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
-@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}}
 </style>
 </head>
-<body><main>
-<div class="top"><div><h1>馬場状態予測モデル</h1></div><a class="simple-home-link" href="index.html">← トップページに戻る</a></div>
-<section class="hero"><h2 class="sectiontitle">試験運用をどう進化させるか</h2><p>JRA 10競馬場 × 芝/ダートの20モデルを独立管理し、<strong>試験運用 → 検証中 → 候補 → 検証済み</strong> の順に昇格させます。Stage単位でも検証状態を分け、候補生成までは自動化し、本番予想への接続は承認後だけ行います。</p><div class="grid"><div><div class="small">Stage A</div><div class="metric">前日 → 当日朝</div><p class="small">公式含水率とJMA気象履歴から朝の含水率を予測。LOYOと前向き時系列検証でbaseline比較。</p></div><div><div class="small">Stage B</div><div class="metric">朝実測 → 発走時</div><p class="small">朝実測・降雨・乾燥条件から、各レース時点のJRA公式「良/稍重/重/不良」を確率予測。発走時含水率を架空の正解値として扱いません。</p></div><div><div class="small">Production</div><div class="metric">承認制</div><p class="small">候補になっても自動で本番ルータへ接続しません。既存の検証済みモデルも勝手に置換しません。</p></div></div></section>
-<section class="card"><h2>現在の整備状況</h2><div class="legend"><span class="status validated">検証済み</span><span class="status candidate">候補</span><span class="status backtesting">検証中</span><span class="status pilot">試験運用</span><span class="status degraded">要改善</span></div><div id="summary" class="summary"></div><p id="registryMeta" class="small"></p><div id="cards" class="grid"><p class="small">モデルレジストリを読み込み中…</p></div></section>
-<section class="card"><h2>芝：JRA公式 含水率目安</h2><p class="small">範囲には重複があります。馬場状態は含水率だけで機械的に決定しません。</p><div class="tablewrap"><table><thead><tr><th>競馬場</th><th>良</th><th>稍重</th><th>重</th><th>不良</th></tr></thead><tbody id="thresholds"></tbody></table></div></section>
-<section class="card"><h2>昇格ルール</h2><p class="note"><strong>可視化ルール：</strong> 実測バックテストが存在する指標だけ表示します。「Baseline」は比較対象です。Stage A 候補でもStage BがPilotなら、モデル全体はBacktestingのままです。</p><ol><li>Stage Aは複数年・独立サンプルでLOYO/時系列検証を行い、naive baselineより改善すること。</li><li>Stage Bはレース時点のJRA公式馬場状態を教師ラベルにし、現行heuristicよりLog Loss/Brier Scoreを改善すること。</li><li>乾燥ケースだけでなく雨天・馬場変化ケースを別監査すること。</li><li>未来情報混入なし・再現可能なバックテストであること。</li><li>候補 → 検証済み、本番モデル置換は承認必須。</li></ol></section>
-<p class="small">データ方針： JRA公式含水率は2018-07-27以降、クッション値は2020-09-11以降を基本母集団。京都は2023年再開後を現行レジームとして優先します。</p>
+<body class="research-dashboard">
+<header class="method-hero">
+  <div class="wrap">
+    <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
+    <div class="hero-copy">
+      <p class="kicker">GOING FORECAST RESEARCH</p>
+      <h1>馬場状態予測の研究</h1>
+      <p class="hero-deck">レースの発走時に、馬場が「良・稍重・重・不良」のどれになりそうかを、どこまで正確に予測できるか検証しています。</p>
+      <div class="hero-thesis"><strong>ここで分かるのは「発走時の馬場を予想に使えるレベルまで読めるか」。</strong> 競馬場×芝・ダートごとに精度を測り、十分に検証できたものだけ本番のAI予想へ接続します。</div>
+    </div>
+  </div>
+</header>
+<main class="wrap article">
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>このページで分かること</h2><p class="chapter-lead">モデルの内部構造より先に、ユーザーが知りたい3点を示します。</p></div></div>
+    <div class="rd-purpose">
+      <div><b>発走時の馬場をどこまで読めるか</b><span>前日や朝の情報から、実際のレース時点の馬場状態をどの程度当てられるかを見る</span></div>
+      <div><b>どの競馬場が使える段階か</b><span>10競馬場×芝・ダートを別々に検証し、完成度を確認する</span></div>
+      <div><b>本番AI予想に使っているか</b><span>研究中なのか、候補なのか、すでに本番予想へ接続しているのかを確認する</span></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>今の結論</h2><p class="chapter-lead">20モデル全体の整備状況を、まずここで確認します。</p></div></div>
+    <div style="margin-top:20px"><span id="babaState" class="rd-status">読み込み中</span></div>
+    <h3 id="babaConclusion" class="rd-conclusion">現在の整備状況を確認しています。</h3>
+    <p id="babaConclusionSub" class="rd-conclusion-text"></p>
+    <div id="summary" class="rd-summary-model"></div>
+    <p id="registryMeta" class="rd-sub"></p>
+    <div class="rd-note"><strong>見方：</strong>「候補」や「検証中」は、まだ自動的に本番AI予想へ採用される状態ではありません。十分な検証と承認を経たものだけ接続します。</div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>競馬場別の整備状況</h2><p class="chapter-lead">競馬場ごとに、芝・ダートの研究状況と精度を確認できます。</p></div></div>
+    <div class="rd-chips" style="margin:18px 0 12px"><span class="rd-chip validated">検証済み</span><span class="rd-chip candidate">候補</span><span class="rd-chip backtesting">検証中</span><span class="rd-chip pilot">試験運用</span><span class="rd-chip degraded">要改善</span></div>
+    <div id="cards" class="rd-model-grid"><p class="rd-small">モデルレジストリを読み込み中…</p></div>
+  </section>
+
+  <details class="rd-tech">
+    <summary>予測の仕組み・含水率・昇格ルールなどの技術情報を見る</summary>
+    <div class="rd-tech-body">
+      <h3>どう予測しているか</h3>
+      <div class="rd-purpose">
+        <div><b>Stage A：前日 → 当日朝</b><span>公式含水率と気象履歴から、当日朝の状態を予測します。</span></div>
+        <div><b>Stage B：朝実測 → 発走時</b><span>朝の実測、降雨、乾燥条件から、レース時点の良・稍重・重・不良を確率で予測します。</span></div>
+        <div><b>本番接続は承認制</b><span>候補になっても勝手に本番AI予想へ切り替えません。</span></div>
+      </div>
+      <h3 style="margin-top:24px">芝：JRA公式 含水率目安</h3>
+      <p class="rd-small">範囲には重複があります。馬場状態は含水率だけで機械的に決定しません。</p>
+      <div class="rd-tablewrap"><table class="rd-table"><thead><tr><th>競馬場</th><th>良</th><th>稍重</th><th>重</th><th>不良</th></tr></thead><tbody id="thresholds"></tbody></table></div>
+      <h3 style="margin-top:24px">本番採用までのルール</h3>
+      <div class="rd-note"><strong>可視化ルール：</strong> 実測バックテストが存在する指標だけ表示します。「Baseline」は比較対象であり、モデル精度そのものではありません。</div>
+      <ol>
+        <li>Stage Aは複数年・独立サンプルでLOYO/時系列検証を行い、naive baselineより改善すること。</li>
+        <li>Stage Bはレース時点のJRA公式馬場状態を教師ラベルにし、現行heuristicよりLog Loss/Brier Scoreを改善すること。</li>
+        <li>乾燥ケースだけでなく雨天・馬場変化ケースを別監査すること。</li>
+        <li>未来情報混入なし・再現可能なバックテストであること。</li>
+        <li>候補 → 検証済み、本番モデル置換は承認必須。</li>
+      </ol>
+      <p class="rd-small">データ方針：JRA公式含水率は2018-07-27以降、クッション値は2020-09-11以降を基本母集団。京都は2023年再開後を現行レジームとして優先します。</p>
+    </div>
+  </details>
+
+  <div class="rd-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 <script>
 const th=[['札幌','≤15','14–18','17–21','≥20'],['函館','≤15','14–18','17–21','≥20'],['福島','≤15','13–17','15–19','≥17'],['新潟','≤15','13–17','15–19','≥17'],['中山','≤13','11–15','14–18','≥17'],['東京','≤19','17–21','18–23','≥20'],['中京','≤14','12–16','14–17','≥16'],['京都','≤13','11–14','13–16','≥14'],['阪神','≤14','12–16','14–18','≥16'],['小倉','≤10','8–12','10–14','≥12']];
@@ -31,13 +84,13 @@ const surfaceLabel={turf:'芝',dirt:'ダート'};
 const fmt=n=>n==null?'未検証':Number(n).toFixed(2);
 const pct=n=>n==null?'未検証':(Number(n)*100).toFixed(1)+'%';
 const pctPoint=n=>n==null?'—':Number(n).toFixed(1)+'%';
-function badge(s){return `<span class="status ${s}">${labels[s]||s}</span>`}
-function metricGrid(m){return `<div class="metrics"><div><span class="small">n</span><strong>${m.n??'—'}</strong></div><div><span class="small">MAE</span><strong>${fmt(m.mae)}</strong></div><div><span class="small">RMSE</span><strong>${fmt(m.rmse)}</strong></div></div><p class="small">±1pt以内: ${pct(m.within_1_0pt)}${m.validation?' / 検証: '+m.validation:''}</p>`}
-function stageAEvidence(stage){if(stage.metrics){const title=stage.status==='candidate'?'Stage A 候補（本番未接続）':'Stage A 検証済みモデル';const imp=stage.metrics.mae_improvement_vs_baseline_pct!=null?`<p class="small"><strong>baseline比:</strong> MAE ${pctPoint(stage.metrics.mae_improvement_vs_baseline_pct)}改善 / RMSE ${pctPoint(stage.metrics.rmse_improvement_vs_baseline_pct)}改善</p>`:'';const wet=stage.metrics.wet_mae!=null?`<p class="small"><strong>雨天:</strong> MAE ${fmt(stage.metrics.wet_mae)} / baseline ${fmt(stage.metrics.wet_baseline_mae)}</p>`:'';const guard=stage.guardrail?`<p class="small"><strong>外挿ガード:</strong> ${stage.guardrail}</p>`:'';return `<div class="${stage.status==='candidate'?'candidate-note':''}"><p class="small"><strong>${title}</strong></p>${metricGrid(stage.metrics)}${imp}${wet}${guard}</div>`}if(stage.baseline)return `<div class="baseline-note"><p class="small"><strong>比較基準 Baseline（モデル精度ではありません）</strong></p>${metricGrid(stage.baseline)}</div><p class="small">Stage Aモデル精度: まだ未検証</p>`;return '<p class="small">Stage A精度: 未検証</p>'}
+function badge(s){return `<span class="rd-chip ${s}">${labels[s]||s}</span>`}
+function metricGrid(m){return `<div class="rd-metrics"><div><span class="rd-small">n</span><strong>${m.n??'—'}</strong></div><div><span class="rd-small">MAE</span><strong>${fmt(m.mae)}</strong></div><div><span class="rd-small">RMSE</span><strong>${fmt(m.rmse)}</strong></div></div><p class="rd-small">±1pt以内: ${pct(m.within_1_0pt)}${m.validation?' / 検証: '+m.validation:''}</p>`}
+function stageAEvidence(stage){if(stage.metrics){const title=stage.status==='candidate'?'Stage A 候補（本番未接続）':'Stage A 検証済みモデル';const imp=stage.metrics.mae_improvement_vs_baseline_pct!=null?`<p class="rd-small"><strong>baseline比:</strong> MAE ${pctPoint(stage.metrics.mae_improvement_vs_baseline_pct)}改善 / RMSE ${pctPoint(stage.metrics.rmse_improvement_vs_baseline_pct)}改善</p>`:'';const wet=stage.metrics.wet_mae!=null?`<p class="rd-small"><strong>雨天:</strong> MAE ${fmt(stage.metrics.wet_mae)} / baseline ${fmt(stage.metrics.wet_baseline_mae)}</p>`:'';const guard=stage.guardrail?`<p class="rd-small"><strong>外挿ガード:</strong> ${stage.guardrail}</p>`:'';return `<div class="${stage.status==='candidate'?'rd-candidate':''}"><p class="rd-small"><strong>${title}</strong></p>${metricGrid(stage.metrics)}${imp}${wet}${guard}</div>`}if(stage.baseline)return `<div class="rd-baseline"><p class="rd-small"><strong>比較基準 Baseline（モデル精度ではありません）</strong></p>${metricGrid(stage.baseline)}</div><p class="rd-small">Stage Aモデル精度: まだ未検証</p>`;return '<p class="rd-small">Stage A精度: 未検証</p>'}
 function dataText(d){const parts=[d.period||'未構築',`samples ${d.samples??0}`,`${d.years??0}年`];if(d.wet_samples!=null)parts.push(`雨天 ${d.wet_samples}`);if(d.observations!=null)parts.push(`観測 ${d.observations}`);if(d.meetings!=null)parts.push(`開催 ${d.meetings}`);return parts.join(' / ')}
-function renderModel(m){return `<div class="surface"><div class="surface-title"><strong>${surfaceLabel[m.surface]} / ${m.version}</strong>${badge(m.status)}</div><div class="stage-row"><span class="small">Stage A</span>${badge(m.stage_a.status)}<span class="small">Stage B</span>${badge(m.stage_b.status)}</div>${stageAEvidence(m.stage_a)}<p class="small">データ: ${dataText(m.data)}</p><p class="small">本番ルータ: ${m.routing.production?'接続中（既存モデル）':'未接続'}</p><details><summary class="small">昇格まで不足している条件</summary><ul class="gaps small">${(m.promotion_gaps||[]).map(x=>`<li>${x}</li>`).join('')}</ul></details></div>`}
-async function load(){try{const r=await fetch('data/baba_model_registry.json',{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();const grouped=new Map();for(const m of data.models){if(!grouped.has(m.track))grouped.set(m.track,{ja:m.track_ja,models:[]});grouped.get(m.track).models.push(m)}document.querySelector('#cards').innerHTML=[...grouped.values()].map(g=>`<article class="card"><div class="track">${g.ja}</div>${g.models.sort((a,b)=>a.surface==='turf'?-1:1).map(renderModel).join('')}</article>`).join('');const counts={};for(const m of data.models)counts[m.status]=(counts[m.status]||0)+1;const stageACandidates=data.models.filter(m=>m.stage_a.status==='candidate').length;document.querySelector('#summary').innerHTML=['validated','backtesting','pilot','degraded'].map(s=>`<div><span class="small">全体 ${labels[s]}</span><strong>${counts[s]||0}</strong><span class="small">/ 20モデル</span></div>`).join('')+`<div><span class="small">Stage A 候補</span><strong>${stageACandidates}</strong><span class="small">/ 20 Stage A</span></div>`;document.querySelector('#registryMeta').textContent=`Registry v${data.registry_version} / 更新 ${data.updated_at} / production router changed: ${data.production_router_changed}`;}catch(e){document.querySelector('#cards').innerHTML=`<div class="error">モデルレジストリの読み込みに失敗しました: ${e.message}</div>`}}
+function renderModel(m){return `<div class="rd-surface"><div class="rd-surface-title"><strong>${surfaceLabel[m.surface]} / ${m.version}</strong>${badge(m.status)}</div><div class="rd-stage-row"><span class="rd-small">Stage A</span>${badge(m.stage_a.status)}<span class="rd-small">Stage B</span>${badge(m.stage_b.status)}</div>${stageAEvidence(m.stage_a)}<p class="rd-small">データ: ${dataText(m.data)}</p><p class="rd-small"><strong>本番AI予想:</strong> ${m.routing.production?'接続中':'未接続'}</p><details><summary class="rd-small">次の段階まで不足している条件</summary><ul class="rd-small">${(m.promotion_gaps||[]).map(x=>`<li>${x}</li>`).join('')}</ul></details></div>`}
+async function load(){try{const r=await fetch('data/baba_model_registry.json',{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const data=await r.json();const grouped=new Map();for(const m of data.models){if(!grouped.has(m.track))grouped.set(m.track,{ja:m.track_ja,models:[]});grouped.get(m.track).models.push(m)}document.querySelector('#cards').innerHTML=[...grouped.values()].map(g=>`<article class="rd-model-card"><div class="rd-track">${g.ja}</div>${g.models.sort((a,b)=>a.surface==='turf'?-1:1).map(renderModel).join('')}</article>`).join('');const counts={};for(const m of data.models)counts[m.status]=(counts[m.status]||0)+1;const stageACandidates=data.models.filter(m=>m.stage_a.status==='candidate').length;const production=data.models.filter(m=>m.routing?.production).length;const total=data.models.length;const validated=counts.validated||0;document.querySelector('#summary').innerHTML=`<div><span class="rd-small">本番AI予想に接続</span><strong>${production}</strong><span class="rd-small">/ ${total}モデル</span></div><div><span class="rd-small">全体 検証済み</span><strong>${validated}</strong><span class="rd-small">/ ${total}モデル</span></div><div><span class="rd-small">検証中</span><strong>${counts.backtesting||0}</strong><span class="rd-small">/ ${total}モデル</span></div><div><span class="rd-small">試験運用</span><strong>${counts.pilot||0}</strong><span class="rd-small">/ ${total}モデル</span></div><div><span class="rd-small">Stage A 候補</span><strong>${stageACandidates}</strong><span class="rd-small">/ ${total} Stage A</span></div>`;const state=document.getElementById('babaState'),title=document.getElementById('babaConclusion'),sub=document.getElementById('babaConclusionSub');if(validated===total&&total>0){state.textContent='全モデル検証済み';state.className='rd-status ok';title.textContent='全競馬場・芝ダートで検証済みの状態です。';sub.textContent=`本番AI予想への接続は ${production}/${total}モデル。接続は承認制で管理しています。`;}else{state.textContent='研究・検証を継続中';state.className='rd-status warn';title.textContent='まだ全競馬場で完成しているわけではありません。';sub.textContent=`全${total}モデルのうち、検証済み ${validated}、本番AI予想へ接続中 ${production}。競馬場・走路ごとに段階的に精度を上げています。`;}document.querySelector('#registryMeta').textContent=`更新 ${data.updated_at} / Registry v${data.registry_version}`;}catch(e){document.querySelector('#cards').innerHTML=`<div class="rd-error">モデルレジストリの読み込みに失敗しました: ${e.message}</div>`;const state=document.getElementById('babaState');state.textContent='読み込みエラー';state.className='rd-status bad';}}
 load();
 </script>
-  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
