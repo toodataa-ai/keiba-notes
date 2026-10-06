@@ -18,6 +18,7 @@ from experience_regime_v1.model import (
     ExperienceValidationError,
     aggregate_rows,
     build_horse_rows,
+    validate_race_context,
 )
 
 VALID_GRADES = {"prospective_strict", "historical_replay", "synthetic"}
@@ -32,17 +33,25 @@ def discover_cases(cases_dir: Path) -> List[Path]:
 def load_collection_policy(repo_root: Path) -> dict:
     cfg = read_json(repo_root / "experience_regime_v1/config.json")
     collection = cfg.get("collection") or {}
+    sampling = collection.get("sampling") or {}
+    categories = sampling.get("categories") or {}
     required_from_raw = collection.get("required_from")
     required_from = date.fromisoformat(required_from_raw) if required_from_raw else None
     return {
         "required_from": required_from,
         "required_from_raw": required_from_raw,
         "required_grades": set(collection.get("required_grades") or []),
-        "scope": collection.get("scope"),
+        "population_scope": collection.get("population_scope"),
+        "selected_scope": collection.get("selected_scope"),
+        "require_race_context": bool(collection.get("require_race_context", False)),
         "publish_per_horse_shadow_on_site": bool(
             collection.get("publish_per_horse_shadow_on_site", False)
         ),
         "public_disclosure": collection.get("public_disclosure"),
+        "sampling_version": sampling.get("version"),
+        "sampling_categories": categories,
+        "sampling_shortage_policy": sampling.get("shortage_policy"),
+        "sampling_selection_policy": sampling.get("selection_policy"),
     }
 
 
@@ -55,6 +64,36 @@ def collection_required(case: dict, grade: str, cutoff: datetime, policy: dict) 
     return case_date >= required_from
 
 
+def category_breakdown(rows: List[dict], categories: dict) -> dict:
+    out = {}
+    observed = {r.get("race_category") for r in rows if r.get("race_category")}
+    keys = list(categories.keys()) + sorted(observed - set(categories))
+    for key in keys:
+        group = [r for r in rows if r.get("race_category") == key]
+        meta = categories.get(key) or {}
+        out[key] = {
+            "label": meta.get("label", key),
+            "target_per_week": meta.get("target_per_week"),
+            "horse_observations": len(group),
+            "races": len({r.get("race_id") for r in group}),
+            "regimes": aggregate_rows(group),
+        }
+    return out
+
+
+def origin_breakdown(rows: List[dict]) -> dict:
+    origins = sorted({r.get("sample_origin") for r in rows if r.get("sample_origin")})
+    out = {}
+    for origin in origins:
+        group = [r for r in rows if r.get("sample_origin") == origin]
+        out[origin] = {
+            "horse_observations": len(group),
+            "races": len({r.get("race_id") for r in group}),
+            "regimes": aggregate_rows(group),
+        }
+    return out
+
+
 def run(repo_root: Path, cases_dir: Path) -> dict:
     policy = load_collection_policy(repo_root)
     rows_by_version: Dict[str, List[dict]] = defaultdict(list)
@@ -64,6 +103,8 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
             "entries_with_experience": 0,
             "missing_experience": 0,
             "required_entries": 0,
+            "required_entries_with_experience": 0,
+            "required_missing_experience": 0,
         }
     )
     errors: List[dict] = []
@@ -83,18 +124,28 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
 
             for spec in case.get("predictions", []):
                 version = spec.get("version", "unknown")
-                coverage_by_version[version]["prediction_entries"] += 1
+                coverage = coverage_by_version[version]
+                coverage["prediction_entries"] += 1
                 if is_required:
-                    coverage_by_version[version]["required_entries"] += 1
+                    coverage["required_entries"] += 1
                 try:
                     prediction, _proof = load_prediction(repo_root, spec, grade, cutoff)
+                    if is_required and policy["require_race_context"]:
+                        validate_race_context(
+                            prediction,
+                            allowed_categories=policy["sampling_categories"].keys(),
+                            required=True,
+                        )
                     rows = build_horse_rows(prediction, result)
                     if rows:
-                        coverage_by_version[version]["entries_with_experience"] += 1
+                        coverage["entries_with_experience"] += 1
+                        if is_required:
+                            coverage["required_entries_with_experience"] += 1
                         rows_by_version[version].extend(rows)
                     else:
-                        coverage_by_version[version]["missing_experience"] += 1
+                        coverage["missing_experience"] += 1
                         if is_required:
+                            coverage["required_missing_experience"] += 1
                             raise ExperienceValidationError(
                                 "experience_required_after_start_date: "
                                 f"grade={grade} date={case.get('date') or cutoff.date().isoformat()} "
@@ -128,17 +179,21 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
         total = coverage["prediction_entries"]
         covered = coverage["entries_with_experience"]
         required = coverage["required_entries"]
+        required_covered = coverage["required_entries_with_experience"]
         coverage["coverage_rate"] = round(covered / total, 6) if total else None
         coverage["required_coverage_rate"] = (
-            round(covered / required, 6) if required else None
+            round(required_covered / required, 6) if required else None
         )
+        rows = rows_by_version.get(version, [])
         versions[version] = {
             "coverage": coverage,
-            "regimes": aggregate_rows(rows_by_version.get(version, [])),
+            "regimes": aggregate_rows(rows),
+            "categories": category_breakdown(rows, policy["sampling_categories"]),
+            "sample_origins": origin_breakdown(rows),
         }
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "model_version": "e012-shadow-v0.1",
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "mode": "shadow_observation_only",
@@ -146,11 +201,19 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
         "collection": {
             "required_from": policy["required_from_raw"],
             "required_grades": sorted(policy["required_grades"]),
-            "scope": policy["scope"],
+            "population_scope": policy["population_scope"],
+            "selected_scope": policy["selected_scope"],
+            "require_race_context": policy["require_race_context"],
             "publish_per_horse_shadow_on_site": policy[
                 "publish_per_horse_shadow_on_site"
             ],
             "public_disclosure": policy["public_disclosure"],
+            "sampling": {
+                "version": policy["sampling_version"],
+                "categories": policy["sampling_categories"],
+                "shortage_policy": policy["sampling_shortage_policy"],
+                "selection_policy": policy["sampling_selection_policy"],
+            },
         },
         "definitions": {
             "E0": "0 starts before race",
@@ -160,11 +223,14 @@ def run(repo_root: Path, cases_dir: Path) -> dict:
         "versions": versions,
         "errors": errors,
         "interpretation": {
+            "all_jra_race_numbers_are_population_candidates": True,
+            "official_main_predictions_are_always_included": True,
+            "non_main_races_are_stratified_by_category": True,
             "missing_experience_before_collection_start_is_allowed": True,
             "missing_required_experience_is_validation_failure": True,
             "no_ranking_or_mark_change": True,
             "no_automatic_promotion": True,
-            "next_step": "Accumulate regime coverage, then estimate uncertainty/shrinkage as a separate challenger.",
+            "next_step": "Accumulate category x regime coverage, then estimate uncertainty/shrinkage as a separate challenger.",
         },
     }
 
