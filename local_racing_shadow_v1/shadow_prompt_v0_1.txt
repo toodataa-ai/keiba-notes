@@ -1,0 +1,81 @@
+地方競馬 Daily Shadow v0.1
+
+目的：
+南関4場（大井・川崎・船橋・浦和）＋園田＋名古屋を、JRA本番とは分離した研究用Shadowとして毎日観測する。
+地方の結果を直接JRA本番へ学習させない。複数場・複数条件で再現する抽象的な改善候補を発見し、JRA側で改めてE2E検証する。
+
+【不変条件】
+- production_effect=false。
+- JRAの正式◎○▲△×、STEP1順位、STEP2、買い目、正式プロンプトを地方Shadowが直接変更してはならない。
+- 予想snapshotは必ず発走前に固定し、cutoff後は改変しない。
+- prediction作成時に着順、払戻、レース後記事、結果を知り得る情報を取得・混入しない。
+- 地方6場を一つの均質な母集団として扱わず、venue別・条件別に保存する。
+- 一日単位の結果だけで一般化しない。
+
+【対象】
+config.jsonでenabled=trueの競馬場。
+初期対象：大井、川崎、船橋、浦和、園田、名古屋。
+開催日の全レースを母集団とする。
+
+【PRE-RACE】
+1. 公式情報を優先して当日の開催有無・番組・出走馬・発走時刻を確認する。
+2. 各レースについて発走前情報だけを収集する。
+3. compact predictionを作る。
+4. 最低限、race_id/date/venue/race_no/race_name/distance/class/age condition/scheduled_start_at/generated_at/information_cutoff_at/model_versionを保存する。
+5. runnersごとに、可能な範囲で以下を保存する。
+   - horse_no / horse_name
+   - weight carried
+   - gate
+   - jockey
+   - recent races available before cutoff
+   - rotation
+   - ability evidence
+   - running style hypothesis
+   - reliability / evidence density
+6. レース全体について以下を保存する。
+   - STEP1相当の能力順位（オッズは能力順位に使わない）
+   - pace hypothesis
+   - going
+   - track/position/path bias evidence if available
+   - sources（name/url/published_at or observed_at）
+7. predictionをGitHubへ保存し、結果確定後も書き換えない。
+
+【POST-RACE】
+1. 公式結果確定後のみresultを取得する。
+2. resultはpredictionとは別ファイルにする。
+3. finish_order / official_going / available splits / positionsを保存する。
+4. predictionとの差を以下の軸で分解する。
+   - venue
+   - distance
+   - class
+   - age band
+   - field size
+   - going
+   - pace
+   - running style
+   - gate
+   - jockey
+   - weight
+   - rotation
+   - ability rank
+   - reliability
+5. 日次aggregateを更新する。
+6. 予想時点で改善可能だった誤差と、偶然・不利・出遅れ等の分散要因を可能な限り分離する。
+
+【TRANSFER CANDIDATE】
+週次でのみ生成する。
+地方特有の数値係数をJRAへ直接持ち込まない。
+複数場・複数日で再現する方法論だけを抽象化し、candidateとして記録する。
+例：
+- 逃げ・先行馬密度とテン性能から展開崩壊確率を推定する方法
+- 枠×脚質×頭数から位置取り不利を測る方法
+- 当日バイアスを時計速度/位置/進路へ分ける方法
+- 騎手条件別寄与を馬質から分離する方法
+- 斤量やローテの条件別効果を測る方法
+
+candidateはJRA productionへ直接接続しない。
+JRA historical replay / Grade A E2E等で別途比較し、明示承認があるまで本番採用しない。
+
+【公開】
+個別の地方Shadow予想は正式予想アーカイブへ載せない。
+公開サイトでは、研究目的、対象競馬場、観測件数、進捗、主要finding、transfer candidateの状態だけを表示する。
