@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "model_version": "e012-shadow-v0.1",
   "mode": "shadow_observation_only",
   "production_effect": false,
@@ -11,10 +11,36 @@
   "collection": {
     "required_from": "2026-10-10",
     "required_grades": ["prospective_strict"],
-    "scope": "JRA each race-day 11R main race",
+    "population_scope": "JRA all races 1R-12R",
+    "selected_scope": "all official main-race predictions plus stratified samples from 1R-12R",
     "store_pre_race": true,
+    "require_race_context": true,
     "publish_per_horse_shadow_on_site": false,
-    "public_disclosure": "research-purpose, aggregate progress, promotion criteria and findings only"
+    "public_disclosure": "research-purpose, aggregate progress, category-level progress, promotion criteria and findings only",
+    "sampling": {
+      "version": "stratified-v0.1",
+      "unit": "race",
+      "cadence": "weekly",
+      "seed_namespace": "e012-stratified-v0.1",
+      "all_race_numbers_eligible": true,
+      "race_number_min": 1,
+      "race_number_max": 12,
+      "always_include": {
+        "official_prediction_races": true,
+        "count_toward_category_quota": false
+      },
+      "categories": {
+        "debut": {"label": "新馬", "target_per_week": 3},
+        "maiden": {"label": "未勝利", "target_per_week": 3},
+        "class_1": {"label": "1勝クラス", "target_per_week": 2},
+        "class_2": {"label": "2勝クラス", "target_per_week": 2},
+        "class_3": {"label": "3勝クラス", "target_per_week": 2},
+        "open_listed": {"label": "OP・L", "target_per_week": 2},
+        "graded": {"label": "GIII・GII・GI", "target_per_week": 2}
+      },
+      "shortage_policy": "take all available races in the category and record the shortfall; do not substitute from another category",
+      "selection_policy": "deterministic hash ranking within each category; selection must be reproducible from week_id, race_id and seed_namespace"
+    }
   },
   "promotion": {
     "automatic": false,
@@ -26,7 +52,8 @@
     },
     "require_historical_replay": true,
     "require_prospective_grade_a": true,
+    "require_category_stability_review": true,
     "require_no_material_e2_regression": true
   },
-  "planned_next_stage": "Estimate regime-specific uncertainty and shrinkage only after shadow calibration; do not use fixed unvalidated bonuses or penalties."
+  "planned_next_stage": "Estimate regime-specific uncertainty and shrinkage only after shadow calibration across race categories; do not use fixed unvalidated bonuses or penalties."
 }
