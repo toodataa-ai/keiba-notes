@@ -84,7 +84,7 @@ function selectNextBlock(days,rows){
       root.innerHTML='<p class="muted">次回の対象レース予定はまだ登録されていません。</p>';
     }
     scheduleRoot.innerHTML=days.length?days.map(d=>{
-      const published=allRows.filter(r=>r.date===d.date&&r.status!=='reviewed').length;
+      const published=allRows.filter(r=>r.date===d.date).length;
       return `<article class="week-day"><h3>${esc(d.date)}（${esc(d.weekday||'')}）</h3>${d.races.map(r=>`<div class="week-race"><span>${esc(r.track)}</span><strong>${esc(r.race)}</strong><time>${esc(r.post_time||'')}</time></div>`).join('')}${estimateHtml(d,published,policy)}</article>`;
     }).join(''):'<p class="muted">次回の対象レース予定はまだ登録されていません。</p>';
   }catch(e){
