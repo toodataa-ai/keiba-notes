@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "model_version": "local-daily-shadow-v0.1",
+  "mode": "shadow_observation_only",
+  "production_effect": false,
+  "start_date": "2026-10-07",
+  "purpose": "Use high-frequency local-racing observations to discover transferable prediction features without directly training or changing the JRA production model.",
+  "venues": {
+    "oi": {"label": "大井", "group": "nankan", "enabled": true},
+    "kawasaki": {"label": "川崎", "group": "nankan", "enabled": true},
+    "funabashi": {"label": "船橋", "group": "nankan", "enabled": true},
+    "urawa": {"label": "浦和", "group": "nankan", "enabled": true},
+    "sonoda": {"label": "園田", "group": "hyogo", "enabled": true},
+    "nagoya": {"label": "名古屋", "group": "aichi", "enabled": true}
+  },
+  "collection": {
+    "population_scope": "all official races held at enabled venues",
+    "sampling": "all_races",
+    "pre_race_snapshot_required": true,
+    "result_join_after_official_confirmation": true,
+    "store_sources": true,
+    "result_leakage_forbidden": true,
+    "publish_individual_shadow_predictions": false
+  },
+  "observation_axes": [
+    "venue",
+    "distance",
+    "class",
+    "age_band",
+    "field_size",
+    "going",
+    "pace",
+    "running_style",
+    "gate",
+    "jockey",
+    "weight",
+    "rotation",
+    "ability_rank",
+    "reliability"
+  ],
+  "daily_cycle": {
+    "pre_race": "Freeze compact shadow predictions before the first relevant race and never edit them after cutoff.",
+    "post_race": "Join official results and aggregate errors after all relevant results are confirmed."
+  },
+  "weekly_cycle": {
+    "purpose": "Generate transferable-feature candidates from repeated errors and stable effects.",
+    "automatic_jra_adoption": false,
+    "candidate_only": true
+  },
+  "transfer_guardrails": {
+    "direct_local_to_jra_weight_update": false,
+    "direct_local_to_jra_prompt_change": false,
+    "venue_specific_effects_stay_local": true,
+    "transferable_candidate_requires_abstraction": true,
+    "transferable_candidate_requires_jra_e2e": true,
+    "transferable_candidate_requires_human_approval_for_production": true
+  }
+}
