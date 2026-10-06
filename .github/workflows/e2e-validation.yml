@@ -9,6 +9,7 @@ on:
       - '.github/workflows/e2e-validation.yml'
       - 'docs/data/e2e_status.json'
       - 'docs/data/experience_regime_status.json'
+      - 'docs/e2e.html'
   push:
     branches: [main]
     paths:
@@ -70,6 +71,9 @@ jobs:
             --cases e2e_validation/cases \
             --output docs/data/experience_regime_status.json
 
+      - name: Build public JRA E2E Shadow data
+        run: python e2e_validation/build_public_data.py
+
       - name: Upload validation reports
         uses: actions/upload-artifact@v4
         with:
@@ -77,17 +81,19 @@ jobs:
           path: |
             docs/data/e2e_status.json
             docs/data/experience_regime_status.json
+            docs/data/e2e_public.json
+            docs/data/e2e-shadow/
           if-no-files-found: error
 
-      - name: Publish status JSON on main
+      - name: Publish status and Shadow data on main
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          if git diff --quiet -- docs/data/e2e_status.json docs/data/experience_regime_status.json; then
-            echo 'No validation status change.'
+          if git diff --quiet -- docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/e2e-shadow; then
+            echo 'No validation/public Shadow change.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/data/e2e_status.json docs/data/experience_regime_status.json
-          git commit -m 'Update E2E validation status'
+          git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/e2e-shadow
+          git commit -m 'Update E2E validation and public Shadow data'
           git push
