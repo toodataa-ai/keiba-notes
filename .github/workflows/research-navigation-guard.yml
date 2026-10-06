@@ -1,0 +1,33 @@
+name: Ensure research navigation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/index.html'
+      - 'docs/local-racing-shadow.html'
+      - 'tools/ensure_research_navigation.py'
+      - '.github/workflows/research-navigation-guard.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  ensure:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure research navigation
+        run: python3 tools/ensure_research_navigation.py
+      - name: Commit navigation changes
+        run: |
+          if git diff --quiet; then
+            echo 'No navigation changes needed.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/index.html
+          git commit -m 'Expose local racing Daily Shadow research'
+          git push
