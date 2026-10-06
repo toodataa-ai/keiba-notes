@@ -77,6 +77,14 @@
       <div class="daily-cycle-step"><span class="daily-cycle-no">4</span><b>プロンプト改良</b><span>再発防止ルールを検討し、変更理由と内容を版管理</span></div>
       <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>次レースで再検証</b><span>改良版を適用し、精度・回収率・誤差の変化を継続観測</span></div>
     </div>
+    <h3 class="cycle-subhead">現在の自動運用スケジュール</h3>
+    <p>通常のJRA開催週では、予想・回顧・週次改善を別タスクとして分離しています。開催がない日は実行せず、祝日月曜を含む変則開催も公式日程を確認して処理します。</p>
+    <div class="phase-grid" aria-label="JRA自動運用スケジュール">
+      <article class="phase done"><span class="phase-label">土・日・月 / 8:00基準</span><h3>JRAメイン予想</h3><p>当日のJRA開催有無を確認し、開催がある場合は各競馬場のメインレースを最新の正式プロンプトで発走前予想。HTML・Grade A用snapshot・proofを保存します。実行時刻は8:00を基準とするflexible運用です。</p></article>
+      <article class="phase done"><span class="phase-label">土・日・月 / 16:00〜20:00</span><h3>JRAメイン回顧</h3><p>時間帯内で毎時確認し、公式結果と払戻が確定した対象レースだけを回顧。発走前予想は改変せず、結果・成績・誤差分析・E2E Grade A結果を追記します。</p></article>
+      <article class="phase done"><span class="phase-label">日・月 / 19:00〜23:00</span><h3>週次プロンプト改善</h3><p>時間帯内で毎時条件を確認し、その週の対象JRAメインがすべてreviewedになった後だけ週次改善を実行します。月曜開催がある週は、月曜分の回顧完了まで待ってから改善判断へ進みます。</p></article>
+    </div>
+    <div class="callout"><b>自動運用の役割分離：</b>朝は「発走前予想を固定」、開催後は「結果を付けて回顧」、週末終了後は「複数レースをまとめて改善判断」と分離します。単発レースの結果だけでプロンプトを変更せず、Grade A E2Eや長期傾向を含む証拠を確認してから次版を判断します。</div>
     <h3 class="cycle-subhead">改善案を本番へ入れるときは、さらに厳しくする</h3>
     <p>日々の反省で見つけた改善案を、そのまま本番へ入れるわけではありません。仮説化し、既存本線から隔離して検証し、候補化・承認・実戦監視まで通します。</p>
     <div class="roadmap-flow" aria-label="改善フロー">
