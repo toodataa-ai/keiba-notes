@@ -5,6 +5,7 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Derived public data only. Source-of-truth prediction/result/case files stay under e2e_validation/.
 ROOT = Path(__file__).resolve().parents[1]
 E2E = ROOT / "e2e_validation"
 DOCS_DATA = ROOT / "docs" / "data"
