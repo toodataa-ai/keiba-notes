@@ -1,150 +1,38 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>AIによる競馬予想精度向上研究所 | JRA予想検証アーカイブ</title>
-  <link rel="stylesheet" href="assets/style.css?v=20261006-red1">
-  <link rel="stylesheet" href="assets/brand.css?v=20261006-labseal4">
-  <link rel="stylesheet" href="assets/schedule.css?v=20261005-schedule1">
-  <link rel="stylesheet" href="assets/disclosure.css?v=20261005-collapse1">
-  <style>
-    .lab-signature{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:#d7d8dd;font-size:12px;font-weight:700;line-height:1.4}
-    .lab-signature::before{content:"";flex:0 0 auto;width:24px;height:2px;border-radius:999px;background:#c61d31;box-shadow:0 0 10px rgba(198,29,49,.28)}
-    .lab-signature-name{letter-spacing:.025em}
-    .lab-signature-cycle{display:inline-flex;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,.16);color:#92959e;font-size:10px;font-weight:700;letter-spacing:.035em}
-    .lab-signature-cycle b{color:#c61d31;font-weight:900}
-    .hero-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:18px;max-width:980px}
-    .hero-nav-link{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#f7f7f8;color:#17171a;font-weight:700;text-decoration:none;box-sizing:border-box;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
-    .hero-nav-link:hover{border-color:#c61d31;box-shadow:0 0 0 2px rgba(198,29,49,.12);transform:translateY(-1px)}
-    .hero-nav-label{display:flex;align-items:center;gap:8px;min-width:0}
-    .hero-nav-new{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;padding:3px 7px;border-radius:999px;background:#c61d31;color:#fff;font-size:10px;font-weight:900;letter-spacing:.06em;line-height:1}
-    .hero-nav-arrow{flex:0 0 auto;font-weight:800;color:#b5172a}
-    .hero-prompt-status{margin-top:14px}
-    @media(max-width:800px){.hero-nav{grid-template-columns:1fr;max-width:none}}
-    @media(max-width:640px){.lab-signature{align-items:flex-start;gap:8px;flex-wrap:wrap}.lab-signature::before{margin-top:7px}.lab-signature-cycle{width:100%;margin-left:32px;padding-left:0;border-left:0}.hero-nav-link{width:100%;min-height:54px}}
-  </style>
-<style id="home-research-navigation-style">
-.home-nav-groups{margin-top:22px;max-width:980px}
-.home-nav-group{padding:18px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.035)}
-.home-nav-group+.home-nav-group{margin-top:34px}
-.home-nav-group.research{background:rgba(255,255,255,.02)}
-.home-nav-head{margin-bottom:13px}
-.home-nav-head h2{margin:0;color:#fff;font-size:20px;line-height:1.35}
-.home-nav-head p{margin:6px 0 0;color:#aeb3bd;font-size:12px;line-height:1.6}
-.home-nav-kicker{display:inline-block;margin-bottom:5px;color:#e06170;font-size:10px;font-weight:900;letter-spacing:.08em}
-.home-main-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.home-main-actions a{display:flex;align-items:center;justify-content:center;min-height:46px;padding:9px 8px;border-radius:9px;background:#fff;color:#17171a;text-decoration:none;font-size:12px;font-weight:800;text-align:center;border:1px solid rgba(255,255,255,.2)}
-.hero-nav.research-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;max-width:none}
-.research-nav .hero-nav-link{display:block;min-height:92px;padding:13px 14px;background:#f7f7f8}
-.research-nav .hero-nav-title{display:block;color:#17171a;font-size:14px;font-weight:850;line-height:1.35}
-.research-nav .hero-nav-desc{display:block;margin-top:6px;color:#666a73;font-size:11px;font-weight:600;line-height:1.5}
-.research-nav .hero-nav-arrow{display:block;margin-top:8px;text-align:right}
-@media(max-width:640px){
-  .home-nav-group{padding:14px 12px}
-  .home-nav-group+.home-nav-group{margin-top:30px}
-  .home-nav-head h2{font-size:18px}
-  .home-main-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-  .home-main-actions a{padding:8px 4px;font-size:11px}
-  .hero-nav.research-nav{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .research-nav .hero-nav-link{min-height:104px;padding:12px 10px}
-  .research-nav .hero-nav-title{font-size:13px}
-  .research-nav .hero-nav-desc{font-size:10px}
-}
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<title>AIによる競馬予想精度向上研究所</title>
+<link rel="stylesheet" href="assets/style.css?v=20261006-red1"><link rel="stylesheet" href="assets/brand.css?v=20261006-labseal4">
+<style>
+.portal{margin-top:28px;max-width:980px}.portal-section{padding:20px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.035)}.portal-section+.portal-section{margin-top:38px}.portal-head{margin-bottom:14px}.portal-kicker{display:block;margin-bottom:5px;color:#e06170;font-size:11px;font-weight:900}.portal-head h2{margin:0;color:#fff;font-size:22px}.portal-head p{margin:7px 0 0;color:#b8bbc3;font-size:13px}.portal-grid{display:grid;gap:10px}.main-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.research-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.portal-card{display:flex;flex-direction:column;justify-content:space-between;text-decoration:none;background:#f7f7f8;color:#17171a;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:16px;box-shadow:0 1px 0 rgba(255,255,255,.18) inset;transition:.18s ease}.portal-card:hover{border-color:#c61d31;transform:translateY(-1px);box-shadow:0 0 0 2px rgba(198,29,49,.12)}.main-card{min-height:132px;padding:20px}.research-card{min-height:104px}.portal-title{font-size:17px;font-weight:900;line-height:1.35}.main-card .portal-title{font-size:20px}.portal-desc{display:block;margin-top:8px;color:#666a73;font-size:12px;font-weight:600;line-height:1.5}.portal-arrow{display:block;margin-top:12px;text-align:right;color:#b5172a;font-size:18px;font-weight:900}.hero-prompt-status{margin-top:16px}.footer-note{padding:24px 0 0;color:#9a9ca3;font-size:12px}@media(max-width:760px){.hero{padding:34px 0 38px}.portal{margin-top:24px}.portal-section{padding:15px 12px}.portal-section+.portal-section{margin-top:32px}.portal-head h2{font-size:20px}.main-grid{grid-template-columns:1fr}.research-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.main-card{min-height:108px;padding:17px}.main-card .portal-title{font-size:19px}.research-card{min-height:112px;padding:13px 11px}.portal-title{font-size:14px}.portal-desc{font-size:10px}}
 </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="wrap">
-      <h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja brand-lab-seal" aria-hidden="true"><span>研</span><span>究</span><span>所</span><span class="brand-lab-mark"></span></span></span></h1>
-      <p class="brand-subtitle">AIで予想し、検証し、改善する。予測精度を育て続ける。</p>
-      <p class="lead">JRAメインレースを対象に、AIを使って予想・検証・回顧を行い、結果と誤差を次のロジック改善へ反映します。予想体系そのものをAI駆動で継続的にブラッシュアップしていきます。</p>
-      <div class="home-nav-groups">
-        <section class="home-nav-group main" aria-labelledby="mainPredictionTitle">
-          <div class="home-nav-head">
-            <span class="home-nav-kicker">このサイトの中心</span>
-            <h2 id="mainPredictionTitle">JRAメインレース予想</h2>
-            <p>各開催日のメインレースをAIで予想し、結果と回顧まで同じページで公開します。</p>
-          </div>
-          <div class="home-main-actions">
-            <a href="#upcomingDisclosure">今後の予定</a>
-            <a href="#performanceDisclosure">成績</a>
-            <a href="#archiveDisclosure">予想履歴</a>
-          </div>
-        </section>
-
-        <section class="home-nav-group research" aria-labelledby="researchTitle">
-          <div class="home-nav-head">
-            <span class="home-nav-kicker">精度向上のための研究</span>
-            <h2 id="researchTitle">予想を強くするために検証していること</h2>
-            <p>以下はすべて、JRAメインレース予想の精度向上につなげるための研究・検証です。</p>
-          </div>
-          <nav class="hero-nav research-nav" aria-label="研究・検証ページ">
-            <a class="hero-nav-link" href="methodology.html"><span class="hero-nav-title">予想ロジックと改善の考え方</span><span class="hero-nav-desc">予想をどう組み立て、どう検証するか</span><span class="hero-nav-arrow">→</span></a>
-            <a class="hero-nav-link" href="roadmap.html"><span class="hero-nav-title">改善ロードマップ</span><span class="hero-nav-desc">何を改善し、どの条件で採用するか</span><span class="hero-nav-arrow">→</span></a>
-            <a class="hero-nav-link" href="baba-models.html"><span class="hero-nav-title">馬場予測の研究</span><span class="hero-nav-desc">10競馬場×芝・ダートを個別に検証</span><span class="hero-nav-arrow">→</span></a>
-            <a class="hero-nav-link" href="e2e.html"><span class="hero-nav-title">JRA予想の比較検証</span><span class="hero-nav-desc">予想を先に固定し、結果と比較して改良効果を測る</span><span class="hero-nav-arrow">→</span></a>
-            <a class="hero-nav-link" href="experience-regime.html"><span class="hero-nav-title">経験の少ない馬の研究</span><span class="hero-nav-desc">新馬やキャリアの浅い馬の予想難度を検証</span><span class="hero-nav-arrow">→</span></a>
-            <a class="hero-nav-link" href="local-racing-shadow.html"><span class="hero-nav-title">地方競馬での予想研究</span><span class="hero-nav-desc">地方競馬でも予想と結果を蓄積して傾向を研究</span><span class="hero-nav-arrow">→</span></a>
-          </nav>
-        </section>
-      </div>
-      <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
-    </div>
-  </header>
-  <main class="wrap">
-    <details class="content-disclosure" id="upcomingDisclosure">
-      <summary>
-        <span class="content-summary-main"><strong id="scheduleTitle">今後の予測・回顧予定</strong></span>
-        <span class="content-summary-note">レース名・発走時刻・予測／回顧予定</span>
-      </summary>
-      <div class="content-disclosure-body">
-        <section class="schedule-panel" aria-labelledby="scheduleTitle">
-          <div class="schedule-head"><p id="scheduleUpdated" class="schedule-updated"></p></div>
-          <p class="schedule-copy">JRA各開催日のメインレース（11R）を対象に、予測から結果確認・回顧までの予定を表示します。</p>
-          <div class="schedule-policy"><span class="schedule-chip prediction">予測：当日午前</span><span class="schedule-chip review">回顧：結果確定後〜当日夜</span></div>
-          <div id="upcomingSchedule"><p class="muted">今後の予定を読み込み中…</p></div>
-          <details id="scheduleMore" class="schedule-more" hidden><summary>その先の予定も見る</summary><div id="scheduleMoreList"></div></details>
-          <p class="schedule-note">JRAの事前番組を基に掲載しています。出走馬・レース順・発走時刻などは変更される場合があり、当週木曜16時頃の出馬表を基準に最終確認します。</p>
-        </section>
-      </div>
-    </details>
-
-    <details class="content-disclosure" id="performanceDisclosure">
-      <summary>
-        <span class="content-summary-main"><strong>成績・集計期間</strong></span>
-        <span class="content-summary-note">予想・結果・反省会まで揃ったレースの成績</span>
-      </summary>
-      <div class="content-disclosure-body">
-        <section class="period-panel"><div><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
-        <details class="performance-disclosure"><summary>この期間の成績を見る</summary><div class="performance-body"><section class="stats" aria-label="期間成績"><article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article><article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article><article><span class="label">回収率</span><strong id="statROI">—</strong></article><article><span class="label">収支</span><strong id="statProfit">—</strong></article><article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article></section><p class="subnote">旧サイトから移行した購入・的中・払戻のみの履歴は、反省会がないため公開成績には含めません。</p></div></details>
-      </div>
-    </details>
-
-    <details class="content-disclosure prompt-history-disclosure">
-      <summary>
-        <span class="content-summary-main"><strong>プロンプト改良履歴 <span id="promptHistoryCount"></span></strong></span>
-        <span class="content-summary-note">変更内容・理由・版管理</span>
-      </summary>
-      <div class="prompt-history-body"><p class="prompt-history-policy">プロンプトを改良したときは、版番号だけでなく「何を変えたか」「なぜ変えたか」を履歴として残します。過去の履歴は上書きせず保存します。</p><div id="promptHistoryList"><p class="muted">読み込み中…</p></div></div>
-    </details>
-
-    <details class="content-disclosure archive-disclosure" id="archiveDisclosure">
-      <summary>
-        <span class="content-summary-main"><strong>予想履歴</strong></span>
-        <span class="content-summary-note">過去の予想・PDF・結果・回顧</span>
-      </summary>
-      <div class="content-disclosure-body">
-        <section class="section-head"><div><h2>予想履歴</h2></div><div class="filters"><select id="statusFilter" aria-label="状態で絞り込み"><option value="all">すべて</option><option value="predicted">予想済み</option><option value="reviewed">結果登録済み</option></select></div></section>
-        <div id="raceList" class="race-list"><p class="muted">読み込み中…</p></div>
-      </div>
-    </details>
-  </main>
-  <footer class="wrap footer"><p>正式成績の対象はJRAメインレース。地方競馬は予想研究として分離し、JRA正式成績・本番予想へ直接混在させません。</p></footer>
-  <script src="assets/schedule.js?v=20261005-schedule1"></script>
-  <script src="assets/app.js?v=20261007-reviewed-only1"></script>
-  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+<header class="hero"><div class="wrap">
+<h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja brand-lab-seal" aria-hidden="true"><span>研</span><span>究</span><span>所</span><span class="brand-lab-mark"></span></span></span></h1>
+<p class="brand-subtitle">AIで予想し、検証し、改善する。予測精度を育て続ける。</p>
+<p class="lead">JRAメインレースを対象に、AIで予想・検証・回顧を行い、結果と誤差を次のロジック改善へ反映します。</p>
+<div class="portal">
+<section class="portal-section" aria-labelledby="mainTitle"><div class="portal-head"><span class="portal-kicker">このサイトの中心</span><h2 id="mainTitle">JRAメインレース予想</h2><p>予想を見る、今後の予定を確認する、過去の成績を振り返る。この3つを中心に使えます。</p></div>
+<div class="portal-grid main-grid">
+<a class="portal-card main-card" href="this-week.html"><span><span class="portal-title">今週の予想</span><span class="portal-desc">今週の対象レースと公開済みのAI予想を見る</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card main-card" href="schedule.html"><span><span class="portal-title">今後の予想スケジュール</span><span class="portal-desc">次回以降の対象レースと予想・回顧予定を確認</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card main-card" href="results.html"><span><span class="portal-title">過去の成績</span><span class="portal-desc">結果・反省会・的中率・回収率を振り返る</span></span><span class="portal-arrow">→</span></a>
+</div></section>
+<section class="portal-section" aria-labelledby="researchTitle"><div class="portal-head"><span class="portal-kicker">精度向上のための研究</span><h2 id="researchTitle">予想を強くするために検証していること</h2><p>以下はすべて、JRAメインレース予想の精度向上につなげるための研究・検証です。</p></div>
+<div class="portal-grid research-grid">
+<a class="portal-card research-card" href="methodology.html"><span><span class="portal-title">予想ロジックと改善の考え方</span><span class="portal-desc">予想をどう組み立て、どう検証するか</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="roadmap.html"><span><span class="portal-title">改善ロードマップ</span><span class="portal-desc">何を改善し、どの条件で採用するか</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="baba-models.html"><span><span class="portal-title">馬場予測の研究</span><span class="portal-desc">10競馬場×芝・ダートを個別に検証</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="e2e.html"><span><span class="portal-title">JRA予想の比較検証</span><span class="portal-desc">予想を先に固定し、改良効果を結果で比較</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="experience-regime.html"><span><span class="portal-title">経験の少ない馬の研究</span><span class="portal-desc">新馬やキャリアの浅い馬の予想難度を検証</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="local-racing-shadow.html"><span><span class="portal-title">地方競馬での予想研究</span><span class="portal-desc">地方競馬でも予想と結果を蓄積して研究</span></span><span class="portal-arrow">→</span></a>
+</div></section>
+</div>
+<div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
+<p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。</p>
+</div></header>
+<script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
+<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
