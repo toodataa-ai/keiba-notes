@@ -1,9 +1,16 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-06T02:18:31+09:00",
+  "updated_at": "2026-10-07T07:22:00+09:00",
   "policy": {
     "required_on_prompt_update": true,
-    "required_fields": ["version", "date", "path", "summary", "changes", "reason"],
+    "required_fields": [
+      "version",
+      "date",
+      "path",
+      "summary",
+      "changes",
+      "reason"
+    ],
     "rule": "Whenever the canonical prediction prompt is improved or its version changes, append a history entry in the same update. Record what changed and why. Do not overwrite old entries.",
     "display": "The GitHub Pages archive reads this file and shows the history to users."
   },
@@ -26,7 +33,10 @@
       "target_week": "2026-10-03/2026-10-04",
       "approval_class": "B",
       "previous_version": "v2.8",
-      "evidence_races": ["2026-10-04-mainichi-okan", "2026-10-04-kyoto-daishoten"],
+      "evidence_races": [
+        "2026-10-04-mainichi-okan",
+        "2026-10-04-kyoto-daishoten"
+      ],
       "summary": "直近JRAメインの複数回顧と既存の長期傾向を踏まえ、予想時点で利用可能な情報の取りこぼしと評価伝播の不足を抑える監査を強化。",
       "changes": [
         "当日馬場情報の鮮度を確認し、発走前に利用可能な更新情報をSTEP1へ反映する監査を強化",
@@ -75,8 +85,14 @@
       "previous_version": "v3.0",
       "evidence": {
         "workflow_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/37344803904",
-        "fit_period": [2015, 2018],
-        "test_period": [2019, 2021],
+        "fit_period": [
+          2015,
+          2018
+        ],
+        "test_period": [
+          2019,
+          2021
+        ],
         "test_races": 7740,
         "test_rows": 105423,
         "adoption_decision": "closing_index_v1/adoption_decision_v1_1.json",
@@ -105,6 +121,32 @@
         "HTML/PDF出力仕様"
       ],
       "reason": "ユーザーから、競馬場によって鋭い上がりより持続・消耗耐性が要求される点と、能力発揮にムラがある馬の再現性を評価したいという改善提案があり、明示的な採用承認を得た。バックテストでは需要型ACIへの直接置換は悪化した一方、再現信頼度には明確な次走識別力が確認されたため、精度を落とす部分を棄却し、コース需要型を解釈レイヤー、ムラを客観的な再現信頼度レイヤーとして部分採用した。"
+    },
+    {
+      "version": "v3.2",
+      "date": "2026-10-07",
+      "path": "競馬予想_完全版プロンプト_v3.2.txt",
+      "source": "manual-user-approved-final-bet-decision",
+      "approval_class": "C-user-approved",
+      "previous_version": "v3.1",
+      "manifest": "e2e_validation/manifests/v3.2.json",
+      "summary": "STEP2の候補列挙で終わらず、買う／見送り、最優先馬券、実際に購入する最終買い目を発走前に固定する意思決定レイヤーを追加。",
+      "changes": [
+        "能力本線・期待値追加・価格乖離候補を購入候補と定義し、実購入と分離",
+        "STEP2の最後に必ず買う／見送りを確定し、買う場合は最優先馬券を1点指定",
+        "券種ごとの適合性を監査し、候補全件を機械的に買わず最終購入買い目へ絞り込む",
+        "資金指定がない通常運用では1点100円を標準化し、final_betsへID・券種・組み合わせ・購入額・layer・理由を保存",
+        "HTML/PDFとraces.jsonのfinal_bets一致を発走前に監査し、発走後の追加・削除・組み替えを禁止",
+        "回顧時の的中・払戻・収支・回収率は発走前固定final_betsだけで計算し、買い目単位settlementを保存"
+      ],
+      "unchanged": [
+        "STEP1/STEP2完全分離と印固定",
+        "①〜⑨評価軸とACI v1.1",
+        "馬場・展開・Time Index・直接実績・復活監査",
+        "能力本線／期待値追加の二層構造自体は候補生成レイヤーとして維持",
+        "進行中のv3.0対v3.1 E2E比較は差し替えない"
+      ],
+      "reason": "ユーザーから、現行予想は候補が多く『ズバリこの馬券を買え』という最終意思決定が弱いとの指摘があり、最終購入指示と成績照合を一貫させる構造変更を明示承認されたため。"
     }
   ]
 }
