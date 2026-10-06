@@ -6,12 +6,36 @@
   "start_date": "2026-10-07",
   "purpose": "Use high-frequency local-racing observations to discover transferable prediction features without directly training or changing the JRA production model.",
   "venues": {
-    "oi": {"label": "大井", "group": "nankan", "enabled": true},
-    "kawasaki": {"label": "川崎", "group": "nankan", "enabled": true},
-    "funabashi": {"label": "船橋", "group": "nankan", "enabled": true},
-    "urawa": {"label": "浦和", "group": "nankan", "enabled": true},
-    "sonoda": {"label": "園田", "group": "hyogo", "enabled": true},
-    "nagoya": {"label": "名古屋", "group": "aichi", "enabled": true}
+    "oi": {
+      "label": "大井",
+      "group": "nankan",
+      "enabled": true
+    },
+    "kawasaki": {
+      "label": "川崎",
+      "group": "nankan",
+      "enabled": true
+    },
+    "funabashi": {
+      "label": "船橋",
+      "group": "nankan",
+      "enabled": true
+    },
+    "urawa": {
+      "label": "浦和",
+      "group": "nankan",
+      "enabled": true
+    },
+    "sonoda": {
+      "label": "園田",
+      "group": "hyogo",
+      "enabled": true
+    },
+    "nagoya": {
+      "label": "名古屋",
+      "group": "aichi",
+      "enabled": true
+    }
   },
   "collection": {
     "population_scope": "all official races held at enabled venues",
@@ -20,7 +44,7 @@
     "result_join_after_official_confirmation": true,
     "store_sources": true,
     "result_leakage_forbidden": true,
-    "publish_individual_shadow_predictions": false
+    "publish_individual_shadow_predictions": true
   },
   "observation_axes": [
     "venue",
