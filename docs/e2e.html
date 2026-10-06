@@ -5,103 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>プロンプト改良前後の比較検証 | 競馬予想精度向上AI</title>
-  <style>
-    :root{--navy:#0b1930;--navy2:#122744;--gold:#d8b35a;--bg:#f3f5f8;--card:#fff;--text:#172033;--muted:#647085;--ok:#167a52;--warn:#9a6a08;--bad:#a53737;--line:#dfe4ea;--blue:#245b99}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:"Meiryo UI",Meiryo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
-    header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:24px 18px;border-bottom:4px solid var(--gold)}
-    header .inner,main{max-width:1160px;margin:auto}
-    h1{font-size:28px;margin:0 0 8px}
-    header p{margin:0;color:#dfe7f1;font-size:14px}
-    .intro-note{margin-top:14px;padding:12px 14px;border:1px solid rgba(255,255,255,.16);border-radius:11px;background:rgba(255,255,255,.07);font-size:13px}
-    main{padding:20px 14px 48px}
-    .hero,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 10px rgba(17,32,52,.05)}
-    .hero{padding:18px;margin-bottom:16px}
-    .card{padding:16px}
-    .section{margin-top:18px}
-    h2{font-size:20px;margin:0 0 10px}
-    .status{display:inline-block;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#eef2f6}
-    .ok{color:var(--ok);background:#eaf7f1}.warn{color:var(--warn);background:#fff7df}.bad{color:var(--bad);background:#fdeeee}
-    .conclusion-title{margin:9px 0 4px;font-size:24px;line-height:1.4}.conclusion-text{margin:0;color:#465267;font-size:14px}.conclusion-sub{margin:8px 0 0;color:var(--muted);font-size:12px}
-    .purpose-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.purpose{padding:13px;border-radius:11px;background:#f7f9fb;border:1px solid #e4e8ee}.purpose b{display:block;font-size:14px;margin-bottom:3px}.purpose span{font-size:12px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}.label{font-size:12px;color:var(--muted);font-weight:700}.value{font-size:28px;font-weight:800;margin-top:2px}.small{font-size:12px;color:var(--muted)}
-    table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;border-bottom:1px solid #e5e9ee;text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--muted);font-weight:700;background:#fafbfc}
-    .compare-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}.compare-head p{margin:0;color:var(--muted);font-size:12px}
-    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.filters select{padding:9px 10px;border:1px solid #ccd4de;border-radius:9px;background:#fff;font:inherit;font-size:13px}
-    .race-list{display:grid;gap:12px}.race-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}.race-head{padding:14px 15px;background:#fafbfc;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.race-title{font-weight:800}.race-meta{font-size:12px;color:var(--muted);margin-top:3px}.race-body{padding:14px 15px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chip{font-size:11px;padding:3px 7px;border-radius:999px;background:#eef2f6;color:#435066;font-weight:700}.chip.strict{background:#eaf7f1;color:var(--ok)}.chip.replay{background:#fff7df;color:var(--warn)}
-    .version-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.version{border:1px solid #e4e8ee;border-radius:10px;padding:11px}.version h3{margin:0 0 6px;font-size:14px}.kv{display:grid;grid-template-columns:95px 1fr;gap:4px 8px;font-size:12px}.kv b{color:var(--muted)}.marks{font-size:13px;font-weight:700}.proof{word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
-    details{margin-top:10px}summary{cursor:pointer;font-weight:700;font-size:13px}.json-link{display:inline-block;margin-top:8px;font-size:12px;color:var(--blue)}
-    .empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed #cbd3dd;border-radius:10px;background:#fafbfc}.error{padding:9px 10px;background:#fdeeee;color:var(--bad);border-radius:8px;margin-top:6px;font-size:12px}
-    .tech-box{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}.tech-box>summary{font-size:14px}.tech-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}.tech-item{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fafbfc;font-size:12px}.tech-item b{display:block;margin-bottom:4px;font-size:13px}.note{border-left:4px solid var(--gold);padding:10px 12px;background:#fffaf0;border-radius:6px;font-size:13px}
-    .simple-home-nav{display:flex;justify-content:flex-start;align-items:center;margin-bottom:18px}.simple-home-link{display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:999px;background:#fff;color:#17171a;border:1px solid rgba(0,0,0,.12);box-shadow:0 1px 4px rgba(0,0,0,.08);text-decoration:none;font-size:14px;font-weight:800;line-height:1.2}
-    .simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff;text-decoration:none;font-weight:800;border:1px solid #17171a}
-    @media(max-width:760px){.purpose-grid,.grid{grid-template-columns:1fr}.value{font-size:24px}.version-grid,.tech-grid{grid-template-columns:1fr}.race-head{display:block}table{font-size:11px}th,td{padding:7px 4px}h1{font-size:24px}.conclusion-title{font-size:21px}.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
-  </style>
+  <link rel="stylesheet" href="assets/methodology.css?v=20261007-1">
+  <link rel="stylesheet" href="assets/research-dashboard.css?v=20261007-1">
+<style id="simple-home-navigation-style">
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}}
+</style>
 </head>
-<body>
-<header><div class="inner">
-  <nav class="simple-home-nav" aria-label="トップページへ戻る"><a class="simple-home-link" href="index.html">← トップページに戻る</a></nav>
-  <h1>プロンプト改良前後の比較検証</h1>
-  <p>プロンプトを改良したことで、AI予想が本当に良くなったのかを、同じレース・同じ発走前条件で比べるページです。</p>
-  <div class="intro-note"><strong>このページで見るのは「改良したら本当に良くなったのか」。</strong> 改良前と改良後を同じ条件で走らせ、十分な実戦データが揃ってから判断します。</div>
-</div></header>
-<main>
-  <section class="hero" aria-labelledby="conclusionHeading">
-    <div id="state" class="status">読み込み中</div>
-    <h2 id="conclusionHeading" class="conclusion-title">現在の結論</h2>
-    <p id="conclusionText" class="conclusion-text">比較データを確認しています。</p>
-    <p id="conclusionSub" class="conclusion-sub"></p>
-    <div class="purpose-grid" aria-label="このページでできること">
-      <div class="purpose"><b>改良効果を確認</b><span>改良前と改良後で、予想成績がどう変わったかを見る</span></div>
-      <div class="purpose"><b>比較の十分性を確認</b><span>何レース比較でき、結論を出せる段階かを見る</span></div>
-      <div class="purpose"><b>レース別に確認</b><span>どのレースで予想が変わったかを個別に確認する</span></div>
+<body class="research-dashboard">
+<header class="method-hero">
+  <div class="wrap">
+    <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
+    <div class="hero-copy">
+      <p class="kicker">PROMPT COMPARISON</p>
+      <h1>プロンプト改良前後の比較検証</h1>
+      <p class="hero-deck">プロンプトを改良したことで、AI予想が本当に良くなったのかを、同じレース・同じ発走前条件で比べるページです。</p>
+      <div class="hero-thesis"><strong>ここで分かるのは「改良したら、本当に予想が良くなったのか」。</strong> 改良前と改良後を同じ条件で走らせ、十分な実戦データが揃ってから判断します。</div>
+    </div>
+  </div>
+</header>
+<main class="wrap article">
+  <section class="chapter" aria-labelledby="conclusionHeading">
+    <div class="chapter-head"><div class="chapter-no">01</div><div><h2 id="conclusionHeading">今の結論</h2><p class="chapter-lead">まず、改良効果を判断できる段階かどうかを確認します。</p></div></div>
+    <div style="margin-top:20px"><span id="state" class="rd-status">読み込み中</span></div>
+    <h3 class="rd-conclusion">プロンプト改良は、本当に効いているか</h3>
+    <p id="conclusionText" class="rd-conclusion-text">比較データを確認しています。</p>
+    <p id="conclusionSub" class="rd-sub"></p>
+    <div class="rd-purpose" aria-label="このページでできること">
+      <div><b>改良効果を確認</b><span>改良前と改良後で、予想成績がどう変わったかを見る</span></div>
+      <div><b>比較の十分性を確認</b><span>何レース比較でき、結論を出せる段階かを見る</span></div>
+      <div><b>レース別に確認</b><span>どのレースで予想が変わったかを個別に確認する</span></div>
     </div>
   </section>
 
-  <section class="grid" aria-label="比較進捗">
-    <div class="card"><div class="label">同条件で比較できたレース</div><div class="value" id="shared">-</div><div class="small" id="minimum">必要件数 -</div></div>
-    <div class="card"><div class="label">実戦データとして確定したレース</div><div class="value" id="strict">-</div><div class="small">発走前に予想を固定済み</div></div>
-    <div class="card"><div class="label">比較対象</div><div class="value" id="pair" style="font-size:20px">-</div><div class="small">改良前 → 改良後</div></div>
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>比較の進み具合</h2><p class="chapter-lead">結論を急がず、同条件で比較できた実戦数を確認します。</p></div></div>
+    <div class="rd-summary">
+      <div><span class="rd-label">同条件で比較できたレース</span><strong class="rd-value" id="shared">-</strong><span class="rd-small" id="minimum">必要件数 -</span></div>
+      <div><span class="rd-label">実戦データとして確定したレース</span><strong class="rd-value" id="strict">-</strong><span class="rd-small">発走前に予想を固定済み</span></div>
+      <div><span class="rd-label">比較対象</span><strong class="rd-value" id="pair" style="font-size:20px">-</strong><span class="rd-small">改良前 → 改良後</span></div>
+    </div>
   </section>
 
-  <section class="card section">
-    <div class="compare-head"><div><h2>改良前・改良後の成績比較</h2><p>まずは分かりやすい実戦指標を中心に比較します。</p></div></div>
-    <div style="overflow:auto"><table><thead><tr><th>プロンプト</th><th>件数</th><th>◎勝率</th><th>◎3着内</th><th>上位印3頭の3着内捕捉</th><th>勝馬が上位印3頭内</th><th>回収率</th></tr></thead><tbody id="versions"></tbody></table></div>
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>改良前・改良後の成績比較</h2><p class="chapter-lead">まずは分かりやすい実戦指標を中心に見ます。</p></div></div>
+    <div class="rd-tablewrap" style="margin-top:18px"><table class="rd-table"><thead><tr><th>プロンプト</th><th>件数</th><th>◎勝率</th><th>◎3着内</th><th>上位印3頭の3着内捕捉</th><th>勝馬が上位印3頭内</th><th>回収率</th></tr></thead><tbody id="versions"></tbody></table></div>
+    <div class="rd-note"><strong>比較状況：</strong><span id="comparison">確認中…</span></div>
   </section>
 
-  <section class="card section">
-    <h2>比較状況</h2>
-    <div id="comparison" class="small">-</div>
-  </section>
-
-  <section class="card section">
-    <h2>レースごとの比較を見る</h2>
-    <p class="small">改良前・改良後で、◎○▲や展開・馬場予測がどう変わったかをレース単位で確認できます。</p>
-    <div class="filters">
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>レースごとの違いを見る</h2><p class="chapter-lead">改良前・改良後で、◎○▲や展開・馬場予測がどう変わったかを確認できます。</p></div></div>
+    <div class="rd-filters">
       <select id="gradeFilter" aria-label="比較データ"><option value="strict">実戦比較</option><option value="historical">過去再現（参考）</option></select>
       <select id="venueFilter" aria-label="競馬場"><option value="all">全競馬場</option></select>
       <select id="statusFilter" aria-label="状態"><option value="all">すべて</option><option value="predicted">予想固定済み・結果待ち</option><option value="reviewed">結果確認済み</option></select>
     </div>
-    <div id="raceList" class="race-list"><div class="empty">比較データを読み込み中です。</div></div>
+    <div id="raceList" class="rd-list"><div class="rd-empty">比較データを読み込み中です。</div></div>
   </section>
 
-  <details class="tech-box">
+  <details class="rd-tech">
     <summary>検証方法・E2E / Grade Aなどの技術情報を見る</summary>
-    <div class="note" style="margin-top:12px">結果を見てから予想を書き換えないため、実戦比較では発走前に予想を固定し、その時点のGitHubコミットを証拠として残します。過去再現は補助資料として別扱いです。</div>
-    <div class="tech-grid">
-      <div class="tech-item"><b>発走前固定</b>情報締切時刻より前に予想スナップショットを保存。</div>
-      <div class="tech-item"><b>Grade A</b>発走前コミット証明がある実戦データだけを正式比較に使用。</div>
-      <div class="tech-item"><b>結果は後から結合</b>予想原本に着順・払戻を書き足さず、別データとして照合。</div>
-      <div class="tech-item"><b>自動昇格しない</b>必要件数と複数指標を満たしてから週次ガバナンスで判断。</div>
-    </div>
-    <div class="tech-grid">
-      <div class="tech-item"><b>勝率確率の検証件数</b><span id="prob">-</span><br><span class="small">Brier / log loss用</span></div>
-      <div class="tech-item"><b>馬券検証件数</b><span id="bets">-</span><br><span class="small">ROIは単独で優劣判定しない</span></div>
-      <div class="tech-item" style="grid-column:span 2"><b>検証エラー</b><div id="errors" class="small">-</div></div>
+    <div class="rd-tech-body">
+      <div class="rd-note"><strong>後出し防止：</strong>結果を見てから予想を書き換えないため、実戦比較では発走前に予想を固定し、その時点のGitHubコミットを証拠として残します。過去再現は補助資料として別扱いです。</div>
+      <div class="rd-tech-grid">
+        <div class="rd-tech-item"><b>発走前固定</b>情報締切時刻より前に予想スナップショットを保存。</div>
+        <div class="rd-tech-item"><b>Grade A</b>発走前コミット証明がある実戦データだけを正式比較に使用。</div>
+        <div class="rd-tech-item"><b>結果は後から結合</b>予想原本に着順・払戻を書き足さず、別データとして照合。</div>
+        <div class="rd-tech-item"><b>自動昇格しない</b>必要件数と複数指標を満たしてから週次ガバナンスで判断。</div>
+      </div>
+      <div class="rd-tech-grid">
+        <div class="rd-tech-item"><b>勝率確率の検証件数</b><span id="prob">-</span><br><span class="rd-small">Brier / log loss用</span></div>
+        <div class="rd-tech-item"><b>馬券検証件数</b><span id="bets">-</span><br><span class="rd-small">ROIは単独で優劣判定しない</span></div>
+        <div class="rd-tech-item" style="grid-column:span 2"><b>検証エラー</b><div id="errors" class="rd-small">-</div></div>
+      </div>
     </div>
   </details>
 
-  <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
+  <div class="rd-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 <script>
 const pct=v=>v==null?'—':(v*100).toFixed(1)+'%';
@@ -109,59 +88,14 @@ const roi=v=>v==null?'—':Number(v).toFixed(1)+'%';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let publicData={races:[],historical_replays:[]};
 let compareMeta={baseline:null,candidate:null};
-
-function loadStatus(){return fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
-  const c=d.comparison||{};compareMeta={baseline:c.baseline||null,candidate:c.candidate||null};
-  const strict=d.case_counts?.strict??0,shared=c.strict_shared_cases??0,min=c.minimum_strict_shared_cases??20;
-  document.getElementById('strict').textContent=strict;
-  document.getElementById('shared').textContent=shared;
-  document.getElementById('minimum').textContent=`結論目安 ${min}レース`;
-  document.getElementById('pair').textContent=`${c.baseline??'—'} → ${c.candidate??'未設定'}`;
-  document.getElementById('prob').textContent=d.coverage?.strict_probability_win_cases??0;
-  document.getElementById('bets').textContent=d.coverage?.strict_bet_cases??0;
-  const st=document.getElementById('state'),state=c.state||'unknown';
-  const labels={waiting_for_candidate:'比較準備中',insufficient_data:'データ収集中',ready_for_review:'比較可能'};
-  st.textContent=labels[state]||state;st.className='status '+(state==='ready_for_review'?'ok':'warn');
-  const conclusion=document.getElementById('conclusionText'),sub=document.getElementById('conclusionSub');
-  if(state==='ready_for_review'){
-    conclusion.textContent='比較に必要な実戦データが揃いました。改良前後の成績を見て、採用判断できる段階です。';
-    sub.textContent=`同条件で比較できたレース：${shared}件。複数指標を確認して最終判断します。`;
-  }else if(state==='waiting_for_candidate'){
-    conclusion.textContent='まだ改良前後の比較を開始できる状態ではありません。';
-    sub.textContent='比較対象となる改良後プロンプトの準備を待っています。';
-  }else{
-    conclusion.textContent='まだ「改良後の方が良い」とは結論づけていません。';
-    sub.textContent=`同条件で比較できたレースは ${shared}/${min}件。必要件数まで実戦データを蓄積しています。`;
-  }
-  const tbody=document.getElementById('versions');const versions=Object.entries(d.versions||{});
-  tbody.innerHTML=versions.length?versions.map(([v,x])=>{const m=x.strict||{};let name=v;if(v===c.baseline)name=`改良前 ${v}`;else if(v===c.candidate)name=`改良後 ${v}`;return `<tr><td><strong>${esc(name)}</strong></td><td>${m.cases??0}</td><td>${pct(m.honmei_win_rate)}</td><td>${pct(m.honmei_top3_rate)}</td><td>${pct(m.top3_marks_capture_rate)}</td><td>${pct(m.winner_in_top3_marks_rate)}</td><td>${roi(m.roi_pct)}</td></tr>`}).join(''):'<tr><td colspan="7" style="text-align:center;color:#647085">比較データを収集中です</td></tr>';
-  document.getElementById('comparison').innerHTML=`改良前: <strong>${esc(c.baseline??'—')}</strong> ／ 改良後: <strong>${esc(c.candidate??'未設定')}</strong><br>同条件で比較できた実戦: <strong>${shared}件</strong>。${state==='ready_for_review'?'必要件数に達しており、改善効果をレビューできます。':`結論目安の${min}件に達するまでは、改善したと断定しません。`}`;
-  const errs=d.errors||[];document.getElementById('errors').innerHTML=errs.length?errs.map(e=>`<div class="error">${esc(e.race_id??'')} ${esc(e.version??'')}: ${esc(e.error)}</div>`).join(''):'エラーなし';
-})}
-
+function loadStatus(){return fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{const c=d.comparison||{};compareMeta={baseline:c.baseline||null,candidate:c.candidate||null};const strict=d.case_counts?.strict??0,shared=c.strict_shared_cases??0,min=c.minimum_strict_shared_cases??20;document.getElementById('strict').textContent=strict;document.getElementById('shared').textContent=shared;document.getElementById('minimum').textContent=`結論目安 ${min}レース`;document.getElementById('pair').textContent=`${c.baseline??'—'} → ${c.candidate??'未設定'}`;document.getElementById('prob').textContent=d.coverage?.strict_probability_win_cases??0;document.getElementById('bets').textContent=d.coverage?.strict_bet_cases??0;const st=document.getElementById('state'),state=c.state||'unknown';const labels={waiting_for_candidate:'比較準備中',insufficient_data:'データ収集中',ready_for_review:'比較可能'};st.textContent=labels[state]||state;st.className='rd-status '+(state==='ready_for_review'?'ok':'warn');const conclusion=document.getElementById('conclusionText'),sub=document.getElementById('conclusionSub');if(state==='ready_for_review'){conclusion.textContent='比較に必要な実戦データが揃いました。改良前後の成績を見て、採用判断できる段階です。';sub.textContent=`同条件で比較できたレース：${shared}件。複数指標を確認して最終判断します。`;}else if(state==='waiting_for_candidate'){conclusion.textContent='まだ改良前後の比較を開始できる状態ではありません。';sub.textContent='比較対象となる改良後プロンプトの準備を待っています。';}else{conclusion.textContent='まだ「改良後の方が良い」とは結論づけていません。';sub.textContent=`同条件で比較できたレースは ${shared}/${min}件。必要件数まで実戦データを蓄積しています。`;}const tbody=document.getElementById('versions');const versions=Object.entries(d.versions||{});tbody.innerHTML=versions.length?versions.map(([v,x])=>{const m=x.strict||{};let name=v;if(v===c.baseline)name=`改良前 ${v}`;else if(v===c.candidate)name=`改良後 ${v}`;return `<tr><td><strong>${esc(name)}</strong></td><td>${m.cases??0}</td><td>${pct(m.honmei_win_rate)}</td><td>${pct(m.honmei_top3_rate)}</td><td>${pct(m.top3_marks_capture_rate)}</td><td>${pct(m.winner_in_top3_marks_rate)}</td><td>${roi(m.roi_pct)}</td></tr>`}).join(''):'<tr><td colspan="7" style="text-align:center;color:#6d6e75">比較データを収集中です</td></tr>';document.getElementById('comparison').innerHTML=`改良前: <strong>${esc(c.baseline??'—')}</strong> ／ 改良後: <strong>${esc(c.candidate??'未設定')}</strong><br>同条件で比較できた実戦: <strong>${shared}件</strong>。${state==='ready_for_review'?'必要件数に達しており、改善効果をレビューできます。':`結論目安の${min}件に達するまでは、改善したと断定しません。`}`;const errs=d.errors||[];document.getElementById('errors').innerHTML=errs.length?errs.map(e=>`<div class="rd-error">${esc(e.race_id??'')} ${esc(e.version??'')}: ${esc(e.error)}</div>`).join(''):'エラーなし';})}
 function markText(m){if(!m)return '—';return `◎ ${m.win??'—'} / ○ ${m.second??'—'} / ▲ ${m.third??'—'}`}
 function goingText(g){const e=Object.entries(g||{});return e.length?e.map(([k,v])=>`${k} ${Math.round(Number(v)*100)}%`).join(' / '):'—'}
 function versionName(v){if(v===compareMeta.baseline)return `改良前 ${v}`;if(v===compareMeta.candidate)return `改良後 ${v}`;return v||'version不明'}
-function raceCard(r){
-  const isReplay=r.grade==='historical_replay';
-  const gradeClass=isReplay?'replay':'strict';
-  const gradeLabel=isReplay?'過去再現（参考）':'実戦比較';
-  const vers=(r.predictions||[]).map(v=>`<div class="version"><h3>${esc(versionName(v.version))}</h3><div class="kv"><b>印</b><span class="marks">${esc(markText(v.marks))}</span><b>展開</b><span>${esc(v.pace||'—')}</span><b>馬場予測</b><span>${esc(goingText(v.going_probabilities))}</span></div><details><summary>技術情報</summary><div class="kv"><b>cutoff</b><span>${esc(v.information_cutoff_at||r.cutoff_at||'—')}</span><b>proof</b><span class="proof">${esc(v.proof_commit||'過去再現のためproofなし')}</span></div>${v.prediction_path?`<a class="json-link" href="${esc(v.prediction_path)}" target="_blank" rel="noopener">予想JSONを見る</a>`:''}</details></div>`).join('');
-  const result=r.result_path?`<details><summary>結果照合データを見る</summary><div class="small">公式馬場: ${esc(r.official_going||'—')} / 結果確定: ${esc(r.official_result_at||'—')}</div><a class="json-link" href="${esc(r.result_path)}" target="_blank" rel="noopener">結果JSONを見る</a></details>`:'<div class="small">結果はまだ確定・結合されていません。</div>';
-  return `<article class="race-card"><div class="race-head"><div><div class="race-title">${esc(r.date||'')} ${esc(r.venue||'')} ${r.race_no?esc(r.race_no)+'R ':''}${esc(r.race_name||r.race_id)}</div><div class="race-meta">${esc(r.race_id)}</div></div><div class="chips"><span class="chip ${gradeClass}">${gradeLabel}</span><span class="chip">${r.status==='reviewed'?'結果確認済み':'結果待ち'}</span></div></div><div class="race-body"><div class="version-grid">${vers||'<div class="empty">比較用の予想データがありません。</div>'}</div>${result}${r.case_path?`<details><summary>ケース定義を見る</summary><a class="json-link" href="${esc(r.case_path)}" target="_blank" rel="noopener">case manifest</a></details>`:''}</div></article>`
-}
-function renderRaces(){
-  const g=document.getElementById('gradeFilter').value,status=document.getElementById('statusFilter').value,venue=document.getElementById('venueFilter').value;
-  let list=g==='historical'?(publicData.historical_replays||[]):(publicData.races||[]);
-  if(status!=='all')list=list.filter(x=>x.status===status);if(venue!=='all')list=list.filter(x=>x.venue===venue);
-  document.getElementById('raceList').innerHTML=list.length?list.map(raceCard).join(''):'<div class="empty">この条件で比較できるレースはまだありません。</div>';
-}
-function loadPublic(){return fetch('data/e2e_public.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
-  publicData=d;const venues=[...new Set([...(d.races||[]),...(d.historical_replays||[])].map(x=>x.venue).filter(Boolean))].sort();
-  const sel=document.getElementById('venueFilter');sel.innerHTML='<option value="all">全競馬場</option>'+venues.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');renderRaces();
-})}
-for(const id of ['gradeFilter','statusFilter','venueFilter'])document.getElementById(id).addEventListener('change',renderRaces);
-Promise.allSettled([loadStatus(),loadPublic()]).then(xs=>{if(xs.some(x=>x.status==='rejected')){const st=document.getElementById('state');if(st.textContent==='読み込み中'){st.textContent='一部データ読み込みエラー';st.className='status bad'}}});
+function raceCard(r){const isReplay=r.grade==='historical_replay';const gradeClass=isReplay?'replay':'strict';const gradeLabel=isReplay?'過去再現（参考）':'実戦比較';const vers=(r.predictions||[]).map(v=>`<div class="rd-version"><h3>${esc(versionName(v.version))}</h3><div class="rd-kv"><b>印</b><span>${esc(markText(v.marks))}</span><b>展開</b><span>${esc(v.pace||'—')}</span><b>馬場予測</b><span>${esc(goingText(v.going_probabilities))}</span></div><details><summary>技術情報</summary><div class="rd-kv"><b>cutoff</b><span>${esc(v.information_cutoff_at||r.cutoff_at||'—')}</span><b>proof</b><span class="rd-proof">${esc(v.proof_commit||'過去再現のためproofなし')}</span></div>${v.prediction_path?`<a href="${esc(v.prediction_path)}" target="_blank" rel="noopener">予想JSONを見る</a>`:''}</details></div>`).join('');const result=r.result_path?`<details><summary>結果照合データを見る</summary><div class="rd-small">公式馬場: ${esc(r.official_going||'—')} / 結果確定: ${esc(r.official_result_at||'—')}</div><a href="${esc(r.result_path)}" target="_blank" rel="noopener">結果JSONを見る</a></details>`:'<div class="rd-small">結果はまだ確定・結合されていません。</div>';return `<article class="rd-card"><div class="rd-card-head"><div><div class="rd-title">${esc(r.date||'')} ${esc(r.venue||'')} ${r.race_no?esc(r.race_no)+'R ':''}${esc(r.race_name||r.race_id)}</div><div class="rd-meta">${esc(r.race_id)}</div></div><div class="rd-chips"><span class="rd-chip ${gradeClass}">${gradeLabel}</span><span class="rd-chip">${r.status==='reviewed'?'結果確認済み':'結果待ち'}</span></div></div><div class="rd-card-body"><div class="rd-version-grid">${vers||'<div class="rd-empty">比較用の予想データがありません。</div>'}</div>${result}${r.case_path?`<details><summary>ケース定義を見る</summary><a href="${esc(r.case_path)}" target="_blank" rel="noopener">case manifest</a></details>`:''}</div></article>`}
+function renderRaces(){const g=document.getElementById('gradeFilter').value,status=document.getElementById('statusFilter').value,venue=document.getElementById('venueFilter').value;let list=g==='historical'?(publicData.historical_replays||[]):(publicData.races||[]);if(status!=='all')list=list.filter(x=>x.status===status);if(venue!=='all')list=list.filter(x=>x.venue===venue);document.getElementById('raceList').innerHTML=list.length?list.map(raceCard).join(''):'<div class="rd-empty">この条件で比較できるレースはまだありません。</div>'}
+function loadPublic(){return fetch('data/e2e_public.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{publicData=d;const venues=[...new Set([...(d.races||[]),...(d.historical_replays||[])].map(x=>x.venue).filter(Boolean))].sort();const sel=document.getElementById('venueFilter');sel.innerHTML='<option value="all">全競馬場</option>'+venues.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');renderRaces();})}
+for(const id of ['gradeFilter','statusFilter','venueFilter'])document.getElementById(id).addEventListener('change',renderRaces);Promise.allSettled([loadStatus(),loadPublic()]).then(xs=>{if(xs.some(x=>x.status==='rejected')){const st=document.getElementById('state');if(st.textContent==='読み込み中'){st.textContent='一部データ読み込みエラー';st.className='rd-status bad'}}});
 </script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
