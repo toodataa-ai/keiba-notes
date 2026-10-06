@@ -1,0 +1,37 @@
+name: Ensure visitor tracking
+
+on:
+  push:
+    paths:
+      - 'docs/**/*.html'
+      - 'docs/assets/visitor-counter.js'
+      - 'tools/ensure_visitor_tracking.py'
+      - '.github/workflows/visitor-tracking-guard.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ensure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure tracker on published HTML
+        run: python tools/ensure_visitor_tracking.py
+
+      - name: Commit injected tracking tags
+        run: |
+          if git diff --quiet -- docs; then
+            echo 'No tracking changes needed.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs
+          git commit -m 'Ensure visitor tracking on published HTML'
+          git push
