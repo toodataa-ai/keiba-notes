@@ -7,35 +7,48 @@ function isoDate(dt){return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1)
 function weekRange(s){const {y,m,d}=dateParts(s);const dt=new Date(Date.UTC(y,m-1,d));const dow=dt.getUTCDay();const back=(dow+6)%7;const start=new Date(dt);start.setUTCDate(dt.getUTCDate()-back);const end=new Date(start);end.setUTCDate(start.getUTCDate()+6);return {key:isoDate(start),start:isoDate(start),end:isoDate(end)};}
 function periodKey(mode,r){if(mode==='year')return r.date.slice(0,4);if(mode==='month')return r.date.slice(0,7);if(mode==='week')return weekRange(r.date).key;return 'all';}
 function periodText(mode,key,rows){if(mode==='all')return '全期間';if(mode==='year')return `${key}年`;if(mode==='month'){const [y,m]=key.split('-');return `${y}年${Number(m)}月`;}if(mode==='week'){const sample=rows.find(r=>weekRange(r.date).key===key);const w=sample?weekRange(sample.date):{start:key,end:key};return `${w.start}〜${w.end}`;}return key;}
-function splitBet(text){const m=String(text||'').trim().match(/^(\S+)\s+(.+)$/);return m?{type:m[1],selection:m[2]}:{type:'買い目',selection:String(text||'—')};}
-function betTypeSummary(bets){const counts=new Map();for(const b of bets){const {type}=splitBet(b);counts.set(type,(counts.get(type)||0)+1);}return [...counts.entries()].map(([k,v])=>`${k}${v}点`).join('・');}
+function splitBet(text){const m=String(text||'').trim().match(/^(\\S+)\\s+(.+)$/);return m?{type:m[1],selection:m[2]}:{type:'買い目',selection:String(text||'—')};}
+function betTypeSummary(bets){const counts=new Map();for(const b of bets){const type=typeof b==='string'?splitBet(b).type:(b.type||'買い目');counts.set(type,(counts.get(type)||0)+1);}return [...counts.entries()].map(([k,v])=>`${k}${v}点`).join('・');}
 function betPanel(r){
   const p=r.performance||{};
+  const structured=Array.isArray(r.final_bets)&&r.final_bets.length?r.final_bets:null;
+  if(r.purchase_decision==='pass'&&(!structured||!structured.length)){
+    return '<section class="bet-panel"><div class="bet-panel-head"><strong>最終購入指示：見送り</strong><span>このレースは成績上の購入額0円です。</span></div></section>';
+  }
   const hitSet=new Set(Array.isArray(p.hit_bets)?p.hit_bets:[]);
   const missSet=new Set(Array.isArray(p.miss_bets)?p.miss_bets:[]);
-  const bets=Array.isArray(r.bets)&&r.bets.length?r.bets:[...hitSet,...missSet];
+  const settlementList=Array.isArray(r.settlements)?r.settlements:(Array.isArray(p.settlements)?p.settlements:[]);
+  const settlements=new Map(settlementList.map(x=>[x.bet_id,x]));
+  let bets=[];
+  if(structured){
+    bets=structured.map(b=>({id:b.id||'',type:b.type||'買い目',selection:String(b.selection||'—'),stake_yen:Number(b.stake_yen),layer:b.layer||'',reason:b.reason||'',legacy_text:`${b.type||''} ${b.selection||''}`.trim()}));
+  }else{
+    const legacy=Array.isArray(r.bets)&&r.bets.length?r.bets:[...hitSet,...missSet];
+    bets=legacy.map((b,i)=>{const x=splitBet(b);return {id:`L${String(i+1).padStart(2,'0')}`,type:x.type,selection:x.selection,stake_yen:null,layer:'',reason:'',legacy_text:b};});
+  }
   if(!bets.length)return '<div class="bet-panel"><div class="bet-empty">買い目ごとの内訳は記録されていません。</div></div>';
-  const stake=Number(p.stake_yen||0),payout=Number(p.payout_yen||0),profit=Number(p.profit_yen??(payout-stake));
-  const explicitDetails=Array.isArray(p.bet_details)?p.bet_details:[];
-  const detailMap=new Map(explicitDetails.map(x=>[x.bet||x.selection_text||x.id,x]));
-  const equal100=stake===bets.length*100;
-  const hitCount=bets.filter(b=>hitSet.has(b)).length;
+  const stake=Number(p.stake_yen??r.total_stake_yen??0),payout=Number(p.payout_yen||0),profit=Number(p.profit_yen??(payout-stake));
+  const equal100=!structured&&stake===bets.length*100;
+  const knownHits=bets.filter(b=>{const st=settlements.get(b.id);return st?.hit===true||hitSet.has(b.legacy_text)}).length;
   const rows=bets.map(b=>{
-    const parsed=splitBet(b),detail=detailMap.get(b)||{};
-    const isHit=detail.hit===true||hitSet.has(b);
-    const isMiss=detail.hit===false||missSet.has(b);
-    const amount=Number.isFinite(Number(detail.stake_yen))?Number(detail.stake_yen):(equal100?100:null);
-    let rowPayout=Number.isFinite(Number(detail.payout_yen))?Number(detail.payout_yen):null;
-    if(rowPayout==null&&isHit&&hitCount===1&&payout>0)rowPayout=payout;
+    const st=settlements.get(b.id);
+    const isHit=st?.hit===true||hitSet.has(b.legacy_text);
+    const isMiss=st?.hit===false||missSet.has(b.legacy_text);
+    const amount=Number.isFinite(b.stake_yen)?b.stake_yen:(equal100?100:null);
+    let rowPayout=Number.isFinite(Number(st?.payout_yen))?Number(st.payout_yen):null;
+    if(rowPayout==null&&isHit&&knownHits===1&&payout>0)rowPayout=payout;
     if(rowPayout==null&&isMiss)rowPayout=0;
     const status=isHit?'的中':isMiss?'ハズレ':'結果不明';
-    const cls=isHit?'hit':'miss';
+    const cls=isHit?'hit':isMiss?'miss':'';
+    const best=structured&&b.id===r.best_bet_id?'<span class="bet-best">最優先</span>':'';
     const payoutText=rowPayout!=null?`払戻 ${yen(rowPayout)}`:'払戻 —';
-    return `<div class="bet-row ${isHit?'is-hit':''}"><div class="bet-main"><span class="bet-type">${esc(parsed.type)}</span><span class="bet-selection">${esc(parsed.selection)}</span></div><span class="bet-status ${cls}">${status}</span><div class="bet-money"><span>購入 ${amount!=null?yen(amount):'—'}</span><span class="${isHit&&rowPayout>0?'payout-hit':''}">${esc(payoutText)}</span></div></div>`;
+    const reason=b.reason?`<span>理由 ${esc(b.reason)}</span>`:'';
+    return `<div class="bet-row ${isHit?'is-hit':''}"><div class="bet-main"><span class="bet-type">${esc(b.type)}</span><span class="bet-selection">${esc(b.selection)}</span>${best}</div><span class="bet-status ${cls}">${status}</span><div class="bet-money"><span>購入 ${amount!=null?yen(amount):'—'}</span><span class="${isHit&&rowPayout>0?'payout-hit':''}">${esc(payoutText)}</span>${reason}</div></div>`;
   }).join('');
-  const pointText=equal100?`${bets.length}点 × 100円`:`${bets.length}点`;
   const summary=betTypeSummary(bets);
-  return `<section class="bet-panel" aria-label="購入した馬券"><div class="bet-panel-head"><strong>購入した馬券</strong><span>${esc(summary)} ／ ${esc(pointText)}</span></div><div class="bet-list">${rows}</div><div class="bet-total"><div><small>購入合計</small><strong>${yen(stake)}</strong></div><div><small>払戻合計</small><strong>${yen(payout)}</strong></div><div><small>収支</small><strong class="${profit>0?'positive':profit<0?'negative':''}">${yen(profit)}</strong></div></div></section>`;
+  const pointText=structured?`${bets.length}点 / 発走前固定`:(equal100?`${bets.length}点 × 100円`:`${bets.length}点`);
+  const decision=structured?'<strong>最終購入指示</strong>':'<strong>購入した馬券</strong>';
+  return `<section class="bet-panel" aria-label="購入した馬券"><div class="bet-panel-head">${decision}<span>${esc(summary)} ／ ${esc(pointText)}</span></div><div class="bet-list">${rows}</div><div class="bet-total"><div><small>購入合計</small><strong>${yen(stake)}</strong></div><div><small>払戻合計</small><strong>${yen(payout)}</strong></div><div><small>収支</small><strong class="${profit>0?'positive':profit<0?'negative':''}">${yen(profit)}</strong></div></div></section>`;
 }
 (async()=>{
   const raceRes=await fetch('data/races.json',{cache:'no-store'});const db=await raceRes.json();
