@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="地方競馬をJRA本番とは分離したDaily Shadow研究場として利用し、南関4場・園田・名古屋で毎日観測して転用可能な予測特徴を探索します。">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>地方競馬 Daily Shadow | 競馬予想精度向上AI</title>
+  <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
+  <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
+</head>
+<body>
+<header class="method-hero roadmap-hero">
+  <div class="wrap">
+    <nav class="method-nav" aria-label="ページナビゲーション">
+      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
+      <div class="method-nav-links"><a href="experience-regime.html">E0/E1/E2研究</a><a href="roadmap.html">ブラッシュアップ思想</a><a href="e2e.html">E2E検証</a><a href="index.html">予想アーカイブ</a></div>
+    </nav>
+    <div class="hero-copy">
+      <p class="kicker">LOCAL RACING / DAILY SHADOW / TRANSFER RESEARCH</p>
+      <h1>毎日観測する。<br>でも、直接は混ぜない。</h1>
+      <p class="hero-deck">地方競馬の高頻度な開催を、JRA本番予想とは完全に分離した研究用Shadowとして利用します。毎日サンプルを増やし、複数場で再現する誤差構造や予測特徴を見つけ、JRA側で改めてE2E検証します。</p>
+      <div class="hero-thesis"><strong>初期対象は大井・川崎・船橋・浦和・園田・名古屋の6場。</strong> 地方の結果や係数をJRAへ直接学習させず、抽象化したtransfer candidateだけをJRA側のChallengerへ渡します。</div>
+      <div class="status-strip" aria-label="現在地">
+        <div class="status-card"><small>MODE</small><strong>DAILY SHADOW</strong><span>本番JRAへの直接影響なし</span></div>
+        <div class="status-card"><small>VENUES</small><strong id="venueCount">6</strong><span>南関4場＋園田＋名古屋</span></div>
+        <div class="status-card"><small>OBSERVED</small><strong id="observed">確認中…</strong><span>観測レース数</span></div>
+        <div class="status-card"><small>TRANSFER</small><strong id="candidates">確認中…</strong><span>転用候補</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap article">
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>なぜ地方競馬を使うのか</h2><p class="chapter-lead">JRAだけでは時間のかかる仮説検証を、高頻度の実戦データで加速します。</p></div></div>
+    <p>地方競馬は平日を含め開催日が多く、ダートを中心に大量の実戦サンプルを蓄積できます。展開、位置取り、枠、騎手、斤量、ローテ、馬場バイアス、再現性などの仮説を短いサイクルで観測できるため、研究速度を大きく上げられます。</p>
+    <div class="callout"><b>狙い：</b>地方で当てるための別モデルを作ることだけが目的ではありません。JRAでも使える可能性のある「測り方」「分解方法」「誤差検出方法」を高速に発見する研究場として使います。</div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>最初は6場で始める</h2><p class="chapter-lead">一気に全国へ広げず、運用とデータ契約を安定させてから拡張します。</p></div></div>
+    <div class="axioms">
+      <div class="axiom"><b>南関4場</b>大井・川崎・船橋・浦和。開催頻度が高く、コース形状も異なるため横断比較しやすい。</div>
+      <div class="axiom"><b>園田</b>小回り・先行力など地方特有の条件差を観測する比較軸。</div>
+      <div class="axiom"><b>名古屋</b>別地区の番組・騎手・コース特性を加え、南関だけへの過適合を避ける。</div>
+    </div>
+    <p>各場は別ドメインとして集計し、地方6場をひとまとめの均質な母集団として扱いません。場ごとの固有効果は原則ローカルに留めます。</p>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>毎日の学習は「毎日モデルを書き換える」ことではない</h2><p class="chapter-lead">観測・誤差集計は毎日、JRA本番への採用判断は分離します。</p></div></div>
+    <div class="daily-cycle" aria-label="地方競馬Daily Shadowサイクル">
+      <div class="daily-cycle-step"><span class="daily-cycle-no">1</span><b>発走前に固定</b><span>対象レースのcompact Shadow predictionを結果を見る前に保存</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">2</span><b>公式結果を結合</b><span>結果確定後に別ファイルで着順・馬場・通過情報等を保存</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">3</span><b>日次誤差集計</b><span>場・距離・クラス・脚質・枠・騎手・斤量・ローテ等で分解</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">4</span><b>週次候補化</b><span>複数日・複数場で再現した論点だけをtransfer candidateへ</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>JRAで再検証</b><span>Historical replay / Grade A E2Eで別途検証し、承認後のみ採用</span></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>何を毎日見るか</h2><p class="chapter-lead">的中率だけでなく、どの条件で予測誤差が増減するかを構造化します。</p></div></div>
+    <table class="metric-table">
+      <thead><tr><th>観測軸</th><th>見ること</th></tr></thead>
+      <tbody>
+        <tr><td>競馬場・距離・クラス</td><td>場固有効果と一般化可能な効果を分離</td></tr>
+        <tr><td>馬場・ペース</td><td>時計速度、位置取り、進路のバイアスと展開崩壊を分離</td></tr>
+        <tr><td>脚質・枠・頭数</td><td>位置取り不利や先行競合の再現条件を確認</td></tr>
+        <tr><td>騎手</td><td>馬質から分離した条件別寄与の候補を探索</td></tr>
+        <tr><td>斤量・ローテ</td><td>条件変化による性能差と再現性の変化を確認</td></tr>
+        <tr><td>能力順位・信頼度</td><td>強さの推定と「今回も出せる確からしさ」の誤差を分離</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>JRAへ直接持ち込まない</h2><p class="chapter-lead">最も重要なガードです。</p></div></div>
+    <div class="guardrails">
+      <div class="guardrail"><b>地方係数を直接コピーしない</b><span>大井1800mで効いた補正を中山ダ1800mへそのまま適用しない。</span></div>
+      <div class="guardrail"><b>地方成績をJRA正式成績へ混ぜない</b><span>研究サンプルとJRA production評価を分離する。</span></div>
+      <div class="guardrail"><b>結果後に予想を書き換えない</b><span>発走前snapshotをproofとして保持する。</span></div>
+      <div class="guardrail"><b>一日で学習則を変えない</b><span>特殊馬場・大荒れ等へ過剰適合しない。</span></div>
+      <div class="guardrail"><b>transfer candidate止まり</b><span>地方で再現してもJRA側でE2Eを通すまでは候補扱い。</span></div>
+      <div class="guardrail"><b>本番採用は承認制</b><span>CandidateからJRA productionへの接続は人が判断する。</span></div>
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>現在の進捗</h2><p class="chapter-lead">個別の地方Shadow予想は公開せず、集計進捗と研究findingだけを公開します。</p></div></div>
+    <div class="live-roadmap">
+      <div class="live-box"><small>RACES OBSERVED</small><strong id="observed2">—</strong><span>累積観測</span></div>
+      <div class="live-box"><small>RESULTS JOINED</small><strong id="joined">—</strong><span>公式結果結合済み</span></div>
+      <div class="live-box"><small>TRANSFER CANDIDATES</small><strong id="candidates2">—</strong><span>JRA未採用</span></div>
+    </div>
+    <p id="latestFinding" class="callout"><b>最新finding：</b>観測開始前です。</p>
+  </section>
+
+  <section class="links-panel">
+    <h2>他の研究レイヤーとつなげて見る</h2>
+    <div class="cta-row"><a class="cta gold" href="experience-regime.html">E0/E1/E2研究へ</a><a class="cta" href="roadmap.html">ブラッシュアップ思想へ</a><a class="cta" href="e2e.html">E2E検証へ</a><a class="cta" href="index.html">正式予想アーカイブへ</a></div>
+  </section>
+</main>
+
+<footer class="wrap foot">地方競馬 Daily Shadow — Local observations are research-only. No direct update to JRA production.</footer>
+<script>
+async function load(){
+  try{
+    const r=await fetch('data/local_racing_shadow_status.json',{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));
+    const d=await r.json();const t=d.totals||{};const venues=Object.values(d.venues||{}).filter(v=>v.enabled);
+    document.getElementById('venueCount').textContent=venues.length;
+    document.getElementById('observed').textContent=t.races_observed??0;
+    document.getElementById('observed2').textContent=t.races_observed??0;
+    document.getElementById('joined').textContent=t.results_joined??0;
+    document.getElementById('candidates').textContent=t.transfer_candidates??0;
+    document.getElementById('candidates2').textContent=t.transfer_candidates??0;
+    document.getElementById('latestFinding').innerHTML='<b>最新finding：</b>'+(d.latest_finding||'観測開始前です。');
+  }catch(e){
+    for(const id of ['observed','observed2','joined','candidates','candidates2'])document.getElementById(id).textContent='—';
+  }
+}
+load();
+</script>
+<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+</body>
+</html>
