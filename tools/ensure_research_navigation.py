@@ -53,6 +53,8 @@ def simplify_method_page(filename: str, replacements=None) -> None:
     text = re.sub(r'<nav class="method-nav simple-home-nav"[^>]*>.*?</nav>', HOME_NAV, text, count=1, flags=re.S)
     text = remove_english_kickers(text)
     text = replace_bottom_links(text)
+    # 横断リンクの章を廃止した後に残る目次リンクも消す。
+    text = re.sub(r'\s*<a href="#links">.*?</a>', '', text, flags=re.S)
     if replacements:
         for old, new in replacements:
             text = text.replace(old, new)
@@ -64,7 +66,6 @@ def simplify_index() -> None:
     text = path.read_text(encoding='utf-8')
     original = text
 
-    # 英語の装飾ラベルを外し、トップページを入口に集約する。
     text = re.sub(r'\s*<div class="lab-signature".*?</div>', '', text, count=1, flags=re.S)
     text = re.sub(r'<span class="brand-lab-en">.*?</span>', '', text, count=1, flags=re.S)
     text = re.sub(
@@ -84,7 +85,6 @@ def simplify_index() -> None:
       </nav>'''
     text = re.sub(r'<nav class="hero-nav"[^>]*>.*?</nav>', nav, text, count=1, flags=re.S)
 
-    # アコーディオン見出しは日本語だけを残す。
     text = re.sub(r'<span class="eyebrow dark">(?:UPCOMING|PERFORMANCE|PROMPT|ARCHIVE)</span>', '', text)
     text = re.sub(r'<p class="eyebrow dark">(?:UPCOMING|PERIOD|ARCHIVE)</p>', '', text)
     text = text.replace('地方競馬はDaily Shadow研究として分離', '地方競馬はシャドー研究として分離')
@@ -106,11 +106,33 @@ def simplify_e2e() -> None:
     else:
         text = text.replace('<header><div class="inner">', '<header><div class="inner">' + home_nav, 1)
 
-    text = text.replace('<title>JRA E2E Shadow | 競馬予想精度向上AI</title>', '<title>JRA E2E シャドー検証 | 競馬予想精度向上AI</title>')
-    text = text.replace('End-to-End Prediction Validation', '発走前固定型のE2E検証')
-    text = text.replace('Baseline / Candidate 比較', '基準版 / 候補版 比較')
-    text = text.replace('Baseline: <strong>', '基準版: <strong>')
-    text = text.replace(' / Candidate: <strong>', ' / 候補版: <strong>')
+    replacements = [
+        ('<title>JRA E2E Shadow | 競馬予想精度向上AI</title>', '<title>JRA E2E シャドー検証 | 競馬予想精度向上AI</title>'),
+        ('<h1>JRA E2E Shadow</h1>', '<h1>JRA E2E シャドー検証</h1>'),
+        ('Git proofを残したまま', '発走前コミット証明を残したまま'),
+        ('<strong>正式な性能比較は Grade A / prospective_strict のみ。</strong> Historical replay は補助検証であり、同じ一覧でも明確に区別して表示します。', '<strong>正式な性能比較は Grade A の発走前固定実戦だけ。</strong> 過去再現検証は補助資料として明確に区別します。'),
+        ('End-to-End Prediction Validation', '発走前固定型のE2E検証'),
+        ('発走前Git proofあり', '発走前コミット証明あり'),
+        ('Baseline / Candidate 比較', '基準版 / 候補版 比較'),
+        ('Baseline: <strong>', '基準版: <strong>'),
+        (' / Candidate: <strong>', ' / 候補版: <strong>'),
+        ('<th>Version</th>', '<th>版</th>'),
+        ('<th>◎○▲ Top3捕捉</th>', '<th>◎○▲の3着内捕捉</th>'),
+        ('<th>Win Brier</th>', '<th>勝率Brier</th>'),
+        ('<th>ROI</th>', '<th>回収率</th>'),
+        ('<h2>発走前 Shadow → proof → 結果</h2>', '<h2>発走前予測 → 証明 → 結果</h2>'),
+        ('地方競馬Daily Shadowと同じ考え方で', '地方競馬シャドー研究と同じ考え方で'),
+        ('発走前snapshotとproof commit', '発走前スナップショットとコミット証明'),
+        ('<option value="historical">Grade B historical replay</option>', '<option value="historical">Grade B 過去再現</option>'),
+        ('発走前snapshotのみ', '発走前スナップショットのみ'),
+        ('Shadowデータを読み込み中です。', 'シャドーデータを読み込み中です。'),
+        ('<b>発走前固定</b>information cutoffより前にsnapshotを保存。', '<b>発走前固定</b>情報締切時刻より前にスナップショットを保存。'),
+        ('<b>Git proof</b>Grade Aは発走前commit SHAで存在証明。', '<b>コミット証明</b>Grade Aは発走前commit SHAで存在を証明。'),
+        ('prediction原本へ着順・払戻を追記しない。', '予測原本へ着順・払戻を追記しない。'),
+    ]
+    for old, new in replacements:
+        text = text.replace(old, new)
+
     if 'simple-home-bottom' not in text:
         text = text.replace('</main>', f'{HOME_BOTTOM}\n</main>', 1)
 
@@ -168,6 +190,7 @@ simplify_method_page('experience-regime.html', [
     ('<small>SCOPE</small>', '<small>対象</small>'),
     ('<small>COVERAGE</small>', '<small>カバー率</small>'),
     ('<small>OBSERVATIONS</small>', '<small>観測数</small>'),
+    ('Experience Regime E0/E1/E2 — Shadow observation only.', 'E0/E1/E2 経験量研究 — シャドー観測専用。'),
 ])
 
 simplify_method_page('local-racing-shadow.html', [
@@ -178,6 +201,8 @@ simplify_method_page('local-racing-shadow.html', [
     ('<small>RACES OBSERVED</small>', '<small>観測レース</small>'),
     ('<small>RESULTS JOINED</small>', '<small>結果照合済み</small>'),
     ('<small>TRANSFER CANDIDATES</small>', '<small>転用候補</small>'),
+    ('地方競馬 Daily Shadow', '地方競馬 シャドー研究'),
+    ('DAILY SHADOW', 'シャドー研究'),
 ])
 
 simplify_e2e()
