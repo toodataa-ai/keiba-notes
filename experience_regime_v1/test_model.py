@@ -8,6 +8,7 @@ from experience_regime_v1.model import (
     build_horse_rows,
     classify_regime,
     validate_experience_block,
+    validate_race_context,
 )
 
 
@@ -36,10 +37,35 @@ class ExperienceRegimeTests(unittest.TestCase):
         with self.assertRaises(ExperienceValidationError):
             validate_experience_block(prediction)
 
+    def test_race_context_validation(self) -> None:
+        prediction = {
+            "race_context": {
+                "race_no": 4,
+                "race_category": "debut",
+                "sample_origin": "stratified_sample",
+            }
+        }
+        context = validate_race_context(
+            prediction, allowed_categories={"debut", "maiden"}, required=True
+        )
+        self.assertEqual(context["race_no"], 4)
+        self.assertEqual(context["race_category"], "debut")
+        with self.assertRaises(ExperienceValidationError):
+            validate_race_context(
+                {"race_context": {"race_no": 13, "race_category": "debut", "sample_origin": "stratified_sample"}},
+                allowed_categories={"debut"},
+                required=True,
+            )
+
     def test_build_and_aggregate_rows(self) -> None:
         prediction = {
             "race_id": "x",
             "prompt_version": "v3.1",
+            "race_context": {
+                "race_no": 5,
+                "race_category": "maiden",
+                "sample_origin": "stratified_sample",
+            },
             "marks": {"win": 2, "second": 1, "third": 4},
             "step1_ranking": [2, 1, 4, 3, 5],
             "probabilities": {
@@ -61,6 +87,9 @@ class ExperienceRegimeTests(unittest.TestCase):
         rows = build_horse_rows(prediction, result)
         self.assertEqual(len(rows), 5)
         self.assertEqual(rows[0]["regime"], "E1")
+        self.assertEqual(rows[0]["race_no"], 5)
+        self.assertEqual(rows[0]["race_category"], "maiden")
+        self.assertEqual(rows[0]["sample_origin"], "stratified_sample")
         agg = aggregate_rows(rows)
         self.assertEqual(agg["E0"]["horse_observations"], 1)
         self.assertEqual(agg["E1"]["horse_observations"], 2)
