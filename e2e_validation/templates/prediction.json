@@ -5,6 +5,13 @@
   "prompt_manifest": "e2e_validation/manifests/v3.1.json",
   "generated_at": "YYYY-MM-DDTHH:MM:SS+09:00",
   "information_cutoff_at": "YYYY-MM-DDTHH:MM:SS+09:00",
+  "race_context": {
+    "venue": "東京",
+    "race_no": 1,
+    "race_name": "2歳新馬",
+    "race_category": "debut",
+    "sample_origin": "stratified_sample"
+  },
   "marks": {"win": 0, "second": 0, "third": 0},
   "step1_ranking": [],
   "experience": {
@@ -27,5 +34,5 @@
   "sources": [
     {"name": "source name", "url": "https://example.invalid", "published_at": "YYYY-MM-DDTHH:MM:SS+09:00"}
   ],
-  "note": "From 2026-10-10, prospective_strict JRA main-race snapshots must preserve pre-race starts_before_race and E0/E1/E2 regime for every runner. The experience block is shadow observation only and must not change v3.1 marks/ranking. probabilities.win/top3 and pace.probabilities remain optional until calibrated output is implemented. Never add race results to this file."
+  "note": "From 2026-10-10, prospective_strict Shadow-selected JRA snapshots may come from any race number 1R-12R. Preserve race_no, race_category, sample_origin, starts_before_race and E0/E1/E2 for every runner before the race. sample_origin is official_prediction for the normal published main-race prediction and stratified_sample for additional research-only races. The experience block is observation only and must not change v3.1 marks/ranking. Never add race results to this file."
 }
