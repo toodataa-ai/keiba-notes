@@ -116,11 +116,11 @@
     <details class="content-disclosure" id="performanceDisclosure">
       <summary>
         <span class="content-summary-main"><strong>成績・集計期間</strong></span>
-        <span class="content-summary-note">的中率・回収率・収支・◎成績</span>
+        <span class="content-summary-note">予想・結果・反省会まで揃ったレースの成績</span>
       </summary>
       <div class="content-disclosure-body">
         <section class="period-panel"><div><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
-        <details class="performance-disclosure"><summary>この期間の成績を見る</summary><div class="performance-body"><section class="stats" aria-label="期間成績"><article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article><article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article><article><span class="label">回収率</span><strong id="statROI">—</strong></article><article><span class="label">収支</span><strong id="statProfit">—</strong></article><article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article></section><section id="legacyNote" class="legacy-note" hidden></section></div></details>
+        <details class="performance-disclosure"><summary>この期間の成績を見る</summary><div class="performance-body"><section class="stats" aria-label="期間成績"><article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article><article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article><article><span class="label">回収率</span><strong id="statROI">—</strong></article><article><span class="label">収支</span><strong id="statProfit">—</strong></article><article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article></section><p class="subnote">旧サイトから移行した購入・的中・払戻のみの履歴は、反省会がないため公開成績には含めません。</p></div></details>
       </div>
     </details>
 
@@ -145,6 +145,6 @@
   </main>
   <footer class="wrap footer"><p>正式成績の対象はJRAメインレース。地方競馬は予想研究として分離し、JRA正式成績・本番予想へ直接混在させません。</p></footer>
   <script src="assets/schedule.js?v=20261005-schedule1"></script>
-  <script src="assets/app.js?v=20261007-hide-legacy1"></script>
+  <script src="assets/app.js?v=20261007-reviewed-only1"></script>
   <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
