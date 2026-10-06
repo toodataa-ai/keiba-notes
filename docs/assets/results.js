@@ -27,10 +27,11 @@ function betPanel(r){
     const amount=Number.isFinite(Number(detail.stake_yen))?Number(detail.stake_yen):(equal100?100:null);
     let rowPayout=Number.isFinite(Number(detail.payout_yen))?Number(detail.payout_yen):null;
     if(rowPayout==null&&isHit&&hitCount===1&&payout>0)rowPayout=payout;
+    if(rowPayout==null&&isMiss)rowPayout=0;
     const status=isHit?'的中':isMiss?'ハズレ':'結果不明';
     const cls=isHit?'hit':'miss';
-    const payoutText=rowPayout!=null&&rowPayout>0?`払戻 ${yen(rowPayout)}`:'';
-    return `<div class="bet-row ${isHit?'is-hit':''}"><span class="bet-type">${esc(parsed.type)}</span><span class="bet-selection">${esc(parsed.selection)}</span><span class="bet-stake">${amount!=null?yen(amount):'—'}</span><span class="bet-status ${cls}">${status}</span><span class="bet-payout">${esc(payoutText)}</span></div>`;
+    const payoutText=rowPayout!=null?`払戻 ${yen(rowPayout)}`:'払戻 —';
+    return `<div class="bet-row ${isHit?'is-hit':''}"><div class="bet-main"><span class="bet-type">${esc(parsed.type)}</span><span class="bet-selection">${esc(parsed.selection)}</span></div><span class="bet-status ${cls}">${status}</span><div class="bet-money"><span>購入 ${amount!=null?yen(amount):'—'}</span><span class="${isHit&&rowPayout>0?'payout-hit':''}">${esc(payoutText)}</span></div></div>`;
   }).join('');
   const pointText=equal100?`${bets.length}点 × 100円`:`${bets.length}点`;
   const summary=betTypeSummary(bets);
