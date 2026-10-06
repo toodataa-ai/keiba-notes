@@ -5,6 +5,12 @@ from statistics import mean
 from typing import Any, Dict, Iterable, List, Optional
 
 REGIMES = ("E0", "E1", "E2")
+SAMPLE_ORIGINS = (
+    "official_prediction",
+    "stratified_sample",
+    "historical_replay",
+    "synthetic",
+)
 
 
 class ExperienceValidationError(ValueError):
@@ -21,6 +27,43 @@ def classify_regime(starts_before_race: int) -> str:
     if starts_before_race <= 3:
         return "E1"
     return "E2"
+
+
+def validate_race_context(
+    prediction: dict,
+    allowed_categories: Optional[Iterable[str]] = None,
+    required: bool = False,
+) -> Dict[str, Any]:
+    context = prediction.get("race_context")
+    if context is None:
+        if required:
+            raise ExperienceValidationError("race_context is required for selected Shadow races")
+        return {}
+    if not isinstance(context, dict):
+        raise ExperienceValidationError("race_context must be an object")
+
+    race_no = context.get("race_no")
+    category = context.get("race_category")
+    sample_origin = context.get("sample_origin")
+
+    if isinstance(race_no, bool) or not isinstance(race_no, int) or not 1 <= race_no <= 12:
+        raise ExperienceValidationError("race_context.race_no must be an integer from 1 to 12")
+    if not isinstance(category, str) or not category:
+        raise ExperienceValidationError("race_context.race_category is required")
+    if allowed_categories is not None and category not in set(allowed_categories):
+        raise ExperienceValidationError(f"unknown race_category: {category}")
+    if sample_origin not in SAMPLE_ORIGINS:
+        raise ExperienceValidationError(
+            "race_context.sample_origin must be one of: " + ",".join(SAMPLE_ORIGINS)
+        )
+
+    return {
+        "race_no": race_no,
+        "race_category": category,
+        "sample_origin": sample_origin,
+        "race_name": context.get("race_name"),
+        "venue": context.get("venue"),
+    }
 
 
 def validate_experience_block(prediction: dict, field: Optional[Iterable[int]] = None) -> Dict[str, dict]:
@@ -70,6 +113,7 @@ def build_horse_rows(prediction: dict, result: dict) -> List[dict]:
     if not exp:
         return []
 
+    context = validate_race_context(prediction, required=False)
     winner = finish[0]
     top3 = set(finish[:3])
     ranking = prediction.get("step1_ranking") or []
@@ -97,6 +141,9 @@ def build_horse_rows(prediction: dict, result: dict) -> List[dict]:
             "race_id": race_id,
             "version": version,
             "horse_no": horse_no,
+            "race_no": context.get("race_no"),
+            "race_category": context.get("race_category"),
+            "sample_origin": context.get("sample_origin"),
             "regime": item["regime"],
             "starts_before_race": item["starts_before_race"],
             "finish_position": position,
