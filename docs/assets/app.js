@@ -28,6 +28,12 @@ function periodText(mode,key,rows){
   }
   return key;
 }
+function hasReview(r){
+  if(typeof r?.review==='string') return r.review.trim().length>0;
+  if(!r?.review||typeof r.review!=='object') return false;
+  if(typeof r.review.summary==='string'&&r.review.summary.trim()) return true;
+  return Object.keys(r.review).length>0;
+}
 
 function renderPromptHistory(history,prompt){
   const root=document.getElementById('promptHistoryList');
@@ -64,9 +70,11 @@ async function load(){
   document.getElementById('promptBadge').textContent=`最新版プロンプト ${prompt.version}`;
   renderPromptHistory(history,prompt);
 
-  // 旧サイトから移行した「購入・的中・払戻だけ」の記録は公開成績・履歴から除外する。
-  // 原本は監査用に保持し、通常の予想済み／回顧待ちレースは隠さない。
-  const allRaces=(db.races||[]).filter(r=>r.scope==='jra-main'&&r.source!=='legacy-performance-list');
+  // 旧サイトから移行した記録のうち、反省会が存在しないものは公開履歴・成績から除外する。
+  // 原本は監査・追跡用として races.json に残す。将来、反省会が正式に追加された移行記録は表示対象へ戻せる。
+  const allRaces=(db.races||[]).filter(r=>
+    r.scope==='jra-main' && !(r.source==='legacy-performance-list' && !hasReview(r))
+  );
   const periodMode=document.getElementById('periodMode');
   const periodValue=document.getElementById('periodValue');
   const statusFilter=document.getElementById('statusFilter');
@@ -93,7 +101,8 @@ async function load(){
   }
 
   function renderStats(rows){
-    const reviewed=rows.filter(r=>r.status==='reviewed'&&r.performance);
+    // 公開成績は、結果と反省会まで揃ったレースだけを母集団にする。
+    const reviewed=rows.filter(r=>r.status==='reviewed'&&r.performance&&hasReview(r));
     const hits=reviewed.filter(r=>r.performance?.ticket_hit===true).length;
     const stake=reviewed.reduce((s,r)=>s+Number(r.performance?.stake_yen||0),0);
     const payout=reviewed.reduce((s,r)=>s+Number(r.performance?.payout_yen||0),0);
@@ -109,21 +118,10 @@ async function load(){
     document.getElementById('statHonmeiNote').textContent=honmeiRows.length<reviewed.length?`印着順を保存済みの${honmeiRows.length}レースで算出`:'';
   }
 
-  function renderLegacyNote(rows){
-    const box=document.getElementById('legacyNote');
-    const n=rows.filter(r=>r.source==='legacy-performance-list').length;
-    if(!n){box.hidden=true;box.innerHTML='';return;}
-    const s=db.legacy_summary;
-    box.hidden=false;
-    if(s){
-      box.innerHTML=`<b>過去成績を移行済み</b>：2026/9/5〜10/3の厳密集計12レースを初期データとして反映しています。全12レースでは投資 ${yen(Number(s.stake_yen))}、払戻 ${yen(Number(s.payout_yen))}、収支 ${yen(Number(s.profit_yen))}、回収率 ${Number(s.roi_pct).toFixed(1)}%、的中 ${s.ticket_hits}/${s.race_count}。神戸新聞杯は券種不明のため集計外です。`;
-    }else{box.textContent=`過去成績一覧から${n}レースを移行済みです。`;}
-  }
-
   function render(){
     const periodRows=currentRows();
     document.getElementById('periodLabel').textContent=periodText(periodMode.value,periodValue.value,allRaces);
-    renderStats(periodRows);renderLegacyNote(periodRows);
+    renderStats(periodRows);
     const rows=periodRows
       .filter(r=>statusFilter.value==='all'||r.status===statusFilter.value)
       .sort((a,b)=>`${b.date}-${b.id}`.localeCompare(`${a.date}-${a.id}`));
@@ -138,7 +136,7 @@ async function load(){
       const links=[];
       if(r.report) links.push(`<a class="btn" href="${encodeURI(r.report)}">予想詳細を見る</a>`);
       if(r.pdf) links.push(`<a class="btn secondary" href="${encodeURI(r.pdf)}">PDF</a>`);
-      const actions=links.length?`<div class="actions">${links.join('')}</div>`:`<div class="legacy-source">過去の成績一覧から移行した記録</div>`;
+      const actions=links.length?`<div class="actions">${links.join('')}</div>`:'';
       return `<article class="race-card">
         <div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race)}</h3></div><span class="status ${r.status==='reviewed'?'reviewed':''}">${r.status==='reviewed'?'結果登録済み':'予想済み'}</span></div>
         ${marks}${result}${review}${actions}
