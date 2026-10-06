@@ -64,7 +64,9 @@ async function load(){
   document.getElementById('promptBadge').textContent=`最新版プロンプト ${prompt.version}`;
   renderPromptHistory(history,prompt);
 
-  const allRaces=(db.races||[]).filter(r=>r.scope==='jra-main');
+  // 旧サイトから移行した「購入・的中・払戻だけ」の記録は公開成績・履歴から除外する。
+  // 原本は監査用に保持し、通常の予想済み／回顧待ちレースは隠さない。
+  const allRaces=(db.races||[]).filter(r=>r.scope==='jra-main'&&r.source!=='legacy-performance-list');
   const periodMode=document.getElementById('periodMode');
   const periodValue=document.getElementById('periodValue');
   const statusFilter=document.getElementById('statusFilter');
