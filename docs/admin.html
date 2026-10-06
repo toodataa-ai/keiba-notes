@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>管理者画面 | AIによる競馬予想精度向上研究所</title>
+  <style>
+    :root{--bg:#f3f3f4;--card:#fff;--ink:#19191d;--muted:#6d6e75;--line:#e1e1e4;--red:#c61d31;--dark:#111116;--ok:#167a52}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Meiryo UI",Meiryo,"Yu Gothic UI",sans-serif;line-height:1.65}.wrap{width:min(960px,calc(100% - 28px));margin:auto}
+    header{background:linear-gradient(135deg,#0d0d10,#211116);color:#fff;border-bottom:4px solid var(--red);padding:28px 0 24px}header p{margin:4px 0 0;color:#c8c8ce;font-size:13px}h1{margin:0;font-size:clamp(22px,4vw,32px)}
+    main{padding:26px 0 60px}.eyebrow{margin:0 0 5px;color:var(--red);font-size:11px;font-weight:900;letter-spacing:.13em}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 3px 18px rgba(13,13,16,.05)}.label{color:var(--muted);font-size:13px;font-weight:700}.value{margin-top:4px;font-size:clamp(38px,8vw,64px);font-weight:900;letter-spacing:-.04em;line-height:1.05}.unit{font-size:14px;color:var(--muted);margin-left:5px}.meta{margin-top:10px;color:var(--muted);font-size:12px}.panel{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.status{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;background:#f0f0f2;color:#555;font-size:12px;font-weight:800}.status.ok{background:#eaf7f1;color:var(--ok)}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.button{appearance:none;border:0;border-radius:10px;background:var(--dark);color:#fff;padding:10px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}.button:disabled{opacity:.5;cursor:wait}.note{margin:14px 0 0;padding:13px 15px;border-left:4px solid var(--red);background:#fff5f6;border-radius:0 10px 10px 0;color:#5e4a50;font-size:12px}.back{display:inline-block;margin-top:18px;color:#8f1726;text-decoration:none;font-weight:800;font-size:13px}
+    @media(max-width:620px){.grid{grid-template-columns:1fr}.card{padding:18px}.value{font-size:48px}}
+  </style>
+</head>
+<body>
+<header><div class="wrap"><p class="eyebrow">ADMIN / VISITOR ANALYTICS</p><h1>管理者画面</h1><p>AIによる競馬予想精度向上研究所 — 来訪状況</p></div></header>
+<main class="wrap">
+  <div class="grid">
+    <section class="card"><div class="label">本日の来訪者</div><div><span class="value" id="today">—</span><span class="unit">人</span></div><div class="meta"><span id="todayDate">—</span>（日本時間 0:00〜現在）</div></section>
+    <section class="card"><div class="label">累積来訪者</div><div><span class="value" id="total">—</span><span class="unit">人</span></div><div class="meta">計測開始以降の推定ユニーク来訪者</div></section>
+  </div>
+  <section class="panel">
+    <div class="row"><div><span class="status" id="status"><span class="dot"></span><span id="statusText">取得中</span></span><div class="meta" id="updated">—</div></div><button class="button" id="refresh" type="button">更新</button></div>
+    <p class="note">同じ人が複数ページを見ても重複しにくい「推定ユニーク来訪者」として表示します。カウント基盤はCounter APIを利用し、当サイト独自には氏名・メールアドレス等の個人情報を保存しません。静的なGitHub Pagesのため、この画面は認証付き管理画面ではなく、URLを知っている人は閲覧できます。</p>
+  </section>
+  <a class="back" href="index.html">← サイトへ戻る</a>
+</main>
+<script>
+(() => {
+  'use strict';
+  const NS='toodataa-ai-keiba-notes', ACTION='visit', API='https://counterapi.com/api';
+  const $=s=>document.querySelector(s);
+  function jstDate(now=new Date()){
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
+    const o=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+    return `${o.year}-${o.month}-${o.day}`;
+  }
+  function fmt(n){return Number.isFinite(Number(n))?Number(n).toLocaleString('ja-JP'):'—'}
+  async function read(key){
+    const nonce=`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const u=`${API}/${encodeURIComponent(NS)}/${encodeURIComponent(ACTION)}/${encodeURIComponent(key)}?readOnly=true&unique=true&_=${nonce}`;
+    const r=await fetch(u,{cache:'no-store',credentials:'omit'});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const d=await r.json();
+    return d.value ?? 0;
+  }
+  async function load(){
+    const btn=$('#refresh');btn.disabled=true;$('#statusText').textContent='取得中';$('#status').classList.remove('ok');
+    const day=jstDate();$('#todayDate').textContent=day;
+    try{
+      const [today,total]=await Promise.all([read(`day-${day}`),read('all-time')]);
+      $('#today').textContent=fmt(today);$('#total').textContent=fmt(total);
+      $('#statusText').textContent='正常';$('#status').classList.add('ok');
+      $('#updated').textContent=`最終更新: ${new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',dateStyle:'medium',timeStyle:'medium'}).format(new Date())}`;
+    }catch(e){
+      $('#statusText').textContent='取得失敗';$('#updated').textContent='Counter APIから値を取得できませんでした。しばらくして再試行してください。';
+    }finally{btn.disabled=false}
+  }
+  $('#refresh').addEventListener('click',load);load();
+})();
+</script>
+</body>
+</html>
