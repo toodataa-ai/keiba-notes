@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "model_version": "local-daily-shadow-v0.1",
+  "mode": "shadow_observation_only",
+  "production_effect": false,
+  "started_from": "2026-10-07",
+  "updated_at": "2026-10-06T23:55:00+09:00",
+  "venues": {
+    "oi": {"label": "大井", "enabled": true, "races_observed": 0},
+    "kawasaki": {"label": "川崎", "enabled": true, "races_observed": 0},
+    "funabashi": {"label": "船橋", "enabled": true, "races_observed": 0},
+    "urawa": {"label": "浦和", "enabled": true, "races_observed": 0},
+    "sonoda": {"label": "園田", "enabled": true, "races_observed": 0},
+    "nagoya": {"label": "名古屋", "enabled": true, "races_observed": 0}
+  },
+  "totals": {
+    "races_observed": 0,
+    "pre_race_snapshots": 0,
+    "results_joined": 0,
+    "transfer_candidates": 0,
+    "jra_candidates_promoted": 0
+  },
+  "latest_finding": null,
+  "guardrail": "Local-racing observations never update JRA production directly. Transfer candidates require separate JRA validation and human approval."
+}
