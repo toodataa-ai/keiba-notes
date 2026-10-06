@@ -60,4 +60,5 @@ fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
   const errs=d.errors||[];document.getElementById('errors').innerHTML=errs.length?errs.map(e=>`<div class="error">${e.race_id??''} ${e.version??''}: ${e.error}</div>`).join(''):'エラーなし';
 }).catch(e=>{const st=document.getElementById('state');st.textContent='データ読み込みエラー';st.className='status bad';document.getElementById('errors').textContent=String(e)});
 </script>
+  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
