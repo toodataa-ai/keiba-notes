@@ -17,22 +17,25 @@
     .analysis-list{display:grid;gap:10px}.analysis-item{background:#fff;border:1px solid #dfe4ea;border-radius:12px;padding:12px 14px}.analysis-item h3{margin:0 0 5px;font-size:15px}.analysis-item p{margin:4px 0;font-size:12px;color:#566174}
     @media(max-width:760px){.shadow-race-head{display:block}.shadow-badges{justify-content:flex-start;margin-top:8px}.shadow-summary{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.shadow-toolbar{display:grid;grid-template-columns:1fr 1fr}.shadow-toolbar select{min-width:0;width:100%}}
   </style>
+<style id="simple-home-navigation-style">
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
+.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
+.simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
+.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
+@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+</style>
 </head>
 <body>
 <header class="method-hero roadmap-hero">
   <div class="wrap">
-    <nav class="method-nav" aria-label="ページナビゲーション">
-      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
-      <div class="method-nav-links"><a href="experience-regime.html">JRA Shadow研究</a><a href="roadmap.html">ブラッシュアップ思想</a><a href="e2e.html">E2E検証</a><a href="index.html">正式予想</a></div>
-    </nav>
+    <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
-      <p class="kicker">LOCAL RACING / DAILY SHADOW / PUBLIC PROOF</p>
       <h1>地方競馬も、<br>発走前予測を残して検証する。</h1>
       <p class="hero-deck">大井・川崎・船橋・浦和・園田・名古屋を対象に、発走前のShadow predictionを固定し、結果確定後に別ファイルで照合・回顧します。JRA正式予想とは分離した研究レイヤーです。</p>
       <div class="hero-thesis"><strong>個別Shadow予測も公開します。</strong> 発走前snapshot・information cutoff・proof・回顧を同じ画面で確認でき、結果を見て予想を書き換えないことを監査できます。</div>
       <div class="status-strip" aria-label="現在地">
-        <div class="status-card"><small>MODE</small><strong>DAILY SHADOW</strong><span>JRA productionへ直接影響なし</span></div>
-        <div class="status-card"><small>VENUES</small><strong id="venueCount">6</strong><span>南関4場＋園田＋名古屋</span></div>
+        <div class="status-card"><small>運用</small><strong>研究中</strong><span>JRA productionへ直接影響なし</span></div>
+        <div class="status-card"><small>対象場</small><strong id="venueCount">6</strong><span>南関4場＋園田＋名古屋</span></div>
         <div class="status-card"><small>SNAPSHOTS</small><strong id="observed">確認中…</strong><span>発走前固定済み</span></div>
         <div class="status-card"><small>REVIEWS</small><strong id="joined">確認中…</strong><span>結果照合・回顧済み</span></div>
       </div>
@@ -78,17 +81,14 @@
   <section class="chapter">
     <div class="chapter-head"><div class="chapter-no">04</div><div><h2>集計進捗</h2><p class="chapter-lead">正式サイト上の公開manifestと研究ステータスを同期します。</p></div></div>
     <div class="live-roadmap">
-      <div class="live-box"><small>RACES OBSERVED</small><strong id="observed2">—</strong><span>累積観測</span></div>
-      <div class="live-box"><small>RESULTS JOINED</small><strong id="joined2">—</strong><span>公式結果結合済み</span></div>
-      <div class="live-box"><small>TRANSFER CANDIDATES</small><strong id="candidates2">—</strong><span>JRA未採用</span></div>
+      <div class="live-box"><small>観測レース</small><strong id="observed2">—</strong><span>累積観測</span></div>
+      <div class="live-box"><small>結果照合済み</small><strong id="joined2">—</strong><span>公式結果結合済み</span></div>
+      <div class="live-box"><small>転用候補</small><strong id="candidates2">—</strong><span>JRA未採用</span></div>
     </div>
     <p id="latestFinding" class="callout"><b>最新finding：</b>観測開始前です。</p>
   </section>
 
-  <section class="links-panel">
-    <h2>研究レイヤーを横断して見る</h2>
-    <div class="cta-row"><a class="cta gold" href="experience-regime.html">JRA Shadow研究へ</a><a class="cta" href="e2e.html">JRA E2E検証へ</a><a class="cta" href="roadmap.html">ブラッシュアップ思想へ</a><a class="cta" href="index.html">正式予想アーカイブへ</a></div>
-  </section>
+  <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 
 <footer class="wrap foot">地方競馬 Daily Shadow — Pre-race snapshots are public research artifacts and remain isolated from JRA production.</footer>

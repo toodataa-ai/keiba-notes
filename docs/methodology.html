@@ -7,23 +7,26 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>予想ロジックと検証思想 | 競馬予想精度向上AI</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
+<style id="simple-home-navigation-style">
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
+.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
+.simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
+.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
+@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+</style>
 </head>
 <body>
 <header class="method-hero">
   <div class="wrap">
-    <nav class="method-nav" aria-label="ページナビゲーション">
-      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
-      <div class="method-nav-links"><a href="index.html">予想アーカイブ</a><a href="baba-models.html">馬場モデル</a><a href="e2e.html">E2E検証</a></div>
-    </nav>
+    <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
-      <p class="kicker">METHOD / THEORY / VALIDATION</p>
       <h1>予想を当てるより、<br>外れ方を説明できるか。</h1>
       <p class="hero-deck">競馬は、強い馬を見つけるだけでは解けません。馬場、ペース、位置取り、斤量、コース、状態、末脚、そして価格。その一つひとつを分けて考え、レース後には「何を読み違えたか」まで検証する。このサイトは、その過程そのものを公開します。</p>
       <div class="hero-thesis">目標は「もっともらしい予想」を作ることではなく、<strong>予想時点で再現でき、後から検証でき、改善効果を比較できる予想体系</strong>を作ることです。</div>
       <div class="live-strip" aria-label="現在のシステム状態">
-        <div class="live-card"><span class="live-label">CURRENT PROMPT</span><span class="live-value" id="livePrompt">確認中…</span></div>
-        <div class="live-card"><span class="live-label">GRADE A E2E CASES</span><span class="live-value" id="liveCases">確認中…</span></div>
-        <div class="live-card"><span class="live-label">E2E EXPERIMENT</span><span class="live-value" id="liveExperiment">確認中…</span></div>
+        <div class="live-card"><span class="live-label">現行プロンプト</span><span class="live-value" id="livePrompt">確認中…</span></div>
+        <div class="live-card"><span class="live-label">Grade A 検証件数</span><span class="live-value" id="liveCases">確認中…</span></div>
+        <div class="live-card"><span class="live-label">E2E 比較状態</span><span class="live-value" id="liveExperiment">確認中…</span></div>
       </div>
     </div>
   </div>
@@ -200,12 +203,7 @@
     </div>
   </section>
 
-  <section class="links-panel anchor" id="links">
-    <p class="kicker">SEE THE EVIDENCE</p>
-    <h2>理論だけでなく、実際の証拠を見る</h2>
-    <p>予想履歴、馬場モデル、E2E成績を別ページで公開しています。読み物で考え方を掴んだら、実データで確かめてください。</p>
-    <div class="cta-row"><a class="cta gold" href="e2e.html">E2E検証を見る →</a><a class="cta" href="baba-models.html">馬場モデルを見る →</a><a class="cta" href="index.html">予想・回顧アーカイブ →</a></div>
-  </section>
+  <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 <footer class="wrap foot">競馬予想精度向上AI — JRAメインレースを対象に、予想・検証・改善の過程を公開しています。</footer>
 <script>

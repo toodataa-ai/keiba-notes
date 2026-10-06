@@ -8,24 +8,27 @@
   <title>Experience Regime E0/E1/E2 | 競馬予想精度向上AI</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
   <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
+<style id="simple-home-navigation-style">
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
+.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
+.simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
+.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
+@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+</style>
 </head>
 <body>
 <header class="method-hero roadmap-hero">
   <div class="wrap">
-    <nav class="method-nav" aria-label="ページナビゲーション">
-      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
-      <div class="method-nav-links"><a href="roadmap.html">ブラッシュアップ思想</a><a href="methodology.html">予想ロジック</a><a href="e2e.html">E2E検証</a><a href="index.html">予想アーカイブ</a></div>
-    </nav>
+    <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
-      <p class="kicker">SHADOW RESEARCH / EXPERIENCE REGIME</p>
       <h1>経験量が違う馬を、<br>同じ確信度で扱わない。</h1>
       <p class="hero-deck">E0/E1/E2は、キャリアの浅さによる不確実性を分離して測る研究レイヤーです。現段階では本番の順位・印・買い目を一切変更せず、発走前に経験量を保存して結果との誤差だけを検証します。</p>
       <div class="hero-thesis"><strong>2026年10月10日からJRAの1R〜12Rすべてを母集団としてShadow観測を開始。</strong> 正式予想のメインレースは全件含め、それ以外は新馬・未勝利・条件戦・OP/L・重賞からカテゴリ別に層化抽出します。</div>
       <div class="status-strip" aria-label="現在地">
-        <div class="status-card"><small>MODE</small><strong>SHADOW</strong><span>本番予想への影響なし</span></div>
-        <div class="status-card"><small>SCOPE</small><strong>1R–12R</strong><span>全JRAレースを母集団</span></div>
-        <div class="status-card"><small>COVERAGE</small><strong id="coverage">確認中…</strong><span>Experience付き予想</span></div>
-        <div class="status-card"><small>OBSERVATIONS</small><strong id="observations">確認中…</strong><span>E0/E1/E2合計</span></div>
+        <div class="status-card"><small>運用</small><strong>研究中</strong><span>本番予想への影響なし</span></div>
+        <div class="status-card"><small>対象</small><strong>1R–12R</strong><span>全JRAレースを母集団</span></div>
+        <div class="status-card"><small>カバー率</small><strong id="coverage">確認中…</strong><span>Experience付き予想</span></div>
+        <div class="status-card"><small>観測数</small><strong id="observations">確認中…</strong><span>E0/E1/E2合計</span></div>
       </div>
     </div>
   </div>
@@ -99,10 +102,7 @@
     <p>正式な予想ページには追加抽出した1R〜12Rの研究用予想や個別馬のShadow診断を表示しません。このページでは研究目的、分類定義、抽出方式、カテゴリ別集計レベルの進捗、採用・棄却判断を公開します。将来、Experience Regimeが順位を変えるChallengerへ進む場合は、その予想出力の保管・公開方法を改めて分離します。</p>
   </section>
 
-  <section class="links-panel">
-    <h2>ブラッシュアップ全体の中で見る</h2>
-    <div class="cta-row"><a class="cta gold" href="roadmap.html">今後のブラッシュアップ思想へ</a><a class="cta" href="e2e.html">E2E検証を見る</a><a class="cta" href="index.html">正式予想アーカイブへ</a></div>
-  </section>
+  <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 
 <footer class="wrap foot">Experience Regime E0/E1/E2 — Shadow observation only. JRA 1R–12R are the population; production ranking and betting decisions are unchanged.</footer>

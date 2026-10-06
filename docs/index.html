@@ -17,7 +17,7 @@
     .lab-signature-name{letter-spacing:.025em}
     .lab-signature-cycle{display:inline-flex;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,.16);color:#92959e;font-size:10px;font-weight:700;letter-spacing:.035em}
     .lab-signature-cycle b{color:#c61d31;font-weight:900}
-    .hero-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px;max-width:980px}
+    .hero-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:18px;max-width:980px}
     .hero-nav-link{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:#f7f7f8;color:#17171a;font-weight:700;text-decoration:none;box-sizing:border-box;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease}
     .hero-nav-link:hover{border-color:#c61d31;box-shadow:0 0 0 2px rgba(198,29,49,.12);transform:translateY(-1px)}
     .hero-nav-label{display:flex;align-items:center;gap:8px;min-width:0}
@@ -31,15 +31,16 @@
 <body>
   <header class="hero">
     <div class="wrap">
-      <div class="lab-signature" aria-label="AI Racing Prediction Research Lab / Predict, Validate, Improve"><span class="lab-signature-name">AI Racing Prediction Research Lab</span><span class="lab-signature-cycle">Predict <b>→</b> Validate <b>→</b> Improve</span></div>
-      <h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja brand-lab-seal" aria-hidden="true"><span>研</span><span>究</span><span>所</span><span class="brand-lab-mark"></span></span><span class="brand-lab-en">RESEARCH LAB</span></span></h1>
+      <h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja brand-lab-seal" aria-hidden="true"><span>研</span><span>究</span><span>所</span><span class="brand-lab-mark"></span></span></span></h1>
       <p class="brand-subtitle">AIで予想し、検証し、改善する。予測精度を育て続ける。</p>
       <p class="lead">JRAメインレースを対象に、AIを使って予想・検証・回顧を行い、結果と誤差を次のロジック改善へ反映します。予想体系そのものをAI駆動で継続的にブラッシュアップしていきます。</p>
-      <nav class="hero-nav" aria-label="予想体系と改善方針">
+      <nav class="hero-nav" aria-label="主要ページ">
         <a class="hero-nav-link" href="methodology.html"><span class="hero-nav-label"><span>予想ロジックと検証思想</span></span><span class="hero-nav-arrow">→</span></a>
-        <a class="hero-nav-link" href="roadmap.html"><span class="hero-nav-label"><span class="hero-nav-new">NEW</span><span>今後のブラッシュアップ思想</span></span><span class="hero-nav-arrow">→</span></a>
-        <a class="hero-nav-link" href="experience-regime.html"><span class="hero-nav-label"><span class="hero-nav-new">SHADOW</span><span>E0/E1/E2 経験量研究</span></span><span class="hero-nav-arrow">→</span></a>
-        <a class="hero-nav-link" href="local-racing-shadow.html"><span class="hero-nav-label"><span class="hero-nav-new">DAILY</span><span>地方競馬 Daily Shadow</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="roadmap.html"><span class="hero-nav-label"><span>今後のブラッシュアップ思想</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="e2e.html"><span class="hero-nav-label"><span>JRA シャドー検証</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="experience-regime.html"><span class="hero-nav-label"><span>E0/E1/E2 経験量研究</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="local-racing-shadow.html"><span class="hero-nav-label"><span>地方競馬 シャドー研究</span></span><span class="hero-nav-arrow">→</span></a>
+        <a class="hero-nav-link" href="baba-models.html"><span class="hero-nav-label"><span>馬場予測モデル</span></span><span class="hero-nav-arrow">→</span></a>
       </nav>
       <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
     </div>
@@ -47,7 +48,7 @@
   <main class="wrap">
     <details class="content-disclosure" id="upcomingDisclosure">
       <summary>
-        <span class="content-summary-main"><span class="eyebrow dark">UPCOMING</span><strong id="scheduleTitle">今後の予測・回顧予定</strong></span>
+        <span class="content-summary-main"><strong id="scheduleTitle">今後の予測・回顧予定</strong></span>
         <span class="content-summary-note">レース名・発走時刻・予測／回顧予定</span>
       </summary>
       <div class="content-disclosure-body">
@@ -64,18 +65,18 @@
 
     <details class="content-disclosure" id="performanceDisclosure">
       <summary>
-        <span class="content-summary-main"><span class="eyebrow dark">PERFORMANCE</span><strong>成績・集計期間</strong></span>
+        <span class="content-summary-main"><strong>成績・集計期間</strong></span>
         <span class="content-summary-note">的中率・回収率・収支・◎成績</span>
       </summary>
       <div class="content-disclosure-body">
-        <section class="period-panel"><div><p class="eyebrow dark">PERIOD</p><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
+        <section class="period-panel"><div><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
         <details class="performance-disclosure"><summary>この期間の成績を見る</summary><div class="performance-body"><section class="stats" aria-label="期間成績"><article><span class="label">評価済み</span><strong id="statReviewed">0</strong><span>レース</span></article><article><span class="label">的中率</span><strong id="statTicketRate">—</strong></article><article><span class="label">回収率</span><strong id="statROI">—</strong></article><article><span class="label">収支</span><strong id="statProfit">—</strong></article><article><span class="label">◎勝率 / 複勝率</span><strong id="statHonmei">—</strong><span id="statHonmeiNote" class="subnote"></span></article></section><section id="legacyNote" class="legacy-note" hidden></section></div></details>
       </div>
     </details>
 
     <details class="content-disclosure prompt-history-disclosure">
       <summary>
-        <span class="content-summary-main"><span class="eyebrow dark">PROMPT</span><strong>プロンプト改良履歴 <span id="promptHistoryCount"></span></strong></span>
+        <span class="content-summary-main"><strong>プロンプト改良履歴 <span id="promptHistoryCount"></span></strong></span>
         <span class="content-summary-note">変更内容・理由・版管理</span>
       </summary>
       <div class="prompt-history-body"><p class="prompt-history-policy">プロンプトを改良したときは、版番号だけでなく「何を変えたか」「なぜ変えたか」を履歴として残します。過去の履歴は上書きせず保存します。</p><div id="promptHistoryList"><p class="muted">読み込み中…</p></div></div>
@@ -83,16 +84,16 @@
 
     <details class="content-disclosure archive-disclosure" id="archiveDisclosure">
       <summary>
-        <span class="content-summary-main"><span class="eyebrow dark">ARCHIVE</span><strong>予想履歴</strong></span>
+        <span class="content-summary-main"><strong>予想履歴</strong></span>
         <span class="content-summary-note">過去の予想・PDF・結果・回顧</span>
       </summary>
       <div class="content-disclosure-body">
-        <section class="section-head"><div><p class="eyebrow dark">ARCHIVE</p><h2>予想履歴</h2></div><div class="filters"><select id="statusFilter" aria-label="状態で絞り込み"><option value="all">すべて</option><option value="predicted">予想済み</option><option value="reviewed">結果登録済み</option></select></div></section>
+        <section class="section-head"><div><h2>予想履歴</h2></div><div class="filters"><select id="statusFilter" aria-label="状態で絞り込み"><option value="all">すべて</option><option value="predicted">予想済み</option><option value="reviewed">結果登録済み</option></select></div></section>
         <div id="raceList" class="race-list"><p class="muted">読み込み中…</p></div>
       </div>
     </details>
   </main>
-  <footer class="wrap footer"><p>正式成績の対象はJRAメインレース。地方競馬はDaily Shadow研究として分離し、JRA正式成績・本番予想へ直接混在させません。</p></footer>
+  <footer class="wrap footer"><p>正式成績の対象はJRAメインレース。地方競馬はシャドー研究として分離し、JRA正式成績・本番予想へ直接混在させません。</p></footer>
   <script src="assets/schedule.js?v=20261005-schedule1"></script>
   <script src="assets/app.js?v=20261004-review1"></script>
   <script src="assets/visitor-counter.js?v=20261006-1" defer></script>

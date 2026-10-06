@@ -8,24 +8,27 @@
   <title>今後のブラッシュアップ思想 | 競馬予想精度向上AI</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
   <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
+<style id="simple-home-navigation-style">
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
+.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
+.simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
+.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
+@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+</style>
 </head>
 <body>
 <header class="method-hero roadmap-hero">
   <div class="wrap">
-    <nav class="method-nav" aria-label="ページナビゲーション">
-      <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
-      <div class="method-nav-links"><a href="methodology.html">予想ロジック</a><a href="baba-models.html">馬場モデル</a><a href="e2e.html">E2E検証</a><a href="index.html">予想アーカイブ</a></div>
-    </nav>
+    <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
-      <p class="kicker">IMPROVEMENT PHILOSOPHY / ROADMAP / GOVERNANCE</p>
       <h1>改善は、足すことではない。<br>測って、捨てて、残すこと。</h1>
       <p class="hero-deck">このページは「次にどんな機能を付けるか」の一覧ではありません。予想精度を高めるために、何を仮説として立て、どう検証し、どこまで自動化し、どの条件を満たしたら本番へ採用するか。その判断基準を、これまでの改善履歴と今後の方向性をつないで公開する読み物です。</p>
       <div class="hero-thesis">目標は、ルールを増やし続けることではありません。<strong>予測時点で使える情報を取りこぼさず、結果リークを防ぎ、改善したつもりの改悪を検出し、効いた部分だけを残す</strong>ことです。</div>
       <div class="status-strip" aria-label="現在地">
-        <div class="status-card"><small>CURRENT PROMPT</small><strong id="roadPrompt">確認中…</strong><span>正式な最新版ポインタから取得</span></div>
-        <div class="status-card"><small>TRACK MODELS</small><strong id="roadModels">確認中…</strong><span>JRA10場 × 芝/ダート</span></div>
-        <div class="status-card"><small>STAGE A CANDIDATES</small><strong id="roadCandidates">確認中…</strong><span>本番未接続の候補</span></div>
-        <div class="status-card"><small>GRADE A E2E</small><strong id="roadE2E">確認中…</strong><span>発走前proof付き正式比較</span></div>
+        <div class="status-card"><small>現行プロンプト</small><strong id="roadPrompt">確認中…</strong><span>正式な最新版ポインタから取得</span></div>
+        <div class="status-card"><small>馬場モデル</small><strong id="roadModels">確認中…</strong><span>JRA10場 × 芝/ダート</span></div>
+        <div class="status-card"><small>Stage A 候補</small><strong id="roadCandidates">確認中…</strong><span>本番未接続の候補</span></div>
+        <div class="status-card"><small>Grade A E2E</small><strong id="roadE2E">確認中…</strong><span>発走前proof付き正式比較</span></div>
       </div>
     </div>
   </div>
@@ -48,7 +51,6 @@
   </section>
 
   <section class="manifesto anchor" id="thesis">
-    <p class="kicker">CORE THESIS</p>
     <h2>予想ロジックは「正しそう」ではなく「比較できる」状態にする</h2>
     <p>競馬予想には、もっともらしい説明をいくらでも後付けできます。だから本システムでは、改善案を思いついた時点をゴールにしません。変更前と変更後を同じ条件で比較し、改善しなければ捨てます。実際にACI v1.1では、コース需要型の過去走ACIへ機械的に置き換える案や、再現性ペナルティを直接ランキングへ差し引く案はバックテストで悪化したため不採用にし、<strong>解釈レイヤーと再現信頼度だけを部分採用</strong>しました。</p>
   </section>
@@ -78,7 +80,7 @@
       <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>次レースで再検証</b><span>改良版を適用し、精度・回収率・誤差の変化を継続観測</span></div>
     </div>
     <h3 class="cycle-subhead">現在の自動運用スケジュール</h3>
-    <p>通常のJRA開催週では、予想・回顧・週次改善を別タスクとして分離しています。開催がない日は実行せず、祝日月曜を含む変則開催も公式日程を確認して処理します。</p>
+    <p>通常のJRA開催週では、発走前予想と、回顧・週次改善を2系統に分離しています。開催がない日は実行せず、祝日月曜を含む変則開催も公式日程を確認して処理します。</p>
     <div class="phase-grid" aria-label="JRA自動運用スケジュール">
       <article class="phase done"><span class="phase-label">土・日・月 / 8:00基準</span><h3>JRAメイン予想</h3><p>当日のJRA開催有無を確認し、開催がある場合は各競馬場のメインレースを最新の正式プロンプトで発走前予想。HTML・Grade A用snapshot・proofを保存します。実行時刻は8:00を基準とするflexible運用です。</p></article>
       <article class="phase done"><span class="phase-label">土・日・月 / 16:00〜20:00</span><h3>JRAメイン回顧</h3><p>時間帯内で毎時確認し、公式結果と払戻が確定した対象レースだけを回顧。発走前予想は改変せず、結果・成績・誤差分析・E2E Grade A結果を追記します。</p></article>
@@ -229,16 +231,7 @@
     <div class="roadmap-footer-note"><strong>「完成版」は作らない。</strong>競馬場、馬場、馬、騎手、レース構成は変化します。したがって目指すのは、永遠に固定された最終ロジックではなく、変更を安全に試し、悪化を止め、良化だけを残せる更新系です。</div>
   </section>
 
-  <section class="links-panel anchor" id="links">
-    <h2>思想だけでなく、現在の実データも公開する</h2>
-    <p>このページの内容は宣言だけで終わらせず、モデル状態、E2E比較、プロンプト履歴、実際の予想アーカイブと接続します。</p>
-    <div class="cta-row">
-      <a class="cta gold" href="baba-models.html">馬場モデルの現在地を見る</a>
-      <a class="cta" href="e2e.html">E2E検証を見る</a>
-      <a class="cta" href="methodology.html">予想ロジックを読む</a>
-      <a class="cta" href="index.html">予想・回顧アーカイブへ</a>
-    </div>
-  </section>
+  <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 
 <footer class="wrap foot">競馬予想精度向上AI — 改善案は、検証できる形にしてから採用する。対象成績はJRA各開催日のメインレース。海外競馬・地方競馬は成績集計と改善学習の対象外です。</footer>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>JRA E2E Shadow | 競馬予想精度向上AI</title>
+  <title>JRA E2E シャドー検証 | 競馬予想精度向上AI</title>
   <style>
     :root{--navy:#0b1930;--navy2:#122744;--gold:#d8b35a;--bg:#f3f5f8;--card:#fff;--text:#172033;--muted:#647085;--ok:#167a52;--warn:#9a6a08;--bad:#a53737;--line:#dfe4ea;--blue:#245b99}
     *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Meiryo UI",Meiryo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
@@ -25,10 +25,17 @@
     .empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed #cbd3dd;border-radius:10px;background:#fafbfc}.policy-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.policy{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fafbfc;font-size:12px}.policy b{display:block;margin-bottom:4px;font-size:13px}
     @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.value{font-size:22px}table{font-size:11px}th,td{padding:7px 4px}.version-grid,.policy-grid{grid-template-columns:1fr}.race-head{display:block}.kv{grid-template-columns:100px 1fr}h1{font-size:24px}}
   </style>
+<style id="simple-home-navigation-style">
+.simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
+.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
+.simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
+.simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
+@media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+</style>
 </head>
 <body>
 <header><div class="inner">
-  <nav class="nav"><a href="index.html">予想アーカイブ</a><a href="methodology.html">予想ロジック</a><a href="experience-regime.html">E0/E1/E2 Shadow</a><a href="local-racing-shadow.html">地方競馬 Shadow</a></nav>
+  <nav class="nav simple-home-nav" aria-label="トップページへ戻る"><a class="simple-home-link" href="index.html">← トップページに戻る</a></nav>
   <h1>JRA E2E Shadow</h1>
   <p>発走前スナップショットを固定し、Git proofを残したまま、結果を別ファイルで後結合して検証します。</p>
   <div class="hero-note"><strong>正式な性能比較は Grade A / prospective_strict のみ。</strong> Historical replay は補助検証であり、同じ一覧でも明確に区別して表示します。</div>
@@ -36,7 +43,7 @@
 <main>
   <div class="hero">
     <div id="state" class="status">読み込み中</div>
-    <h2 style="margin-top:10px">End-to-End Prediction Validation</h2>
+    <h2 style="margin-top:10px">発走前固定型のE2E検証</h2>
     <div class="note">予想原本は発走前commitで固定し、結果確定後も書き換えません。サイト表示用データは原本から自動生成される公開ミラーです。</div>
   </div>
 
@@ -49,7 +56,7 @@
 
   <div class="card section"><h2>版別 Grade A 成績</h2><div style="overflow:auto"><table><thead><tr><th>Version</th><th>件数</th><th>◎勝率</th><th>◎3着内</th><th>◎○▲ Top3捕捉</th><th>勝馬◎○▲</th><th>Win Brier</th><th>ROI</th></tr></thead><tbody id="versions"></tbody></table></div></div>
 
-  <div class="card section"><h2>Baseline / Candidate 比較</h2><div id="comparison" class="small">-</div></div>
+  <div class="card section"><h2>基準版 / 候補版 比較</h2><div id="comparison" class="small">-</div></div>
 
   <div class="card section">
     <h2>発走前 Shadow → proof → 結果</h2>
@@ -91,7 +98,7 @@ function loadStatus(){return fetch('data/e2e_status.json',{cache:'no-store'}).th
   st.textContent=labels[state]||state;st.className='status '+(state==='ready_for_review'?'ok':'warn');
   const tbody=document.getElementById('versions');const versions=Object.entries(d.versions||{});
   tbody.innerHTML=versions.length?versions.map(([v,x])=>{const m=x.strict||{};return `<tr><td>${esc(v)}</td><td>${m.cases??0}</td><td>${pct(m.honmei_win_rate)}</td><td>${pct(m.honmei_top3_rate)}</td><td>${pct(m.top3_marks_capture_rate)}</td><td>${pct(m.winner_in_top3_marks_rate)}</td><td>${num(m.win_brier)}</td><td>${roi(m.roi_pct)}</td></tr>`}).join(''):'<tr><td colspan="8" style="text-align:center;color:#647085">Grade Aデータを収集中です</td></tr>';
-  const c=d.comparison||{};document.getElementById('comparison').innerHTML=`Baseline: <strong>${esc(c.baseline??'—')}</strong> / Candidate: <strong>${esc(c.candidate??'未設定')}</strong><br>共通Grade A: ${c.strict_shared_cases??0}件。${c.state==='ready_for_review'?'改善レビューに利用できます。':'必要件数に達するまで性能向上は確定扱いしません。'}`;
+  const c=d.comparison||{};document.getElementById('comparison').innerHTML=`基準版: <strong>${esc(c.baseline??'—')}</strong> / 候補版: <strong>${esc(c.candidate??'未設定')}</strong><br>共通Grade A: ${c.strict_shared_cases??0}件。${c.state==='ready_for_review'?'改善レビューに利用できます。':'必要件数に達するまで性能向上は確定扱いしません。'}`;
   const errs=d.errors||[];document.getElementById('errors').innerHTML=errs.length?errs.map(e=>`<div class="error">${esc(e.race_id??'')} ${esc(e.version??'')}: ${esc(e.error)}</div>`).join(''):'エラーなし';
 })}
 
