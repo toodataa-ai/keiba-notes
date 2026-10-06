@@ -3,30 +3,43 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>E2E検証 | 競馬予想精度向上AI</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>JRA E2E Shadow | 競馬予想精度向上AI</title>
   <style>
-    :root{--navy:#0b1930;--navy2:#122744;--gold:#d8b35a;--bg:#f3f5f8;--card:#fff;--text:#172033;--muted:#647085;--ok:#167a52;--warn:#9a6a08;--bad:#a53737}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Meiryo UI",Meiryo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}
+    :root{--navy:#0b1930;--navy2:#122744;--gold:#d8b35a;--bg:#f3f5f8;--card:#fff;--text:#172033;--muted:#647085;--ok:#167a52;--warn:#9a6a08;--bad:#a53737;--line:#dfe4ea;--blue:#245b99}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Meiryo UI",Meiryo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.6}
     header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:24px 18px;border-bottom:4px solid var(--gold)}
-    header .inner,main{max-width:1120px;margin:auto} h1{font-size:24px;margin:0 0 5px} header p{margin:0;color:#dfe7f1;font-size:14px}
-    main{padding:20px 14px 48px}.hero,.card{background:var(--card);border:1px solid #dfe4ea;border-radius:14px;box-shadow:0 2px 10px rgba(17,32,52,.05)}
+    header .inner,main{max-width:1160px;margin:auto}.nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}.nav a{color:#dfe7f1;text-decoration:none;font-size:12px;font-weight:700}
+    h1{font-size:28px;margin:0 0 6px} header p{margin:0;color:#dfe7f1;font-size:14px}.hero-note{margin-top:12px;padding:10px 12px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(255,255,255,.06);font-size:13px}
+    main{padding:20px 14px 48px}.hero,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 10px rgba(17,32,52,.05)}
     .hero{padding:18px;margin-bottom:16px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.card{padding:16px}
     .label{font-size:12px;color:var(--muted);font-weight:700}.value{font-size:28px;font-weight:800;margin-top:2px}.small{font-size:12px;color:var(--muted)}
-    .section{margin-top:18px}h2{font-size:18px;margin:0 0 10px}.status{display:inline-block;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#eef2f6}.ok{color:var(--ok);background:#eaf7f1}.warn{color:var(--warn);background:#fff7df}.bad{color:var(--bad);background:#fdeeee}
+    .section{margin-top:18px}h2{font-size:19px;margin:0 0 10px}.status{display:inline-block;padding:4px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#eef2f6}.ok{color:var(--ok);background:#eaf7f1}.warn{color:var(--warn);background:#fff7df}.bad{color:var(--bad);background:#fdeeee}
     table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px 8px;border-bottom:1px solid #e5e9ee;text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--muted);font-weight:700;background:#fafbfc}
     .note{border-left:4px solid var(--gold);padding:10px 12px;background:#fffaf0;border-radius:6px;font-size:13px}.error{padding:9px 10px;background:#fdeeee;color:var(--bad);border-radius:8px;margin-top:6px;font-size:12px}
-    a{color:#245b99}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-    @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.value{font-size:22px}table{font-size:11px}th,td{padding:7px 4px}}
+    a{color:var(--blue)}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.filters select{padding:9px 10px;border:1px solid #ccd4de;border-radius:9px;background:#fff;font:inherit;font-size:13px}
+    .race-list{display:grid;gap:12px}.race-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}.race-head{padding:14px 15px;background:#fafbfc;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.race-title{font-weight:800}.race-meta{font-size:12px;color:var(--muted);margin-top:3px}.race-body{padding:14px 15px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chip{font-size:11px;padding:3px 7px;border-radius:999px;background:#eef2f6;color:#435066;font-weight:700}.chip.strict{background:#eaf7f1;color:var(--ok)}.chip.replay{background:#fff7df;color:var(--warn)}
+    .version-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.version{border:1px solid #e4e8ee;border-radius:10px;padding:11px}.version h3{margin:0 0 6px;font-size:14px}.kv{display:grid;grid-template-columns:120px 1fr;gap:4px 8px;font-size:12px}.kv b{color:var(--muted)}.marks{font-size:13px;font-weight:700}.proof{word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+    details{margin-top:10px}summary{cursor:pointer;font-weight:700;font-size:13px}.json-link{display:inline-block;margin-top:8px;font-size:12px}
+    .empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed #cbd3dd;border-radius:10px;background:#fafbfc}.policy-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.policy{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fafbfc;font-size:12px}.policy b{display:block;margin-bottom:4px;font-size:13px}
+    @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.value{font-size:22px}table{font-size:11px}th,td{padding:7px 4px}.version-grid,.policy-grid{grid-template-columns:1fr}.race-head{display:block}.kv{grid-template-columns:100px 1fr}h1{font-size:24px}}
   </style>
 </head>
 <body>
-<header><div class="inner"><h1>競馬予想精度向上AI — E2E検証</h1><p>予想時点のスナップショットを固定し、結果リークを防いでプロンプト版を比較します。</p></div></header>
+<header><div class="inner">
+  <nav class="nav"><a href="index.html">予想アーカイブ</a><a href="methodology.html">予想ロジック</a><a href="experience-regime.html">E0/E1/E2 Shadow</a><a href="local-racing-shadow.html">地方競馬 Shadow</a></nav>
+  <h1>JRA E2E Shadow</h1>
+  <p>発走前スナップショットを固定し、Git proofを残したまま、結果を別ファイルで後結合して検証します。</p>
+  <div class="hero-note"><strong>正式な性能比較は Grade A / prospective_strict のみ。</strong> Historical replay は補助検証であり、同じ一覧でも明確に区別して表示します。</div>
+</div></header>
 <main>
   <div class="hero">
     <div id="state" class="status">読み込み中</div>
     <h2 style="margin-top:10px">End-to-End Prediction Validation</h2>
-    <div class="note">正式なプロンプト比較には <strong>Grade A / prospective_strict</strong> のみ使用します。過去レースの後追い再実行は補助資料であり、昇格根拠には単独使用しません。</div>
+    <div class="note">予想原本は発走前commitで固定し、結果確定後も書き換えません。サイト表示用データは原本から自動生成される公開ミラーです。</div>
   </div>
+
   <div class="grid">
     <div class="card"><div class="label">Grade A 実レース</div><div class="value" id="strict">-</div><div class="small">発走前Git proofあり</div></div>
     <div class="card"><div class="label">共通比較レース</div><div class="value" id="shared">-</div><div class="small" id="minimum">最低件数 -</div></div>
@@ -37,14 +50,37 @@
   <div class="card section"><h2>版別 Grade A 成績</h2><div style="overflow:auto"><table><thead><tr><th>Version</th><th>件数</th><th>◎勝率</th><th>◎3着内</th><th>◎○▲ Top3捕捉</th><th>勝馬◎○▲</th><th>Win Brier</th><th>ROI</th></tr></thead><tbody id="versions"></tbody></table></div></div>
 
   <div class="card section"><h2>Baseline / Candidate 比較</h2><div id="comparison" class="small">-</div></div>
+
+  <div class="card section">
+    <h2>発走前 Shadow → proof → 結果</h2>
+    <p class="small">地方競馬Daily Shadowと同じ考え方で、レース単位に発走前snapshotとproof commitを確認できます。結果確定後は同じカードに後結合されます。</p>
+    <div class="filters">
+      <select id="gradeFilter" aria-label="検証グレード"><option value="strict">Grade A</option><option value="historical">Grade B historical replay</option></select>
+      <select id="venueFilter" aria-label="競馬場"><option value="all">全競馬場</option></select>
+      <select id="statusFilter" aria-label="状態"><option value="all">すべて</option><option value="predicted">発走前snapshotのみ</option><option value="reviewed">結果結合済み</option></select>
+    </div>
+    <div id="raceList" class="race-list"><div class="empty">Shadowデータを読み込み中です。</div></div>
+  </div>
+
   <div class="card section"><h2>検証エラー</h2><div id="errors" class="small">-</div></div>
-  <div class="card section"><h2>運用ルール</h2><p class="small">予想ファイルは発走前コミットSHAから読み直します。結果は別ファイルで後結合します。プロンプトの依存ファイルはGit blob SHAで固定し、同じversion名のまま内容が変わることを検出します。</p><p class="small"><a href="index.html">予想アーカイブへ戻る</a></p></div>
+
+  <div class="card section"><h2>運用ルール</h2>
+    <div class="policy-grid">
+      <div class="policy"><b>発走前固定</b>information cutoffより前にsnapshotを保存。</div>
+      <div class="policy"><b>Git proof</b>Grade Aは発走前commit SHAで存在証明。</div>
+      <div class="policy"><b>結果は別結合</b>prediction原本へ着順・払戻を追記しない。</div>
+      <div class="policy"><b>昇格は自動化しない</b>Grade A比較＋週次ガバナンスで判断。</div>
+    </div>
+  </div>
 </main>
 <script>
 const pct=v=>v==null?'—':(v*100).toFixed(1)+'%';
 const num=v=>v==null?'—':Number(v).toFixed(3);
 const roi=v=>v==null?'—':Number(v).toFixed(1)+'%';
-fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let publicData={races:[],historical_replays:[]};
+
+function loadStatus(){return fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
   document.getElementById('strict').textContent=d.case_counts?.strict??0;
   document.getElementById('shared').textContent=d.comparison?.strict_shared_cases??0;
   document.getElementById('minimum').textContent='最低件数 '+(d.comparison?.minimum_strict_shared_cases??'-');
@@ -52,13 +88,34 @@ fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
   document.getElementById('bets').textContent=d.coverage?.strict_bet_cases??0;
   const st=document.getElementById('state'),state=d.comparison?.state||'unknown';
   const labels={waiting_for_candidate:'候補版待ち',insufficient_data:'Grade A収集中',ready_for_review:'比較レビュー可能'};
-  st.textContent=labels[state]||state; st.className='status '+(state==='ready_for_review'?'ok':'warn');
-  const tbody=document.getElementById('versions');
-  const versions=Object.entries(d.versions||{});
-  tbody.innerHTML=versions.length?versions.map(([v,x])=>{const m=x.strict||{};return `<tr><td>${v}</td><td>${m.cases??0}</td><td>${pct(m.honmei_win_rate)}</td><td>${pct(m.honmei_top3_rate)}</td><td>${pct(m.top3_marks_capture_rate)}</td><td>${pct(m.winner_in_top3_marks_rate)}</td><td>${num(m.win_brier)}</td><td>${roi(m.roi_pct)}</td></tr>`}).join(''):'<tr><td colspan="8" style="text-align:center;color:#647085">Grade Aデータを収集中です</td></tr>';
-  const c=d.comparison||{};document.getElementById('comparison').innerHTML=`Baseline: <strong>${c.baseline??'—'}</strong> / Candidate: <strong>${c.candidate??'未設定'}</strong><br>共通Grade A: ${c.strict_shared_cases??0}件。${c.state==='ready_for_review'?'改善レビューに利用できます。':'必要件数に達するまで自動昇格は行いません。'}`;
-  const errs=d.errors||[];document.getElementById('errors').innerHTML=errs.length?errs.map(e=>`<div class="error">${e.race_id??''} ${e.version??''}: ${e.error}</div>`).join(''):'エラーなし';
-}).catch(e=>{const st=document.getElementById('state');st.textContent='データ読み込みエラー';st.className='status bad';document.getElementById('errors').textContent=String(e)});
+  st.textContent=labels[state]||state;st.className='status '+(state==='ready_for_review'?'ok':'warn');
+  const tbody=document.getElementById('versions');const versions=Object.entries(d.versions||{});
+  tbody.innerHTML=versions.length?versions.map(([v,x])=>{const m=x.strict||{};return `<tr><td>${esc(v)}</td><td>${m.cases??0}</td><td>${pct(m.honmei_win_rate)}</td><td>${pct(m.honmei_top3_rate)}</td><td>${pct(m.top3_marks_capture_rate)}</td><td>${pct(m.winner_in_top3_marks_rate)}</td><td>${num(m.win_brier)}</td><td>${roi(m.roi_pct)}</td></tr>`}).join(''):'<tr><td colspan="8" style="text-align:center;color:#647085">Grade Aデータを収集中です</td></tr>';
+  const c=d.comparison||{};document.getElementById('comparison').innerHTML=`Baseline: <strong>${esc(c.baseline??'—')}</strong> / Candidate: <strong>${esc(c.candidate??'未設定')}</strong><br>共通Grade A: ${c.strict_shared_cases??0}件。${c.state==='ready_for_review'?'改善レビューに利用できます。':'必要件数に達するまで性能向上は確定扱いしません。'}`;
+  const errs=d.errors||[];document.getElementById('errors').innerHTML=errs.length?errs.map(e=>`<div class="error">${esc(e.race_id??'')} ${esc(e.version??'')}: ${esc(e.error)}</div>`).join(''):'エラーなし';
+})}
+
+function markText(m){if(!m)return '—';return `◎ ${m.win??'—'} / ○ ${m.second??'—'} / ▲ ${m.third??'—'}`}
+function goingText(g){const e=Object.entries(g||{});return e.length?e.map(([k,v])=>`${k} ${Math.round(Number(v)*100)}%`).join(' / '):'—'}
+function raceCard(r){
+  const grade=r.grade==='historical_replay'?'Grade B':'Grade A';
+  const gradeClass=r.grade==='historical_replay'?'replay':'strict';
+  const vers=(r.predictions||[]).map(v=>`<div class="version"><h3>${esc(v.version||'version不明')}</h3><div class="kv"><b>印</b><span class="marks">${esc(markText(v.marks))}</span><b>展開</b><span>${esc(v.pace||'—')}</span><b>馬場予測</b><span>${esc(goingText(v.going_probabilities))}</span><b>cutoff</b><span>${esc(v.information_cutoff_at||r.cutoff_at||'—')}</span><b>proof</b><span class="proof">${esc(v.proof_commit||'Grade B / proofなし')}</span></div>${v.prediction_path?`<a class="json-link" href="${esc(v.prediction_path)}" target="_blank" rel="noopener">発走前snapshot JSON</a>`:''}</div>`).join('');
+  const result=r.result_path?`<details><summary>結果結合データを見る</summary><div class="small">公式馬場: ${esc(r.official_going||'—')} / 結果確定: ${esc(r.official_result_at||'—')}</div><a class="json-link" href="${esc(r.result_path)}" target="_blank" rel="noopener">result JSON</a></details>`:'<div class="small">結果はまだ結合されていません。</div>';
+  return `<article class="race-card"><div class="race-head"><div><div class="race-title">${esc(r.date||'')} ${esc(r.venue||'')} ${r.race_no?esc(r.race_no)+'R ':''}${esc(r.race_name||r.race_id)}</div><div class="race-meta">${esc(r.race_id)} / cutoff ${esc(r.cutoff_at||'—')}</div></div><div class="chips"><span class="chip ${gradeClass}">${grade}</span><span class="chip">${r.status==='reviewed'?'結果結合済み':'発走前固定'}</span></div></div><div class="race-body"><div class="version-grid">${vers||'<div class="empty">prediction entryがありません。</div>'}</div>${result}${r.case_path?`<a class="json-link" href="${esc(r.case_path)}" target="_blank" rel="noopener">case manifest</a>`:''}</div></article>`
+}
+function renderRaces(){
+  const g=document.getElementById('gradeFilter').value;const status=document.getElementById('statusFilter').value;const venue=document.getElementById('venueFilter').value;
+  let list=g==='historical'?(publicData.historical_replays||[]):(publicData.races||[]);
+  if(status!=='all')list=list.filter(x=>x.status===status);if(venue!=='all')list=list.filter(x=>x.venue===venue);
+  document.getElementById('raceList').innerHTML=list.length?list.map(raceCard).join(''):'<div class="empty">この条件のShadowレースはまだありません。</div>';
+}
+function loadPublic(){return fetch('data/e2e_public.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+  publicData=d;const venues=[...new Set([...(d.races||[]),...(d.historical_replays||[])].map(x=>x.venue).filter(Boolean))].sort();
+  const sel=document.getElementById('venueFilter');sel.innerHTML='<option value="all">全競馬場</option>'+venues.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');renderRaces();
+})}
+for(const id of ['gradeFilter','statusFilter','venueFilter'])document.getElementById(id).addEventListener('change',renderRaces);
+Promise.allSettled([loadStatus(),loadPublic()]).then(xs=>{if(xs.some(x=>x.status==='rejected')){const st=document.getElementById('state');if(st.textContent==='読み込み中'){st.textContent='一部データ読み込みエラー';st.className='status bad'}}});
 </script>
-  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
