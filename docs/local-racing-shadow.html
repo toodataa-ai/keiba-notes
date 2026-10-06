@@ -3,123 +3,111 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="地方競馬をJRA本番とは分離したDaily Shadow研究場として利用し、南関4場・園田・名古屋で毎日観測して転用可能な予測特徴を探索します。">
+  <meta name="description" content="地方競馬Daily Shadowの発走前予測・proof・結果照合・回顧を、JRA正式予想とは分離して公開します。">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>地方競馬 Daily Shadow | 競馬予想精度向上AI</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
   <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
+  <style>
+    .shadow-notice{margin:18px 0;padding:14px 16px;border:1px solid #d8b35a;border-left:5px solid #d8b35a;border-radius:10px;background:#fffaf0;font-size:13px}
+    .shadow-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:16px 0}.shadow-toolbar label{display:grid;gap:5px;font-size:12px;font-weight:700;color:#647085}.shadow-toolbar select{min-width:150px;padding:9px 10px;border:1px solid #ccd4df;border-radius:8px;background:#fff;font:inherit}
+    .shadow-list{display:grid;gap:12px}.shadow-race{background:#fff;border:1px solid #dfe4ea;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(17,32,52,.05)}
+    .shadow-race-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}.shadow-race h3{margin:0;font-size:17px}.shadow-meta{margin-top:4px;color:#647085;font-size:12px}.shadow-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.shadow-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eef2f6;color:#435066;font-size:11px;font-weight:800}.shadow-badge.pre{background:#eaf2ff;color:#245b99}.shadow-badge.review{background:#eaf7f1;color:#167a52}.shadow-badge.proof{background:#fff3d6;color:#8a620d}.shadow-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.shadow-summary>div{background:#f7f9fb;border-radius:9px;padding:9px 10px}.shadow-summary small{display:block;color:#647085;font-size:10px;font-weight:700}.shadow-summary strong{display:block;margin-top:3px;font-size:13px}.shadow-open{border:0;border-radius:9px;padding:9px 12px;background:#172033;color:#fff;font-weight:800;cursor:pointer}
+    .shadow-detail{margin-top:14px;border-top:1px solid #e5e9ee;padding-top:14px}.shadow-detail[hidden]{display:none}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail-card{border:1px solid #e2e7ed;border-radius:12px;padding:13px;background:#fafbfc}.detail-card h4{margin:0 0 8px;font-size:14px}.rank-table{width:100%;border-collapse:collapse;font-size:12px}.rank-table th,.rank-table td{padding:7px 5px;border-bottom:1px solid #e6e9ed;text-align:left}.rank-table th{color:#647085}.json-note{font-size:11px;color:#647085;word-break:break-all}.review-text{white-space:pre-wrap;font-size:13px}.empty{padding:18px;border:1px dashed #cbd3dc;border-radius:12px;color:#647085;text-align:center;background:#fafbfc}
+    .analysis-list{display:grid;gap:10px}.analysis-item{background:#fff;border:1px solid #dfe4ea;border-radius:12px;padding:12px 14px}.analysis-item h3{margin:0 0 5px;font-size:15px}.analysis-item p{margin:4px 0;font-size:12px;color:#566174}
+    @media(max-width:760px){.shadow-race-head{display:block}.shadow-badges{justify-content:flex-start;margin-top:8px}.shadow-summary{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.shadow-toolbar{display:grid;grid-template-columns:1fr 1fr}.shadow-toolbar select{min-width:0;width:100%}}
+  </style>
 </head>
 <body>
 <header class="method-hero roadmap-hero">
   <div class="wrap">
     <nav class="method-nav" aria-label="ページナビゲーション">
       <a class="method-brand" href="index.html">競馬予想精度向上AI</a>
-      <div class="method-nav-links"><a href="experience-regime.html">E0/E1/E2研究</a><a href="roadmap.html">ブラッシュアップ思想</a><a href="e2e.html">E2E検証</a><a href="index.html">予想アーカイブ</a></div>
+      <div class="method-nav-links"><a href="experience-regime.html">JRA Shadow研究</a><a href="roadmap.html">ブラッシュアップ思想</a><a href="e2e.html">E2E検証</a><a href="index.html">正式予想</a></div>
     </nav>
     <div class="hero-copy">
-      <p class="kicker">LOCAL RACING / DAILY SHADOW / TRANSFER RESEARCH</p>
-      <h1>毎日観測する。<br>でも、直接は混ぜない。</h1>
-      <p class="hero-deck">地方競馬の高頻度な開催を、JRA本番予想とは完全に分離した研究用Shadowとして利用します。毎日サンプルを増やし、複数場で再現する誤差構造や予測特徴を見つけ、JRA側で改めてE2E検証します。</p>
-      <div class="hero-thesis"><strong>初期対象は大井・川崎・船橋・浦和・園田・名古屋の6場。</strong> 地方の結果や係数をJRAへ直接学習させず、抽象化したtransfer candidateだけをJRA側のChallengerへ渡します。</div>
+      <p class="kicker">LOCAL RACING / DAILY SHADOW / PUBLIC PROOF</p>
+      <h1>地方競馬も、<br>発走前予測を残して検証する。</h1>
+      <p class="hero-deck">大井・川崎・船橋・浦和・園田・名古屋を対象に、発走前のShadow predictionを固定し、結果確定後に別ファイルで照合・回顧します。JRA正式予想とは分離した研究レイヤーです。</p>
+      <div class="hero-thesis"><strong>個別Shadow予測も公開します。</strong> 発走前snapshot・information cutoff・proof・回顧を同じ画面で確認でき、結果を見て予想を書き換えないことを監査できます。</div>
       <div class="status-strip" aria-label="現在地">
-        <div class="status-card"><small>MODE</small><strong>DAILY SHADOW</strong><span>本番JRAへの直接影響なし</span></div>
+        <div class="status-card"><small>MODE</small><strong>DAILY SHADOW</strong><span>JRA productionへ直接影響なし</span></div>
         <div class="status-card"><small>VENUES</small><strong id="venueCount">6</strong><span>南関4場＋園田＋名古屋</span></div>
-        <div class="status-card"><small>OBSERVED</small><strong id="observed">確認中…</strong><span>観測レース数</span></div>
-        <div class="status-card"><small>TRANSFER</small><strong id="candidates">確認中…</strong><span>転用候補</span></div>
+        <div class="status-card"><small>SNAPSHOTS</small><strong id="observed">確認中…</strong><span>発走前固定済み</span></div>
+        <div class="status-card"><small>REVIEWS</small><strong id="joined">確認中…</strong><span>結果照合・回顧済み</span></div>
       </div>
     </div>
   </div>
 </header>
 
 <main class="wrap article">
-  <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>なぜ地方競馬を使うのか</h2><p class="chapter-lead">JRAだけでは時間のかかる仮説検証を、高頻度の実戦データで加速します。</p></div></div>
-    <p>地方競馬は平日を含め開催日が多く、ダートを中心に大量の実戦サンプルを蓄積できます。展開、位置取り、枠、騎手、斤量、ローテ、馬場バイアス、再現性などの仮説を短いサイクルで観測できるため、研究速度を大きく上げられます。</p>
-    <div class="callout"><b>狙い：</b>地方で当てるための別モデルを作ることだけが目的ではありません。JRAでも使える可能性のある「測り方」「分解方法」「誤差検出方法」を高速に発見する研究場として使います。</div>
-  </section>
+  <div class="shadow-notice"><b>SHADOW表示について：</b>ここに表示する順位・評価は地方競馬の研究用発走前予測です。JRA正式予想の◎○▲・買い目・成績とは別管理で、地方の係数や結果をJRAへ直接流し込みません。</div>
 
   <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>最初は6場で始める</h2><p class="chapter-lead">一気に全国へ広げず、運用とデータ契約を安定させてから拡張します。</p></div></div>
-    <div class="axioms">
-      <div class="axiom"><b>南関4場</b>大井・川崎・船橋・浦和。開催頻度が高く、コース形状も異なるため横断比較しやすい。</div>
-      <div class="axiom"><b>園田</b>小回り・先行力など地方特有の条件差を観測する比較軸。</div>
-      <div class="axiom"><b>名古屋</b>別地区の番組・騎手・コース特性を加え、南関だけへの過適合を避ける。</div>
+    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>発走前Shadow予測</h2><p class="chapter-lead">発走前に固定した予測とproofを、レース単位で確認できます。</p></div></div>
+    <div class="shadow-toolbar">
+      <label>日付<select id="dateFilter"><option value="all">すべて</option></select></label>
+      <label>競馬場<select id="venueFilter"><option value="all">すべて</option></select></label>
+      <label>状態<select id="stateFilter"><option value="all">すべて</option><option value="predicted">発走前予測のみ</option><option value="reviewed">回顧済み</option></select></label>
     </div>
-    <p>各場は別ドメインとして集計し、地方6場をひとまとめの均質な母集団として扱いません。場ごとの固有効果は原則ローカルに留めます。</p>
+    <div id="raceList" class="shadow-list"><div class="empty">Shadowデータを読み込み中…</div></div>
   </section>
 
   <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>毎日の学習は「毎日モデルを書き換える」ことではない</h2><p class="chapter-lead">観測・誤差集計は毎日、JRA本番への採用判断は分離します。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>日次分析</h2><p class="chapter-lead">単発結果ではなく、競馬場・距離帯・クラス別の誤差構造を蓄積します。</p></div></div>
+    <div id="analysisList" class="analysis-list"><div class="empty">日次分析を読み込み中…</div></div>
+  </section>
+
+  <section class="chapter">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>研究ルール</h2><p class="chapter-lead">JRA Shadowと同様に、結果リークを避けて前向き検証します。</p></div></div>
     <div class="daily-cycle" aria-label="地方競馬Daily Shadowサイクル">
-      <div class="daily-cycle-step"><span class="daily-cycle-no">1</span><b>発走前に固定</b><span>対象レースのcompact Shadow predictionを結果を見る前に保存</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">2</span><b>公式結果を結合</b><span>結果確定後に別ファイルで着順・馬場・通過情報等を保存</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">3</span><b>日次誤差集計</b><span>場・距離・クラス・脚質・枠・騎手・斤量・ローテ等で分解</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">4</span><b>週次候補化</b><span>複数日・複数場で再現した論点だけをtransfer candidateへ</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>JRAで再検証</b><span>Historical replay / Grade A E2Eで別途検証し、承認後のみ採用</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">1</span><b>発走前に固定</b><span>結果・払戻を見ずにpredictionを保存</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">2</span><b>proofを保持</b><span>cutoff後は発走前predictionを上書きしない</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">3</span><b>結果は別結合</b><span>公式結果・払戻は別ファイルに保存</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">4</span><b>回顧を分離</b><span>改善可能なミスと偶然要因を分ける</span></div>
+      <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>候補化して検証</b><span>単発でロジックを書き換えない</span></div>
+    </div>
+    <div class="guardrails" style="margin-top:18px">
+      <div class="guardrail"><b>オッズ非混入</b><span>能力順位へ人気・オッズを混ぜない。</span></div>
+      <div class="guardrail"><b>原本不変</b><span>結果確定後も発走前predictionを編集しない。</span></div>
+      <div class="guardrail"><b>JRA分離</b><span>地方Shadowの結果でJRA正式プロンプトを直接変更しない。</span></div>
+      <div class="guardrail"><b>場別監査</b><span>6場を均質な母集団として扱わず、venue biasを分離する。</span></div>
     </div>
   </section>
 
   <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>何を毎日見るか</h2><p class="chapter-lead">的中率だけでなく、どの条件で予測誤差が増減するかを構造化します。</p></div></div>
-    <table class="metric-table">
-      <thead><tr><th>観測軸</th><th>見ること</th></tr></thead>
-      <tbody>
-        <tr><td>競馬場・距離・クラス</td><td>場固有効果と一般化可能な効果を分離</td></tr>
-        <tr><td>馬場・ペース</td><td>時計速度、位置取り、進路のバイアスと展開崩壊を分離</td></tr>
-        <tr><td>脚質・枠・頭数</td><td>位置取り不利や先行競合の再現条件を確認</td></tr>
-        <tr><td>騎手</td><td>馬質から分離した条件別寄与の候補を探索</td></tr>
-        <tr><td>斤量・ローテ</td><td>条件変化による性能差と再現性の変化を確認</td></tr>
-        <tr><td>能力順位・信頼度</td><td>強さの推定と「今回も出せる確からしさ」の誤差を分離</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>JRAへ直接持ち込まない</h2><p class="chapter-lead">最も重要なガードです。</p></div></div>
-    <div class="guardrails">
-      <div class="guardrail"><b>地方係数を直接コピーしない</b><span>大井1800mで効いた補正を中山ダ1800mへそのまま適用しない。</span></div>
-      <div class="guardrail"><b>地方成績をJRA正式成績へ混ぜない</b><span>研究サンプルとJRA production評価を分離する。</span></div>
-      <div class="guardrail"><b>結果後に予想を書き換えない</b><span>発走前snapshotをproofとして保持する。</span></div>
-      <div class="guardrail"><b>一日で学習則を変えない</b><span>特殊馬場・大荒れ等へ過剰適合しない。</span></div>
-      <div class="guardrail"><b>transfer candidate止まり</b><span>地方で再現してもJRA側でE2Eを通すまでは候補扱い。</span></div>
-      <div class="guardrail"><b>本番採用は承認制</b><span>CandidateからJRA productionへの接続は人が判断する。</span></div>
-    </div>
-  </section>
-
-  <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>現在の進捗</h2><p class="chapter-lead">個別の地方Shadow予想は公開せず、集計進捗と研究findingだけを公開します。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>集計進捗</h2><p class="chapter-lead">正式サイト上の公開manifestと研究ステータスを同期します。</p></div></div>
     <div class="live-roadmap">
       <div class="live-box"><small>RACES OBSERVED</small><strong id="observed2">—</strong><span>累積観測</span></div>
-      <div class="live-box"><small>RESULTS JOINED</small><strong id="joined">—</strong><span>公式結果結合済み</span></div>
+      <div class="live-box"><small>RESULTS JOINED</small><strong id="joined2">—</strong><span>公式結果結合済み</span></div>
       <div class="live-box"><small>TRANSFER CANDIDATES</small><strong id="candidates2">—</strong><span>JRA未採用</span></div>
     </div>
     <p id="latestFinding" class="callout"><b>最新finding：</b>観測開始前です。</p>
   </section>
 
   <section class="links-panel">
-    <h2>他の研究レイヤーとつなげて見る</h2>
-    <div class="cta-row"><a class="cta gold" href="experience-regime.html">E0/E1/E2研究へ</a><a class="cta" href="roadmap.html">ブラッシュアップ思想へ</a><a class="cta" href="e2e.html">E2E検証へ</a><a class="cta" href="index.html">正式予想アーカイブへ</a></div>
+    <h2>研究レイヤーを横断して見る</h2>
+    <div class="cta-row"><a class="cta gold" href="experience-regime.html">JRA Shadow研究へ</a><a class="cta" href="e2e.html">JRA E2E検証へ</a><a class="cta" href="roadmap.html">ブラッシュアップ思想へ</a><a class="cta" href="index.html">正式予想アーカイブへ</a></div>
   </section>
 </main>
 
-<footer class="wrap foot">地方競馬 Daily Shadow — Local observations are research-only. No direct update to JRA production.</footer>
+<footer class="wrap foot">地方競馬 Daily Shadow — Pre-race snapshots are public research artifacts and remain isolated from JRA production.</footer>
 <script>
-async function load(){
-  try{
-    const r=await fetch('data/local_racing_shadow_status.json',{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));
-    const d=await r.json();const t=d.totals||{};const venues=Object.values(d.venues||{}).filter(v=>v.enabled);
-    document.getElementById('venueCount').textContent=venues.length;
-    document.getElementById('observed').textContent=t.races_observed??0;
-    document.getElementById('observed2').textContent=t.races_observed??0;
-    document.getElementById('joined').textContent=t.results_joined??0;
-    document.getElementById('candidates').textContent=t.transfer_candidates??0;
-    document.getElementById('candidates2').textContent=t.transfer_candidates??0;
-    document.getElementById('latestFinding').innerHTML='<b>最新finding：</b>'+(d.latest_finding||'観測開始前です。');
-  }catch(e){
-    for(const id of ['observed','observed2','joined','candidates','candidates2'])document.getElementById(id).textContent='—';
-  }
-}
-load();
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=v=>v==null||v===''?'—':String(v);
+let manifest={races:[],daily_analysis:[]};
+function topRanking(p){const r=p?.step1_ranking||p?.STEP1?.ranking||p?.ranking||p?.ability_ranking||[];if(!Array.isArray(r))return [];return r.slice(0,5)}
+function runnerName(x){return x?.horse_name||x?.name||x?.horse||x?.runner_name||''}
+function rankRow(x,i){if(typeof x==='string')return `<tr><td>${i+1}</td><td>${esc(x)}</td><td>—</td></tr>`;return `<tr><td>${esc(x?.rank??i+1)}</td><td>${esc(runnerName(x)||x?.horse_no||x?.number||'—')}</td><td>${esc(x?.grade||x?.rating||x?.score||'—')}</td></tr>`}
+function preview(r){const t=r.preview||{};return {top:t.top_pick||t.honmei||t.rank1||'—',pace:t.pace||'—',going:t.going||'—'}}
+function populateFilters(){const dates=[...new Set(manifest.races.map(r=>r.date).filter(Boolean))].sort().reverse();const venues=[...new Set(manifest.races.map(r=>r.venue).filter(Boolean))].sort();$('dateFilter').innerHTML='<option value="all">すべて</option>'+dates.map(x=>`<option>${esc(x)}</option>`).join('');$('venueFilter').innerHTML='<option value="all">すべて</option>'+venues.map(x=>`<option>${esc(x)}</option>`).join('')}
+function renderList(){const df=$('dateFilter').value,vf=$('venueFilter').value,sf=$('stateFilter').value;const rows=manifest.races.filter(r=>(df==='all'||r.date===df)&&(vf==='all'||r.venue===vf)&&(sf==='all'||r.status===sf));if(!rows.length){$('raceList').innerHTML='<div class="empty">条件に合うShadow予測はまだありません。</div>';return} $('raceList').innerHTML=rows.sort((a,b)=>String(b.scheduled_start_at||b.date).localeCompare(String(a.scheduled_start_at||a.date))).map((r,i)=>{const p=preview(r);const reviewed=r.status==='reviewed'||r.review_path;return `<article class="shadow-race"><div class="shadow-race-head"><div><h3>${esc(r.venue||'')} ${esc(r.race_no?`${r.race_no}R`:'')} ${esc(r.race_name||r.race_id)}</h3><div class="shadow-meta">${esc(r.date||'')} / ${esc(fmt(r.distance))}${r.distance?'m':''} / ${esc(fmt(r.class))} / 発走 ${esc(fmt(r.scheduled_start_at))}</div></div><div class="shadow-badges"><span class="shadow-badge pre">PRE-RACE FIXED</span>${reviewed?'<span class="shadow-badge review">REVIEWED</span>':''}${r.proof_commit?'<span class="shadow-badge proof">GIT PROOF</span>':''}</div></div><div class="shadow-summary"><div><small>能力1位</small><strong>${esc(p.top)}</strong></div><div><small>展開仮説</small><strong>${esc(p.pace)}</strong></div><div><small>馬場</small><strong>${esc(p.going)}</strong></div></div><button class="shadow-open" data-i="${i}" data-race="${esc(r.race_id)}">予測・回顧を見る</button><div class="shadow-detail" id="detail-${esc(r.race_id)}" hidden></div></article>`}).join('');document.querySelectorAll('.shadow-open').forEach(btn=>btn.addEventListener('click',()=>openDetail(rows.find(r=>r.race_id===btn.dataset.race),btn)))}
+async function fetchJson(path){if(!path)return null;const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error(`${r.status} ${path}`);return r.json()}
+async function openDetail(r,btn){const box=$(`detail-${r.race_id}`);if(!box)return;if(!box.hidden){box.hidden=true;btn.textContent='予測・回顧を見る';return} box.hidden=false;btn.textContent='閉じる';box.innerHTML='<div class="empty">詳細を読み込み中…</div>';try{const [p,res,rev]=await Promise.all([fetchJson(r.prediction_path),fetchJson(r.result_path),fetchJson(r.review_path)]);const ranks=topRanking(p);const cutoff=p?.information_cutoff_at||r.information_cutoff_at;const proof=r.proof_commit||p?.proof_commit||p?.metadata?.proof_commit;const pace=p?.pace?.label||p?.pace?.hypothesis||p?.pace_hypothesis||p?.pace||'—';const going=p?.going?.label||p?.going?.prediction||p?.going||'—';const reviewText=rev?.summary||rev?.review||rev?.analysis||rev?.text||'';box.innerHTML=`<div class="detail-grid"><div class="detail-card"><h4>発走前Prediction</h4><p class="json-note">model: ${esc(p?.model_version||r.model_version||'—')}<br>cutoff: ${esc(cutoff||'—')}<br>proof: ${esc(proof||'—')}</p><p><b>展開：</b>${esc(typeof pace==='object'?JSON.stringify(pace):pace)}<br><b>馬場：</b>${esc(typeof going==='object'?JSON.stringify(going):going)}</p><table class="rank-table"><thead><tr><th>順位</th><th>馬</th><th>評価</th></tr></thead><tbody>${ranks.length?ranks.map(rankRow).join(''):'<tr><td colspan="3">順位データなし</td></tr>'}</tbody></table></div><div class="detail-card"><h4>結果照合・回顧</h4>${res?`<p class="json-note">official result joined: ${esc(res.official_result_at||'yes')} / going: ${esc(res.official_going||'—')}</p>`:'<p class="json-note">公式結果は未結合です。</p>'}${reviewText?`<div class="review-text">${esc(reviewText)}</div>`:'<p>回顧はまだありません。</p>'}</div></div>`}catch(e){box.innerHTML=`<div class="empty">詳細データの読み込みに失敗しました。<br>${esc(e)}</div>`}}
+function renderAnalysis(){const xs=manifest.daily_analysis||[];if(!xs.length){$('analysisList').innerHTML='<div class="empty">日次分析はまだありません。結果・回顧が蓄積されるとここに表示されます。</div>';return}$('analysisList').innerHTML=xs.sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`<div class="analysis-item"><h3>${esc(x.date||'')} ${esc(x.venue||x.scope||'全対象場')}</h3><p>${esc(x.summary||x.latest_finding||'分析済み')}</p><p>reviewed: ${esc(x.reviewed_races??'—')} / findings: ${esc((x.findings||[]).map(f=>f.category||f).join(', ')||'—')}</p></div>`).join('')}
+async function load(){try{const [s,m]=await Promise.all([fetchJson('data/local_racing_shadow_status.json'),fetchJson('data/local_racing_shadow_public.json')]);manifest=m||manifest;const t=s?.totals||{};const venues=Object.values(s?.venues||{}).filter(v=>v.enabled);$('venueCount').textContent=venues.length;$('observed').textContent=t.pre_race_snapshots??t.races_observed??0;$('observed2').textContent=t.races_observed??0;$('joined').textContent=t.results_joined??0;$('joined2').textContent=t.results_joined??0;$('candidates2').textContent=t.transfer_candidates??0;$('latestFinding').innerHTML='<b>最新finding：</b>'+esc(s?.latest_finding||'観測開始前です。');populateFilters();renderList();renderAnalysis()}catch(e){$('raceList').innerHTML='<div class="empty">公開manifestの読み込みに失敗しました。</div>';$('analysisList').innerHTML='<div class="empty">分析データを読み込めませんでした。</div>';for(const id of ['observed','observed2','joined','joined2','candidates2'])$(id).textContent='—'}}
+['dateFilter','venueFilter','stateFilter'].forEach(id=>$(id).addEventListener('change',renderList));load();
 </script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
