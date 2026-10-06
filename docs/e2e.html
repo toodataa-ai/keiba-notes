@@ -36,9 +36,9 @@
 <body>
 <header><div class="inner">
   <nav class="nav simple-home-nav" aria-label="トップページへ戻る"><a class="simple-home-link" href="index.html">← トップページに戻る</a></nav>
-  <h1>JRA E2E Shadow</h1>
-  <p>発走前スナップショットを固定し、Git proofを残したまま、結果を別ファイルで後結合して検証します。</p>
-  <div class="hero-note"><strong>正式な性能比較は Grade A / prospective_strict のみ。</strong> Historical replay は補助検証であり、同じ一覧でも明確に区別して表示します。</div>
+  <h1>JRA E2E シャドー検証</h1>
+  <p>発走前スナップショットを固定し、発走前コミット証明を残したまま、結果を別ファイルで後結合して検証します。</p>
+  <div class="hero-note"><strong>正式な性能比較は Grade A の発走前固定実戦だけ。</strong> 過去再現検証は補助資料として明確に区別します。</div>
 </div></header>
 <main>
   <div class="hero">
@@ -48,34 +48,34 @@
   </div>
 
   <div class="grid">
-    <div class="card"><div class="label">Grade A 実レース</div><div class="value" id="strict">-</div><div class="small">発走前Git proofあり</div></div>
+    <div class="card"><div class="label">Grade A 実レース</div><div class="value" id="strict">-</div><div class="small">発走前コミット証明あり</div></div>
     <div class="card"><div class="label">共通比較レース</div><div class="value" id="shared">-</div><div class="small" id="minimum">最低件数 -</div></div>
     <div class="card"><div class="label">勝率確率の検証件数</div><div class="value" id="prob">-</div><div class="small">Brier / log loss</div></div>
     <div class="card"><div class="label">馬券検証件数</div><div class="value" id="bets">-</div><div class="small">ROIは単独評価しない</div></div>
   </div>
 
-  <div class="card section"><h2>版別 Grade A 成績</h2><div style="overflow:auto"><table><thead><tr><th>Version</th><th>件数</th><th>◎勝率</th><th>◎3着内</th><th>◎○▲ Top3捕捉</th><th>勝馬◎○▲</th><th>Win Brier</th><th>ROI</th></tr></thead><tbody id="versions"></tbody></table></div></div>
+  <div class="card section"><h2>版別 Grade A 成績</h2><div style="overflow:auto"><table><thead><tr><th>版</th><th>件数</th><th>◎勝率</th><th>◎3着内</th><th>◎○▲の3着内捕捉</th><th>勝馬◎○▲</th><th>勝率Brier</th><th>回収率</th></tr></thead><tbody id="versions"></tbody></table></div></div>
 
   <div class="card section"><h2>基準版 / 候補版 比較</h2><div id="comparison" class="small">-</div></div>
 
   <div class="card section">
-    <h2>発走前 Shadow → proof → 結果</h2>
-    <p class="small">地方競馬Daily Shadowと同じ考え方で、レース単位に発走前snapshotとproof commitを確認できます。結果確定後は同じカードに後結合されます。</p>
+    <h2>発走前予測 → 証明 → 結果</h2>
+    <p class="small">地方競馬シャドー研究と同じ考え方で、レース単位に発走前スナップショットとコミット証明を確認できます。結果確定後は同じカードに後結合されます。</p>
     <div class="filters">
-      <select id="gradeFilter" aria-label="検証グレード"><option value="strict">Grade A</option><option value="historical">Grade B historical replay</option></select>
+      <select id="gradeFilter" aria-label="検証グレード"><option value="strict">Grade A</option><option value="historical">Grade B 過去再現</option></select>
       <select id="venueFilter" aria-label="競馬場"><option value="all">全競馬場</option></select>
-      <select id="statusFilter" aria-label="状態"><option value="all">すべて</option><option value="predicted">発走前snapshotのみ</option><option value="reviewed">結果結合済み</option></select>
+      <select id="statusFilter" aria-label="状態"><option value="all">すべて</option><option value="predicted">発走前スナップショットのみ</option><option value="reviewed">結果結合済み</option></select>
     </div>
-    <div id="raceList" class="race-list"><div class="empty">Shadowデータを読み込み中です。</div></div>
+    <div id="raceList" class="race-list"><div class="empty">シャドーデータを読み込み中です。</div></div>
   </div>
 
   <div class="card section"><h2>検証エラー</h2><div id="errors" class="small">-</div></div>
 
   <div class="card section"><h2>運用ルール</h2>
     <div class="policy-grid">
-      <div class="policy"><b>発走前固定</b>information cutoffより前にsnapshotを保存。</div>
-      <div class="policy"><b>Git proof</b>Grade Aは発走前commit SHAで存在証明。</div>
-      <div class="policy"><b>結果は別結合</b>prediction原本へ着順・払戻を追記しない。</div>
+      <div class="policy"><b>発走前固定</b>情報締切時刻より前にスナップショットを保存。</div>
+      <div class="policy"><b>コミット証明</b>Grade Aは発走前commit SHAで存在を証明。</div>
+      <div class="policy"><b>結果は別結合</b>予測原本へ着順・払戻を追記しない。</div>
       <div class="policy"><b>昇格は自動化しない</b>Grade A比較＋週次ガバナンスで判断。</div>
     </div>
   </div>
