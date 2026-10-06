@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "model_version": "e012-shadow-v0.1",
-  "generated_at": "2026-10-06T03:59:44+00:00",
+  "generated_at": "2026-10-06T04:00:19+00:00",
   "mode": "shadow_observation_only",
   "production_effect": false,
   "collection": {
@@ -9,9 +9,46 @@
     "required_grades": [
       "prospective_strict"
     ],
-    "scope": null,
+    "population_scope": "JRA all races 1R-12R",
+    "selected_scope": "all official main-race predictions plus stratified samples from 1R-12R",
+    "require_race_context": true,
     "publish_per_horse_shadow_on_site": false,
-    "public_disclosure": "research-purpose, aggregate progress, category-level progress, promotion criteria and findings only"
+    "public_disclosure": "research-purpose, aggregate progress, category-level progress, promotion criteria and findings only",
+    "sampling": {
+      "version": "stratified-v0.1",
+      "categories": {
+        "debut": {
+          "label": "新馬",
+          "target_per_week": 3
+        },
+        "maiden": {
+          "label": "未勝利",
+          "target_per_week": 3
+        },
+        "class_1": {
+          "label": "1勝クラス",
+          "target_per_week": 2
+        },
+        "class_2": {
+          "label": "2勝クラス",
+          "target_per_week": 2
+        },
+        "class_3": {
+          "label": "3勝クラス",
+          "target_per_week": 2
+        },
+        "open_listed": {
+          "label": "OP・L",
+          "target_per_week": 2
+        },
+        "graded": {
+          "label": "GIII・GII・GI",
+          "target_per_week": 2
+        }
+      },
+      "shortage_policy": "take all available races in the category and record the shortfall; do not substitute from another category",
+      "selection_policy": "deterministic hash ranking within each category; selection must be reproducible from week_id, race_id and seed_namespace"
+    }
   },
   "definitions": {
     "E0": "0 starts before race",
@@ -21,10 +58,13 @@
   "versions": {},
   "errors": [],
   "interpretation": {
+    "all_jra_race_numbers_are_population_candidates": true,
+    "official_main_predictions_are_always_included": true,
+    "non_main_races_are_stratified_by_category": true,
     "missing_experience_before_collection_start_is_allowed": true,
     "missing_required_experience_is_validation_failure": true,
     "no_ranking_or_mark_change": true,
     "no_automatic_promotion": true,
-    "next_step": "Accumulate regime coverage, then estimate uncertainty/shrinkage as a separate challenger."
+    "next_step": "Accumulate category x regime coverage, then estimate uncertainty/shrinkage as a separate challenger."
   }
 }
