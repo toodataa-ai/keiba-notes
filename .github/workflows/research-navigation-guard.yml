@@ -1,11 +1,16 @@
-name: Ensure research navigation
+name: Ensure simple site navigation
 
 on:
   push:
     branches: [main]
     paths:
       - 'docs/index.html'
+      - 'docs/methodology.html'
+      - 'docs/roadmap.html'
+      - 'docs/e2e.html'
+      - 'docs/experience-regime.html'
       - 'docs/local-racing-shadow.html'
+      - 'docs/baba-models.html'
       - 'tools/ensure_research_navigation.py'
       - '.github/workflows/research-navigation-guard.yml'
 
@@ -18,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Ensure research navigation
+      - name: Simplify public navigation
         run: python3 tools/ensure_research_navigation.py
       - name: Commit navigation changes
         run: |
@@ -28,6 +33,13 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/index.html
-          git commit -m 'Expose local racing Daily Shadow research'
+          git add \
+            docs/index.html \
+            docs/methodology.html \
+            docs/roadmap.html \
+            docs/e2e.html \
+            docs/experience-regime.html \
+            docs/local-racing-shadow.html \
+            docs/baba-models.html
+          git commit -m 'Simplify public site navigation'
           git push
