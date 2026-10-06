@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-07T00:00:00Z",
+  "generated_at": "2026-10-06T15:51:05.841291+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -14,7 +14,18 @@
     "candidate": "v3.1",
     "state": "insufficient_data",
     "strict_shared_cases": 0,
-    "minimum_strict_shared_cases": 20
+    "minimum_strict_shared_cases": 20,
+    "deltas_candidate_minus_baseline": {
+      "honmei_win": null,
+      "honmei_top3": null,
+      "top3_marks_capture": null,
+      "winner_in_top3_marks": null,
+      "win_brier": null,
+      "win_log_loss": null,
+      "top3_brier": null,
+      "roi_pct_per_case": null
+    },
+    "note": "Lower is better for Brier/log loss; higher is better for hit/capture/ROI metrics."
   },
   "totals": {
     "prospective_strict_races": 0,
