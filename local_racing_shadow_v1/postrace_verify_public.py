@@ -27,6 +27,8 @@ def main(date, retries, delay):
             remote=json.loads(response.content)
             if remote.get("updated_at") != loc.get("updated_at"):
                 raise RuntimeError(f"Stale manifest updated_at: {remote.get('updated_at')}")
+            if remote != loc:
+                raise RuntimeError("Published manifest fields differ from committed manifest")
             if {r["race_id"] for r in remote["races"] if r["date"]==date} != expected:
                 raise RuntimeError("Remote manifest race coverage differs")
             for row in records:
