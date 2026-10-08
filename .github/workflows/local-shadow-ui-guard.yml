@@ -5,6 +5,7 @@ on:
     paths:
       - 'docs/local-racing-shadow.html'
       - 'local_racing_shadow_v1/test_public_ui.cjs'
+      - 'local_racing_shadow_v1/verify_public_ui.cjs'
       - '.github/workflows/local-shadow-ui-guard.yml'
   workflow_dispatch:
 permissions:
@@ -20,5 +21,7 @@ jobs:
           node-version: '22'
       - name: Check complete 2026-10-08 reviewed-race display and integrity
         run: node local_racing_shadow_v1/test_public_ui.cjs
+      - name: Compare deployed GitHub Pages JS with committed UI
+        run: node local_racing_shadow_v1/verify_public_ui.cjs
       - name: Guard immutable pre-race files
         run: test -z "$(git status --porcelain -- local_racing_shadow_v1/predictions)"
