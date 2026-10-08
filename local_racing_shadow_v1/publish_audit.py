@@ -35,7 +35,9 @@ def parse_time(value):
 
 
 def proof(path, start):
-    cmd = ["git", "log", "--follow", "--format=%H|%cI", "--", str(path)]
+    # Do not follow Git similarity-based renames across different daily JSON files.
+    # Immutability is defined by the exact canonical prediction path.
+    cmd = ["git", "log", "--no-renames", "--format=%H|%cI", "--", str(path)]
     rows = subprocess.check_output(cmd, text=True).splitlines()
     if not rows:
         raise ValueError(f"No committed prediction proof: {path}")
