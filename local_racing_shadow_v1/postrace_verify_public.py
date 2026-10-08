@@ -35,7 +35,7 @@ def main(date, retries, delay):
                 for key in ("prediction_path","result_path","review_path"):
                     urlpath = row[key]
                     assert urlpath, f"{row['race_id']} missing {key}"
-                    local = (ROOT/urlpath.removeprefix("data/")).read_bytes()
+                    local = (ROOT/urlpath).read_bytes()
                     live=session.get(urljoin(BASE,urlpath), timeout=25,
                                      headers={"Cache-Control":"no-cache"})
                     live.raise_for_status()
@@ -44,7 +44,7 @@ def main(date, retries, delay):
             for x in loc.get("daily_analysis",[]):
                 if x.get("date") == date:
                     rel=x["path"]
-                    local=(ROOT/rel.removeprefix("data/")).read_bytes()
+                    local=(ROOT/rel).read_bytes()
                     live=session.get(urljoin(BASE,rel),timeout=25,headers={"Cache-Control":"no-cache"})
                     live.raise_for_status()
                     if digest(live.content)!=digest(local):
