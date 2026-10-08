@@ -1,0 +1,101 @@
+{
+  "race_id": "20261008-sonoda-01",
+  "date": "2026-10-08",
+  "venue": "園田",
+  "prediction_path": "local_racing_shadow_v1/predictions/2026-10-08/20261008-sonoda-01.json",
+  "result_path": "local_racing_shadow_v1/results/2026-10-08/20261008-sonoda-01.json",
+  "prediction_sha256": "0ebd741070b1b596730960540310c6c83606d0f8fc58b3a025d43002733b80f1",
+  "proof_commit": "58bb1ade093d73bb1a1186904ed6fbe28a293ee4",
+  "top_pick": {
+    "horse_no": 4,
+    "horse_name": "マーブルティスワ"
+  },
+  "actual_top_pick_finish": 2,
+  "rank_comparison": [
+    {
+      "horse_no": 4,
+      "horse_name": "マーブルティスワ",
+      "predicted_rank": 1,
+      "actual_finish": 2,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 2,
+      "horse_name": "イングリッドローズ",
+      "predicted_rank": 2,
+      "actual_finish": 3,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 3,
+      "horse_name": "ジュンオーズ",
+      "predicted_rank": 3,
+      "actual_finish": 1,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 6,
+      "horse_name": "エイシンウィキッド",
+      "predicted_rank": 4,
+      "actual_finish": 6,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 1,
+      "horse_name": "セレナリス",
+      "predicted_rank": 5,
+      "actual_finish": 4,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 8,
+      "horse_name": "スティールソニック",
+      "predicted_rank": 6,
+      "actual_finish": 8,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 7,
+      "horse_name": "メイショウガイフウ",
+      "predicted_rank": 7,
+      "actual_finish": 7,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 5,
+      "horse_name": "ジーベローチェ",
+      "predicted_rank": 8,
+      "actual_finish": 5,
+      "official_disposition": null
+    }
+  ],
+  "hit_metrics": {
+    "evaluable": true,
+    "top_pick_win": 0,
+    "top_pick_top3": 1,
+    "top_pick_rank_error": 1
+  },
+  "diagnostics": [
+    {
+      "classification": "evidence",
+      "finding": "Official finishing position compared against frozen pre-race ranking"
+    },
+    {
+      "classification": "unknown",
+      "finding": "Pre-race pace cannot be validated from finish order alone"
+    }
+  ],
+  "known_limitations": [
+    "No post-race hindsight adjustment to the pre-race ranking",
+    "Single-day sample cannot establish transferable effects",
+    "Official incident narratives and bias not independently verified",
+    "Official splits are not interpreted unless separately verified"
+  ],
+  "predicted_pace": "M（仮説）",
+  "official_pace_evidence": null,
+  "source_urls": [
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=27&k_raceDate=2026%2F10%2F08&k_raceNo=1",
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=27&k_raceDate=2026%2F10%2F08"
+  ],
+  "review_status": "VERIFIED"
+}
