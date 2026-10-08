@@ -145,7 +145,13 @@ def parse_official(soup, p):
     heading = head.find_next(["h2","h3","h4"])
     official_name = heading.get_text(" ", strip=True) if heading else None
     if official_name and clean(p["race_name"]) != clean(official_name):
-        raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
+        # NAR RaceList often abbreviates race names while RaceMarkTable uses the full name.
+        # Keep exact date/venue/race_no/distance/horse-number checks; only tolerate
+        # a verifiable unambiguous substring, including omitted reading parentheses.
+        normalized = clean(re.sub(r"[（(][^）)]{1,16}[）)]", "", official_name))
+        abbreviated = clean(p["race_name"])
+        if len(abbreviated) < 6 or abbreviated not in normalized:
+            raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
     body = soup.get_text(" ", strip=True)
     dist_match = re.search(r"ダート\s*(\d{3,4})\s*[ｍm]", body)
     if not dist_match:
@@ -421,6 +427,13 @@ def run(date, only_id):
                    "review_ids": sorted(validated), "unresolved_ids": sorted(set(statuses) - set(validated)),
                    "ineligible_proof_ids": sorted(rid for rid,x in statuses.items() if x["status"] == "BLOCKED_PROOF")}}
     analysis_path = ROOT / "analysis" / f"{date}-summary.json"
+    if analysis_path.exists():
+        old_summary = jread(analysis_path)
+        # No new evidence or coverage: preserve byte-identical daily summary on retries.
+        if (old_summary.get("reconciliation", {}).get("review_ids") == summary["reconciliation"]["review_ids"]
+            and old_summary.get("reconciliation", {}).get("unresolved_ids") == summary["reconciliation"]["unresolved_ids"]
+            and old_summary.get("summary") == summary["summary"]):
+            summary = old_summary
     write_distinct(analysis_path, summary, mutable=True)
     diagnostics = {"schema_version": 1, "date": date, "prompt": cfg["prompts"]["post_race"],
                    "expected_predictions": len(pred_paths), "completed_or_verified": len(validated),
@@ -428,6 +441,16 @@ def run(date, only_id):
                    "retry_only_race_ids": sorted(set(statuses)-set(validated)),
                    "status": "SUCCESS" if len(validated) == len(pred_paths) and summary["reconciliation"]["eligible_equals_categories"] else "PARTIAL"}
     diag_path = ROOT / "diagnostics" / f"{date}-postrace-run.json"
+    if diag_path.exists():
+        old_diag = jread(diag_path)
+        unresolved_ids = set(diagnostics["retry_only_race_ids"])
+        previous_unresolved = {k: v for k, v in old_diag.get("races", {}).items()
+                               if k in unresolved_ids}
+        current_unresolved = {k: v for k, v in statuses.items() if k in unresolved_ids}
+        if (old_diag.get("completed_or_verified") == len(validated)
+            and old_diag.get("retry_only_race_ids") == diagnostics["retry_only_race_ids"]
+            and previous_unresolved == current_unresolved):
+            diagnostics = old_diag
     write_distinct(diag_path, diagnostics, mutable=True)
     print(json.dumps({"date":date,"completed_or_verified":len(validated),"unresolved":len(pred_paths)-len(validated),
                       "diagnostics":str(diag_path),"status":diagnostics["status"]},ensure_ascii=False))
