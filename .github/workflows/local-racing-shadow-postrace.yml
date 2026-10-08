@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/local-racing-shadow-postrace.yml'
+      - 'local_racing_shadow_v1/postrace.py'
+      - 'local_racing_shadow_v1/postrace_audit.py'
+      - 'local_racing_shadow_v1/postrace_verify_public.py'
   workflow_dispatch:
     inputs:
       date:
