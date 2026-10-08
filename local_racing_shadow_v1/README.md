@@ -111,3 +111,12 @@
 Daily Shadow → repeated finding → transferable candidate → JRA historical/replay or Grade A E2E → human approval → production
 
 地方競馬は学習速度を上げる研究場であり、JRA本番モデルの教師データそのものではない。
+
+## POST-RACEの正本（2026-10-09更新）
+
+- PRE-RACEの既存正本: `shadow_prompt_v0_1.txt`（原本予想は不変更）。
+- POST-RACEの正本: `shadow_review_prompt_v0_2.txt`。適用するパスは `config.json.prompts.post_race` を参照。
+- 正本プロンプトは実行仕様であって、結果取得・JOIN・回顧生成の実行プログラムではない。現行リポジトリに `results/`、`reviews/`、`analysis/` の生成器がない限り、回顧は `BLOCKED_IMPLEMENTATION` と報告する。
+- 既存の `publish_audit.py` は保存済みファイルを検査・公開ミラーへ複写する機能であり、NAR公式結果の取得・回顧生成を実行しない。GitHub Actionsが緑でも回顧完了を意味しない。
+- 完了条件: 対象の全レースについて発走前proof検証済み、NAR公式確定成績と一意JOIN済み、result/review/day-summary保存済み、GitHub commitと公開manifest、公開ミラーの内容照合済みであること。未完了が1件でもあればPARTIALまたはBLOCKEDと報告する。
+- 回顧実行でJRA関連ファイルと保存済みpredictionに変更を加えない。
