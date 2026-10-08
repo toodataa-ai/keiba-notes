@@ -1,5 +1,9 @@
 name: Local Racing Shadow Publish Audit
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'local_racing_shadow_v1/publish_audit.py'
   schedule:
     - cron: '7 0-14 * * *' # 09:07-23:07 JST, UTC
     - cron: '7 23 * * *'   # 08:07 JST
