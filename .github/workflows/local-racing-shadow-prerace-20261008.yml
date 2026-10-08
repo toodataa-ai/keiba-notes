@@ -1,5 +1,10 @@
 name: Local Racing Shadow Pre-race Snapshot (2026-10-08)
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'local_racing_shadow_v1/generate_daily.py'
+      - '.github/workflows/local-racing-shadow-prerace-20261008.yml'
   schedule:
     - cron: '12,27,42 0 8 10 *'
   workflow_dispatch:
