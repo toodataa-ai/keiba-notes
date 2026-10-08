@@ -1,0 +1,115 @@
+{
+  "race_id": "20261008-oi-04",
+  "date": "2026-10-08",
+  "venue": "大井",
+  "prediction_path": "local_racing_shadow_v1/predictions/2026-10-08/20261008-oi-04.json",
+  "result_path": "local_racing_shadow_v1/results/2026-10-08/20261008-oi-04.json",
+  "prediction_sha256": "b2121b02250dfd3db06f871c7ada1752566c0e42b6ec00ef9f4b99fdac91e8a0",
+  "proof_commit": "58bb1ade093d73bb1a1186904ed6fbe28a293ee4",
+  "top_pick": {
+    "horse_no": 10,
+    "horse_name": "ロワゾドゥフ"
+  },
+  "actual_top_pick_finish": 2,
+  "rank_comparison": [
+    {
+      "horse_no": 10,
+      "horse_name": "ロワゾドゥフ",
+      "predicted_rank": 1,
+      "actual_finish": 2,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 1,
+      "horse_name": "ベイビーパーティー",
+      "predicted_rank": 2,
+      "actual_finish": 4,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 9,
+      "horse_name": "アボーイ",
+      "predicted_rank": 3,
+      "actual_finish": 3,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 3,
+      "horse_name": "ラインホープ",
+      "predicted_rank": 4,
+      "actual_finish": 1,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 2,
+      "horse_name": "ディアウェンディ",
+      "predicted_rank": 5,
+      "actual_finish": 5,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 5,
+      "horse_name": "デストロイヤー",
+      "predicted_rank": 6,
+      "actual_finish": 9,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 7,
+      "horse_name": "ロヴァニエミ",
+      "predicted_rank": 7,
+      "actual_finish": 8,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 8,
+      "horse_name": "タリタ",
+      "predicted_rank": 8,
+      "actual_finish": 6,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 6,
+      "horse_name": "コードイレヴン",
+      "predicted_rank": 9,
+      "actual_finish": 7,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 4,
+      "horse_name": "カミコ",
+      "predicted_rank": 10,
+      "actual_finish": 10,
+      "official_disposition": null
+    }
+  ],
+  "hit_metrics": {
+    "evaluable": true,
+    "top_pick_win": 0,
+    "top_pick_top3": 1,
+    "top_pick_rank_error": 1
+  },
+  "diagnostics": [
+    {
+      "classification": "evidence",
+      "finding": "Official finishing position compared against frozen pre-race ranking"
+    },
+    {
+      "classification": "unknown",
+      "finding": "Pre-race pace cannot be validated from finish order alone"
+    }
+  ],
+  "known_limitations": [
+    "No post-race hindsight adjustment to the pre-race ranking",
+    "Single-day sample cannot establish transferable effects",
+    "Official incident narratives and bias not independently verified",
+    "Official splits are not interpreted unless separately verified"
+  ],
+  "predicted_pace": "M（平均）",
+  "official_pace_evidence": null,
+  "source_urls": [
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=20&k_raceDate=2026%2F10%2F08&k_raceNo=4",
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=20&k_raceDate=2026%2F10%2F08"
+  ],
+  "review_status": "VERIFIED"
+}
