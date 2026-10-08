@@ -1,12 +1,10 @@
-name: Local Racing Shadow Pre-race Snapshot (2026-10-08)
+name: Local Racing Shadow Pre-race Snapshot (2026-10-09)
 on:
   push:
     branches: [main]
     paths:
       - 'local_racing_shadow_v1/generate_daily.py'
       - '.github/workflows/local-racing-shadow-prerace-20261008.yml'
-  schedule:
-    - cron: '12,27,42 0 8 10 *'
   workflow_dispatch:
 permissions:
   contents: write
@@ -29,17 +27,22 @@ jobs:
       - run: python -m pip install requests beautifulsoup4
       - name: Freeze all official pre-race snapshots (no JRA data)
         run: |
-          if [ "$(TZ=Asia/Tokyo date +%F)" != "2026-10-08" ]; then
-            echo "One-day 2026-10-08 research run only"; exit 0
+          if [ "$(TZ=Asia/Tokyo date +%F)" != "2026-10-09" ]; then
+            echo "One-day 2026-10-09 research run only"; exit 0
           fi
           python local_racing_shadow_v1/generate_daily.py
+      - name: Verify complete official 2026-10-09 race population (Oi 10 + Sonoda 12)
+        run: |
+          test "$(find local_racing_shadow_v1/predictions/2026-10-09 -maxdepth 1 -name '*.json' -type f | wc -l)" -eq 22
+          test "$(find local_racing_shadow_v1/predictions/2026-10-09 -maxdepth 1 -name '*-oi-*.json' -type f | wc -l)" -eq 10
+          test "$(find local_racing_shadow_v1/predictions/2026-10-09 -maxdepth 1 -name '*-sonoda-*.json' -type f | wc -l)" -eq 12
       - name: Commit immutable snapshots BEFORE publishing audit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add local_racing_shadow_v1/predictions
           if ! git diff --cached --quiet; then
-            git commit -m "Freeze official local Shadow pre-race snapshots for 2026-10-08"
+            git commit -m "Freeze official local Shadow pre-race snapshots for 2026-10-09"
             git push
           fi
       - name: Verify committed proof, publish public mirror and manifest
@@ -48,6 +51,6 @@ jobs:
         run: |
           git add docs/data/local-racing-shadow docs/data/local_racing_shadow_public.json docs/data/local_racing_shadow_status.json
           if ! git diff --cached --quiet; then
-            git commit -m "Publish audited local Shadow snapshots for 2026-10-08"
+            git commit -m "Publish audited local Shadow snapshots for 2026-10-09"
             git push
           fi
