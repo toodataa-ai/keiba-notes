@@ -1,0 +1,109 @@
+地方競馬Daily Shadow「公式結果回顧」正本プロンプト v0.2
+制定日：2026-10-09
+対象リポジトリ：toodataa-ai/keiba-notes
+対象スコープ：local_racing_shadow_v1 の POST-RACE のみ
+既存 PRE-RACE：shadow_prompt_v0_1.txt を引き続き使用
+原則：原本予想・JRA資産・正式予想の絶対不変更／検証できないものは未完了
+
+【1. 実行目的と契約】
+指定日（未指定時は日本時間で前日）の「発走前にGitHub保存済みの地方Shadow prediction」だけを回顧する。
+対象全レースの official result をNAR公式から取得し、prediction→result→review→daily analysis→公開manifestの整合性を確認する。
+実行しただけで「完了」と言ってはならない。すべての保存・commit・公開・監査結果が確認できたものだけを完了とする。
+今回の実行はJRAの予想、印、PDF、HTML、プロンプト、予想データ、本番重み、ワークフローに一切影響させない。
+production_effect=falseを保持する。対象外ファイルの変更は禁止。
+
+【2. 入力・正本・日付の確定】
+A. 最初に GitHub main の local_racing_shadow_v1/config.json と本プロンプト、README.md を取得し、取得時点のcommit SHAを記録する。
+B. 指定日を YYYY-MM-DD（JST）で確定。会話日時やPCのUTC日付から推測して取り違えない。
+C. enabled=trueの競馬場をconfigから読み込む。ただし当該日の回顧対象は「ローカルにGitHub保存済みかつ時間証跡を満たすprediction」に限る。開催があったが予想が無いレースは、予想を後付けせずcoverage gapに記録する。
+D. local_racing_shadow_v1/predictions/<対象日>/*.json を列挙し、race_id・venue・race_no・ファイル名・日付の一意性を確認する。
+E. 0件なら status=BLOCKED_NO_PREDICTIONS で終了。推定した予想や結果を作らない。
+F. 各predictionについて、SHA・Git履歴・公開mirror・proof_commitを確認する。git log --no-renames -- <正規パス> で初回commitと変更回数を確認し、predictionの生成時刻・cutoff・最初のGit commitが公式発走時刻より前かつ時刻にタイムゾーンがあることを検証する。
+G. 発走後に初めてcommitされたもの、再編集されたもの、参照できないものは監査失格。該当レースは独立したBLOCKED_PROOFとして隔離。結果から予想を再構築しない。
+H. 既存predictionのバイト列・SHAは処理の前後で比較する。差異があれば即時FAIL。修正・整形・移動も禁止。
+I. 以前のresult/reviewが存在したら読み取り、すでに監査済みの同一内容ならSKIPPED_VERIFIEDとする。相違があれば無断上書きせずBLOCKED_CONFLICT。公式訂正が必要な場合は別版・訂正記録を作り、原本を残す。
+
+【3. 結果の公式確認／禁止データ】
+A. 一次情報はNAR公式「競走成績」(RaceMarkTable) と「当日メニュー」(RaceList)を使う。URLパラメータの日付・競馬場コード・R番号を実際のpredictionと突合する。
+B. 日付・場・レース番号・競走名・距離・馬場状態・確定着順・馬番・馬名・競走取止／取消／除外・出走馬数を確認し、必要なら公開されている通過順・ラップ・時計を取得する。
+C. NAR公式レース成績の着順テーブルを主証拠とし、過去5走欄や当日の「対戦表」、オッズ、速報、検索スニペットを確定成績と誤認しない。
+D. 公式結果が未公表、途中経過、取得失敗、HTMLレイアウト変更、データ欠落、開催中止、競走不成立の場合は事実に対応するPENDING_OFFICIAL / BLOCKED_FETCH / BLOCKED_PARSE / CANCELLED_OFFICIAL等で明示し、着順を創作しない。
+E. 一時的な通信失敗は有限回（最大3試行）だけ再取得する。別情報源から架空の数字で補完しない。1レースの不具合で、他の独立した正常レースの成果を破棄しない。
+F. 結果を取得した日時(JST)、公式URL、馬場等の確認日時・ソースを記録。結果公開後に取得した情報をpredictionの列に逆流させない。
+
+【4. マッチングと検証（fail-closed）】
+A. JOINキーは race_id を主キー、date/venue/race_no を補助キー、horse_noを馬単位キーとする。馬名は表記差異のチェックにのみ使う。
+B. predictionの出走馬番の重複、結果の馬番重複、着順重複（公式同着を除く）、頭数の不整合、レースID誤り、着順に現れない馬の理由不明はBLOCKED_JOIN。
+C. 取消／除外／競走中止／失格／降着／同着は別状態で扱い、通常の着順・的中率の分母に無条件で入れない。公式の区分と名称を保存する。
+D. 予想評価に使うtop_pickおよびability_orderは予想原本からのみ読み取り、公式結果や人気で後から変更しない。
+E. 利用可能な結果項目と未取得項目を区別し、ソースで確認していないラップ・通過順・不利・バイアスを事実として書かない。
+F. 各レースの照合で「予想先頭馬の馬番・馬名／実着順」「上位3頭の予想順位と実着順」「推定ペースと公式に検証可能な情報の有無」を明示。
+G. 予想と結果の一致・不一致の説明はエビデンスあり・合理的仮説・不明を区分し、事後情報で予想プロセスが正しかったように書き換えない。
+
+【5. 保存する成果物（既存形式を保護）】
+(1) local_racing_shadow_v1/results/<YYYY-MM-DD>/<race_id>.json
+    race_id,date,venue,race_no,official_source_url,official_observed_at,official_going,
+    status,finish_order（馬番・馬名・着順・公式除外区分）,official_splits（取得できた場合）,
+    prediction_path,prediction_sha256,proof_commit,source_evidence,validation。
+(2) local_racing_shadow_v1/reviews/<YYYY-MM-DD>/<race_id>.json
+    race_id,prediction_path,result_path,prediction_sha256,proof_commit,
+    top_pick,actual_top_pick_finish,rank_comparison,hit_metrics,diagnostics,
+    known_limitations,source_urls,review_status。
+(3) local_racing_shadow_v1/analysis/<YYYY-MM-DD>-summary.json
+    scope=predictions_with_valid_proof_only,expected_predictions,eligible_predictions,
+    completed_reviews,pending,blocked,skipped_existing,by_venue,by_distance,
+    top_pick_win_rate,top_pick_top3_rate,ranking_error_summary,
+    evidence_based_findings,uncertainties,coverage_gaps,reconciliation。
+(4) 必要なら同一日について local_racing_shadow_v1/diagnostics/<YYYY-MM-DD>-postrace-run.json
+    レースごとの状態、理由、URL、チェック結果、Git保存状態、再開対象を明示する。
+(5) docs/data/local-racing-shadow の該当mirror、docs/data/local_racing_shadow_public.json、
+    docs/data/local_racing_shadow_status.json を公開監査経由で更新する。
+すべて機械可読JSONかつUTF-8。同名ファイルは整合した既存内容を優先し、矛盾時は上書き禁止。
+未取得数値はnull、原因は明示的statusとreason。0・空文字・推定値で代用しない。
+
+【6. 回顧指標・分析】
+A. レースごとに予想1位の1着率、3着内率、順位ずれを記録。公式取消等は対象外・分母調整を明示。
+B. 可能な軸は venue / distance / class / going / field_size / pace /
+   running_style / gate / jockey / weight / rotation / ability_rank / reliability。
+C. 元predictionにない脚質・馬場・斤量等の予想時点特徴を、結果を見て後付けしない。「データなし」とする。
+D. サンプルが少ない指標は n と不確実性を併記。1日で重み更新・一般化・JRA移植を行わない。
+E. 日次summaryは実在するレビューのみを母集団とし、未完了レースを的中・不的中のいずれにもカウントしない。
+F. 誤差の分類は「予想時点で改善可能かもしれない点」と「結果後にしか判別できない事象」を分離し、反証例も残す。
+
+【7. commit・公開・第三者が検証できる監査】
+A. 変更可能ファイルのホワイトリストは local_racing_shadow_v1/results/**、
+   local_racing_shadow_v1/reviews/**、local_racing_shadow_v1/analysis/**、
+   local_racing_shadow_v1/diagnostics/**、docs/data/local-racing-shadow/**、
+   docs/data/local_racing_shadow_public.json、docs/data/local_racing_shadow_status.json
+   のみとする。prompt/README/config等の改善自体は別の改修commitとし回顧実行では変更しない。
+B. GitHubで保存されたことをcommit SHAとファイル再取得で確認。GitHub作成前のローカルファイル存在を保存成功と呼ばない。
+C. publish_audit.pyによりprediction改変・公開ミラー不一致を検査。さらにpost-race専用の検査で result↔review↔prediction、全対象race_id、分母・日次summaryを照合する。
+D. GitHub Actions「Success」は回顧完了の十分条件ではない。workflow/job/step、保存ファイル、公開manifest、公開URLの取得結果を相互照合する。
+E. デプロイの反映が確認できない場合はCOMMITTED_NOT_PUBLISHEDとして残す。404、古いmanifestを成功扱いしない。
+F. 数量の整合式:
+   eligible_predictions = completed_reviews + pending + blocked + skipped_existing(監査済)
+   ただしカテゴリーは排他的にする。予想なしはeligible_predictionsに含めずcoverage_gapsで別計数。
+   published_reviewed_countは検証済みcompleted_reviews + skipped_existingに一致すること。
+G. 日次結果の一部のみ完了ならPARTIAL。全件の監査証跡がそろったときのみSUCCESS。
+H. 公開更新済みのrace_idごとに、result_pathとreview_pathが非nullで実在・内容一致することを再確認。
+
+【8. 復旧と冪等性】
+- 成功済みレースを壊さず、未処理・失敗レースだけ再試行する。
+- 書込前に毎回リモート最新版SHAを確認し、競合・同時更新があれば止める。
+- 同内容を再実行しても余計なcommitを増やさない。
+- 失敗箇所を「情報取得／JOIN／GitHub書込／公開／監査」に分類し、再開地点を明示する。
+- 曖昧な一括やり直し禁止。やり直す場合も既存predictionのバイト列は一切触らない。
+
+【9. 出力の必須報告（省略禁止）】
+先頭に日付・実行対象・情報源・適用promptの相対パスとバージョンを示す。
+次に場別の表: 予想保存済/有効proof/公式結果確認/回顧保存/公開確認/未完了/理由。
+最後に (a) result/review/analysis GitHub paths (b) 保存commit SHA (c) proof_commit
+(d) publish audit run URLと結論 (e) manifest上の該当レース数 (f) 公開ページ検証状況
+(g) 未完了race_idと理由 (h) 次回の再開指示 (i) JRA変更ファイル0件 を報告。
+証跡が取れない項目は「未確認」と明記し、想像で埋めない。
+「完了しました」「全レース回顧済み」は SUCCESS の検証式を満たした場合に限る。
+
+【10. 実行前の必須機能点検】
+- 回顧生成プログラム・公式結果パーサ・保存手段・GitHub書込権限・レビュー監査が実装済みか検査する。
+- 未実装なら絶対に回顧成功と報告せずBLOCKED_IMPLEMENTATIONとする。
+- プロンプト自体はプログラムやGitHub Actionsを生成・実行しない。必要な機能が欠けていれば、欠けたコンポーネント名と、実装または手動実行に必要な作業を具体的に提示する。
