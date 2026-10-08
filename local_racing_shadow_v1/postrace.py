@@ -38,7 +38,7 @@ def now():
     return dt.datetime.now(JST).isoformat(timespec="seconds")
 
 def clean(value):
-    return re.sub(r"\\s+", "", unicodedata.normalize("NFKC", str(value or "")))
+    return re.sub(r"\s+", "", unicodedata.normalize("NFKC", str(value or "")))
 
 def timestamp(value):
     v = dt.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
@@ -53,7 +53,7 @@ def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def dump(obj):
-    return json.dumps(obj, ensure_ascii=False, indent=2) + "\\n"
+    return json.dumps(obj, ensure_ascii=False, indent=2) + "\n"
 
 def write_distinct(path, obj, mutable=False):
     content = dump(obj)
@@ -140,20 +140,20 @@ def parse_official(soup, p):
         raise Blocked("BLOCKED_PARSE", "Official page date mismatch")
     if clean(p["venue"]) not in clean(htext):
         raise Blocked("BLOCKED_PARSE", "Official venue mismatch")
-    if not re.search(r"第\\s*" + str(int(p["race_no"])) + r"\\s*競走", clean(htext)):
+    if not re.search(r"第\s*" + str(int(p["race_no"])) + r"\s*競走", clean(htext)):
         raise Blocked("BLOCKED_PARSE", "Official race number mismatch")
     heading = head.find_next(["h2","h3","h4"])
     official_name = heading.get_text(" ", strip=True) if heading else None
     if official_name and clean(p["race_name"]) != clean(official_name):
         raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
     body = soup.get_text(" ", strip=True)
-    dist_match = re.search(r"ダート\\s*(\\d{3,4})\\s*[ｍm]", body)
+    dist_match = re.search(r"ダート\s*(\d{3,4})\s*[ｍm]", body)
     if not dist_match:
         raise Blocked("BLOCKED_PARSE", "Official surface/distance missing")
     distance = int(dist_match.group(1))
     if distance != int(p["distance"]) or clean(p.get("surface")) != "ダート":
         raise Blocked("BLOCKED_JOIN", "Official distance/surface does not match prediction")
-    going_match = re.search(r"馬場[：:]\\s*(良|稍重|重|不良)", body)
+    going_match = re.search(r"馬場[：:]\s*(良|稍重|重|不良)", body)
     if not going_match:
         raise Blocked("BLOCKED_PARSE", "Official going not found")
     if any(x in body for x in ("競走取り止め", "競走取止め", "競走不成立")):
@@ -175,7 +175,7 @@ def parse_official(soup, p):
         if len(cells) < 10:
             continue
         horse_number = clean(cells[2].get_text(" ", strip=True))
-        if not re.fullmatch(r"\\d{1,2}", horse_number):
+        if not re.fullmatch(r"\d{1,2}", horse_number):
             continue
         raw_rank = clean(cells[0].get_text(" ", strip=True))
         name = cells[3].get_text(" ", strip=True)
@@ -184,7 +184,7 @@ def parse_official(soup, p):
             name = anchor.get_text(" ", strip=True)
         if not name:
             raise Blocked("BLOCKED_PARSE", f"No horse name for #{horse_number}")
-        rank = int(raw_rank) if re.fullmatch(r"\\d{1,2}", raw_rank) else None
+        rank = int(raw_rank) if re.fullmatch(r"\d{1,2}", raw_rank) else None
         special = next((code for code in ("出走取消", "競走除外", "競走中止", "失格", "降着", "取消", "除外", "中止")
                         if code in raw_rank), None)
         if rank is None and special is None:
