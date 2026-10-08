@@ -123,14 +123,19 @@ def main():
         write_if_changed(MANIFEST, desired)
     if STATUS.exists():
         status = read(STATUS)
+        before_status = json.dumps(status, ensure_ascii=False, sort_keys=True)
         status.setdefault("totals", {})
         status["totals"]["races_observed"] = len(entries)
         status["totals"]["pre_race_snapshots"] = len(entries)
         status["totals"]["results_joined"] = sum(x["status"] == "reviewed" for x in entries)
-        for venue in status.get("venues", []):
+        venue_data = status.get("venues", {})
+        venue_rows = venue_data.values() if isinstance(venue_data, dict) else venue_data
+        for venue in venue_rows:
             if isinstance(venue, dict):
                 label = venue.get("label", venue.get("venue"))
                 venue["races_observed"] = sum(x["venue"] == label for x in entries)
+        if json.dumps(status, ensure_ascii=False, sort_keys=True) != before_status:
+            status["updated_at"] = dt.datetime.now(JST).isoformat(timespec="seconds")
         write_if_changed(STATUS, status)
     print(f"Shadow publish audit passed: {len(entries)} predictions, {len(analyses)} analyses")
 
