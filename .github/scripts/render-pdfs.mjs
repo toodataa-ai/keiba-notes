@@ -86,6 +86,18 @@ function restoreCanonicalStyledReports() {
 
 restoreCanonicalStyledReports();
 
+// Preserve the visitor counter when restoring immutable authored HTML sources.
+// The canonical source hash is checked before adding this non-printing script.
+for (const name of fs.readdirSync(reportsDir).filter(file => file.endsWith('.html'))) {
+  const reportPath = path.join(reportsDir, name);
+  const authoredHtml = fs.readFileSync(reportPath, 'utf8');
+  if (!authoredHtml.includes('visitor-counter.js') && authoredHtml.includes('</body>')) {
+    const tag = '<script src="../assets/visitor-counter.js?v=20261006-1" defer></script>';
+    fs.writeFileSync(reportPath, authoredHtml.replace('</body>', `  ${tag}\n</body>`));
+    console.log(`Preserved visitor counter in ${name}`);
+  }
+}
+
 function getHorseCount(html) {
   const declared = Number(html.match(/data-horse-count="(\d+)"/)?.[1] || 0);
   if (declared) return declared;
