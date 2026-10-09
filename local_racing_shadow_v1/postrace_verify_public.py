@@ -63,7 +63,7 @@ def main(date, retries, delay):
 
 if __name__=="__main__":
     ap=argparse.ArgumentParser()
-    ap.add_argument("--date",default="2026-10-08")
+    ap.add_argument("--date",required=True)
     ap.add_argument("--retries",type=int,default=15)
     ap.add_argument("--delay",type=int,default=12)
     args=ap.parse_args()

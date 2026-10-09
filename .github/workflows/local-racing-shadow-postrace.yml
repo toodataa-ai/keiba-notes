@@ -3,16 +3,13 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/local-racing-shadow-postrace.yml'
-      - 'local_racing_shadow_v1/postrace.py'
-      - 'local_racing_shadow_v1/postrace_audit.py'
-      - 'local_racing_shadow_v1/postrace_verify_public.py'
+      - 'local_racing_shadow_v1/postrace_request.json'
   workflow_dispatch:
     inputs:
       date:
         description: 'JST race date (YYYY-MM-DD)'
-        required: true
-        default: '2026-10-09'
+        required: false
+        default: ''
         type: string
       race_id:
         description: 'Retry only one failed race_id; blank = all unresolved'
@@ -26,8 +23,6 @@ concurrency:
   cancel-in-progress: false
 jobs:
   official-postrace:
-    # An explicit recovery-marker push runs only the target race, avoiding future accidental stale-date runs.
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shadow-postrace:2026-10-09]')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -39,26 +34,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Test safe JST date/race selectors
+        run: python local_racing_shadow_v1/resolve_postrace_request.py --self-test
+      - name: Resolve dated ChatGPT request or manual workflow inputs
+        id: request
+        env:
+          POSTRACE_EVENT: ${{ github.event_name }}
+          POSTRACE_INPUT_DATE: ${{ inputs.date }}
+          POSTRACE_INPUT_RACE_ID: ${{ inputs.race_id }}
+        run: python local_racing_shadow_v1/resolve_postrace_request.py
       - name: Install isolated NAR parser dependencies
         run: python -m pip install requests beautifulsoup4
-      - name: Verify postrace prompt and scope
-        env:
-          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
-        run: |
-          python - <<'PY'
-          import json, os
-          from pathlib import Path
-          cfg=json.loads(Path("local_racing_shadow_v1/config.json").read_text())
-          assert cfg["production_effect"] is False
-          assert cfg["prompts"]["post_race"] == "local_racing_shadow_v1/shadow_review_prompt_v0_2.txt"
-          assert len(list(Path("local_racing_shadow_v1/predictions",os.environ["RACE_DATE"]).glob("*.json"))) > 0
-          PY
       - name: Join official NAR results and write only missing reviewed artifacts
         id: generate
         shell: bash
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
-          RACE_ID: ${{ inputs.race_id || (github.event_name == 'push' && '20261009-oi-03') || '' }}
+          RACE_DATE: ${{ steps.request.outputs.date }}
+          RACE_ID: ${{ steps.request.outputs.race_id }}
         run: |
           set +e
           if [ -n "$RACE_ID" ]; then
@@ -76,15 +68,18 @@ jobs:
       - name: Validate strictly isolated changes before writing
         run: |
           git status --short
-          git diff --name-only | python -c 'import sys; paths=[x.strip() for x in sys.stdin if x.strip()]; allowed=("local_racing_shadow_v1/results/","local_racing_shadow_v1/reviews/","local_racing_shadow_v1/analysis/","local_racing_shadow_v1/diagnostics/"); assert all(x.startswith(allowed) for x in paths), f"Unexpected working-tree edits: {paths}"'
+          git status --porcelain --untracked-files=all | sed 's/^...//' | python -c 'import sys; paths=[x.strip() for x in sys.stdin if x.strip()]; allowed=("local_racing_shadow_v1/results/","local_racing_shadow_v1/reviews/","local_racing_shadow_v1/analysis/","local_racing_shadow_v1/diagnostics/"); assert all(x.startswith(allowed) for x in paths), f"Unexpected working-tree edits: {paths}"'
           git diff --exit-code -- local_racing_shadow_v1/predictions
       - name: Commit independent results, reviews, analysis and diagnostics
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add local_racing_shadow_v1/results local_racing_shadow_v1/reviews local_racing_shadow_v1/analysis local_racing_shadow_v1/diagnostics
+          git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; allowed=("local_racing_shadow_v1/results/","local_racing_shadow_v1/reviews/","local_racing_shadow_v1/analysis/","local_racing_shadow_v1/diagnostics/"); assert all(x.startswith(allowed) for x in p), f"Unexpected staged files: {p}"'
           if ! git diff --cached --quiet; then
-            git commit -m "Save official local NAR POST-RACE reviews for 2026-10-09"
+            git commit -m "Save official local NAR POST-RACE reviews for $RACE_DATE"
             git push
           fi
       - name: Audit prediction proof and publish reviewed mirrors and manifest
@@ -93,7 +88,7 @@ jobs:
         id: audit
         shell: bash
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
+          RACE_DATE: ${{ steps.request.outputs.date }}
         run: |
           set +e
           python local_racing_shadow_v1/postrace_audit.py --date "$RACE_DATE" --published
@@ -104,23 +99,26 @@ jobs:
           fi
           echo "audit_exit=$code" >> "$GITHUB_OUTPUT"
       - name: Commit only local Shadow public artifacts
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
         run: |
           git diff --exit-code -- local_racing_shadow_v1/predictions
           git add docs/data/local-racing-shadow docs/data/local_racing_shadow_public.json docs/data/local_racing_shadow_status.json
+          git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; allowed=("docs/data/local-racing-shadow/","docs/data/local_racing_shadow_public.json","docs/data/local_racing_shadow_status.json"); assert all(x.startswith(allowed) for x in p), f"Unexpected staged public files: {p}"'
           if ! git diff --cached --quiet; then
-            git commit -m "Publish audited local NAR post-race reports for 2026-10-09"
+            git commit -m "Publish audited local NAR post-race reports for $RACE_DATE"
             git push
           fi
       - name: Recheck committed audit after publication
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
+          RACE_DATE: ${{ steps.request.outputs.date }}
         run: |
           python local_racing_shadow_v1/publish_audit.py
           python local_racing_shadow_v1/postrace_audit.py --date "$RACE_DATE" --published || test "$?" -eq 2
           test -z "$(git status --porcelain)"
       - name: Verify live published GitHub Pages files, not just Actions success
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
+          RACE_DATE: ${{ steps.request.outputs.date }}
         run: python local_racing_shadow_v1/postrace_verify_public.py --date "$RACE_DATE"
       - name: Fail workflow if even one requested review is unresolved
         if: always() && steps.audit.outcome == 'success'

@@ -120,3 +120,15 @@ Daily Shadow → repeated finding → transferable candidate → JRA historical/
 - 既存の `publish_audit.py` は保存済みファイルを検査・公開ミラーへ複写する機能であり、NAR公式結果の取得・回顧生成を実行しない。GitHub Actionsが緑でも回顧完了を意味しない。
 - 完了条件: 対象の全レースについて発走前proof検証済み、NAR公式確定成績と一意JOIN済み、result/review/day-summary保存済み、GitHub commitと公開manifest、公開ミラーの内容照合済みであること。未完了が1件でもあればPARTIALまたはBLOCKEDと報告する。
 - 回顧実行でJRA関連ファイルと保存済みpredictionに変更を加えない。
+
+
+## POST-RACE manual ChatGPT dispatch (generic workflow, 2026-10)
+
+- Keep the canonical POST-RACE specification at config.json -> prompts.post_race (v0.2).
+- To run from ChatGPT, resolve the user's target date in JST. Create or update local_racing_shadow_v1/postrace_request.json as the ONLY changed file in a standalone commit. No separate GitHub UI interaction is needed if GitHub write access is available.
+- The request is JSON: {"schema_version":1,"scope":"POST-RACE","date":"YYYY-MM-DD","race_id":null,"request_seq":1,"production_effect":false}. Increase request_seq for each subsequent request, even retrying the same date. Use null race_id for all eligible records; use an exact local-race ID only for isolated recovery.
+- Only a postrace_request.json-only commit triggers POST-RACE on push. Normal source edits do not automatically start a recovery against stale dates.
+- GitHub Actions workflow_dispatch also works. Its date field uses the PREVIOUS JST DAY if left blank; ChatGPT push requests always supply an explicit JST date.
+- No frozen prediction for target date: BLOCKED_NO_PREDICTIONS, never create hindsight predictions. Existing reviewed artifacts are verified and reused; conflicts are blocked, not overwritten.
+- Verify official NAR finish data, immutable proof, result/review/analysis commits, public manifest, GitHub Pages live bytes, and all race IDs. One unresolved race causes FAILED/PARTIAL, not SUCCESS.
+- The request file controls POST-RACE ONLY; it cannot trigger PRE-RACE and must never change JRA-related assets or frozen predictions. PRE-RACE new-day population needs its own separately approved execution flow.

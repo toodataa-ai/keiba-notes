@@ -106,7 +106,7 @@ def audit(date, published):
 
 if __name__=="__main__":
     ap=argparse.ArgumentParser()
-    ap.add_argument("--date",default="2026-10-08")
+    ap.add_argument("--date",required=True)
     ap.add_argument("--published",action="store_true")
     args=ap.parse_args()
     try: sys.exit(audit(args.date,args.published))
