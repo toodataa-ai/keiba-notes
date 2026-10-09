@@ -1,0 +1,94 @@
+{
+  "race_id": "20261009-sonoda-02",
+  "date": "2026-10-09",
+  "venue": "園田",
+  "prediction_path": "local_racing_shadow_v1/predictions/2026-10-09/20261009-sonoda-02.json",
+  "result_path": "local_racing_shadow_v1/results/2026-10-09/20261009-sonoda-02.json",
+  "prediction_sha256": "dd8eed925ba34fb6a906a86e65962d650ad8459ee5cd40cc8a48e488046e7353",
+  "proof_commit": "65da1462c316775d8189c90bcc5ecde3076466ef",
+  "top_pick": {
+    "horse_no": 5,
+    "horse_name": "ゴッズフェイヴリト"
+  },
+  "actual_top_pick_finish": 1,
+  "rank_comparison": [
+    {
+      "horse_no": 5,
+      "horse_name": "ゴッズフェイヴリト",
+      "predicted_rank": 1,
+      "actual_finish": 1,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 7,
+      "horse_name": "コパノジャマイカ",
+      "predicted_rank": 2,
+      "actual_finish": 4,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 4,
+      "horse_name": "スナップコール",
+      "predicted_rank": 3,
+      "actual_finish": 2,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 2,
+      "horse_name": "ブラーヴテン",
+      "predicted_rank": 4,
+      "actual_finish": 7,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 6,
+      "horse_name": "ラゲルサ",
+      "predicted_rank": 5,
+      "actual_finish": 6,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 3,
+      "horse_name": "ニッポンセーラ",
+      "predicted_rank": 6,
+      "actual_finish": 5,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 1,
+      "horse_name": "クールスカイ",
+      "predicted_rank": 7,
+      "actual_finish": 3,
+      "official_disposition": null
+    }
+  ],
+  "hit_metrics": {
+    "evaluable": true,
+    "top_pick_win": 1,
+    "top_pick_top3": 1,
+    "top_pick_rank_error": 0
+  },
+  "diagnostics": [
+    {
+      "classification": "evidence",
+      "finding": "Official finishing position compared against frozen pre-race ranking"
+    },
+    {
+      "classification": "unknown",
+      "finding": "Pre-race pace cannot be validated from finish order alone"
+    }
+  ],
+  "known_limitations": [
+    "No post-race hindsight adjustment to the pre-race ranking",
+    "Single-day sample cannot establish transferable effects",
+    "Official incident narratives and bias not independently verified",
+    "Official splits are not interpreted unless separately verified"
+  ],
+  "predicted_pace": "M（仮説）",
+  "official_pace_evidence": null,
+  "source_urls": [
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=27&k_raceDate=2026%2F10%2F09&k_raceNo=2",
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=27&k_raceDate=2026%2F10%2F09"
+  ],
+  "review_status": "VERIFIED"
+}
