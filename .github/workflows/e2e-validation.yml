@@ -35,7 +35,10 @@ jobs:
       - name: Validate pinned prompt manifests
         run: python e2e_validation/validate_manifests.py
 
-      - name: Audit all nine JRA bet types for v3.3+ predictions\n        run: node .github/scripts/validate-bet-type-coverage.mjs\n\n      - name: Unit tests
+      - name: Audit all nine JRA bet types for v3.3+ predictions
+        run: node .github/scripts/validate-bet-type-coverage.mjs
+
+      - name: Unit tests
         run: |
           python -m unittest e2e_validation.test_evaluate -v
           python -m unittest experience_regime_v1.test_model -v
