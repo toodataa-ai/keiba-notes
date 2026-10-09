@@ -1,4 +1,4 @@
-name: Local Racing Shadow POST-RACE (NAR 2026-10-08)
+name: Local Racing Shadow POST-RACE (NAR)
 on:
   push:
     branches: [main]
@@ -12,7 +12,7 @@ on:
       date:
         description: 'JST race date (YYYY-MM-DD)'
         required: true
-        default: '2026-10-08'
+        default: '2026-10-09'
         type: string
       race_id:
         description: 'Retry only one failed race_id; blank = all unresolved'
@@ -26,6 +26,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   official-postrace:
+    # An explicit recovery-marker push runs only the target race, avoiding future accidental stale-date runs.
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[shadow-postrace:2026-10-09]')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -41,7 +43,7 @@ jobs:
         run: python -m pip install requests beautifulsoup4
       - name: Verify postrace prompt and scope
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-08' }}
+          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
         run: |
           python - <<'PY'
           import json, os
@@ -55,8 +57,8 @@ jobs:
         id: generate
         shell: bash
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-08' }}
-          RACE_ID: ${{ inputs.race_id || '' }}
+          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
+          RACE_ID: ${{ inputs.race_id || (github.event_name == 'push' && '20261009-oi-03') || '' }}
         run: |
           set +e
           if [ -n "$RACE_ID" ]; then
@@ -82,7 +84,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add local_racing_shadow_v1/results local_racing_shadow_v1/reviews local_racing_shadow_v1/analysis local_racing_shadow_v1/diagnostics
           if ! git diff --cached --quiet; then
-            git commit -m "Save official local NAR POST-RACE reviews for 2026-10-08"
+            git commit -m "Save official local NAR POST-RACE reviews for 2026-10-09"
             git push
           fi
       - name: Audit prediction proof and publish reviewed mirrors and manifest
@@ -91,7 +93,7 @@ jobs:
         id: audit
         shell: bash
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-08' }}
+          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
         run: |
           set +e
           python local_racing_shadow_v1/postrace_audit.py --date "$RACE_DATE" --published
@@ -106,19 +108,19 @@ jobs:
           git diff --exit-code -- local_racing_shadow_v1/predictions
           git add docs/data/local-racing-shadow docs/data/local_racing_shadow_public.json docs/data/local_racing_shadow_status.json
           if ! git diff --cached --quiet; then
-            git commit -m "Publish audited local NAR post-race reports for 2026-10-08"
+            git commit -m "Publish audited local NAR post-race reports for 2026-10-09"
             git push
           fi
       - name: Recheck committed audit after publication
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-08' }}
+          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
         run: |
           python local_racing_shadow_v1/publish_audit.py
           python local_racing_shadow_v1/postrace_audit.py --date "$RACE_DATE" --published || test "$?" -eq 2
           test -z "$(git status --porcelain)"
       - name: Verify live published GitHub Pages files, not just Actions success
         env:
-          RACE_DATE: ${{ inputs.date || '2026-10-08' }}
+          RACE_DATE: ${{ inputs.date || '2026-10-09' }}
         run: python local_racing_shadow_v1/postrace_verify_public.py --date "$RACE_DATE"
       - name: Fail workflow if even one requested review is unresolved
         if: always() && steps.audit.outcome == 'success'

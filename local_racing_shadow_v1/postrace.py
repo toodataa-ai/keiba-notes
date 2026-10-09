@@ -150,6 +150,10 @@ def parse_official(soup, p):
         # a verifiable unambiguous substring, including omitted reading parentheses.
         normalized = clean(re.sub(r"[（(][^）)]{1,16}[）)]", "", official_name))
         abbreviated = clean(p["race_name"])
+        # NAR pre-race titles may begin with JRA-designation "J指", omitted
+        # by official results. Ignore only this exact leading qualifier.
+        normalized = re.sub(r"^J指", "", normalized)
+        abbreviated = re.sub(r"^J指", "", abbreviated)
         if len(abbreviated) < 6 or abbreviated not in normalized:
             raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
     body = soup.get_text(" ", strip=True)
