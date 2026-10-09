@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.3",
+  "source_commit": "aeabd5871239d286d8684b8a460b3e0623eeaf88",
+  "components": [
+    {
+      "path": "競馬予想_完全版プロンプト_v3.0.txt",
+      "git_blob_sha": "8cb18e5cd2bab88bfaf5a04f103a402acb9aac90",
+      "role": "base_prompt"
+    },
+    {
+      "path": "closing_index_v1/production_profile_v1_1.json",
+      "git_blob_sha": "a72db216545cc481644c8f066b52e66c9b0083eb",
+      "role": "aci_production_profile"
+    },
+    {
+      "path": "closing_index_v1/adoption_decision_v1_1.json",
+      "git_blob_sha": "831bebfb4133856bd9284901594ecea30cc7ba27",
+      "role": "aci_adoption_decision"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.1.txt",
+      "git_blob_sha": "688ff0c06a441ca2634c73810aa2708bcbdec949",
+      "role": "aci_delta_prompt"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.2.txt",
+      "git_blob_sha": "1c2feb336575376c0736f78e7313ac7301e197e7",
+      "role": "final_bet_decision_delta"
+    },
+    {
+      "path": "docs/data/bet_type_coverage_policy_v1.json",
+      "git_blob_sha": "f88a1c8678853b5401e0d41e9404c42110813168",
+      "role": "bet_type_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.3.txt",
+      "git_blob_sha": "28479c99b02932739890e7b22de8e8fe043a9eac",
+      "role": "all_bet_types_delta"
+    }
+  ],
+  "note": "v3.3 adds nine official JRA ticket types (including event-level WIN5), verified candidate odds, machine-checkable market-coverage rows. Past v3.2 predictions and the existing E2E comparison remain immutable."
+}

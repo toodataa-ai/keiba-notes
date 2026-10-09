@@ -1,6 +1,6 @@
 {
-  "version": "v3.2",
-  "path": "競馬予想_完全版プロンプト_v3.2.txt",
-  "updated_at": "2026-10-07T07:22:00+09:00",
-  "rule": "Every prediction task must resolve this pointer first. Never infer the latest version from filename order alone. Whenever version or path is changed because the canonical prompt is improved, append a matching entry to docs/data/prompt_history.json in the same update. The history entry must state what changed and why; old history entries must not be overwritten. v3.2 is a modular delta prompt and must load the inherited v3.0 base, v3.1 ACI delta, and the production/adoption files explicitly listed in v3.2."
+  "version": "v3.3",
+  "path": "競馬予想_完全版プロンプト_v3.3.txt",
+  "updated_at": "2026-10-10T08:51:45.872+09:00",
+  "rule": "Resolve this pointer first. v3.3 loads v3.0 base, ACI v3.1, final-purchase v3.2, bet_type_coverage_policy_v1.json and the v3.3 all-nine-type delta. Maintain matching append-only prompt_history. Do not change frozen older predictions or E2E comparison."
 }

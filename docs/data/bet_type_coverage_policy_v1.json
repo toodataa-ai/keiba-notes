@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_bet_type_coverage_v1",
+  "effective_prompt_version": "v3.3",
+  "source_urls": [
+    "https://www.jra.go.jp/faq/pop03/1_5.html",
+    "https://www.jra.go.jp/kouza/baken/",
+    "https://www.jra.go.jp/kouza/win5/info/racelist.html"
+  ],
+  "race_local_types": [
+    "単勝",
+    "複勝",
+    "枠連",
+    "馬連",
+    "馬単",
+    "ワイド",
+    "三連複",
+    "三連単"
+  ],
+  "cross_race_types": [
+    "WIN5"
+  ],
+  "statuses": [
+    "evaluated",
+    "unpriced",
+    "probability_unavailable",
+    "not_offered",
+    "separate_event_pending",
+    "unpriced_by_design",
+    "not_applicable"
+  ],
+  "required_evaluation_fields": [
+    "type",
+    "status",
+    "candidate",
+    "market_odds",
+    "source_url",
+    "observed_at",
+    "assessed_at",
+    "probability",
+    "probability_method",
+    "ev_multiple",
+    "decision",
+    "reason"
+  ],
+  "source_preferences": [
+    "JRA official",
+    "named dated secondary site"
+  ],
+  "win5_rules": "Cross-race ticket: require official day's five races and five STEP1 fixed forecasts. No fixed pre-race WIN5 odds. Saturday sales have been year-round from 2026-04-25; verify per-date published race list.",
+  "special_days": {
+    "2026-10-10": {
+      "all_bet_types_target_payout_rate_pct": 80,
+      "source": "https://jra.jp/news/202610/100402.html"
+    }
+  },
+  "legacy_protection": "Never alter any prereace v3.2-or-earlier prediction, final_bets, or proof_commit",
+  "completeness_rule": "All offered local ticket types need a grounded representative market quote and estimated joint probability. If major prices/probabilities missing, no claim of global best ticket.",
+  "notes": "Evaluations are assessments, not instructions to buy all nine types. WIN5 is handled at the meeting/date level."
+}
