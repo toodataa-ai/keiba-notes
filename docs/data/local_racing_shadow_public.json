@@ -2,7 +2,7 @@
   "schema_version": 1,
   "mode": "local_daily_shadow_public_view",
   "production_effect": false,
-  "updated_at": "2026-10-09T22:11:32+09:00",
+  "updated_at": "2026-10-09T22:21:45+09:00",
   "model_version": "local-daily-shadow-v0.1",
   "notice": "地方競馬Shadowは研究用です。JRA正式予想・正式成績には直接反映しません。発走前predictionは結果確定後も改変しません。",
   "venues": [
@@ -673,13 +673,13 @@
       "distance": 1600,
       "class": "Ｊ指 とき特別２歳一 二選抜",
       "scheduled_start_at": "2026-10-09T16:40:00+09:00",
-      "status": "predicted",
+      "status": "reviewed",
       "model_version": "local-daily-shadow-v0.1",
       "information_cutoff_at": "2026-10-09T08:21:52+09:00",
       "proof_commit": "65da1462c316775d8189c90bcc5ecde3076466ef",
       "prediction_path": "data/local-racing-shadow/predictions/2026-10-09/20261009-oi-03.json",
-      "result_path": null,
-      "review_path": null,
+      "result_path": "data/local-racing-shadow/results/2026-10-09/20261009-oi-03.json",
+      "review_path": "data/local-racing-shadow/reviews/2026-10-09/20261009-oi-03.json",
       "preview": {
         "top_pick": {
           "horse_no": 6,
@@ -1186,15 +1186,15 @@
     {
       "date": "2026-10-09",
       "scope": "predictions_with_valid_proof_only",
-      "reviewed_races": 21,
+      "reviewed_races": 22,
       "summary": {
-        "reviewed": 21,
-        "evaluable": 21,
+        "reviewed": 22,
+        "evaluable": 22,
         "top_pick_wins": 5,
-        "top_pick_top3": 12,
-        "win_rate": 0.238095,
-        "top3_rate": 0.571429,
-        "mean_absolute_top_pick_rank_error": 2.761905,
+        "top_pick_top3": 13,
+        "win_rate": 0.227273,
+        "top3_rate": 0.590909,
+        "mean_absolute_top_pick_rank_error": 2.727273,
         "small_sample_warning": true
       },
       "findings": [],
