@@ -4,10 +4,10 @@
   "scope": "predictions_with_valid_proof_only",
   "expected_predictions": 22,
   "eligible_predictions": 22,
-  "completed_reviews": 21,
+  "completed_reviews": 1,
   "pending": 0,
-  "blocked": 1,
-  "skipped_existing": 0,
+  "blocked": 0,
+  "skipped_existing": 21,
   "by_venue": {
     "園田": {
       "reviewed": 12,
@@ -20,13 +20,13 @@
       "small_sample_warning": true
     },
     "大井": {
-      "reviewed": 9,
-      "evaluable": 9,
+      "reviewed": 10,
+      "evaluable": 10,
       "top_pick_wins": 2,
-      "top_pick_top3": 6,
-      "win_rate": 0.222222,
-      "top3_rate": 0.666667,
-      "mean_absolute_top_pick_rank_error": 3.111111,
+      "top_pick_top3": 7,
+      "win_rate": 0.2,
+      "top3_rate": 0.7,
+      "mean_absolute_top_pick_rank_error": 3.0,
       "small_sample_warning": true
     }
   },
@@ -72,10 +72,10 @@
       "small_sample_warning": true
     },
     "1600": {
-      "reviewed": 2,
-      "evaluable": 2,
+      "reviewed": 3,
+      "evaluable": 3,
       "top_pick_wins": 0,
-      "top_pick_top3": 2,
+      "top_pick_top3": 3,
       "win_rate": 0.0,
       "top3_rate": 1.0,
       "mean_absolute_top_pick_rank_error": 2.0,
@@ -102,21 +102,21 @@
       "small_sample_warning": true
     }
   },
-  "top_pick_win_rate": 0.238095,
-  "top_pick_top3_rate": 0.571429,
+  "top_pick_win_rate": 0.227273,
+  "top_pick_top3_rate": 0.590909,
   "ranking_error_summary": {
-    "top_pick_mean_absolute_rank_error": 2.761905,
-    "evaluable_n": 21
+    "top_pick_mean_absolute_rank_error": 2.727273,
+    "evaluable_n": 22
   },
-  "reviewed_races": 21,
+  "reviewed_races": 22,
   "summary": {
-    "reviewed": 21,
-    "evaluable": 21,
+    "reviewed": 22,
+    "evaluable": 22,
     "top_pick_wins": 5,
-    "top_pick_top3": 12,
-    "win_rate": 0.238095,
-    "top3_rate": 0.571429,
-    "mean_absolute_top_pick_rank_error": 2.761905,
+    "top_pick_top3": 13,
+    "win_rate": 0.227273,
+    "top3_rate": 0.590909,
+    "mean_absolute_top_pick_rank_error": 2.727273,
     "small_sample_warning": true
   },
   "evidence_based_findings": [
@@ -132,6 +132,7 @@
     "review_ids": [
       "20261009-oi-01",
       "20261009-oi-02",
+      "20261009-oi-03",
       "20261009-oi-04",
       "20261009-oi-05",
       "20261009-oi-06",
@@ -152,9 +153,7 @@
       "20261009-sonoda-11",
       "20261009-sonoda-12"
     ],
-    "unresolved_ids": [
-      "20261009-oi-03"
-    ],
+    "unresolved_ids": [],
     "ineligible_proof_ids": []
   }
 }
