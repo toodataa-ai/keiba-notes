@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-04T17:37:00+09:00",
+  "updated_at": "2026-10-10T08:11:52+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -476,6 +476,105 @@
         ]
       },
       "review": "◎ダノンシーマ9着、○ディープモンスター4着、▲アクアヴァーナル3着。最大の改善点は馬場。実際は雨・稍重で、良前提の速度/位置/進路評価がずれた。さらに勝ち馬12エコロディノスは全頭診断で『京都2200m3着』『キタサンブラック産駒で距離延長余地』『反発候補』『好位可』まで抽出していたのに総合B・×に留めた。2着10マイネルエンペラーも『京都2400直接実績への回帰』『反発候補』『ピーク時G1級持続力』を認識済みで、条件変化復活監査の出力を印へ十分昇格できていない。一方▲6は3着で、斤量55kg・京都長距離適性・休み明けの評価は妥当。◎18は大外18番かつ稍重で、能力最上位を条件不利が上回るシナリオの重み不足。予見可能な改善は、当日降雨による馬場更新、直接/近似コース実績と反発候補の昇格ルール、外枠×馬場悪化の複合リスク。11番人気12の勝ち切り自体の大きさは分散要素として残す。推奨7点は全て不的中、各100円換算で投資700円・払戻0円。"
+    },
+    {
+      "id": "2026-10-10-saudi-arabia-royal-cup",
+      "date": "2026-10-10",
+      "venue": "東京",
+      "race": "サウジアラビアロイヤルカップ",
+      "scope": "jra-main",
+      "prompt_version": "v3.2",
+      "status": "predicted",
+      "source": "official-prerace-fixed",
+      "eligible_for_learning": true,
+      "field_size": 11,
+      "report": "reports/2026-10-10-saudi-arabia-royal-cup.html",
+      "pdf": "pdfs/2026-10-10-saudi-arabia-royal-cup.pdf",
+      "pdf_mode": "full",
+      "marks": {
+        "win": "5 フィリオソラーレ",
+        "second": "6 ベルウッドディープ",
+        "third": "9 ジップスパーク"
+      },
+      "bets": [
+        "単勝 6",
+        "単勝 9"
+      ],
+      "purchase_decision": "buy",
+      "best_bet_id": "B02",
+      "total_stake_yen": 200,
+      "final_bets_fixed_at": "2026-10-10T08:11:52+09:00",
+      "final_bets": [
+        {
+          "id": "B01",
+          "type": "単勝",
+          "selection": [
+            6
+          ],
+          "stake_yen": 100,
+          "layer": "ability_core",
+          "reason": "同コース直接実績と追走能力。早朝5.0倍に対し主観的勝率22％、概算倍率期待値1.10。"
+        },
+        {
+          "id": "B02",
+          "type": "単勝",
+          "selection": [
+            9
+          ],
+          "stake_yen": 100,
+          "layer": "value_add",
+          "reason": "マイル末脚能力と7.6倍の価格乖離。主観的勝率17％、概算倍率期待値1.29。ただし東京初挑戦の不確実性あり。"
+        }
+      ],
+      "step1_fixed_at": "2026-10-10T08:08:29+09:00",
+      "step1_snapshot": "e2e_validation/step1/2026-10-10-saudi-arabia-royal-cup.json",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.2.json",
+      "market_snapshot_at": "2026-10-10T07:47:00+09:00",
+      "note": "STEP1 and final_bets fixed before scheduled start; official results not used."
+    },
+    {
+      "id": "2026-10-10-mimuro-stakes",
+      "date": "2026-10-10",
+      "venue": "京都",
+      "race": "御陵ステークス",
+      "scope": "jra-main",
+      "prompt_version": "v3.2",
+      "status": "predicted",
+      "source": "official-prerace-fixed",
+      "eligible_for_learning": true,
+      "field_size": 13,
+      "report": "reports/2026-10-10-mimuro-stakes.html",
+      "pdf": "pdfs/2026-10-10-mimuro-stakes.pdf",
+      "pdf_mode": "full",
+      "marks": {
+        "win": "11 サイモンシュバリエ",
+        "second": "13 サンライズケヴィン",
+        "third": "5 リベッチオ"
+      },
+      "bets": [
+        "単勝 11"
+      ],
+      "purchase_decision": "buy",
+      "best_bet_id": "B01",
+      "total_stake_yen": 100,
+      "final_bets_fixed_at": "2026-10-10T08:11:52+09:00",
+      "final_bets": [
+        {
+          "id": "B01",
+          "type": "単勝",
+          "selection": [
+            11
+          ],
+          "stake_yen": 100,
+          "layer": "ability_core",
+          "reason": "京都ダ1800m複数回の好走と現級再挑戦。早朝7.4倍と主観的勝率19％から概算倍率期待値1.41。"
+        }
+      ],
+      "step1_fixed_at": "2026-10-10T08:08:31+09:00",
+      "step1_snapshot": "e2e_validation/step1/2026-10-10-mimuro-stakes.json",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.2.json",
+      "market_snapshot_at": "2026-10-10T08:04:00+09:00",
+      "note": "STEP1 and final_bets fixed before scheduled start; official results not used."
     }
   ]
 }
