@@ -1,0 +1,38 @@
+name: Validate v3.4 JRA purchase decision gate
+on:
+  push:
+    branches: [main]
+    paths:
+      - '競馬予想_完全版プロンプト_v3.4.txt'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/purchase_gate_policy_v1.json'
+      - '.github/scripts/validate-purchase-gate-v34.mjs'
+      - '.github/scripts/test-purchase-gate-v34.mjs'
+      - '.github/workflows/validate-v34-purchase-gate.yml'
+      - 'e2e_validation/predictions/**'
+  pull_request:
+    paths:
+      - '競馬予想_完全版プロンプト_v3.4.txt'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/purchase_gate_policy_v1.json'
+      - '.github/scripts/validate-purchase-gate-v34.mjs'
+      - '.github/scripts/test-purchase-gate-v34.mjs'
+      - '.github/workflows/validate-v34-purchase-gate.yml'
+      - 'e2e_validation/predictions/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise independent WIN5 vs local purchase gate
+        run: node .github/scripts/test-purchase-gate-v34.mjs
+      - name: Validate all saved v3.4+ purchase decisions
+        run: node .github/scripts/validate-purchase-gate-v34.mjs
+      - name: Verify legacy nine-type coverage rules are retained
+        run: node .github/scripts/validate-bet-type-coverage.mjs
