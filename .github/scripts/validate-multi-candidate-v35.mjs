@@ -26,7 +26,7 @@ export function validateMultiCandidate35(data){
   for(const [i,c] of comparisons.entries()){
     const loc='comparison['+i+']';
     if(!TYPES.includes(c.type)){err(loc+' invalid type or WIN5');continue;}
-    if(!Array.isArray(c.selection)||!c.selection.length||c.selection.some(n=>!Number.isInteger(n)||n<1)||new Set(c.selection).size!==c.selection.length)err(loc+' invalid selection');
+    if(!Array.isArray(c.selection)||!c.selection.length||c.selection.some(n=>!Number.isInteger(n)||n<1)||(c.type!=='枠連'&&new Set(c.selection).size!==c.selection.length))err(loc+' invalid selection');
     if(['三連複','三連単'].includes(c.type)&&c.selection.length!==3)err(loc+' must have 3 selections');
     if(['馬単','馬連','枠連','ワイド'].includes(c.type)&&c.selection.length!==2)err(loc+' must have 2 selections');
     if(['単勝','複勝'].includes(c.type)&&c.selection.length!==1)err(loc+' must have 1 selection');
