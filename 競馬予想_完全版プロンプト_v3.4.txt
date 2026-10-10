@@ -1,5 +1,5 @@
 競馬予想・完全版プロンプト v3.4
-【8券種の独立購入判断・WIN5分離・不確実性を明示した価格比較】
+【通常8券種・根拠付き連系的中確率・独立判断】
 
 作成日：2026-10-10
 変更分類：ユーザー指摘に基づくSTEP2購入判断ゲート修正。旧予想の再評価や差替えではない。
@@ -18,17 +18,17 @@
 8. docs/data/purchase_gate_policy_v1.json
 9. 本v3.4差分
 
-v3.0〜3.3の①〜⑨、STEP1とオッズの分離、事前の印固定、ACI、実オッズの証拠、9券種比較表、WIN5独立集約、1点原則100円、HTML/PDF、結果後の原本不変を継承する。
+v3.0〜3.3のSTEP1、①〜⑨、ACI、価格証拠、通常8券種比較、最終購入固定、HTML/PDF、原本不変を継承する。ただし、ユーザーの明示指示によりWIN5はv3.4から対象外とする。過去v3.3の全9券種比較は歴史的記録として維持する。
 ただし、v3.3 [ALL-09] の「主要な一部券種の価格/確率が欠落したら、原則レース全体を情報不足passにする」部分を[FIX-01]〜[FIX-12]で置換する。
 これらのルールとv3.3が衝突するときは、本v3.4を優先する。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-■ 1. 3つの独立軸
+■ 1. 通常8券種の独立評価
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 [FIX-01] 次の3つを混同しない。
  A. market_coverage_status：8券種全体の比較完了度（complete/incomplete）。未確認を明記する客観的な監査指標。
  B. local purchase gate：当該レースの通常8券種の各代表候補が購入判断できるか（候補単位）。
- C. WIN5 cross-event gate：その日のJRA指定5レースの独立した購入判断（race-localの購入ゲートへ連動させない）。
+ C. WIN5：v3.4では完全に対象外。分析・比較表・購入判定・追加レース評価を行わない。
 
 8券種のうち1券種が未確認でも、それだけで他の券種を不適格としない。WIN5の未完了によって各メインの単勝・馬連などを見送ることは絶対にしない。
 各券種の未確認は「部分的な比較未完了」として透明に記録し、「全券種中の真の最適」と宣言しない。
@@ -36,7 +36,7 @@ v3.0〜3.3の①〜⑨、STEP1とオッズの分離、事前の印固定、ACI�
 [FIX-02] 必ず8券種すべての「代表候補/発売可否/市場価格/確率の手法と信頼度/評価/採否」を記録する。
 価格が取得不能な券種は unpriced でEV=nullとし、その券種だけ対象外にする。
 確率評価不能な券種は probability_unavailable と記録する。その欠落を別券種へ伝染させない。
-WIN5のstatusは not_offered、separate_event_pending、unpriced_by_design 等を開催日単位で記録する。WIN5だけが未完了なら通常8券種の購入判断は継続する。
+WIN5のstatusや別ファイルを新規作成しない。通常8券種のみで完結させる。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ 2. 券種別の購入資格（candidate-level）
@@ -71,7 +71,7 @@ EVが高い、あるいは1を上回ったという一点のみでは買わな�
 [FIX-07] 価格付きで資格を満たすローカル候補が1つ以上ある場合、レースの購入判定を必ず行う（buyかpass）。
 market_coverage_status=incomplete、未確認券種あり、WIN5未完了、JRA公式クロスチェック未完了、それぞれ単独を一律pass条件としない。
 買うか見送るかは、適格な候補の期待値と信頼度・レース条件・資金の比較で決める。信頼できる候補がなければ情報不足passとする。
-なお一部券種欠落時に「全9券種中で最適」と書くことは禁止。「確認済み購入適格候補の中で最優先」と表記する。
+なお一部券種欠落時に「確認済み8券種で最適」と書くことは禁止。「確認済み購入適格候補の中で最優先」と表記する。
 
 [FIX-08] 判定の理由を排他的なコードとして1つ保存する：
  purchase_decision: buy / pass（v3.2互換を維持）
@@ -92,11 +92,10 @@ reference_priority_candidateは独立して保持してよいが「参考・未�
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ 4. JSON/HTML/PDFの監査可能性
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[FIX-10] v3.4以降の各predictionには v3.3の9券種比較行に加えて、purchase_gateを保存する。
+[FIX-10] v3.4以降の各predictionには通常8券種の比較行に加えて、purchase_gateを保存する。
 purchase_gate：
  scope: "race_local_8types"
  local_coverage_status: complete / partial / none （市場価格の取得状況）
- win5_status: 発売/未完了等の参考情報（localの判定には絶対に使わない）
  candidates: [{type, selection, quote_verified, source_url, observed_at, probability_assessed, probability_method, uncertainty_assessed, ability_reason, edge_reason, risk_reason, eligibility:"eligible" / "ineligible", reason}]
 評価の判定根拠、リスク、候補に使った情報のURLと時点は監査可能な記録とする。
 purchase_reason_code、market_coverage_status、best_bet_id、final_bets、total_stake_yen、final_bets_fixed_at も必須。
@@ -104,7 +103,7 @@ buyなら最優先馬券とfinal_betsがその適格候補と一致すること�
 情報不足passはeligible候補がゼロの場合しか使用できない。
 数値が未確定ならnullを使う。undefined/NaN等をHTML/PDFへ表示しない。
 
-[FIX-11] HTML/PDFの全9券種比較表に、ローカル購入資格、候補別見送り理由、WIN5別判定とデータの欠落を明示する。
+[FIX-11] HTML/PDFの通常8券種比較表に、ローカル購入資格、候補別見送り理由とデータの欠落を明示する。
 レース内8券種が部分比較の場合「確認済み券種内の最優先」とする。最終購入判断に「情報不足」を使う場合は具体的に何が欠けたかを一覧で示す。
 PDFはA4縦、1頭1ページ、Meiryo UI、約13pt、既存評価色を維持しページ単位で検品。表示ラベルはJSON candidate.selectionから正規化して作成し、undefined/NaNを監査で拒否する。
 
@@ -122,7 +121,7 @@ PDFはA4縦、1頭1ページ、Meiryo UI、約13pt、既存評価色を維持し
 ■ 6. 回答時の最終表示
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 各競馬場ごとに次の順番：
-STEP1◎○▲と固定時刻、全9券種比較の完全/部分表示、8券種の適格候補数、WIN5独立判定、
+STEP1◎○▲と固定時刻、通常8券種比較の完全/部分表示、8券種の適格候補数、
 purchase_decisionとpurchase_reason_code、確認済み適格候補の中の最優先1点（買わない場合は参考候補と区別）、
 final_betsと合計円、HTML/PDF、GitHub証跡、ブロッカー。
 無理に買うことも、全部の検証が完成するまで機械的に全見送りにすることも禁止する。
