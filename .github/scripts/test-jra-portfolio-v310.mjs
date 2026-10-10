@@ -26,7 +26,13 @@ function build({large=false}={}){
  addStrategy(data,'S03','単勝','single',{selection:[1]},12);
  addStrategy(data,'S04','三連単','single',{selection:[1,2,3]},700);
  // Intentional overlap: original S01 quinella-wheel tickets repeated in another formation.
- addStrategy(data,'S05','馬連','formation',{slots:[[1],[2,3]]},i=>i===0?60:55);
+ const duplicate=addStrategy(data,'S05','馬連','formation',{slots:[[1],[2,3]]},i=>i===0?60:55);
+ // Source / timestamp and odds must be identical for deduplication, not silently best-priced.
+ for(const l of duplicate.lines){
+   const original=data.purchase_strategy_evaluations[0].lines.find(x=>ticketKey(x.type,x.selection)===ticketKey(l.type,l.selection));
+   if(original){l.market_odds=original.market_odds;l.source_url=original.source_url;l.observed_at=original.observed_at;}
+ }
+ Object.assign(duplicate,evaluateStrategy(duplicate.lines,data.outcome_distributions,data.frame_map,data.race_context));
  if(large)addStrategy(data,'S06','三連単','box',{horses:[1,2,3,4,5]},750);
  const optimal=optimizePurchasePortfolio({
   budget_yen:6000,strategies:data.purchase_strategy_evaluations,outcome_distributions:data.outcome_distributions,
