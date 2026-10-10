@@ -12,7 +12,7 @@ const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const n=x=>typeof x==='number'&&Number.isFinite(x);
 const lowerOdds=x=>n(x)&&x>1?x:Array.isArray(x)&&x.length===2&&x.every(v=>n(v)&&v>1)&&x[0]<=x[1]?x[0]:null;
 const near=(a,b)=>n(a)&&Math.abs(a-b)<=Math.max(0.000001,Math.abs(b)*0.000001);
-export const isV38=v=>{const m=/^v(\d+)\.(\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=8);};
+export const isV38=v=>v==='v3.8';
 
 function orderedTriples(def,kind){
  const out=[],add=a=>{if(a.length===3&&a.every(x=>Number.isInteger(x)&&x>0)&&new Set(a).size===3)out.push(a);};

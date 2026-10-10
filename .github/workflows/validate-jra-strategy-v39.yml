@@ -1,0 +1,58 @@
+name: Validate JRA v3.9 all eight ticket strategies
+on:
+  push:
+    branches: [main]
+    paths:
+      - '競馬予想_完全版プロンプト_v3.9.txt'
+      - 'docs/data/all_bet_strategy_policy_v1.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'e2e_validation/manifests/v3.9.json'
+      - '.github/scripts/jra-strategy-engine-v39.mjs'
+      - '.github/scripts/validate-jra-strategy-v39.mjs'
+      - '.github/scripts/test-jra-strategy-v39.mjs'
+      - '.github/scripts/validate-jra-strategy-prompt-v39.mjs'
+      - 'e2e_validation/predictions/**'
+  pull_request:
+    paths:
+      - '競馬予想_完全版プロンプト_v3.9.txt'
+      - 'docs/data/all_bet_strategy_policy_v1.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'e2e_validation/manifests/v3.9.json'
+      - '.github/scripts/**'
+      - 'e2e_validation/predictions/**'
+      - '.github/workflows/validate-jra-strategy-v39.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check pinned formal source, unchanged prior versions, and mode registry
+        run: |
+          node .github/scripts/validate-jra-strategy-prompt-v39.mjs
+          node .github/scripts/validate-prompt-history.mjs
+      - name: Exercise 8-type modes, exact amount, co-winning events and failures
+        run: |
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/validate-jra-strategy-v39.mjs
+      - name: Maintain previous version regression
+        run: |
+          node .github/scripts/test-jra-strategy-v38.mjs
+          node .github/scripts/validate-jra-strategy-v38.mjs
+          node .github/scripts/test-multi-candidate-v35.mjs
+          node .github/scripts/test-purchase-gate-v34.mjs
+          node .github/scripts/test-jra-conditional-ticket-probability.mjs
+          node .github/scripts/validate-jra-strategy-prompt-v38.mjs
+          node .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-one-shot-v36.mjs
+      # Older fixed 2026-10-10 v3.6 snapshots have known mismatched legacy fields.
+      # Those standalone archived-file scan workflows remain FAIL and are not rewritten by v3.9.
