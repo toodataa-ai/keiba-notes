@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const TYPES=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単'];
-const ALL=[...TYPES,'WIN5'];
+const ALL=TYPES;
 const REASONS=['bought','no_value','risk_high','insufficient_local_information'];
 const PASS_REASONS=['no_value','risk_high','insufficient_local_information'];
 
@@ -21,15 +21,15 @@ export function validateV34(data) {
   const add=message=>errors.push(message);
   if(!isV34OrLater(data.prompt_version)) return errors;
   const rows=data.bet_type_evaluations;
-  if(!Array.isArray(rows)||rows.length!==9) { add('exactly nine bet_type_evaluations required'); return errors; }
-  if(ALL.some((type,i)=>rows[i]?.type!==type)) add('nine types missing/out of policy order');
+  if(!Array.isArray(rows)||rows.length!==8) { add('exactly eight bet_type_evaluations required; WIN5 excluded'); return errors; }
+  if(ALL.some((type,i)=>rows[i]?.type!==type)) add('eight local ticket types missing/out of policy order');
   const map=new Map(rows.map(r=>[r.type,r]));
   if(!['complete','incomplete'].includes(data.market_coverage_status)) add('invalid market_coverage_status');
   if(!dateValid(data.market_coverage_snapshot_at)) add('market_coverage_snapshot_at required');
   const gate=data.purchase_gate;
   if(!gate||gate.scope!=='race_local_8types') {add('purchase_gate.scope must be race_local_8types');return errors;}
   if(!['complete','partial','none'].includes(gate.local_coverage_status)) add('invalid local_coverage_status');
-  if(!nonempty(gate.win5_status)) add('WIN5 status must be independently reported');
+  if('win5_status' in gate || 'WIN5' in map) add('WIN5 is out of scope for v3.4');
   if(!Array.isArray(gate.candidates)) {add('purchase_gate.candidates array required');return errors;}
   const localEvaluated=TYPES.filter(t=>map.get(t)?.status==='evaluated');
   const complete=localEvaluated.length===8;
@@ -83,8 +83,7 @@ export function validateV34(data) {
     if(data.purchase_reason_code==='insufficient_local_information' && eligible.length>0) add('insufficient_local_information invalid when any local candidate is eligible (WIN5/coverage may be incomplete)');
     if(['no_value','risk_high'].includes(data.purchase_reason_code) && eligible.length===0) add('no_value/risk_high requires at least one eligible local candidate');
   }
-  // A local buy decision MUST NOT depend on WIN5 being complete.
-  // It is valid to buy with WIN5 separate_event_pending and incomplete market coverage.
+  // User excludes WIN5. A local bet is evaluated without any unrelated cross-race gate.
   return errors;
 }
 
@@ -106,5 +105,5 @@ if(process.argv[1] && path.resolve(process.argv[1])===path.resolve(new URL(impor
     }
   }
   if(errors.length){console.error('v3.4 purchase-gate validation FAILED\n'+errors.join('\n'));process.exit(1);}
-  console.log('v3.4 purchase-gate validation OK; '+count+' v3.4+ predictions, eight local types independent of WIN5');
+  console.log('v3.4 purchase-gate validation OK; '+count+' v3.4+ predictions, eight local types only, WIN5 omitted');
 }
