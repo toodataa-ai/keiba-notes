@@ -36,10 +36,10 @@
 | strategy_plan_fixed_at | オッズ参照前に選んだ各方式の固定時刻 |
 | strategies[] | type, strategy_kind, strategy_id, definition（既存expandStrategy準拠）, ability_reason, risk_reason, decision_reason。少なくとも通常8券種それぞれ1方式 |
 | mode_exclusions[] | 採用計画のない各モードについてtype, mode, reason, evidence。**全方式を「評価済候補」または「除外理由あり」で網羅** |
-| market_quotes[] | race_id, type, selection, market_selection_id（正規化ticketKeyと完全一致）, market_odds, observed_at, source_url, source_capture_sha256（64桁）, quote_verified=true。複勝・ワイドの幅は[下限,上限]で記録 |
+| market_quotes[] | race_id, type, selection, market_selection_id（正規化ticketKeyと完全一致）, market_odds, observed_at, source_url, source_capture_path（e2e_validation/quote-evidence/配下に保存された証跡ファイル）, source_capture_sha256（実ファイルSHA-256、64桁）, quote_verified=true。複勝・ワイドの幅は[下限,上限]で記録 |
 | input_source | 情報取得・確認の記録、監査担当など |
 
-時刻はすべてTZ付きで扱う。オッズ観測時刻は最終固定時刻より前でなければならない。**URLと証跡ハッシュの項目が存在することだけでは価格の真実性を証明できない**。元ページ内容と個別馬券、時刻の一致を入力工程で確認する必要がある（この点は今後の自動取得機構の課題）。
+時刻はすべてTZ付きで扱う。STEP1固定→方式の候補計画固定→オッズ観測→最終freeze→発走の順を厳守する。オッズ観測時刻は最終固定時刻より前でなければならない。**URLと保存した証跡ファイルのSHA-256が一致しても価格の真実性までは証明できない**。元ページ内容と個別馬券、時刻の一致を入力工程で確認する必要がある（この点は今後の自動取得機構の課題）。
 
 完全な実レース価格が揃っていなくても、**確認済み個別馬券だけを評価対象にする**。確認済み価格がゼロなら「妙味なし」ではなくBLOCKERとして停止。八券種・全方式の調査状況と価格不足を公開原本に残す。
 
