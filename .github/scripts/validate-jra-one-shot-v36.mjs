@@ -24,7 +24,7 @@ else for(const part of manifest.components){
 }
 if(manifest.components?.at(-1)?.path!==v36)issues.push('last manifest component must be v3.6');
 if(manifest.prompt_version!=='v3.6')issues.push('manifest wrong version');
-if(!['v3.5','v3.6'].includes(latest.version))issues.push('unexpected latest pointer '+latest.version);
+if(!['v3.5','v3.6','v3.7'].includes(latest.version))issues.push('unexpected latest pointer '+latest.version);
 if(latest.version==='v3.6'){
   if(latest.path!==v36)issues.push('latest pointer does not target canonical v3.6');
   const h=history.entries?.find(x=>x.version==='v3.6');
