@@ -11,7 +11,7 @@ const dateOk=x=>nonempty(x)&&Number.isFinite(Date.parse(x));
 const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const n=x=>typeof x==='number'&&Number.isFinite(x);
 const near=(a,b)=>n(a)&&Math.abs(a-b)<=Math.max(0.000001,Math.abs(b)*0.000001);
-export const isV38=v=>{const m=/^v(\\d+)\\.(\\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=8);};
+export const isV38=v=>{const m=/^v(\d+)\.(\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=8);};
 
 function orderedTriples(def,kind){
  const out=[],add=a=>{if(a.length===3&&a.every(x=>Number.isInteger(x)&&x>0)&&new Set(a).size===3)out.push(a);};
@@ -148,6 +148,6 @@ if(process.argv[1]&&path.resolve(process.argv[1])===path.resolve(new URL(import.
      for(const error of validateV38(data))errors.push(filePath+': '+error);
    }
  }
- if(errors.length){console.error('v3.8 strategy verification failed:\\n'+errors.join('\\n'));process.exit(1);}
+ if(errors.length){console.error('v3.8 strategy verification failed:\n'+errors.join('\n'));process.exit(1);}
  console.log('v3.8 strategy validation OK; '+count+' versioned predictions audited');
 }
