@@ -1,6 +1,6 @@
 {
-  "version": "v3.3",
-  "path": "競馬予想_完全版プロンプト_v3.3.txt",
-  "updated_at": "2026-10-10T08:51:45.872+09:00",
-  "rule": "Resolve this pointer first. v3.3 loads v3.0 base, ACI v3.1, final-purchase v3.2, bet_type_coverage_policy_v1.json and the v3.3 all-nine-type delta. Maintain matching append-only prompt_history. Do not change frozen older predictions or E2E comparison."
+  "version": "v3.4",
+  "path": "競馬予想_完全版プロンプト_v3.4.txt",
+  "updated_at": "2026-10-10T13:58:26.352+09:00",
+  "rule": "Resolve latest_prompt.json first; inherit v3.0/v3.1/v3.2/v3.3 modules and policies as pinned in e2e_validation/manifests/v3.4.json, then apply v3.4 overrides. Only 8 ordinary JRA ticket types (no WIN5). Demand dated pre-race per-horse ①〜⑨ evidence, conditional finish probabilities with scenario sensitivity, verified actual ticket-specific odds, candidate-specific buy/pass gates. Preserve all v3.2/v3.3 predictions, proofs and E2E comparison."
 }
