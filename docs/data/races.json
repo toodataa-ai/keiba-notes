@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-10T08:11:52+09:00",
+  "updated_at": "2026-10-10T19:41:50.784+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -484,7 +484,7 @@
       "race": "サウジアラビアロイヤルカップ",
       "scope": "jra-main",
       "prompt_version": "v3.2",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "official-prerace-fixed",
       "eligible_for_learning": true,
       "field_size": 11,
@@ -530,7 +530,88 @@
       "step1_snapshot": "e2e_validation/step1/2026-10-10-saudi-arabia-royal-cup.json",
       "e2e_prediction": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.2.json",
       "market_snapshot_at": "2026-10-10T07:47:00+09:00",
-      "note": "STEP1 and final_bets fixed before scheduled start; official results not used."
+      "note": "STEP1 and final_bets fixed before scheduled start; official results not used.",
+      "result": {
+        "summary": "4→3→5 / ◎5 3着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 4,
+            "horse": "アゴルディーノ"
+          },
+          {
+            "pos": 2,
+            "no": 3,
+            "horse": "サトノハクマイ"
+          },
+          {
+            "pos": 3,
+            "no": 5,
+            "horse": "フィリオソラーレ"
+          }
+        ],
+        "finish_order": [
+          4,
+          3,
+          5,
+          8,
+          6,
+          9,
+          10,
+          1,
+          2,
+          7,
+          11
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604031120261010%2F5A",
+        "verified_at": "2026-10-10T19:41:50.784+09:00"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "単勝",
+          "selection": [
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604031120261010%2F5A"
+        },
+        {
+          "bet_id": "B02",
+          "type": "単勝",
+          "selection": [
+            9
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604031120261010%2F5A"
+        }
+      ],
+      "performance": {
+        "stake_yen": 200,
+        "payout_yen": 0,
+        "profit_yen": -200,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 3,
+        "honmei_win": false,
+        "honmei_place": true,
+        "second_mark_finish": 5,
+        "third_mark_finish": 6,
+        "top_marks_in_top3": 1,
+        "hit_bets": [],
+        "miss_bets": [
+          "単勝 6",
+          "単勝 9"
+        ]
+      },
+      "review": "◎5フィリオソラーレは3着、○6ベルウッドディープ5着、▲9ジップスパーク6着。勝利馬4アゴルディーノは3角・4角9番手から最速33.4秒で差し切り、2着3サトノハクマイも4角4番手。予想時の展開M・先行持続力重視に対し、前半1000m60.1秒からの終盤加速と差し馬4の末脚・位置取りの評価が不足した。良馬場予測は的中。◎5は7番手から3着に入っており能力評価の方向性は一部妥当だが、◎○▲上位3頭に勝ち馬・2着馬を含められなかった。最終購入指示は単勝6、単勝9各100円でともに不的中、投資200円・払戻0円。勝ち馬を結果から機械的に昇格させず、2歳馬の少ないサンプルでの末脚・展開分岐と証拠密度不足を改善候補として保留する。",
+      "review_at": "2026-10-10T19:41:50.784+09:00",
+      "e2e_case": "e2e_validation/cases/2026-10-10-saudi-arabia-royal-cup/case.json"
     },
     {
       "id": "2026-10-10-mimuro-stakes",
@@ -539,7 +620,7 @@
       "race": "御陵ステークス",
       "scope": "jra-main",
       "prompt_version": "v3.2",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "official-prerace-fixed",
       "eligible_for_learning": true,
       "field_size": 13,
@@ -574,7 +655,78 @@
       "step1_snapshot": "e2e_validation/step1/2026-10-10-mimuro-stakes.json",
       "e2e_prediction": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.2.json",
       "market_snapshot_at": "2026-10-10T08:04:00+09:00",
-      "note": "STEP1 and final_bets fixed before scheduled start; official results not used."
+      "note": "STEP1 and final_bets fixed before scheduled start; official results not used.",
+      "result": {
+        "summary": "11→10→4 / ◎11 1着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 11,
+            "horse": "サイモンシュバリエ"
+          },
+          {
+            "pos": 2,
+            "no": 10,
+            "horse": "ベルダイナフェロー"
+          },
+          {
+            "pos": 3,
+            "no": 4,
+            "horse": "ショウサンジョージ"
+          }
+        ],
+        "finish_order": [
+          11,
+          10,
+          4,
+          1,
+          8,
+          12,
+          5,
+          9,
+          7,
+          6,
+          3,
+          2,
+          13
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604031120261010%2F38",
+        "verified_at": "2026-10-10T19:41:50.784+09:00"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "単勝",
+          "selection": [
+            11
+          ],
+          "stake_yen": 100,
+          "hit": true,
+          "payout_yen": 1080,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604031120261010%2F38"
+        }
+      ],
+      "performance": {
+        "stake_yen": 100,
+        "payout_yen": 1080,
+        "profit_yen": 980,
+        "roi_pct": 1080,
+        "ticket_hit": true,
+        "honmei_finish": 1,
+        "honmei_win": true,
+        "honmei_place": true,
+        "second_mark_finish": 13,
+        "third_mark_finish": 7,
+        "top_marks_in_top3": 1,
+        "hit_bets": [
+          "単勝 11"
+        ],
+        "miss_bets": []
+      },
+      "review": "◎11サイモンシュバリエが逃げ切り1着。予想で重視した京都ダ1800mの直接実績と先行持続力は勝因と整合する。△4ショウサンジョージは3着で、予想時に把握していた同コース現級4着・斤量55kgへの軽減による反発候補は妥当。一方、×10ベルダイナフェローが52kgで2着、○13サンライズケヴィンが13着、▲5リベッチオが7着。上位候補13の外枠・昇級・同コース未経験リスクを把握しながら2番手評価とした点、および軽斤量馬10の条件別浮上可能性を十分検証できなかった点は再確認課題。ただし12番人気の2着を事後的な正解ルールに変換しない。最終購入指示の単勝11（100円）は公式払戻1080円で的中し、投資100円・払戻1080円。良馬場予測も一致。",
+      "review_at": "2026-10-10T19:41:50.784+09:00",
+      "e2e_case": "e2e_validation/cases/2026-10-10-mimuro-stakes/case.json"
     }
   ]
 }
