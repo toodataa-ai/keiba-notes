@@ -91,7 +91,7 @@ export function buildTicketUniverse({strategies,outcome_distributions,frame_map,
 export function optimizePurchasePortfolio(args){
  const budget=args.budget_yen??6000;
  must(Number.isInteger(budget)&&budget>=100&&budget%100===0,'budget needs 100-yen units');
- must(budget<=6000||args.budget_source==='user_override','budget >6000 not authorized');
+ must(budget<=6000,'budget must be at most 6000 yen');
  const {all,audit}=buildTicketUniverse({...args,max_ticket_stake_yen:args.max_ticket_stake_yen??100});
  const eligible=all.filter(t=>t.expected_profit_yen>0);
  const excluded=all.filter(t=>t.expected_profit_yen<=0).map(t=>({key:t.key,reason:'nonpositive modeled central expected net profit'}));
