@@ -40,14 +40,14 @@
     },
     {
       "path": "docs/data/purchase_gate_policy_v1.json",
-      "git_blob_sha": "51a9a8fc01067465fff81724632f8e5e2ff440f0",
+      "git_blob_sha": "8a5f1a9b987579d0938a760e6271c6e632d5ca63",
       "role": "race_local_purchase_gate_policy"
     },
     {
       "path": "競馬予想_完全版プロンプト_v3.4.txt",
-      "git_blob_sha": "f8983c18514411680e8f2680d317635d005ec750",
+      "git_blob_sha": "872458bd29bf467837fdcb0db402f336954bef28",
       "role": "v3.4_purchase_decision_delta"
     }
   ],
-  "note": "Fix erroneous blanket information-insufficient pass: eight local bet types retain independent buy/pass gate; missing WIN5 legs or some types never automatically blocks a verified local candidate. Uncalibrated probability remains explicitly uncertain. Legacy v3.2/v3.3 predictions, PDFs, proof_commit, final_bets and E2E comparison remain untouched."
+  "note": "v3.4 evaluates eight ordinary local JRA ticket types; WIN5 excluded by user. Every combination ticket uses a full-field conditional finish model with declared pre-race ①-⑨ evidence, model and scenario uncertainty. Historical v3.3 9-type data and frozen results remain unchanged."
 }
