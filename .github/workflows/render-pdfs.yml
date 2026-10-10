@@ -13,6 +13,9 @@ on:
       - 'docs/data/races.json'
       - 'docs/assets/**'
       - '.github/scripts/render-pdfs.mjs'
+      - '.github/scripts/validate-jra-pdf-layout.py'
+      - 'docs/data/jra_pdf_layout_policy_v1.json'
+      - '.github/workflows/render-pdfs.yml'
   workflow_dispatch:
 
 permissions:
@@ -40,7 +43,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk poppler-utils
-          python3 -m pip install 'weasyprint==68.0'
+          python3 -m pip install 'weasyprint==68.0' 'pymupdf==1.26.4'
           python3 -m weasyprint --version
       - name: Restore, validate and render authored reports
         run: node .github/scripts/render-pdfs.mjs
@@ -55,9 +58,28 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           mkdir -p docs/reports docs/pdfs
-          cp -a /tmp/generated-reports/. docs/reports/
-          cp -a /tmp/generated-pdfs/. docs/pdfs/
-          git add docs/reports docs/pdfs
+          # Stage ONLY newly created eligible reports and PDFs. Historical
+          # predictions and prior PDFs must never be replaced by this job.
+          python3 - <<'PY'
+          import json, shutil, subprocess
+          from pathlib import Path
+          races = json.loads(Path('docs/data/races.json').read_text())['races']
+          policy = json.loads(Path('docs/data/jra_pdf_layout_policy_v1.json').read_text())
+          for race in races:
+              if race.get('scope') != 'jra-main' or race.get('date','') < policy['effective_jra_race_date_from']:
+                  continue
+              for key, temp in [('report','/tmp/generated-reports'),('pdf','/tmp/generated-pdfs')]:
+                  rel = race.get(key)
+                  if not rel:
+                      raise RuntimeError('Missing '+key+' path for '+race['id'])
+                  source = Path(temp) / Path(rel).relative_to('reports' if key=='report' else 'pdfs')
+                  target = Path('docs') / rel
+                  if not source.exists():
+                      raise RuntimeError('Generated file missing: '+str(source))
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  shutil.copy2(source,target)
+                  subprocess.run(['git','add','--',str(target)],check=True)
+          PY
           if git diff --cached --quiet; then
             echo "No authored report/PDF changes"
           else
