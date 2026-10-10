@@ -30,6 +30,21 @@ function sample(){
        eligibility:'eligible',reason:'Specific priced candidate, evidence/risk examined'
      }]
    },
+   probability_model_audit:{
+     status:'complete',model:'Full-field pre-race PL scenario',
+     primary_source:'https://www.jra.go.jp/JRADB/',source_observed_at:stamp,
+     calibrated:false,
+     runners:[
+       {horse_number:5,win_probability:.45,evidence:'pre-race nine-axis course/speed evidence',source_url:'https://www.jra.go.jp/JRADB/'},
+       {horse_number:3,win_probability:.35,evidence:'pre-race competitor/pace evidence',source_url:'https://www.jra.go.jp/JRADB/'},
+       {horse_number:9,win_probability:.20,evidence:'pre-race form evidence',source_url:'https://www.jra.go.jp/JRADB/'}
+     ],
+     scenarios:[
+       {name:'neutral',assumption:'base course',candidate_hit_probability:.45},
+       {name:'front advantage',assumption:'front-runners reinforced',candidate_hit_probability:.38},
+       {name:'late speed advantage',assumption:'closers reinforced',candidate_hit_probability:.51}
+     ]
+   },
    purchase_decision:'buy',purchase_reason_code:'bought',best_bet_id:'B01',
    total_stake_yen:100,final_bets_fixed_at:'2026-10-11T08:05:00+09:00',
    final_bets:[{id:'B01',type:'単勝',selection:[5],stake_yen:100,reason:'ability and price'}]
