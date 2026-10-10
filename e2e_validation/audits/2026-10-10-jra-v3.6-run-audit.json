@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "execution_date": "2026-10-10",
+  "timezone": "Asia/Tokyo",
+  "model_prompt_version": "v3.6",
+  "scope": "Tokyo and Kyoto JRA 11R only",
+  "win5_excluded": true,
+  "prompt_integrity": {
+    "pointer": "docs/data/latest_prompt.json",
+    "manifest": "e2e_validation/manifests/v3.6.json",
+    "manifest_components": 12,
+    "all_component_blob_sha_match": true,
+    "validator_script_present": ".github/scripts/validate-multi-candidate-v35.mjs",
+    "validator_script_executed": false
+  },
+  "races": [
+    {
+      "race_id": "2026-10-10-saudi-arabia-royal-cup",
+      "starts_at": "2026-10-10T15:45:00+09:00",
+      "step1_fixed_at": "2026-10-10T08:08:29+09:00",
+      "step1_reused": true,
+      "step1_sha": "201175357108308c4fadcdda7470f9daed35e9bc",
+      "final_bets_fixed_at": "2026-10-10T15:03:42+09:00",
+      "final_bets": [
+        {
+          "type": "単勝",
+          "selection": [
+            9
+          ],
+          "stake_yen": 100
+        }
+      ],
+      "candidate_count": 28,
+      "bet_type_count": 8,
+      "prediction_path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.6-20261010-prestart.json",
+      "prediction_commit_sha": "cc914788adbd44ebb913f24cea555c1312361ca4",
+      "prediction_blob_sha": "1827c6244e3b5194e8f6c1fec7cae2b8b6082fca",
+      "proof_commit_sha": "601bb2c91814ac72908488f7ca1d95f61dfbd341",
+      "report_path": "reports/2026-10-10-saudi-arabia-royal-cup-v36.html",
+      "report_sha": "e3028d6580c2ad916cf333232314f96651e90de6",
+      "pdf_status": "generated_local_a4_13pages_render_checked_not_committed_to_github",
+      "pdf_horse_pages": 11
+    },
+    {
+      "race_id": "2026-10-10-mimuro-stakes",
+      "starts_at": "2026-10-10T15:30:00+09:00",
+      "step1_fixed_at": "2026-10-10T08:08:31+09:00",
+      "step1_reused": true,
+      "step1_sha": "072b58543393ccf7b5b0dde85a6c31ed0987d821",
+      "final_bets_fixed_at": "2026-10-10T15:03:55+09:00",
+      "final_bets": [
+        {
+          "type": "単勝",
+          "selection": [
+            11
+          ],
+          "stake_yen": 100
+        }
+      ],
+      "candidate_count": 32,
+      "bet_type_count": 8,
+      "prediction_path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.6-20261010-prestart.json",
+      "prediction_commit_sha": "1412ccbde75439f75795ddf898c46f0641ee9b12",
+      "prediction_blob_sha": "05f803f17f9d07d03b7e8e9498ccfa345703874b",
+      "proof_commit_sha": "4b707927b788722c927cd38030bec471facacf5e",
+      "report_path": "reports/2026-10-10-mimuro-stakes-v36.html",
+      "report_sha": "9044e36bdcd0d261d57629f589e45d648613da95",
+      "pdf_status": "generated_local_a4_16pages_render_checked_not_committed_to_github",
+      "pdf_horse_pages": 13
+    }
+  ],
+  "protected_ref_blobs_rechecked": {
+    "docs/data/latest_prompt.json": "12f7c1c32c92dc8b0d54f4874413ae58987c6d79",
+    "e2e_validation/manifests/v3.6.json": "78a2e97f2732bd88d58fa565605e68acd3be2aed",
+    "docs/data/races.json": "bdae70b56d4c9efb95995d713e05f13e454ce670",
+    "e2e_validation/step1/2026-10-10-saudi-arabia-royal-cup.json": "201175357108308c4fadcdda7470f9daed35e9bc",
+    "e2e_validation/step1/2026-10-10-mimuro-stakes.json": "072b58543393ccf7b5b0dde85a6c31ed0987d821",
+    "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.2.json": "a39e8a4e131e1ba1d2db3487a02597190c661dfe",
+    "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.2.json": "54ed0ba8ad1a3aa7f6f30dd1c965ffb116563794"
+  },
+  "integrity_results": {
+    "core_prerace_prediction_proof_verified": true,
+    "report_git_blob_verified": true,
+    "legacy_sha_unchanged": true,
+    "conditional_finish_probabilities_uncalibrated": true,
+    "market_prices_from_time_stamped_interim_secondary_snapshots": true,
+    "pdf_local_visual_and_page_bounds_check": true,
+    "pdf_published_to_github": false,
+    "github_pages_http_verified": false,
+    "github_actions_ci_executed": false,
+    "full_grade_A_confirmed": false
+  },
+  "blockers": [
+    "Public GitHub Pages HTTP response not independently verified in current execution environment.",
+    "PDF binaries were produced and rendered locally but not committed to GitHub; GitHub binary upload bridge unavailable in this execution.",
+    "v3.5 candidate validator script presence was checked but not executed through Actions; full end-to-end CI grade cannot be claimed.",
+    "Quantitative official same-day track bias, ACI calibration, complete comparative workout clock evidence were not all obtained.",
+    "The combined probabilistic race models and scenario EVs are uncalibrated; real odds at betting time may differ."
+  ],
+  "classification": "PRERACE_JSON_PROOF_AND_HTML_VERIFIED_PDF_LOCAL_CI_PUBLIC_UNVERIFIED"
+}
