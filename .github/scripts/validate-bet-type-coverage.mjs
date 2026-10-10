@@ -17,8 +17,10 @@ if(fs.existsSync(base)){
    try{data=JSON.parse(fs.readFileSync(filename,'utf8'));}catch(e){errors.push(filename+': malformed JSON '+e.message);continue;}
    if(!/^v3\.[3-9](?:$|\.)|^v[4-9]\./.test(String(data.prompt_version||''))) continue;
    checks.push(path.relative(root,filename));
+   const is34=/^v3\.(?:[4-9]|[1-9][0-9]+)$|^v[4-9]\./.test(String(data.prompt_version||''));
+   const requiredTypes=is34?policy.race_local_types:names;
    const entries=data.bet_type_evaluations;
-   if(!Array.isArray(entries)||entries.length!==names.length){errors.push(filename+': exactly '+names.length+' bet_type_evaluations required');continue;}
+   if(!Array.isArray(entries)||entries.length!==requiredTypes.length){errors.push(filename+': exactly '+requiredTypes.length+' bet_type_evaluations required');continue;}
    const got=new Set();
    for(const e of entries){
     if(!e||typeof e!=='object'){errors.push(filename+': invalid row');continue;}
@@ -36,7 +38,8 @@ if(fs.existsSync(base)){
      if(e.status==='unpriced'&&e.ev_multiple!==null)errors.push(filename+': '+e.type+' unpriced requires ev_multiple=null');
     }
    }
-   for(const required of names)if(!got.has(required))errors.push(filename+': missing type '+required);
+   for(const required of requiredTypes)if(!got.has(required))errors.push(filename+': missing type '+required);
+   if(is34&&got.has('WIN5')) errors.push(filename+': WIN5 explicitly excluded from v3.4+');
    if(!['complete','incomplete'].includes(data.market_coverage_status))errors.push(filename+': market_coverage_status must be complete/incomplete');
    if(!data.market_coverage_snapshot_at)errors.push(filename+': missing market_coverage_snapshot_at');
    const unevaluatedLocal=entries.filter(e=>policy.race_local_types.includes(e.type)&&e.status!=='evaluated'&&e.status!=='not_offered');
@@ -50,4 +53,4 @@ if(fs.existsSync(base)){
  }
 }
 if(errors.length){console.error('Bet-type coverage validation FAILED:',errors.join('\n- '));process.exit(1);}
-console.log('Bet-type coverage OK: '+checks.length+' v3.3+ predictions checked; '+names.length+' mandatory types');
+console.log('Bet-type coverage OK: '+checks.length+' predictions checked (v3.3: 9 historical types, v3.4+: 8 local types); WIN5 excluded from new predictions');
