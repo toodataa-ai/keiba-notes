@@ -1,6 +1,6 @@
 {
-  "version": "v3.9",
-  "path": "競馬予想_完全版プロンプト_v3.9.txt",
-  "updated_at": "2026-10-10T22:11:43.616Z",
-  "rule": "Resolve docs/data/latest_prompt.json and all e2e_validation/manifests/v3.9.json pinned components first. Preserve v3.0-v3.8 unchanged. On frozen STEP1, compare all 8 normal ticket types' real-world purchase modes: single, multiple singles, box, 1-/2-key wheel, first/second-key exacta and multi, 3-leg ordered/unordered formation, trifecta 1-/2-key fixed and multi, plus optional WIN+PLACE support bundle. Maintain mode-by-type coverage with reasons, exact quote for every expanded line and same-outcome P(at least one hit), aggregate payout/stake ROI, full-loss and net-loss scenarios. Choose at most 1 budgeted strategy (default cap 3000 yen). Freeze all actual final_bets and proof before post. Never fabricate unknown odds or retro-edit snapshots. Maintain existing JRA STEP1, 8-type single-ticket comparisons, WIN5 exclusion, local-racing isolation, and reader-v1 PDF CSS/geometry and fail-closed CI."
+  "version": "v3.10",
+  "path": "競馬予想_完全版プロンプト_v3.10.txt",
+  "updated_at": "2026-10-10T22:25:16.994Z",
+  "rule": "Read docs/data/latest_prompt.json then verify e2e_validation/manifests/v3.10.json all SHA pins. Inherit v3.0-v3.9 STEP1, full-field outcome model, all eight JRA ticket types and purchase mode candidate generation unchanged. Replace 'one best strategy' and default 3000-yen cap with cross-type multi-strategy optimizer: exact 0/1 knapsack, default 100-yen distinct ticket, sum stake <=6000 yen, maximize model-based central expected NET profit. Require pre-start full ticket odds/source/selection precision; deduplicate ticket intersections; compute same-outcome portfolio payouts, ROI, P(any win), P(full loss) and P(net loss) across low/central/high scenarios. Never spend to quota or fabricate prices. Freeze all selected final_bets and proof before report; old predictions/results, local Shadow, WIN5 exclusion and approved v3.7 PDF layout unchanged. Run v3.10 optimizer and inherited regression CI."
 }
