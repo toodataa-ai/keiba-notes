@@ -1,0 +1,44 @@
+name: Validate formal JRA v3.7 layout contract
+on:
+  pull_request:
+    paths:
+      - '競馬予想_完全版プロンプト_v3.7.txt'
+      - 'e2e_validation/manifests/v3.7.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'docs/data/jra_pdf_layout_policy_v1.json'
+      - 'docs/assets/jra-pdf-reader-v1.css'
+      - '.github/scripts/validate-jra-reader-v37.mjs'
+      - '.github/workflows/validate-jra-reader-v37.yml'
+  push:
+    branches: [main]
+    paths:
+      - '競馬予想_完全版プロンプト_v3.7.txt'
+      - 'e2e_validation/manifests/v3.7.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - '.github/scripts/validate-jra-reader-v37.mjs'
+      - '.github/workflows/validate-jra-reader-v37.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate SHA-pinned full v3.7 contract
+        run: |
+          node .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-one-shot-v36.mjs
+          node .github/scripts/validate-prompt-history.mjs
+      - name: Validate existing ticket logic
+        run: |
+          node .github/scripts/test-multi-candidate-v35.mjs
+          node .github/scripts/test-purchase-gate-v34.mjs
+          node .github/scripts/test-jra-conditional-ticket-probability.mjs
