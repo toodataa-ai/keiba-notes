@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-10T14:52:59.074+09:00",
+  "updated_at": "2026-10-10T06:48:33.341Z",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -246,6 +246,30 @@
         "地方競馬ShadowとE2E比較の設定・データ"
       ],
       "reason": "ユーザーより毎回のJRA再実行指示プロンプトが肥大化しているため、本ちゃんプロンプトへ固定できないか指摘。重複ルールを手動指示文に書き続けず、短文だけで同じ標準工程を実行できる構造に整理した。"
+    },
+    {
+      "version": "v3.7",
+      "date": "2026-10-10",
+      "path": "競馬予想_完全版プロンプト_v3.7.txt",
+      "source": "user-approved-pdf-layout-freeze",
+      "previous_version": "v3.6",
+      "approval_class": "C-user-requested",
+      "manifest": "e2e_validation/manifests/v3.7.json",
+      "summary": "ユーザー承認済みの読みやすいJRA競馬予想PDFのレイアウトを固定。CSSのSHA一致、A4・1頭1ページ・章構成・視認性・内部ID漏出を実PDFで検査し、不合格ならPDF自動公開を停止。旧版の予想・PDFは保護。",
+      "changes": [
+        "承認済みreader-v1 CSSを独立正本化し、異なるCSSやレイアウトの無断再生成を禁止",
+        "新規JRAの全頭1頭1ページ、A4縦、PDFページ数・個票順・余白・欠字・不要なSHA/数字列をCIで実測検証",
+        "PDF生成後、GitHubに公開コミットする前に実PDFの検査に合格しなければ停止",
+        "調教、Time Index等の実データ不足をレイアウトだけで隠した要約PDFへの置換を禁止",
+        "2026-10-10以前の旧レポートを再生成せず、旧予想・結果・E2E・地方競馬Shadowを保持",
+        "短いJRA実行指示でも正式ポインタを通じてレイアウト契約と新CIを必ず適用"
+      ],
+      "unchanged": [
+        "v3.0〜v3.6の能力評価と馬場、STEP1印固定と8券種/複数候補評価",
+        "WIN5除外、発走前prediction/final_bets/proof_commitの優先順位",
+        "旧v3.6以前の全予想、PDF、成績原本、E2E比較、地方競馬Shadow"
+      ],
+      "reason": "2026-10-10のJRA PDFで前回と異なる帳票、余白の多い個票、内部SHAの露出と未完成な分析が発生。ユーザーは修正後のレイアウトを承認し、次回以降のレイアウト崩れ防止を要求。"
     }
   ]
 }
