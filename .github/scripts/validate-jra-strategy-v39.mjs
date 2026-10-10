@@ -62,6 +62,18 @@ export function validateV39(data){
      for(const k of sets[0])if(sets.some(s=>!s.has(k)))add('outcome support differs by scenario');
    }
  }
+ // Every central first-place marginal must agree with the frozen STEP1-derived win probabilities.
+ // This prohibits a purchase-only recalculation from quietly changing horse assessment.
+ if(Array.isArray(dists?.central)&&Array.isArray(runners)){
+   const first=new Map(runners.map(r=>[r.horse_number,0]));
+   for(const o of dists.central)if(Array.isArray(o.finish)&&first.has(o.finish[0])&&finite(o.probability))
+     first.set(o.finish[0],first.get(o.finish[0])+o.probability);
+   for(const runner of runners){
+     const win=first.get(runner.horse_number);
+     if(!finite(runner.win_probability)||!finite(win)||Math.abs(win-runner.win_probability)>0.0005)
+       add('central joint distribution changes frozen win probability for horse '+runner.horse_number);
+   }
+ }
  const coverage=data.strategy_coverage_audit;
  if(!Array.isArray(coverage)||coverage.length!==8||TYPES.some((t,i)=>coverage[i]?.type!==t)) add('all eight bet type strategy coverage rows required');
  const strategies=data.purchase_strategy_evaluations;
