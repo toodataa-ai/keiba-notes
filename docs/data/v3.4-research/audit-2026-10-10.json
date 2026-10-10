@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.4",
+  "date": "2026-10-10",
+  "verified_at": "2026-10-10T14:10:16.834+09:00",
+  "research_only": true,
+  "official_legacy_registry_modified": false,
+  "win5_excluded": true,
+  "formal_prompt_pointer": "docs/data/latest_prompt.json",
+  "prompt_manifest": "e2e_validation/manifests/v3.4.json",
+  "research": [
+    {
+      "race_id": "2026-10-10-saudi-arabia-royal-cup",
+      "step1_fixed": "docs/data/v3.4-research/step1-2026-10-10-saudi-arabia-royal-cup.json",
+      "prediction": "docs/data/v3.4-research/prediction-2026-10-10-saudi-arabia-royal-cup.json",
+      "proof": "docs/data/v3.4-research/proof-2026-10-10-saudi-arabia-royal-cup.json",
+      "proof_commit": "ee4fe2ad2006fbebf4b360d1e3defdaa5df5c461",
+      "html": "docs/reports/v3.4-2026-10-10-saudi-arabia-royal-cup.html",
+      "pdf": "docs/pdfs/v3.4-2026-10-10-saudi-arabia-royal-cup.pdf",
+      "pdf_pages": 17,
+      "horse_pages": 11,
+      "buy_research": "単勝9 100円",
+      "pdf_blob": "21ccac23df8b8f739ed4713928c32fa1d16d41dd"
+    },
+    {
+      "race_id": "2026-10-10-mimuro-stakes",
+      "step1_fixed": "docs/data/v3.4-research/step1-2026-10-10-mimuro-stakes.json",
+      "prediction": "docs/data/v3.4-research/prediction-2026-10-10-mimuro-stakes.json",
+      "proof": "docs/data/v3.4-research/proof-2026-10-10-mimuro-stakes.json",
+      "proof_commit": "e4716535aed8c2e5f5da712478c0d530b5f9751e",
+      "html": "docs/reports/v3.4-2026-10-10-mimuro-stakes.html",
+      "pdf": "docs/pdfs/v3.4-2026-10-10-mimuro-stakes.pdf",
+      "pdf_pages": 19,
+      "horse_pages": 13,
+      "buy_research": "単勝11 100円",
+      "pdf_blob": "c0fd91ebbf11d97d8a597acf65188fb360bcb907"
+    }
+  ],
+  "checks": {
+    "all_files_exist": true,
+    "all_files_verified": [
+      {
+        "path": "docs/data/v3.4-research/step1-2026-10-10-saudi-arabia-royal-cup.json",
+        "exists": true,
+        "blob": "f2fef616d95c0af7257c769a40ed422b4b3c9503"
+      },
+      {
+        "path": "docs/data/v3.4-research/prediction-2026-10-10-saudi-arabia-royal-cup.json",
+        "exists": true,
+        "blob": "25853305ad5eef0106cd40a61349635580927a12"
+      },
+      {
+        "path": "docs/data/v3.4-research/proof-2026-10-10-saudi-arabia-royal-cup.json",
+        "exists": true,
+        "blob": "2b021d33f18c07abdd3f6cc4f733a5eb0b66523d"
+      },
+      {
+        "path": "docs/reports/v3.4-2026-10-10-saudi-arabia-royal-cup.html",
+        "exists": true,
+        "blob": "a4764f921e4606aced75286ac67749fe048ef75c"
+      },
+      {
+        "path": "docs/pdfs/v3.4-2026-10-10-saudi-arabia-royal-cup.pdf",
+        "exists": true,
+        "blob": "21ccac23df8b8f739ed4713928c32fa1d16d41dd"
+      },
+      {
+        "path": "docs/data/v3.4-research/step1-2026-10-10-mimuro-stakes.json",
+        "exists": true,
+        "blob": "f548511b128e549d6cb7cb40d6102a1e034f7e95"
+      },
+      {
+        "path": "docs/data/v3.4-research/prediction-2026-10-10-mimuro-stakes.json",
+        "exists": true,
+        "blob": "347befcde3d0c24c01dbd08476581566150c5b42"
+      },
+      {
+        "path": "docs/data/v3.4-research/proof-2026-10-10-mimuro-stakes.json",
+        "exists": true,
+        "blob": "ad1bd45d2a779b1abdea7a26833d313fb14d5f1f"
+      },
+      {
+        "path": "docs/reports/v3.4-2026-10-10-mimuro-stakes.html",
+        "exists": true,
+        "blob": "d1091133f2aa69d036209e1b79f56f997168915d"
+      },
+      {
+        "path": "docs/pdfs/v3.4-2026-10-10-mimuro-stakes.pdf",
+        "exists": true,
+        "blob": "c0fd91ebbf11d97d8a597acf65188fb360bcb907"
+      }
+    ],
+    "historical_protected_blobs_checked": 167,
+    "historical_protected_blobs_unchanged": true,
+    "changed_protected_blobs": [],
+    "prompt_history_ci": true,
+    "v34_purchase_ci": true,
+    "e2e_ci": false,
+    "isolated_pdf_render_ci": [
+      38026449562,
+      38026444622
+    ],
+    "pages_deploy_ci_latest": [
+      {
+        "run_id": 38026546849,
+        "status": "pending",
+        "conclusion": null
+      },
+      {
+        "run_id": 38026489690,
+        "status": "completed",
+        "conclusion": "cancelled"
+      }
+    ],
+    "direct_public_url_http_status": "unverified: unavailable by external HTTP tools",
+    "pdf_render_a4": true,
+    "pdf_pages_exact": [
+      17,
+      19
+    ],
+    "no_unresolved_placeholders_reported": true,
+    "rendered_pdf_manual_color_and_font_review": false
+  },
+  "significant_limitations": [
+    "Model probabilities rely on subjective ordinal nine-axis grades and arbitrary softmax weights; not historically calibrated.",
+    "Beta scenarios represent ability-concentration uncertainty only, not independently measured weather or pace scenarios.",
+    "Reported interim market odds are from dated secondary website records; no direct final market price guarantee.",
+    "Publication status verified via GitHub files and Actions but direct public-domain HTTP checks are unavailable.",
+    "Historical v3.2/v3.3 prediction/settlement data unchanged; no current research buying tickets actually purchased."
+  ],
+  "completion_status": "reports_and_proofs_saved; direct_HTTP_and_manual_pdf_visual_review_not_verified"
+}
