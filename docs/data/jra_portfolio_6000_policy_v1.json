@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_portfolio_6000_expected_profit_v310",
+  "effective_prompt_version": "v3.10",
+  "scope": "step2_purchase_only",
+  "win5": "excluded",
+  "optimization": {
+    "objective": "maximize_total_central_expected_net_profit_yen",
+    "budget_yen": 6000,
+    "budget_is_maximum_not_target": true,
+    "one_selected_strategy_only": false,
+    "cross_type_and_cross_strategy": true,
+    "per_line_stake_yen": 100,
+    "stake_scaling_allowed_without_separate_approval": false,
+    "no_compulsory_purchase": true,
+    "algorithm": "exact_zero_one_knapsack_v1",
+    "primary_constraint": "sum of independently verified distinct tickets' 100-yen stakes <= 6000",
+    "edge_rule": "include eligible candidates with central p*conservative_market_odds >1",
+    "tie_breaker": [
+      "higher low-scenario profit",
+      "lower total stake",
+      "deterministic ticket key"
+    ],
+    "deduplicate_key": "normalized type+selection",
+    "no_probabilistic_independence_assumption": true,
+    "risk_metrics": [
+      "expected_payout_yen",
+      "expected_net_profit_yen",
+      "roi",
+      "at_least_one_hit_probability",
+      "full_loss_probability",
+      "net_loss_probability"
+    ]
+  },
+  "preservation": {
+    "fixed_STEP1": true,
+    "old_prompt_components": true,
+    "all_eight_types": true,
+    "old_predictions": true,
+    "old_results": true,
+    "pdf_css_v37": true,
+    "win5_excluded": true,
+    "local_shadow": true
+  },
+  "audit": {
+    "require_source_every_line": true,
+    "quotes_observed_before_fixed_at": true,
+    "no_odds_invention": true,
+    "reoptimize_and_match_exact_final_bets": true,
+    "record_mode_origins": true,
+    "no_after_post_mutations": true,
+    "no_unverified_stakes": true,
+    "require_scenario_distributions": true
+  }
+}
