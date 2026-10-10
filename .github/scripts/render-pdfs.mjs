@@ -122,11 +122,6 @@ function validateFullReport(race) {
     throw new Error(`${race.id}: reconstructed text HTML can never be an official PDF source`);
   }
 
-  const missing = mandatoryMarkers.filter(marker => !html.includes(marker));
-  if (missing.length) {
-    throw new Error(`${race.id}: complete report is missing sections: ${missing.join(', ')}`);
-  }
-
   // From 2026-10-11, a stricter user-accepted reader-v1 layout contract
   // replaces the legacy marker-only layout check. The rendered PDF itself is
   // validated below, before the publish commit is allowed.
@@ -136,6 +131,12 @@ function validateFullReport(race) {
     }
     return;
   }
+
+  const missing = mandatoryMarkers.filter(marker => !html.includes(marker));
+  if (missing.length) {
+    throw new Error(`${race.id}: complete report is missing sections: ${missing.join(', ')}`);
+  }
+
   const horseCount = getHorseCount(html);
   if (!race.field_size) throw new Error(`${race.id}: field_size is required for complete-report validation`);
   if (horseCount !== race.field_size) {
