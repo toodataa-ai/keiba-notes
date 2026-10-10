@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_all_eight_ticket_modes_v39",
+  "effective_prompt_version": "v3.9",
+  "scope": "step2_purchase_only",
+  "win5": "excluded",
+  "modes": {
+    "単勝": [
+      "single",
+      "multiple_singles"
+    ],
+    "複勝": [
+      "single",
+      "multiple_singles"
+    ],
+    "枠連": [
+      "single",
+      "box",
+      "key_wheel",
+      "formation"
+    ],
+    "馬連": [
+      "single",
+      "box",
+      "key_wheel",
+      "formation"
+    ],
+    "馬単": [
+      "single",
+      "box",
+      "key_wheel_first",
+      "key_wheel_second",
+      "key_wheel_multi",
+      "formation"
+    ],
+    "ワイド": [
+      "single",
+      "box",
+      "key_wheel",
+      "formation"
+    ],
+    "三連複": [
+      "single",
+      "box",
+      "one_key_wheel",
+      "two_key_wheel",
+      "formation"
+    ],
+    "三連単": [
+      "single",
+      "box",
+      "formation",
+      "one_key_fixed",
+      "two_key_fixed",
+      "one_key_multi",
+      "two_key_multi"
+    ]
+  },
+  "mixed_modes": [
+    "win_place_support"
+  ],
+  "requirements": {
+    "strategy_candidate_timing": "post-STEP1-fix pre-odds",
+    "coverage_audit_required": true,
+    "source_each_line": true,
+    "quote_verified_true": true,
+    "budget_default_cap_yen": 3000,
+    "minimum_stake_yen": 100,
+    "one_selected_strategy_per_race": true,
+    "realistic_model": "same full-field joint top-three outcomes by scenario",
+    "scenario_names": [
+      "low",
+      "central",
+      "high"
+    ],
+    "expected_payout_formula": "sum_over_outcomes(p(outcome) * sum_of_all_winning_tickets(stake * verified_odds_floor))",
+    "hit_probability_formula": "P(at least one line hits), NOT sum of marginal hit probabilities when multiple lines can co-win",
+    "roi_formula": "expected payout / all-lines stake",
+    "full_loss_formula": "P(no line wins)",
+    "net_loss_formula": "P(total payout less than total stake)",
+    "include_bet_types_without_quotes": "list unpriced and skip purchase; never fabricate odds",
+    "purchased_final_bets": "expand all selected lines separately and freeze before race",
+    "archive_protection": "do not overwrite any prereace existing files or old version predictions",
+    "sale_rules": "JRA official headcount, same-frame box omission and wheel/formation eligibility"
+  },
+  "official_rules": [
+    "https://www.jra.go.jp/kouza/baken/",
+    "https://www.jra.go.jp/faq/pop04/1_9.html",
+    "https://www.jra.go.jp/kouza/beginner/mark/"
+  ]
+}
