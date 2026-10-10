@@ -1,0 +1,65 @@
+name: JRA PDF reader layout guard
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/validate-jra-pdf-layout.py'
+      - '.github/scripts/test-jra-pdf-layout.py'
+      - '.github/workflows/jra-pdf-reader-guard.yml'
+      - '.github/scripts/render-pdfs.mjs'
+      - '.github/workflows/render-pdfs.yml'
+      - 'docs/assets/jra-pdf-reader-v1.css'
+      - 'docs/data/jra_pdf_layout_policy_v1.json'
+      - 'docs/reports/**'
+      - 'docs/data/races.json'
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/validate-jra-pdf-layout.py'
+      - '.github/scripts/test-jra-pdf-layout.py'
+      - '.github/workflows/jra-pdf-reader-guard.yml'
+      - '.github/scripts/render-pdfs.mjs'
+      - 'docs/assets/jra-pdf-reader-v1.css'
+      - 'docs/data/jra_pdf_layout_policy_v1.json'
+      - 'docs/reports/**'
+      - 'docs/data/races.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reader-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned PDF engine and Japanese font
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk poppler-utils
+          python -m pip install 'weasyprint==68.0' 'pymupdf==1.26.4'
+      - name: Validate reference template plus deliberate bad-PDF cases
+        run: python .github/scripts/test-jra-pdf-layout.py
+      - name: Render and validate all new eligible JRA reports without publishing
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          policy=json.loads(Path('docs/data/jra_pdf_layout_policy_v1.json').read_text())
+          races=json.loads(Path('docs/data/races.json').read_text())['races']
+          out=Path('/tmp/jra-pdf-reader-check');out.mkdir(exist_ok=True)
+          checked=0
+          for race in races:
+              if race.get('scope')!='jra-main' or race.get('date','') < policy['effective_jra_race_date_from']:
+                  continue
+              source=Path('docs') / race['report'] if race.get('report') else None
+              if not source or not source.exists():
+                  raise SystemExit('Missing authored HTML for eligible new JRA report: '+race['id'])
+              dest=out / (race['id']+'.pdf')
+              subprocess.run([sys.executable,'-m','weasyprint',str(source),str(dest)],check=True)
+              subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-layout.py',
+                  '--html',str(source),'--pdf',str(dest)],check=True)
+              checked+=1
+          print('Validated future JRA PDF sources:',checked,'(new reports are required to use the approved template)')
+          PY
