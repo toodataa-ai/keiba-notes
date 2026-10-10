@@ -3,6 +3,7 @@
 // Generate all top-three outcomes; expand the pre-quote 8-type strategy plan; price each exact line;
 // apply the already approved v3.10 optimiser. An unsealed snapshot is NEVER a formal prediction.
 import fs from 'node:fs';
+import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {TYPES,MODES,expandStrategy,ticketKey,oddsFloor,matches,evaluateStrategy} from './jra-strategy-engine-v39.mjs';
@@ -100,8 +101,8 @@ function checkInput(input,freezeAt){
   must(filled(st.strategy_id)&&!planIds.has(st.strategy_id),'strategy IDs must be unique');planIds.add(st.strategy_id);
   must(TYPES.includes(st.type)&&MODES[st.type].includes(st.strategy_kind),'invalid strategy mode');
   must(filled(st.ability_reason)&&filled(st.risk_reason)&&filled(st.decision_reason),'pre-price evidence and risk needed per strategy');
-  must(timestamp(input.strategy_plan_fixed_at)<=timestamp(fixed.fixed_at)||timestamp(input.strategy_plan_fixed_at)<=freeze,
-   'strategy plan timestamp invalid');
+  must(isTime(input.strategy_plan_fixed_at)&&timestamp(input.strategy_plan_fixed_at)>=timestamp(fixed.fixed_at)&&timestamp(input.strategy_plan_fixed_at)<=freeze,
+   'strategy plan must be frozen after STEP1 and before final freeze');
   mapped.add(st.type+':'+st.strategy_kind);
  }
  must(TYPES.every(type=>input.strategies.some(st=>st.type===type)),'must consider every ticket type before checking prices');
@@ -118,6 +119,8 @@ function checkInput(input,freezeAt){
  for(const type of TYPES)for(const mode of MODES[type])must(mapped.has(type+':'+mode)||checked.has(type+':'+mode),
    'missing mode audit '+type+'/'+mode);
  must(Array.isArray(input.market_quotes),'exact market quote catalog required');
+ for(const q of input.market_quotes)must(timestamp(q.observed_at)>timestamp(input.strategy_plan_fixed_at),
+  'BLOCKER: strategy selection plan must precede every market observation');
  return {race,runners,frame,freeze,start};
 }
 export function assemble(input,freezeAt,proofCommit=null){
@@ -132,6 +135,11 @@ export function assemble(input,freezeAt,proofCommit=null){
   must(cleanUrl(q.source_url),'market URL missing '+key);
   must(q.market_selection_id===key,'market key does not match selection '+key);
   must(q.source_capture_sha256&&/^[a-f0-9]{64}$/i.test(q.source_capture_sha256),'quote capture content SHA256 required '+key);
+  must(typeof q.source_capture_path==='string'&&q.source_capture_path.startsWith('e2e_validation/quote-evidence/')&&
+   !q.source_capture_path.includes('..')&&fs.existsSync(q.source_capture_path),
+   'tracked quote source capture missing '+key);
+  const digest=createHash('sha256').update(fs.readFileSync(q.source_capture_path)).digest('hex');
+  must(digest.toLowerCase()===q.source_capture_sha256.toLowerCase(),'actual quote capture SHA256 mismatch '+key);
   must(q.quote_verified===true&&oddsFloor(q.market_odds)!==null,'quote unverifiable '+key);
   if(captured.has(key)){
    const prior=captured.get(key);
