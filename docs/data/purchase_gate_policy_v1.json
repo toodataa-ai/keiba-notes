@@ -9,7 +9,7 @@
     "競馬予想_完全版プロンプト_v3.3.txt",
     "docs/data/bet_type_coverage_policy_v1.json"
   ],
-  "key_rule": "Separate bet-type coverage completeness, local candidate eligibility, local buy/pass judgement and WIN5 cross-race completion. Partial market coverage must not mechanically force all local bets to pass.",
+  "key_rule": "Separate coverage of the eight JRA race-local bet types from per-candidate purchase eligibility and buy/pass. WIN5 is explicitly out of scope for v3.4 at user request; neither forecast nor evaluation nor 9th row required.",
   "local_bet_types": [
     "単勝",
     "複勝",
@@ -20,7 +20,7 @@
     "三連複",
     "三連単"
   ],
-  "win5_scope": "event_only_independent",
+  "win5_scope": "excluded_by_user_request_no_forecast_no_coverage_row",
   "decision_codes": {
     "buy": "At least one independently purchase-eligible local candidate is adopted and frozen before post time.",
     "no_value": "Eligible local candidates exist but estimated reward/risk does not justify buying.",
@@ -37,15 +37,16 @@
     ],
     "quote_allow": "Either verified official quote or dated named independent secondary quote with checked race, venue, date, ticket type and exact selection, and fetched before cutoff.",
     "quote_prohibit": "Do not infer combined-ticket odds from win odds; do not treat unverified, stale or other-race odds as executable.",
-    "probability_allow": "Disclose estimated probability and underlying evidence; an uncalibrated model is permitted for scenario comparison only when uncertainty range, plausible scenario sensitivity, source/rank assumptions and limitations are visible.",
-    "probability_prohibit": "Do not invent calibrated probabilities, ignore horse joint finishing dependencies, or use a single naive Plackett–Luce point estimate as sufficient evidence to buy.",
+    "probability_allow": "Compute an explicit ordered finish probability for trifecta using coherent full-field pre-race win probabilities and an identified conditional ranking model. Record assumptions and sensitivity; uncalibrated estimates are only scenario-based and may inform, but never solely prove, a positive EV. For other tickets match exact finishing event and field size.",
+    "probability_prohibit": "Never fabricate certainty or exacta/trifecta hit rates from odds or rank alone; no naive independent product or unqualified point Plackett–Luce number as sufficient proof to buy. Lack of historical calibration lowers confidence but does not imply no numeric estimate can be calculated.",
     "risk_checks": [
       "step1_fixed_before_market",
+      "full_field_probability_input_provenance",
+      "conditional_order_joint_probability_method",
       "uncertainty_sensitivity",
       "odds_movement",
       "scratch_and_going",
-      "budget_and_stake",
-      "joint_probability_model_for_multi_horse_tickets"
+      "budget_and_stake"
     ],
     "buy_requires": [
       "quote_verified",
@@ -76,12 +77,12 @@
       "partial",
       "none"
     ],
-    "win5_status": "separately assessed; this field cannot gate local eight types",
+    "win5_status": "Not present in v3.4. WIN5 is not predicted, evaluated, or counted as a coverage requirement.",
     "candidates": "Array of market candidates with candidate type/selection, quote evidence, probability uncertainty and eligibility decision",
     "note": "If local_coverage_status=partial and ≥1 candidate eligible, buy/pass is allowed but never claim global best across all eight types."
   },
   "immutable_policy": "Never mutate any historical v3.2/v3.3 STEP1, prediction, final_bets, proof_commit, reports, results, E2E comparison or local-racing data.",
-  "postrace_replay_policy": "No new formal prerace candidate after race starts. Do not backdate new v3.4 decision onto v3.3.",
+  "postrace_replay_policy": "Never backdate post-start v3.4 as a prerace prediction or revise frozen v3.2/v3.3 decisions. v3.4 effective for future pre-race decisions only.",
   "source_policy": "JRA official preferred; dated source-matched secondary market quotes usable with source disclosure, not forced JRA cross-check if matching provenance adequate.",
-  "audit": "Validator .github/scripts/validate-purchase-gate-v34.mjs applies only to v3.4+ predictions and tests independence of WIN5 and partial coverage."
+  "audit": "Validate eight ordinary ticket types on v3.4+ via .github/scripts/validate-purchase-gate-v34.mjs and adapted nine-type legacy validator; do not touch historical v3.3 nine-type data. Verify explicit trifecta ordered probability inputs and sensitivity."
 }
