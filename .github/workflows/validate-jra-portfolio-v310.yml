@@ -1,0 +1,59 @@
+name: Validate JRA v3.10 combined portfolio purchases
+on:
+  pull_request:
+    paths:
+      - '競馬予想_完全版プロンプト_v3.10.txt'
+      - 'docs/data/jra_portfolio_6000_policy_v1.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'e2e_validation/manifests/v3.10.json'
+      - '.github/scripts/**'
+      - '.github/workflows/validate-jra-portfolio-v310.yml'
+      - 'e2e_validation/predictions/**'
+  push:
+    branches: [main]
+    paths:
+      - '競馬予想_完全版プロンプト_v3.10.txt'
+      - 'docs/data/jra_portfolio_6000_policy_v1.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'e2e_validation/manifests/v3.10.json'
+      - '.github/scripts/jra-portfolio-optimizer-v310.mjs'
+      - '.github/scripts/validate-jra-portfolio-v310.mjs'
+      - '.github/scripts/test-jra-portfolio-v310.mjs'
+      - '.github/scripts/validate-jra-portfolio-prompt-v310.mjs'
+      - '.github/workflows/validate-jra-portfolio-v310.yml'
+      - 'e2e_validation/predictions/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify immutable prior analysis and v3.10 budgeted purchase scope
+        run: |
+          node .github/scripts/validate-jra-portfolio-prompt-v310.mjs
+          node .github/scripts/validate-prompt-history.mjs
+      - name: Exercise optimum 6000 yen cross-type selection with regression failures
+        run: |
+          node .github/scripts/test-jra-portfolio-v310.mjs
+          node .github/scripts/validate-jra-portfolio-v310.mjs
+      - name: Preserve legacy analysis, betting, PDF tests
+        run: |
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/test-jra-strategy-v38.mjs
+          node .github/scripts/test-multi-candidate-v35.mjs
+          node .github/scripts/test-purchase-gate-v34.mjs
+          node .github/scripts/test-jra-conditional-ticket-probability.mjs
+          node .github/scripts/validate-jra-strategy-prompt-v39.mjs
+          node .github/scripts/validate-jra-strategy-prompt-v38.mjs
+          node .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-one-shot-v36.mjs
+      # Legacy archived v3.6 prereace JSON defects remain separate baseline failures; do not rewrite.

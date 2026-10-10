@@ -140,3 +140,6 @@ v=cp(base);v.final_bets_fixed_at='2026-10-11T16:00:00+09:00';invalid('late freez
 v=cp(base);v.race_context.place_paid_positions=2;invalid('place eligibility error',v,'8+ horse races');
 v=cp(base);v.probability_model_audit.runners[0].win_probability+=.01;invalid('do not silently change fixed STEP1 win chance',v,'central joint distribution changes frozen win probability');
 console.log('PASS all bet strategies + joint payout regression cases');
+
+// Reuse the unchanged synthetic v3.9 fixture in later-version purchase-only regression tests.
+export {sample as makeV39Sample};
