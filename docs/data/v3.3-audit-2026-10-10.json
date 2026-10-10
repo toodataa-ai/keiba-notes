@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-10T09:10:14.837+09:00",
+  "prompt_version": "v3.3",
+  "date": "2026-10-10",
+  "snapshot_kind": "separate_unpromoted_pre_race",
+  "baseline_tree": "e805cfd6da72ff1b31cbc82ba98e5127df1d2d23",
+  "protected_blob_integrity": {
+    "passed": true,
+    "checked_paths": [
+      {
+        "path": "docs/data/latest_prompt.json",
+        "match": true
+      },
+      {
+        "path": "docs/data/races.json",
+        "match": true
+      },
+      {
+        "path": "e2e_validation/config.json",
+        "match": true
+      },
+      {
+        "path": "docs/pdfs/2026-10-10-mimuro-stakes.pdf",
+        "match": true
+      },
+      {
+        "path": "docs/pdfs/2026-10-10-saudi-arabia-royal-cup.pdf",
+        "match": true
+      },
+      {
+        "path": "docs/pdfs/2026-10-04-kyoto-daishoten.pdf",
+        "match": true
+      },
+      {
+        "path": "docs/pdfs/2026-10-04-mainichi-okan.pdf",
+        "match": true
+      },
+      {
+        "path": "e2e_validation/step1/2026-10-10-saudi-arabia-royal-cup.json",
+        "match": true
+      },
+      {
+        "path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.2.json",
+        "match": true
+      },
+      {
+        "path": "e2e_validation/step1/2026-10-10-mimuro-stakes.json",
+        "match": true
+      },
+      {
+        "path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.2.json",
+        "match": true
+      }
+    ]
+  },
+  "legacy_pdfs_restored_exactly": {
+    "passed": true,
+    "restore_commit": "6868adee074f4d2e644bb5037523b92116bd2f1c"
+  },
+  "snapshots": [
+    {
+      "race_id": "2026-10-10-saudi-arabia-royal-cup",
+      "prediction_path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.3.json",
+      "proof_path": "e2e_validation/proofs/2026-10-10-saudi-arabia-royal-cup/v3.3.json",
+      "html_path": "docs/reports/v3.3-2026-10-10-saudi-arabia-royal-cup.html",
+      "pdf_path": "docs/pdfs/v3.3-2026-10-10-saudi-arabia-royal-cup.pdf",
+      "file_existence": [
+        {
+          "kind": "prediction",
+          "exists": true,
+          "size_bytes": 18660
+        },
+        {
+          "kind": "proof",
+          "exists": true,
+          "size_bytes": 1351
+        },
+        {
+          "kind": "html",
+          "exists": true,
+          "size_bytes": 45136
+        },
+        {
+          "kind": "pdf",
+          "exists": true,
+          "size_bytes": 477471
+        }
+      ],
+      "status": "created_nonpromoted",
+      "decision": "pass",
+      "final_bets": [],
+      "stake_yen": 0
+    },
+    {
+      "race_id": "2026-10-10-mimuro-stakes",
+      "prediction_path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.3.json",
+      "proof_path": "e2e_validation/proofs/2026-10-10-mimuro-stakes/v3.3.json",
+      "html_path": "docs/reports/v3.3-2026-10-10-mimuro-stakes.html",
+      "pdf_path": "docs/pdfs/v3.3-2026-10-10-mimuro-stakes.pdf",
+      "file_existence": [
+        {
+          "kind": "prediction",
+          "exists": true,
+          "size_bytes": 18566
+        },
+        {
+          "kind": "proof",
+          "exists": true,
+          "size_bytes": 1324
+        },
+        {
+          "kind": "html",
+          "exists": true,
+          "size_bytes": 50847
+        },
+        {
+          "kind": "pdf",
+          "exists": true,
+          "size_bytes": 491331
+        }
+      ],
+      "status": "created_nonpromoted",
+      "decision": "pass",
+      "final_bets": [],
+      "stake_yen": 0
+    }
+  ],
+  "pdf_audit": {
+    "renderer": "WeasyPrint 68.0 on GitHub Actions; font fallback Noto CJK if Meiryo UI unavailable",
+    "a4_portrait_verified_from_pdfinfo": true,
+    "pages": {
+      "tokyo": 17,
+      "kyoto": 19
+    },
+    "one_horse_per_section_source_checks": {
+      "tokyo": 11,
+      "kyoto": 13
+    },
+    "grade_css_preserved": true,
+    "rendered_visual_grade_colors_verified": false,
+    "font_meiryo_ui_actual_verified": false,
+    "workflow_success_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38007450187"
+  },
+  "win5": {
+    "source": "https://www.jra.go.jp/kouza/win5/info/racelist.html",
+    "scope": 5,
+    "assessed_or_inherited": 2,
+    "not_completed": 3,
+    "cross_race_selection": null,
+    "status": "incomplete",
+    "path": "docs/data/v3.3-win5-2026-10-10.json"
+  },
+  "publicity": {
+    "github_main_files_exist": true,
+    "github_pages_action_success_recorded": true,
+    "direct_pages_http_verified": false,
+    "public_registry_did_not_replace_v3_2": true
+  },
+  "e2e_integrity": {
+    "comparison_config_blob_unchanged": true,
+    "previous_predictions_unmodified": true,
+    "legacy_registry_blob_unchanged": true
+  },
+  "blocks": [
+    "WIN5最初の3レースの①〜⑨全頭STEP1未完了",
+    "中間オッズのJRA公式突合未完了",
+    "Plackett–Luce確率は未校正で実用精度不明",
+    "GitHub PagesのHTML/PDF直URLに対するHTTP実アクセス検証未実施",
+    "PDF描画後の色・使用フォントを視覚監査未実施"
+  ],
+  "completion_status": "partial_with_blockers",
+  "no_result_data_used": true,
+  "no_v3_2_data_overwritten": true
+}
