@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-10T14:46:12.547+09:00",
+  "updated_at": "2026-10-10T14:52:59.074+09:00",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -221,6 +221,31 @@
         "E2E比較、地方競馬Shadowは変更しない"
       ],
       "reason": "ユーザー指摘のとおりv3.4で三連単の代表1組合せだけを評価すると単勝へ選択が偏り、妥当な連系組合せが購入候補へ上がる機会を欠く。単勝と公平に選択しながら期待値の過大評価を防ぐため。"
+    },
+    {
+      "version": "v3.6",
+      "date": "2026-10-10",
+      "path": "競馬予想_完全版プロンプト_v3.6.txt",
+      "source": "user-requested-embed-long-jra-run-instruction",
+      "previous_version": "v3.5",
+      "approval_class": "C-user-requested",
+      "manifest": "e2e_validation/manifests/v3.6.json",
+      "summary": "長文化したJRA手動実行依頼を正式プロンプト本体にワンショット実行契約として統合。短い指示で予想、8券種比較、買う/見送り、発走前原本固定、proof、HTML/PDF、公開・デグレ監査まで実施。",
+      "changes": [
+        "『最新版で今日のJRAを予想して／再実行して』だけで、日付・開催場メイン確認から全工程を起動する既定解釈を追加",
+        "STEP1→オッズ確認→8券種の複数組合せ比較→最終購入決定を、v3.5までの要件ID参照で重複せず一括実行",
+        "発走前のSTEP1/STEP2/final_bets予想JSON GitHubコミット・proof確認を、HTML/PDF生成より優先する手順を固定",
+        "独立スナップショット保存と旧版データ・地方競馬・E2E比較の保護、公開Pagesの実体と旧PDFデグレを監査",
+        "全頭HTML/PDF、A4縦・1頭1ページ・13pt・フォント・評価色・undefined防止、監査結果を最終報告の標準形に統合",
+        "v3.6本体は既存要件の複製を避け約3200字の実行レイヤーに限定、SHA固定manifestとGitHub Actionsのワンショット契約テストを追加"
+      ],
+      "unchanged": [
+        "v3.0からv3.5の①〜⑨・ACI・馬場・時計・STEP1印固定・複数候補/全8券種の購入判断",
+        "WIN5を予想しない",
+        "既存v3.2/v3.3/v3.4/v3.5の発走前記録、final_bets、proof_commit、HTML/PDF、回顧・成績",
+        "地方競馬ShadowとE2E比較の設定・データ"
+      ],
+      "reason": "ユーザーより毎回のJRA再実行指示プロンプトが肥大化しているため、本ちゃんプロンプトへ固定できないか指摘。重複ルールを手動指示文に書き続けず、短文だけで同じ標準工程を実行できる構造に整理した。"
     }
   ]
 }
