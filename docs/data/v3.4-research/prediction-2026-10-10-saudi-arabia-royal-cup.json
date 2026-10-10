@@ -1,0 +1,732 @@
+{
+  "schema_version": 2,
+  "prompt_version": "v3.4",
+  "race_id": "2026-10-10-saudi-arabia-royal-cup",
+  "race_context": {
+    "venue": "東京",
+    "race_no": 11,
+    "race_name": "サウジアラビアロイヤルカップ",
+    "course": "芝1600m 良（当日二次情報）",
+    "start_at": "2026-10-10T15:45:00+09:00",
+    "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+  },
+  "generated_at": "2026-10-10T14:03:32.619+09:00",
+  "information_cutoff_at": "2026-10-10T14:03:32.619+09:00",
+  "snapshot_kind": "independent_v3.4_shadow_research_not_promoted",
+  "official_registry_excluded": true,
+  "legacy_v3_2_v3_3_untouched": true,
+  "step1_source_path": "docs/data/v3.4-research/step1-2026-10-10-saudi-arabia-royal-cup.json",
+  "step1_blob_sha": "f2fef616d95c0af7257c769a40ed422b4b3c9503",
+  "step1_fixed_at": "2026-10-10T14:01:52.778+09:00",
+  "marks": {
+    "win": 5,
+    "second": 6,
+    "third": 9
+  },
+  "step1_ranking": [
+    5,
+    6,
+    9,
+    4,
+    2,
+    10,
+    3,
+    8,
+    1,
+    7,
+    11
+  ],
+  "step1_analysis": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+  "market_coverage_status": "complete",
+  "market_coverage_snapshot_at": "2026-10-10T14:03:32.619+09:00",
+  "bet_type_evaluations": [
+    {
+      "type": "単勝",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          9
+        ],
+        "label": "9",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 8.6,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:53:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.1314156,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.1277773,
+        "central": 0.1314156,
+        "concentrated": 0.1330822
+      },
+      "ev_multiple": 1.13,
+      "ev_scenarios": {
+        "min": 1.099,
+        "central": 1.13,
+        "max": 1.145
+      },
+      "break_even_probability": 0.116279,
+      "decision": "buy",
+      "reason": "有力な購入候補として総合評価。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "複勝",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          9
+        ],
+        "label": "9",
+        "kind": "horse_numbers"
+      },
+      "market_odds": [
+        1.8,
+        2.6
+      ],
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:53:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.4033966,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.3836308,
+        "central": 0.4033966,
+        "concentrated": 0.4304634
+      },
+      "ev_multiple": 0.726,
+      "ev_scenarios": {
+        "min": 0.691,
+        "central": 0.726,
+        "max": 0.775
+      },
+      "break_even_probability": 0.555556,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "枠連",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          6
+        ],
+        "label": "5-6",
+        "kind": "frame_numbers"
+      },
+      "market_odds": 6.2,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:53:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.1347813,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.1102274,
+        "central": 0.1347813,
+        "concentrated": 0.1761747
+      },
+      "ev_multiple": 0.836,
+      "ev_scenarios": {
+        "min": 0.683,
+        "central": 0.836,
+        "max": 1.092
+      },
+      "break_even_probability": 0.16129,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "馬連",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          6
+        ],
+        "label": "5-6",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 6,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:58:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.1102151,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0853275,
+        "central": 0.1102151,
+        "concentrated": 0.1532725
+      },
+      "ev_multiple": 0.661,
+      "ev_scenarios": {
+        "min": 0.512,
+        "central": 0.661,
+        "max": 0.92
+      },
+      "break_even_probability": 0.166667,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "馬単",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          6
+        ],
+        "label": "5→6",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 8.7,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040311?ninki=1",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T14:00:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.05908,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0448377,
+        "central": 0.05908,
+        "concentrated": 0.0851631
+      },
+      "ev_multiple": 0.514,
+      "ev_scenarios": {
+        "min": 0.39,
+        "central": 0.514,
+        "max": 0.741
+      },
+      "break_even_probability": 0.114943,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "ワイド",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          6
+        ],
+        "label": "5-6",
+        "kind": "horse_numbers"
+      },
+      "market_odds": [
+        2.7,
+        2.9
+      ],
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:58:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.277749,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.2230652,
+        "central": 0.277749,
+        "concentrated": 0.3644965
+      },
+      "ev_multiple": 0.75,
+      "ev_scenarios": {
+        "min": 0.602,
+        "central": 0.75,
+        "max": 0.984
+      },
+      "break_even_probability": 0.37037,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "三連複",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          6,
+          9
+        ],
+        "label": "5-6-9",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 13.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605040311?ninki=1",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:56:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0679559,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0485462,
+        "central": 0.0679559,
+        "concentrated": 0.1042329
+      },
+      "ev_multiple": 0.917,
+      "ev_scenarios": {
+        "min": 0.655,
+        "central": 0.917,
+        "max": 1.407
+      },
+      "break_even_probability": 0.074074,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "三連単",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          6,
+          9
+        ],
+        "label": "5→6→9",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 34.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040311?ninki=1",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:51:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0136223,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0092457,
+        "central": 0.0136223,
+        "concentrated": 0.0228559
+      },
+      "ev_multiple": 0.465,
+      "ev_scenarios": {
+        "min": 0.315,
+        "central": 0.465,
+        "max": 0.779
+      },
+      "break_even_probability": 0.029326,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    }
+  ],
+  "probability_model_audit": {
+    "status": "complete",
+    "model": "nine factor grade-weight softmax (beta=.9/1.1/1.4) -> full-field PL conditional ordered 1st/2nd/3rd",
+    "calibrated": false,
+    "primary_source": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E",
+    "source_observed_at": "2026-10-10T14:01:52.778+09:00",
+    "grade_weight_reference": "docs/data/v3.4-research/step1-2026-10-10-saudi-arabia-royal-cup.json",
+    "runners": [
+      {
+        "horse_number": 5,
+        "horse_name": "フィリオソラーレ",
+        "win_probability": 0.27160943,
+        "factors": [
+          "A",
+          "A",
+          "B+",
+          "B",
+          "A+",
+          "A",
+          "B-",
+          "B+",
+          "A+"
+        ],
+        "evidence": "東京マイル同舞台で速い上がりと追走力を示す。初の重賞・休養明けが不確実性",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 6,
+        "horse_name": "ベルウッドディープ",
+        "win_probability": 0.15843828,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "B",
+          "A+",
+          "B+",
+          "B-",
+          "B",
+          "A"
+        ],
+        "evidence": "同舞台の完勝を評価。重賞の相手強化と3か月超の間隔が課題",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 9,
+        "horse_name": "ジップスパーク",
+        "win_probability": 0.13141564,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "B+",
+          "B+",
+          "B+",
+          "B-",
+          "B+",
+          "A"
+        ],
+        "evidence": "マイル直線勝負での末脚が強み。東京のコーナー・坂は未確認",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 4,
+        "horse_name": "アゴルディーノ",
+        "win_probability": 0.09552281,
+        "factors": [
+          "A",
+          "A",
+          "B+",
+          "B+",
+          "B",
+          "B+",
+          "B-",
+          "B+",
+          "B+"
+        ],
+        "evidence": "OP対戦実績と先行持続力は強い。東京1600への短縮・直線の瞬発力は未知",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 2,
+        "horse_name": "デミアン",
+        "win_probability": 0.09141094,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "B",
+          "B+",
+          "B+",
+          "B-",
+          "B+",
+          "B+"
+        ],
+        "evidence": "東京適性と終いの脚を評価。1600mへの延長は未知",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 10,
+        "horse_name": "アイファーマーリン",
+        "win_probability": 0.06358421,
+        "factors": [
+          "A",
+          "B",
+          "B+",
+          "B+",
+          "B",
+          "B",
+          "B-",
+          "B",
+          "B+"
+        ],
+        "evidence": "前走の道悪勝ちと鋭い上がり。初東京と外枠、位置取り後方リスク",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 3,
+        "horse_name": "サトノハクマイ",
+        "win_probability": 0.05332286,
+        "factors": [
+          "A",
+          "B+",
+          "B",
+          "B+",
+          "B",
+          "B+",
+          "B-",
+          "B",
+          "B"
+        ],
+        "evidence": "重馬場新馬勝ち、先行できる。高速東京マイルへの適性は未確認",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 8,
+        "horse_name": "グルーヴェンス",
+        "win_probability": 0.0462178,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "B+",
+          "B-",
+          "B",
+          "B-",
+          "B",
+          "B"
+        ],
+        "evidence": "1400mで先行力を示すが初マイル、終いの持続力に課題",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 1,
+        "horse_name": "ギブリ",
+        "win_probability": 0.02786482,
+        "factors": [
+          "A",
+          "B",
+          "B+",
+          "C",
+          "B",
+          "B",
+          "B-",
+          "B",
+          "B-"
+        ],
+        "evidence": "マイル勝ちだが中1週・東京替わり、重賞級裏付け不足",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 7,
+        "horse_name": "ニシノトラノスケ",
+        "win_probability": 0.03750091,
+        "factors": [
+          "A",
+          "B",
+          "B+",
+          "B+",
+          "B",
+          "B",
+          "B-",
+          "B",
+          "B-"
+        ],
+        "evidence": "同距離勝ち。着差0.0で重賞相手の決め手は未知",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      },
+      {
+        "horse_number": 11,
+        "horse_name": "ハンサム",
+        "win_probability": 0.0231123,
+        "factors": [
+          "A",
+          "B",
+          "B",
+          "B-",
+          "B-",
+          "B",
+          "B-",
+          "B",
+          "B-"
+        ],
+        "evidence": "重い馬場の先行粘りは評価。中1週・高速東京への変化が不安",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+      }
+    ],
+    "scenarios": [
+      {
+        "name": "conservative_flat",
+        "assumption": "Ability difference flattened (beta=.9); assesses uncertainty in grade discrimination",
+        "candidate_hit_probability": 0.1277773
+      },
+      {
+        "name": "central",
+        "assumption": "Central 9-axis score beta=1.1; no odds fed into grade scoring",
+        "candidate_hit_probability": 0.1314156
+      },
+      {
+        "name": "ability_concentrated",
+        "assumption": "Ability differentiation beta=1.4; hypothetical preference for top graded horse",
+        "candidate_hit_probability": 0.1330822
+      }
+    ],
+    "limitations": [
+      "Ordinal grades and scenario beta not empirically calibrated",
+      "Scenario bounds are NOT statistical confidence intervals",
+      "No independent fully calibrated pace-by-track or surface changes",
+      "Due to available evidence, probabilities should not be interpreted as exact frequencies"
+    ]
+  },
+  "purchase_gate": {
+    "scope": "race_local_8types",
+    "local_coverage_status": "complete",
+    "candidates": [
+      {
+        "type": "単勝",
+        "selection": [
+          9
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+        "observed_at": "2026-10-10T13:53:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 1.099-1.145 at observed quote; positive in all 3 heuristic scenarios",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "eligible",
+        "reason": "Observed market quote and fixed ability evidence support limited 100-yen scenario purchase, not validated edge"
+      },
+      {
+        "type": "複勝",
+        "selection": [
+          9
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+        "observed_at": "2026-10-10T13:53:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.691-0.775; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "枠連",
+        "selection": [
+          5,
+          6
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+        "observed_at": "2026-10-10T13:53:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.683-1.092; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          5,
+          6
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040311?ninki=0",
+        "observed_at": "2026-10-10T13:58:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.512-0.92; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          5,
+          6
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040311?ninki=1",
+        "observed_at": "2026-10-10T14:00:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.39-0.741; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "ワイド",
+        "selection": [
+          5,
+          6
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605040311?ninki=0",
+        "observed_at": "2026-10-10T13:58:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.602-0.984; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          5,
+          6,
+          9
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605040311?ninki=1",
+        "observed_at": "2026-10-10T13:56:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.655-1.407; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          6,
+          9
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040311?ninki=1",
+        "observed_at": "2026-10-10T13:51:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "東京芝1600mの実走直接実績は⑤フィリオソラーレ（1:34.3・上がり33.3）と⑥ベルウッドディープ（1:35.8・上がり33.9）。⑨ジップスパークは新潟芝1600m 1着（上がり33.6）、東京は初。④アゴルディーノOP2着も条件差。2歳馬の少ない戦歴と追切詳細未入手に大きな不確実性。",
+        "edge_reason": "3 scenario EV range 0.315-0.779; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      }
+    ]
+  },
+  "purchase_decision": "buy",
+  "purchase_reason_code": "bought",
+  "purchase_reason_detail": "Old v3.2 ability evidence fixed. Fresh dated independent quote plus scenario win probability is consistently above implied break-even in 3 heuristic concentration scenarios; model uncalibrated and actual profits uncertain. Exclude other ticket types.",
+  "best_bet_id": "B01",
+  "reference_priority_candidate": null,
+  "final_bets": [
+    {
+      "type": "単勝",
+      "selection": [
+        9
+      ],
+      "id": "B01",
+      "stake_yen": 100,
+      "layer": "value_add",
+      "reason": "新潟芝1600m新馬を3角3番手→2番手・上がり33.6で0.3秒差勝ち。旧STEP1▲だが脚と距離の適性を評価。東京の坂は未知で確率校正も未了。"
+    }
+  ],
+  "final_bets_fixed_at": "2026-10-10T14:03:32.619+09:00",
+  "total_stake_yen": 100,
+  "report_generated_for_real_purchase": false,
+  "previous_records_not_modified": true,
+  "final_bets_record_type": "reproducible_research_purchase_instruction_not_actual_ticket_purchase",
+  "source_links": [
+    "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E",
+    "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040311?ninki=1",
+    "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605040311?ninki=1",
+    "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040311?ninki=1"
+  ],
+  "known_limits": [
+    "高い上がり時計だけを優劣に使わない。同舞台実績と2歳戦キャリア、馬場、相手関係を分離。",
+    "単勝9の仮説p範囲はβ感応度のみであり、実際の予想精度を保証しない。"
+  ]
+}
