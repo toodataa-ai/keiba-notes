@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const TYPES=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単'];
 const ALL=TYPES;
+const isV38OrLater=v=>{const m=/^v(\d+)\.(\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=8);};
 const REASONS=['bought','no_value','risk_high','insufficient_local_information'];
 const PASS_REASONS=['no_value','risk_high','insufficient_local_information'];
 
@@ -19,7 +20,7 @@ const dateValid=x=>nonempty(x)&&Number.isFinite(Date.parse(x));
 export function validateV34(data) {
   const errors=[];
   const add=message=>errors.push(message);
-  if(!isV34OrLater(data.prompt_version)) return errors;
+  if(!isV34OrLater(data.prompt_version)||isV38OrLater(data.prompt_version)) return errors;
   const rows=data.bet_type_evaluations;
   if(!Array.isArray(rows)||rows.length!==8) { add('exactly eight bet_type_evaluations required; WIN5 excluded'); return errors; }
   if(ALL.some((type,i)=>rows[i]?.type!==type)) add('eight local ticket types missing/out of policy order');
