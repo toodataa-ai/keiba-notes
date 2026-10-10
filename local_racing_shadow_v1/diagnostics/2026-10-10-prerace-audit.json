@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "PRE-RACE",
+  "status": "SKIPPED_NO_ELIGIBLE_RACES",
+  "model_version": "local-daily-shadow-v0.1",
+  "production_effect": false,
+  "rule_sources": {
+    "config_path": "local_racing_shadow_v1/config.json",
+    "config_blob_sha": "368d69484d32c35d9d4b4c418820d2ad1ee028c2",
+    "prompt_path": "local_racing_shadow_v1/shadow_prompt_v0_1.txt",
+    "prompt_blob_sha": "c2afcae81f65dd9ecfc7a8e4bbf02fa424a85187"
+  },
+  "official_calendar": {
+    "source": "NAR 本日のレース情報",
+    "url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TodayRaceInfoTop",
+    "date": "2026-10-10",
+    "official_venues": [
+      "帯広ば",
+      "高知",
+      "佐賀"
+    ],
+    "enabled_venues": [
+      "大井",
+      "川崎",
+      "船橋",
+      "浦和",
+      "園田",
+      "名古屋"
+    ],
+    "intersection": []
+  },
+  "daily_audit": {
+    "eligible_races": 0,
+    "prediction_files_existing": 0,
+    "result_files_existing": 0,
+    "review_files_existing": 0,
+    "manifest_entries_for_date": 0,
+    "prediction_created": false,
+    "proof_commit": null,
+    "proof_commit_reason": "Not applicable: no eligible races or snapshots exist.",
+    "no_hindsight_predictions": true,
+    "previous_manifest_entries": 46,
+    "public_manifest_path": "docs/data/local_racing_shadow_public.json",
+    "public_manifest_blob_sha_at_audit": "ac83fb3d93455c2bb035c2ed386dee0a57f23719",
+    "public_manifest_change_required": false,
+    "github_pages_live_bytes_verified": false,
+    "github_pages_note": "Live hosted JSON could not be independently fetched during this audit; GitHub committed manifest was inspected.",
+    "jra_related_files_changed": false
+  },
+  "forward_looking_blockers": [
+    "PRE-RACE workflow .github/workflows/local-racing-shadow-prerace-20261008.yml has a date guard for 2026-10-09 only; a future-day full run cannot be assumed to work.",
+    "generate_daily.py currently implements only oi and sonoda, although config.json enables six venues."
+  ],
+  "note": "No race-level prediction or result was created. This file is a calendar/eligibility audit only, not pre-race proof. Existing saved race snapshots were not changed."
+}
