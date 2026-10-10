@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {validateV34, isV34OrLater} from './validate-purchase-gate-v34.mjs';
 
-const types=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単','WIN5'];
+const types=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単'];
 const stamp='2026-10-11T08:00:00+09:00';
 function sample(){
  const data={
@@ -9,7 +9,7 @@ function sample(){
    race_context:{venue:'東京',race_no:11,start_at:'2026-10-11T15:45:00+09:00'},
    market_coverage_status:'incomplete',market_coverage_snapshot_at:stamp,
    bet_type_evaluations:types.map(t=>({
-     type:t,status:t==='単勝'?'evaluated':t==='WIN5'?'separate_event_pending':'unpriced',
+     type:t,status:t==='単勝'?'evaluated':'unpriced',
      candidate:t==='単勝'?{selection:[5],label:'5'}:null,
      market_odds:t==='単勝'?5.6:null,
      source_url:t==='単勝'?'https://example.org/market/5':null,
@@ -20,7 +20,6 @@ function sample(){
    })),
    purchase_gate:{
      scope:'race_local_8types',local_coverage_status:'partial',
-     win5_status:'separate_event_pending',
      candidates:[{
        type:'単勝',selection:[5],quote_verified:true,
        source_url:'https://example.org/market/5',observed_at:stamp,
@@ -40,7 +39,7 @@ function sample(){
 function valid(name,obj){const errors=validateV34(obj);assert.deepEqual(errors,[],name+': '+errors.join('; '));console.log('PASS '+name);}
 function invalid(name,obj,fragment){const errors=validateV34(obj);assert(errors.some(x=>x.includes(fragment)),name+': expected '+fragment+' in '+errors.join('; '));console.log('PASS '+name+' (rejected unsafe case)');}
 assert(isV34OrLater('v3.4'));assert(isV34OrLater('v4.0'));assert(!isV34OrLater('v3.3'));
-valid('partial market + WIN5 incomplete can still buy verified local single win',sample());
+valid('partial market can still buy verified local single win without WIN5',sample());
 {
  const x=sample();x.purchase_decision='pass';x.purchase_reason_code='no_value';x.best_bet_id=null;x.final_bets=[];x.total_stake_yen=0;
  valid('fully assessed local candidate passed for low value, not called missing data',x);
