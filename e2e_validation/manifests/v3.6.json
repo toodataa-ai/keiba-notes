@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.6",
+  "source_commit": "92eb403cf29904e376dbaf2f1011418dadf12d90",
+  "components": [
+    {
+      "path": "競馬予想_完全版プロンプト_v3.0.txt",
+      "git_blob_sha": "8cb18e5cd2bab88bfaf5a04f103a402acb9aac90",
+      "role": "base_prompt"
+    },
+    {
+      "path": "closing_index_v1/production_profile_v1_1.json",
+      "git_blob_sha": "a72db216545cc481644c8f066b52e66c9b0083eb",
+      "role": "aci_production_profile"
+    },
+    {
+      "path": "closing_index_v1/adoption_decision_v1_1.json",
+      "git_blob_sha": "831bebfb4133856bd9284901594ecea30cc7ba27",
+      "role": "aci_adoption_decision"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.1.txt",
+      "git_blob_sha": "688ff0c06a441ca2634c73810aa2708bcbdec949",
+      "role": "aci_delta_prompt"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.2.txt",
+      "git_blob_sha": "1c2feb336575376c0736f78e7313ac7301e197e7",
+      "role": "final_bet_decision_delta"
+    },
+    {
+      "path": "docs/data/bet_type_coverage_policy_v1.json",
+      "git_blob_sha": "f88a1c8678853b5401e0d41e9404c42110813168",
+      "role": "bet_type_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.3.txt",
+      "git_blob_sha": "28479c99b02932739890e7b22de8e8fe043a9eac",
+      "role": "all_bet_types_delta"
+    },
+    {
+      "path": "docs/data/purchase_gate_policy_v1.json",
+      "git_blob_sha": "8a5f1a9b987579d0938a760e6271c6e632d5ca63",
+      "role": "race_local_purchase_gate_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.4.txt",
+      "git_blob_sha": "872458bd29bf467837fdcb0db402f336954bef28",
+      "role": "v3.4_purchase_decision_delta"
+    },
+    {
+      "path": "docs/data/multi_candidate_selection_policy_v1.json",
+      "git_blob_sha": "784f9ba08e72c297abba6b0e688f204afa338ef7",
+      "role": "multi_candidate_ticket_selection_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.5.txt",
+      "git_blob_sha": "073f691d7ef6bbb532395598785f3bfaa004f8e0",
+      "role": "v3.5_multi_candidate_delta"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.6.txt",
+      "git_blob_sha": "ec136aceecada66dd65f17997c616c6f94d04762",
+      "role": "one_shot_jra_execution_orchestrator"
+    }
+  ],
+  "note": "Self-contained execution contract for short natural-language instructions; retains all v3.5 prior logic without duplicating domain rules. JRA 8 local bet types, WIN5 excluded, STEP1 before odds, source/time matching, independent prereace proofs, HTML+PDF auditing, legacy file protection."
+}
