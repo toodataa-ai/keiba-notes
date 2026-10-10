@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-10T08:51:45.872+09:00",
+  "updated_at": "2026-10-10T13:49:14.808+09:00",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -170,6 +170,32 @@
         "旧版予想、E2E比較、JRA以外のデータ"
       ],
       "reason": "2026-10-10のJRAメイン予想で連系実オッズの未取得により単勝だけが実質比較され、最適馬券を選べたか検証不能になったため。ユーザーが全券種評価を指定した。"
+    },
+    {
+      "version": "v3.4",
+      "date": "2026-10-10",
+      "path": "競馬予想_完全版プロンプト_v3.4.txt",
+      "source": "user-requested-correction-of-overconservative-purchase-gate",
+      "approval_class": "C-user-requested",
+      "previous_version": "v3.3",
+      "manifest": "e2e_validation/manifests/v3.4.json",
+      "summary": "全券種比較の未完了、ローカル購入候補の適格性、WIN5の未完了を分離し、情報不足による全レース機械的見送りを是正。買わせる強制はせず、未校正モデルと価格リスクは候補ごとに評価。",
+      "changes": [
+        "通常8券種の購入判断をWIN5と独立化。WIN5の一部レース未完了は当該レースの8券種をブロックしない",
+        "全券種市場カバレッジの完了/未完了と、検証済み候補での買う/見送りを別フィールドとして記録",
+        "1券種の実オッズ欠落はその券種のみ保留、確認済み他券種の購入可能性は損なわない",
+        "組合せ・時刻・市場情報源が確認できる二次実オッズも明示のうえ候補へ利用できるようにする",
+        "未校正確率の感応度・下振れ・順位分布の仮定を評価し、見かけの高EVだけで買わない",
+        "buy/no_value/risk_high/insufficient_local_informationを排他的reason codeで記録し、適格候補ありの情報不足passを禁止",
+        "v3.4+購入判断の自動監査・synthetic単体テスト・独立CI workflow・immutable source manifestを導入"
+      ],
+      "unchanged": [
+        "v3.0〜v3.3のSTEP1・①〜⑨・ACI・発走前印固定",
+        "JRA全9券種の比較とWIN5別イベント評価",
+        "旧v3.2/v3.3のSTEP1・prediction・final_bets・proof_commit・HTML/PDF・成績集計対象は不変",
+        "E2E v3.0対v3.1の比較と地方競馬Shadowデータは不変"
+      ],
+      "reason": "2026-10-10のv3.3実行で8券種の中間オッズは取得できたのに、WIN5未完了や確率未校正を全レースの機械的『情報不足』passとして扱った不具合へのユーザー指摘。価格情報と確率推定の不確実性を丁寧に説明しつつ、真に購入判断できる候補だけを独立評価するため。"
     }
   ]
 }
