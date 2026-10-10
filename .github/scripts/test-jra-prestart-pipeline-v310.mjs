@@ -1,5 +1,7 @@
 // Synthetic deterministic fixtures ONLY; never treated as real race data or actual odds.
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {createHash} from 'node:crypto';
 import {TYPES,MODES,expandStrategy,ticketKey} from './jra-strategy-engine-v39.mjs';
 import {fullFieldOutcomes,assemble} from './jra-prestart-pipeline-v310.mjs';
 import {validateV310} from './validate-jra-portfolio-v310.mjs';
@@ -41,6 +43,12 @@ function fixture(){
    market_selection_id:key,market_odds:prices[l.type],observed_at:quoteAt,
    source_url:synthetic,source_capture_sha256:'a'.repeat(64),quote_verified:true});
  }
+ const capturePath='e2e_validation/quote-evidence/fixture-synthetic-only.json';
+ const captureData=JSON.stringify({source_url:synthetic,observed_at:quoteAt,lines:[...odds.values()].map(q=>({type:q.type,selection:q.selection,market_odds:q.market_odds}))});
+ fs.mkdirSync('e2e_validation/quote-evidence',{recursive:true});
+ fs.writeFileSync(capturePath,captureData);
+ const realDigest=createHash('sha256').update(captureData).digest('hex');
+ for(const q of odds.values()){q.source_capture_path=capturePath;q.source_capture_sha256=realDigest;}
  return {prompt_version:'v3.10',race_id:'2030-10-11-test-race',
   race_context:{venue:'東京',race_no:11,start_at:'2030-10-11T15:45:00+09:00',sale_field_size:9,
    place_paid_positions:3,offered_types:TYPES,official_source_url:synthetic},
@@ -85,6 +93,8 @@ p=deep(raw);p.market_quotes[0].market_odds=null;check('no invented odds',p,'quot
 p=deep(raw);p.market_quotes[0].observed_at='2030-10-11T16:00:00+09:00';check('late price',p,'quote after freeze');
 p=deep(raw);p.market_quotes[0].market_selection_id='単勝:[9]';check('selection precision',p,'market key');
 p=deep(raw);p.market_quotes[0].source_capture_sha256=null;check('missing page capture hash',p,'capture content');
+p=deep(raw);p.market_quotes[0].source_capture_sha256='b'.repeat(64);check('incorrect page capture hash',p,'actual quote capture SHA256 mismatch');
+p=deep(raw);p.strategy_plan_fixed_at='2030-10-11T08:06:00+09:00';check('strategy chosen after observing odds',p,'plan must precede every market observation');
 p=deep(raw);p.market_quotes.push({...p.market_quotes[0],market_odds:2.5});check('same ticket price conflict',p,'conflicting price');
 p=deep(raw);p.step1.runners[0].win_probability=.3;check('no model from arbitrary probabilities',p,'unnormalized');
 p=deep(raw);p.step1.no_odds_used_to_change_marks=false;check('independence of STEP1',p,'independence');
