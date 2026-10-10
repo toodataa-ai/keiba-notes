@@ -1,0 +1,770 @@
+{
+  "schema_version": 2,
+  "prompt_version": "v3.4",
+  "race_id": "2026-10-10-mimuro-stakes",
+  "race_context": {
+    "venue": "京都",
+    "race_no": 11,
+    "race_name": "御陵ステークス",
+    "course": "ダート1800m 良（当日二次情報）",
+    "start_at": "2026-10-10T15:30:00+09:00",
+    "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+  },
+  "generated_at": "2026-10-10T14:03:32.619+09:00",
+  "information_cutoff_at": "2026-10-10T14:03:32.619+09:00",
+  "snapshot_kind": "independent_v3.4_shadow_research_not_promoted",
+  "official_registry_excluded": true,
+  "legacy_v3_2_v3_3_untouched": true,
+  "step1_source_path": "docs/data/v3.4-research/step1-2026-10-10-mimuro-stakes.json",
+  "step1_blob_sha": "f548511b128e549d6cb7cb40d6102a1e034f7e95",
+  "step1_fixed_at": "2026-10-10T14:01:52.778+09:00",
+  "marks": {
+    "win": 11,
+    "second": 13,
+    "third": 5
+  },
+  "step1_ranking": [
+    11,
+    13,
+    5,
+    1,
+    3,
+    12,
+    4,
+    6,
+    8,
+    9,
+    7,
+    10,
+    2
+  ],
+  "step1_analysis": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+  "market_coverage_status": "complete",
+  "market_coverage_snapshot_at": "2026-10-10T14:03:32.619+09:00",
+  "bet_type_evaluations": [
+    {
+      "type": "単勝",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          11
+        ],
+        "label": "11",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 8.2,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:38:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.1680119,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.1507526,
+        "central": 0.1680119,
+        "concentrated": 0.1935875
+      },
+      "ev_multiple": 1.378,
+      "ev_scenarios": {
+        "min": 1.236,
+        "central": 1.378,
+        "max": 1.587
+      },
+      "break_even_probability": 0.121951,
+      "decision": "buy",
+      "reason": "有力な購入候補として総合評価。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "複勝",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          11
+        ],
+        "label": "11",
+        "kind": "horse_numbers"
+      },
+      "market_odds": [
+        1.9,
+        2.5
+      ],
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:38:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.4648019,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.4226234,
+        "central": 0.4648019,
+        "concentrated": 0.525375
+      },
+      "ev_multiple": 0.883,
+      "ev_scenarios": {
+        "min": 0.803,
+        "central": 0.883,
+        "max": 0.998
+      },
+      "break_even_probability": 0.526316,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "枠連",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          7,
+          8
+        ],
+        "label": "7-8",
+        "kind": "frame_numbers"
+      },
+      "market_odds": 9.6,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:38:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0920944,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0829851,
+        "central": 0.0920944,
+        "concentrated": 0.1065622
+      },
+      "ev_multiple": 0.884,
+      "ev_scenarios": {
+        "min": 0.797,
+        "central": 0.884,
+        "max": 1.023
+      },
+      "break_even_probability": 0.104167,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "馬連",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          11,
+          13
+        ],
+        "label": "11-13",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 14.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2608040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:56:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0546933,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.044928,
+        "central": 0.0546933,
+        "concentrated": 0.0704077
+      },
+      "ev_multiple": 0.771,
+      "ev_scenarios": {
+        "min": 0.633,
+        "central": 0.771,
+        "max": 0.993
+      },
+      "break_even_probability": 0.070922,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "馬単",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          11,
+          13
+        ],
+        "label": "11→13",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 39.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040311?ninki=1",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:34:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0278338,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0227583,
+        "central": 0.0278338,
+        "concentrated": 0.0361206
+      },
+      "ev_multiple": 1.099,
+      "ev_scenarios": {
+        "min": 0.899,
+        "central": 1.099,
+        "max": 1.427
+      },
+      "break_even_probability": 0.025316,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "ワイド",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          11,
+          13
+        ],
+        "label": "11-13",
+        "kind": "horse_numbers"
+      },
+      "market_odds": [
+        6,
+        6.5
+      ],
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040311?ninki=0",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T14:00:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.1521338,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.1263054,
+        "central": 0.1521338,
+        "concentrated": 0.1933305
+      },
+      "ev_multiple": 0.913,
+      "ev_scenarios": {
+        "min": 0.758,
+        "central": 0.913,
+        "max": 1.16
+      },
+      "break_even_probability": 0.166667,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "三連複",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          5,
+          11,
+          13
+        ],
+        "label": "5-11-13",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 23.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040311?ninki=1",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:32:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0379151,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0271103,
+        "central": 0.0379151,
+        "concentrated": 0.0588805
+      },
+      "ev_multiple": 0.876,
+      "ev_scenarios": {
+        "min": 0.626,
+        "central": 0.876,
+        "max": 1.36
+      },
+      "break_even_probability": 0.04329,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    },
+    {
+      "type": "三連単",
+      "status": "evaluated",
+      "candidate": {
+        "selection": [
+          11,
+          5,
+          13
+        ],
+        "label": "11→5→13",
+        "kind": "horse_numbers"
+      },
+      "market_odds": 208.6,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040311?ninki=1",
+      "market_source_name": "スポーツナビ競馬／中間オッズ（二次情報）",
+      "observed_at": "2026-10-10T13:34:00+09:00",
+      "assessed_at": "2026-10-10T14:03:32.619+09:00",
+      "probability": 0.0065771,
+      "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+      "probability_scenarios": {
+        "conservative": 0.0046515,
+        "central": 0.0065771,
+        "concentrated": 0.0104164
+      },
+      "ev_multiple": 1.372,
+      "ev_scenarios": {
+        "min": 0.97,
+        "central": 1.372,
+        "max": 2.173
+      },
+      "break_even_probability": 0.004794,
+      "decision": "pass",
+      "reason": "価格と条件付き確率を比較。単一順位モデルの前提に敏感で、現時点では購入から除外。EVの値は仮定付き参考値、校正済み・確定利益ではない。"
+    }
+  ],
+  "probability_model_audit": {
+    "status": "complete",
+    "model": "nine factor grade-weight softmax (beta=.9/1.1/1.4) -> full-field PL conditional ordered 1st/2nd/3rd",
+    "calibrated": false,
+    "primary_source": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C",
+    "source_observed_at": "2026-10-10T14:01:52.778+09:00",
+    "grade_weight_reference": "docs/data/v3.4-research/step1-2026-10-10-mimuro-stakes.json",
+    "runners": [
+      {
+        "horse_number": 11,
+        "horse_name": "サイモンシュバリエ",
+        "win_probability": 0.16801188,
+        "factors": [
+          "B+",
+          "A",
+          "B+",
+          "B",
+          "A+",
+          "A",
+          "B-",
+          "B+",
+          "A"
+        ],
+        "evidence": "同場同距離の再現性が最も明瞭。3勝級初戦敗退だが先行持続力は上位",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 13,
+        "horse_name": "サンライズケヴィン",
+        "win_probability": 0.13783188,
+        "factors": [
+          "A+",
+          "A",
+          "B+",
+          "A",
+          "B",
+          "B+",
+          "B-",
+          "B+",
+          "A"
+        ],
+        "evidence": "3歳55kgで先行持続。昇級・京都コース未経験・外枠が課題",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 5,
+        "horse_name": "リベッチオ",
+        "win_probability": 0.15902075,
+        "factors": [
+          "A+",
+          "A",
+          "B+",
+          "B+",
+          "B+",
+          "A",
+          "B-",
+          "B+",
+          "A"
+        ],
+        "evidence": "3歳55kgで先行安定、距離適合。伏竜S重馬場大敗は別条件として分解",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 1,
+        "horse_name": "ダンツシタン",
+        "win_probability": 0.09909061,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "B+",
+          "B+",
+          "B+",
+          "B-",
+          "A",
+          "B+"
+        ],
+        "evidence": "現級連対が能力根拠。前走阪神1800大敗を過大減点せず内枠差しを再検討",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 3,
+        "horse_name": "ドラゴン",
+        "win_probability": 0.0897506,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "B",
+          "B+",
+          "B+",
+          "B-",
+          "A",
+          "B+"
+        ],
+        "evidence": "同コース勝ち・先行可能。現級京都9着で勝ち切り再現性は低め",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 12,
+        "horse_name": "ゲキザル",
+        "win_probability": 0.07202654,
+        "factors": [
+          "A",
+          "B+",
+          "B+",
+          "A",
+          "B",
+          "B",
+          "B-",
+          "B",
+          "B+"
+        ],
+        "evidence": "現級で近走安定。京都初経験と差し届く展開かが鍵",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 4,
+        "horse_name": "ショウサンジョージ",
+        "win_probability": 0.07952208,
+        "factors": [
+          "A+",
+          "B+",
+          "B+",
+          "B",
+          "B+",
+          "B",
+          "B-",
+          "B",
+          "B+"
+        ],
+        "evidence": "同コース現級4着と58→55kgで反発候補。近2戦大敗は慎重評価",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 6,
+        "horse_name": "オリーブグリーン",
+        "win_probability": 0.06174634,
+        "factors": [
+          "B+",
+          "B+",
+          "B+",
+          "B",
+          "B+",
+          "B+",
+          "B-",
+          "A",
+          "B"
+        ],
+        "evidence": "同コースで現級5着。近走不振でも斤量55kg維持と坂井騎乗がプラス",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 8,
+        "horse_name": "メイショウコガシラ",
+        "win_probability": 0.0329844,
+        "factors": [
+          "B+",
+          "B",
+          "B+",
+          "B",
+          "B+",
+          "B",
+          "B-",
+          "B",
+          "B-"
+        ],
+        "evidence": "3勝級で堅実だが勝ち切る裏付けは乏しい",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 9,
+        "horse_name": "ラオラシオン",
+        "win_probability": 0.0329844,
+        "factors": [
+          "B+",
+          "B",
+          "B+",
+          "B",
+          "B+",
+          "B",
+          "B-",
+          "B",
+          "B-"
+        ],
+        "evidence": "同コース経験はあるが近走現級で一歩不足",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 7,
+        "horse_name": "テーオールビー",
+        "win_probability": 0.03409104,
+        "factors": [
+          "A+",
+          "B",
+          "B+",
+          "B",
+          "B",
+          "B",
+          "B-",
+          "B",
+          "B-"
+        ],
+        "evidence": "52kg軽量は魅力も近2走大敗。京都1800近似が弱い",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 10,
+        "horse_name": "ベルダイナフェロー",
+        "win_probability": 0.02171568,
+        "factors": [
+          "A+",
+          "B",
+          "B+",
+          "B",
+          "B-",
+          "B",
+          "B-",
+          "B",
+          "C"
+        ],
+        "evidence": "52kgも近走不振。復調条件の明確な直接根拠が足りない",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      },
+      {
+        "horse_number": 2,
+        "horse_name": "ミカッテヨンデイイ",
+        "win_probability": 0.01122378,
+        "factors": [
+          "A+",
+          "C",
+          "B",
+          "B",
+          "C",
+          "C",
+          "B-",
+          "B",
+          "C"
+        ],
+        "evidence": "芝短距離からダート1800へ大変更。直接裏付けなく未知を適性肯定に転換できない",
+        "source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+      }
+    ],
+    "scenarios": [
+      {
+        "name": "conservative_flat",
+        "assumption": "Ability difference flattened (beta=.9); assesses uncertainty in grade discrimination",
+        "candidate_hit_probability": 0.1507526
+      },
+      {
+        "name": "central",
+        "assumption": "Central 9-axis score beta=1.1; no odds fed into grade scoring",
+        "candidate_hit_probability": 0.1680119
+      },
+      {
+        "name": "ability_concentrated",
+        "assumption": "Ability differentiation beta=1.4; hypothetical preference for top graded horse",
+        "candidate_hit_probability": 0.1935875
+      }
+    ],
+    "limitations": [
+      "Ordinal grades and scenario beta not empirically calibrated",
+      "Scenario bounds are NOT statistical confidence intervals",
+      "No independent fully calibrated pace-by-track or surface changes",
+      "Due to available evidence, probabilities should not be interpreted as exact frequencies"
+    ]
+  },
+  "purchase_gate": {
+    "scope": "race_local_8types",
+    "local_coverage_status": "complete",
+    "candidates": [
+      {
+        "type": "単勝",
+        "selection": [
+          11
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+        "observed_at": "2026-10-10T13:38:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 1.236-1.587 at observed quote; positive in all 3 heuristic scenarios",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "eligible",
+        "reason": "Observed market quote and fixed ability evidence support limited 100-yen scenario purchase, not validated edge"
+      },
+      {
+        "type": "複勝",
+        "selection": [
+          11
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+        "observed_at": "2026-10-10T13:38:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.803-0.998; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "枠連",
+        "selection": [
+          7,
+          8
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+        "observed_at": "2026-10-10T13:38:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.797-1.023; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          11,
+          13
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2608040311?ninki=0",
+        "observed_at": "2026-10-10T13:56:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.633-0.993; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          11,
+          13
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040311?ninki=1",
+        "observed_at": "2026-10-10T13:34:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.899-1.427; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "ワイド",
+        "selection": [
+          11,
+          13
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040311?ninki=0",
+        "observed_at": "2026-10-10T14:00:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.758-1.16; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          5,
+          11,
+          13
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040311?ninki=1",
+        "observed_at": "2026-10-10T13:32:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.626-1.36; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          11,
+          5,
+          13
+        ],
+        "quote_verified": true,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040311?ninki=1",
+        "observed_at": "2026-10-10T13:34:00+09:00",
+        "probability_assessed": true,
+        "probability_method": "Full-field v3.4 fixed grade-weight softmax beta=1.1 with PL conditional ranking, NOT empirically calibrated",
+        "uncertainty_assessed": true,
+        "ability_reason": "⑪サイモンシュバリエ：5月京都ダ1800mで2勝級1着と3着。3勝級7着は小倉1700m。⑬サンライズケヴィンは9/20阪神ダ1800m2勝級を0.6秒差で先行勝ち、3歳55kgだが京都未経験。⑤リベッチオは8/9中京ダ1800m2勝級勝ち、重の伏竜S大敗を別条件として分解。馬場良・ペースM-H想定で先行馬同士の競り合いを不確実性に含める。",
+        "edge_reason": "3 scenario EV range 0.97-2.173; no sufficient price/risk superiority over single win",
+        "risk_reason": "モデル未校正・中間オッズ変動・直前馬場/取消/馬体重の再確認は未完了",
+        "eligibility": "ineligible",
+        "reason": "Model uncertainty, price/risk and competing single-win candidate make ticket unattractive"
+      }
+    ]
+  },
+  "purchase_decision": "buy",
+  "purchase_reason_code": "bought",
+  "purchase_reason_detail": "Old v3.2 ability evidence fixed. Fresh dated independent quote plus scenario win probability is consistently above implied break-even in 3 heuristic concentration scenarios; model uncalibrated and actual profits uncertain. Exclude other ticket types.",
+  "best_bet_id": "B01",
+  "reference_priority_candidate": null,
+  "final_bets": [
+    {
+      "type": "単勝",
+      "selection": [
+        11
+      ],
+      "id": "B01",
+      "stake_yen": 100,
+      "layer": "ability_core",
+      "reason": "京都ダ1800mで5月2勝級1着・3着（同騎手騎乗）。3勝級前走7着は小倉1700m・別距離。7-8倍台を得られるなら同条件再現の価格余地。"
+    }
+  ],
+  "final_bets_fixed_at": "2026-10-10T14:03:32.619+09:00",
+  "total_stake_yen": 100,
+  "report_generated_for_real_purchase": false,
+  "previous_records_not_modified": true,
+  "final_bets_record_type": "reproducible_research_purchase_instruction_not_actual_ticket_purchase",
+  "source_links": [
+    "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C",
+    "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/ur/2608040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040311?ninki=1",
+    "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040311?ninki=0",
+    "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040311?ninki=1",
+    "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040311?ninki=1"
+  ],
+  "known_limits": [
+    "斤量差、同条件直接実績、昇級、現級実績を別評価し、過去時計を無補正比較しない。",
+    "3勝級前走の再現性とハンデ馬場の不確実性は高い。"
+  ]
+}
