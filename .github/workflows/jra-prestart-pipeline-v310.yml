@@ -1,0 +1,86 @@
+name: JRA v3.10 prestart prediction pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      input_path:
+        description: 'Audited prereace STEP1 + exact odds catalog (e2e_validation/inputs/*.json)'
+        type: string
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: jra-v310-prestart-proof
+  cancel-in-progress: false
+jobs:
+  prestart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run v3.10 new + inherited regression tests
+        run: |
+          node .github/scripts/test-jra-prestart-pipeline-v310.mjs
+          node .github/scripts/test-jra-portfolio-v310.mjs
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/validate-jra-portfolio-prompt-v310.mjs
+      - name: Validate path and reserve immutable snapshot names
+        env:
+          INPUT_PATH: ${{ inputs.input_path }}
+          RUN_ID: ${{ github.run_id }}
+          ATTEMPT: ${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$INPUT_PATH" in e2e_validation/inputs/*.json) ;; *) echo "::error::Input must be a tracked prereace JSON under e2e_validation/inputs"; exit 1;; esac
+          if [[ "$INPUT_PATH" == *..* ]] || [[ ! -f "$INPUT_PATH" ]] || [[ -L "$INPUT_PATH" ]]; then
+            echo "::error::Unsafe or missing race input"; exit 1
+          fi
+          RACE_ID=$(node -e "const o=require('./'+process.argv[1]);if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$/.test(o.race_id||''))process.exit(1);console.log(o.race_id)" "$INPUT_PATH")
+          REL="v3.10-run${RUN_ID}-attempt${ATTEMPT}.json"
+          SNAPSHOT="e2e_validation/snapshots/${RACE_ID}/${REL}"
+          PREDICTION="e2e_validation/predictions/${RACE_ID}/${REL}"
+          if [[ -e "$SNAPSHOT" || -e "$PREDICTION" ]]; then
+            echo "::error::Immutable snapshot/prediction path already occupied"; exit 1
+          fi
+          {
+            echo "INPUT_PATH=$INPUT_PATH"
+            echo "SNAPSHOT=$SNAPSHOT"
+            echo "PREDICTION=$PREDICTION"
+          } >> "$GITHUB_ENV"
+      - name: Generate and audit the complete unsealed betting snapshot
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-prestart-pipeline-v310.mjs --input "$INPUT_PATH" --output "$SNAPSHOT"
+          node -e "const p=require('./'+process.argv[1]);if(p.stage!=='pending_git_proof'||p.proof_commit!==null||p.prompt_version!=='v3.10')process.exit(1)" "$SNAPSHOT"
+      - name: Freeze snapshot in a real Git commit before race start
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$SNAPSHOT"
+          git commit -m "Freeze prereace JRA v3.10 audit and final_bets snapshot"
+          git push origin HEAD:main
+          PROOF=$(git rev-parse HEAD)
+          echo "PROOF=$PROOF" >> "$GITHUB_ENV"
+          echo "Recorded immutable prereace snapshot $SNAPSHOT in $PROOF"
+      - name: Seal final prediction with existing Git proof
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-prestart-pipeline-v310.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
+          node .github/scripts/validate-jra-portfolio-v310.mjs
+          node .github/scripts/validate-jra-portfolio-prompt-v310.mjs
+      - name: Publish structured formal prediction only (no fabricated HTML/PDF)
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION"
+          git commit -m "Seal JRA v3.10 prediction with verified prereace commit"
+          git push origin HEAD:main
+          echo "Formal JSON prediction: $PREDICTION"
+          echo "Report and official PDF are separately BLOCKED until full authored report and page-level checks pass."
