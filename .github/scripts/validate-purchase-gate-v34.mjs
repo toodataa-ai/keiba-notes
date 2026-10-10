@@ -37,6 +37,28 @@ export function validateV34(data) {
   if(gate.local_coverage_status==='complete' && !complete) add('local coverage marked complete without eight evaluated rows');
   if(gate.local_coverage_status==='none' && localEvaluated.length) add('local coverage none despite evaluated type');
   if(gate.local_coverage_status==='partial' && (complete||localEvaluated.length===0)) add('local coverage partial inconsistent with priced types');
+  const audit=data.probability_model_audit;
+  if(!audit||typeof audit!=='object') add('probability_model_audit required');
+  else if(audit.status==='complete'){
+    if(!nonempty(audit.model)||!nonempty(audit.primary_source)||!dateValid(audit.source_observed_at)) add('probability model lacks source/method/timestamp');
+    if(!Array.isArray(audit.runners)||audit.runners.length<3) add('full-field probability runners missing');
+    else{
+      if(data.runners&&audit.runners.length!==data.runners.length) add('probability field size does not equal runner count');
+      const ids=new Set(audit.runners.map(r=>r.horse_number));
+      const probSum=audit.runners.reduce((a,r)=>a+(Number.isFinite(r.win_probability)?r.win_probability:0),0);
+      if(ids.size!==audit.runners.length||Math.abs(probSum-1)>1e-5) add('full-field probabilities not normalized or duplicate horses');
+      for(const r of audit.runners){
+        if(!(Number.isInteger(r.horse_number)&&r.horse_number>0&&Number.isFinite(r.win_probability)&&r.win_probability>0&&r.win_probability<1))
+          add('invalid per-runner probability');
+        if(!nonempty(r.evidence)||!nonempty(r.source_url)) add('per-runner evidence/source required');
+      }
+    }
+    if(!Array.isArray(audit.scenarios)||audit.scenarios.length<3) add('at least three sensitivity scenarios needed');
+    else for(const z of audit.scenarios) {
+      if(!nonempty(z.name)||!nonempty(z.assumption)||!Number.isFinite(z.candidate_hit_probability)||z.candidate_hit_probability<0||z.candidate_hit_probability>1) add('scenario missing assumption/probability');
+    }
+    if(audit.calibrated!==false&&audit.calibrated!==true) add('calibrated flag must be explicit');
+  } else if(audit?.status!=='incomplete') add('probability_model_audit.status must be complete/incomplete');
   const eligible=[];
   for(const [i,c] of gate.candidates.entries()){
     const loc='candidate['+i+']';
@@ -63,6 +85,7 @@ export function validateV34(data) {
   if(data.purchase_decision==='buy'){
     if(data.purchase_reason_code!=='bought') add('buy requires bought reason');
     if(eligible.length===0) add('buy has no eligible local candidates');
+    if(audit?.status!=='complete') add('buy requires full-field audited probability model, not point estimate alone');
     if(!bets.length) add('buy requires frozen final_bets');
     if(!nonempty(data.best_bet_id)||!bets.some(b=>b.id===data.best_bet_id)) add('buy must have one best bet id in final_bets');
     if(!dateValid(data.final_bets_fixed_at)) add('buy requires prereace fixed time');
@@ -82,6 +105,7 @@ export function validateV34(data) {
     if(data.best_bet_id!==null||bets.length||data.total_stake_yen!==0) add('pass must have zero stake, empty bets, null best_bet_id');
     if(data.purchase_reason_code==='insufficient_local_information' && eligible.length>0) add('insufficient_local_information invalid when any local candidate is eligible (WIN5/coverage may be incomplete)');
     if(['no_value','risk_high'].includes(data.purchase_reason_code) && eligible.length===0) add('no_value/risk_high requires at least one eligible local candidate');
+    if(['no_value','risk_high'].includes(data.purchase_reason_code) && audit?.status!=='complete') add('value/risk judgement requires audited probability scenarios');
   }
   // User excludes WIN5. A local bet is evaluated without any unrelated cross-race gate.
   return errors;
