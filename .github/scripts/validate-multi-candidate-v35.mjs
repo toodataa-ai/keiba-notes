@@ -5,6 +5,7 @@ import {validateV34} from './validate-purchase-gate-v34.mjs';
 const TYPES=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単'];
 const key=(type,selection)=>type+':'+JSON.stringify(selection);
 const isV35=v=>{const m=/^v(\d+)\.(\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=5)};
+const isV38=v=>{const m=/^v(\d+)\.(\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=8);};
 const priced=odds=>typeof odds==='number'&&Number.isFinite(odds)&&odds>1 ||
   Array.isArray(odds)&&odds.length===2&&odds.every(n=>typeof n==='number'&&Number.isFinite(n)&&n>1);
 const nonempty=x=>typeof x==='string'&&x.trim().length>0;
@@ -15,7 +16,7 @@ const depth={単勝:2,複勝:2,枠連:2,馬連:2,馬単:2,ワイド:2,三連複:
 export function validateMultiCandidate35(data){
   const errors=[];
   const err=t=>errors.push(t);
-  if(!isV35(data.prompt_version))return errors;
+  if(!isV35(data.prompt_version)||isV38(data.prompt_version))return errors;
   errors.push(...validateV34(data));
   const comparisons=data.ticket_candidate_comparisons;
   const audit=data.ticket_candidate_search_audit;
