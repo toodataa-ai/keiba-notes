@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.4",
+  "source_commit": "c27a7ae2f2b6d23956c504342b5154e7a50e9018",
+  "components": [
+    {
+      "path": "競馬予想_完全版プロンプト_v3.0.txt",
+      "git_blob_sha": "8cb18e5cd2bab88bfaf5a04f103a402acb9aac90",
+      "role": "base_prompt"
+    },
+    {
+      "path": "closing_index_v1/production_profile_v1_1.json",
+      "git_blob_sha": "a72db216545cc481644c8f066b52e66c9b0083eb",
+      "role": "aci_production_profile"
+    },
+    {
+      "path": "closing_index_v1/adoption_decision_v1_1.json",
+      "git_blob_sha": "831bebfb4133856bd9284901594ecea30cc7ba27",
+      "role": "aci_adoption_decision"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.1.txt",
+      "git_blob_sha": "688ff0c06a441ca2634c73810aa2708bcbdec949",
+      "role": "aci_delta_prompt"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.2.txt",
+      "git_blob_sha": "1c2feb336575376c0736f78e7313ac7301e197e7",
+      "role": "final_bet_decision_delta"
+    },
+    {
+      "path": "docs/data/bet_type_coverage_policy_v1.json",
+      "git_blob_sha": "f88a1c8678853b5401e0d41e9404c42110813168",
+      "role": "bet_type_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.3.txt",
+      "git_blob_sha": "28479c99b02932739890e7b22de8e8fe043a9eac",
+      "role": "all_bet_types_delta"
+    },
+    {
+      "path": "docs/data/purchase_gate_policy_v1.json",
+      "git_blob_sha": "51a9a8fc01067465fff81724632f8e5e2ff440f0",
+      "role": "race_local_purchase_gate_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.4.txt",
+      "git_blob_sha": "f8983c18514411680e8f2680d317635d005ec750",
+      "role": "v3.4_purchase_decision_delta"
+    }
+  ],
+  "note": "Fix erroneous blanket information-insufficient pass: eight local bet types retain independent buy/pass gate; missing WIN5 legs or some types never automatically blocks a verified local candidate. Uncalibrated probability remains explicitly uncertain. Legacy v3.2/v3.3 predictions, PDFs, proof_commit, final_bets and E2E comparison remain untouched."
+}
