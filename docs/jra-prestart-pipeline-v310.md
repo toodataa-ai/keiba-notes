@@ -17,8 +17,8 @@
 
 ## 入力ファイルの配置と実行
 
-1. レースごとに、次項のJSON契約に沿って発走前の情報を監査・記録し、GitHubの **e2e_validation/inputs/YYYY-MM-DD-レースslug.json** に新規保存する（過去の予想は編集しない）。
-2. GitHubの **Actions → JRA v3.10 prestart prediction pipeline → Run workflow** で input_path にその保存パスを入力する。毎回別ファイルのレースIDで動かす。
+1. レースごとに、次項のJSON契約に沿って発走前の情報を監査・記録し、GitHubの **e2e_validation/inputs/YYYY-MM-DD-レースslug.json** に**新規保存してコミット**する（過去の予想は編集しない）。
+2. 新しい入力ファイル1件のpushでActionが自動起動する（既存ファイルの上書きや複数件一括投入は安全のため停止）。手動実行する場合は **Actions → JRA v3.10 prestart prediction pipeline → Run workflow** で input_path に保存パスを入力できる。
 3. テスト→予想生成→証跡コミット→正式JSON封印→v3.10既存検査の順に進む。発走済み時刻なら途中で必ず失敗する。
 4. 結果は e2e_validation/predictions/YYYY-MM-DD-レースslug/v3.10-runN-attemptN.json に格納。proof_commitはスナップショットを含むGit SHAとして照合する。
 5. PDFおよびサイト掲載は別工程。正式JSONコミット＝公開済PDFという扱いは禁止。
