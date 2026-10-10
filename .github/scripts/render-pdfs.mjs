@@ -127,6 +127,15 @@ function validateFullReport(race) {
     throw new Error(`${race.id}: complete report is missing sections: ${missing.join(', ')}`);
   }
 
+  // From 2026-10-11, a stricter user-accepted reader-v1 layout contract
+  // replaces the legacy marker-only layout check. The rendered PDF itself is
+  // validated below, before the publish commit is allowed.
+  if (race.date >= '2026-10-11') {
+    if (!html.includes('<section class="horse">')) {
+      throw new Error(`${race.id}: missing individual reader-v1 horse sheets`);
+    }
+    return;
+  }
   const horseCount = getHorseCount(html);
   if (!race.field_size) throw new Error(`${race.id}: field_size is required for complete-report validation`);
   if (horseCount !== race.field_size) {
@@ -163,6 +172,12 @@ for (const file of files) {
     console.log(`Skipping unmanaged report ${file}; existing PDF is left unchanged`);
     continue;
   }
+  // Old authored PDF originals remain immutable; never regenerate them as a
+  // side-effect of enabling a stricter future layout gate.
+  if (race.date < '2026-10-11') {
+    console.log(`Protected historical report/PDF: ${slug}`);
+    continue;
+  }
 
   const reportPath = path.join(reportsDir, file);
   const out = path.resolve('docs', race.pdf);
@@ -174,6 +189,15 @@ for (const file of files) {
     stdio: 'inherit',
     maxBuffer: 20 * 1024 * 1024
   });
+
+  // Fail closed. Never publish a broken new PDF merely because PDF
+  // generation returned exit code zero.
+  execFileSync('python3', [
+    '.github/scripts/validate-jra-pdf-layout.py',
+    '--html', reportPath,
+    '--pdf', out,
+    '--policy', 'docs/data/jra_pdf_layout_policy_v1.json'
+  ], { stdio: 'inherit' });
 
   const renderedPages = pdfPageCount(out);
   if (race.full_report_pages && renderedPages !== race.full_report_pages) {
