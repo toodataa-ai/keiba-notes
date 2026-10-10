@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.3",
+  "event_id": "2026-10-10-JRA-WIN5",
+  "date": "2026-10-10",
+  "snapshot_at": "2026-10-10T09:05:03.892+09:00",
+  "official_race_list": "https://www.jra.go.jp/kouza/win5/info/racelist.html",
+  "sale_status": "offered",
+  "win5_fixed_prerace_payout_odds": null,
+  "payout_odds_policy": "WIN5には事前固定の払戻倍率なし",
+  "legs": [
+    {
+      "win_leg": 1,
+      "venue": "東京",
+      "race_no": 9,
+      "race_name": "陣馬特別",
+      "start_at": "2026-10-10T14:35:00+09:00",
+      "step1_status": "not_completed",
+      "marks": null,
+      "win_probability": null,
+      "blocker": "公式発走前履歴を揃えた①〜⑨全頭診断と印固定を本実行では完成できていない"
+    },
+    {
+      "win_leg": 2,
+      "venue": "京都",
+      "race_no": 10,
+      "race_name": "宇治川特別",
+      "start_at": "2026-10-10T14:50:00+09:00",
+      "step1_status": "not_completed",
+      "marks": null,
+      "win_probability": null,
+      "blocker": "公式発走前履歴を揃えた①〜⑨全頭診断と印固定を本実行では完成できていない"
+    },
+    {
+      "win_leg": 3,
+      "venue": "東京",
+      "race_no": 10,
+      "race_name": "JRA電話・インターネット発売50周年記念",
+      "start_at": "2026-10-10T15:10:00+09:00",
+      "step1_status": "not_completed",
+      "marks": null,
+      "win_probability": null,
+      "blocker": "公式発走前履歴を揃えた①〜⑨全頭診断と印固定を本実行では完成できていない"
+    },
+    {
+      "win_leg": 4,
+      "venue": "京都",
+      "race_no": 11,
+      "race_name": "御陵ステークス",
+      "start_at": "2026-10-10T15:30:00+09:00",
+      "step1_status": "fixed_legacy_v3.2_reused",
+      "marks": {
+        "win": 11,
+        "second": 13,
+        "third": 5
+      },
+      "step1_fixed_at": "2026-10-10T08:08:31+09:00",
+      "snapshot_path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.3.json",
+      "blocker": "WIN5用途の校正済み単勝分布は未入手"
+    },
+    {
+      "win_leg": 5,
+      "venue": "東京",
+      "race_no": 11,
+      "race_name": "サウジアラビアロイヤルカップ",
+      "start_at": "2026-10-10T15:45:00+09:00",
+      "step1_status": "fixed_legacy_v3.2_reused",
+      "marks": {
+        "win": 5,
+        "second": 6,
+        "third": 9
+      },
+      "step1_fixed_at": "2026-10-10T08:08:29+09:00",
+      "snapshot_path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.3.json",
+      "blocker": "WIN5用途の校正済み単勝分布は未入手"
+    }
+  ],
+  "win5_selection": null,
+  "win5_win_probability": null,
+  "win5_expected_return": null,
+  "win5_budget_yen": 0,
+  "purchase_decision": "pass",
+  "final_bets": [],
+  "audit_status": "incomplete",
+  "blockers": [
+    "WIN1からWIN3までの完全な独立STEP1評価と時刻固定が未完了",
+    "したがって5レース横断の的中確率・組合せ点数・払戻期待値を算定できない",
+    "WIN5の事前確定オッズは制度上存在しない。払戻の捏造を禁止"
+  ],
+  "immutable_legacy": true,
+  "legacy_registry_unchanged": true
+}
