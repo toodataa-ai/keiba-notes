@@ -120,7 +120,7 @@ function sample(){
   probability_assessed:true,probability_method:'Full-field conditional top3 model',uncertainty_assessed:true,
   ability_reason:'Synthetic',edge_reason:'Price and probability',risk_reason:'Uncalibrated',eligibility:'eligible',reason:'Valid'}]},
  probability_model_audit:{status:'complete',calibrated:false,model:'Full field probabilities',primary_source:'https://example.org/synthetic-runners',
-  source_observed_at:at,runners:Array.from({length:n},(_,i)=>({horse_number:i+1,win_probability:1/n,evidence:'nine axes synth',source_url:'https://example.org/synthetic-runners'})),
+  source_observed_at:at,runners:Array.from({length:n},(_,i)=>({horse_number:i+1,win_probability:distributions.central.filter(o=>o.finish[0]===i+1).reduce((p,o)=>p+o.probability,0),evidence:'nine axes synth',source_url:'https://example.org/synthetic-runners'})),
   scenarios:['low','central','high'].map(s=>({name:s,assumption:'Simulated pace '+s,candidate_hit_probability:.02}))},
  frame_map:fmap,model_assumptions:['no_dead_heat','uncalibrated'],
  outcome_distributions:distributions,strategy_coverage_audit:coverage,purchase_strategy_evaluations:[st],
@@ -138,4 +138,5 @@ v=cp(base);v.purchase_budget_yen=100;invalid('over budget',v,'exceeds race budge
 v=cp(base);v.strategy_coverage_audit[3].modes.box.reason=null;invalid('unexplained skipped strategy',v,'coverage skip reason missing');
 v=cp(base);v.final_bets_fixed_at='2026-10-11T16:00:00+09:00';invalid('late freeze',v,'not frozen before start');
 v=cp(base);v.race_context.place_paid_positions=2;invalid('place eligibility error',v,'8+ horse races');
+v=cp(base);v.probability_model_audit.runners[0].win_probability+=.01;invalid('do not silently change fixed STEP1 win chance',v,'central joint distribution changes frozen win probability');
 console.log('PASS all bet strategies + joint payout regression cases');
