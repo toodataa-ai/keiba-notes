@@ -25,6 +25,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fonts-noto-cjk poppler-utils
           python3 -m pip install 'weasyprint==68.0'
+      - name: Validate full v3.3 snapshots before rendering
+        run: node .github/scripts/validate-v33-snapshot-presentation.mjs
       - name: Render only new v3.3 HTML
         run: |
           mkdir -p /tmp/v33-pdfs
@@ -34,6 +36,10 @@ jobs:
             base=$(basename "$f" .html)
             python3 -m weasyprint "$f" "/tmp/v33-pdfs/$base.pdf"
             pdfinfo "/tmp/v33-pdfs/$base.pdf" | grep -E 'Page size:|Pages:'
+            if pdftotext "/tmp/v33-pdfs/$base.pdf" - | grep -Eq 'undefined|NaN|\\[object Object\\]'; then
+              echo "::error::Unresolved placeholder detected in PDF: $base"
+              exit 1
+            fi
           done
       - name: Commit only isolated snapshot PDFs
         run: |
