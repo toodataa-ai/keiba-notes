@@ -1,6 +1,6 @@
 {
-  "version": "v3.4",
-  "path": "競馬予想_完全版プロンプト_v3.4.txt",
-  "updated_at": "2026-10-10T13:58:26.352+09:00",
-  "rule": "Resolve latest_prompt.json first; inherit v3.0/v3.1/v3.2/v3.3 modules and policies as pinned in e2e_validation/manifests/v3.4.json, then apply v3.4 overrides. Only 8 ordinary JRA ticket types (no WIN5). Demand dated pre-race per-horse ①〜⑨ evidence, conditional finish probabilities with scenario sensitivity, verified actual ticket-specific odds, candidate-specific buy/pass gates. Preserve all v3.2/v3.3 predictions, proofs and E2E comparison."
+  "version": "v3.5",
+  "path": "競馬予想_完全版プロンプト_v3.5.txt",
+  "updated_at": "2026-10-10T14:46:41.266+09:00",
+  "rule": "Resolve this pointer and pinned e2e_validation/manifests/v3.5.json. Inherit 3.0→3.4 then apply v3.5, docs/data/multi_candidate_selection_policy_v1.json. JRA local 8 types only; WIN5 excluded. Generate multiple evidence-backed ordered combinations per ticket type before market lookup; verify ticket-specific dated real odds and full-field conditional finish-probability scenario ranges; compare all candidates fairly so an eligible trifecta may be the best bet, but never force purchases or trust inflated odds alone. Preserve all frozen legacy predictions/proofs/results/E2E and local racing."
 }
