@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_multi_candidate_ticket_selection_v35",
+  "effective_prompt_version": "v3.5",
+  "source_version": "v3.4",
+  "scope": "jra_eight_race_local_ticket_types",
+  "win5": "excluded",
+  "problem_statement": "v3.4 evaluated one arbitrary representative per ticket type, then effectively favored win bets; no reliable opportunity for attractive trifecta/exacta or permutations to reach purchase review.",
+  "types": [
+    "単勝",
+    "複勝",
+    "枠連",
+    "馬連",
+    "馬単",
+    "ワイド",
+    "三連複",
+    "三連単"
+  ],
+  "generation": {
+    "timing": "Generate plausible orders and alternatives solely from frozen STEP1 plus course/pace/going scenarios before retrieving odds.",
+    "trifecta": "Explicitly consider ◎→○→▲, ◎→▲→○, ○→◎→▲, scenario-specific reversals and at least one supported △ in third when plausible. Do not force if no pre-race evidence, but report excluded alternatives.",
+    "trio": "Consider three different 3-horse sets around ◎○▲ and supported △/value competitors; exclude unsupported longshots.",
+    "exacta": "Evaluate both justified orderings, not favorite-first only.",
+    "quinella_wide": "Consider top-pair and at least one different pair from ability/track/pace evidence where possible.",
+    "single_win_place": "Compare top ability and price-divergent candidate(s) where possible.",
+    "target_minimum_per_trifecta_trio": "Three justified distinct market combinations when obtainable, else record candidate_generation_blocker; never fabricate odds.",
+    "other_types": "Two justified distinct combinations where obtainable, or document missing evidence.",
+    "combinations_not_buy_bets": "Exploratory candidate count is not final purchased ticket count."
+  },
+  "pricing": {
+    "required": [
+      "type",
+      "selection",
+      "market_odds",
+      "source_url",
+      "observed_at",
+      "assessed_at"
+    ],
+    "official_preferred": true,
+    "dated_secondary_allowed": true,
+    "no_inferred_odds": true,
+    "combine_only_exact_selection": true,
+    "odds_range_use_lower_for_ev": true
+  },
+  "probability": {
+    "model": "Full-field conditional finish events with provenance for each runner and all nine axes; separate scenarios and calibrated flag.",
+    "factors": "Ability, 1st/2nd/3rd order plausibility, class, course, going, pace, jockey, burden, recent form.",
+    "require_candidate_specific_scenarios": true,
+    "minimum_scenarios": 3,
+    "never_independent_win_products": true,
+    "allow_uncalibrated": true,
+    "uncertainty_label": "scenario range (not statistical CI)",
+    "risk_consistency": "Apply same evidence/uncertainty standards to single and combination bets; do not reject simply because trifecta is high-variance or uncalibrated."
+  },
+  "selection": {
+    "primary_objective": "Compare reward relative to assessed probability, downside sensitivity, scenario/horse support and budget; do not rank by highest hit-rate or highest point EV alone.",
+    "required_break_even_probability": true,
+    "candidate_statuses": [
+      "eligible",
+      "ineligible",
+      "unpriced",
+      "probability_unavailable"
+    ],
+    "market_gap_independent": true,
+    "can_select_trifecta": true,
+    "no_forced_trifecta": true,
+    "decision": "buy/pass for each race and all admissible types; top purchase point may be any of 8 types.",
+    "no_value_reason": "If priced and supported but reward does not justify risk, label value/risk, not information-unavailable.",
+    "stake": "normally 100 yen each, no automatic multi-leg wide spread or arbitrary bigger stakes",
+    "avoid_multiple_testing_bias": true,
+    "calibration_warning": "Candidate search inflates apparent best EV; apply uncertainty/multiple comparisons penalty and document limits rather than claiming profits."
+  },
+  "data_contract": {
+    "full_candidates_field": "ticket_candidate_comparisons",
+    "entry_required": [
+      "type",
+      "selection",
+      "source_url",
+      "observed_at",
+      "market_odds",
+      "probability_method",
+      "probability_scenarios",
+      "break_even_probability",
+      "ev_scenarios",
+      "ability_reason",
+      "risk_reason",
+      "eligibility",
+      "decision_reason"
+    ],
+    "summary_field": "bet_type_evaluations",
+    "summary_rule": "Eight legacy-compatible rows retain one best grounded representative per type; detailed list must contain its exact selection and odds.",
+    "purchase_gate_rule": "purchase_gate.candidates lists only the summary representative for each type as needed to preserve existing v3.4 compatibility; selection must match source row.",
+    "candidate_search_audit": "For each type show how many generated/evaluated/unpriced/excluded and why. Missing alternatives must not masquerade as confirmed global best.",
+    "historical": "Never edit v3.4 or earlier predictions, snapshots, proofs, reports, E2E benchmark, results or local-racing data."
+  },
+  "testing": "Synthetic positive trifecta price case, positive single-win case, no-value trifecta case, unpriced trifecta rejection, order swap/market mismatch rejection, legacy integrity check."
+}
