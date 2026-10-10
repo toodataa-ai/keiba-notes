@@ -10,6 +10,7 @@ const nonempty=x=>typeof x==='string'&&x.trim().length>0;
 const dateOk=x=>nonempty(x)&&Number.isFinite(Date.parse(x));
 const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const n=x=>typeof x==='number'&&Number.isFinite(x);
+const lowerOdds=x=>n(x)&&x>1?x:Array.isArray(x)&&x.length===2&&x.every(v=>n(v)&&v>1)&&x[0]<=x[1]?x[0]:null;
 const near=(a,b)=>n(a)&&Math.abs(a-b)<=Math.max(0.000001,Math.abs(b)*0.000001);
 export const isV38=v=>{const m=/^v(\d+)\.(\d+)$/.exec(String(v||''));return !!m&&(Number(m[1])>3||Number(m[1])===3&&Number(m[2])>=8);};
 
@@ -77,7 +78,7 @@ export function validateV38(data){
      if(!Array.isArray(l.selection)||l.selection.length!==(st.type==='三連単'?3:(['単勝','複勝'].includes(st.type)?1:2)))err(lLoc+' selection arity mismatch');
      const c=searchMap.get(key(l.type,l.selection));
      if(!c)err(lLoc+' missing detailed individual candidate');
-     if(!n(l.market_odds)||l.market_odds<=1||!nonempty(l.source_url)||!dateOk(l.observed_at)){priceAll=false;continue;}
+     if(lowerOdds(l.market_odds)===null||!nonempty(l.source_url)||!dateOk(l.observed_at)){priceAll=false;continue;}
      if(!c||c.eligibility!=='eligible'||!eq(c.market_odds,l.market_odds)||c.source_url!==l.source_url||c.observed_at!==l.observed_at)err(lLoc+' priced line not exact verified candidate');
      if(dateOk(data.race_context?.start_at)&&new Date(l.observed_at)>=new Date(data.race_context.start_at))err(lLoc+' market quote after post');
      if(!l.probability_scenarios||requiredScenarios.some(sc=>!n(l.probability_scenarios[sc])||l.probability_scenarios[sc]<0||l.probability_scenarios[sc]>1))err(lLoc+' missing 3 coherent probability scenarios');
@@ -96,7 +97,7 @@ export function validateV38(data){
      let p=0,payout=0;
      for(const l of st.lines){
        if(!l.probability_scenarios||!n(l.probability_scenarios[sc]))continue;
-       p+=l.probability_scenarios[sc];payout+=l.probability_scenarios[sc]*l.stake_yen*l.market_odds;
+       p+=l.probability_scenarios[sc];payout+=l.probability_scenarios[sc]*l.stake_yen*lowerOdds(l.market_odds);
      }
      if(p>1.0000001)err(loc+' sum of disjoint trifecta probabilities exceeds 1 ('+sc+')');
      if(!near(st.hit_probability_scenarios?.[sc],p))err(loc+' hit probability sum incorrect ('+sc+')');
