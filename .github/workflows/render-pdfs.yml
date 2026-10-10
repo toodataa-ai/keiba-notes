@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'docs/reports/**.html'
+      # v3.3 snapshots use an isolated renderer; do not regenerate legacy PDFs.
+      - '!docs/reports/v3.3-2026-10-10-*.html'
       - 'docs/styled-report-sources/**'
       - 'docs/full-reports/**'
       - 'docs/data/races.json'
