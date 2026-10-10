@@ -8,6 +8,8 @@ on:
       - 'docs/data/purchase_gate_policy_v1.json'
       - '.github/scripts/validate-purchase-gate-v34.mjs'
       - '.github/scripts/test-purchase-gate-v34.mjs'
+      - '.github/scripts/jra-conditional-ticket-probability.mjs'
+      - '.github/scripts/test-jra-conditional-ticket-probability.mjs'
       - '.github/workflows/validate-v34-purchase-gate.yml'
       - 'e2e_validation/predictions/**'
   pull_request:
@@ -17,6 +19,8 @@ on:
       - 'docs/data/purchase_gate_policy_v1.json'
       - '.github/scripts/validate-purchase-gate-v34.mjs'
       - '.github/scripts/test-purchase-gate-v34.mjs'
+      - '.github/scripts/jra-conditional-ticket-probability.mjs'
+      - '.github/scripts/test-jra-conditional-ticket-probability.mjs'
       - '.github/workflows/validate-v34-purchase-gate.yml'
       - 'e2e_validation/predictions/**'
   workflow_dispatch:
@@ -32,6 +36,8 @@ jobs:
           node-version: '22'
       - name: Exercise independent WIN5 vs local purchase gate
         run: node .github/scripts/test-purchase-gate-v34.mjs
+      - name: Test coherent eight-ticket conditional finishing probabilities
+        run: node .github/scripts/test-jra-conditional-ticket-probability.mjs
       - name: Validate all saved v3.4+ purchase decisions
         run: node .github/scripts/validate-purchase-gate-v34.mjs
       - name: Verify legacy nine-type coverage rules are retained
