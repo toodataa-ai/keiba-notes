@@ -1,0 +1,50 @@
+name: Render isolated v3.3 JRA snapshot PDFs
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/reports/v3.3-2026-10-10-*.html'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: render-v33-20261010
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install canonical PDF renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk poppler-utils
+          python3 -m pip install 'weasyprint==68.0'
+      - name: Render only new v3.3 HTML
+        run: |
+          mkdir -p /tmp/v33-pdfs
+          set -e
+          for f in docs/reports/v3.3-2026-10-10-*.html; do
+            [ -f "$f" ] || continue
+            base=$(basename "$f" .html)
+            python3 -m weasyprint "$f" "/tmp/v33-pdfs/$base.pdf"
+            pdfinfo "/tmp/v33-pdfs/$base.pdf" | grep -E 'Page size:|Pages:'
+          done
+      - name: Commit only isolated snapshot PDFs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git reset --hard origin/main
+          mkdir -p docs/pdfs
+          cp -a /tmp/v33-pdfs/. docs/pdfs/
+          git add docs/pdfs/v3.3-2026-10-10-*.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m "Render isolated October 10 v3.3 JRA PDFs"
+            git push origin HEAD:main
+          fi
