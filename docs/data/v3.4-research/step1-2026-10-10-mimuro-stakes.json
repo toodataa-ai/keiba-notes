@@ -1,0 +1,535 @@
+{
+  "schema_version": 1,
+  "race_id": "2026-10-10-mimuro-stakes",
+  "prompt_version": "v3.4",
+  "snapshot_kind": "deterministic_step1_reuse_research_unpromoted",
+  "generated_at": "2026-10-10T14:01:52.778+09:00",
+  "information_cutoff_at": "2026-10-10T14:01:52.778+09:00",
+  "market_access_note": "Grade inputs are strictly inherited from pre-market frozen 08:08 v3.2 STEP1; no current market odds used to derive score weights/horse scores. Independent new Grade A model has NOT been established.",
+  "step1_provenance": {
+    "source_version": "v3.2",
+    "frozen_at": "2026-10-10T08:08:31+09:00",
+    "source_path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.2.json",
+    "source_sha": "54ed0ba8ad1a3aa7f6f30dd1c965ffb116563794",
+    "marks": {
+      "win": 11,
+      "second": 13,
+      "third": 5
+    },
+    "ranking": [
+      11,
+      13,
+      5,
+      1,
+      3,
+      12,
+      4,
+      6,
+      8,
+      9,
+      7,
+      10,
+      2
+    ]
+  },
+  "method": {
+    "scope": "all_runners_9_axes",
+    "type": "nine_axis_weighted_grade_softmax",
+    "grade_mapping": {
+      "A+": 6,
+      "A": 5,
+      "B+": 4,
+      "B": 3,
+      "B-": 2,
+      "C": 1
+    },
+    "weights": [
+      0.1,
+      0.12,
+      0.09,
+      0.09,
+      0.17,
+      0.05,
+      0.06,
+      0.08,
+      0.24
+    ],
+    "weight_descriptions": [
+      "斤量",
+      "展開",
+      "当日馬場適性",
+      "ローテ",
+      "コース",
+      "血統",
+      "調教",
+      "騎手",
+      "基礎能力"
+    ],
+    "formula": "factor_score_i=SUM(weights_k * ordinal_grade_k); p_i=exp(beta*(factor_score_i-3))/SUM_j exp(beta*(factor_score_j-3))",
+    "scenario_betas": [
+      0.9,
+      1.1,
+      1.4
+    ],
+    "limitations": [
+      "Ordinal grades are subjective and not calibrated to empirical win probabilities",
+      "beta range is heuristic concentration sensitivity, NOT a statistical confidence interval",
+      "All previous incomplete training/track measurements remain unknown; prior B- or other grades are inherited without new official re-verification",
+      "Current live odds are never used to alter STEP1 marks or grade inputs"
+    ]
+  },
+  "runners": [
+    {
+      "horse_number": 11,
+      "horse_name": "サイモンシュバリエ",
+      "mark": "◎",
+      "grade": "A",
+      "factor_grades": [
+        "B+",
+        "A",
+        "B+",
+        "B",
+        "A+",
+        "A",
+        "B-",
+        "B+",
+        "A"
+      ],
+      "source_evidence": "同場同距離の再現性が最も明瞭。3勝級初戦敗退だが先行持続力は上位",
+      "ability_score": 4.54,
+      "rank": 1,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 13,
+      "horse_name": "サンライズケヴィン",
+      "mark": "○",
+      "grade": "A",
+      "factor_grades": [
+        "A+",
+        "A",
+        "B+",
+        "A",
+        "B",
+        "B+",
+        "B-",
+        "B+",
+        "A"
+      ],
+      "source_evidence": "3歳55kgで先行持続。昇級・京都コース未経験・外枠が課題",
+      "ability_score": 4.36,
+      "rank": 2,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 5,
+      "horse_name": "リベッチオ",
+      "mark": "▲",
+      "grade": "A",
+      "factor_grades": [
+        "A+",
+        "A",
+        "B+",
+        "B+",
+        "B+",
+        "A",
+        "B-",
+        "B+",
+        "A"
+      ],
+      "source_evidence": "3歳55kgで先行安定、距離適合。伏竜S重馬場大敗は別条件として分解",
+      "ability_score": 4.49,
+      "rank": 3,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 1,
+      "horse_name": "ダンツシタン",
+      "mark": "△",
+      "grade": "B+",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "B+",
+        "B+",
+        "B+",
+        "B-",
+        "A",
+        "B+"
+      ],
+      "source_evidence": "現級連対が能力根拠。前走阪神1800大敗を過大減点せず内枠差しを再検討",
+      "ability_score": 4.06,
+      "rank": 4,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 3,
+      "horse_name": "ドラゴン",
+      "mark": "△",
+      "grade": "B+",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "B",
+        "B+",
+        "B+",
+        "B-",
+        "A",
+        "B+"
+      ],
+      "source_evidence": "同コース勝ち・先行可能。現級京都9着で勝ち切り再現性は低め",
+      "ability_score": 3.97,
+      "rank": 5,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 12,
+      "horse_name": "ゲキザル",
+      "mark": "△",
+      "grade": "B+",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "A",
+        "B",
+        "B",
+        "B-",
+        "B",
+        "B+"
+      ],
+      "source_evidence": "現級で近走安定。京都初経験と差し届く展開かが鍵",
+      "ability_score": 3.77,
+      "rank": 6,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 4,
+      "horse_name": "ショウサンジョージ",
+      "mark": "△",
+      "grade": "B",
+      "factor_grades": [
+        "A+",
+        "B+",
+        "B+",
+        "B",
+        "B+",
+        "B",
+        "B-",
+        "B",
+        "B+"
+      ],
+      "source_evidence": "同コース現級4着と58→55kgで反発候補。近2戦大敗は慎重評価",
+      "ability_score": 3.86,
+      "rank": 7,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 6,
+      "horse_name": "オリーブグリーン",
+      "mark": "△",
+      "grade": "B",
+      "factor_grades": [
+        "B+",
+        "B+",
+        "B+",
+        "B",
+        "B+",
+        "B+",
+        "B-",
+        "A",
+        "B"
+      ],
+      "source_evidence": "同コースで現級5着。近走不振でも斤量55kg維持と坂井騎乗がプラス",
+      "ability_score": 3.63,
+      "rank": 8,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 8,
+      "horse_name": "メイショウコガシラ",
+      "mark": "×",
+      "grade": "B-",
+      "factor_grades": [
+        "B+",
+        "B",
+        "B+",
+        "B",
+        "B+",
+        "B",
+        "B-",
+        "B",
+        "B-"
+      ],
+      "source_evidence": "3勝級で堅実だが勝ち切る裏付けは乏しい",
+      "ability_score": 3.06,
+      "rank": 9,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 9,
+      "horse_name": "ラオラシオン",
+      "mark": "×",
+      "grade": "B-",
+      "factor_grades": [
+        "B+",
+        "B",
+        "B+",
+        "B",
+        "B+",
+        "B",
+        "B-",
+        "B",
+        "B-"
+      ],
+      "source_evidence": "同コース経験はあるが近走現級で一歩不足",
+      "ability_score": 3.06,
+      "rank": 10,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 7,
+      "horse_name": "テーオールビー",
+      "mark": "×",
+      "grade": "C",
+      "factor_grades": [
+        "A+",
+        "B",
+        "B+",
+        "B",
+        "B",
+        "B",
+        "B-",
+        "B",
+        "B-"
+      ],
+      "source_evidence": "52kg軽量は魅力も近2走大敗。京都1800近似が弱い",
+      "ability_score": 3.09,
+      "rank": 11,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 10,
+      "horse_name": "ベルダイナフェロー",
+      "mark": "×",
+      "grade": "C",
+      "factor_grades": [
+        "A+",
+        "B",
+        "B+",
+        "B",
+        "B-",
+        "B",
+        "B-",
+        "B",
+        "C"
+      ],
+      "source_evidence": "52kgも近走不振。復調条件の明確な直接根拠が足りない",
+      "ability_score": 2.68,
+      "rank": 12,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    },
+    {
+      "horse_number": 2,
+      "horse_name": "ミカッテヨンデイイ",
+      "mark": "×",
+      "grade": "C",
+      "factor_grades": [
+        "A+",
+        "C",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B-",
+        "B",
+        "C"
+      ],
+      "source_evidence": "芝短距離からダート1800へ大変更。直接裏付けなく未知を適性肯定に転換できない",
+      "ability_score": 2.08,
+      "rank": 13,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "conservative_flat",
+      "beta": 0.9,
+      "probabilities": [
+        {
+          "horse_number": 11,
+          "probability": 0.15075261
+        },
+        {
+          "horse_number": 13,
+          "probability": 0.12820623
+        },
+        {
+          "horse_number": 5,
+          "probability": 0.14411911
+        },
+        {
+          "horse_number": 1,
+          "probability": 0.09787001
+        },
+        {
+          "horse_number": 3,
+          "probability": 0.0902551
+        },
+        {
+          "horse_number": 12,
+          "probability": 0.0753874
+        },
+        {
+          "horse_number": 4,
+          "probability": 0.0817479
+        },
+        {
+          "horse_number": 6,
+          "probability": 0.06646265
+        },
+        {
+          "horse_number": 8,
+          "probability": 0.03979097
+        },
+        {
+          "horse_number": 9,
+          "probability": 0.03979097
+        },
+        {
+          "horse_number": 7,
+          "probability": 0.04087997
+        },
+        {
+          "horse_number": 10,
+          "probability": 0.02826545
+        },
+        {
+          "horse_number": 2,
+          "probability": 0.01647164
+        }
+      ]
+    },
+    {
+      "id": "central",
+      "beta": 1.1,
+      "probabilities": [
+        {
+          "horse_number": 11,
+          "probability": 0.16801188
+        },
+        {
+          "horse_number": 13,
+          "probability": 0.13783188
+        },
+        {
+          "horse_number": 5,
+          "probability": 0.15902075
+        },
+        {
+          "horse_number": 1,
+          "probability": 0.09909061
+        },
+        {
+          "horse_number": 3,
+          "probability": 0.0897506
+        },
+        {
+          "horse_number": 12,
+          "probability": 0.07202654
+        },
+        {
+          "horse_number": 4,
+          "probability": 0.07952208
+        },
+        {
+          "horse_number": 6,
+          "probability": 0.06174634
+        },
+        {
+          "horse_number": 8,
+          "probability": 0.0329844
+        },
+        {
+          "horse_number": 9,
+          "probability": 0.0329844
+        },
+        {
+          "horse_number": 7,
+          "probability": 0.03409104
+        },
+        {
+          "horse_number": 10,
+          "probability": 0.02171568
+        },
+        {
+          "horse_number": 2,
+          "probability": 0.01122378
+        }
+      ]
+    },
+    {
+      "id": "ability_concentrated",
+      "beta": 1.4,
+      "probabilities": [
+        {
+          "horse_number": 11,
+          "probability": 0.19358745
+        },
+        {
+          "horse_number": 13,
+          "probability": 0.15046483
+        },
+        {
+          "horse_number": 5,
+          "probability": 0.18049974
+        },
+        {
+          "horse_number": 1,
+          "probability": 0.09886244
+        },
+        {
+          "horse_number": 3,
+          "probability": 0.08715859
+        },
+        {
+          "horse_number": 12,
+          "probability": 0.06587305
+        },
+        {
+          "horse_number": 4,
+          "probability": 0.07471862
+        },
+        {
+          "horse_number": 6,
+          "probability": 0.05414845
+        },
+        {
+          "horse_number": 8,
+          "probability": 0.02437918
+        },
+        {
+          "horse_number": 9,
+          "probability": 0.02437918
+        },
+        {
+          "horse_number": 7,
+          "probability": 0.02542491
+        },
+        {
+          "horse_number": 10,
+          "probability": 0.01432103
+        },
+        {
+          "horse_number": 2,
+          "probability": 0.00618254
+        }
+      ]
+    }
+  ],
+  "official_pre_race_form": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604031120261010%2F7C",
+  "post_time": "2026-10-10T15:30:00+09:00",
+  "final_bets_status": "not_yet_set"
+}
