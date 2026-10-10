@@ -1,0 +1,41 @@
+name: Validate v3.5 multi-candidate JRA ticket selection
+on:
+  push:
+    branches: [main]
+    paths:
+      - '競馬予想_完全版プロンプト_v3.5.txt'
+      - 'docs/data/multi_candidate_selection_policy_v1.json'
+      - '.github/scripts/validate-multi-candidate-v35.mjs'
+      - '.github/scripts/test-multi-candidate-v35.mjs'
+      - '.github/workflows/validate-v35-multi-candidate.yml'
+      - 'docs/data/latest_prompt.json'
+      - 'e2e_validation/predictions/**'
+  pull_request:
+    paths:
+      - '競馬予想_完全版プロンプト_v3.5.txt'
+      - 'docs/data/multi_candidate_selection_policy_v1.json'
+      - '.github/scripts/validate-multi-candidate-v35.mjs'
+      - '.github/scripts/test-multi-candidate-v35.mjs'
+      - '.github/workflows/validate-v35-multi-candidate.yml'
+      - 'docs/data/latest_prompt.json'
+      - 'e2e_validation/predictions/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Demonstrate trifecta eligibility and negative tests
+        run: node .github/scripts/test-multi-candidate-v35.mjs
+      - name: Scan formal v3.5+ predictions for candidate-level evidence
+        run: node .github/scripts/validate-multi-candidate-v35.mjs
+      - name: Preserve legacy eight-/nine-ticket policy validity
+        run: |
+          node .github/scripts/test-purchase-gate-v34.mjs
+          node .github/scripts/test-jra-conditional-ticket-probability.mjs
+          node .github/scripts/validate-bet-type-coverage.mjs
