@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_ticket_portfolio_strategy_v38",
+  "effective_prompt_version": "v3.8",
+  "scope": "step2_purchase_only",
+  "win5": "excluded",
+  "permitted_kinds": [
+    "single",
+    "trifecta_formation",
+    "trifecta_two_key_multi",
+    "trifecta_box"
+  ],
+  "rules": {
+    "candidate_generation": "frozen_STEP1_before_odds",
+    "budget_default_cap_yen": 3000,
+    "minimum_unit_yen": 100,
+    "default_unit_stake_yen": 100,
+    "max_selected_strategies_per_race": 1,
+    "do_not_force_budget_expenditure": true,
+    "allow_legacy_eight_types": true,
+    "require_quote_for_every_purchased_line": true,
+    "formulas": {
+      "stake": "sum(stake_yen)",
+      "p_hit": "sum(disjoint ordered trifecta probabilities)",
+      "expected_payout": "sum(probability*stake_yen*market_odds)",
+      "roi": "expected_payout/total_stake_yen",
+      "full_loss": "1-p_hit"
+    },
+    "enforce_scenario_consistency": true
+  },
+  "data": {
+    "new_fields": [
+      "purchase_strategy_evaluations",
+      "selected_strategy_id",
+      "best_strategy_id"
+    ],
+    "legacy_fields_preserved": [
+      "bet_type_evaluations",
+      "ticket_candidate_comparisons",
+      "purchase_gate",
+      "purchase_decision",
+      "purchase_reason_code",
+      "best_bet_id",
+      "final_bets",
+      "total_stake_yen",
+      "final_bets_fixed_at"
+    ],
+    "final_bets_are_expanded": true
+  },
+  "forbidden": [
+    "alter_STEP1",
+    "invent_quote",
+    "change_v37_pdf_css",
+    "edit_preexisting_predictions",
+    "independent_win_probability_products",
+    "retrospective_strategy_selection"
+  ]
+}

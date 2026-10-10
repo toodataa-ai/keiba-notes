@@ -11,7 +11,7 @@ const prompt=read(promptPath);
 const policy=JSON.parse(read('docs/data/jra_pdf_layout_policy_v1.json'));
 const css=fs.readFileSync('docs/assets/jra-pdf-reader-v1.css');
 const errors=[];
-if(latest.version!=='v3.7'||latest.path!==promptPath) errors.push('latest pointer is not v3.7');
+if(!['v3.7','v3.8'].includes(latest.version)||(latest.version==='v3.7'&&latest.path!==promptPath)) errors.push('latest pointer is not v3.7');
 if(!history.entries.some(x=>x.version==='v3.7'&&x.path===promptPath)) errors.push('v3.7 history missing');
 if(manifest.prompt_version!=='v3.7'||manifest.components.length!==15) errors.push('unexpected manifest schema/component count');
 for(let i=0;i<=6;i++) if(!prompt.includes('[LAY-0'+i+']')) errors.push('missing [LAY-0'+i+']');
