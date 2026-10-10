@@ -1,0 +1,467 @@
+{
+  "schema_version": 1,
+  "race_id": "2026-10-10-saudi-arabia-royal-cup",
+  "prompt_version": "v3.4",
+  "snapshot_kind": "deterministic_step1_reuse_research_unpromoted",
+  "generated_at": "2026-10-10T14:01:52.778+09:00",
+  "information_cutoff_at": "2026-10-10T14:01:52.778+09:00",
+  "market_access_note": "Grade inputs are strictly inherited from pre-market frozen 08:08 v3.2 STEP1; no current market odds used to derive score weights/horse scores. Independent new Grade A model has NOT been established.",
+  "step1_provenance": {
+    "source_version": "v3.2",
+    "frozen_at": "2026-10-10T08:08:29+09:00",
+    "source_path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.2.json",
+    "source_sha": "a39e8a4e131e1ba1d2db3487a02597190c661dfe",
+    "marks": {
+      "win": 5,
+      "second": 6,
+      "third": 9
+    },
+    "ranking": [
+      5,
+      6,
+      9,
+      4,
+      2,
+      10,
+      3,
+      8,
+      1,
+      7,
+      11
+    ]
+  },
+  "method": {
+    "scope": "all_runners_9_axes",
+    "type": "nine_axis_weighted_grade_softmax",
+    "grade_mapping": {
+      "A+": 6,
+      "A": 5,
+      "B+": 4,
+      "B": 3,
+      "B-": 2,
+      "C": 1
+    },
+    "weights": [
+      0.1,
+      0.12,
+      0.09,
+      0.09,
+      0.17,
+      0.05,
+      0.06,
+      0.08,
+      0.24
+    ],
+    "weight_descriptions": [
+      "斤量",
+      "展開",
+      "当日馬場適性",
+      "ローテ",
+      "コース",
+      "血統",
+      "調教",
+      "騎手",
+      "基礎能力"
+    ],
+    "formula": "factor_score_i=SUM(weights_k * ordinal_grade_k); p_i=exp(beta*(factor_score_i-3))/SUM_j exp(beta*(factor_score_j-3))",
+    "scenario_betas": [
+      0.9,
+      1.1,
+      1.4
+    ],
+    "limitations": [
+      "Ordinal grades are subjective and not calibrated to empirical win probabilities",
+      "beta range is heuristic concentration sensitivity, NOT a statistical confidence interval",
+      "All previous incomplete training/track measurements remain unknown; prior B- or other grades are inherited without new official re-verification",
+      "Current live odds are never used to alter STEP1 marks or grade inputs"
+    ]
+  },
+  "runners": [
+    {
+      "horse_number": 5,
+      "horse_name": "フィリオソラーレ",
+      "mark": "◎",
+      "grade": "A+",
+      "factor_grades": [
+        "A",
+        "A",
+        "B+",
+        "B",
+        "A+",
+        "A",
+        "B-",
+        "B+",
+        "A+"
+      ],
+      "source_evidence": "東京マイル同舞台で速い上がりと追走力を示す。初の重賞・休養明けが不確実性",
+      "ability_score": 4.88,
+      "rank": 1,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 6,
+      "horse_name": "ベルウッドディープ",
+      "mark": "○",
+      "grade": "A",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "B",
+        "A+",
+        "B+",
+        "B-",
+        "B",
+        "A"
+      ],
+      "source_evidence": "同舞台の完勝を評価。重賞の相手強化と3か月超の間隔が課題",
+      "ability_score": 4.39,
+      "rank": 2,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 9,
+      "horse_name": "ジップスパーク",
+      "mark": "▲",
+      "grade": "A",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "B+",
+        "B+",
+        "B+",
+        "B-",
+        "B+",
+        "A"
+      ],
+      "source_evidence": "マイル直線勝負での末脚が強み。東京のコーナー・坂は未確認",
+      "ability_score": 4.22,
+      "rank": 3,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 4,
+      "horse_name": "アゴルディーノ",
+      "mark": "△",
+      "grade": "B+",
+      "factor_grades": [
+        "A",
+        "A",
+        "B+",
+        "B+",
+        "B",
+        "B+",
+        "B-",
+        "B+",
+        "B+"
+      ],
+      "source_evidence": "OP対戦実績と先行持続力は強い。東京1600への短縮・直線の瞬発力は未知",
+      "ability_score": 3.93,
+      "rank": 4,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 2,
+      "horse_name": "デミアン",
+      "mark": "△",
+      "grade": "B+",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "B",
+        "B+",
+        "B+",
+        "B-",
+        "B+",
+        "B+"
+      ],
+      "source_evidence": "東京適性と終いの脚を評価。1600mへの延長は未知",
+      "ability_score": 3.89,
+      "rank": 5,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 10,
+      "horse_name": "アイファーマーリン",
+      "mark": "△",
+      "grade": "B+",
+      "factor_grades": [
+        "A",
+        "B",
+        "B+",
+        "B+",
+        "B",
+        "B",
+        "B-",
+        "B",
+        "B+"
+      ],
+      "source_evidence": "前走の道悪勝ちと鋭い上がり。初東京と外枠、位置取り後方リスク",
+      "ability_score": 3.56,
+      "rank": 6,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 3,
+      "horse_name": "サトノハクマイ",
+      "mark": "△",
+      "grade": "B",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B",
+        "B+",
+        "B",
+        "B+",
+        "B-",
+        "B",
+        "B"
+      ],
+      "source_evidence": "重馬場新馬勝ち、先行できる。高速東京マイルへの適性は未確認",
+      "ability_score": 3.4,
+      "rank": 7,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 8,
+      "horse_name": "グルーヴェンス",
+      "mark": "×",
+      "grade": "B",
+      "factor_grades": [
+        "A",
+        "B+",
+        "B+",
+        "B+",
+        "B-",
+        "B",
+        "B-",
+        "B",
+        "B"
+      ],
+      "source_evidence": "1400mで先行力を示すが初マイル、終いの持続力に課題",
+      "ability_score": 3.27,
+      "rank": 8,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 1,
+      "horse_name": "ギブリ",
+      "mark": "×",
+      "grade": "B-",
+      "factor_grades": [
+        "A",
+        "B",
+        "B+",
+        "C",
+        "B",
+        "B",
+        "B-",
+        "B",
+        "B-"
+      ],
+      "source_evidence": "マイル勝ちだが中1週・東京替わり、重賞級裏付け不足",
+      "ability_score": 2.81,
+      "rank": 9,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 7,
+      "horse_name": "ニシノトラノスケ",
+      "mark": "×",
+      "grade": "B-",
+      "factor_grades": [
+        "A",
+        "B",
+        "B+",
+        "B+",
+        "B",
+        "B",
+        "B-",
+        "B",
+        "B-"
+      ],
+      "source_evidence": "同距離勝ち。着差0.0で重賞相手の決め手は未知",
+      "ability_score": 3.08,
+      "rank": 10,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    },
+    {
+      "horse_number": 11,
+      "horse_name": "ハンサム",
+      "mark": "×",
+      "grade": "B-",
+      "factor_grades": [
+        "A",
+        "B",
+        "B",
+        "B-",
+        "B-",
+        "B",
+        "B-",
+        "B",
+        "B-"
+      ],
+      "source_evidence": "重い馬場の先行粘りは評価。中1週・高速東京への変化が不安",
+      "ability_score": 2.64,
+      "rank": 11,
+      "official_form_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "conservative_flat",
+      "beta": 0.9,
+      "probabilities": [
+        {
+          "horse_number": 5,
+          "probability": 0.23143263
+        },
+        {
+          "horse_number": 6,
+          "probability": 0.14890207
+        },
+        {
+          "horse_number": 9,
+          "probability": 0.12777729
+        },
+        {
+          "horse_number": 4,
+          "probability": 0.09842441
+        },
+        {
+          "horse_number": 2,
+          "probability": 0.09494415
+        },
+        {
+          "horse_number": 10,
+          "probability": 0.07054768
+        },
+        {
+          "horse_number": 3,
+          "probability": 0.06108637
+        },
+        {
+          "horse_number": 8,
+          "probability": 0.05434153
+        },
+        {
+          "horse_number": 1,
+          "probability": 0.0359198
+        },
+        {
+          "horse_number": 7,
+          "probability": 0.04580022
+        },
+        {
+          "horse_number": 11,
+          "probability": 0.03082385
+        }
+      ]
+    },
+    {
+      "id": "central",
+      "beta": 1.1,
+      "probabilities": [
+        {
+          "horse_number": 5,
+          "probability": 0.27160943
+        },
+        {
+          "horse_number": 6,
+          "probability": 0.15843828
+        },
+        {
+          "horse_number": 9,
+          "probability": 0.13141564
+        },
+        {
+          "horse_number": 4,
+          "probability": 0.09552281
+        },
+        {
+          "horse_number": 2,
+          "probability": 0.09141094
+        },
+        {
+          "horse_number": 10,
+          "probability": 0.06358421
+        },
+        {
+          "horse_number": 3,
+          "probability": 0.05332286
+        },
+        {
+          "horse_number": 8,
+          "probability": 0.0462178
+        },
+        {
+          "horse_number": 1,
+          "probability": 0.02786482
+        },
+        {
+          "horse_number": 7,
+          "probability": 0.03750091
+        },
+        {
+          "horse_number": 11,
+          "probability": 0.0231123
+        }
+      ]
+    },
+    {
+      "id": "ability_concentrated",
+      "beta": 1.4,
+      "probabilities": [
+        {
+          "horse_number": 5,
+          "probability": 0.33528033
+        },
+        {
+          "horse_number": 6,
+          "probability": 0.16884261
+        },
+        {
+          "horse_number": 9,
+          "probability": 0.1330822
+        },
+        {
+          "horse_number": 4,
+          "probability": 0.08867402
+        },
+        {
+          "horse_number": 2,
+          "probability": 0.08384476
+        },
+        {
+          "horse_number": 10,
+          "probability": 0.05282407
+        },
+        {
+          "horse_number": 3,
+          "probability": 0.04222308
+        },
+        {
+          "horse_number": 8,
+          "probability": 0.03519722
+        },
+        {
+          "horse_number": 1,
+          "probability": 0.01848514
+        },
+        {
+          "horse_number": 7,
+          "probability": 0.02697652
+        },
+        {
+          "horse_number": 11,
+          "probability": 0.01457003
+        }
+      ]
+    }
+  ],
+  "official_pre_race_form": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604031120261010%2F9E",
+  "post_time": "2026-10-10T15:45:00+09:00",
+  "final_bets_status": "not_yet_set"
+}
