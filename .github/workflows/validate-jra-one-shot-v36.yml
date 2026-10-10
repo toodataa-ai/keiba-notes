@@ -1,0 +1,39 @@
+name: Validate v3.6 JRA one-shot prompt
+on:
+  push:
+    branches: [main]
+    paths:
+      - '競馬予想_完全版プロンプト_v3.6.txt'
+      - 'e2e_validation/manifests/v3.6.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - '.github/scripts/validate-jra-one-shot-v36.mjs'
+      - '.github/workflows/validate-jra-one-shot-v36.yml'
+  pull_request:
+    paths:
+      - '競馬予想_完全版プロンプト_v3.6.txt'
+      - 'e2e_validation/manifests/v3.6.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - '.github/scripts/validate-jra-one-shot-v36.mjs'
+      - '.github/workflows/validate-jra-one-shot-v36.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate compact one-shot contract and all pinned components
+        run: node .github/scripts/validate-jra-one-shot-v36.mjs
+      - name: Validate formal prompt pointer and history
+        run: node .github/scripts/validate-prompt-history.mjs
+      - name: Validate prior bet-type selection behaviors
+        run: |
+          node .github/scripts/test-multi-candidate-v35.mjs
+          node .github/scripts/test-purchase-gate-v34.mjs
+          node .github/scripts/test-jra-conditional-ticket-probability.mjs
