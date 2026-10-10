@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-10",
   "task": "JRA postrace",
-  "status": "RESULT_REVIEW_SAVED_E2E_PENDING_CI",
+  "status": "RESULT_REVIEW_REGISTERED_WITH_POSTRACE_BLOCKERS",
   "created_at": "2026-10-10T19:41:50.784+09:00",
   "formal_pre_race_prompt_for_this_round": "v3.2",
   "current_prompt_pointer_version": "v3.7",
@@ -50,8 +50,17 @@
     "roi_pct": 360,
     "real_money_trades": false
   },
-  "weekly_improvement": "HOLD: Monday 2026-10-12 JRA programme incomplete",
-  "pdf_status": "PENDING_GITHUB_ACTION_RENDER_AND_LAYOUT_CHECK",
-  "git_pages_status": "PENDING_HTTP_VERIFICATION",
-  "notes": "Official result times are the time confirmed during this review, not JRA initial publication timestamp. No historical prediction file was written."
+  "weekly_improvement": "HOLD pending all 2026-10-12 Monday JRA main races reviewed",
+  "pdf_status": "PDF_UNCHANGED_BY_DESIGN: existing approved pre-race PDFs protected; renderer skipped these reports, even though render workflow succeeded",
+  "git_pages_status": "DEPLOYMENT_ACTION_SUCCESS_BUT_PUBLIC_HTTP_BYTES_NOT_VERIFIED",
+  "notes": "Official result times are the time confirmed during this review, not JRA initial publication timestamp. No historical prediction file was written.",
+  "pdf_render_action_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38045809885",
+  "layout_guard_status": "SUCCESS",
+  "layout_guard_action_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38045809898",
+  "github_pages_deploy_status": "SUCCESS_ACTION_ONLY",
+  "github_pages_deploy_action_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38045809646",
+  "e2e_validation_status": "BLOCKED_PRE_EXISTING_NINE_BET_TYPE_AUDIT_BEFORE_REAL_CASE_EVALUATION",
+  "e2e_validation_action_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38045809883",
+  "e2e_validation_blocker": "The pre-existing v3.6-20261010-prestart prediction files lack required per-ticket market evaluation fields. E2E validation exits before Grade A proof and metric evaluation; frozen predictions must not be silently rewritten to pass CI.",
+  "verified_at": "2026-10-10T19:43:39.678+09:00"
 }
