@@ -33,7 +33,14 @@ function build({large=false}={}){
    if(original){l.market_odds=original.market_odds;l.source_url=original.source_url;l.observed_at=original.observed_at;}
  }
  Object.assign(duplicate,evaluateStrategy(duplicate.lines,data.outcome_distributions,data.frame_map,data.race_context));
- if(large)addStrategy(data,'S06','三連単','box',{horses:[1,2,3,4,5]},750);
+ if(large){
+   const box=addStrategy(data,'S06','三連単','box',{horses:[1,2,3,4,5]},750);
+   const single=data.purchase_strategy_evaluations.find(s=>s.strategy_id==='S04').lines[0];
+   for(const line of box.lines)if(ticketKey(line.type,line.selection)===ticketKey(single.type,single.selection)){
+     line.market_odds=single.market_odds;line.source_url=single.source_url;line.observed_at=single.observed_at;
+   }
+   Object.assign(box,evaluateStrategy(box.lines,data.outcome_distributions,data.frame_map,data.race_context));
+ }
  const optimal=optimizePurchasePortfolio({
   budget_yen:6000,strategies:data.purchase_strategy_evaluations,outcome_distributions:data.outcome_distributions,
   frame_map:data.frame_map,race_context:data.race_context,freeze_at:data.final_bets_fixed_at
