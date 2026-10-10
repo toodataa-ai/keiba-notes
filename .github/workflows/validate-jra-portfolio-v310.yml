@@ -44,6 +44,7 @@ jobs:
       - name: Exercise optimum 6000 yen cross-type selection with regression failures
         run: |
           node .github/scripts/test-jra-portfolio-v310.mjs
+          node .github/scripts/test-jra-prestart-pipeline-v310.mjs
           node .github/scripts/validate-jra-portfolio-v310.mjs
       - name: Preserve legacy analysis, betting, PDF tests
         run: |
