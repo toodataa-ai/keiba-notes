@@ -1,5 +1,9 @@
 name: JRA v3.10 prestart prediction pipeline
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/inputs/*.json'
   workflow_dispatch:
     inputs:
       input_path:
@@ -33,11 +37,21 @@ jobs:
       - name: Validate path and reserve immutable snapshot names
         env:
           INPUT_PATH: ${{ inputs.input_path }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
           RUN_ID: ${{ github.run_id }}
           ATTEMPT: ${{ github.run_attempt }}
         shell: bash
         run: |
           set -euo pipefail
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            mapfile -t NEW_FILES < <(git diff --diff-filter=A --name-only "$BEFORE_SHA" "$AFTER_SHA" -- e2e_validation/inputs)
+            if [[ ${#NEW_FILES[@]} -ne 1 ]]; then
+              echo "::error::Exactly one newly created JRA input JSON is required per push, got ${#NEW_FILES[@]}"; exit 1
+            fi
+            INPUT_PATH="${NEW_FILES[0]}"
+          fi
           case "$INPUT_PATH" in e2e_validation/inputs/*.json) ;; *) echo "::error::Input must be a tracked prereace JSON under e2e_validation/inputs"; exit 1;; esac
           if [[ "$INPUT_PATH" == *..* ]] || [[ ! -f "$INPUT_PATH" ]] || [[ -L "$INPUT_PATH" ]]; then
             echo "::error::Unsafe or missing race input"; exit 1
