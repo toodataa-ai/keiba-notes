@@ -68,7 +68,8 @@
     "best_bet_id",
     "final_bets",
     "total_stake_yen",
-    "final_bets_fixed_at"
+    "final_bets_fixed_at",
+    "probability_model_audit"
   ],
   "purchase_gate_fields": {
     "scope": "race_local_8types",
@@ -77,12 +78,20 @@
       "partial",
       "none"
     ],
-    "win5_status": "Not present in v3.4. WIN5 is not predicted, evaluated, or counted as a coverage requirement.",
     "candidates": "Array of market candidates with candidate type/selection, quote evidence, probability uncertainty and eligibility decision",
-    "note": "If local_coverage_status=partial and ≥1 candidate eligible, buy/pass is allowed but never claim global best across all eight types."
+    "note": "8 local types only. If any market row is missing, do not claim a global best among all offered types; decide among supported candidates. Do not include WIN5."
   },
   "immutable_policy": "Never mutate any historical v3.2/v3.3 STEP1, prediction, final_bets, proof_commit, reports, results, E2E comparison or local-racing data.",
   "postrace_replay_policy": "Never backdate post-start v3.4 as a prerace prediction or revise frozen v3.2/v3.3 decisions. v3.4 effective for future pre-race decisions only.",
   "source_policy": "JRA official preferred; dated source-matched secondary market quotes usable with source disclosure, not forced JRA cross-check if matching provenance adequate.",
-  "audit": "Validate eight ordinary ticket types on v3.4+ via .github/scripts/validate-purchase-gate-v34.mjs and adapted nine-type legacy validator; do not touch historical v3.3 nine-type data. Verify explicit trifecta ordered probability inputs and sensitivity."
+  "audit": "Validate eight ordinary ticket types on v3.4+ via .github/scripts/validate-purchase-gate-v34.mjs and adapted nine-type legacy validator; do not touch historical v3.3 nine-type data. Verify explicit trifecta ordered probability inputs and sensitivity.",
+  "probability_model_audit": {
+    "scope": "race_local_8types_only",
+    "input_source": "per-horse STEP1 ①〜⑨ explanations from documented pre-race evidence, not odds-derived grading",
+    "model": "Plackett-Luce full-field conditional ordered triples as an explicit approximation, with exact market-event summation for each of 8 ticket types",
+    "runners": "All participants with pre-race strength/normalized win probabilities and factor-level evidence and data-source timestamps",
+    "scenarios": "At least neutral and two event-relevant alternative conditions, with order-specific win probabilities and source-based assumptions",
+    "confidence": "Uncalibrated scenarios may be computed; cannot be presented as validated empirical frequencies",
+    "best_bet": "Must compare observed implied break-even probability, scenario EV range, and race-specific risks; point estimate alone is insufficient"
+  }
 }
