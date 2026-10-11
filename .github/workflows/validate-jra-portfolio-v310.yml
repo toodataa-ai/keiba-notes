@@ -41,7 +41,7 @@ jobs:
           node-version: '22'
       - name: Verify immutable prior analysis and v3.10 budgeted purchase scope
         run: |
-          node .github/scripts/validate-jra-portfolio-prompt-v310.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-portfolio-prompt-v310.mjs
           node .github/scripts/validate-prompt-history.mjs
       - name: Exercise optimum 6000 yen cross-type selection with regression failures
         run: |
@@ -55,8 +55,8 @@ jobs:
           node .github/scripts/test-multi-candidate-v35.mjs
           node .github/scripts/test-purchase-gate-v34.mjs
           node .github/scripts/test-jra-conditional-ticket-probability.mjs
-          node .github/scripts/validate-jra-strategy-prompt-v39.mjs
-          node .github/scripts/validate-jra-strategy-prompt-v38.mjs
-          node .github/scripts/validate-jra-reader-v37.mjs
-          node .github/scripts/validate-jra-one-shot-v36.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-strategy-prompt-v39.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-strategy-prompt-v38.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-one-shot-v36.mjs
       # Legacy archived v3.6 prereace JSON defects remain separate baseline failures; do not rewrite.
