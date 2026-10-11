@@ -174,6 +174,22 @@ assert len(wheel_cmd) == 1
 assert wheel_cmd[0]["method"] == "1頭軸流し" and wheel_cmd[0]["numbers"] == "軸:2／相手:5,8"
 wheel_all["final_bets"] = [line("馬連",[2,5],1)]
 assert overlay.purchase_commands(wheel_all)[0]["method"] == "個別指定（1点）"
+
+# Wrong source expansion must not cause a wheel/formation label to buy extra tickets.
+bad_wheel = {"final_bets":[line("馬連",[2,5],1),line("馬連",[5,8],2)],
+    "purchase_strategy_evaluations":[wheel]}
+assert all(x["method"] == "個別指定（1点）" for x in overlay.purchase_commands(bad_wheel))
+form = {"strategy_id":"F1","type":"馬単","strategy_kind":"formation",
+        "definition":{"slots":[[2],[5,8]]},
+        "lines":[{"type":"馬単","selection":[2,5]},{"type":"馬単","selection":[2,8]}]}
+form_pred = {"final_bets":[line("馬単",[2,5],1),line("馬単",[2,8],2)],
+             "purchase_strategy_evaluations":[form]}
+form_cmd = overlay.purchase_commands(form_pred)
+assert len(form_cmd) == 1 and form_cmd[0]["method"] == "フォーメーション"
+assert form_cmd[0]["numbers"] == "1着:2／2着:5,8"
+form_pred["final_bets"].pop()
+assert overlay.purchase_commands(form_pred)[0]["method"] == "個別指定（1点）"
+
 # Do not label as BOX when there are multiple stakes, even with all combinations present.
 different_stakes = {"final_bets":[line("馬連",nums,i+1,200 if i==0 else 100)
                                  for i,nums in enumerate(box_lines)],
