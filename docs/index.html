@@ -35,10 +35,34 @@
 <a class="portal-card research-card" href="experience-regime.html"><span><span class="portal-title">新馬・戦歴の少ない馬の予想研究</span><span class="portal-desc">実戦経験の少なさがAI予想の精度にどう影響するかを検証</span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card research-card" href="local-racing-shadow.html"><span><span class="portal-title">地方競馬でのAI予想研究</span><span class="portal-desc">地方競馬でも予想と結果を蓄積して研究</span></span><span class="portal-arrow">→</span></a>
 </div></section>
+<section class="portal-section" aria-labelledby="releaseHistoryTitle" style="margin-top:34px">
+<div class="portal-head"><span class="portal-kicker">PUBLIC RELEASES</span><h2 id="releaseHistoryTitle">公開バージョン履歴</h2><p>実際に本番へ公開成功した版だけを記録します。ステージング途中の改修は含みません。</p></div>
+<div style="font-size:12px;color:#bfc4ce;margin-bottom:7px">現在公開中：<b id="currentPublicVersion" style="color:white">—</b></div>
+<details style="font-size:12px;color:#e3e5eb"><summary style="cursor:pointer">過去の公開履歴を見る <span id="releaseHistoryCount"></span></summary><div id="releaseHistoryList" style="padding-top:8px;font-size:12px;color:#c2c6d0">読み込み中…</div></details>
+</section>
 </div>
 <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
 <p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="staging/release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.00 ／ ステージング v1.01（未公開）</small></p>
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
+<script>
+fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(String(r.status));return r.json()}).then(d=>{
+ const versions=Array.isArray(d.releases)?d.releases:[];
+ const current=document.getElementById('currentPublicVersion');
+ current.textContent=d.current_public_version||'—';
+ document.getElementById('releaseHistoryCount').textContent=versions.length?'（全'+versions.length+'版）':'';
+ const list=document.getElementById('releaseHistoryList');list.textContent='';
+ if(!versions.length){list.textContent='公開履歴はまだありません。';return}
+ for(const v of [...versions].reverse()){
+  const row=document.createElement('p');row.style.cssText='margin:7px 0;border-bottom:1px solid #5558;padding-bottom:7px';
+  const title=document.createElement('strong');title.textContent='Version '+v.public_version+
+   (v.public_version===d.current_public_version?'　現在公開中':'');
+  row.append(title);
+  const note=document.createElement('span');note.style.display='block';note.textContent=
+   (v.deployed_at?'公開日 '+v.deployed_at.slice(0,10)+'　':'')+(v.note||'');
+  row.append(note);list.append(row)
+ }
+}).catch(()=>{document.getElementById('releaseHistoryList').textContent='履歴の取得に失敗しました。'});
+</script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
