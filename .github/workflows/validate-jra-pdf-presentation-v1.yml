@@ -1,0 +1,60 @@
+name: JRA PDF Japanese display and compact audit acceptance
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-pdf-presentation-overlay-v1.py'
+      - '.github/scripts/test-jra-pdf-presentation-overlay-v1.py'
+      - '.github/workflows/jra-prestart-pipeline-fresh-v312.yml'
+      - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+      - 'docs/data/latest_prompt.json'
+      - '.github/workflows/validate-jra-pdf-presentation-v1.yml'
+  push:
+    branches: [main, 'fix/jra-v312-pdf-ja-compact-audit-20261011']
+    paths:
+      - '.github/scripts/jra-pdf-presentation-overlay-v1.py'
+      - '.github/scripts/test-jra-pdf-presentation-overlay-v1.py'
+      - '.github/workflows/jra-prestart-pipeline-fresh-v312.yml'
+      - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+      - 'docs/data/latest_prompt.json'
+      - '.github/workflows/validate-jra-pdf-presentation-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  presentation-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Check immutable original and SHA-pinned presentation overlay
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          j=json.loads(Path('docs/data/latest_prompt.json').read_text(encoding='utf-8'))
+          assert j['version']=='v3.12'
+          addon=j['pdf_presentation_overlay']
+          for k in ('script','test'):
+              obj=addon[k]
+              digest=subprocess.check_output(['git','hash-object',obj['path']],text=True).strip()
+              assert digest==obj['git_blob_sha'], (k,digest,obj['git_blob_sha'])
+          x=j['odds_freshness_execution_overlay']
+          for k in ('workflow','new_race_workflow'):
+              obj=x[k]
+              digest=subprocess.check_output(['git','hash-object',obj['path']],text=True).strip()
+              assert digest==obj['git_blob_sha'], (k,digest,obj['git_blob_sha'])
+          for k in ('workflow','new_race_workflow'):
+              script=Path(x[k]['path']).read_text()
+              assert script.count('jra-pdf-presentation-overlay-v1.py')>=2
+              assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS' in script
+              assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"' in script
+          PY
+      - name: Verify real 14-row A4 pages with pinned renderer dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python -m py_compile .github/scripts/jra-pdf-presentation-overlay-v1.py
+          python .github/scripts/test-jra-pdf-presentation-overlay-v1.py
