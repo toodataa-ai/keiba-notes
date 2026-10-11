@@ -67,7 +67,7 @@
     "scope": "HTML/PDF presentation only: final purchase decision is placed on page 1, original STEP1/STEP2/bets/odds/proof/CSS/historical PDF bytes untouched",
     "script": {
       "path": ".github/scripts/jra-pdf-presentation-overlay-v1.py",
-      "git_blob_sha": "c677ab5c8f9523330aac4eec1cf8d7199739ecdc"
+      "git_blob_sha": "e423ce6edefa4021aafc1519b4662a3827b7ed9d"
     },
     "test": {
       "path": ".github/scripts/test-jra-pdf-presentation-overlay-v1.py",
@@ -91,7 +91,8 @@
         "No new or omitted/duplicated selections",
         "Per-line stake and grand total match immutable final_bets",
         "All 8 ticket types remain valid",
-        "Retain existing 1-horse-per-page A4 and numbered exclusions in tail"
+        "Retain existing 1-horse-per-page A4 and numbered exclusions in tail",
+        "Allowed strategy methods are explicitly type-checked for each of the eight JRA ticket types"
       ]
     }
   }
