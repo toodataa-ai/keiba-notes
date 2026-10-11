@@ -18,7 +18,7 @@
 <p class="lead">JRAメインレースを対象に、AIで予想・検証・回顧を行い、結果と誤差を次のロジック改善へ反映します。</p>
 <div class="portal">
 <section class="portal-section" aria-labelledby="mainTitle"><div class="portal-head"><span class="portal-kicker">このサイトの中心</span><h2 id="mainTitle">JRAメインレース予想</h2><p>今週の予想、これからの予定、過去の成績をここから確認できます。</p></div>
-<div style="margin:8px 0 12px"><a class="portal-card" href="special-2026-10-11-tokyo12.html" style="border-left:3px solid #b5172a;padding:11px 13px"><span><span class="portal-title" style="font-size:13px">臨時参考予想｜10月11日 東京12R</span><span class="portal-desc">東京最終レースの暫定評価／正式購入判断は未実施</span></span><span class="portal-arrow">→</span></a></div>
+<div style="margin:8px 0 12px"><a class="portal-card" href="staging/purchase-preview.html" style="border-left:3px solid #b5172a;padding:11px 13px"><span><span class="portal-title" style="font-size:13px">購入操作は最大3行＋穴狙い1行（検証版）</span><span class="portal-desc">BOX・流し・フォーメーションを簡潔に。実オッズで検証し、正式買い目とは区別します。</span></span><span class="portal-arrow">→</span></a></div>
 <div class="portal-grid main-grid">
 <a class="portal-card main-card" href="this-week.html"><span><span class="portal-title">今週のAI予想</span><span class="portal-desc">今週の対象レースと公開済みのAI予想</span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card main-card" href="schedule.html"><span><span class="portal-title">今後のAI予想スケジュール</span><span class="portal-desc">次回以降の対象レースと予想・回顧予定</span></span><span class="portal-arrow">→</span></a>
@@ -37,7 +37,7 @@
 </div></section>
 </div>
 <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
-<p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。</p>
+<p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="staging/release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.00 ／ ステージング v1.01（未公開）</small></p>
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
