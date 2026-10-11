@@ -1,0 +1,40 @@
+name: Generate JRA live v3.10 inputs for 2026-10-11 (research gate)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-live-20261011-v310.yml'
+      - '.github/scripts/jra-gather-live-20261011-v310.py'
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install -q beautifulsoup4 requests
+      - name: Prepare prereace source data for both actual JRA main races
+        run: python .github/scripts/jra-gather-live-20261011-v310.py
+      - name: Prove candidate parsing and purchase-policy compatibility
+        run: |
+          node .github/scripts/test-jra-prestart-pipeline-v310.mjs
+          node .github/scripts/test-jra-portfolio-v310.mjs
+          node .github/scripts/jra-prestart-pipeline-v310.mjs --input e2e_validation/inputs/2026-10-11-ireland-trophy.json --output /tmp/tokyo-snapshot.json
+          node .github/scripts/jra-prestart-pipeline-v310.mjs --input e2e_validation/inputs/2026-10-11-uzumasa-stakes.json --output /tmp/kyoto-snapshot.json
+          python -c "import json; a=json.load(open('/tmp/tokyo-snapshot.json'));b=json.load(open('/tmp/kyoto-snapshot.json'));print('TOKYO',a['purchase_decision'],a['total_stake_yen'],a['market_quote_audit']);print('KYOTO',b['purchase_decision'],b['total_stake_yen'],b['market_quote_audit'])"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jra-v310-live-probe-inputs
+          path: |
+            e2e_validation/inputs/*2026-10-11*.json
+            e2e_validation/quote-evidence/2026-10-11-*/
+            /tmp/tokyo-snapshot.json
+            /tmp/kyoto-snapshot.json
+          if-no-files-found: warn
