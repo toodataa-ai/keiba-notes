@@ -4,7 +4,11 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/jra-postrace-e2e-public-v1.yml'
-      - 'e2e_validation/cases/2026-10-11-*/case.json'
+      - 'e2e_validation/cases/**/case.json'
+      - 'docs/data/jra_postrace_audit_2026-10-11.json'
+      - 'docs/data/jra_postrace_meetings_v1.json'
+      - 'e2e_validation/weekly_review_status_v1.py'
+      - 'e2e_validation/test_weekly_review_status_v1.py'
       - 'e2e_validation/build_public_data.py'
   workflow_dispatch:
 permissions:
@@ -36,7 +40,7 @@ jobs:
           assert len(entries)==2
           assert {e['race_id'] for e in entries}==expected
           assert all(e['grade']=='prospective_strict' and e['proof']['read_from_proof_commit'] for e in entries)
-          assert s['comparison']['state']=='insufficient_data'
+          assert s['case_counts']['strict']>=4
           print('FORMAL_E2E_V312_STRICT_APPROVED:',len(entries),'of',s['case_counts']['strict'],'total')
           PY
       - name: Calculate and disclose independent E0/E1/E2 Shadow evidence gaps without waiver
@@ -49,6 +53,10 @@ jobs:
           for e in x.get('errors',[]):print(e['race_id'],e['error'])
           assert not x['interpretation']['no_automatic_promotion']==False
           PY
+      - name: Validate meeting-wide formal-review and separate Shadow gates
+        run: |
+          python -m unittest e2e_validation.test_weekly_review_status_v1 -v
+          python e2e_validation/weekly_review_status_v1.py
       - name: Publish complete public E2E status and original-source-derived display
         run: |
           python e2e_validation/build_public_data.py
@@ -58,6 +66,7 @@ jobs:
           e=json.loads(Path('docs/data/e2e_public.json').read_text())
           assert all(x['status']=='reviewed' for x in e['races'] if x['race_id'] in ('2026-10-11-ireland-trophy','2026-10-11-uzumasa-stakes'))
           assert e['totals']['prospective_strict_races']>=4
+          assert e['review_completion']['meetings'][0]['weekly_improvement_decision']=='not_evaluated' or e['review_completion']['meetings'][0]['formal_grade_a_review_state']=='complete'
           print('E2E_PUBLIC_FOUR_CASES_VERIFIED')
           PY
       - name: Commit only derived public reports
@@ -65,7 +74,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/e2e-shadow/
+          git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/jra_review_completion.json docs/data/e2e-shadow/
           if git diff --cached --quiet; then
             echo 'No derived public changes'
           else
@@ -85,10 +94,9 @@ jobs:
           import json
           from pathlib import Path
           reg=json.loads(Path('docs/data/races.json').read_text())
-          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json']
+          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json']
           for r in reg['races']:
-              if r['date']=='2026-10-11' and r['scope']=='jra-main':
-                  assert r['status']=='reviewed'
+              if r['date'] in ('2026-10-10','2026-10-11','2026-10-12') and r['scope']=='jra-main' and r['status']=='reviewed':
                   paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json'])
           for p in paths:
               assert Path(p).is_file(),p

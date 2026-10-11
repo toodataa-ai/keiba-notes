@@ -12,6 +12,7 @@ DOCS_DATA = ROOT / "docs" / "data"
 PUBLIC_ROOT = DOCS_DATA / "e2e-shadow"
 PUBLIC_MANIFEST = DOCS_DATA / "e2e_public.json"
 STATUS_PATH = DOCS_DATA / "e2e_status.json"
+REVIEW_STATUS_PATH = DOCS_DATA / "jra_review_completion.json"
 
 
 def load_json(path: Path):
@@ -146,6 +147,7 @@ def main() -> None:
             "result_joined_separately": True,
         },
         "comparison": status.get("comparison") or {},
+        "review_completion": load_json(REVIEW_STATUS_PATH) if REVIEW_STATUS_PATH.exists() else None,
         "totals": {
             "prospective_strict_races": len(strict),
             "historical_replay_races": len(historical),

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "date": "2026-10-11",
   "task": "JRA postrace Sunday of three-day holiday meeting",
-  "observed_at": "2026-10-12T06:39:00+09:00",
-  "status": "REVIEW_DATA_COMMITTED_E2E_ACTIONS_AND_PUBLICATION_PENDING",
+  "observed_at": "2026-10-12T07:08:20+09:00",
+  "status": "REVIEW_DATA_COMMITTED_GRADE_A_E2E_AND_PUBLICATION_VERIFIED",
   "canonical_prompt_pointer": "v3.13",
   "pre_race_immutability": true,
   "reviewed_races": [
@@ -20,13 +20,13 @@
       "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47"
     }
   ],
-  "e2e_case_grade": "prospective_strict_pending_validation",
+  "e2e_case_grade": "prospective_strict_verified",
   "e2e_prediction_adapter": "read-only v3.12 schema normalization in evaluate.py",
   "weekly_improvement": "HOLD: 2026-10-12 Monday holiday Tokyo/Kyoto main races not yet reviewed",
   "weekly_change_decision": "not_evaluated",
-  "publication_http_status": "PENDING_REAL_HTTP_CHECK",
-  "html_pdf_status": "ORIGINALS_IMMUTABLE_PDF_CI_TO_VERIFY",
-  "known_prior_blocker": "2026-10-10 E2E workflow failed on historic v3.6 eight-ticket validation before grading; new validation still required",
+  "publication_http_status": "VERIFIED_HTTP_BYTE_PARITY_ACTIONS_38178136684",
+  "html_pdf_status": "ORIGINALS_UNCHANGED_PDF_GUARD_PASS_38177976809",
+  "known_prior_blocker": "E0/E1/E2 Shadow pre-race evidence gaps remain independently recorded; pinned standard CI is still failing; do not alter frozen forecasts or pinned manifests",
   "mutated_paths": [
     "e2e_validation/results/2026-10-11-ireland-trophy.json",
     "e2e_validation/cases/2026-10-11-ireland-trophy/case.json",
@@ -35,5 +35,9 @@
     "docs/data/races.json",
     "e2e_validation/evaluate.py",
     "docs/data/jra_postrace_audit_2026-10-11.json"
-  ]
+  ],
+  "audit_runs": {
+    "formal_and_http": 38178136684,
+    "pdf_guard": 38177976809
+  }
 }
