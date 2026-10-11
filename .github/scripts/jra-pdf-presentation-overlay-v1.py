@@ -243,6 +243,65 @@ PURCHASE_MODES_BY_TYPE = {
 }
 
 
+
+def _display_only_group_candidates(final_by_key):
+    """Find safe JRA BOX/馬連流し presentations directly from sealed final tickets.
+
+    Candidate construction changes *no bets*: accepted only when independent
+    ticket expansion matches every line at one common stake.
+    """
+    from itertools import combinations, permutations
+    from math import comb, factorial
+    by_type_stake = {}
+    for key, bet in final_by_key.items():
+        by_type_stake.setdefault((key[0], bet["stake_yen"]), set()).add(key)
+    derived = []
+    for (typ, unit), available in by_type_stake.items():
+        if typ in ("枠連", "馬連", "馬単", "ワイド", "三連複", "三連単"):
+            arity = 3 if typ in ("三連複","三連単") else 2
+            ordered = typ in ("馬単", "三連単")
+            # 60×100円 is the maximum user budget. Avoid a huge combinatorial
+            # search; every declared BOX must contain at least two line items.
+            max_horses = 5 if typ == "三連単" else 8
+            horses = sorted(set(h for _, selection in available for h in selection))
+            for count in range(min(len(horses), max_horses), arity, -1):
+                combos = comb(count, arity) * (factorial(arity) if ordered else 1)
+                if combos < 2 or combos > len(available):
+                    continue
+                for hs in combinations(horses, count):
+                    keys = {
+                        bet_key({"type":typ,"selection":list(ordered_combo)})
+                        for picked in combinations(hs, arity)
+                        for ordered_combo in (permutations(picked) if ordered else (picked,))
+                    }
+                    if keys.issubset(available) and len(keys) == combos:
+                        sid = f"DISPLAY_BOX_{typ}_{unit}_{'_'.join(map(str,hs))}"
+                        derived.append({"strategy_id":sid, "type":typ,
+                                        "strategy_kind":"box",
+                                        "definition":{"horses":list(hs)},
+                                        "lines":[{"type":k[0],"selection":list(k[1])}
+                                                 for k in sorted(keys)]})
+        if typ == "馬連":
+            horses = sorted(set(h for _, selection in available for h in selection))
+            for axis in horses:
+                partners = sorted({
+                    next(h for h in selection if h != axis)
+                    for _,selection in available if axis in selection and
+                    len(selection) == 2 and selection[0] != selection[1]
+                })
+                if len(partners) < 2:
+                    continue
+                keys = {bet_key({"type":"馬連","selection":[axis,p]}) for p in partners}
+                if keys.issubset(available):
+                    sid = f"DISPLAY_WHEEL_{typ}_{unit}_{axis}"
+                    derived.append({"strategy_id":sid,"type":typ,
+                                    "strategy_kind":"key_wheel",
+                                    "definition":{"key":axis,"partners":partners},
+                                    "lines":[{"type":"馬連","selection":[axis,p]}
+                                             for p in partners]})
+    return derived
+
+
 def purchase_commands(prediction):
     """Prove each on-screen instruction expands to *exactly* the sealed final_bets.
 
@@ -265,7 +324,7 @@ def purchase_commands(prediction):
                 "key_wheel_multi":1, "one_key_wheel":1, "two_key_wheel":1,
                 "one_key_fixed":1, "two_key_fixed":1, "one_key_multi":1,
                 "two_key_multi":1, "formation":2, "multiple_singles":3}
-    for st in prediction.get("purchase_strategy_evaluations") or []:
+    for st in (prediction.get("purchase_strategy_evaluations") or []) + _display_only_group_candidates(final_by_key):
         kind = st.get("strategy_kind")
         if kind in ignored or kind not in priority or kind not in PURCHASE_MODES_BY_TYPE.get(st.get("type"), set()):
             continue
