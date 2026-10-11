@@ -190,7 +190,7 @@
       },
       "workflow": {
         "path": ".github/workflows/jra-generic-one-shot-v314.yml",
-        "git_blob_sha": "f78111b6690e26ae0dd28e7cde0340d50910f8a2"
+        "git_blob_sha": "ef05f562d5388c44c48588af200b9e8daa10c065"
       },
       "tests": {
         "path": ".github/scripts/test-jra-generic-v314.py",
@@ -214,11 +214,11 @@
     "scope": "New-race STEP2 comparative research only; official final_bets remain immutable in v3.13",
     "audit_script": {
       "path": ".github/scripts/jra-set-preference-v1.mjs",
-      "git_blob_sha": "58f8c6646da86f8d9ebf39c4f82ef39bb2ec3a45"
+      "git_blob_sha": "6d54d5fbb8aebf03df097fb841589095d67c1e2f"
     },
     "audit_test": {
       "path": ".github/scripts/test-jra-set-preference-v1.mjs",
-      "git_blob_sha": "506dff78de4e82d7804a23277001735d83551fce"
+      "git_blob_sha": "ab400f15940981f218fc2ea7fc7ac6f605540e11"
     },
     "display_overlay": {
       "path": ".github/scripts/jra-pdf-presentation-overlay-v2.py",
@@ -235,6 +235,7 @@
     "budget_yen": 6000,
     "economic_guards": "Compare genuinely priced complete JRA purchase operations; no more than 2% or 100 yen modeled net profit decrease, <=0.5pp union-hit decrease, <=1pp net-loss increase, <=200 yen low-scenario net profit decrease. Require at least one fewer complete purchase command.",
     "formalization_gate": "Shadow comparison must never modify formal v3.13 selected tickets. To activate differing portfolio, version formal model/validator and PDF/report manifest explicitly and pass new actual live E2E; no silent activation.",
-    "display_contract": "For each 2026-10-12-and-later new JRA prereace prediction, render v2 presentation-only exact grouped commands via jra-generic-one-shot-v314.yml. Displayed methods must expand to same immutable final_bets including every ticket and stake."
+    "display_contract": "For each 2026-10-12-and-later new JRA prereace prediction, render v2 presentation-only exact grouped commands via jra-generic-one-shot-v314.yml. Displayed methods must expand to same immutable final_bets including every ticket and stake.",
+    "sidecar_publication": "The generic GitHub Actions workflow generates docs/data/jra-set-preference/<race_id>.json only from a sealed formal v3.13 original and verifies deployed HTTP bytes; no final_bets are changed."
   }
 }
