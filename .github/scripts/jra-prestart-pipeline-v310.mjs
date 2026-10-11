@@ -271,7 +271,7 @@ function main(){
  must(output,'--output path required');
  if(seal){
   must(proof&&/^[0-9a-f]{40}$/.test(proof),'--proof-commit Git SHA required');
-  const proofObj=JSON.parse(execFileSync('git',['show',proof+':'+seal],{encoding:'utf8'}));
+  const proofObj=JSON.parse(execFileSync('git',['show',proof+':'+seal],{encoding:'utf8',maxBuffer:64*1024*1024}));
   must(proofObj.stage==='pending_git_proof'&&proofObj.proof_commit===null,'snapshot not pending or already sealed');
   const commitTime=execFileSync('git',['show','-s','--format=%cI',proof],{encoding:'utf8'}).trim();
   must(timestamp(commitTime)<timestamp(proofObj.race_context.start_at),'BLOCKER: proof commit after race post');
