@@ -1,40 +1,129 @@
-name: Generate JRA live v3.10 inputs for 2026-10-11 (research gate)
+name: JRA v3.10 LIVE official prediction and approved PDFs 2026-10-11
 on:
   push:
     branches: [main]
     paths:
       - '.github/workflows/jra-live-20261011-v310.yml'
-      - '.github/scripts/jra-gather-live-20261011-v310.py'
+  workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: live-jra-v310-20261011
+  cancel-in-progress: false
 jobs:
-  live:
+  publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: python -m pip install -q beautifulsoup4 requests
-      - name: Prepare prereace source data for both actual JRA main races
-        run: python .github/scripts/jra-gather-live-20261011-v310.py
-      - name: Prove candidate parsing and purchase-policy compatibility
+      - name: Install exact approved PDF renderer and live source dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q beautifulsoup4 requests weasyprint==68.0 pymupdf==1.26.4
+          python -m weasyprint --version
+      - name: Confirm v3.10 optimizer and prestart input contracts
         run: |
           node .github/scripts/test-jra-prestart-pipeline-v310.mjs
           node .github/scripts/test-jra-portfolio-v310.mjs
-          node .github/scripts/jra-prestart-pipeline-v310.mjs --input e2e_validation/inputs/2026-10-11-ireland-trophy.json --output /tmp/tokyo-snapshot.json
-          node .github/scripts/jra-prestart-pipeline-v310.mjs --input e2e_validation/inputs/2026-10-11-uzumasa-stakes.json --output /tmp/kyoto-snapshot.json
-          python -c "import json; a=json.load(open('/tmp/tokyo-snapshot.json'));b=json.load(open('/tmp/kyoto-snapshot.json'));print('TOKYO',a['purchase_decision'],a['total_stake_yen'],a['market_quote_audit']);print('KYOTO',b['purchase_decision'],b['total_stake_yen'],b['market_quote_audit'])"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: jra-v310-live-probe-inputs
-          path: |
-            e2e_validation/inputs/*2026-10-11*.json
-            e2e_validation/quote-evidence/2026-10-11-*/
-            /tmp/tokyo-snapshot.json
-            /tmp/kyoto-snapshot.json
-          if-no-files-found: warn
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/validate-jra-portfolio-prompt-v310.mjs
+      - name: Refresh official JRA runners and independent actual odds
+        run: |
+          set -euo pipefail
+          python .github/scripts/jra-gather-live-20261011-v310.py
+      - name: Construct detailed pre-start bet snapshots with exact odds
+        env:
+          RUN_ID: ${{ github.run_id }}
+          ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          for SLUG in 2026-10-11-ireland-trophy 2026-10-11-uzumasa-stakes; do
+            SNAPSHOT="e2e_validation/snapshots/$SLUG/v3.10-run$RUN_ID-attempt$ATTEMPT.json"
+            node .github/scripts/jra-prestart-pipeline-v310.mjs --input "e2e_validation/inputs/$SLUG.json" --output "$SNAPSHOT"
+            echo "$SLUG|$SNAPSHOT" >> /tmp/jra-v310-races.txt
+          done
+      - name: Preflight complete HTML/PDF on unsealed input (layout smoke only)
+        run: |
+          set -euo pipefail
+          while IFS='|' read -r SLUG SNAPSHOT; do
+            python - "$SNAPSHOT" "/tmp/$SLUG-layout.json" <<'PY'
+          import json,sys
+          o=json.load(open(sys.argv[1]))
+          o['stage']='formal_prestart'
+          o['proof_commit']='a'*40
+          with open(sys.argv[2],'w') as f:json.dump(o,f,ensure_ascii=False)
+          PY
+            mkdir -p docs/reports docs/pdfs
+            python .github/scripts/jra-render-live-v310.py "/tmp/$SLUG-layout.json" "docs/reports/$SLUG.html"
+            python -m weasyprint "docs/reports/$SLUG.html" "/tmp/$SLUG-layout.pdf"
+            python .github/scripts/validate-jra-pdf-layout.py \
+              --html "docs/reports/$SLUG.html" --pdf "/tmp/$SLUG-layout.pdf" \
+              --policy "docs/data/jra_pdf_layout_policy_v1.json"
+          done < /tmp/jra-v310-races.txt
+      - name: Freeze exact actual odds, auditable inputs and purchase portfolio BEFORE post
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            e2e_validation/inputs/2026-10-11-ireland-trophy.json \
+            e2e_validation/inputs/2026-10-11-uzumasa-stakes.json \
+            e2e_validation/quote-evidence/2026-10-11-ireland-trophy \
+            e2e_validation/quote-evidence/2026-10-11-uzumasa-stakes
+          while IFS='|' read -r SLUG SNAPSHOT; do git add -- "$SNAPSHOT"; done < /tmp/jra-v310-races.txt
+          git diff --cached --name-only | tee /tmp/jra-staged-files.txt
+          if grep -Ev '^e2e_validation/(inputs|quote-evidence|snapshots)/' /tmp/jra-staged-files.txt; then
+            echo "::error::Historical file outside allowed prereace evidence scope"; exit 1
+          fi
+          git commit -m "Freeze 2026-10-11 JRA main-race v3.10 exact odds and optimal bets before post"
+          git push origin HEAD:main
+          git rev-parse HEAD > /tmp/jra-proof-commit.txt
+          echo "PROOF_COMMIT=$(cat /tmp/jra-proof-commit.txt)"
+      - name: Seal validated v3.10 formal prediction JSON from existing proof
+        run: |
+          set -euo pipefail
+          PROOF=$(cat /tmp/jra-proof-commit.txt)
+          while IFS='|' read -r SLUG SNAPSHOT; do
+            PRED="e2e_validation/predictions/$SLUG/$(basename "$SNAPSHOT")"
+            node .github/scripts/jra-prestart-pipeline-v310.mjs --seal "$SNAPSHOT" \
+              --proof-commit "$PROOF" --output "$PRED"
+            echo "$PRED" >> /tmp/jra-final-predictions.txt
+          done < /tmp/jra-v310-races.txt
+          node .github/scripts/validate-jra-portfolio-v310.mjs
+      - name: Render from formal JSON with approved immutable CSS and verify every PDF page
+        run: |
+          set -euo pipefail
+          while IFS= read -r PRED; do
+            SLUG=$(basename "$(dirname "$PRED")")
+            python .github/scripts/jra-render-live-v310.py "$PRED" "docs/reports/$SLUG.html"
+            python -m weasyprint "docs/reports/$SLUG.html" "docs/pdfs/$SLUG.pdf"
+            python .github/scripts/validate-jra-pdf-layout.py \
+              --html "docs/reports/$SLUG.html" --pdf "docs/pdfs/$SLUG.pdf" \
+              --policy "docs/data/jra_pdf_layout_policy_v1.json"
+          done < /tmp/jra-final-predictions.txt
+          python .github/scripts/jra-publish-live-v310.py $(cat /tmp/jra-final-predictions.txt)
+      - name: Publish full confirmed formal HTML/PDF and registry with no historical changes
+        run: |
+          set -euo pipefail
+          git add -- docs/data/races.json
+          while IFS= read -r PRED; do
+            SLUG=$(basename "$(dirname "$PRED")")
+            git add -- "$PRED" "docs/reports/$SLUG.html" "docs/pdfs/$SLUG.pdf"
+          done < /tmp/jra-final-predictions.txt
+          git diff --cached --name-only | tee /tmp/jra-publish-list.txt
+          if grep -Ev '^((docs/data/races.json)|(docs/reports/2026-10-11-(ireland-trophy|uzumasa-stakes).html)|(docs/pdfs/2026-10-11-(ireland-trophy|uzumasa-stakes).pdf)|(e2e_validation/predictions/2026-10-11-(ireland-trophy|uzumasa-stakes)/.*json))$' /tmp/jra-publish-list.txt; then
+            echo "::error::Publication includes an unapproved file"; exit 1
+          fi
+          git commit -m "Publish verified 2026-10-11 JRA v3.10 formal HTML and reader-v1 PDFs"
+          git push origin HEAD:main
+          echo "PUBLISHED_2026_10_11_JSON_HTML_PDF"
+          echo "Proof commit: $(cat /tmp/jra-proof-commit.txt)"
