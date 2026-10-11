@@ -101,6 +101,116 @@ def strategy_registry(prediction):
         registry[sid] = (st, len(ticket_keys & selected), len(ticket_keys))
     return registry
 
+
+COVER = re.compile(
+    r'<section class="page"><div class="chapter">本日の正式予想｜表紙</div>(.*?)</section>', re.S
+)
+TYPE_ORDER = ("単勝", "複勝", "枠連", "馬連", "馬単", "ワイド", "三連複", "三連単")
+
+
+def cover_conclusion(prediction, original_cover):
+    """Place the final buy/no-buy decision and ticket types first; preserve all tail details."""
+    final = prediction.get("final_bets")
+    if not isinstance(final, list):
+        raise ValueError("JRA presentation blocker: frozen final_bets missing")
+    cost = prediction.get("total_stake_yen")
+    if not isinstance(cost, int) or cost < 0 or cost > 6000:
+        raise ValueError("JRA presentation blocker: invalid frozen purchase budget")
+    bought = prediction.get("purchase_decision") == "buy"
+    if bought != bool(final) or sum(x.get("stake_yen", 0) for x in final) != cost:
+        raise ValueError("JRA presentation blocker: purchase decision/cost mismatch")
+    if len({x["id"] for x in final}) != len(final):
+        raise ValueError("JRA presentation blocker: duplicate final ticket ID")
+    if len({bet_key(x) for x in final}) != len(final):
+        raise ValueError("JRA presentation blocker: duplicate final ticket")
+    by_type = {}
+    for line in final:
+        typ = line["type"]
+        selection = line["selection"]
+        amount = line["stake_yen"]
+        if typ not in TYPE_ORDER or not isinstance(selection, list) or not selection or (
+            not isinstance(amount, int) or amount <= 0
+        ):
+            raise ValueError("JRA presentation blocker: malformed final ticket")
+        by_type.setdefault(typ, []).append(line)
+
+    # The approved original report has an explicit race title and dated race context.
+    # Keep them verbatim; only the prioritization of the front-page content changes.
+    front = re.match(r'\s*(<h1>.*?</h1>)(<p>.*?</p>)', original_cover, re.S)
+    if not front:
+        raise ValueError("JRA presentation blocker: frozen cover heading changed")
+    title, race_details = front.groups()
+    esc = lambda x: html_module.escape(str(x), quote=True)
+    max_items = int(__import__("os").getenv("JRA_COVER_BETS_PER_TYPE", "6"))
+    if max_items < 1:
+        raise ValueError("JRA presentation blocker: at least one ticket per type must be visible")
+    state = "購入候補あり" if bought else "購入見送り"
+    info = (f'<div class="hero"><div class="m">最終購入結論：{state}</div>'
+            f'<p>採用 {len(final)}点／購入予定額 {cost:,}円／予算上限6,000円</p></div>')
+    if not bought:
+        details = '<p>最終採用の買い目はありません。購入見送りの詳しい理由は後半の購入監査を参照してください。</p>'
+    else:
+        table = ('<table class="table dense"><thead><tr>'
+                 '<th>券種</th><th>購入する組番（馬番・枠番）</th>'
+                 '<th>点数</th><th>購入額</th></tr></thead><tbody>')
+        for typ in TYPE_ORDER:
+            lines = by_type.get(typ, [])
+            if not lines:
+                continue
+            rendered = []
+            for line in lines[:max_items]:
+                sel = "-".join(map(str, line["selection"]))
+                amount = line["stake_yen"]
+                rendered.append(sel if amount == 100 else f"{sel}({amount:,}円)")
+            extra = len(lines) - len(rendered)
+            if extra:
+                rendered.append(f"ほか{extra}点（後半に全件記載）")
+            table += ("<tr><td>" + esc(typ) + "</td><td>" + esc("、".join(rendered)) +
+                      "</td><td>" + str(len(lines)) + "点</td><td>" +
+                      f"{sum(x['stake_yen'] for x in lines):,}円</td></tr>")
+        table += "</tbody></table>"
+        details = table
+
+    portfolio = prediction.get("purchase_portfolio_selection") or {}
+    prof = (portfolio.get("expected_net_profit_yen_scenarios") or {}).get("central")
+    hit = (portfolio.get("hit_probability_scenarios") or {}).get("central")
+    loss = (portfolio.get("loss_probability_scenarios") or {}).get("central")
+    def yen(v):
+        return f"{v:,.1f}円" if isinstance(v, (int, float)) else "算定対象外"
+    def pct(v):
+        return f"{v*100:.1f}%" if isinstance(v, (int, float)) else "算定対象外"
+    indicators = ('<table class="table dense"><thead><tr>'
+                  '<th>集合的中率（推定）</th><th>期待純利益（推定）</th>'
+                  '<th>実損確率（推定）</th></tr></thead><tbody><tr>'
+                  f'<td>{pct(hit) if bought else "算定対象外"}</td>'
+                  f'<td>{yen(prof) if bought else "算定対象外"}</td>'
+                  f'<td>{pct(loss) if bought else "算定対象外"}</td>'
+                  '</tr></tbody></table>')
+    note = ('<p class="tiny">※買い目と投資額は確定した発走前予想の表示です。実際の馬券は購入していません。'
+            '確率・期待利益は未校正モデルによる推定で、的中や利益を保証しません。'
+            '詳細は後半の「採用買い目」、不採用理由は「不採用買い目」、'
+            '方式比較は「購入最適化監査」にあります。</p>')
+    body = (title + race_details + info + '<h3>最終の買い目（購入候補）</h3>' +
+            details + '<h3>購入セット全体の評価</h3>' + indicators + note)
+    return '<section class="page"><div class="chapter">最終購入結論｜本日の正式予想</div>' + body + '</section>'
+
+
+def move_conclusion_to_front(source, prediction):
+    # Match precisely one first-page original; leave the 4 other front pages and
+    # all horse / adopted / rejected / audit chapters in their approved order.
+    if not source.startswith("<!doctype html>"):
+        raise ValueError("JRA presentation blocker: unexpected report document")
+    updated, found = COVER.subn(
+        lambda m: cover_conclusion(prediction, m.group(1)), source, count=1)
+    if found != 1 or COVER.search(updated):
+        raise ValueError("JRA presentation blocker: ambiguous original cover")
+    if updated.count("最終購入結論｜本日の正式予想") != 1:
+        raise ValueError("JRA presentation blocker: front-page conclusion absent")
+    if updated.count('<section class="page">') != source.count('<section class="page">'):
+        raise ValueError("JRA presentation blocker: presentation altered page sections")
+    return updated
+
+
 def apply(html_source, prediction):
     pages = PAGE.findall(html_source)
     if not pages:
@@ -154,6 +264,7 @@ def apply(html_source, prediction):
         converted, count=1)
     if count != 1:
         raise ValueError("JRA presentation blocker: selected-ticket chapter absent")
+    converted = move_conclusion_to_front(converted, prediction)
     return converted, changed[0], len(pages)
 
 def main():
