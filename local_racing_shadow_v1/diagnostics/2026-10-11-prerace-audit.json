@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "scope": "PRE-RACE",
+  "status": "SKIPPED_NO_ELIGIBLE_RACES",
+  "model_version": "local-daily-shadow-v0.1",
+  "production_effect": false,
+  "rule_sources": {
+    "config_path": "local_racing_shadow_v1/config.json",
+    "config_blob_sha": "368d69484d32c35d9d4b4c418820d2ad1ee028c2",
+    "prompt_path": "local_racing_shadow_v1/shadow_prompt_v0_1.txt",
+    "prompt_blob_sha": "c2afcae81f65dd9ecfc7a8e4bbf02fa424a85187"
+  },
+  "official_calendar": {
+    "source": "NAR 地方競馬情報サイト・本日のレース情報",
+    "url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TodayRaceInfoTop",
+    "date": "2026-10-11",
+    "checked_at_jst": "2026-10-11T19:21:43+09:00",
+    "official_venues": [
+      "帯広ば",
+      "盛岡",
+      "金沢",
+      "高知",
+      "佐賀"
+    ],
+    "enabled_venues": [
+      "大井",
+      "川崎",
+      "船橋",
+      "浦和",
+      "園田",
+      "名古屋"
+    ],
+    "intersection": []
+  },
+  "daily_audit": {
+    "eligible_races": 0,
+    "prediction_files_existing": 0,
+    "result_files_existing": 0,
+    "review_files_existing": 0,
+    "manifest_entries_for_date": 0,
+    "prediction_created": false,
+    "proof_commit": null,
+    "proof_commit_reason": "Not applicable: no eligible races or pre-race snapshots exist for the date.",
+    "no_hindsight_predictions": true,
+    "previous_manifest_entries": 46,
+    "public_manifest_path": "docs/data/local_racing_shadow_public.json",
+    "public_manifest_blob_sha_at_audit": "ac83fb3d93455c2bb035c2ed386dee0a57f23719",
+    "public_manifest_change_required": false,
+    "github_pages_live_bytes_verified": false,
+    "github_pages_note": "Publicly hosted Pages JSON/HTML could not be independently fetched with available browsing tools; committed manifest was checked. Do not claim live publication verified.",
+    "jra_related_files_changed": false
+  },
+  "forward_looking_blockers": [
+    "PRE-RACE workflow .github/workflows/local-racing-shadow-prerace-20261008.yml contains a one-day guard for 2026-10-09; future dates cannot rely on this workflow.",
+    "local_racing_shadow_v1/generate_daily.py currently implements only oi and sonoda, while config enables six venues.",
+    "Current connected GitHub actions cannot directly invoke workflow_dispatch; a generic PRE-RACE event/dispatch trigger has not been established."
+  ],
+  "note": "The six enabled Shadow venues had no official races on 2026-10-11. No race predictions, proofs, results or reviews were created; existing frozen race files and the public manifest were not modified. This is an eligibility/calendar audit, not a race-level prediction proof."
+}
