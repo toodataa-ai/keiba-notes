@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_prestart_canonical_republication_v1",
+  "applies_to_prompt_version": "v3.11",
+  "effective_date": "2026-10-11",
+  "scope": "public_current_prediction_pointer_only",
+  "allow_prestart_canonical_replacement": true,
+  "cutoff": "strictly_before_official_race_start_for_that_race_in_JST",
+  "status_eligible": [
+    "predicted"
+  ],
+  "no_replacement_after_post": true,
+  "require_new_prediction": {
+    "formal_stage": "formal_prestart",
+    "verified_real_git_proof": true,
+    "newer_freeze_than_previous": true,
+    "newer_proof_commit_before_start": true,
+    "newer_prediction_price_evidence": true,
+    "newer_report_pdf_validation": true,
+    "full_eight_bet_type_audit": true,
+    "all_selected_and_rejected_lines": true
+  },
+  "unchanged": {
+    "archived_predictions": true,
+    "archived_pdf_html": true,
+    "historical_git_snapshots": true,
+    "proof_commits": true,
+    "past_results_reviews_performance": true,
+    "model_step1": true,
+    "approved_pdf_css": true,
+    "local_shadow": true
+  },
+  "promotion": {
+    "canonical_registry": "docs/data/races.json",
+    "revision_journal": "docs/data/jra_publication_revision_log.json",
+    "publication_strategy": "switch_canonical_report_pdf_and_final_bets_to_latest_formal_prestart",
+    "archive_previous_canonical_entry_in_revision_journal": true,
+    "canonical_one_race_one_entry": true,
+    "full_http_binary_verification": true,
+    "rollback_on_blocker": "do_not_commit_unverified_canonical_promotion"
+  },
+  "note": "Replacement means replacing public canonical record/links and current buying recommendation, not rewriting immutable prereace prediction JSON, old PDF, git proof, or results. A post-start prediction revision is prohibited."
+}
