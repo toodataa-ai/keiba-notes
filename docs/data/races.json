@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-11T10:34:54.886+09:00",
+  "updated_at": "2026-10-11T12:17:08.761+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -931,30 +931,45 @@
       "venue": "京都",
       "race": "太秦ステークス",
       "scope": "jra-main",
-      "prompt_version": "v3.11",
+      "prompt_version": "v3.12",
       "status": "predicted",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 14,
-      "report": "reports/2026-10-11-uzumasa-stakes-v311.html",
-      "pdf": "pdfs/2026-10-11-uzumasa-stakes-v311.pdf",
+      "report": "reports/2026-10-11-uzumasa-stakes-v3.12-rerun38107735525-attempt2-v312.html",
+      "pdf": "pdfs/2026-10-11-uzumasa-stakes-v3.12-rerun38107735525-attempt2-v312.pdf",
       "pdf_mode": "full",
-      "full_report_pages": 46,
+      "full_report_pages": 51,
       "marks": {
         "win": "13 メルカントゥール",
         "second": "5 タガノバビロン",
         "third": "1 モックモック"
       },
       "bets": [
+        "三連単 3-4-13",
         "単勝 4",
         "枠連 1-3"
       ],
       "purchase_decision": "buy",
       "purchase_reason_code": "bought",
-      "total_stake_yen": 200,
+      "total_stake_yen": 300,
       "final_bets": [
         {
           "id": "B01",
+          "type": "三連単",
+          "selection": [
+            3,
+            4,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 806.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040411?umaBan=3&position=1",
+          "observed_at": "2026-10-11T03:16:30.829+00:00",
+          "market_selection_id": "三連単:[3,4,13]"
+        },
+        {
+          "id": "B02",
           "type": "単勝",
           "selection": [
             4
@@ -966,7 +981,7 @@
           "market_selection_id": "単勝:[4]"
         },
         {
-          "id": "B02",
+          "id": "B03",
           "type": "枠連",
           "selection": [
             1,
@@ -979,10 +994,10 @@
           "market_selection_id": "枠連:[1,3]"
         }
       ],
-      "final_bets_fixed_at": "2026-10-11T01:23:19.814Z",
+      "final_bets_fixed_at": "2026-10-11T03:16:31.262Z",
       "step1_fixed_at": "2026-10-11T09:12:47.712+09:00",
-      "e2e_prediction": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.11-run38101635486-attempt1.json",
-      "proof_commit": "3b253d7534d65e928514f428ddffb0454e23953f",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38107735525-attempt2.json",
+      "proof_commit": "2b0b810ab66e2011ceeb6cfdc1fa2417411ee17e",
       "purchase_budget_yen": 6000,
       "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
     }
