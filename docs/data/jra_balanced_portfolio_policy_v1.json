@@ -28,10 +28,14 @@
     "rejected_tickets_with_individual_reason": true,
     "unknown_odds_not_eligible": true,
     "pdf_tail_sections": [
-      "採用買い目",
-      "不採用買い目",
-      "購入最適化監査"
-    ]
+      "採用買い目:全件・自動複数ページ",
+      "不採用買い目:全件・理由付き自動複数ページ",
+      "購入最適化監査:必要ページ数"
+    ],
+    "max_pdf_pages": null,
+    "auto_paginate_all_candidates": true,
+    "require_one_page_per_horse": true,
+    "no_omissions_or_dummy_filler": true
   },
   "preservation": {
     "immutable_v310_components": true,
@@ -47,9 +51,10 @@
     "stale_or_unverified_quote",
     "missing_joint_distribution",
     "missing_rejection_reason",
-    "pdf_suppresses_selected_bets",
     "pdf_spare_dummy_tail_page",
     "pdf_blank_or_bad_grade_colors",
-    "post_start_freeze"
+    "post_start_freeze",
+    "rendered_page_or_line_count_mismatch",
+    "candidate_line_omission"
   ]
 }
