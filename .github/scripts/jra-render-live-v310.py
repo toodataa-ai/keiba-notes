@@ -59,7 +59,7 @@ def make(report):
    '前走成績はJRA公式に照らした客観資料ですが、総合評価と印には推定が含まれます。')
   +rows_table(['印','馬番','馬名','総合','斤量','前走概要'],[(x['mark'],x['horse_number'],x['horse_name'],
    x['overall_grade'],str(x.get('weight_kg',''))+'kg',
-   (x.get('past_performances') or [{}])[0].get('source_excerpt','データなし')[:47]) for x in runners])
+   (x.get('past_performances') or [{}])[0].get('source_excerpt','データなし')[:14]) for x in runners])
   +paragraph('同条件直接実績を優先し、古い好走だけで現在値を判断しない。出走数とオッズは発走前に変わる可能性があります。'))
  body+=page('STEP2 8券種・購入方式の検証',
   paragraph('WIN5は対象外。単勝／複勝／枠連／馬連／馬単／ワイド／三連複／三連単について、単点・流し・BOX・フォーメーション・マルチ等を展開しています。')
