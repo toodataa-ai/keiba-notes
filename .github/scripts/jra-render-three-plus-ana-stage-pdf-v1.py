@@ -60,9 +60,10 @@ tr.ana{background:#fff7ed}tr.ana td{border-top:2px solid #d8b682}
 .foot{margin-top:16px;padding-top:8px;border-top:1px solid #cbd1d8;color:#677181;font-size:8pt}
 </style></head><body><header><div class="kicker">STAGING v1.01 ／ 購入指示コンパクト化・検証見本</div>
 <h1>'''+esc(title)+'''</h1></header>
-<p class="warn">これは発走前に封印された正式版v3.13とは異なる、3操作＋穴狙いの研究案です。
+<p class="warn">これは発走前に封印された正式版v3.13とは異なる、通常最大3操作＋中穴・大穴の研究案です。
 実際の購入指示として使用しないでください。</p>
-<h2>通常最大3操作 ＋ 中穴・大穴を各1行</h2>\n<p style="font-size:8pt;color:#647082;margin:0 0 5px">三連単は6点以上、三連複は3点以上の購入セットを候補とし、単独1点への絞り込みを避けています。</p>
+<h2>通常最大3操作 ＋ 中穴・大穴を各1行</h2>
+<p style="font-size:8pt;color:#647082;margin:0 0 5px">三連単は6点以上、三連複は3点以上の購入セットを候補とし、単独1点への絞り込みを避けています。</p>
 <p style="font-size:8pt;color:#647082;margin:0 0 7px">馬連・三連複などは「－」／馬単・三連単などは「→」／BOXの「・」は候補馬の一覧。</p>
 <table><colgroup><col style="width:21%"><col style="width:43%"><col style="width:36%"></colgroup>
 <thead><tr><th>券種・買い方</th><th>JRA画面に指定する馬番</th><th>点数 × 単価 ＝ 金額</th></tr></thead>
@@ -85,7 +86,7 @@ def main():
  assert a.input.startswith('docs/staging/data/three-plus-ana/')
  assert a.pdf.startswith('docs/staging/pdfs/')
  data=json.loads(Path(a.input).read_text(encoding='utf8'))
- commands=data['regular_commands']+[data['ana_command']]
+ commands=data['regular_commands']+[data['medium_command'],data['large_command']]
  target=Path(a.pdf);target.parent.mkdir(parents=True,exist_ok=True)
  rendered_html=make(data)
  assert rendered_html.count('<table')==3,'regular medium and large classes need separate tables'
