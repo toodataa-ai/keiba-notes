@@ -29,6 +29,21 @@ jobs:
           Path('/tmp/ireland-v312-staging.json').write_text(json.dumps(o,ensure_ascii=False),encoding='utf-8')
           print('PREREACE INPUT',o['race_id'],'observed_quotes',len(o['market_quotes']),'planned_modes',len(o['strategies']))
           PY
+          python3 - <<'PY'
+          import requests
+          from bs4 import BeautifulSoup
+          u='https://sports.yahoo.co.jp/keiba/race/odds/st/2605040411?ninki=0'
+          r=requests.get(u,timeout=20);r.raise_for_status()
+          s=BeautifulSoup(r.content,'html.parser')
+          print('SOURCE_FORMS',len(s.select('form')),'HTML_BYTES',len(r.content))
+          for f in s.select('form'):
+              opts=[]
+              for sel in f.select('select'):
+                  option=sel.select('option')
+                  opts.append({'name':sel.get('name'),'options':len(option),
+                     'sample':[(o.get('value'),o.get_text(' ',strip=True)[:15]) for o in option[:5]]})
+              print('FORM',f.get('method'),f.get('action'),'SELECTS',opts)
+          PY
           python3 .github/scripts/jra-odds-recovery-v312.py \
             --input /tmp/ireland-v312-staging.json \
             --output /tmp/ireland-v312-recovered.json \
