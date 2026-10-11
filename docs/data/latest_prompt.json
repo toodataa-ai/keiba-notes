@@ -1,6 +1,6 @@
 {
-  "version": "v3.10",
-  "path": "競馬予想_完全版プロンプト_v3.10.txt",
-  "updated_at": "2026-10-10T22:25:16.994Z",
-  "rule": "Read docs/data/latest_prompt.json then verify e2e_validation/manifests/v3.10.json all SHA pins. Inherit v3.0-v3.9 STEP1, full-field outcome model, all eight JRA ticket types and purchase mode candidate generation unchanged. Replace 'one best strategy' and default 3000-yen cap with cross-type multi-strategy optimizer: exact 0/1 knapsack, default 100-yen distinct ticket, sum stake <=6000 yen, maximize model-based central expected NET profit. Require pre-start full ticket odds/source/selection precision; deduplicate ticket intersections; compute same-outcome portfolio payouts, ROI, P(any win), P(full loss) and P(net loss) across low/central/high scenarios. Never spend to quota or fabricate prices. Freeze all selected final_bets and proof before report; old predictions/results, local Shadow, WIN5 exclusion and approved v3.7 PDF layout unchanged. Run v3.10 optimizer and inherited regression CI."
+  "version": "v3.11",
+  "path": "競馬予想_完全版プロンプト_v3.11.txt",
+  "updated_at": "2026-10-11T00:52:17.081Z",
+  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail pages, no dummy pages, fail closed if selected lines cannot fit. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal."
 }
