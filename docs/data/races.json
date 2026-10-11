@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-10T19:41:50.784+09:00",
+  "updated_at": "2026-10-11T09:14:52.842+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -727,6 +727,264 @@
       "review": "◎11サイモンシュバリエが逃げ切り1着。予想で重視した京都ダ1800mの直接実績と先行持続力は勝因と整合する。△4ショウサンジョージは3着で、予想時に把握していた同コース現級4着・斤量55kgへの軽減による反発候補は妥当。一方、×10ベルダイナフェローが52kgで2着、○13サンライズケヴィンが13着、▲5リベッチオが7着。上位候補13の外枠・昇級・同コース未経験リスクを把握しながら2番手評価とした点、および軽斤量馬10の条件別浮上可能性を十分検証できなかった点は再確認課題。ただし12番人気の2着を事後的な正解ルールに変換しない。最終購入指示の単勝11（100円）は公式払戻1080円で的中し、投資100円・払戻1080円。良馬場予測も一致。",
       "review_at": "2026-10-10T19:41:50.784+09:00",
       "e2e_case": "e2e_validation/cases/2026-10-10-mimuro-stakes/case.json"
+    },
+    {
+      "id": "2026-10-11-ireland-trophy",
+      "date": "2026-10-11",
+      "venue": "東京",
+      "race": "アイルランドトロフィー",
+      "scope": "jra-main",
+      "prompt_version": "v3.10",
+      "status": "predicted",
+      "source": "jra-live-source-capture-prerace-fixed",
+      "eligible_for_learning": false,
+      "field_size": 16,
+      "report": "reports/2026-10-11-ireland-trophy.html",
+      "pdf": "pdfs/2026-10-11-ireland-trophy.pdf",
+      "pdf_mode": "full",
+      "full_report_pages": 24,
+      "marks": {
+        "win": "16 カムニャック",
+        "second": "10 セキトバイースト",
+        "third": "3 クイーンズウォーク"
+      },
+      "bets": [
+        "ワイド 10-15",
+        "ワイド 10-16",
+        "三連単 1-10-16",
+        "三連単 1-16-10",
+        "単勝 10",
+        "枠連 1-5",
+        "枠連 2-5",
+        "枠連 3-8",
+        "枠連 5-6",
+        "複勝 10",
+        "馬連 10-15"
+      ],
+      "purchase_decision": "buy",
+      "purchase_reason_code": "bought",
+      "total_stake_yen": 1100,
+      "final_bets": [
+        {
+          "id": "B01",
+          "type": "ワイド",
+          "selection": [
+            10,
+            15
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            17.4,
+            18.7
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:45.368+09:00",
+          "market_selection_id": "ワイド:[10,15]"
+        },
+        {
+          "id": "B02",
+          "type": "ワイド",
+          "selection": [
+            10,
+            16
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            11.9,
+            12.9
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:45.368+09:00",
+          "market_selection_id": "ワイド:[10,16]"
+        },
+        {
+          "id": "B03",
+          "type": "三連単",
+          "selection": [
+            1,
+            10,
+            16
+          ],
+          "stake_yen": 100,
+          "market_odds": 818.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:46.297+09:00",
+          "market_selection_id": "三連単:[1,10,16]"
+        },
+        {
+          "id": "B04",
+          "type": "三連単",
+          "selection": [
+            1,
+            16,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 671.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:46.297+09:00",
+          "market_selection_id": "三連単:[1,16,10]"
+        },
+        {
+          "id": "B05",
+          "type": "単勝",
+          "selection": [
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 9.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:44.937+09:00",
+          "market_selection_id": "単勝:[10]"
+        },
+        {
+          "id": "B06",
+          "type": "枠連",
+          "selection": [
+            1,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": 30.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:44.937+09:00",
+          "market_selection_id": "枠連:[1,5]"
+        },
+        {
+          "id": "B07",
+          "type": "枠連",
+          "selection": [
+            2,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": 21.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:44.937+09:00",
+          "market_selection_id": "枠連:[2,5]"
+        },
+        {
+          "id": "B08",
+          "type": "枠連",
+          "selection": [
+            3,
+            8
+          ],
+          "stake_yen": 100,
+          "market_odds": 25.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:44.937+09:00",
+          "market_selection_id": "枠連:[3,8]"
+        },
+        {
+          "id": "B09",
+          "type": "枠連",
+          "selection": [
+            5,
+            6
+          ],
+          "stake_yen": 100,
+          "market_odds": 16.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:44.937+09:00",
+          "market_selection_id": "枠連:[5,6]"
+        },
+        {
+          "id": "B10",
+          "type": "複勝",
+          "selection": [
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            3.6,
+            4.7
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:44.937+09:00",
+          "market_selection_id": "複勝:[10]"
+        },
+        {
+          "id": "B11",
+          "type": "馬連",
+          "selection": [
+            10,
+            15
+          ],
+          "stake_yen": 100,
+          "market_odds": 45.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:45.129+09:00",
+          "market_selection_id": "馬連:[10,15]"
+        }
+      ],
+      "final_bets_fixed_at": "2026-10-11T00:12:49.411Z",
+      "step1_fixed_at": "2026-10-11T09:12:43.462+09:00",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-11-ireland-trophy/v3.10-run38097626417-attempt1.json",
+      "proof_commit": "fcd74f558aa09c9d41e649918bcb94b2f4d198ee",
+      "purchase_budget_yen": 6000,
+      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
+    },
+    {
+      "id": "2026-10-11-uzumasa-stakes",
+      "date": "2026-10-11",
+      "venue": "京都",
+      "race": "太秦ステークス",
+      "scope": "jra-main",
+      "prompt_version": "v3.10",
+      "status": "predicted",
+      "source": "jra-live-source-capture-prerace-fixed",
+      "eligible_for_learning": false,
+      "field_size": 14,
+      "report": "reports/2026-10-11-uzumasa-stakes.html",
+      "pdf": "pdfs/2026-10-11-uzumasa-stakes.pdf",
+      "pdf_mode": "full",
+      "full_report_pages": 22,
+      "marks": {
+        "win": "13 メルカントゥール",
+        "second": "5 タガノバビロン",
+        "third": "1 モックモック"
+      },
+      "bets": [
+        "単勝 4",
+        "枠連 1-3"
+      ],
+      "purchase_decision": "buy",
+      "purchase_reason_code": "bought",
+      "total_stake_yen": 200,
+      "final_bets": [
+        {
+          "id": "B01",
+          "type": "単勝",
+          "selection": [
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 11.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:47.928+09:00",
+          "market_selection_id": "単勝:[4]"
+        },
+        {
+          "id": "B02",
+          "type": "枠連",
+          "selection": [
+            1,
+            3
+          ],
+          "stake_yen": 100,
+          "market_odds": 24.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040411?ninki=0",
+          "observed_at": "2026-10-11T09:12:47.928+09:00",
+          "market_selection_id": "枠連:[1,3]"
+        }
+      ],
+      "final_bets_fixed_at": "2026-10-11T00:12:51.689Z",
+      "step1_fixed_at": "2026-10-11T09:12:47.712+09:00",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.10-run38097626417-attempt1.json",
+      "proof_commit": "fcd74f558aa09c9d41e649918bcb94b2f4d198ee",
+      "purchase_budget_yen": 6000,
+      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
     }
   ]
 }
