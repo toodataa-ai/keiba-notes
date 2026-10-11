@@ -8,6 +8,7 @@ import hashlib
 import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 try:
@@ -22,6 +23,17 @@ LONG_DECIMAL = re.compile(r"(?<!\d)\d{12,}(?!\d)")
 HORSE_TAG = re.compile(r'<section\s+class=["\x27]horse["\x27]', re.I)
 PAGE_TAG = re.compile(r'<section\s+class=["\x27]page["\x27]', re.I)
 HORSE_HEAD = re.compile(r'<h1>\s*([◎○▲△×])\s*(\d+)\s+([^<]+)</h1>')
+# Existing approved palette, NOT a new stylesheet: RGB text colors and matching backgrounds.
+GRADE = {'A+':('gAp','#701622','#f29fa9'), 'A':('gA','#6e201c','#f7b8b5'),
+         'B+':('gBp','#734a10','#f9c896'), 'B':('gB','#725518','#ffdf9d'),
+         'B-':('gBm','#4c6129','#d8e7ba'), 'C':('gC','#2a5570','#d1e7f0')}
+GRADE_BADGE = re.compile(r'<span class="g (gAp|gA|gBp|gB|gBm|gC)">(A\+|A|B\+|B|B-|C)</span>')
+HORSE_SECTION = re.compile(r'<section class="horse">(.*?)</section>', re.S)
+def close_color(actual,expected,tolerance=0.035):
+    if isinstance(actual,int):actual=((actual>>16&255)/255,(actual>>8&255)/255,(actual&255)/255)
+    exp=tuple(int(expected[i:i+2],16)/255 for i in (1,3,5))
+    return actual is not None and len(actual)>=3 and all(abs(a-b)<=tolerance for a,b in zip(actual,exp))
+
 
 def validate(html_path, pdf_path, policy_path):
     policy = json.loads(Path(policy_path).read_text(encoding="utf-8"))
@@ -47,6 +59,25 @@ def validate(html_path, pdf_path, policy_path):
     if len(PAGE_TAG.findall(html)) != base_pages:
         errors.append(f"Expected exactly {base_pages} non-horse .page sections")
     horses = HORSE_HEAD.findall(html)
+    horse_sections = HORSE_SECTION.findall(html)
+    expected_badges = []
+    if len(horse_sections)!=expected_horses:
+        errors.append('Cannot identify all individual horse HTML sections for grade-color audit')
+    for index,section in enumerate(horse_sections):
+        badges = GRADE_BADGE.findall(section)
+        # One overall rating plus exactly nine graded factors; no naked black grades permitted.
+        if len(badges)!=10:
+            errors.append(f'Horse {index+1}: expected exactly 10 colored grade badges (overall + 9 axes), got {len(badges)}')
+        for css,grade in badges:
+            if GRADE[grade][0]!=css:
+                errors.append(f'Horse {index+1}: grade {grade} uses incorrect CSS color class {css}')
+        head=section.split('①〜⑨：評価軸別グレード</h3>',1)
+        factor_badges=GRADE_BADGE.findall(head[1].split('</table>',1)[0]) if len(head)==2 else []
+        if len(factor_badges)!=9:
+            errors.append(f'Horse {index+1}: nine axes not individually grade-colored in HTML')
+        expected_badges.append(Counter(grade for _,grade in badges))
+    if len(GRADE_BADGE.findall(html))<10*expected_horses:
+        errors.append('HTML lacks grade palette markup')
     if len(horses) != expected_horses:
         errors.append(f"Horse headings {len(horses)} != horse pages {expected_horses}")
     if len({number for _, number, _ in horses}) != len(horses):
@@ -103,6 +134,28 @@ def validate(html_path, pdf_path, policy_path):
                     errors.append(f"Page {number}: incorrect horse/page mapping: {horse_no} {name}")
                 if f"{offset+1}/{expected_horses}" not in contents.replace(" ", ""):
                     errors.append(f"Page {number}: wrong horse counter")
+            if offset<len(expected_badges):
+                # Inspect the rendered PDF, not just source CSS. A completely grey PDF must fail.
+                wanted=expected_badges[offset]
+                found=Counter()
+                for block in page.get_text('dict').get('blocks',[]):
+                    for line in block.get('lines',[]):
+                        for span in line.get('spans',[]):
+                            grade=span.get('text','').strip()
+                            if grade in GRADE and close_color(span.get('color'),GRADE[grade][1]):
+                                found[grade]+=1
+                for grade,count in wanted.items():
+                    if found[grade]<count:
+                        errors.append(f'Page {number}: grade {grade} colored PDF text missing ({found[grade]}/{count})')
+                fills=Counter()
+                for drawing in page.get_drawings():
+                    rgb=drawing.get('fill')
+                    if rgb is None:continue
+                    for grade,(_,_,hex_bg) in GRADE.items():
+                        if close_color(rgb,hex_bg):fills[grade]+=1
+                for grade,count in wanted.items():
+                    if fills[grade]<count:
+                        errors.append(f'Page {number}: grade {grade} colored PDF background missing ({fills[grade]}/{count})')
         elif HEADING in contents:
             errors.append(f"Page {number}: horse diagnosis spilled into another page")
     return errors
@@ -119,7 +172,7 @@ def main():
             print(f"::error::{error}", file=sys.stderr)
         print(f"FAILED: {len(errors)} PDF layout violations", file=sys.stderr)
         return 1
-    print(f"PASS: A4 / stable layout / all individual horse pages / no exposed IDs: {args.pdf}")
+    print(f"PASS: A4 / stable layout / all individual horse pages / verified A+ through C grade text/background palette / no exposed IDs: {args.pdf}")
     return 0
 
 if __name__ == "__main__":
