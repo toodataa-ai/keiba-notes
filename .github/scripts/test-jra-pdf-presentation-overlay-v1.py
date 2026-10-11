@@ -49,13 +49,13 @@ prefix = ('<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>' +
 source = prefix + section(0, 2, codes[:9]) + section(1, 2, codes[9:]) + "</body></html>"
 converted, rows, pages = overlay.apply(source, prediction_for(source))
 assert (rows, pages) == (len(codes), 2)
-assert "ボックス<div class=\"tiny\">1・2・3｜一部採用1/2点" in converted
-assert "フォーメーション<div class=\"tiny\">1列:1・2／2列:2・3" in converted
-assert "2頭軸マルチ<div class=\"tiny\">軸1・2→2・3" in converted
+assert "ボックス 1,2,3（採用1/2点）" in converted
+assert "フォーメーション 1,2/2,3（採用1/2点）" in converted
+assert "2頭軸マルチ 軸1,2→2,3（採用1/2点）" in converted
 assert "BOX" not in converted  # Actual Japanese descriptions, not English shorthand.
 assert len(overlay.PAGE.findall(converted)) == 2
 assert not any("<td>"+code+"</td>" in converted for code in codes)
-assert "重複購入は計上しません" in converted
+assert "重複買い目は計上しません" in converted
 
 tampered = source.replace("<td>single</td>", "<td>unknown_mode</td>", 1)
 try:
@@ -86,5 +86,5 @@ with tempfile.TemporaryDirectory() as tmp:
     with fitz.open(pdf) as doc:
         assert len(doc) == 4, f"one adopted page and three audit pages expected, got {len(doc)}"
         assert all(len(page.get_text().strip()) > 150 for page in list(doc)[1:])
-        assert '採用買い目' in doc[0].get_text() and '重複購入' in doc[0].get_text()
+        assert '採用買い目' in doc[0].get_text() and '重複買い目' in doc[0].get_text()
 print("PASS: every strategy-mode label and concrete bundle definition; full/partial adoption, 14-row A4 PDF")
