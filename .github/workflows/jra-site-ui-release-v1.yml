@@ -1,0 +1,112 @@
+name: JRA UI-only gated production release and reversible rollback
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/site-release-requests/*.json'
+  workflow_dispatch:
+    inputs:
+      request_path:
+        description: 'Existing approved immutable request in docs/site-release-requests/'
+        type: string
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: jra-site-production-ui-release
+  cancel-in-progress: false
+jobs:
+  promotion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Resolve exactly one explicit approval request and source SHA
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUEST_FROM_UI: ${{ inputs.request_path }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin staging/jra-ui-v101-three-plus-ana
+          if [[ "$EVENT_NAME" == "push" ]];then
+            REQ_COUNT=$(git diff --diff-filter=A --name-only "$BEFORE_SHA" "$AFTER_SHA" -- docs/site-release-requests | wc -l)
+            [[ "$REQ_COUNT" -eq 1 ]] || { echo '::error::One and only one new approval request required';exit 1; }
+            INPUT=$(git diff --diff-filter=A --name-only "$BEFORE_SHA" "$AFTER_SHA" -- docs/site-release-requests)
+          else INPUT="$REQUEST_FROM_UI";fi
+          case "$INPUT" in docs/site-release-requests/*.json) ;; *) echo '::error::Invalid request path';exit 1;; esac
+          [[ -f "$INPUT" && ! -L "$INPUT" ]] || { echo '::error::Request missing';exit 1; }
+          echo "APPROVAL_REQUEST=$INPUT" >> "$GITHUB_ENV"
+          python3 -m py_compile .github/scripts/jra-site-ui-release-v1.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Prepare user-approved UI only, archive v1.00 release snapshot if needed
+        shell: bash
+        run: |
+          set -euo pipefail
+          MODE=$(python3 -c "import json,os;print(json.load(open(os.environ['APPROVAL_REQUEST']))['mode'])")
+          VERSION=$(python3 -c "import json,os;print(json.load(open(os.environ['APPROVAL_REQUEST']))['target_version'])")
+          if [[ "$MODE" == release && -z $(git tag -l jra-site-v1.00) ]];then
+            git tag -a jra-site-v1.00 -m 'Original JRA site presentation v1.00, before staging v1.01 promotion'
+          fi
+          if [[ "$MODE" == release && -n $(git tag -l "jra-site-$VERSION") ]];then
+            echo '::error::Immutable version tag exists; refusing overwrite';exit 1
+          fi
+          python3 .github/scripts/jra-site-ui-release-v1.py "$APPROVAL_REQUEST"
+          git add -- docs/index.html docs/this-week.html docs/data/jra-site-ui-history.json
+          python3 - <<'PY'
+          import subprocess
+          files=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          allow={'docs/index.html','docs/this-week.html','docs/data/jra-site-ui-history.json'}
+          if not files or not files.issubset(allow):
+              raise SystemExit('BLOCKER: non-UI or empty production change '+repr(files))
+          print('SAFE_UI_RELEASE_FILES',sorted(files))
+          PY
+          git commit -m "UI-only $MODE $VERSION with historical immutable rollback and ledger"
+          echo "RELEASE_MODE=$MODE" >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Push with safe non-force conflict resolution
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5;do
+            if git push origin HEAD:main;then
+              echo 'JRA_UI_ONLY_PRODUCTION_PUSHED';break
+            fi
+            [[ $attempt -lt 5 ]] || { echo '::error::Production changed concurrently; manual reconciliation required';exit 1; }
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort;echo '::error::Site UI edit conflicted with new main changes';exit 1; }
+            sleep 5
+          done
+          if [[ "$RELEASE_MODE" == release ]];then
+            git tag -a "jra-site-$RELEASE_VERSION" -m "Approved JRA UI release $RELEASE_VERSION"
+            git push origin "refs/tags/jra-site-$RELEASE_VERSION"
+            if git show-ref --quiet refs/tags/jra-site-v1.00;then
+              git push origin refs/tags/jra-site-v1.00
+            fi
+          fi
+      - name: Verify true deployed production bytes, not merely green GitHub Actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30);do
+            ok=1
+            for file in docs/index.html docs/this-week.html docs/data/jra-site-ui-history.json;do
+              url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
+              if ! curl -fsSL --max-time 20 "$url" -o /tmp/jra-prod-ui-check ||
+                 ! cmp -s "$file" /tmp/jra-prod-ui-check;then ok=0;break;fi
+            done
+            if [[ $ok -eq 1 ]];then
+              echo "JRA_UI_PRODUCTION_HTTP_BYTES_VERIFIED $RELEASE_MODE $RELEASE_VERSION"
+              exit 0
+            fi
+            sleep 12
+          done
+          echo '::error::Production UI commit found, but deployed HTTP byte equality not confirmed';exit 1
+
