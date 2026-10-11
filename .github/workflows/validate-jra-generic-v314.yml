@@ -7,6 +7,7 @@ on:
       - '.github/workflows/jra-generic-one-shot-v314.yml'
       - '.github/workflows/validate-jra-generic-v314.yml'
       - 'docs/operations/jra_generic_execution_v314.md'
+      - 'docs/data/latest_prompt.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,6 +46,21 @@ jobs:
                            'JRA_V313_NEW_RACE_FULL_PUBLIC_HTTP_VERIFIED']:
               assert required in flow,required
           print('PASS: one-shot workflow static contract')
+          PY
+      - name: Confirm v3.13 formal model stays active and generic overlay SHA pins are all real Git blobs
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          pointer=json.loads(Path('docs/data/latest_prompt.json').read_text())
+          assert pointer['version']=='v3.13'
+          overlay=pointer['generic_one_shot_execution_v314']
+          assert overlay['read_each_new_jra_run'] is True
+          assert overlay['formal_prediction_version']=='v3.13'
+          for ref in overlay['files'].values():
+              observed=subprocess.check_output(['git','hash-object',ref['path']],text=True).strip()
+              assert observed==ref['git_blob_sha'],(ref['path'],observed,ref['git_blob_sha'])
+          print('PASS: v3.14 intake SHA sealed with unchanged formal v3.13 predictions')
           PY
       - name: Existing formal predictor and optimizer compatibility checks
         run: |
