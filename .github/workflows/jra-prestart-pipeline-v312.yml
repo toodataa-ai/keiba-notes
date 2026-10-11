@@ -9,7 +9,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: jra-v311-prestart-proof
+  group: jra-v312-prestart-proof
   cancel-in-progress: false
 jobs:
   prestart:
@@ -118,7 +118,7 @@ jobs:
           for ROWS in 10:7 8:5 6:4 4:3 2:2 1:1; do
             SELECTED_ROWS="${ROWS%:*}"; REJECTED_ROWS="${ROWS#*:}"
             echo "Rendering candidate rows/page selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
-            JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE=7 \
+            JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$REJECTED_ROWS" \
               python3 .github/scripts/jra-render-live-v312.py /tmp/jra-v311-layout-only.json "$REPORT" &&
             python3 -m weasyprint "$REPORT" /tmp/jra-v311-layout-only.pdf &&
             python3 .github/scripts/validate-jra-pdf-content-v312.py \
@@ -137,7 +137,8 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "$SNAPSHOT" "$RECOVERED_INPUT" "$RECOVERED_EVIDENCE"
+          git add -- "$SNAPSHOT" "$RECOVERED_INPUT"
+          if [[ -d "$RECOVERED_EVIDENCE" ]] && find "$RECOVERED_EVIDENCE" -type f -print -quit | grep -q .; then git add -- "$RECOVERED_EVIDENCE"; fi
           git commit -m "Freeze prereace JRA v3.12 complete quote evidence, purchase audit and final_bets"
           git push origin HEAD:main
           PROOF=$(git rev-parse HEAD)
