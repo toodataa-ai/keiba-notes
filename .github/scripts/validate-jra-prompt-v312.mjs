@@ -29,8 +29,23 @@ for(const {path,git_blob_sha} of now.components){
      'legacy v3.11 manifest SHA pin was altered: '+path);
    assert.equal(actual,ciReplacement.current_blob_sha,
      'CI compatibility workflow differs from audited v3.12 successor');
+   // Older Actions workflows use fetch-depth=1. Load the known original
+   // pre-release commit when the archived Git object is absent locally.
+   const originalCommit=supersession.historical_base_commit_sha;
+   assert(/^[0-9a-f]{40}$/.test(originalCommit),'unverified historical anchor commit');
+   let originalPresent=false;
+   try{
+     originalPresent=execFileSync('git',['cat-file','-t',ciReplacement.historical_blob_sha],
+       {encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim()==='blob';
+   }catch{}
+   if(!originalPresent){
+     execFileSync('git',['fetch','--no-tags','--depth=1','origin',originalCommit],
+       {encoding:'utf8',stdio:['ignore','pipe','pipe']});
+   }
+   assert.equal(execFileSync('git',['rev-parse',originalCommit+':'+path],{encoding:'utf8'}).trim(),
+      ciReplacement.historical_blob_sha,'actual historical workflow differs from frozen v3.11 manifest');
    assert.equal(execFileSync('git',['cat-file','-t',ciReplacement.historical_blob_sha],{encoding:'utf8'}).trim(),
-     'blob','original approved v3.11 workflow Git blob no longer available');
+     'blob','original approved v3.11 workflow Git blob missing');
    assert(fs.readFileSync(path,'utf8').includes(ciReplacement.required_compatibility_marker),
      'compatibility check is missing from authorized successor CI workflow');
  } else assert.equal(actual,git_blob_sha,'Git SHA mismatch '+path);
