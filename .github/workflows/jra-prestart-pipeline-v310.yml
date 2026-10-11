@@ -1,9 +1,5 @@
 name: JRA v3.10 prestart prediction pipeline
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'e2e_validation/inputs/*.json'
   workflow_dispatch:
     inputs:
       input_path:
