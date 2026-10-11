@@ -53,7 +53,7 @@ jobs:
             fi
             INPUT_PATH="${NEW_FILES[0]}"
           fi
-          case "$INPUT_PATH" in e2e_validation/inputs/*.json) ;; *) echo "::error::Input must be a tracked prereace JSON under e2e_validation/inputs"; exit 1;; esac
+          case "$INPUT_PATH" in e2e_validation/inputs/v313/*.json) ;; *) echo "::error::Input must be a new audited v3.13 prereace JSON under e2e_validation/inputs/v313/"; exit 1;; esac
           if [[ "$INPUT_PATH" == *..* ]] || [[ ! -f "$INPUT_PATH" ]] || [[ -L "$INPUT_PATH" ]]; then
             echo "::error::Unsafe or missing race input"; exit 1
           fi
@@ -74,6 +74,7 @@ jobs:
             echo "::error::Immutable snapshot/prediction path already occupied"; exit 1
           fi
           {
+            echo "RACE_ID=$RACE_ID"
             echo "INPUT_PATH=$INPUT_PATH"
             echo "SNAPSHOT=$SNAPSHOT"
             echo "PREDICTION=$PREDICTION"
@@ -178,4 +179,24 @@ jobs:
           PY
           git commit -m "Publish validated v3.13 full JRA original prediction HTML PDF and public registry"
           git push origin HEAD:main
-          echo "PUBLISHED_JRA_V312_JSON_HTML_PDF $RACE_ID proof=$PROOF"
+          echo "JRA_V313_COMMITTED_AWAITING_PUBLIC_HTTP_VERIFICATION $RACE_ID proof=$PROOF"
+      - name: Independently compare deployed website HTML PDF and public race registry
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 24); do
+            OK=1
+            for FILE in docs/data/races.json "$REPORT" "$PDF"; do
+              URL="https://toodataa-ai.github.io/keiba-notes/${FILE#docs/}"
+              if ! curl -LfsS --max-time 20 "$URL" -o "/tmp/jra-v313-http-$(basename "$FILE")" ||
+                ! cmp -s "$FILE" "/tmp/jra-v313-http-$(basename "$FILE")"; then
+                OK=0;break
+              fi
+            done
+            if [[ "$OK" == 1 ]]; then
+              echo "JRA_V313_NEW_RACE_FULL_PUBLIC_HTTP_VERIFIED $RACE_ID $PROOF"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo '::error::GitHub files committed but real public HTML/PDF/registry publication not verified'
+          exit 1
