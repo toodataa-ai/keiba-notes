@@ -217,11 +217,11 @@ def make(report):
   +paragraph('発走前に実際の買い目価格・市場時刻を固定。的中率優先セットのシナリオ比較は購入推奨と区別します。')
   +paragraph('一部の馬券を増やしても「少なくとも1点的中」は上がりませんが、同時払戻によって期待純利益や純損失確率が変わり得ます。')
   +paragraph('本モデルは未校正であり、期待利益・的中確率の実現を保証しません。'))
-  result='<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+h(race['race_name'])+' JRA v3.12予想</title><style>'+css+'</style></head><body data-full-report="true" data-authored-report="true" data-tail-pagination="dynamic" data-purchase-audit="v3.12">'+body+'</body></html>'
+ result='<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+h(race['race_name'])+' JRA v3.12予想</title><style>'+css+'</style></head><body data-full-report="true" data-authored-report="true" data-tail-pagination="dynamic" data-purchase-audit="v3.12">'+body+'</body></html>'
  return result
 if __name__=='__main__':
  require=lambda ok,msg: (_ for _ in ()).throw(RuntimeError(msg)) if not ok else None
- require(len(sys.argv)==3,'Usage: python jra-render-live-v311.py formal.json docs/reports/slug.html')
+ require(len(sys.argv)==3,'Usage: python jra-render-live-v312.py formal.json docs/reports/slug.html')
  payload=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
  require(payload.get('prompt_version')=='v3.12' and payload.get('stage')=='formal_prestart','cannot render nonformal or unsealed prediction')
  dst=Path(sys.argv[2]);dst.parent.mkdir(parents=True,exist_ok=True)
