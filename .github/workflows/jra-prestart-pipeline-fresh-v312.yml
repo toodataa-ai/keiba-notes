@@ -121,7 +121,7 @@ jobs:
             echo "Rendering candidate rows/page selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
             JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
               python3 .github/scripts/jra-render-live-v312.py /tmp/jra-v311-layout-only.json "$REPORT" &&
-             python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" &&
+             python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction /tmp/jra-v311-layout-only.json &&
             python3 -m weasyprint "$REPORT" /tmp/jra-v311-layout-only.pdf &&
             python3 .github/scripts/validate-jra-pdf-content-v312.py \
               --html "$REPORT" --pdf /tmp/jra-v311-layout-only.pdf --prediction /tmp/jra-v311-layout-only.json
@@ -161,7 +161,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 .github/scripts/jra-render-live-v312.py "$PREDICTION" "$REPORT"
-           python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT"
+           python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction "$PREDICTION"
           python -m weasyprint "$REPORT" "$PDF"
           python3 .github/scripts/validate-jra-pdf-content-v312.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
           python3 .github/scripts/jra-publish-live-v312.py "$PREDICTION"
