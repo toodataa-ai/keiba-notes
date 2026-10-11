@@ -51,6 +51,7 @@ jobs:
               assert script.count(' --prediction ')>=2
               assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS' in script
               assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"' in script
+              assert 'JRA_COVER_BETS_PER_TYPE=$COVER_BETS" >> "$GITHUB_ENV"' in script
           PY
       - name: Verify real 14-row A4 pages with pinned renderer dependencies
         run: |
@@ -71,11 +72,11 @@ jobs:
             OUTPUT_HTML="/tmp/$RACE-japanese.html"
             OUTPUT_PDF="/tmp/$RACE-japanese.pdf"
             PASS=0
-            for ROWS in 14:12:14 12:10:14 10:9:14 10:8:14 10:7:14 8:5:10 6:4:8 4:3:6 2:2:4 1:1:2; do
-              IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS <<< "$ROWS"
+            for ROWS in 14:12:14:6 12:10:14:6 10:9:14:6 10:8:14:6 10:7:14:6 8:5:10:4 6:4:8:3 4:3:6:2 2:2:4:1 1:1:2:1; do
+              IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS COVER_BETS <<< "$ROWS"
               if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
                    python3 .github/scripts/jra-render-live-v312.py "$PRED" "$OUTPUT_HTML" &&
-                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML" --prediction "$PRED" &&
+                 JRA_COVER_BETS_PER_TYPE="$COVER_BETS" python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML" --prediction "$PRED" &&
                  python3 -m weasyprint "$OUTPUT_HTML" "$OUTPUT_PDF" &&
                  python3 .github/scripts/validate-jra-pdf-content-v312.py \
                    --html "$OUTPUT_HTML" --pdf "$OUTPUT_PDF" --prediction "$PRED"; then
