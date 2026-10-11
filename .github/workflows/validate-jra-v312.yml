@@ -1,0 +1,58 @@
+name: Validate JRA v3.12 staged quote coverage and portfolio comparison
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/*v312*'
+      - '.github/workflows/*v312*'
+      - 'docs/data/jra_v312_purchase_coverage_policy.json'
+      - '競馬予想_完全版プロンプト_v3.12.txt'
+      - 'e2e_validation/manifests/v3.12.json'
+  push:
+    branches: [feature/jra-v312-odds-portfolio-audit]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Syntax and price-coverage contracts
+        run: |
+          set -euo pipefail
+          node --check .github/scripts/jra-purchase-audit-v312.mjs
+          node --check .github/scripts/jra-prestart-pipeline-v312.mjs
+          node --check .github/scripts/validate-jra-portfolio-v312.mjs
+          node --check .github/scripts/test-jra-purchase-audit-v312.mjs
+          python -m py_compile .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v312.py .github/scripts/validate-jra-pdf-content-v312.py .github/scripts/jra-publish-live-v312.py
+          node .github/scripts/test-jra-purchase-audit-v312.mjs
+          node .github/scripts/test-jra-balanced-v311.mjs
+          node .github/scripts/test-jra-portfolio-v311.mjs
+          node .github/scripts/test-jra-prestart-pipeline-v311.mjs
+          node .github/scripts/validate-prompt-history.mjs
+      - name: Protect historical SHA pins and approved reader CSS
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          manifests=['e2e_validation/manifests/v3.11.json']
+          for f in manifests:
+              d=json.loads(Path(f).read_text())
+              for comp in d['components']:
+                  sha=subprocess.check_output(['git','hash-object',comp['path']],text=True).strip()
+                  assert sha==comp['git_blob_sha'],comp['path']
+          print('v3.11 manifest and previously approved CSS remain immutable')
+          PY
+      - name: PDF invariants, A4 and no lost candidate rows
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q 'weasyprint==68.0' 'pymupdf==1.26.4'
+          python .github/scripts/test-jra-pdf-dynamic-v311.py
