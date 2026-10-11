@@ -1,0 +1,29 @@
+name: Validate JRA set-preference STEP2 shadow comparison
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-set-preference-v1.mjs'
+      - '.github/scripts/test-jra-set-preference-v1.mjs'
+      - '.github/workflows/validate-jra-set-preference-v1.yml'
+      - 'docs/operations/jra_set_preference_v1.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  set-preference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Real archived 2026-10-11 prestart replays + safety economics
+        run: node .github/scripts/test-jra-set-preference-v1.mjs
+      - name: v3.13 and all established purchase strategy regressions
+        run: |
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/test-jra-balanced-v311.mjs
+          node .github/scripts/test-jra-purchase-audit-v312.mjs
+          node .github/scripts/test-jra-v313-formal-real.mjs
+          node .github/scripts/validate-jra-prompt-v313.mjs
