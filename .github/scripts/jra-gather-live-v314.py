@@ -371,6 +371,12 @@ def validate_request(req):
           'official capture timestamp invalid')
   require((datetime.now(JST)-stamped).total_seconds()<86400,'official roster snapshot older than 24h')
  return race,data
+def require_market_open(req,race):
+ opened=datetime.fromisoformat(req['market_open_at'])
+ if datetime.now(JST)<opened:
+  raise RuntimeError('NOT_YET_ON_SALE: '+race['slug']+' opens '+req['market_open_at']+
+    ' under JRA published sales timetable. Do not misclassify as HTTP403 or missing data.')
+
 def entry():
  import argparse
  parser=argparse.ArgumentParser()
@@ -382,9 +388,7 @@ def entry():
  race,preview=validate_request(req)
  if a.validate_only:
   print('V314_RESEARCH_REQUEST_VERIFIED',race['slug']);return
- if datetime.now(JST)<datetime.fromisoformat(req['market_open_at']):
-  raise RuntimeError('NOT_YET_ON_SALE: '+race['slug']+' opens '+req['market_open_at']+
-    ' under JRA published sales timetable. Do not misclassify as HTTP403 or missing data.')
+ require_market_open(req,race)
  global DATE,PREVIEW,RACES,load
  DATE=req['date'];PREVIEW=Path(req['preview_path']);RACES=[race]
  if req.get('official_snapshot_path'):
