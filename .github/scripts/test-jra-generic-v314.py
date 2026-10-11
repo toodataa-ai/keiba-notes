@@ -35,6 +35,8 @@ class TestGenericJRAIntake(unittest.TestCase):
 
  def sample_request(self,preview):
   return {'date':'2026-10-12','preview_path':str(preview),
+   'market_open_at':'2026-10-11T19:30:00+09:00',
+   'market_open_source_url':'https://www.jra.go.jp/news/202610/100402.html',
    'race':{'slug':'2026-10-12-october-stakes','venue':'東京',
            'name':'オクトーバーステークス','race_no':11,
            'start_at':'2026-10-12T15:30:00+09:00','race_code':'2605040511',
@@ -53,6 +55,18 @@ class TestGenericJRAIntake(unittest.TestCase):
     race,preview=a.validate_request(req)
     self.assertEqual(race['race_no'],11)
     self.assertEqual(len(preview['races'][0]['horses']),9)
+    with self.assertRaisesRegex(RuntimeError,'NOT_YET_ON_SALE'):
+     a.require_market_open(req,race)
+    with patch.object(a,'datetime',type('AfterMarketDatetime',(datetime,),{
+       'now':classmethod(lambda cls,tz=None: datetime(2026,10,11,20,0,tzinfo=tz))})):
+     a.require_market_open(req,race)
+    wrong=json.loads(json.dumps(req));wrong['market_open_at']='2026-10-12T17:00:00+09:00'
+    with self.assertRaisesRegex(RuntimeError,'sale open time'):
+     a.validate_request(wrong)
+    wrong=json.loads(json.dumps(req));wrong['market_open_source_url']='https://example.com/'
+    with self.assertRaisesRegex(RuntimeError,'sale open time'):
+     a.validate_request(wrong)
+
     bad=json.loads(json.dumps(req));bad['race']['start_at']='2026-10-12T15:45:00+09:00'
     with self.assertRaisesRegex(RuntimeError,'schedule'):a.validate_request(bad)
     bad=json.loads(json.dumps(req));bad['race']['slug']='2026-10-11-october-stakes'
@@ -76,6 +90,8 @@ class TestGenericJRAIntake(unittest.TestCase):
   flow=(ROOT/'.github/workflows/jra-generic-one-shot-v314.yml').read_text()
   self.assertIn("DATE=req['date']",py)
   self.assertIn("preview_path",py)
+  self.assertIn("NOT_YET_ON_SALE",py)
+  self.assertIn("market_open_source_url",py)
   self.assertIn('sha256(raw)',py)
   self.assertNotIn("DATE='2026-10-11'",py)
   self.assertIn("paths:",flow)
