@@ -56,7 +56,7 @@ export function optimizeWinStakeForRecovery({
                           Math.max(0,baselineProfit)*policy.max_expected_profit_sacrifice_ratio));
  const lowFloor=baseLow-policy.max_low_scenario_expected_profit_sacrifice_yen;
  const baselineRecovery=1-base.loss_probability_scenarios.central;
- const eligible=winRows(original).filter(x=>x.probabilities?.central*oddsFloor(x.market_odds)>1);
+ const eligible=winRows(original).filter(x=>finite(x.probabilities?.central)&&x.probabilities.central>0);
  const winBreakEven=winRows(original).map(x=>{
    const other=stake-x.stake_yen;
    const odds=oddsFloor(x.market_odds);
@@ -69,7 +69,9 @@ export function optimizeWinStakeForRecovery({
      note:'Conservative isolated-win threshold; actual portfolio recovery uses joint finish distributions'};
  });
  let current=original, metrics=base, rounds=0, evaluated=0;
- // Fixed ticket selection; only add 100-yen steps to positively priced win bets.
+ // Fixed ticket selection; only add 100-yen steps to quoted win tickets.
+ // A bounded negative individual edge can still improve entire-set recovery,
+ // but the portfolio expected-profit floor and lower-scenario guards always apply.
  // Evaluate the ENTIRE cross-type portfolio for every proposed stake.
  if(baselineProfit>0&&eligible.length){
   const ticketIds=new Set(eligible.map(fmtKey));
