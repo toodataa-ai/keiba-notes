@@ -66,8 +66,7 @@ def form_queries(base,soup,first_horse):
   for s in selectors:
    opts=[(o.get('value',''),o.get_text(' ',strip=True)) for o in s.select('option')]
    matches=[v for v,label in opts if v==str(first_horse) and
-     ('馬' in s.get('name','') or '軸' in s.get_text(' ',strip=True) or
-       any('着' in w[1] for w in opts))]
+     len([o for o in opts if o[0].isdigit()])>=4]
    if matches and axis is None:axis=s;params[s['name']]=matches[0]
    else:
     selected=next((o for o in s.select('option') if o.has_attr('selected')),s.select('option')[0])
