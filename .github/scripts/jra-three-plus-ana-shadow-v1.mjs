@@ -7,6 +7,7 @@ import {compareThreeCommandPortfolio} from './jra-three-command-shadow-v1.mjs';
 import {buildTicketUniverse} from './jra-portfolio-optimizer-v310.mjs';
 import {evaluateStrategy,oddsFloor,ticketKey,expandStrategy} from './jra-strategy-engine-v39.mjs';
 import {formatPurchaseCommand} from './jra-ticket-notation-v1.mjs';
+import {assessExactaMultiCoverage} from './jra-exacta-wheel-comparison-v1.mjs';
 const must=(v,msg)=>{if(!v)throw Error('THREE_PLUS_ANA_BLOCKER: '+msg);};
 const sum=(xs,f)=>xs.reduce((a,x)=>a+f(x),0);
 const key=x=>ticketKey(x.type,x.selection);
@@ -112,15 +113,21 @@ export function compareThreePlusAna(args){
  const excluded=[...medium.ticket_keys,...large.ticket_keys];
  const regular=compareThreeCommandPortfolio({...args,formal_final_bets:args.formal_final_bets,
    max_spend_yen:6000-allocation.spend,exclude_ticket_keys:excluded});
- const commands=regular.commands.map((c,i)=>({...c,
-   row:i+1,category:'通常',jra_input:instructions(c)}));
- const selectedRegular=regular.proposed_lines;
  const quoteLookup=new Map(all.map(x=>[key(x),x]));
  const selectedHole=[...excluded].map(k=>{
    const x=quoteLookup.get(k);must(x,'special selection quote disappeared');
    return {type:x.type,selection:x.selection,stake_yen:100,market_odds:x.market_odds,
      source_url:x.source_url,observed_at:x.observed_at,market_selection_id:x.market_selection_id};
  });
+ // Independently check both key directions and the complete 1-axis MULTI,
+ // with actual quoted odds and the budget INCLUDING medium/large class rows.
+ const exacta=assessExactaMultiCoverage({
+   regular_commands:regular.commands,regular_lines:regular.proposed_lines,
+   side_lines:selectedHole,all,args,budget_yen:6000
+ });
+ const commands=exacta.regular_commands.map(c=>({...c,
+   category:'通常',jra_input:instructions(c)}));
+ const selectedRegular=exacta.regular_lines;
  const lines=[...selectedRegular,...selectedHole];
  must(commands.length<=3,'too many regular commands');
  must(new Set(lines.map(key)).size===lines.length,'overlapping candidate tickets');
@@ -139,14 +146,14 @@ export function compareThreePlusAna(args){
    modeled_net_loss_probability:round(s.loss_probability_scenarios.central)
  }:null;
  const formal=regular.baseline;
- return {algorithm:'three_regular_plus_optional_medium_and_100x_large_shadow_v2',
+ return {algorithm:'three_regular_plus_optional_medium_and_100x_large_shadow_v3_exacta_audit',
    status:regular.proposed?'three_plus_two_holes_shadow_candidate':'no_qualifying_regular_command',
    formal_version_unchanged:true,formal_final_bets_unchanged:true,
    candidate_medium_count:eligibleHoles.filter(x=>x.tier==='中穴').length,
    candidate_large_count:eligibleHoles.filter(x=>x.tier==='大穴').length,
    max_regular_commands:3,max_medium_rows:1,max_large_rows:1,
    max_total_budget_yen:6000,formal_baseline:formal,regular_research:regular,
-   summary:stat,regular_commands:commands,
+   summary:stat,regular_commands:commands,exacta_coverage_audit:exacta.audit,
    medium_command:medium,large_command:large,proposed_lines:lines,
    change_vs_formal:stat?{
      expected_profit_yen:round(stat.modeled_expected_net_profit_yen-formal.expected_net_profit_yen),
