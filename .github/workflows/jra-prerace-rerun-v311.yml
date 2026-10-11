@@ -1,0 +1,195 @@
+name: JRA v3.11 rerun and republish same race BEFORE start (strict proof)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/inputs/revisions/*.json'
+  workflow_dispatch:
+    inputs:
+      input_path:
+        required: true
+        type: string
+        description: 'A verified current premarket STEP1 and market odds catalog under e2e_validation/inputs/revisions/'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  rerun:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Validate unchanged formally pinned predictor and prereace-revision approval
+        run: |
+          set -euo pipefail
+          node .github/scripts/test-jra-balanced-v311.mjs
+          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/test-jra-prestart-pipeline-v311.mjs
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          d=json.loads(Path('docs/data/latest_prompt.json').read_text())
+          r=d['prerace_overwrite_policy']
+          assert d['version']=='v3.11' and r['read_each_new_jra_run'] is True
+          for item in [r['policy'],r['instructions'],r['publisher']]:
+              assert subprocess.check_output(['git','hash-object',item['path']],text=True).strip()==item['git_blob_sha']
+          PY
+      - name: Validate newly added audited input, official post time and unique paths
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_FROM_UI: ${{ inputs.input_path }}
+          RUN_NUMBER: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT" == "push" ]]; then
+            mapfile -t NEW < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- e2e_validation/inputs/revisions)
+            if [[ ${#NEW[@]} -ne 1 ]];then echo "::error::Exactly one new revision input per push required";exit 1;fi
+            INPUT="${NEW[0]}"
+          else INPUT="$INPUT_FROM_UI";fi
+          case "$INPUT" in e2e_validation/inputs/revisions/*.json) ;; *) echo "::error::Unsafe revision input path";exit 1;; esac
+          if [[ "$INPUT" == *..* || ! -f "$INPUT" || -L "$INPUT" ]];then echo "::error::Unsafe or missing input";exit 1;fi
+          export INPUT
+          python3 - <<'PY'
+          import datetime,json,os,sys
+          from pathlib import Path
+          i=json.loads(Path(os.environ['INPUT']).read_text())
+          reg=json.loads(Path('docs/data/races.json').read_text())
+          old=[r for r in reg['races'] if r['id']==i['race_id']]
+          assert len(old)==1 and old[0]['status']=='predicted' and old[0]['scope']=='jra-main'
+          assert i['race_context']['date']==old[0]['date'] and i['race_context']['race_name']==old[0]['race']
+          start=datetime.datetime.fromisoformat(i['race_context']['start_at'])
+          assert datetime.datetime.now(datetime.timezone.utc)<start,'Race has already started: cannot replace'
+          assert i['step1']['no_odds_used_to_change_marks'] is True
+          assert i['prompt_version'] in ('v3.10','v3.11')
+          assert i['market_quotes'] and i['strategies'],'verified source/strategies missing'
+          print('PASS: only a real live, prepost race can be revised')
+          PY
+          RACE_ID=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["race_id"])' "$INPUT")
+          [[ "$RACE_ID" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$ ]] || exit 1
+          LABEL="v3.11-rerun${RUN_NUMBER}-attempt${RUN_ATTEMPT}"
+          SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
+          PREDICTION="e2e_validation/predictions/$RACE_ID/$LABEL.json"
+          REPORT="docs/reports/$RACE_ID-$LABEL-v311.html"
+          PDF="docs/pdfs/$RACE_ID-$LABEL-v311.pdf"
+          MANIFEST="docs/data/jra-prerace-revision-$RACE_ID-$LABEL.json"
+          for P in "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST"; do
+            [[ ! -e "$P" ]] || { echo "::error::Immutable revision output exists: $P";exit 1; }
+          done
+          for k in INPUT RACE_ID LABEL SNAPSHOT PREDICTION REPORT PDF MANIFEST;do echo "$k=${!k}" >> "$GITHUB_ENV";done
+      - name: Install pinned full Japanese PDF rendering dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Prepare v3.11-only purchase overlay without changing upstream STEP1
+        run: |
+          set -euo pipefail
+          python3 - "$INPUT" /tmp/jra-v311-revision-source.json <<'PY'
+          import json,sys
+          from pathlib import Path
+          i=json.loads(Path(sys.argv[1]).read_text())
+          assert i['prompt_version'] in ('v3.10','v3.11')
+          i['prompt_version']='v3.11'
+          Path(sys.argv[2]).write_text(json.dumps(i,ensure_ascii=False,indent=2)+'\n')
+          PY
+          node .github/scripts/jra-prestart-pipeline-v311.mjs --input /tmp/jra-v311-revision-source.json --output "$SNAPSHOT"
+      - name: Generate every detailed page and reject blank pages before proof commit
+        run: |
+          set -euo pipefail
+          python3 - "$SNAPSHOT" /tmp/jra-v311-revision-preview.json <<'PY'
+          import json,sys
+          from pathlib import Path
+          o=json.loads(Path(sys.argv[1]).read_text())
+          o['stage']='formal_prestart';o['proof_commit']='a'*40
+          Path(sys.argv[2]).write_text(json.dumps(o,ensure_ascii=False))
+          PY
+          PASS=0
+          for ROWS in 10:7 8:5 6:4 4:3 2:2 1:1; do
+            SELECTED_ROWS="${ROWS%:*}"; REJECTED_ROWS="${ROWS#*:}"
+            if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" \
+                python3 .github/scripts/jra-render-live-v311.py /tmp/jra-v311-revision-preview.json "$REPORT" &&
+                python3 -m weasyprint "$REPORT" /tmp/jra-v311-revision-preview.pdf &&
+                python3 .github/scripts/validate-jra-pdf-content-v311.py --html "$REPORT" \
+                  --pdf /tmp/jra-v311-revision-preview.pdf --prediction /tmp/jra-v311-revision-preview.json; then
+              PASS=1;break
+            fi
+          done
+          [[ $PASS == 1 ]] || { echo '::error::Cannot issue proof for invalid PDF';exit 1; }
+          echo "JRA_SELECTED_ROWS_PER_PAGE=$SELECTED_ROWS" >> "$GITHUB_ENV"
+          echo "JRA_REJECTED_ROWS_PER_PAGE=$REJECTED_ROWS" >> "$GITHUB_ENV"
+      - name: Strict start gate and immutable prereace Git snapshot
+        run: |
+          set -euo pipefail
+          python3 - "$SNAPSHOT" <<'PY'
+          import datetime,json,sys
+          d=json.load(open(sys.argv[1]));post=datetime.datetime.fromisoformat(d['race_context']['start_at'])
+          assert datetime.datetime.now(datetime.timezone.utc)<post,'Cannot freeze prediction after race begins'
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$SNAPSHOT"
+          [[ "$(git diff --cached --name-only)" == "$SNAPSHOT" ]] || { echo '::error::Unsafe staged original';exit 1; }
+          git commit -m "Freeze new verified JRA prereace revision with separate immutable proof"
+          git push origin HEAD:main
+          PROOF=$(git rev-parse HEAD)
+          echo "PROOF=$PROOF" >> "$GITHUB_ENV"
+      - name: Seal and validate formal report PDF, prepare revision manifest
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-prestart-pipeline-v311.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
+          python3 .github/scripts/jra-render-live-v311.py "$PREDICTION" "$REPORT"
+          python3 -m weasyprint "$REPORT" "$PDF"
+          python3 .github/scripts/validate-jra-pdf-content-v311.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
+          python3 - "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF" "$PROOF" "$MANIFEST" <<'PY'
+          import json,fitz,sys
+          from pathlib import Path
+          snap,pred,report,pdf,proof,manifest=sys.argv[1:]
+          a=json.loads(Path(pred).read_text())
+          with fitz.open(pdf) as d:pages=len(d)
+          record=dict(race_id=a['race_id'],date=a['race_context']['date'],prompt_version='v3.11',
+            prediction_path=pred,snapshot_path=snap,proof_commit=proof,
+            report=report.removeprefix('docs/'),pdf=pdf.removeprefix('docs/'),pdf_pages=pages)
+          Path(manifest).write_text(json.dumps({'schema_version':1,'original_v310_immutable':True,
+             'races':[record]},ensure_ascii=False,indent=2)+'\n')
+          PY
+          python3 .github/scripts/jra-promote-prerace-v311.py "$MANIFEST"
+      - name: Commit only the latest canonical index plus new immutable artifacts and journal
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST" docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import os,subprocess
+          expected={os.environ[k] for k in ('PREDICTION','REPORT','PDF','MANIFEST')}
+          expected.update({'docs/data/races.json','docs/data/jra_publication_revision_log.json'})
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert expected==actual,('Unexpected file modification',actual^expected)
+          PY
+          git commit -m "Publish replaced prereace prediction with complete PDF and revision proof"
+          git push origin HEAD:main
+      - name: Verify newly published HTML PDF current registry and revised journal over public HTTP
+        run: |
+          set -euo pipefail
+          for t in $(seq 1 24); do
+            OK=1
+            for FILE in docs/data/races.json docs/data/jra_publication_revision_log.json "$MANIFEST" "$REPORT" "$PDF"; do
+              URI="https://toodataa-ai.github.io/keiba-notes/${FILE#docs/}"
+              if ! curl -LfsS --max-time 20 "$URI" -o "/tmp/jra-http-$(basename "$FILE")" ||
+                ! cmp -s "$FILE" "/tmp/jra-http-$(basename "$FILE")";then OK=0;break;fi
+            done
+            if [[ "$OK" == 1 ]];then echo "JRA_REVISED_PREREACE_REPORT_PUBLIC_VERIFIED $RACE_ID $LABEL";exit 0;fi
+            sleep 15
+          done
+          echo '::error::Git commit succeeded, but HTTP publication not verified';exit 1
