@@ -13,7 +13,7 @@ from pathlib import Path
 METHOD_NAMES = {
     "single": "1点買い",
     "multiple_singles": "複数頭の単点買い",
-    "box": "ボックス",
+    "box": "BOX",
     "key_wheel": "1頭軸流し",
     "key_wheel_first": "1着固定流し",
     "key_wheel_second": "2着固定流し",
@@ -119,17 +119,19 @@ def input_numbers(st):
             raise ValueError("JRA purchase blocker: malformed formation slots")
         labels = (["1着", "2着", "3着"] if st["type"] in ("馬単", "三連単")
                   else ["1列", "2列", "3列"])
-        return "／".join(f"{labels[i]}:{numbers(slot)}" for i, slot in enumerate(slots))
+        return "／".join(f"{labels[i]}：{numbers(slot)}" for i, slot in enumerate(slots))
     if kind in ("single",):
         return "-".join(map(str, d["selection"]))
     if kind in ("box", "multiple_singles"):
-        return numbers(d["horses"])
+        return "・".join(numbers(d["horses"]).split(","))
     if kind in ("key_wheel", "key_wheel_first", "key_wheel_second", "key_wheel_multi",
                 "one_key_wheel", "one_key_fixed", "one_key_multi"):
         position = ("1着" if kind == "key_wheel_first" else
                     "2着" if kind == "key_wheel_second" else
                     f"{d['position']}着" if kind == "one_key_fixed" else "軸")
-        return f"{position}:{d['key']}／相手:{numbers(d['partners'])}"
+        if st["type"] == "馬連" and kind == "key_wheel":
+            return f"軸馬：{d['key']}／相手馬：{'・'.join(numbers(d['partners']).split(','))}"
+        return f"{position}：{d['key']}／相手：{'・'.join(numbers(d['partners']).split(','))}"
     if kind in ("two_key_wheel", "two_key_fixed", "two_key_multi"):
         if kind == "two_key_fixed":
             axis = {pos: val for pos, val in zip(d["positions"], d["axes"])}
@@ -292,7 +294,9 @@ def purchase_commands(prediction):
         unit = final_by_key[next(iter(keys))]["stake_yen"]
         commands.append({"type":st["type"],"method":METHOD_NAMES[st["strategy_kind"]],
                          "numbers":specification,"tickets":len(keys),"unit_yen":unit,
-                         "amount_yen":unit*len(keys),"_keys":keys})
+                         "amount_yen":unit*len(keys),"_keys":keys,
+                         "_formation_slots": [list(x) for x in st["definition"]["slots"]]
+                              if st["strategy_kind"] == "formation" else None})
         used.update(keys)
 
     for k, line in sorted(final_by_key.items(), key=lambda x:
@@ -311,6 +315,31 @@ def purchase_commands(prediction):
         raise ValueError("JRA purchase blocker: instructions differ from immutable final_bets")
     return sorted(commands,key=lambda x:(TYPE_ORDER.index(x["type"]),
                                           -x["tickets"], x["method"],x["numbers"]))
+
+
+
+def _format_purchase_numbers(cmd):
+    """Show actual betting-screen entry, tree for an ordered/unordered formation."""
+    if cmd.get("_formation_slots") is None:
+        return html_module.escape(cmd["numbers"], quote=True)
+    slots = cmd["_formation_slots"]
+    typ = cmd["type"]
+    if typ not in ("枠連", "馬連", "馬単", "ワイド", "三連複", "三連単"):
+        raise ValueError("JRA purchase blocker: invalid formation type")
+    if len(slots) not in (2, 3):
+        raise ValueError("JRA purchase blocker: invalid formation tree depth")
+    labels = (("1着", "2着", "3着") if typ in ("馬単", "三連単")
+              else ("1列目", "2列目", "3列目"))
+    branches = []
+    for i, slot in enumerate(slots):
+        branch = "└─" if i == len(slots) - 1 else "├─"
+        selection = "・".join(numbers(slot).split(","))
+        branches.append('<div style="margin:0;white-space:nowrap;">' +
+                        html_module.escape(f"{branch} {labels[i]}：{selection}", quote=True) +
+                        '</div>')
+    return ('<div class="jra-formation-tree" '
+            'style="font-size:10pt;line-height:1.3;white-space:nowrap;">' +
+            "".join(branches) + '</div>')
 
 
 def cover_conclusion(prediction, original_cover):
@@ -366,7 +395,7 @@ def cover_conclusion(prediction, original_cover):
             typ_cmds = [x for x in commands if x["type"] == typ]
             for cmd in typ_cmds[:max_items]:
                 table += ('<tr><td>'+esc(typ)+'</td><td>'+esc(cmd["method"])+'</td>'
-                          '<td>'+esc(cmd["numbers"])+'</td><td>'+
+                          '<td>'+_format_purchase_numbers(cmd)+'</td><td>'+
                           f'{cmd["tickets"]}点×{cmd["unit_yen"]:,}円＝{cmd["amount_yen"]:,}円'
                           '</td></tr>')
             hidden = typ_cmds[max_items:]
@@ -377,8 +406,9 @@ def cover_conclusion(prediction, original_cover):
                           f'{sum(x["amount_yen"] for x in hidden):,}円</td></tr>')
         table += "</tbody></table>"
         details = ('<p class="tiny">各行を「券種→買い方→指定馬番→金額」の順に入力。'
-                   'ボックス・流し・フォーメーションは採用全組番と完全一致する場合のみ表示し、'
-                   '一部採用の場合は「個別指定（1点）」に分解しています。</p>'+table)
+                   'BOX・流し・フォーメーションは表示された購入操作が採用組番と一致する場合だけ使用。'
+                   'フォーメーションは着順・列ごとのツリー表記。'
+                   '一部しか再現できない場合は「個別指定（1点）」です。</p>'+table)
 
     portfolio = prediction.get("purchase_portfolio_selection") or {}
     prof = (portfolio.get("expected_net_profit_yen_scenarios") or {}).get("central")
