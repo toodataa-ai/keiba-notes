@@ -67,7 +67,7 @@ def main() -> int:
             expected = component["git_blob_sha"]
             actual = git_hash_object(repo_root, component_path)
             exception = accepted.get(component_path)
-            if actual != expected and exception and version in ("v3.11", "v3.12"):
+            if actual != expected and exception and version in ("v3.11", "v3.12", "v3.13"):
                 is_expected = (expected == exception["historical_blob_sha"] and
                                actual == exception["current_blob_sha"])
                 old_object = subprocess.run(["git", "cat-file", "-t", expected],
