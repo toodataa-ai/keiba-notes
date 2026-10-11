@@ -1,0 +1,50 @@
+name: Independently audit approved JRA production v1.01 HTTP bytes
+on:
+  push:
+    branches: [audit/jra-ui-v101-live-20261012]
+    paths: ['.github/workflows/audit-jra-approved-v101-production-http.yml']
+permissions:
+  contents: read
+jobs:
+  actual-public:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Verify exact production UI release commit and old preview removal
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 632146ccb581847ae5d4cb9535fb868b8b4517d8 HEAD
+          ONLY="$(git diff 632146ccb581847ae5d4cb9535fb868b8b4517d8^ 632146ccb581847ae5d4cb9535fb868b8b4517d8 --name-only)"
+          test "$ONLY" = "$(printf 'docs/index.html\ndocs/this-week.html')"
+          grep -q '正式版 v1.01' docs/index.html
+          grep -q '公開バージョン履歴' docs/index.html
+          grep -q 'brand-title.brand-lockup{justify-content:center' docs/index.html
+          grep -q 'Racing_%28Unsplash%29.jpg' docs/index.html
+          ! grep -q '購入操作は最大3行' docs/index.html
+          ! grep -q 'special-2026-10-11-tokyo12' docs/index.html
+          ! grep -q 'special-2026-10-11-tokyo12' docs/this-week.html
+          echo PASS_JRA_APPROVED_RELEASE_V101_DIFF_AND_UI_SCOPE
+      - name: Match actual public Pages files byte by byte, independently
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 25); do
+            ok=1
+            for path in docs/index.html docs/this-week.html; do
+              url="https://toodataa-ai.github.io/keiba-notes/${path#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra-actual-page ||
+                 ! cmp -s "$path" /tmp/jra-actual-page; then
+                ok=0;break
+              fi
+            done
+            if [[ "$ok" -eq 1 ]]; then
+              echo PASS_JRA_APPROVED_RELEASE_V101_PUBLIC_HTTP_BINARY_MATCH
+              exit 0
+            fi
+            sleep 12
+          done
+          echo "::error::Production Pages HTML bytes differ from approved release"
+          exit 1
