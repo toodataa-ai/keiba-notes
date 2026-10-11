@@ -11,6 +11,8 @@ on:
       - '.github/scripts/test-jra-three-plus-ana-v1.mjs'
       - '.github/scripts/jra-assemble-site-staging-v101.mjs'
       - '.github/scripts/jra-render-three-plus-ana-stage-pdf-v1.py'
+      - '.github/scripts/jra-stage-visual-marker-v1.py'
+      - 'docs/operations/JRA_RELEASE_PROCESS.md'
       - '.github/workflows/jra-site-staging-v101.yml'
   workflow_dispatch:
 permissions:
@@ -46,6 +48,7 @@ jobs:
             --input e2e_validation/predictions/2026-10-12-swan-stakes/v3.13-run38177942081-attempt2.json \
             --output docs/staging/data/three-plus-ana/2026-10-12-swan-stakes.json
           node .github/scripts/jra-assemble-site-staging-v101.mjs
+          python3 .github/scripts/jra-stage-visual-marker-v1.py --sha "$GITHUB_SHA"
           python3 - <<'PY'
           from pathlib import Path
           for p in [Path('docs/staging/index.html'),Path('docs/staging/this-week.html')]:
@@ -53,6 +56,8 @@ jobs:
               assert '<base href="../">' in text
               assert 'special-2026-10-11-tokyo12' not in text
               assert 'staging/purchase-preview.html' in text
+              assert '<meta name="robots" content="noindex,nofollow">' in text
+              assert 'class="staging-visual-marker"' in text
           print('PASS_STAGE_HTML_AND_TEMP12R_REMOVAL')
           PY
       - name: Render two independent A4 staging PDF purchase summaries and validate every page
