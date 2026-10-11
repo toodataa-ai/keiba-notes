@@ -1,0 +1,110 @@
+name: Restore grade palette and validate October 11 JRA PDFs
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-grade-palette-repair-20261011.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jra-grade-palette-repair-20261011
+  cancel-in-progress: false
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exactly approved PDF engine, Japanese font and PDF-page inspector
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Fix generated HTML and PDF grade palettes without changing predictions
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/jra-grade-validation
+          for SLUG in 2026-10-11-ireland-trophy 2026-10-11-uzumasa-stakes; do
+            PRED="e2e_validation/predictions/$SLUG/v3.10-run38097626417-attempt1.json"
+            HTML="docs/reports/$SLUG.html"
+            PDF="docs/pdfs/$SLUG.pdf"
+            test -f "$PRED"
+            test -f "$HTML"
+            test -f "$PDF"
+            cp "$HTML" "/tmp/jra-grade-validation/old-$SLUG.html"
+            cp "$PDF" "/tmp/jra-grade-validation/old-$SLUG.pdf"
+            python .github/scripts/jra-render-live-v310.py "$PRED" "$HTML"
+            python -m weasyprint "$HTML" "$PDF"
+            python .github/scripts/validate-jra-pdf-layout.py --html "$HTML" --pdf "$PDF" \
+              --policy docs/data/jra_pdf_layout_policy_v1.json
+            # Negative regression: Old grayscale PDF must fail the NEW palette validator.
+            if python .github/scripts/validate-jra-pdf-layout.py --html "$HTML" \
+                --pdf "/tmp/jra-grade-validation/old-$SLUG.pdf" \
+                --policy docs/data/jra_pdf_layout_policy_v1.json \
+                > "/tmp/jra-grade-validation/negative-$SLUG.log" 2>&1; then
+              echo "::error::Validator accepted old monochrome PDF. Color gate is ineffective."
+              exit 1
+            fi
+            grep -q 'colored PDF' "/tmp/jra-grade-validation/negative-$SLUG.log"
+            echo "NEGATIVE_CONTROL_PASS old monochrome PDF rejected $SLUG"
+            python - "$PRED" "$HTML" "$PDF" <<'PY'
+          import collections,hashlib,json,re,sys
+          import fitz
+          p=json.load(open(sys.argv[1]))
+          html=open(sys.argv[2],encoding='utf-8').read()
+          doc=fitz.open(sys.argv[3])
+          n=len(p['step1_ranking'])
+          assert len(doc)==n+8
+          assert len(re.findall(r'<span class="g g(?:Ap|A|Bp|B|Bm|C)">',html))>=10*n
+          txt={}
+          for page in doc:
+              for b in page.get_text('dict')['blocks']:
+                  for line in b.get('lines',[]):
+                      for span in line['spans']:
+                          text=span['text'].strip()
+                          if text in ('A+','A','B+','B','B-','C'):
+                              color=span['color']
+                              if color!=0x222222:txt[(text,color)]=txt.get((text,color),0)+1
+          assert txt, 'Expected actual colored grade text spans, got none'
+          print('GRADE_PALETTE_RENDER_PASS',p['race_id'],'horses',n,'pages',len(doc),
+                'grade_colored_spans',sum(txt.values()),'palette',list(txt.items())[:8])
+          PY
+          done
+      - name: Allow updating only the four visual report files; protect betting proof and all prior races
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/reports/2026-10-11-ireland-trophy.html \
+            docs/pdfs/2026-10-11-ireland-trophy.pdf \
+            docs/reports/2026-10-11-uzumasa-stakes.html \
+            docs/pdfs/2026-10-11-uzumasa-stakes.pdf
+          python - <<'PY'
+          import subprocess
+          expected={
+            'docs/reports/2026-10-11-ireland-trophy.html',
+            'docs/pdfs/2026-10-11-ireland-trophy.pdf',
+            'docs/reports/2026-10-11-uzumasa-stakes.html',
+            'docs/pdfs/2026-10-11-uzumasa-stakes.pdf'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert actual==expected,('Unexpected changed source/prediction/history files',expected^actual)
+          print('IMMUTABLE_PRERACE_PROOF_AND_LEGACY_DATA_UNCHANGED')
+          PY
+          git commit -m "Restore approved JRA A+ to C colored grading and gate PDF palette rendering"
+          git push origin HEAD:main
+          echo "COLORED_JRA_HTML_PDF_PUBLISHED"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: grade-palette-failure-diagnostics
+          path: /tmp/jra-grade-validation/*.log
+          if-no-files-found: ignore
