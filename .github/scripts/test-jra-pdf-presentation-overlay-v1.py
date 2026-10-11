@@ -190,7 +190,7 @@ form_pred = {"final_bets":[line("馬単",[2,5],1),line("馬単",[2,8],2)],
 form_cmd = overlay.purchase_commands(form_pred)
 assert len(form_cmd) == 1 and form_cmd[0]["method"] == "フォーメーション"
 assert form_cmd[0]["numbers"] == "1着：2／2着：5,8"
-assert "├─ 1着：2" in overlay._format_purchase_numbers(form_cmd[0])
+assert "● 1着：2" in overlay._format_purchase_numbers(form_cmd[0])
 assert "└─ 2着：5・8" in overlay._format_purchase_numbers(form_cmd[0])
 form_pred["final_bets"].pop()
 assert overlay.purchase_commands(form_pred)[0]["method"] == "個別指定（1点）"
@@ -238,8 +238,8 @@ assert wheel_commands[0]["tickets"] == 3
 
 # The vertical tree is for *purchase* formations. Ordered bets use 着, unordered bets 列目.
 for typ, slots, expected in [
-    ("三連単", [[2],[5],[8,9]], ("├─ 1着：2", "├─ 2着：5", "└─ 3着：8・9")),
-    ("三連複", [[2],[5],[8,9]], ("├─ 1列目：2", "├─ 2列目：5", "└─ 3列目：8・9"))
+    ("三連単", [[2],[5],[8,9]], ("● 1着：2", "└─ 2着：5", "└─ 3着：8・9")),
+    ("三連複", [[2],[5],[8,9]], ("● 1列目：2", "└─ 2列目：5", "└─ 3列目：8・9"))
 ]:
     from itertools import product
     lines = [list(x) for x in product(*slots)]
