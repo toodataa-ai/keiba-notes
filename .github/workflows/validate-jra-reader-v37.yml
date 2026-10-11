@@ -34,8 +34,8 @@ jobs:
           node-version: '22'
       - name: Validate SHA-pinned full v3.7 contract
         run: |
-          node .github/scripts/validate-jra-reader-v37.mjs
-          node .github/scripts/validate-jra-one-shot-v36.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-one-shot-v36.mjs
           node .github/scripts/validate-prompt-history.mjs
       - name: Validate existing ticket logic
         run: |
