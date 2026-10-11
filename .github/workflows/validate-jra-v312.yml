@@ -56,3 +56,4 @@ jobs:
           sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
           python -m pip install -q 'weasyprint==68.0' 'pymupdf==1.26.4'
           python .github/scripts/test-jra-pdf-dynamic-v311.py
+          python .github/scripts/test-jra-v312-pdf.py
