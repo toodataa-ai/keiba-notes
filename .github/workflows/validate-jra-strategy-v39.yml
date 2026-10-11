@@ -38,7 +38,7 @@ jobs:
           node-version: '22'
       - name: Check pinned formal source, unchanged prior versions, and mode registry
         run: |
-          node .github/scripts/validate-jra-strategy-prompt-v39.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-strategy-prompt-v39.mjs
           node .github/scripts/validate-prompt-history.mjs
       - name: Exercise 8-type modes, exact amount, co-winning events and failures
         run: |
@@ -51,8 +51,8 @@ jobs:
           node .github/scripts/test-multi-candidate-v35.mjs
           node .github/scripts/test-purchase-gate-v34.mjs
           node .github/scripts/test-jra-conditional-ticket-probability.mjs
-          node .github/scripts/validate-jra-strategy-prompt-v38.mjs
-          node .github/scripts/validate-jra-reader-v37.mjs
-          node .github/scripts/validate-jra-one-shot-v36.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-strategy-prompt-v38.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-one-shot-v36.mjs
       # Older fixed 2026-10-10 v3.6 snapshots have known mismatched legacy fields.
       # Those standalone archived-file scan workflows remain FAIL and are not rewritten by v3.9.
