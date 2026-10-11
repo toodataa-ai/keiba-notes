@@ -120,8 +120,10 @@ jobs:
           PASS=0
           for ROWS in 10:7 8:5 6:4 4:3 2:2 1:1; do
             SELECTED_ROWS="${ROWS%:*}"; REJECTED_ROWS="${ROWS#*:}"
-            if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$REJECTED_ROWS" \
+            AUDIT_ROWS=$((REJECTED_ROWS*2))
+            if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
                 python3 .github/scripts/jra-render-live-v312.py /tmp/jra-v312-revision-preview.json "$REPORT" &&
+                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" &&
                 python3 -m weasyprint "$REPORT" /tmp/jra-v312-revision-preview.pdf &&
                 python3 .github/scripts/validate-jra-pdf-content-v312.py --html "$REPORT" \
                   --pdf /tmp/jra-v312-revision-preview.pdf --prediction /tmp/jra-v312-revision-preview.json; then
@@ -131,6 +133,7 @@ jobs:
           [[ $PASS == 1 ]] || { echo '::error::Cannot issue proof for invalid PDF';exit 1; }
           echo "JRA_SELECTED_ROWS_PER_PAGE=$SELECTED_ROWS" >> "$GITHUB_ENV"
           echo "JRA_REJECTED_ROWS_PER_PAGE=$REJECTED_ROWS" >> "$GITHUB_ENV"
+           echo "JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"
       - name: Strict start gate and immutable prereace Git snapshot
         run: |
           set -euo pipefail
@@ -162,6 +165,7 @@ jobs:
           node .github/scripts/jra-prestart-pipeline-v312.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
           node .github/scripts/validate-jra-portfolio-v312.mjs
           python3 .github/scripts/jra-render-live-v312.py "$PREDICTION" "$REPORT"
+           python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT"
           python3 -m weasyprint "$REPORT" "$PDF"
           python3 .github/scripts/validate-jra-pdf-content-v312.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
           python3 - "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF" "$PROOF" "$MANIFEST" <<'PY'
