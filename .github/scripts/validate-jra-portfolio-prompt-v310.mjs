@@ -8,7 +8,7 @@ const legacy=JSON.parse(read('e2e_validation/manifests/v3.9.json'));
 const policy=JSON.parse(read('docs/data/jra_portfolio_6000_policy_v1.json'));
 const promptPath='競馬予想_完全版プロンプト_v3.10.txt';
 const prompt=read(promptPath),errors=[];
-if(latest.version!=='v3.10'||latest.path!==promptPath)errors.push('latest prompt is not canonical v3.10');
+if(!['v3.10','v3.11'].includes(latest.version)||(latest.version==='v3.10'&&latest.path!==promptPath))errors.push('frozen v3.10 manifest must be compatible with latest pointer');
 if(!hist.entries.some(x=>x.version==='v3.10'&&x.path===promptPath&&x.previous_version==='v3.9'))errors.push('missing v3.10 history entry');
 if(current.prompt_version!=='v3.10'||current.components.length!==23)errors.push('expected 23 SHA-pinned components');
 if(JSON.stringify(current.components.slice(0,20))!==JSON.stringify(legacy.components))errors.push('v3.0-v3.9 canonical components were changed');
