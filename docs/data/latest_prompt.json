@@ -50,7 +50,7 @@
     },
     "workflow": {
       "path": ".github/workflows/jra-prerace-rerun-fresh-v312.yml",
-      "git_blob_sha": "8633ec27eeb9594c7329bc54c383cfb8fe416761"
+      "git_blob_sha": "df72d4e2326d070a22a3ccd31361d6eebedeb58a"
     },
     "required_for": "all next JRA prestart executions requesting current odds",
     "immutable_bet_model": "v3.12 with frozen STEP1 + v3.11 balanced optimizer; purchase logic unchanged",
@@ -59,7 +59,7 @@
     "prior_quote_reuse_prohibited": true,
     "new_race_workflow": {
       "path": ".github/workflows/jra-prestart-pipeline-fresh-v312.yml",
-      "git_blob_sha": "d9015e21fb328273f707cf3c34e2a7d85ac697e9"
+      "git_blob_sha": "bffdfc35b6ab6756f45117323364360feba50a9c"
     }
   },
   "pdf_presentation_overlay": {
@@ -78,7 +78,7 @@
     "requires_acceptance": "Every PDF page validated by existing v3.12 PDF content/layout gate and new A4 density CI",
     "first_page_policy": {
       "first_content": "Final buy/pass conclusion, exact race and as-of summary, total purchased ticket count, budget and stake, ticket numbers grouped by bet type, scenario-level modeled win/expected net profit/loss risk.",
-      "overflow": "At most six explicit ticket combinations per bet type on cover; disclose exact per-type counts and rest in adopted full-detail chapter, never imply the summary is exhaustive.",
+      "overflow": "Try up to six explicit numbered ticket combinations per bet type. On any PDF overflow, reduce adaptive cover detail cap to 4,3,2,1 as needed and rerender all pages; keep full type counts and exact total stakes on first page and all exact adopted bet details in back chapter.",
       "tail": "Preserve all original adopted-ticket detail, excluded reasons, strategy comparison and all horse pages in identical subsequent order; do not double-count final ticket IDs.",
       "error_rule": "Any first-page overflow or PDF validator error must trigger existing adaptive density search; publication remains blocked unless all pages validate."
     }
