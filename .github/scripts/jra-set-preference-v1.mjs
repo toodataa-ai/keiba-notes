@@ -169,3 +169,39 @@ export function compareSetPreferredPortfolio(args){
   guardrails:{minimum_central_profit_yen:minProfit,policy:SET_PREFERENCE_POLICY},
   caveat:'Modeled win probabilities are uncalibrated; no actual-return guarantee. This sidecar never changes the official v3.13 final_bets.'};
 }
+
+if(process.argv[1]&&process.argv[1].endsWith('/jra-set-preference-v1.mjs')){
+ try{
+  const fs=await import('node:fs'),path=await import('node:path');
+  const argv=process.argv.slice(2),get=k=>argv[argv.indexOf(k)+1];
+  const input=get('--input'),output=get('--output');
+  must(input&&output&&argv.includes('--input')&&argv.includes('--output'),'--input/--output required');
+  must(!fs.existsSync(output),'immutable sidecar already exists: '+output);
+  const source=JSON.parse(fs.readFileSync(input,'utf8'));
+  must(source.prompt_version==='v3.13'&&source.stage==='formal_prestart'&&
+   /^[a-f0-9]{40}$/.test(source.proof_commit||''),
+   'only sealed v3.13 prestart originals are eligible for shadow research');
+  must(new RegExp('^docs/data/jra-set-preference/[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+\\.json$').test(output)&&
+   output==='docs/data/jra-set-preference/'+source.race_id+'.json',
+   'sidecar path must be canonical and race-specific');
+  const base=source.v312_balanced_baseline?.purchase_portfolio_selection?.selected_lines;
+  must(Array.isArray(base),'immutable v3.12 baseline not available');
+  const comparisons=compareSetPreferredPortfolio({
+   budget_yen:6000,strategies:source.purchase_strategy_evaluations,
+   baseline_selected_lines:base,outcome_distributions:source.outcome_distributions,
+   frame_map:source.frame_map,race_context:source.race_context,freeze_at:source.final_bets_fixed_at
+  });
+  const sha=(await import('node:crypto')).createHash('sha256')
+    .update(fs.readFileSync(input)).digest('hex');
+  const payload={race_id:source.race_id,status:'shadow_comparison_only',
+   formal_prompt_version:'v3.13',formal_purchase_decision_unchanged:true,
+   formal_bets_selection_unchanged:true,formal_proof_commit:source.proof_commit,
+   formal_prediction_file:input,formal_prediction_sha256:sha,
+   models_compared:'v3.12 100-yen selected-line baseline vs grouped complete-strategy counterfactual; not v3.13 WIN-stake-sized final',
+   comparison:comparisons};
+  fs.mkdirSync(path.dirname(output),{recursive:true});
+  fs.writeFileSync(output,JSON.stringify(payload,null,2)+'\\n');
+  console.log('JRA_SET_PREFERENCE_SHADOW_CREATED',source.race_id,
+   comparisons.status,comparisons.baseline.command_count,comparisons.proposed.command_count);
+ }catch(e){console.error('JRA_SET_PREFERENCE_BLOCKER',e.message);process.exitCode=1;}
+}
