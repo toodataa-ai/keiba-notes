@@ -74,6 +74,7 @@ def main():
  assert a.input.startswith('docs/staging/data/three-plus-ana/')
  assert a.pdf.startswith('docs/staging/pdfs/')
  data=json.loads(Path(a.input).read_text(encoding='utf8'))
+ commands=data['regular_commands']+[data['ana_command']]
  target=Path(a.pdf);target.parent.mkdir(parents=True,exist_ok=True)
  HTML(string=make(data),base_url=str(Path('.').resolve())).write_pdf(str(target))
  with fitz.open(str(target)) as pdf:
