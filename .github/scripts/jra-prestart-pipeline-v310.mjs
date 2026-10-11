@@ -140,6 +140,12 @@ export function assemble(input,freezeAt,proofCommit=null){
    'tracked quote source capture missing '+key);
   const digest=createHash('sha256').update(fs.readFileSync(q.source_capture_path)).digest('hex');
   must(digest.toLowerCase()===q.source_capture_sha256.toLowerCase(),'actual quote capture SHA256 mismatch '+key);
+  const snapshot=JSON.parse(fs.readFileSync(q.source_capture_path,'utf8'));
+  must(snapshot.source_url===q.source_url&&snapshot.observed_at===q.observed_at,
+   'capture URL/time disagrees with quote '+key);
+  const observed=(snapshot.entries||[]).filter(t=>ticketKey(t.type,t.selection)===key);
+  must(observed.length===1&&JSON.stringify(observed[0].market_odds)===JSON.stringify(q.market_odds),
+   'capture lacks exact selection/price or has duplicate lines '+key);
   must(q.quote_verified===true&&oddsFloor(q.market_odds)!==null,'quote unverifiable '+key);
   if(captured.has(key)){
    const prior=captured.get(key);
