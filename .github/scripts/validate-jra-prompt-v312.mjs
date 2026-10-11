@@ -18,15 +18,18 @@ assert.deepEqual(now.components.slice(0,old.components.length),old.components,
   'historical v3.11 SHA-pinned components must remain byte-identical');
 assert(now.components.length>=old.components.length+16,'v3.12 components incomplete');
 // Narrow v3.13 supersession: old SHA-pinned historical source remains available
-// at the exact approved original commit. Only these two version-acceptance adapters
+// at the exact approved original commit. Only these five narrowly scoped version-acceptance adapters
 // may differ in the working tree; every model, historical bet, and original CI
 // contract continues to be verified against v3.12's immutable manifest.
 const v313Sup=latest.version==='v3.13'?json('docs/data/jra_v313_historical_adapter_v1.json'):null;
 const v313Replacements=new Map((v313Sup?.superseded_components||[]).map(x=>[x.path,x]));
 if(v313Sup){
  assert.deepEqual([...v313Replacements.keys()].sort(),[
+  '.github/scripts/validate-jra-archived-compact-v312.mjs',
   '.github/scripts/validate-jra-ci-forward-v312.mjs',
-  '.github/scripts/validate-jra-prompt-v312.mjs'
+  '.github/scripts/validate-jra-prerace-v312.mjs',
+  '.github/scripts/validate-jra-prompt-v312.mjs',
+  'e2e_validation/validate_manifests.py'
  ],'v3.13 exception exceeds legacy pointer acceptance adapters');
  assert(/^[a-f0-9]{40}$/.test(v313Sup.historical_anchor_commit));
 }
