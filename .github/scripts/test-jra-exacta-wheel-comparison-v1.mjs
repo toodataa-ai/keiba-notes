@@ -54,8 +54,10 @@ const invoke=(overrides={})=>assessExactaMultiCoverage({regular_commands,regular
 }
 {
  const r=invoke({budget_yen:200});
- assert.equal(r.regular_commands[0].method,'key_wheel_second');
+ assert.notEqual(r.regular_commands[0].method,'key_wheel_multi',
+   'unaffordable multi is blocked, but the affordable 1st-fixed is still eligible for comparison');
  assert.equal(r.audit[0].variants.key_wheel_multi.status,'over_budget');
+ assert.ok(r.regular_commands[0].stake_yen<=200);
  console.log('PASS_EXACTA_MULTI_CANNOT_EXCEED_BUDGET');
 }
 {
