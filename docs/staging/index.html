@@ -41,5 +41,4 @@
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
 
-  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
