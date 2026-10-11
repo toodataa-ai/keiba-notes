@@ -1,14 +1,60 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T06:52:07+00:00",
+  "generated_at": "2026-10-11T21:52:28+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 2,
+    "strict": 4,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 2
+    "prediction_entries": 4
   },
   "versions": {
+    "v3.12": {
+      "all_non_synthetic": {
+        "cases": 2,
+        "honmei_win_rate": 0.5,
+        "honmei_top3_rate": 0.5,
+        "top3_marks_capture_rate": 0.166666,
+        "winner_in_top3_marks_rate": 0.5,
+        "winner_mean_rank": null,
+        "winner_mrr": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "stake_yen": 1900,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "bet_cases": 2,
+        "probability_cases": {
+          "win": 0,
+          "top3": 0
+        }
+      },
+      "strict": {
+        "cases": 2,
+        "honmei_win_rate": 0.5,
+        "honmei_top3_rate": 0.5,
+        "top3_marks_capture_rate": 0.166666,
+        "winner_in_top3_marks_rate": 0.5,
+        "winner_mean_rank": null,
+        "winner_mrr": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "stake_yen": 1900,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "bet_cases": 2,
+        "probability_cases": {
+          "win": 0,
+          "top3": 0
+        }
+      }
+    },
     "v3.2": {
       "all_non_synthetic": {
         "cases": 2,
@@ -77,7 +123,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 2
+    "strict_bet_cases": 4
   },
   "errors": [],
   "entries": [
@@ -153,6 +199,86 @@
         "payout_yen": 0,
         "roi_pct": 0.0,
         "going_log_loss": 0.040822,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-11-ireland-trophy",
+      "date": "2026-10-11",
+      "venue": "東京",
+      "surface": "turf",
+      "race": "アイルランドトロフィー",
+      "grade": "prospective_strict",
+      "version": "v3.12",
+      "prediction_path": "e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "52a12bd7c5ad8dd46f6018cbe1582af9b184a04a",
+        "proof_commit_at": "2026-10-11T05:10:40+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.12.json",
+        "component_count": 83
+      },
+      "metrics": {
+        "honmei_win": 1,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 1400,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-11-uzumasa-stakes",
+      "date": "2026-10-11",
+      "venue": "京都",
+      "surface": "dirt",
+      "race": "太秦ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.12",
+      "prediction_path": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38113827050-attempt2.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "2cc3ecf2ec8d50dd72400c8f1f8c15bb6883357c",
+        "proof_commit_at": "2026-10-11T05:12:35+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.12.json",
+        "component_count": 83
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.0,
+        "winner_in_top3_marks": 0,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 500,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
         "pace_log_loss": null,
         "win_brier": null,
         "win_log_loss": null,

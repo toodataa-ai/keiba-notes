@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T06:52:08.158096+00:00",
+  "generated_at": "2026-10-11T21:52:28.379924+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -28,12 +28,297 @@
     "note": "Lower is better for Brier/log loss; higher is better for hit/capture/ROI metrics."
   },
   "totals": {
-    "prospective_strict_races": 2,
+    "prospective_strict_races": 4,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 2,
-    "prospective_results_joined": 2
+    "prospective_prediction_entries": 4,
+    "prospective_results_joined": 4
   },
   "races": [
+    {
+      "race_id": "2026-10-11-uzumasa-stakes",
+      "date": "2026-10-11",
+      "venue": "京都",
+      "surface": "dirt",
+      "race_name": "太秦ステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-11T15:25:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-11-uzumasa-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-11-uzumasa-stakes.json",
+      "official_result_at": "2026-10-12T06:39:00+09:00",
+      "official_going": "良",
+      "finish_order": [
+        3,
+        8,
+        4,
+        12,
+        7,
+        2,
+        1,
+        13,
+        9,
+        11,
+        10,
+        6,
+        14,
+        5
+      ],
+      "predictions": [
+        {
+          "version": "v3.12",
+          "generated_at": "2026-10-11T05:11:59.462000+00:00",
+          "information_cutoff_at": "2026-10-11T05:11:59.462000+00:00",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "太秦ステークス",
+          "marks": {
+            "third": 1,
+            "second": 5,
+            "win": 13
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "三連単",
+              "selection": [
+                3,
+                4,
+                13
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "三連単",
+              "selection": [
+                4,
+                2,
+                1
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "単勝",
+              "selection": [
+                4
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "馬単",
+              "selection": [
+                4,
+                1
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "馬単",
+              "selection": [
+                4,
+                5
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "2cc3ecf2ec8d50dd72400c8f1f8c15bb6883357c",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38113827050-attempt2.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38113827050-attempt2.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-10-11-ireland-trophy",
+      "date": "2026-10-11",
+      "venue": "東京",
+      "surface": "turf",
+      "race_name": "アイルランドトロフィー",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-11T15:40:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-11-ireland-trophy/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-11-ireland-trophy.json",
+      "official_result_at": "2026-10-12T06:39:00+09:00",
+      "official_going": "良",
+      "finish_order": [
+        16,
+        15,
+        11,
+        5,
+        12,
+        7,
+        1,
+        3,
+        14,
+        6,
+        13,
+        2,
+        8,
+        9,
+        10,
+        4
+      ],
+      "predictions": [
+        {
+          "version": "v3.12",
+          "generated_at": "2026-10-11T05:09:50.231000+00:00",
+          "information_cutoff_at": "2026-10-11T05:09:50.231000+00:00",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "アイルランドトロフィー",
+          "marks": {
+            "third": 3,
+            "second": 10,
+            "win": 16
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "ワイド",
+              "selection": [
+                10,
+                15
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "ワイド",
+              "selection": [
+                10,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "三連単",
+              "selection": [
+                1,
+                10,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "三連単",
+              "selection": [
+                10,
+                1,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "三連単",
+              "selection": [
+                10,
+                16,
+                1
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B06",
+              "type": "単勝",
+              "selection": [
+                10
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B07",
+              "type": "枠連",
+              "selection": [
+                1,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B08",
+              "type": "枠連",
+              "selection": [
+                2,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B09",
+              "type": "枠連",
+              "selection": [
+                3,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B10",
+              "type": "枠連",
+              "selection": [
+                5,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B11",
+              "type": "枠連",
+              "selection": [
+                5,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B12",
+              "type": "複勝",
+              "selection": [
+                10
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B13",
+              "type": "馬単",
+              "selection": [
+                10,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B14",
+              "type": "馬連",
+              "selection": [
+                10,
+                15
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "52a12bd7c5ad8dd46f6018cbe1582af9b184a04a",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-10-10-saudi-arabia-royal-cup",
       "date": "2026-10-10",
