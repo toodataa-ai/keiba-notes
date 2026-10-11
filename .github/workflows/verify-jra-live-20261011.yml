@@ -31,6 +31,8 @@ jobs:
             assert len(r['final_bets'])==r['total_stake_yen']//100
           print('PASS: both official race records, immutable proof and exact stakes match')
           PY
+      - name: Install PDF palette acceptance inspector
+        run: python -m pip install -q pymupdf==1.26.4
       - name: Validate direct Pages HTTP availability and PDF byte signatures
         run: |
           set -euo pipefail
@@ -57,4 +59,6 @@ jobs:
               fi
               echo "PASS public Pages HTTP $URL bytes=$(wc -c < "$OUT")"
             done
+            python .github/scripts/validate-jra-pdf-layout.py --html "/tmp/$SLUG.html" --pdf "/tmp/$SLUG.pdf" --policy docs/data/jra_pdf_layout_policy_v1.json
+            echo "LIVE_PAGES_GRADE_PALETTE_AND_LAYOUT_PASS $SLUG"
           done
