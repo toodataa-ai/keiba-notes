@@ -274,7 +274,7 @@
     },
     {
       "path": ".github/workflows/validate-jra-v312.yml",
-      "git_blob_sha": "a9f4b97f38af88a196796f9d088e327acf9c1a86",
+      "git_blob_sha": "ff57b10c4fba797ec8b38556620db5be10199853",
       "role": "validate-jra-v312.yml"
     },
     {
@@ -396,9 +396,29 @@
       "path": "e2e_validation/cases/2026-10-10-mimuro-stakes/case.json",
       "role": "v312_archival_compatibility_or_unchanged_original_proof",
       "git_blob_sha": "f833d33b480e1f845d80a0160e60fb8ad194788a"
+    },
+    {
+      "path": ".github/workflows/jra-prerace-rerun-v312.yml",
+      "git_blob_sha": "abc138b4f8d709a5df520d6f01ce69bb863c96f6",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": ".github/scripts/jra-promote-prerace-v312.py",
+      "git_blob_sha": "dfe21d4aefd03dcc4f03352061fc44a87519744d",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": "docs/data/jra_prerace_overwrite_policy_v312.json",
+      "git_blob_sha": "18a18fdb3ad0c1975df4804d91cdb66e20903b59",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prerace-v312.mjs",
+      "git_blob_sha": "40c741dea0d2b87a1dfb0e9deaf1691f0dc963a9",
+      "role": "v312_prepost_revision_or_forward_release_gate"
     }
   ],
   "previous_manifest_sha": "b0570e7a928a15fb82f81b29aa01dc0999d36a7c",
   "scope": "append_only_future_JRA_prerace",
-  "note": "Formal v3.12: all historical v3.11 pins unchanged, except one audited v3.11 CI workflow current file whose original blob survives in Git and whose authorized new SHA is pinned in docs/data/jra_ci_supersession_v312.json. Exact SHA-pinned compact v3.6 archival predictions and prospective case are protected against any alteration. v3.12 full 171-ticket actual-odds shadow E2E PDF 53 pages passed."
+  "note": "v3.12 production canonical candidate: previous 42 SHA pins unchanged; approved v3.11 CI-workflow compatibility SHA exception proves original ancestor. Archived v3.6 compact observations/case unchanged and SHA-pinned. Complete 171-of-171 quote real-data shadow E2E (53-page A4) passed. New before-post v3.12 rerun has its own SHA-pinned revised publisher and strict canonical proof/journal/HTTP byte audit; historic v3.11 replay publisher unchanged."
 }
