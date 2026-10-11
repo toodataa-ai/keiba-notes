@@ -191,7 +191,27 @@
       "path": ".github/workflows/validate-jra-balanced-v311.yml",
       "git_blob_sha": "aef1675b63c1a41b0cdfdad91a45e51b336b1488",
       "role": "full_positive_negative_dynamic_pdf_ci"
+    },
+    {
+      "path": ".github/scripts/test-jra-portfolio-v311.mjs",
+      "git_blob_sha": "d0e4b7a3f822cf228233f95e910dd1467c5002b4",
+      "role": "production_workflow_existing_v310_v311_regression_entrypoint"
+    },
+    {
+      "path": ".github/scripts/validate-jra-portfolio-prompt-v311.mjs",
+      "git_blob_sha": "aa51ec53178dbb476ae6c00924cabc4a6bdfc00e",
+      "role": "production_workflow_formal_v311_manifest_guard_entrypoint"
+    },
+    {
+      "path": ".github/scripts/validate-jra-v311-prepublish-flow.mjs",
+      "git_blob_sha": "7904eb7404e444ef16970e3f68051ed28ffed8f1",
+      "role": "prevent_missing_script_and_early_publication"
+    },
+    {
+      "path": ".github/workflows/validate-jra-prepublish-v311.yml",
+      "git_blob_sha": "b3a78b7525a88bf99f4df251c85d70f9f5e192bd",
+      "role": "regression_guard_for_actual_prestart_pipeline"
     }
   ],
-  "note": "Append-only from v3.10. Frozen prior 23 SHA-pinned components unchanged. New v3.11 considers profit, union hit probability and downside risk; unlimited A4 tail pagination with all adopted/rejected lines and no upper page count. Multi-objective search is deterministic neighbourhood heuristic, not globally optimal."
+  "note": "Append-only from v3.10. Frozen prior 23 SHA-pinned components unchanged. New v3.11 considers profit, union hit probability and downside risk; unlimited A4 tail pagination with all adopted/rejected lines and no upper page count. Multi-objective search is deterministic neighbourhood heuristic, not globally optimal. Maintenance release: pin both previously absent v3.11 runtime entry points and fail-closed prepublish workflow audit. Preserve the prior 38 pinned blob SHAs exactly."
 }

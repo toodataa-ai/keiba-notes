@@ -1,0 +1,37 @@
+name: JRA v3.11 prepublish completion workflow guard
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/validate-jra-v311-prepublish-flow.mjs'
+      - '.github/scripts/test-jra-portfolio-v311.mjs'
+      - '.github/scripts/validate-jra-portfolio-prompt-v311.mjs'
+      - '.github/workflows/jra-prestart-pipeline-v311.yml'
+      - '.github/workflows/validate-jra-prepublish-v311.yml'
+      - 'e2e_validation/manifests/v3.11.json'
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/validate-jra-v311-prepublish-flow.mjs'
+      - '.github/scripts/test-jra-portfolio-v311.mjs'
+      - '.github/scripts/validate-jra-portfolio-prompt-v311.mjs'
+      - '.github/workflows/jra-prestart-pipeline-v311.yml'
+      - '.github/workflows/validate-jra-prepublish-v311.yml'
+      - 'e2e_validation/manifests/v3.11.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dependency-and-publication-order:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify every runtime entry point and pre-upload gate sequence
+        run: node .github/scripts/validate-jra-v311-prepublish-flow.mjs
+      - name: Verify canonical SHA pins and approved prompt
+        run: node .github/scripts/validate-jra-portfolio-prompt-v311.mjs
+      - name: Execute previously missing runtime test entry point
+        run: node .github/scripts/test-jra-portfolio-v311.mjs
