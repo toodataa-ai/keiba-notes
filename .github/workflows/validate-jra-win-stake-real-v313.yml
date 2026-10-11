@@ -1,0 +1,33 @@
+name: JRA v3.13 real prestart stake-sizing comparison
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/test-jra-win-stake-real-replay-v313.mjs'
+      - '.github/scripts/jra-win-recovery-stake-shadow-v1.mjs'
+      - '.github/workflows/validate-jra-win-stake-real-v313.yml'
+  push:
+    branches: [main, 'feature/jra-v313-win-stake-formal-20261011']
+    paths:
+      - '.github/scripts/test-jra-win-stake-real-replay-v313.mjs'
+      - '.github/scripts/jra-win-recovery-stake-shadow-v1.mjs'
+      - '.github/workflows/validate-jra-win-stake-real-v313.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-prestart-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Compare v3.12 sealed prestart win-stake sizing with new scheme
+        run: node .github/scripts/test-jra-win-stake-real-replay-v313.mjs
+      - name: Save actual comparison evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-win-stake-real-prestart-comparison
+          path: jra-v313-replay-artifacts/prestart-stakes-comparison.json
+          if-no-files-found: ignore
