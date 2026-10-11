@@ -57,10 +57,10 @@ prefix = ('<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>' +
 source = prefix + section(0, 2, codes[:9]) + section(1, 2, codes[9:]) + "</body></html>"
 converted, rows, pages = overlay.apply(source, prediction_for(source))
 assert (rows, pages) == (len(codes), 2)
-assert "ボックス 1,2,3（採用1/2点）" in converted
+assert "BOX 1,2,3（採用1/2点）" in converted
 assert "フォーメーション 1,2/2,3（採用1/2点）" in converted
 assert "2頭軸マルチ 軸1,2→2,3（採用1/2点）" in converted
-assert "BOX" not in converted  # Actual Japanese descriptions, not English shorthand.
+assert "BOX" in converted  # Normal JRA betting-screen spelling.
 assert len(overlay.PAGE.findall(converted)) == 2
 assert converted.index('最終購入結論｜本日の正式予想') < converted.index('採用買い目｜1/1')
 assert converted.index('不採用買い目｜1/1') < converted.index('方式別セット比較')
@@ -125,7 +125,9 @@ many["purchase_decision"] = "buy"
 many["total_stake_yen"] = 3000
 full, _, _ = overlay.apply(source, many)
 assert "採用 30点／購入予定額 3,000円" in full
-assert "残り24操作・24点" in full
+assert "採用買い目の全件明細を参照" in full
+assert sum(x["amount_yen"] for x in overlay.purchase_commands(many)) == 3000
+assert sum(x["tickets"] for x in overlay.purchase_commands(many)) == 30
 assert "B01" not in full.split('</section>', 1)[0]
 assert "馬連" in full.split('</section>', 1)[0]
 
@@ -141,15 +143,15 @@ box_def = {"strategy_id": "BOX1", "type": "馬連",
 full_box = {"final_bets":[line("馬連", nums, i+1) for i,nums in enumerate(box_lines)],
             "purchase_strategy_evaluations":[box_def]}
 full_command = overlay.purchase_commands(full_box)
-assert len(full_command) == 1 and full_command[0]["method"] == "ボックス"
-assert full_command[0]["numbers"] == "2,5,8"
+assert len(full_command) == 1 and full_command[0]["method"] == "BOX"
+assert full_command[0]["numbers"] == "2・5・8"
 assert full_command[0]["tickets"] == 3 and full_command[0]["amount_yen"] == 300
 partial_box = {"final_bets":[line("馬連",[2,5],1),line("馬連",[2,8],2)],
                "purchase_strategy_evaluations":[box_def]}
 partial_command = overlay.purchase_commands(partial_box)
-assert len(partial_command) == 2
-assert all(x["method"] == "個別指定（1点）" for x in partial_command)
-assert {x["numbers"] for x in partial_command} == {"2-5","2-8"}
+assert len(partial_command) == 1
+assert partial_command[0]["method"] == "1頭軸流し"
+assert partial_command[0]["numbers"] == "軸馬：2／相手馬：5・8"
 assert sum(x["amount_yen"] for x in partial_command) == 200
 # 1,2,3 exact ordered permutations: six trifecta BOX tickets, not three unordered lines.
 from itertools import permutations
@@ -159,7 +161,7 @@ trifecta = {"final_bets":[line("三連単", nums, i+1) for i,nums in enumerate(o
     "strategy_kind":"box","definition":{"horses":[1,2,3]},
     "lines":[{"type":"三連単","selection":x} for x in ordered]}]}
 trifecta_cmd = overlay.purchase_commands(trifecta)
-assert len(trifecta_cmd) == 1 and trifecta_cmd[0]["method"] == "ボックス"
+assert len(trifecta_cmd) == 1 and trifecta_cmd[0]["method"] == "BOX"
 assert trifecta_cmd[0]["tickets"] == 6 and trifecta_cmd[0]["amount_yen"] == 600
 trifecta["final_bets"].pop()
 assert all(x["method"] == "個別指定（1点）" for x in overlay.purchase_commands(trifecta))
@@ -171,14 +173,15 @@ wheel_all = {"final_bets":[line("馬連",[2,5],1),line("馬連",[2,8],2)],
              "purchase_strategy_evaluations":[wheel]}
 wheel_cmd = overlay.purchase_commands(wheel_all)
 assert len(wheel_cmd) == 1
-assert wheel_cmd[0]["method"] == "1頭軸流し" and wheel_cmd[0]["numbers"] == "軸:2／相手:5,8"
+assert wheel_cmd[0]["method"] == "1頭軸流し" and wheel_cmd[0]["numbers"] == "軸馬：2／相手馬：5・8"
 wheel_all["final_bets"] = [line("馬連",[2,5],1)]
 assert overlay.purchase_commands(wheel_all)[0]["method"] == "個別指定（1点）"
 
 # Wrong source expansion must not cause a wheel/formation label to buy extra tickets.
 bad_wheel = {"final_bets":[line("馬連",[2,5],1),line("馬連",[5,8],2)],
     "purchase_strategy_evaluations":[wheel]}
-assert all(x["method"] == "個別指定（1点）" for x in overlay.purchase_commands(bad_wheel))
+assert len(overlay.purchase_commands(bad_wheel)) == 1
+assert overlay.purchase_commands(bad_wheel)[0]["numbers"] == "軸馬：5／相手馬：2・8"
 form = {"strategy_id":"F1","type":"馬単","strategy_kind":"formation",
         "definition":{"slots":[[2],[5,8]]},
         "lines":[{"type":"馬単","selection":[2,5]},{"type":"馬単","selection":[2,8]}]}
@@ -186,7 +189,9 @@ form_pred = {"final_bets":[line("馬単",[2,5],1),line("馬単",[2,8],2)],
              "purchase_strategy_evaluations":[form]}
 form_cmd = overlay.purchase_commands(form_pred)
 assert len(form_cmd) == 1 and form_cmd[0]["method"] == "フォーメーション"
-assert form_cmd[0]["numbers"] == "1着:2／2着:5,8"
+assert form_cmd[0]["numbers"] == "1着：2／2着：5,8"
+assert "├─ 1着：2" in overlay._format_purchase_numbers(form_cmd[0])
+assert "└─ 2着：5・8" in overlay._format_purchase_numbers(form_cmd[0])
 form_pred["final_bets"].pop()
 assert overlay.purchase_commands(form_pred)[0]["method"] == "個別指定（1点）"
 
@@ -194,7 +199,7 @@ assert overlay.purchase_commands(form_pred)[0]["method"] == "個別指定（1点
 different_stakes = {"final_bets":[line("馬連",nums,i+1,200 if i==0 else 100)
                                  for i,nums in enumerate(box_lines)],
                     "purchase_strategy_evaluations":[box_def]}
-assert all(x["method"] != "ボックス" for x in overlay.purchase_commands(different_stakes))
+assert all(x["method"] != "BOX" for x in overlay.purchase_commands(different_stakes))
 # Include a cross-type purchase plan and ensure the HTML describes the actual operation.
 screen_prediction = prediction_for(source)
 for st in screen_prediction["purchase_strategy_evaluations"]:
@@ -204,14 +209,53 @@ for st in screen_prediction["purchase_strategy_evaluations"]:
 screen_prediction["final_bets"] = [line("馬連",n,i+1) for i,n in enumerate(box_lines)]
 screen_prediction["total_stake_yen"] = 300
 screen_html, _, _ = overlay.apply(source, screen_prediction)
-assert "ボックス</td><td>2,5,8</td><td>3点×100円＝300円" in screen_html
-assert "一部採用の場合は「個別指定（1点）」" in screen_html
+assert "BOX</td><td>2・5・8</td><td>3点×100円＝300円" in screen_html
+assert "フォーメーションは着順・列ごとのツリー表記" in screen_html
 assert "不採用買い目｜1/1" in screen_html
 screen_prediction["final_bets"] = [line("馬連",[2,5],1)]
 screen_prediction["total_stake_yen"] = 100
 screen_html, _, _ = overlay.apply(source, screen_prediction)
 first_page = screen_html.split('</section>', 1)[0]
-assert "ボックス</td>" not in first_page
+assert "BOX</td>" not in first_page
 assert "個別指定（1点）</td><td>2-5" in first_page
+
+
+# Grouped buy instructions MUST be independent of strategy presence or historical audit metadata.
+synthetic_box = {"final_bets":[line("馬連", n, i + 1) for i, n in enumerate(box_lines)],
+                 "purchase_strategy_evaluations":[]}
+synthetic_commands = overlay.purchase_commands(synthetic_box)
+assert len(synthetic_commands) == 1
+assert synthetic_commands[0]["method"] == "BOX"
+assert synthetic_commands[0]["numbers"] == "2・5・8"
+assert synthetic_commands[0]["amount_yen"] == 300
+synthetic_wheel = {"final_bets":[line("馬連", n, i+1)
+                                  for i,n in enumerate([[3,5],[3,7],[3,9]])],
+                   "purchase_strategy_evaluations":[]}
+wheel_commands = overlay.purchase_commands(synthetic_wheel)
+assert len(wheel_commands) == 1 and wheel_commands[0]["method"] == "1頭軸流し"
+assert wheel_commands[0]["numbers"] == "軸馬：3／相手馬：5・7・9"
+assert wheel_commands[0]["tickets"] == 3
+
+# The vertical tree is for *purchase* formations. Ordered bets use 着, unordered bets 列目.
+for typ, slots, expected in [
+    ("三連単", [[2],[5],[8,9]], ("├─ 1着：2", "├─ 2着：5", "└─ 3着：8・9")),
+    ("三連複", [[2],[5],[8,9]], ("├─ 1列目：2", "├─ 2列目：5", "└─ 3列目：8・9"))
+]:
+    from itertools import product
+    lines = [list(x) for x in product(*slots)]
+    formation = {"strategy_id":"FORM-"+typ, "type":typ,
+                 "strategy_kind":"formation", "definition":{"slots":slots},
+                 "lines":[{"type":typ,"selection":x} for x in lines]}
+    pred = {"final_bets":[line(typ, x, i+1) for i,x in enumerate(lines)],
+            "purchase_strategy_evaluations":[formation]}
+    cm = overlay.purchase_commands(pred)
+    assert len(cm) == 1 and cm[0]["method"] == "フォーメーション"
+    rendered = overlay._format_purchase_numbers(cm[0])
+    assert "jra-formation-tree" in rendered
+    for row in expected:
+        assert row in rendered, (typ, row, rendered)
+    assert cm[0]["tickets"] == len(lines)
+    pred["final_bets"].pop()
+    assert all(c["_formation_slots"] is None for c in overlay.purchase_commands(pred))
 
 print("PASS: every strategy-mode label and concrete bundle definition; full/partial adoption, 14-row A4 PDF")
