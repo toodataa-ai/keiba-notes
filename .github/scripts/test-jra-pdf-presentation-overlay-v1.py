@@ -181,7 +181,10 @@ different_stakes = {"final_bets":[line("馬連",nums,i+1,200 if i==0 else 100)
 assert all(x["method"] != "ボックス" for x in overlay.purchase_commands(different_stakes))
 # Include a cross-type purchase plan and ensure the HTML describes the actual operation.
 screen_prediction = prediction_for(source)
-screen_prediction["purchase_strategy_evaluations"].append(box_def)
+for st in screen_prediction["purchase_strategy_evaluations"]:
+    if st["strategy_kind"] == "box":
+        st["definition"] = box_def["definition"]
+        st["lines"] = box_def["lines"]
 screen_prediction["final_bets"] = [line("馬連",n,i+1) for i,n in enumerate(box_lines)]
 screen_prediction["total_stake_yen"] = 300
 screen_html, _, _ = overlay.apply(source, screen_prediction)
