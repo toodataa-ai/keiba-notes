@@ -1,9 +1,6 @@
 name: JRA v3.10 prestart forecast plus complete approved PDF
+# v3.10 remains manual-only; new inputs are handled by v3.11, avoiding duplicate competing publishes.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'e2e_validation/inputs/*.json'
   workflow_dispatch:
     inputs:
       input_path:
