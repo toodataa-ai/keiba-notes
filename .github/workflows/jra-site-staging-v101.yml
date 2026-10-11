@@ -9,6 +9,8 @@ on:
       - '.github/scripts/jra-three-command-shadow-v1.mjs'
       - '.github/scripts/jra-three-plus-ana-shadow-v1.mjs'
       - '.github/scripts/jra-ticket-notation-v1.mjs'
+      - '.github/scripts/jra-exacta-wheel-comparison-v1.mjs'
+      - '.github/scripts/test-jra-exacta-wheel-comparison-v1.mjs'
       - '.github/scripts/test-jra-ticket-notation-v1.mjs'
       - '.github/scripts/test-jra-three-plus-ana-v1.mjs'
       - '.github/scripts/jra-assemble-site-staging-v101.mjs'
@@ -41,6 +43,7 @@ jobs:
           node --check .github/scripts/jra-three-plus-ana-shadow-v1.mjs
           node .github/scripts/test-jra-three-plus-ana-v1.mjs
           node .github/scripts/test-jra-ticket-notation-v1.mjs
+          node .github/scripts/test-jra-exacta-wheel-comparison-v1.mjs
       - name: Generate stage-only race purchase candidates from sealed originals
         run: |
           set -euo pipefail
