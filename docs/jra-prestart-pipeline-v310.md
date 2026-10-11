@@ -11,9 +11,9 @@
 - .github/workflows/jra-prestart-pipeline-v310.yml: 実レース入力が準備された場合にのみ手動実行し、GitHub上で「未封印スナップショット」を先にコミットしたうえで、発走時刻より前の証跡コミットSHAを用いて「正式JSON」を後から封印する。欠損・発走後・オッズ価格の衝突・旧パス上書きはBLOCKER
 - .github/scripts/test-jra-prestart-pipeline-v310.mjs: 合成入力による正規・欠損・遅延・改変ケースの回帰テスト
 
-**重要**: 本パイプラインはJRA、二次オッズサイト、追い切りなどの外部情報を自動取得しない。ChatGPTなどの情報収集工程で**実際に検証されたソースと証跡**を入力JSONに準備する必要がある。テストの合成オッズを実際のレースに転用することは禁止。市場オッズも勝率モデルも検証なしには生成しない。
+**重要**: 汎用の実行ワークフロー単体ではJRA、二次オッズサイト、追い切りなどの外部情報を自動取得しない。2026-10-11については日付限定の実取得アダプタ `.github/scripts/jra-gather-live-20261011-v310.py` を使用し、実際に両レースの発走前入力と証跡を生成して公開まで成功した。次の開催日には、公式レースコード・出走馬・条件を取得する当日用データ入力処理を用意する必要がある。ChatGPTなどの情報収集工程で**実際に検証されたソースと証跡**を入力JSONに準備する必要がある。テストの合成オッズを実際のレースに転用することは禁止。市場オッズも勝率モデルも検証なしには生成しない。
 
-また、**フルレポートHTML / 承認済み1頭1ページPDFの自動生成・公開は未実装**。正式JSONを生成できてもpublication_statusは「awaiting_independently_authored_full_html_and_validated_pdf」を維持し、PDF・Pagesまで完了とは報告しない。既存のPDFレンダラと検品CIを利用する場合は別途フル原稿を準備する。
+**正式入力JSONがある場合のフルレポートHTML / 承認済み1頭1ページPDF生成・公開**は、汎用 `.github/workflows/jra-prestart-pipeline-v310.yml` に接続済み。STEP1固定・8券種実オッズ照合・未封印証跡コミット・正式予想封印・全頭HTML・WeasyPrint 68 PDF・既存のページ単位CI・公開races.json登録を1つのActionで実施する。ただし、データ収集の不足、馬場の重要な欠測、レイアウト逸脱、直前の取消やオッズ不一致などはBLOCKER。**検査が通らなければ公開しない**。
 
 ## 入力ファイルの配置と実行
 
@@ -21,7 +21,7 @@
 2. 新しい入力ファイル1件のpushでActionが自動起動する（既存ファイルの上書きや複数件一括投入は安全のため停止）。手動実行する場合は **Actions → JRA v3.10 prestart prediction pipeline → Run workflow** で input_path に保存パスを入力できる。
 3. テスト→予想生成→証跡コミット→正式JSON封印→v3.10既存検査の順に進む。発走済み時刻なら途中で必ず失敗する。
 4. 結果は e2e_validation/predictions/YYYY-MM-DD-レースslug/v3.10-runN-attemptN.json に格納。proof_commitはスナップショットを含むGit SHAとして照合する。
-5. PDFおよびサイト掲載は別工程。正式JSONコミット＝公開済PDFという扱いは禁止。
+5. 実際に全頭HTMLと承認済みPDFが生成され、ページ単位検査が完了した場合に限り、`docs/reports`・`docs/pdfs`・`docs/data/races.json` へ新規レースを登録して公開する。GitHub Pagesの外部HTTP到達性はデプロイ後に別途確認する。
 
 ## 入力JSONの必須フィールド
 
@@ -48,5 +48,13 @@
 - 既存prompt最新版指示はdocs/data/latest_prompt.json=v3.10を維持し、既存のmanifestのSHAを変更しない。これは**運用パイプラインの追加**であり新しい予想ロジックのバージョン変更ではない。
 - パイプラインはdocs/data/races.json、既存HTML/PDF、過去prediction、地方競馬Shadowを変更しない。
 - 同レースでもrun_id毎に新規のスナップショットと正式予想を生成。上書きは禁止。
-- GitHub Actionsの成功は**構造化JSONの検証**を意味するだけで、馬の実力判断そのものや配当の実現性を保証しない。
+- GitHub Actionsの成功は**構造化JSONと生成HTML・PDFの品質ゲート通過**を意味するが、馬の実力判断そのものや配当の実現性を保証しない。
 - データソースの利用条件や法律、発走後の時刻制約を守る。自動的に実馬券の購入は行わない。
+
+## 2026-10-11 正式公開実績
+
+- 発走前原本SHA: `fcd74f558aa09c9d41e649918bcb94b2f4d198ee`（9:13 JST）
+- 正式公開SHA: `b9698c5fcd52a0030560462d117a6d268bef7f29`（9:14 JST）
+- JRAメイン2競走。東京11R アイルランドトロフィー：全16頭、24ページ、11点・1,100円。京都11R 太秦ステークス：全14頭、22ページ、2点・200円。
+- Pages検証: `.github/workflows/verify-jra-live-20261011.yml` でHTML/PDFのHTTP取得とPDF署名を全4ファイル検査し成功。
+- 既存16レースのraces.json項目に変更なし。v3.10は未校正の予測分布で、過去の払戻を遡及最適化しない。
