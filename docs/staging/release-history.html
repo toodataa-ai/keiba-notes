@@ -1,0 +1,8 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../">
+<title>サイト公開履歴とロールバック・ステージング</title><link rel="stylesheet" href="assets/style.css">
+<style>body{font:13px/1.75 Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;background:#f5f6f8;color:#232834}.wrap{max-width:860px;margin:0 auto;padding:25px 16px}h1{font-size:22px}h2{font-size:17px}.card{padding:16px;background:#fff;border:1px solid #e0e3e7;border-radius:9px;margin:12px 0}.small{color:#5c6674;font-size:12px}.warning{border-left:3px solid #a34b24;padding:10px;background:#fffbf4}code{overflow-wrap:anywhere}.pill{display:inline-block;background:#eee;padding:2px 7px;border-radius:6px}</style></head><body>
+<main class="wrap"><a href="staging/index.html">← ステージングトップ</a><h1>サイト公開履歴・旧版復元</h1><p class="small">表示改修の公開版と、予想・結果などのデータ更新を別々に管理します。画面はステージング検証→承認→正式リリース、データ更新は従来の本番更新を継続します。</p>
+<section class="card"><h2>v1.00 <span class="pill">正式版（現行）</span></h2><p>10月12日改修前のサイト画面。復元対象はHTML/CSS/JSなど画面ファイルのみ。すでに固定された予想原本・結果・払戻・最新データの巻き戻しは禁止です。</p><p>復元スナップショットは次のリリース時にGitの不変タグとして固定します。</p></section>
+<section class="card"><h2>v1.01 <span class="pill">ステージング</span></h2><p>12R臨時予想の通常画面からの撤去、通常購入最大3操作＋穴狙い最大1行、スマートフォン向け4行以内の見本表示、公開履歴導線。</p><p>正式モデルv3.13は変更なし。新しい購入セットは反実仮想の研究段階で、承認と正式CIまで本番購入指示に昇格させません。</p><p><a href="staging/purchase-preview.html">購入指示のステージングを確認 →</a></p></section>
+<section class="card"><h2>正式リリース／戻す運用</h2><p>ステージング上の機能・画面・端末表示・CIが合格したら、明示承認のあとにのみ表示版を公開します。次の正式版に変更後も v1.00 タグおよび各版タグから画面を再構築できます。</p><p>復元も明示指示で実施し、対象の画面ファイルだけを復元して公開HTTPの一致まで検証します。履歴・原本・買い目・ライブデータは一切戻しません。</p></section>
+<p class="warning">公開済みの正式レース結果・証跡はリリース版と独立しています。過去の予想に最新の買い目選択を上書きしません。</p></main></body></html>
