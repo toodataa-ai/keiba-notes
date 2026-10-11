@@ -32,6 +32,32 @@ def main() -> int:
     if set(accepted) != {".github/workflows/validate-jra-balanced-v311.yml"}:
         raise RuntimeError("unexpected grandfathered SHA exceptions")
 
+    # A separately pinned v3.13 bridge verifies exact approved legacy Git blobs.
+    # No previous manifest is rewritten; checks run against the real original commit.
+    formal_version = json.loads((repo_root / "docs/data/latest_prompt.json").read_text(encoding="utf-8")).get("version")
+    grandfathered = {}
+    historic_anchor = None
+    if formal_version == "v3.13":
+        bridge = json.loads((repo_root / "docs/data/jra_v313_historical_adapter_v1.json").read_text(encoding="utf-8"))
+        grandfathered = {item["path"]: item for item in bridge["superseded_components"]}
+        historic_anchor = bridge["historical_anchor_commit"]
+        authorized = {
+            ".github/scripts/validate-jra-ci-forward-v312.mjs",
+            ".github/scripts/validate-jra-prompt-v312.mjs",
+            ".github/scripts/validate-jra-archived-compact-v312.mjs",
+            ".github/scripts/validate-jra-prerace-v312.mjs",
+            "e2e_validation/validate_manifests.py",
+        }
+        if set(grandfathered) != authorized or not bridge.get("fail_closed_on_other_changes"):
+            raise RuntimeError("unapproved legacy v3.13 SHA exception list")
+        for src, exception in grandfathered.items():
+            if git_hash_object(repo_root, src) != exception["current_blob_sha"]:
+                raise RuntimeError("unapproved changed legacy SHA: " + src)
+            original = subprocess.run(["git", "rev-parse", historic_anchor + ":" + src],
+                                      cwd=repo_root, capture_output=True, text=True)
+            if original.returncode or original.stdout.strip() != exception["original_blob_sha"]:
+                raise RuntimeError("missing original audited Git history for " + src)
+
     for path in sorted(manifest_dir.glob("*.json")):
         manifest = json.loads(path.read_text(encoding="utf-8"))
         version = manifest.get("prompt_version")
@@ -49,6 +75,10 @@ def main() -> int:
                 is_original_preserved = old_object.returncode == 0 and old_object.stdout.strip() == "blob"
                 updated_text = (repo_root / component_path).read_text(encoding="utf-8")
                 if is_expected and is_original_preserved and exception["required_compatibility_marker"] in updated_text:
+                    continue
+            override = grandfathered.get(component_path)
+            if actual != expected and override:
+                if expected == override["original_blob_sha"] and actual == override["current_blob_sha"]:
                     continue
             if actual != expected:
                 errors.append(
