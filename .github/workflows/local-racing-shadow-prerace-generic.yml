@@ -88,6 +88,45 @@ jobs:
           ids={x["race_id"] for x in m["races"]}
           assert all(x in ids for x in r["created_race_ids"])
           assert r["official_total_races"] == r["created_count"] + r["gap_count"], r
-          assert not os.popen("git status --porcelain").read().strip()
+          import subprocess
+          dirty=subprocess.check_output(["git","status","--porcelain","--untracked-files=all"],text=True).splitlines()
+          unexpected=[x for x in dirty if "__pycache__/" not in x and not x.endswith(".pyc")]
+          assert not unexpected, f"Unexpected dirty files: {unexpected}"
           print("AUDITED: "+str(rows[0]))
+          PY
+      - name: Independently verify GitHub Pages live manifest and latest public coverage
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
+        run: |
+          python - <<'PY'
+          import os, json, time, requests
+          day=os.environ["RACE_DATE"]
+          base="https://toodataa-ai.github.io/keiba-notes/data/"
+          local=json.load(open("docs/data/local_racing_shadow_public.json",encoding="utf-8"))
+          local_coverage=[x for x in local["daily_coverage"] if x["date"]==day][0]
+          last_error="not checked"
+          for n in range(20):
+              try:
+                  r=requests.get(base+"local_racing_shadow_public.json",timeout=12)
+                  r.raise_for_status()
+                  remote=r.json()
+                  match=[x for x in remote.get("daily_coverage",[]) if x.get("date")==day]
+                  assert len(match)==1 and match[0]==local_coverage, "Live manifest not yet updated"
+                  c=requests.get("https://toodataa-ai.github.io/keiba-notes/"+local_coverage["path"],timeout=12)
+                  c.raise_for_status()
+                  remote_coverage=c.json()
+                  local_diag=json.load(open("local_racing_shadow_v1/diagnostics/"+day+"-all-venues-prerace-run.json"))
+                  assert remote_coverage==local_diag, "Live coverage diagnostic differs"
+                  for race in [x for x in local["races"] if x["date"]==day]:
+                      p=requests.get("https://toodataa-ai.github.io/keiba-notes/"+race["prediction_path"],timeout=12)
+                      p.raise_for_status()
+                      assert p.json()["race_id"]==race["race_id"], race["race_id"]
+                  print("PAGES VERIFIED: live manifest + coverage diagnostic + all race predictions",len([x for x in local["races"] if x["date"]==day]))
+                  break
+              except Exception as exc:
+                  last_error=str(exc)
+                  print(f"Retry live Pages check {n+1}/20: {last_error}",flush=True)
+                  time.sleep(6)
+          else:
+              raise RuntimeError("COMMITTED_NOT_PUBLISHED: "+last_error)
           PY
