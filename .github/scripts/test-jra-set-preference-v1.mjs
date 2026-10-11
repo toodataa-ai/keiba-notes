@@ -61,7 +61,7 @@ function fixture(badPrice=25){
 }
 {
  const data=fixture();
- data.baseline_selected_lines[0].market_odds=44;
+ data.baseline_selected_lines[0]={...data.baseline_selected_lines[0],market_odds:44};
  assert.throws(()=>compareSetPreferredPortfolio(data),/baseline selection differs from verified quotes/);
  console.log('PASS_SET_PREFERENCE_refuse_baseline_quote_mismatch');
 }
