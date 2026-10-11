@@ -62,6 +62,20 @@ class TestTrueExactGroups(unittest.TestCase):
   cmds=check_coverage(d)
   self.assertEqual(len(cmds),1)
   self.assertEqual(cmds[0]['method'],'1頭軸固定')
+ def test_actual_full_pdf_html_source_renderer_with_new_overlay(self):
+  render=ROOT/'.github/scripts/jra-render-live-v312.py'
+  spec=importlib.util.spec_from_file_location('jra_full_html_v312',render)
+  reader=importlib.util.module_from_spec(spec);spec.loader.exec_module(reader)
+  p=ROOT/'e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json'
+  d=json.loads(p.read_text())
+  raw=reader.make(d)
+  content,rows,pages=old.apply(raw,d)
+  self.assertGreater(rows,0)
+  self.assertGreater(pages,0)
+  self.assertIn('採用買い目',content)
+  self.assertIn('本日の正式予想',content)
+  self.assertNotIn('purchase blocker',content)
+  self.assertEqual(len(check_coverage(d)),len(old.purchase_commands(d)))
  def test_previous_two_real_races_nonregression(self):
   files=[
    ROOT/'e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json',
