@@ -114,6 +114,13 @@ jobs:
             echo "PDF=$PDF"
             echo "JRA_SET_RESEARCH=docs/data/jra-set-preference/$RACE_ID.json"
           } >> "$GITHUB_ENV"
+      - name: Archive pre-race E0/E1/E2 source-evidence completeness separately from official STEP1
+        run: |
+          set -euo pipefail
+          SHADOW_EVIDENCE="e2e_validation/shadow-collection-audits/$RACE_ID/v3.13-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}.json"
+          python3 experience_regime_v1/prestart_collection_audit_v1.py --input "$INPUT_PATH" --output "$SHADOW_EVIDENCE"
+          echo "SHADOW_EVIDENCE=$SHADOW_EVIDENCE" >> "$GITHUB_ENV"
+          echo 'Missing evidence blocks Shadow research, not the immutable official JRA betting prediction.'
       - name: Resolve exact live odds using only source-advertised forms
         env:
           RACE_INPUT: ${{ env.INPUT_PATH }}
@@ -179,7 +186,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # Persist original request-derived input and all source quote evidence in the proof.
-          git add -- "$INPUT_PATH" "$SNAPSHOT" "$RECOVERED_INPUT" "e2e_validation/quote-evidence/$RACE_ID"
+          git add -- "$INPUT_PATH" "$SNAPSHOT" "$RECOVERED_INPUT" "e2e_validation/quote-evidence/$RACE_ID" "$SHADOW_EVIDENCE"
           if [[ -d "$RECOVERED_EVIDENCE" ]] && find "$RECOVERED_EVIDENCE" -type f -print -quit | grep -q .; then git add -- "$RECOVERED_EVIDENCE"; fi
           git commit -m "Freeze JRA v3.14 generic intake and complete v3.13 prestart market evidence"
           git push origin HEAD:main
