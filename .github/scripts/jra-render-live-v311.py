@@ -120,54 +120,64 @@ def make(report):
   body+=paragraph('負けるパターン：ペースが想定と逆方向に振れ、脚質・コース適性が発揮できない場合。')
   body+=paragraph('調教の一次時計・騎手コース別補正実績は未確認。過度な精度表現は避け、前走までの公式記録に基づきます。')
   body+='</section>\n'
- def buyTable(items):
-  return rows_table(['ID','券種','買い目','投資','実オッズ'],[(x['id'],x['type'],'-'.join(map(str,x['selection'])),
-   str(x['stake_yen'])+'円',number(x['market_odds'][0] if isinstance(x['market_odds'],list) else x['market_odds']))
-   for x in items])
- # The approved 5+N+3-page contract must not silently spill or drop an official final_bets line.
- if len(lines)>18:raise RuntimeError('PDF BLOCKER: >18 final bets need a separately approved new layout; no omitted purchased tickets')
- balanced=portfolio.get('optimizer_audit',{}).get('balanced_selection',{})
- if not balanced:raise RuntimeError('PDF BLOCKER: missing balanced portfolio audit')
- excluded=portfolio.get('optimizer_audit',{}).get('considered_excluded',[])
- exclusions=sorted(excluded,key=lambda x:(-float(x.get('expected_profit_yen') or 0),str(x.get('key'))))
+ # Dynamic tail sections: never drop candidates or impose a PDF page ceiling.
+ # Fixed A4 typography / color and one-horse-per-page CSS remain untouched.
+ def paginate_records(records,items_per_page):
+  return [records[k:k+items_per_page] for k in range(0,len(records),items_per_page)] or [[]]
+ def rows_page(headers,records):
+  return rows_table(headers,records) if records else paragraph('該当する明細はありません。')
+ def quote(x):
+  v=x.get('market_odds')
+  if isinstance(v,list):v=v[0] if v else None
+  return number(v)+'倍' if v is not None else '未確認'
+ balanced=portfolio.get('optimizer_audit',{}).get('balanced_selection')
+ if not balanced:raise RuntimeError('PDF BLOCKER: balanced portfolio audit missing')
+ excluded=portfolio.get('optimizer_audit',{}).get('considered_excluded')
+ if not isinstance(excluded,list):raise RuntimeError('PDF BLOCKER: excluded candidates not in frozen model')
  unpriced=[x for x in report.get('ticket_candidate_comparisons',[]) if x.get('eligibility')=='unpriced']
- body+=page('採用買い目｜購入セットと採用理由',
-  paragraph('発走前に固定した最終購入候補を全件記載。券種をまたぐ流し・BOX・フォーメーション等の展開後の個別買い目です。実際の投票行為は行っていません。')
-  +(buyTable(lines) if lines else paragraph('購入見送り。購入額0円。価格・推定確率の監査を満たし、利益と損失の基準を同時に満たす購入セットがありません。'))
-  +paragraph(f'採用{len(lines)}点、総投資{cost:,}円、未使用予算{6000-cost:,}円。全件の実オッズと出典時刻は発走前のJSONに保存されています。')
-  +paragraph('採用理由：期待純利益最大の従来解を比較の基準として、利益下限と実損確率の制約を守った範囲で集合的中率を改善。改善が僅少な場合は従来解を維持します。')
-  +paragraph('市場オッズは発走前の中間価格です。購入セットの利益や的中確率は未校正のモデル上の推定であり保証ではありません。'))
- reason_rows=[]
- for x in exclusions[:11]:
-  why='個別期待利益が0円以下、集合での補完条件も未達' if x.get('reason_code')=='nonpositive_individual_expected_profit' else '購入セットの予算・利益下限・全損/実損リスクとの比較で不採用'
-  reason_rows.append((x.get('type',''),'-'.join(map(str,x.get('selection') or [])),
-    number(x.get('expected_profit_yen'))+'円',why))
- for x in unpriced[:2]:
-  reason_rows.append((x.get('type',''),'-'.join(map(str,x.get('selection') or [])),'算定不可','個別の発走前実オッズが未確認'))
- body+=page('不採用買い目｜比較と理由',
-  paragraph('採用しなかった候補も評価対象です。以下は不採用候補のうち期待利益が上位のものを優先表示し、未確認オッズを区別します。全件の根拠・出典・除外理由は発走前JSONに保持します。')
-  +(rows_table(['券種','買い目','個別期待利益','不採用理由'],reason_rows) if reason_rows else paragraph('不採用候補なし。生成済みの候補については購入適格性と除外条件を監査し、価格未確認の馬券は購入候補へ昇格させません。'))
-  +paragraph(f'個別価格を検証済みの不採用 {len(excluded)}点／価格未確認の候補 {len(unpriced)}点。PDFは見やすさのため主要候補のみ掲載し、全件はJSONで検証できます。')
-  +paragraph('「個別期待利益がマイナス」と「個別期待利益はプラスだがセット全体の制約で不採用」は別の理由です。高額配当だけで期待値を推定したり、オッズ欠損を架空の数値で埋めたりしません。')
-  +paragraph('買い目がレース結果で外れた場合の原因分析は発走後の回顧で扱います。事前の不採用理由を後から書き換えることはありません。'))
- body+=page('購入最適化｜集合的中率・実損リスク監査',
-  paragraph('8券種の複数買い目を同じ着順事象上で評価し、券種間の同時的中を反映しています。買い目の個別確率を単純に足した数値ではありません。')
-  +rows_table(['比較項目','従来の期待利益最大解','今回のリスク調整解'],[
-   ('期待純利益',number(balanced.get('baseline_expected_profit_yen'))+'円',number(central.get('central'))+'円'),
-   ('集合的中確率',number(100*balanced.get('baseline_hit_probability',0))+'%',number(100*hit.get('central',0))+'%'),
-   ('実損確率',number(100*balanced.get('baseline_net_loss_probability',0))+'%',number(100*loss.get('central',0))+'%'),
-   ('利益を譲った額','基準0円',number(balanced.get('expected_profit_sacrifice_yen'))+'円'),
-   ('利益下限','比較の基準解',number(balanced.get('expected_profit_floor_yen'))+'円')])
-  +paragraph('シナリオ別：期待純利益、集合的中率、実損率。悪条件/中央/好条件の前提は発走前に固定した同じ着順確率モデルです。')
-  +rows_table(['条件','期待純利益','1点以上的中','実損確率'],[
+ # Publish exact final_bets, including more than 60 rows if the purchase contract ever permits.
+ select_chunks=paginate_records(lines,10)
+ for i,block in enumerate(select_chunks,1):
+  entries=[(x['id'],x['type'],'-'.join(map(str,x['selection'])),str(x['stake_yen'])+'円',quote(x)) for x in block]
+  intro=paragraph('購入は個別チケット全件の発走前確定候補です。重複馬券は除き、券種・買い目・購入額・観測したオッズを一意に列記します。')
+  summary=paragraph(f'採用{len(lines)}点、総投資{cost:,}円、余剰予算{6000-cost:,}円。実投票済みを意味しません。')
+  why=paragraph('集合で採用する理由：利益下限と実損リスクの制約内で、複数の馬券に流したときの集合的中率を検証しています。') if i==1 else ''
+  body+=page(f'採用買い目｜{i}/{len(select_chunks)}',
+   intro+rows_page(['ID','券種','買い目','投資','実オッズ'],entries)+summary+why
+   +paragraph('個別オッズの出典と取得時刻、購入方式、発走前証跡は発走前JSONに全件保存されています。'))
+ reasons=[]
+ for i,x in enumerate(sorted(excluded,key=lambda x:(-float(x.get('expected_profit_yen') or 0),str(x.get('key')))),1):
+  reason='個別期待利益が0円以下。補完効果も集合の制約内では採用されなかった。' if x.get('reason_code')=='nonpositive_individual_expected_profit' else '単独期待利益は正だが、予算と集合的中率・期待利益下限・実損リスクの組合せ比較で不採用。'
+  reasons.append(('X'+str(i).zfill(4),x.get('type',''),'-'.join(map(str,x.get('selection') or [])),number(x.get('expected_profit_yen'))+'円',reason))
+ for i,x in enumerate(unpriced,1):
+  reasons.append(('U'+str(i).zfill(4),x.get('type',''),'-'.join(map(str,x.get('selection') or [])),'算定不可','発走前の当該買い目の実オッズ未確認。買い目の購入資格がない。'))
+ reject_chunks=paginate_records(reasons,7)
+ for i,block in enumerate(reject_chunks,1):
+  body+=page(f'不採用買い目｜{i}/{len(reject_chunks)}',
+   paragraph('不採用候補を省略せず全件掲載します。Xは価格確認済みで不採用、Uは個別実オッズ未確認です。')
+   +rows_page(['ID','券種','買い目','期待利益','不採用理由'],block)
+   +paragraph(f'全不採用候補 {len(reasons)}点（価格確認済 {len(excluded)}点、実オッズ未確認 {len(unpriced)}点）。')
+   +paragraph('個別期待利益が低い理由と、個別期待利益がプラスでも集合の投資最適性で落とした理由を区別。')
+   +paragraph('予想時点の不採用理由と、発走後に採用馬券が不的中となった回顧理由は別です。'))
+ risk_rows=[
+  ('期待純利益',number(balanced.get('baseline_expected_profit_yen'))+'円',number(central.get('central'))+'円' if bought else '対象外'),
+  ('集合的中確率',number(100*balanced.get('baseline_hit_probability',0))+'%',number(100*hit.get('central',0))+'%' if bought else '対象外'),
+  ('実損確率',number(100*balanced.get('baseline_net_loss_probability',0))+'%',number(100*loss.get('central',0))+'%' if bought else '対象外'),
+  ('許容する利益低下','比較基準0円',number(balanced.get('expected_profit_sacrifice_yen'))+'円'),
+  ('確保する期待純利益の下限','比較の基準解',number(balanced.get('expected_profit_floor_yen'))+'円')]
+ body+=page('購入最適化監査｜基準解と集合的中率',
+  paragraph('1つのレースの同時着順分布を使い、馬連・ワイド・三連複・三連単などの複数買い目が同時的中する場合も二重に数えません。')
+  +rows_table(['比較項目','期待利益最大の基準解','今回の集合改善案'],risk_rows)
+  +paragraph('3シナリオ：発走前に凍結した低・中央・高の着順確率で、セット全体の損益を再計算しています。')
+  +rows_table(['条件','期待純利益','集合的中率','実損確率'],[
    (sc,number(central.get(sc))+'円' if bought else '対象外',
     number(100*hit.get(sc,0))+'%' if bought else '対象外',
     number(100*loss.get(sc,0))+'%' if bought else '対象外')
    for sc in ['low','central','high']])
-  +paragraph('利益犠牲は従来解の最大10%、かつ200円以下。実損確率の悪化は2ポイント以下、集合的中率の改善が1ポイント未満なら従来解を維持します。')
-  +paragraph('探索方法は決定的な近傍探索です。期待利益最大の基準解は厳密ですが、多目的の全組合せで大域最適を証明したものではありません。監査には試行件数と探索上の制約を記録します。')
-  +paragraph('STEP1の印・全頭①〜⑨・旧予想・発売済みの買い目原本・PDF配色は変更していません。推定モデルの過去結果に対する校正は未確認です。'))
- result='<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+h(race['race_name'])+' JRA v3.11予想</title><style>'+css+'</style></head><body data-full-report="true" data-authored-report="true">'+body+'</body></html>'
+  +paragraph('期待利益は厳密最大解から最大10%かつ200円以内の減少を許容。実損確率の悪化は2ポイント以内、集合的中率の改善が1ポイント未満なら基準解を維持。')
+  +paragraph('多目的最適化は決定的な近傍探索です。期待利益最大の基準解は厳密ですが、集合的中率の大域最適解の証明ではありません。')
+  +paragraph('根拠のある中間オッズのみ使用。利益や的中率は未校正の条件付き推定であり、結果を保証しません。'))
+ result='<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+h(race['race_name'])+' JRA v3.11予想</title><style>'+css+'</style></head><body data-full-report="true" data-authored-report="true" data-tail-pagination="dynamic">'+body+'</body></html>'
  return result
 if __name__=='__main__':
  require=lambda ok,msg: (_ for _ in ()).throw(RuntimeError(msg)) if not ok else None
