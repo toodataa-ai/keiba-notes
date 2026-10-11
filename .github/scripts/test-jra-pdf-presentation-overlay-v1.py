@@ -256,6 +256,6 @@ for typ, slots, expected in [
         assert row in rendered, (typ, row, rendered)
     assert cm[0]["tickets"] == len(lines)
     pred["final_bets"].pop()
-    assert all(c["_formation_slots"] is None for c in overlay.purchase_commands(pred))
+    assert all(c.get("_formation_slots") is None for c in overlay.purchase_commands(pred))
 
 print("PASS: every strategy-mode label and concrete bundle definition; full/partial adoption, 14-row A4 PDF")
