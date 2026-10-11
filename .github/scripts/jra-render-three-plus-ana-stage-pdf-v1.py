@@ -17,6 +17,7 @@ def make(data):
  tot=sum(c.get('stake_yen',0) for c in commands)
  assert tot==data['summary']['stake_yen']
  out=[]
+ ana_out=[]
  methods={'box':'BOX','single':'個別指定','formation':'フォーメーション',
   'key_wheel':'1頭軸流し','two_key_wheel':'2頭軸流し','one_key_wheel':'1頭軸流し',
   'key_wheel_first':'1着固定流し','key_wheel_second':'2着固定流し',
@@ -27,12 +28,11 @@ def make(data):
   is_ana=c['category']=='穴狙い'
   method='購入なし' if c['method']=='pass' else methods.get(c['method'],c['method'])
   type_label=c.get('type','見送り')
-  category_label='<span class="ana-label">穴狙い</span>' if is_ana else ''
   number_text=c['jra_input']
   pay=(f"{c['points']}点 × {yen(c['unit_stake_yen'])} ＝ {yen(c['stake_yen'])}"
        if c['points'] else '購入なし・0円')
-  out.append(f'<tr class="{"ana" if is_ana else "normal"}"><td><b>{esc(type_label)}</b>'
-   f'<small>{esc(method)}</small>{category_label}</td><td class="spec">{esc(number_text)}</td>'
+  (ana_out if is_ana else out).append(f'<tr class="{"ana" if is_ana else "normal"}"><td><b>{esc(type_label)}</b>'
+   f'<small>{esc(method)}</small></td><td class="spec">{esc(number_text)}</td>'
    f'<td class="money">{esc(pay)}</td></tr>')
  title='東京11R オクトーバーステークス' if 'october-stakes' in data['race_id'] else '京都11R スワンステークス'
  m=data['summary']
@@ -50,7 +50,8 @@ th{background:#f0f2f5;font-size:9pt;color:#344151;text-align:left;padding:9px 8p
 td{border-bottom:1px solid #d7dce2;padding:10px 8px;vertical-align:top;overflow-wrap:anywhere}
 th:nth-child(1),td:nth-child(1){width:21%}th:nth-child(2),td:nth-child(2){width:43%}th:nth-child(3),td:nth-child(3){width:36%}
 td small{display:block;font-size:8pt;color:#657386;margin-top:2px}
-.ana-label{display:block;font-size:7.5pt;font-weight:bold;color:#8c562e;margin-top:3px}
+.ana-heading{font-size:8.5pt;font-weight:bold;color:#8c562e;margin:11px 0 5px;padding-left:2px}
+.ana-table{border-top:1px solid #d8b682}
 td.spec{font-weight:550;line-height:1.8}td.money{font-weight:bold;font-size:9pt}
 tr.ana{background:#fff7ed}tr.ana td{border-top:2px solid #d8b682}
 .metrics{padding:11px;background:#f2f4f7;border-radius:5px;margin-top:14px;font-size:9pt}
@@ -61,8 +62,12 @@ tr.ana{background:#fff7ed}tr.ana td{border-top:2px solid #d8b682}
 実際の購入指示として使用しないでください。</p>
 <h2>通常最大3操作 ＋ 穴狙い1行</h2>\n<p style="font-size:8pt;color:#647082;margin:0 0 5px">三連単は6点以上、三連複は3点以上の購入セットを候補とし、単独1点への絞り込みを避けています。</p>
 <p style="font-size:8pt;color:#647082;margin:0 0 7px">馬連・三連複などは「－」／馬単・三連単などは「→」／BOXの「・」は候補馬の一覧。</p>
-<table><thead><tr><th>券種・買い方</th><th>JRA画面に指定する馬番</th><th>点数 × 単価 ＝ 金額</th></tr></thead>
+<table><colgroup><col style="width:21%"><col style="width:43%"><col style="width:36%"></colgroup>
+<thead><tr><th>券種・買い方</th><th>JRA画面に指定する馬番</th><th>点数 × 単価 ＝ 金額</th></tr></thead>
 <tbody>'''+''.join(out)+'''</tbody></table>
+<p class="ana-heading">穴狙い</p>
+<table class="ana-table"><colgroup><col style="width:21%"><col style="width:43%"><col style="width:36%"></colgroup>
+<tbody>'''+''.join(ana_out)+'''</tbody></table>
 <div class="metrics"><b>合計：'''+yen(tot)+'''</b>（'''+str(m['command_count'])+'''操作）
 　／　モデル期待純利益：'''+yen(m['modeled_expected_net_profit_yen'])+'''
 　／　推定的中確率：'''+f"{m['modeled_union_hit_probability']*100:.1f}%"+'''
