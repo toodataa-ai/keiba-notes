@@ -1,0 +1,770 @@
+{
+  "race_id": "2026-10-12-october-stakes",
+  "formal_prediction_sha256": "8222710bd1bf38e9fa018745e0789a8c26551acf9e0fd1011a00ef0c1f394996",
+  "formal_proof_commit": "49867444915081298778464b1e6f615b8f0e0073",
+  "created_from_frozen_source_only": true,
+  "algorithm": "three_regular_plus_optional_longshot_shadow_v1",
+  "status": "three_plus_ana_shadow_candidate",
+  "formal_version_unchanged": true,
+  "formal_final_bets_unchanged": true,
+  "eligible_longshot_count": 69,
+  "max_regular_commands": 3,
+  "max_ana_rows": 1,
+  "max_total_budget_yen": 6000,
+  "formal_baseline": {
+    "stake_yen": 6000,
+    "expected_net_profit_yen": 4497.332,
+    "expected_net_profit_low_yen": 1726.1678,
+    "hit_probability": 0.9063,
+    "net_loss_probability": 0.8687
+  },
+  "regular_research": {
+    "status": "three_command_shadow_candidate",
+    "formal_prediction_unchanged": true,
+    "formal_bets_unchanged": true,
+    "formal_adoption_authorized": false,
+    "not_global_optimum": true,
+    "algorithm": "three_command_bounded_joint_outcome_shadow_v1",
+    "max_spend_yen": 5900,
+    "baseline": {
+      "stake_yen": 6000,
+      "expected_net_profit_yen": 4497.332,
+      "expected_net_profit_low_yen": 1726.1678,
+      "hit_probability": 0.9063,
+      "net_loss_probability": 0.8687
+    },
+    "proposed": {
+      "stake_yen": 2200,
+      "expected_net_profit_yen": 658.4588,
+      "expected_net_profit_low_yen": -37.358,
+      "hit_probability": 0.2305,
+      "net_loss_probability": 0.8102
+    },
+    "commands": [
+      {
+        "type": "馬単",
+        "method": "box",
+        "definition": {
+          "horses": [
+            1,
+            2,
+            18,
+            3,
+            7
+          ]
+        },
+        "points": 20,
+        "unit_stake_yen": 100,
+        "stake_yen": 2000,
+        "ticket_keys": [
+          "馬単:[1,18]",
+          "馬単:[1,2]",
+          "馬単:[1,3]",
+          "馬単:[1,7]",
+          "馬単:[18,1]",
+          "馬単:[18,2]",
+          "馬単:[18,3]",
+          "馬単:[18,7]",
+          "馬単:[2,18]",
+          "馬単:[2,1]",
+          "馬単:[2,3]",
+          "馬単:[2,7]",
+          "馬単:[3,18]",
+          "馬単:[3,1]",
+          "馬単:[3,2]",
+          "馬単:[3,7]",
+          "馬単:[7,18]",
+          "馬単:[7,1]",
+          "馬単:[7,2]",
+          "馬単:[7,3]"
+        ],
+        "source_strategy_id": "S18"
+      },
+      {
+        "type": "三連単",
+        "method": "single",
+        "definition": {
+          "selection": [
+            3,
+            7,
+            1
+          ]
+        },
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[3,7,1]"
+        ],
+        "source_strategy_id": "single:三連単:[3,7,1]"
+      },
+      {
+        "type": "三連単",
+        "method": "single",
+        "definition": {
+          "selection": [
+            3,
+            7,
+            18
+          ]
+        },
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[3,7,18]"
+        ],
+        "source_strategy_id": "single:三連単:[3,7,18]"
+      }
+    ],
+    "proposed_lines": [
+      {
+        "type": "馬単",
+        "selection": [
+          1,
+          18
+        ],
+        "stake_yen": 100,
+        "market_odds": 68.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          1,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 19.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          1,
+          3
+        ],
+        "stake_yen": 100,
+        "market_odds": 123.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          1,
+          7
+        ],
+        "stake_yen": 100,
+        "market_odds": 88.3,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          18,
+          1
+        ],
+        "stake_yen": 100,
+        "market_odds": 92.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          18,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 57.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          18,
+          3
+        ],
+        "stake_yen": 100,
+        "market_odds": 219.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          18,
+          7
+        ],
+        "stake_yen": 100,
+        "market_odds": 200.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          2,
+          1
+        ],
+        "stake_yen": 100,
+        "market_odds": 13.3,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          2,
+          18
+        ],
+        "stake_yen": 100,
+        "market_odds": 34.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          2,
+          3
+        ],
+        "stake_yen": 100,
+        "market_odds": 50.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          2,
+          7
+        ],
+        "stake_yen": 100,
+        "market_odds": 45.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          3,
+          1
+        ],
+        "stake_yen": 100,
+        "market_odds": 159.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          3,
+          18
+        ],
+        "stake_yen": 100,
+        "market_odds": 224.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          3,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 85.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          3,
+          7
+        ],
+        "stake_yen": 100,
+        "market_odds": 276.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          7,
+          1
+        ],
+        "stake_yen": 100,
+        "market_odds": 125.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          7,
+          18
+        ],
+        "stake_yen": 100,
+        "market_odds": 192.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          7,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 77.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          7,
+          3
+        ],
+        "stake_yen": 100,
+        "market_odds": 311,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+        "observed_at": "2026-10-11T21:53:36.083+00:00"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          3,
+          7,
+          1
+        ],
+        "stake_yen": 100,
+        "market_odds": 2460.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040511?umaBan=3&position=1",
+        "observed_at": "2026-10-11T21:53:35.181+00:00"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          3,
+          7,
+          18
+        ],
+        "stake_yen": 100,
+        "market_odds": 3715.3,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040511?umaBan=3&position=1",
+        "observed_at": "2026-10-11T21:53:35.181+00:00"
+      }
+    ],
+    "comparison": {
+      "expected_profit_delta_yen": -3838.8732,
+      "hit_probability_delta_pp": -67.58,
+      "net_loss_probability_delta_pp": -5.85
+    },
+    "audit": {
+      "verified_source_ticket_count": 171,
+      "candidate_group_count": 24,
+      "combinations_enumerated": 1629,
+      "exact_evaluations": 73,
+      "positive_profit_evaluations": 73,
+      "rejected": {
+        "partial": 0,
+        "unpriced": 0,
+        "over_budget": 0,
+        "unsupported": 0
+      }
+    },
+    "caution": "This is a separately priced counterfactual, not the formal final_bets. Never publish as the official purchase instruction; model probabilities are uncalibrated."
+  },
+  "summary": {
+    "stake_yen": 2300,
+    "ticket_count": 23,
+    "command_count": 4,
+    "modeled_expected_net_profit_yen": 819.2006,
+    "modeled_low_expected_net_profit_yen": 56.5838,
+    "modeled_union_hit_probability": 0.2305,
+    "modeled_net_loss_probability": 0.8102
+  },
+  "regular_commands": [
+    {
+      "type": "馬単",
+      "method": "box",
+      "definition": {
+        "horses": [
+          1,
+          2,
+          18,
+          3,
+          7
+        ]
+      },
+      "points": 20,
+      "unit_stake_yen": 100,
+      "stake_yen": 2000,
+      "ticket_keys": [
+        "馬単:[1,18]",
+        "馬単:[1,2]",
+        "馬単:[1,3]",
+        "馬単:[1,7]",
+        "馬単:[18,1]",
+        "馬単:[18,2]",
+        "馬単:[18,3]",
+        "馬単:[18,7]",
+        "馬単:[2,18]",
+        "馬単:[2,1]",
+        "馬単:[2,3]",
+        "馬単:[2,7]",
+        "馬単:[3,18]",
+        "馬単:[3,1]",
+        "馬単:[3,2]",
+        "馬単:[3,7]",
+        "馬単:[7,18]",
+        "馬単:[7,1]",
+        "馬単:[7,2]",
+        "馬単:[7,3]"
+      ],
+      "source_strategy_id": "S18",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "BOX 1・2・18・3・7"
+    },
+    {
+      "type": "三連単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          3,
+          7,
+          1
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "三連単:[3,7,1]"
+      ],
+      "source_strategy_id": "single:三連単:[3,7,1]",
+      "row": 2,
+      "category": "通常",
+      "jra_input": "3・7・1"
+    },
+    {
+      "type": "三連単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          3,
+          7,
+          18
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "三連単:[3,7,18]"
+      ],
+      "source_strategy_id": "single:三連単:[3,7,18]",
+      "row": 3,
+      "category": "通常",
+      "jra_input": "3・7・18"
+    }
+  ],
+  "ana_command": {
+    "row": 4,
+    "category": "穴狙い",
+    "type": "三連単",
+    "method": "single",
+    "definition": {
+      "selection": [
+        7,
+        3,
+        1
+      ]
+    },
+    "jra_input": "7・3・1",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "三連単:[7,3,1]"
+    ],
+    "observed_odds_floor": 2334,
+    "modeled_central_event_probability": 0.0011,
+    "modeled_profit_yen": 160.7419,
+    "reason": "実測オッズ20倍以上・推定事象確率10%以下・モデル上の期待純利益プラス。高配当狙いの別枠で的中保証なし。"
+  },
+  "proposed_lines": [
+    {
+      "type": "馬単",
+      "selection": [
+        1,
+        18
+      ],
+      "stake_yen": 100,
+      "market_odds": 68.8,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        1,
+        2
+      ],
+      "stake_yen": 100,
+      "market_odds": 19.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        1,
+        3
+      ],
+      "stake_yen": 100,
+      "market_odds": 123.9,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        1,
+        7
+      ],
+      "stake_yen": 100,
+      "market_odds": 88.3,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        18,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 92.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        18,
+        2
+      ],
+      "stake_yen": 100,
+      "market_odds": 57.6,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        18,
+        3
+      ],
+      "stake_yen": 100,
+      "market_odds": 219.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        18,
+        7
+      ],
+      "stake_yen": 100,
+      "market_odds": 200.4,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        2,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 13.3,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        2,
+        18
+      ],
+      "stake_yen": 100,
+      "market_odds": 34.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        2,
+        3
+      ],
+      "stake_yen": 100,
+      "market_odds": 50.9,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        2,
+        7
+      ],
+      "stake_yen": 100,
+      "market_odds": 45.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        3,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 159.7,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        3,
+        18
+      ],
+      "stake_yen": 100,
+      "market_odds": 224.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        3,
+        2
+      ],
+      "stake_yen": 100,
+      "market_odds": 85.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        3,
+        7
+      ],
+      "stake_yen": 100,
+      "market_odds": 276.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        7,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 125.4,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        7,
+        18
+      ],
+      "stake_yen": 100,
+      "market_odds": 192.6,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        7,
+        2
+      ],
+      "stake_yen": 100,
+      "market_odds": 77.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        7,
+        3
+      ],
+      "stake_yen": 100,
+      "market_odds": 311,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040511?ninki=0",
+      "observed_at": "2026-10-11T21:53:36.083+00:00"
+    },
+    {
+      "type": "三連単",
+      "selection": [
+        3,
+        7,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 2460.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040511?umaBan=3&position=1",
+      "observed_at": "2026-10-11T21:53:35.181+00:00"
+    },
+    {
+      "type": "三連単",
+      "selection": [
+        3,
+        7,
+        18
+      ],
+      "stake_yen": 100,
+      "market_odds": 3715.3,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040511?umaBan=3&position=1",
+      "observed_at": "2026-10-11T21:53:35.181+00:00"
+    },
+    {
+      "type": "三連単",
+      "selection": [
+        7,
+        3,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 2334,
+      "observed_at": "2026-10-11T21:53:35.237+00:00",
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040511?umaBan=7&position=1",
+      "market_selection_id": "三連単:[7,3,1]"
+    }
+  ],
+  "change_vs_formal": {
+    "expected_profit_yen": -3678.1314,
+    "union_hit_pp": -67.58,
+    "net_loss_pp": -5.85
+  },
+  "warning": "STAGING RESEARCH ONLY. Never use as actual official purchase instruction before new formal model/CI/live E2E approval. Probability model not calibrated."
+}
