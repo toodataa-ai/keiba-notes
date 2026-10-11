@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-11T00:52:12.638Z",
+  "updated_at": "2026-10-11",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -370,6 +370,28 @@
         "WIN5除外と最大予算6000円、1点原則100円"
       ],
       "reason": "ユーザー指定のB案に基づき、単数の買い目では当たりにくい複数点購入方式もセットの集合的中率・期待利益で評価し、落とした理由とPDFの空白問題を解消するため。 ページ総数に上限を設けないことはユーザーが明示的に指定。"
+    }
+  ],
+  "execution_addenda": [
+    {
+      "id": "jra-completion-v1",
+      "date": "2026-10-11",
+      "applies_to_prompt_version": "v3.11",
+      "path": "docs/operations/jra_run_completion_addendum_v1.txt",
+      "type": "execution_and_acceptance_rule_only",
+      "summary": "具体的な課題・エラーがなければJRA依頼の全工程を継続し、GitHub実ファイル・公開HTTPの実物検証まで終了としない。",
+      "changes": [
+        "進捗報告や部分完了で処理終了しない",
+        "ユーザーが不在でも正常なら残工程を続ける",
+        "全レース/全馬/全買い目、証跡、HTML/PDF、公開整合性まで完了ゲートを定義",
+        "実際のエラー・安全上の制約・ツールや時間制限時だけ停止し、blockerと未完了を明示"
+      ],
+      "unchanged": [
+        "v3.11正式予想のSTEP1/STEP2と馬券最適化",
+        "v3.11およびそれ以前の固定済みプロンプトSHA/旧予想ファイル",
+        "承認済みPDF仕様・地方競馬Shadow"
+      ],
+      "reason": "ユーザーが『課題やエラーがあった場合は止めて構わないが、何もないのに途中でやめない』を実行の基本方針として明示したため。"
     }
   ]
 }
