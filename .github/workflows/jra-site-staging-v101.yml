@@ -1,0 +1,124 @@
+name: JRA stage only | build, verify and publish independent preview
+on:
+  push:
+    branches: [staging/jra-ui-v101-three-plus-ana]
+    paths:
+      - 'docs/index.html'
+      - 'docs/this-week.html'
+      - 'docs/staging/**'
+      - '.github/scripts/jra-three-command-shadow-v1.mjs'
+      - '.github/scripts/jra-three-plus-ana-shadow-v1.mjs'
+      - '.github/scripts/test-jra-three-plus-ana-v1.mjs'
+      - '.github/scripts/jra-assemble-site-staging-v101.mjs'
+      - '.github/workflows/jra-site-staging-v101.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jra-site-staging-v101
+  cancel-in-progress: false
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify stage engine and frozen historical 2026-10-12 inputs
+        run: |
+          set -euo pipefail
+          node --check .github/scripts/jra-three-command-shadow-v1.mjs
+          node --check .github/scripts/jra-three-plus-ana-shadow-v1.mjs
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+      - name: Generate stage-only race purchase candidates from sealed originals
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-three-plus-ana-shadow-v1.mjs \
+            --input e2e_validation/predictions/2026-10-12-october-stakes/v3.13-run38177939515-attempt2.json \
+            --output docs/staging/data/three-plus-ana/2026-10-12-october-stakes.json
+          node .github/scripts/jra-three-plus-ana-shadow-v1.mjs \
+            --input e2e_validation/predictions/2026-10-12-swan-stakes/v3.13-run38177942081-attempt2.json \
+            --output docs/staging/data/three-plus-ana/2026-10-12-swan-stakes.json
+          node .github/scripts/jra-assemble-site-staging-v101.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          for p in [Path('docs/staging/index.html'),Path('docs/staging/this-week.html')]:
+              text=p.read_text()
+              assert '<base href="../">' in text
+              assert 'special-2026-10-11-tokyo12' not in text
+              assert 'staging/purchase-preview.html' in text
+          print('PASS_STAGE_HTML_AND_TEMP12R_REMOVAL')
+          PY
+      - name: Atomically publish ONLY docs/staging files to main with bounded push-conflict retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4 5 6; do
+            git fetch origin main
+            target=$(mktemp -d)
+            git worktree add --detach "$target" origin/main
+            mkdir -p "$target/docs/staging"
+            cp -a docs/staging/. "$target/docs/staging/"
+            (
+              cd "$target"
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git add -A -- docs/staging
+              python3 - <<'PY'
+          import subprocess
+          files=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          if not all(x.startswith('docs/staging/') for x in files):
+              raise SystemExit('BLOCKER: staging attempted to change production '+repr(files))
+          print('ONLY_STAGING_FILES',len(files))
+          PY
+              if git diff --cached --quiet; then
+                echo 'STAGING_NO_DIFF';exit 0
+              fi
+              git commit -m "Preview JRA v1.01 three plus ana staging without touching production"
+              git push origin HEAD:main
+            ) && {
+              git worktree remove --force "$target"
+              echo 'STAGING_PUSH_SUCCESS'
+              break
+            }
+            git worktree remove --force "$target"
+            if [[ $attempt -eq 6 ]]; then
+              echo "::error::Staging push conflict remains after six safe rebases";exit 1
+            fi
+            sleep 4
+          done
+      - name: Independently verify HTTP byte-identical staged HTML and data
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            ok=1
+            for file in \
+              docs/staging/index.html \
+              docs/staging/this-week.html \
+              docs/staging/purchase-preview.html \
+              docs/staging/release-history.html \
+              docs/staging/data/three-plus-ana/2026-10-12-october-stakes.json \
+              docs/staging/data/three-plus-ana/2026-10-12-swan-stakes.json; do
+              url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
+              if ! curl -LfsS --max-time 15 "$url" -o /tmp/jra-staging-http-file ||
+                 ! cmp -s "$file" /tmp/jra-staging-http-file; then
+                 ok=0;break
+              fi
+            done
+            if [[ $ok -eq 1 ]]; then
+              echo 'JRA_STAGE_V101_PUBLIC_HTTP_BYTE_VERIFIED'
+              exit 0
+            fi
+            sleep 12
+          done
+          echo '::error::Staging GitHub commit present but public HTTP byte match not verified'
+          exit 1
+
