@@ -5,14 +5,21 @@ import html,json,sys
 from pathlib import Path
 from itertools import islice
 LABELS=['斤量','展開','馬場','ローテ','コース','血統','調教','騎手','基礎能力']
+# Reference colours are already defined in docs/assets/jra-pdf-reader-v1.css.
+# Preserve the accepted stylesheet fingerprint: apply existing CSS classes only.
+GRADE_CLASSES={'A+':'gAp','A':'gA','B+':'gBp','B':'gB','B-':'gBm','C':'gC'}
+def grade_badge(value):
+ if value not in GRADE_CLASSES:raise ValueError('Unexpected grade: '+str(value))
+ return '<span class="g '+GRADE_CLASSES[value]+'">'+h(value)+'</span>'
 def h(x):return html.escape(str(x),quote=True)
 def number(x,precision=1):
  return '未確定' if x is None else f'{x:,.{precision}f}'
 def page(title,body):
  return f'<section class="page"><div class="chapter">{h(title)}</div>{body}</section>\n'
-def rows_table(headers,data,cls='table dense'):
+def rows_table(headers,data,cls='table dense',grade_columns=()):
  s=f'<table class="{cls}"><thead><tr>'+''.join('<th>'+h(x)+'</th>' for x in headers)+'</tr></thead><tbody>'
- for row in data:s+='<tr>'+''.join('<td>'+h(x)+'</td>' for x in row)+'</tr>'
+ for row in data:
+  s+='<tr>'+''.join('<td>'+(grade_badge(x) if i in grade_columns else h(x))+'</td>' for i,x in enumerate(row))+'</tr>'
  return s+'</tbody></table>'
 def make(report):
  race=report['race_context'];runners=report['step1_ranking'];n=len(runners)
@@ -32,7 +39,7 @@ def make(report):
  css=Path('docs/assets/jra-pdf-reader-v1.css').read_text(encoding='utf-8')
  body=''
  def paragraph(t):return '<p>'+h(t)+'</p>'
- marks=rows_table(['印','馬番','馬名','評価'],[(r['mark'],r['horse_number'],r['horse_name'],r['overall_grade']) for r in runners[:7]])
+ marks=rows_table(['印','馬番','馬名','評価'],[(r['mark'],r['horse_number'],r['horse_name'],r['overall_grade']) for r in runners[:7]],grade_columns=(3,))
  body+=page('本日の正式予想｜表紙',f'<h1>{h(race["venue"])}11R {h(race["race_name"])}</h1>'
   +paragraph(f'{race.get("date","")}　{race["surface"]}{race["distance_m"]}m　発走 {race["start_at"][11:16]}　馬場 {race.get("official_going","未確認")}')
   +paragraph('GitHub正式プロンプト v3.10／STEP1印を事前固定、STEP2だけ実オッズと厳密期待純利益で判定。')
@@ -59,7 +66,7 @@ def make(report):
    '前走成績はJRA公式に照らした客観資料ですが、総合評価と印には推定が含まれます。')
   +rows_table(['印','馬番','馬名','総合','斤量','前走概要'],[(x['mark'],x['horse_number'],x['horse_name'],
    x['overall_grade'],str(x.get('weight_kg',''))+'kg',
-   (x.get('past_performances') or [{}])[0].get('source_excerpt','データなし')[:14]) for x in runners])
+   (x.get('past_performances') or [{}])[0].get('source_excerpt','データなし')[:14]) for x in runners],grade_columns=(3,))
   +paragraph('同条件直接実績を優先し、古い好走だけで現在値を判断しない。出走数とオッズは発走前に変わる可能性があります。'))
  body+=page('STEP2 8券種・購入方式の検証',
   paragraph('WIN5は対象外。単勝／複勝／枠連／馬連／馬単／ワイド／三連複／三連単について、単点・流し・BOX・フォーメーション・マルチ等を展開しています。')
@@ -96,11 +103,11 @@ def make(report):
     (p.get('time') or '?'),('同条件' if p.get('same_condition') else '近似/別条件')))
   while len(rows)<4:rows.append(('情報なし','—','—','—','—','—','—'))
   factors=rows_table(['①斤量','②展開','③馬場','④ローテ','⑤コース','⑥血統','⑦調教','⑧騎手','⑨能力'],
-   [[*r['factor_grades']]],cls='table dense')
+   [[*r['factor_grades']]],cls='table dense',grade_columns=range(9))
   note=r.get('evidence','')[:240]
   body+=f'<section class="horse"><div class="chapter">全頭診断・個別評価　{idx+1}/{n}</div>'
   body+=f'<h1>{h(mark)} {num} {h(name)}</h1>'
-  body+=(f'<div class="hero"><b>総合 {h(r["overall_grade"])}</b>　負担重量 {h(r.get("weight_kg"))}kg'
+  body+=(f'<div class="hero"><b>総合 {grade_badge(r["overall_grade"])}</b>　負担重量 {h(r.get("weight_kg"))}kg'
   +f'　騎手 {h(r.get("jockey"))}</div>')
   body+=paragraph('能力と今回適性：'+note)
   body+='<h3>①〜⑨：評価軸別グレード</h3>'+factors
