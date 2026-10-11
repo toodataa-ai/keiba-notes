@@ -29,12 +29,12 @@ jobs:
           node .github/scripts/test-jra-balanced-v311.mjs
           node .github/scripts/test-jra-purchase-audit-v312.mjs
           python3 -m py_compile .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v312.py .github/scripts/validate-jra-pdf-content-v312.py
-          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/validate-jra-prompt-v312.mjs
           node .github/scripts/validate-prompt-history.mjs
           node .github/scripts/test-jra-prestart-pipeline-v312.mjs
           node .github/scripts/test-jra-portfolio-v311.mjs
           node .github/scripts/test-jra-strategy-v39.mjs
-          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/validate-jra-prompt-v312.mjs
       - name: Validate path and reserve immutable snapshot names
         env:
           INPUT_PATH: ${{ inputs.input_path }}
