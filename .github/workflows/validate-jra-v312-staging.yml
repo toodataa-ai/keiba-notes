@@ -1,0 +1,50 @@
+name: JRA v3.12 STEP2 odds completeness and purchase-set audit (staging)
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-v312-*.mjs'
+      - '.github/scripts/jra-prestart-pipeline-v312.mjs'
+      - '.github/scripts/jra-render-live-v312.py'
+      - '.github/scripts/validate-jra-portfolio-v312.mjs'
+      - '.github/scripts/validate-jra-pdf-content-v312.py'
+      - '.github/scripts/test-jra-v312*.mjs'
+      - '.github/workflows/validate-jra-v312-staging.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Ensure historical v3.11 contracts remain unchanged
+        run: |
+          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/test-jra-balanced-v311.mjs
+      - name: Exact trifecta-quote coverage and correlated set comparison regression
+        run: |
+          node .github/scripts/test-jra-v312.mjs
+          python3 -m py_compile .github/scripts/jra-render-live-v312.py .github/scripts/validate-jra-pdf-content-v312.py
+      - name: Render full frozen-source layout fixture with ORIGINAL CSS
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          node .github/scripts/test-jra-v312-render-preview.mjs /tmp/jra-v312-fixture.json
+          python3 .github/scripts/jra-render-live-v312.py /tmp/jra-v312-fixture.json /tmp/jra-v312-fixture.html
+          python3 -m weasyprint /tmp/jra-v312-fixture.html /tmp/jra-v312-fixture.pdf
+          python3 .github/scripts/validate-jra-pdf-content-v312.py --html /tmp/jra-v312-fixture.html --pdf /tmp/jra-v312-fixture.pdf --prediction /tmp/jra-v312-fixture.json
+          python3 - <<'PY'
+          import fitz
+          with fitz.open('/tmp/jra-v312-fixture.pdf') as pdf:
+            assert len(pdf)>30, 'must keep every horse and every adopted/rejected bet'
+            text=' '.join(p.get_text() for p in pdf)
+            assert '複数点購入による的中率' in text and '追加・入替比較' in text
+          print('PASS: original CSS, full-page content and all set comparisons in real PDF')
+          PY
