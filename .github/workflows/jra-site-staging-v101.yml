@@ -61,7 +61,16 @@ jobs:
               text=p.read_text()
               assert '<base href="../">' in text
               assert 'special-2026-10-11-tokyo12' not in text
-              assert 'staging/purchase-preview.html' in text
+              if p.name=='index.html':
+                  assert 'staging/purchase-preview.html' in text
+                  assert '検証用：購入方法のステージング比較' in text
+                  assert '購入操作は最大3行＋' not in text
+                  assert '.hero .brand-title.brand-lockup{justify-content:center' in text
+                  assert 'Racing_%28Unsplash%29.jpg' in text
+                  assert 'background-image:linear-gradient' in text
+                  assert 'photo-credit' in text
+              else:
+                  assert '試験中：買いやすい3操作' not in text
               assert '<meta name="robots" content="noindex,nofollow">' in text
               assert 'class="staging-visual-marker"' in text
           print('PASS_STAGE_HTML_AND_TEMP12R_REMOVAL')
