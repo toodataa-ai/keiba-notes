@@ -10,14 +10,15 @@ def yen(x):return f'{int(x):,}円'
 def make(data):
  assert data['formal_final_bets_unchanged'] is True
  assert len(data['regular_commands'])<=3
- assert data['ana_command']['row']==4
+ assert data['medium_command']['row']==4 and data['large_command']['row']==5
  assert data['summary']['stake_yen']<=6000
- commands=data['regular_commands']+[data['ana_command']]
- assert len(commands)<=4
+ commands=data['regular_commands']+[data['medium_command'],data['large_command']]
+ assert len(commands)<=5
  tot=sum(c.get('stake_yen',0) for c in commands)
  assert tot==data['summary']['stake_yen']
  out=[]
- ana_out=[]
+ medium_out=[]
+ large_out=[]
  methods={'box':'BOX','single':'個別指定','formation':'フォーメーション',
   'key_wheel':'1頭軸流し','two_key_wheel':'2頭軸流し','one_key_wheel':'1頭軸流し',
   'key_wheel_first':'1着固定流し','key_wheel_second':'2着固定流し',
@@ -25,13 +26,14 @@ def make(data):
   'two_key_multi':'2頭軸マルチ','one_key_fixed':'1頭軸固定',
   'one_key_multi':'1頭軸マルチ'}
  for c in commands:
-  is_ana=c['category']=='穴狙い'
+  is_ana=c['category'] in ('中穴','大穴')
   method='購入なし' if c['method']=='pass' else methods.get(c['method'],c['method'])
   type_label=c.get('type','見送り')
   number_text=c['jra_input']
   pay=(f"{c['points']}点 × {yen(c['unit_stake_yen'])} ＝ {yen(c['stake_yen'])}"
        if c['points'] else '購入なし・0円')
-  (ana_out if is_ana else out).append(f'<tr class="{"ana" if is_ana else "normal"}"><td><b>{esc(type_label)}</b>'
+  target_rows=medium_out if c['category']=='中穴' else large_out if c['category']=='大穴' else out
+  target_rows.append(f'<tr class="{"ana" if is_ana else "normal"}"><td><b>{esc(type_label)}</b>'
    f'<small>{esc(method)}</small></td><td class="spec">{esc(number_text)}</td>'
    f'<td class="money">{esc(pay)}</td></tr>')
  title='東京11R オクトーバーステークス' if 'october-stakes' in data['race_id'] else '京都11R スワンステークス'
@@ -60,20 +62,23 @@ tr.ana{background:#fff7ed}tr.ana td{border-top:2px solid #d8b682}
 <h1>'''+esc(title)+'''</h1></header>
 <p class="warn">これは発走前に封印された正式版v3.13とは異なる、3操作＋穴狙いの研究案です。
 実際の購入指示として使用しないでください。</p>
-<h2>通常最大3操作 ＋ 穴狙い1行</h2>\n<p style="font-size:8pt;color:#647082;margin:0 0 5px">三連単は6点以上、三連複は3点以上の購入セットを候補とし、単独1点への絞り込みを避けています。</p>
+<h2>通常最大3操作 ＋ 中穴・大穴を各1行</h2>\n<p style="font-size:8pt;color:#647082;margin:0 0 5px">三連単は6点以上、三連複は3点以上の購入セットを候補とし、単独1点への絞り込みを避けています。</p>
 <p style="font-size:8pt;color:#647082;margin:0 0 7px">馬連・三連複などは「－」／馬単・三連単などは「→」／BOXの「・」は候補馬の一覧。</p>
 <table><colgroup><col style="width:21%"><col style="width:43%"><col style="width:36%"></colgroup>
 <thead><tr><th>券種・買い方</th><th>JRA画面に指定する馬番</th><th>点数 × 単価 ＝ 金額</th></tr></thead>
 <tbody>'''+''.join(out)+'''</tbody></table>
-<p class="ana-heading">穴狙い</p>
+<p class="ana-heading">中穴（20倍以上100倍未満）</p>
 <table class="ana-table"><colgroup><col style="width:21%"><col style="width:43%"><col style="width:36%"></colgroup>
-<tbody>'''+''.join(ana_out)+'''</tbody></table>
+<tbody>'''+''.join(medium_out)+'''</tbody></table>
+<p class="ana-heading">大穴（100倍以上・万馬券狙い）</p>
+<table class="ana-table"><colgroup><col style="width:21%"><col style="width:43%"><col style="width:36%"></colgroup>
+<tbody>'''+''.join(large_out)+'''</tbody></table>
 <div class="metrics"><b>合計：'''+yen(tot)+'''</b>（'''+str(m['command_count'])+'''操作）
 　／　モデル期待純利益：'''+yen(m['modeled_expected_net_profit_yen'])+'''
 　／　推定的中確率：'''+f"{m['modeled_union_hit_probability']*100:.1f}%"+'''
 　／　推定損失確率：'''+f"{m['modeled_net_loss_probability']*100:.1f}%"+'''</div>
-<p class="foot">通常と穴狙いで重複した組番を含まず、総額6,000円以内。各行のBOX・流し・フォーメーションの組番を展開して監査済み。
-穴狙いは20倍以上かつ推定事象確率10%以下・正のモデル期待値を条件とします。モデルは未校正、オッズは取得時点の中間値で確定値ではありません。正式予想・過去原本は一切変更していません。</p>
+<p class="foot">通常と中穴・大穴で重複した組番を含まず、総額6,000円以内。各行のBOX・流し・フォーメーションの組番を展開して監査済み。
+中穴は20〜100倍未満、大穴はすべての構成馬券が100倍以上かつ推定期待利益がプラスを条件とします。大穴の的中時払戻見込みは100円あたり1万円以上ですが、的中の保証ではありません。モデルは未校正、オッズは取得時点の中間値で確定値ではありません。正式予想・過去原本は一切変更していません。</p>
 </body></html>'''
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--input',required=True);ap.add_argument('--pdf',required=True);a=ap.parse_args()
@@ -83,9 +88,9 @@ def main():
  commands=data['regular_commands']+[data['ana_command']]
  target=Path(a.pdf);target.parent.mkdir(parents=True,exist_ok=True)
  rendered_html=make(data)
- assert rendered_html.count('<table')==2,'regular and annotated special row must use separate tables'
- assert '<p class="ana-heading">穴狙い</p>' in rendered_html,'hole category must be outside the table'
- assert '<td><b>穴狙い</b>' not in rendered_html,'hole category cannot replace ticket type'
+ assert rendered_html.count('<table')==3,'regular medium and large classes need separate tables'
+ assert '<p class="ana-heading">中穴（20倍以上100倍未満）</p>' in rendered_html and '<p class="ana-heading">大穴（100倍以上・万馬券狙い）</p>' in rendered_html,'hole categories must be outside all betting tables'
+ assert '<td><b>中穴</b>' not in rendered_html and '<td><b>大穴</b>' not in rendered_html,'hole category cannot replace ticket type'
  assert 'class="ana-label"' not in rendered_html,'no redundant hole label inside ticket cell'
  HTML(string=rendered_html,base_url=str(Path('.').resolve())).write_pdf(str(target))
  with fitz.open(str(target)) as pdf:
@@ -93,7 +98,7 @@ def main():
   page=pdf[0]
   assert abs(page.rect.width-595.28)<1 and abs(page.rect.height-841.89)<1
   text=re.sub(r'\s+','',page.get_text()) # normalize PDF line breaks, never skip or shorten content
-  for token in ('STAGING','穴狙い','モデル期待純利益','6,000円以内','購入指示として使用しないでください'):
+  for token in ('STAGING','中穴','大穴','万馬券狙い','モデル期待純利益','6,000円以内','購入指示として使用しないでください'):
    assert token in text,'A4 missing '+token
   # Standard ordered notation must survive actual rendered PDF glyph extraction.
   if any(x['type'] in ('馬単','三連単') and x['method']=='single' for x in commands if x.get('type')):
@@ -107,6 +112,6 @@ def main():
     for span in line['spans']:
      assert span['bbox'][0]>=0 and span['bbox'][2]<page.rect.width+1
      assert span['bbox'][1]>=0 and span['bbox'][3]<page.rect.height+1
- print('PASS_STAGING_A4_4_ROW_PDF',target,data['race_id'],'operations',data['summary']['command_count'])
+ print('PASS_STAGING_A4_5_ROW_PDF',target,data['race_id'],'operations',data['summary']['command_count'])
 if __name__=='__main__':main()
 
