@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "date": "2026-10-11",
-  "scope": "PRE-RACE",
-  "status": "SKIPPED_NO_ELIGIBLE_RACES",
+  "scope": "PRE-RACE_FULL_OFFICIAL_DAY",
+  "status": "BLOCKED_FULL_COVERAGE",
   "model_version": "local-daily-shadow-v0.1",
   "production_effect": false,
   "rule_sources": {
@@ -31,17 +31,32 @@
       "園田",
       "名古屋"
     ],
-    "intersection": []
+    "intersection": [],
+    "official_race_counts": {
+      "帯広ば": 12,
+      "盛岡": 12,
+      "金沢": 10,
+      "高知": 11,
+      "佐賀": 11
+    },
+    "official_total_races": 56,
+    "venue_program_urls": {
+      "帯広ば": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=3&k_raceDate=2026%2F10%2F11",
+      "盛岡": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=10&k_raceDate=2026%2F10%2F11",
+      "金沢": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=22&k_raceDate=2026%2F10%2F11",
+      "高知": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=31&k_raceDate=2026%2F10%2F11",
+      "佐賀": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=32&k_raceDate=2026%2F10%2F11"
+    }
   },
   "daily_audit": {
-    "eligible_races": 0,
+    "eligible_races": 56,
     "prediction_files_existing": 0,
     "result_files_existing": 0,
     "review_files_existing": 0,
     "manifest_entries_for_date": 0,
     "prediction_created": false,
     "proof_commit": null,
-    "proof_commit_reason": "Not applicable: no eligible races or pre-race snapshots exist for the date.",
+    "proof_commit_reason": "56 officially scheduled races exist, but no verified pre-race prediction snapshots were captured before the respective cutoffs; no hindsight predictions are permitted.",
     "no_hindsight_predictions": true,
     "previous_manifest_entries": 46,
     "public_manifest_path": "docs/data/local_racing_shadow_public.json",
@@ -49,12 +64,16 @@
     "public_manifest_change_required": false,
     "github_pages_live_bytes_verified": false,
     "github_pages_note": "Publicly hosted Pages JSON/HTML could not be independently fetched with available browsing tools; committed manifest was checked. Do not claim live publication verified.",
-    "jra_related_files_changed": false
+    "jra_related_files_changed": false,
+    "requested_full_day_scope_races": 56,
+    "coverage_gap_races": 56,
+    "full_day_scope_verified": true
   },
   "forward_looking_blockers": [
-    "PRE-RACE workflow .github/workflows/local-racing-shadow-prerace-20261008.yml contains a one-day guard for 2026-10-09; future dates cannot rely on this workflow.",
-    "local_racing_shadow_v1/generate_daily.py currently implements only oi and sonoda, while config enables six venues.",
-    "Current connected GitHub actions cannot directly invoke workflow_dispatch; a generic PRE-RACE event/dispatch trigger has not been established."
+    "BLOCKED_SCOPE: config.json currently enables only six venues, none of which race today. Full-day user intent covers the five active venues and 56 scheduled races.",
+    "BLOCKED_IMPLEMENTATION: generate_daily.py currently implements only oi and sonoda, and the existing PRE-RACE workflow has a date guard limiting it to 2026-10-09.",
+    "BLOCKED_TIMING: races that have already started cannot be assigned new or retroactively committed prediction snapshots; no hindsight predictions.",
+    "BLOCKED_REPRODUCIBILITY: the public manifest's 46 existing entries are from 2026-10-08 and 2026-10-09, not proof of a 2026-10-11 prediction."
   ],
-  "note": "The six enabled Shadow venues had no official races on 2026-10-11. No race predictions, proofs, results or reviews were created; existing frozen race files and the public manifest were not modified. This is an eligibility/calendar audit, not a race-level prediction proof."
+  "note": "Correction of prior incorrect SKIPPED_NO_ELIGIBLE_RACES finding: all 56 races at the five officially active venues are within the user's requested coverage. The 6-venue config mismatch is a blocker requiring remediation, not grounds to declare the day a successful skip. Prior predictions and JRA files remain unchanged."
 }
