@@ -328,6 +328,13 @@ def validate_request(req):
          race['official'].startswith('https://sp.jra.jp/JRADB/accessD.html?CNAME='),
          'independent official JRA form required')
  start=datetime.fromisoformat(race['start_at'])
+ require(isinstance(req.get('market_open_at'),str) and isinstance(req.get('market_open_source_url'),str),
+         'JRA ticket sale opening time and official source must be supplied')
+ try:market_open=datetime.fromisoformat(req['market_open_at'])
+ except ValueError:raise RuntimeError('BLOCKER: invalid official market opening date')
+ require(market_open.tzinfo is not None and market_open.utcoffset().total_seconds()==9*3600 and
+         market_open<start and req['market_open_source_url'].startswith('https://www.jra.go.jp/'),
+         'JRA sale open time/source not consistent with official JST timetable')
  require(start.tzinfo is not None and start.date().isoformat()==date and
          start.utcoffset().total_seconds()==9*3600,'JST start/date mismatch')
  require(datetime.now(JST)<start,'cannot create any prestart input after race has begun')
@@ -375,6 +382,9 @@ def entry():
  race,preview=validate_request(req)
  if a.validate_only:
   print('V314_RESEARCH_REQUEST_VERIFIED',race['slug']);return
+ if datetime.now(JST)<datetime.fromisoformat(req['market_open_at']):
+  raise RuntimeError('NOT_YET_ON_SALE: '+race['slug']+' opens '+req['market_open_at']+
+    ' under JRA published sales timetable. Do not misclassify as HTTP403 or missing data.')
  global DATE,PREVIEW,RACES,load
  DATE=req['date'];PREVIEW=Path(req['preview_path']);RACES=[race]
  if req.get('official_snapshot_path'):
