@@ -44,6 +44,11 @@ jobs:
               markers=[w for w in ['__NEXT_DATA__','__INITIAL_STATE__','race/odds','trifecta','sanrentan','3-10-16'] if w in body]
               if markers or len(body)>2000:
                   print('SCRIPT_STRUCTURE',script.get('id'),script.get('type'),script.get('src'),'BYTES',len(body),'MARKERS',markers,'PREFIX',body[:220].replace('\\n',' '))
+          print('ODDS_SELECTS',[(n,s.select_one('#'+n).get_text(' ',strip=True)[:320] if s.select_one('#'+n) else 'missing') for n in ['js-umaBan','js-position']])
+          print('SCRIPT_SRCS',[sc.get('src') for sc in scripts if sc.get('src')])
+          for sc in scripts:
+              body=sc.string or sc.get_text()
+              if 'new window.sn.hr.searchBox' in body:print('ODDS_SEARCH_CONFIG',body[:1600])
           for h in s.select('[data-testid],[data-reactroot]')[:8]:
               print('ROOT_STRUCTURE',h.name,h.get('data-testid'),h.get('id'),h.get('class'))
           for f in s.select('form'):
