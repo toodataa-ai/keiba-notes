@@ -1,0 +1,71 @@
+name: Verify JRA v3.12 public Pages against Git originals
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-jra-v312-release-http.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-http-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Verify formal pointer and preserve old JRA prediction/report/proof bytes
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/data/latest_prompt.json').read_text(encoding='utf-8'))
+          assert x['version']=='v3.12'
+          assert x['path']=='競馬予想_完全版プロンプト_v3.12.txt'
+          for attr in ('policy','publisher','rerun_workflow'):
+              assert 'v312' in x['prerace_overwrite_policy'][attr]['path']
+          print('RELEASE_POINTER_V312_CONFIRMED')
+          PY
+          BASE_SHA=ba54748dc0fbb32b31e6ef49a854b4672e634eb2
+          git cat-file -e "${BASE_SHA}^{commit}"
+          if ! git diff --quiet "$BASE_SHA" HEAD -- e2e_validation/predictions/ e2e_validation/snapshots/ docs/reports/ docs/pdfs/ docs/data/races.json docs/data/local_racing_shadow_public.json; then
+             echo "::error::Prior prediction, proof, PDF, canonical races registry or local Shadow changed"; exit 1
+          fi
+          echo "UNCHANGED_ORIGINAL_JRA_PREDICTIONS_AND_PDF_VERIFIED"
+      - name: Compare published full HTTP content with exact GitHub Pages source bytes
+        run: |
+          set -euo pipefail
+          BASE=https://toodataa-ai.github.io/keiba-notes
+          SUCCESS=0
+          for attempt in $(seq 1 36); do
+            GOOD=1
+            for FILE in docs/data/latest_prompt.json docs/data/prompt_history.json docs/data/jra_v312_purchase_coverage_policy.json docs/data/jra_ci_supersession_v312.json; do
+              REMOTE="$BASE/${FILE#docs/}?version=${GITHUB_SHA}"
+              LOCAL="/tmp/jra-v312-public-$(basename "$FILE")"
+              if ! curl -LfsS --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "$REMOTE" -o "$LOCAL" ||
+                 ! cmp -s "$FILE" "$LOCAL"; then
+                 GOOD=0
+                 echo "Pages not yet byte-for-byte current: $FILE (attempt $attempt)"
+                 break
+              fi
+            done
+            if [[ "$GOOD" == 1 ]] &&
+               curl -LfsS --max-time 20 "$BASE/index.html?version=${GITHUB_SHA}" -o /tmp/jra-v312-landing.html; then
+              SUCCESS=1
+              break
+            fi
+            sleep 10
+          done
+          if [[ "$SUCCESS" != 1 ]]; then
+            echo "::error::v3.12 actual public HTTP content not identical to published Git files";exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/jra-v312-public-latest_prompt.json').read_text(encoding='utf-8'))
+          assert j['version']=='v3.12'
+          print('JRA_V312_PUBLIC_HTTP_VERIFIED canonical=',j['version'],
+              'publisher=',j['prerace_overwrite_policy']['publisher']['path'],
+              'historical_originals_unchanged=True')
+          PY
