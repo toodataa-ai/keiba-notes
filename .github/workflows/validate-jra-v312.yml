@@ -7,8 +7,20 @@ on:
       - 'docs/data/jra_v312_purchase_coverage_policy.json'
       - '競馬予想_完全版プロンプト_v3.12.txt'
       - 'e2e_validation/manifests/v3.12.json'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/jra_ci_supersession_v312.json'
+      - '.github/workflows/e2e-validation.yml'
+      - '.github/workflows/validate-jra-balanced-v311.yml'
   push:
-    branches: [feature/jra-v312-odds-portfolio-audit]
+    branches: [feature/jra-v312-odds-portfolio-audit, main]
+    paths:
+      - '.github/scripts/*v312*'
+      - '.github/workflows/*v312*'
+      - '.github/workflows/validate-jra-balanced-v311.yml'
+      - '.github/workflows/e2e-validation.yml'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/jra_ci_supersession_v312.json'
+      - 'e2e_validation/manifests/v3.12.json'
   workflow_dispatch:
 permissions:
   contents: read
@@ -40,20 +52,11 @@ jobs:
           node .github/scripts/test-jra-prestart-pipeline-v311.mjs
           node .github/scripts/validate-prompt-history.mjs
           node .github/scripts/validate-jra-prompt-v312.mjs
+          node .github/scripts/validate-bet-type-coverage-v312.mjs
       - name: Protect historical SHA pins and approved reader CSS
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          import json,subprocess
-          from pathlib import Path
-          manifests=['e2e_validation/manifests/v3.11.json']
-          for f in manifests:
-              d=json.loads(Path(f).read_text())
-              for comp in d['components']:
-                  sha=subprocess.check_output(['git','hash-object',comp['path']],text=True).strip()
-                  assert sha==comp['git_blob_sha'],comp['path']
-          print('v3.11 manifest and previously approved CSS remain immutable')
-          PY
+          python3 e2e_validation/validate_manifests.py
       - name: PDF invariants, A4 and no lost candidate rows
         run: |
           sudo apt-get update -qq
