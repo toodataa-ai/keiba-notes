@@ -30,7 +30,9 @@ jobs:
           node --check .github/scripts/jra-prestart-pipeline-v312.mjs
           node --check .github/scripts/validate-jra-portfolio-v312.mjs
           node --check .github/scripts/test-jra-purchase-audit-v312.mjs
-          python -m py_compile .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v312.py .github/scripts/validate-jra-pdf-content-v312.py .github/scripts/jra-publish-live-v312.py
+          python -m pip install -q beautifulsoup4 requests
+          python .github/scripts/test-jra-odds-recovery-v312.py
+          python -m py_compile .github/scripts/validate-jra-pdf-layout-v312.py .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v312.py .github/scripts/validate-jra-pdf-content-v312.py .github/scripts/jra-publish-live-v312.py
           node .github/scripts/test-jra-purchase-audit-v312.mjs
           node .github/scripts/test-jra-balanced-v311.mjs
           node .github/scripts/test-jra-portfolio-v311.mjs
