@@ -85,5 +85,6 @@ with tempfile.TemporaryDirectory() as tmp:
     HTML(string=localized).write_pdf(str(pdf))
     with fitz.open(pdf) as doc:
         assert len(doc) == 4, f"one adopted page and three audit pages expected, got {len(doc)}"
-        assert all(len(page.get_text().strip()) > 150 for page in doc)
+        assert all(len(page.get_text().strip()) > 150 for page in list(doc)[1:])
+        assert '採用買い目' in doc[0].get_text() and '重複購入' in doc[0].get_text()
 print("PASS: every strategy-mode label and concrete bundle definition; full/partial adoption, 14-row A4 PDF")
