@@ -1,0 +1,41 @@
+name: JRA v3.12 live odds recovery smoke (no publication)
+on:
+  push:
+    branches: [feature/jra-v312-odds-portfolio-audit]
+    paths:
+      - '.github/workflows/jra-v312-live-quote-smoke-20261011.yml'
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Recover only missing live exact odds without changing any predictions
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('e2e_validation/inputs/2026-10-11-ireland-trophy.json')
+          o=json.loads(p.read_text(encoding='utf-8'))
+          o['prompt_version']='v3.12'
+          Path('/tmp/ireland-v312-staging.json').write_text(json.dumps(o,ensure_ascii=False),encoding='utf-8')
+          print('PREREACE INPUT',o['race_id'],'observed_quotes',len(o['market_quotes']),'planned_modes',len(o['strategies']))
+          PY
+          python3 .github/scripts/jra-odds-recovery-v312.py \
+            --input /tmp/ireland-v312-staging.json \
+            --output /tmp/ireland-v312-recovered.json \
+            --evidence-dir e2e_validation/quote-evidence/2026-10-11-ireland-trophy/v312-live-smoke
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/ireland-v312-recovered.json').read_text())
+          print('RECOVERY SUCCESS original unchanged. Total exact quotes:',len(d['market_quotes']))
+          PY
