@@ -149,7 +149,7 @@ jobs:
           set -euo pipefail
           node .github/scripts/jra-prestart-pipeline-v312.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
           node .github/scripts/validate-jra-portfolio-v312.mjs
-          node .github/scripts/validate-jra-portfolio-prompt-v311.mjs
+          node .github/scripts/validate-jra-prompt-v312.mjs
       - name: Generate final PDF from immutable proof, validate every page and append public registry
         run: |
           set -euo pipefail
@@ -169,4 +169,4 @@ jobs:
           PY
           git commit -m "Publish validated v3.12 full JRA original prediction HTML PDF and public registry"
           git push origin HEAD:main
-          echo "PUBLISHED_JRA_V310_JSON_HTML_PDF $RACE_ID proof=$PROOF"
+          echo "PUBLISHED_JRA_V312_JSON_HTML_PDF $RACE_ID proof=$PROOF"
