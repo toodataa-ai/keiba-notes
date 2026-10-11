@@ -28,6 +28,8 @@ function fixture(n=5,odds=25,partial=false){
 }
 function assertExact(r){
   assert.ok(r.commands.length<=3);
+  assert.ok(r.commands.every(c=>!['三連単','三連複'].includes(c.type)||
+   (c.type==='三連単'?c.points>=6:c.points>=3)), 'do not overconcentrate triple wagers');
   const reconstructed=[];
   for(const c of r.commands){
     const x=expandStrategy(c.type,c.method,c.definition);
