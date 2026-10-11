@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.13",
+  "previous_version": "v3.12",
+  "previous_manifest": "e2e_validation/manifests/v3.12.json",
+  "historical_predictions_immutable": true,
+  "components": [
+    {
+      "path": "競馬予想_完全版プロンプト_v3.0.txt",
+      "git_blob_sha": "8cb18e5cd2bab88bfaf5a04f103a402acb9aac90",
+      "role": "base_prompt"
+    },
+    {
+      "path": "closing_index_v1/production_profile_v1_1.json",
+      "git_blob_sha": "a72db216545cc481644c8f066b52e66c9b0083eb",
+      "role": "aci_production_profile"
+    },
+    {
+      "path": "closing_index_v1/adoption_decision_v1_1.json",
+      "git_blob_sha": "831bebfb4133856bd9284901594ecea30cc7ba27",
+      "role": "aci_adoption_decision"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.1.txt",
+      "git_blob_sha": "688ff0c06a441ca2634c73810aa2708bcbdec949",
+      "role": "aci_delta_prompt"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.2.txt",
+      "git_blob_sha": "1c2feb336575376c0736f78e7313ac7301e197e7",
+      "role": "final_bet_decision_delta"
+    },
+    {
+      "path": "docs/data/bet_type_coverage_policy_v1.json",
+      "git_blob_sha": "f88a1c8678853b5401e0d41e9404c42110813168",
+      "role": "bet_type_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.3.txt",
+      "git_blob_sha": "28479c99b02932739890e7b22de8e8fe043a9eac",
+      "role": "all_bet_types_delta"
+    },
+    {
+      "path": "docs/data/purchase_gate_policy_v1.json",
+      "git_blob_sha": "8a5f1a9b987579d0938a760e6271c6e632d5ca63",
+      "role": "race_local_purchase_gate_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.4.txt",
+      "git_blob_sha": "872458bd29bf467837fdcb0db402f336954bef28",
+      "role": "v3.4_purchase_decision_delta"
+    },
+    {
+      "path": "docs/data/multi_candidate_selection_policy_v1.json",
+      "git_blob_sha": "784f9ba08e72c297abba6b0e688f204afa338ef7",
+      "role": "multi_candidate_ticket_selection_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.5.txt",
+      "git_blob_sha": "073f691d7ef6bbb532395598785f3bfaa004f8e0",
+      "role": "v3.5_multi_candidate_delta"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.6.txt",
+      "git_blob_sha": "ec136aceecada66dd65f17997c616c6f94d04762",
+      "role": "one_shot_jra_execution_orchestrator"
+    },
+    {
+      "path": "docs/data/jra_pdf_layout_policy_v1.json",
+      "git_blob_sha": "4c935f56b8249a022f1e41bb56c62349f82f23ef",
+      "role": "approved_pdf_layout_policy"
+    },
+    {
+      "path": "docs/assets/jra-pdf-reader-v1.css",
+      "git_blob_sha": "290f9cd673371bff5cce61f5a682fd84ddb05822",
+      "role": "approved_pdf_layout_css"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.7.txt",
+      "git_blob_sha": "259aa148d80d6ad47bbb6935342ba6c7bca929e1",
+      "role": "fail_closed_pdf_layout_delta"
+    },
+    {
+      "path": "docs/data/ticket_portfolio_policy_v1.json",
+      "git_blob_sha": "e4bb71f2cdd3b821af801e1032cbcdd067fc88f3",
+      "role": "trifecta_multi_ticket_strategy_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.8.txt",
+      "git_blob_sha": "bf31f79d14e007d2a5dca01167acb657fc5f8ba9",
+      "role": "purchase_only_portfolio_delta"
+    },
+    {
+      "path": "docs/data/all_bet_strategy_policy_v1.json",
+      "git_blob_sha": "bdb6c936de08636070488d201cc52c73c81977b8",
+      "role": "eight_ticket_types_all_major_purchase_modes"
+    },
+    {
+      "path": ".github/scripts/jra-strategy-engine-v39.mjs",
+      "git_blob_sha": "8ecc37094181385cfd320b124bde084eaa8a4e9b",
+      "role": "joint_order_event_and_expansion_engine"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.9.txt",
+      "git_blob_sha": "f07d07a0620bb0763488953a9d66a2591ba59c9a",
+      "role": "eight_type_purchase_strategy_delta"
+    },
+    {
+      "path": "docs/data/jra_portfolio_6000_policy_v1.json",
+      "git_blob_sha": "7743e90cf7cd66874255f690ec02fecf3bf88319",
+      "role": "multi_strategy_6000_budget_policy"
+    },
+    {
+      "path": ".github/scripts/jra-portfolio-optimizer-v310.mjs",
+      "git_blob_sha": "1b362cc7779c218bd50ccd9931793090e8dfef0c",
+      "role": "deterministic_cross_type_exact_profit_optimizer"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.10.txt",
+      "git_blob_sha": "1b8bfd91e7e89cb1f85f297f956dcc11b80bd913",
+      "role": "v310_cross_type_portfolio_purchase_delta"
+    },
+    {
+      "path": "docs/data/jra_balanced_portfolio_policy_v1.json",
+      "git_blob_sha": "2c22d3edeaadd37f7bd6827e244f832fac757324",
+      "role": "balanced_profit_hit_loss_constraints"
+    },
+    {
+      "path": ".github/scripts/jra-balanced-optimizer-v311.mjs",
+      "git_blob_sha": "ac9e0f223176460dea5e7afff0844d068faa1a27",
+      "role": "bounded_risk_neighbourhood_optimiser"
+    },
+    {
+      "path": ".github/scripts/jra-prestart-pipeline-v311.mjs",
+      "git_blob_sha": "09f82e86fdf935549294fa9a9c7c3bfdddd335e5",
+      "role": "prestart_joint_outcome_and_prereace_proof_pipeline"
+    },
+    {
+      "path": ".github/scripts/validate-jra-portfolio-v311.mjs",
+      "git_blob_sha": "458f4c9148ba93b7f3419951a0c2fb13c4e99cb4",
+      "role": "deterministic_risk_portfolio_verifier"
+    },
+    {
+      "path": ".github/scripts/jra-render-live-v311.py",
+      "git_blob_sha": "7f958bbb627cd65495d46d9bbf6fd1c66dc47caf",
+      "role": "approved_css_three_meaningful_tail_pages"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-content-v311.py",
+      "git_blob_sha": "16e57872e594341c7b3f7fdf9b161164775624c5",
+      "role": "empty_tail_and_excluded_bet_pdf_guard"
+    },
+    {
+      "path": ".github/scripts/test-jra-balanced-v311.mjs",
+      "git_blob_sha": "0ce495176de40c0565c994a1b5b285a35c956e0a",
+      "role": "synthetic_multi_ticket_hedge_regressions"
+    },
+    {
+      "path": ".github/scripts/test-jra-prestart-pipeline-v311.mjs",
+      "git_blob_sha": "55e6d983b8c3aacad5cc11caa451e9791ed8b3cb",
+      "role": "prerace_freeze_and_price_provenance_regressions"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.11.txt",
+      "git_blob_sha": "54c205f9736ccfeb4252102a3f98f55cb970c246",
+      "role": "v311_purchase_only_prompt"
+    },
+    {
+      "path": ".github/scripts/jra-publish-live-v311.py",
+      "git_blob_sha": "4296b9506a54a3fa43cffa498d63ed7301fbc8f1",
+      "role": "dynamic_pagecount_public_registry"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-layout.py",
+      "git_blob_sha": "ce07e779e652e465d35a3bbc9d5941355c6c5fa6",
+      "role": "backward_compatible_dynamic_tail_count_with_colored_grade_audit"
+    },
+    {
+      "path": ".github/scripts/test-jra-pdf-dynamic-v311.py",
+      "git_blob_sha": "fcdb3086ba15d6fba6800ffd6c12947013309c9b",
+      "role": "synthetic_unlimited_page_pdf_integrity_stress"
+    },
+    {
+      "path": ".github/scripts/validate-jra-balanced-prompt-v311.mjs",
+      "git_blob_sha": "0e438bd9912eec522516f5b224bec115e54053a8",
+      "role": "append_only_manifest_gate"
+    },
+    {
+      "path": ".github/workflows/jra-prestart-pipeline-v311.yml",
+      "git_blob_sha": "89d34dea09b4f1542179b4343848e5ad93a52d16",
+      "role": "post_commit_v311_dynamic_prestart_publish_workflow"
+    },
+    {
+      "path": ".github/workflows/validate-jra-balanced-v311.yml",
+      "git_blob_sha": "aef1675b63c1a41b0cdfdad91a45e51b336b1488",
+      "role": "full_positive_negative_dynamic_pdf_ci"
+    },
+    {
+      "path": ".github/scripts/test-jra-portfolio-v311.mjs",
+      "git_blob_sha": "d0e4b7a3f822cf228233f95e910dd1467c5002b4",
+      "role": "production_workflow_existing_v310_v311_regression_entrypoint"
+    },
+    {
+      "path": ".github/scripts/validate-jra-portfolio-prompt-v311.mjs",
+      "git_blob_sha": "aa51ec53178dbb476ae6c00924cabc4a6bdfc00e",
+      "role": "production_workflow_formal_v311_manifest_guard_entrypoint"
+    },
+    {
+      "path": ".github/scripts/validate-jra-v311-prepublish-flow.mjs",
+      "git_blob_sha": "7904eb7404e444ef16970e3f68051ed28ffed8f1",
+      "role": "prevent_missing_script_and_early_publication"
+    },
+    {
+      "path": ".github/workflows/validate-jra-prepublish-v311.yml",
+      "git_blob_sha": "b3a78b7525a88bf99f4df251c85d70f9f5e192bd",
+      "role": "regression_guard_for_actual_prestart_pipeline"
+    },
+    {
+      "path": ".github/scripts/jra-purchase-audit-v312.mjs",
+      "git_blob_sha": "b782b66f2115be30d60a3506ff4735760d5dd42e",
+      "role": "jra-purchase-audit-v312.mjs"
+    },
+    {
+      "path": ".github/scripts/jra-prestart-pipeline-v312.mjs",
+      "git_blob_sha": "c6b43a3867aff1f877772c56057e8eedc3e848e0",
+      "role": "jra-prestart-pipeline-v312.mjs"
+    },
+    {
+      "path": ".github/scripts/validate-jra-portfolio-v312.mjs",
+      "git_blob_sha": "7b485b6e31bbdf3c7f41d33ecf845282230831c9",
+      "role": "validate-jra-portfolio-v312.mjs"
+    },
+    {
+      "path": ".github/scripts/jra-render-live-v312.py",
+      "git_blob_sha": "6f0632dd058a884841cf8fa8b978e72aeb2eae8c",
+      "role": "jra-render-live-v312.py"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-content-v312.py",
+      "git_blob_sha": "b29e5c73559a6b5278bafc3fdd0c31588afd6f26",
+      "role": "validate-jra-pdf-content-v312.py"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-layout-v312.py",
+      "git_blob_sha": "42852bcbb6e6bbda35c9e6a964680328372fef74",
+      "role": "validate-jra-pdf-layout-v312.py"
+    },
+    {
+      "path": ".github/scripts/jra-publish-live-v312.py",
+      "git_blob_sha": "7b2e7438514b1a43e076a79e7cbc0b0df8ee6a39",
+      "role": "jra-publish-live-v312.py"
+    },
+    {
+      "path": ".github/scripts/jra-odds-recovery-v312.py",
+      "git_blob_sha": "f3d0ead57d01a4df64d21bf085649374dac71e34",
+      "role": "jra-odds-recovery-v312.py"
+    },
+    {
+      "path": ".github/scripts/test-jra-purchase-audit-v312.mjs",
+      "git_blob_sha": "e7254bddd752004a41cc6758703d90f26c654484",
+      "role": "test-jra-purchase-audit-v312.mjs"
+    },
+    {
+      "path": ".github/scripts/test-jra-v312-pdf.py",
+      "git_blob_sha": "ea2e4da143d3eef79c62c6cf1ede62ac3f104b78",
+      "role": "test-jra-v312-pdf.py"
+    },
+    {
+      "path": ".github/scripts/test-jra-odds-recovery-v312.py",
+      "git_blob_sha": "cc29c5ca51d73870f3d99213a0d2295af35407b8",
+      "role": "test-jra-odds-recovery-v312.py"
+    },
+    {
+      "path": ".github/scripts/test-jra-prestart-pipeline-v312.mjs",
+      "git_blob_sha": "7c0c74aa2988f1f460f104f0eb603995e980ea95",
+      "role": "test-jra-prestart-pipeline-v312.mjs"
+    },
+    {
+      "path": ".github/workflows/validate-jra-v312.yml",
+      "git_blob_sha": "ff57b10c4fba797ec8b38556620db5be10199853",
+      "role": "validate-jra-v312.yml"
+    },
+    {
+      "path": ".github/workflows/jra-prestart-pipeline-v312.yml",
+      "git_blob_sha": "1f7e94ec4d8836cb2db085a880d8fb68e4f95c67",
+      "role": "jra-prestart-pipeline-v312.yml"
+    },
+    {
+      "path": ".github/workflows/jra-v312-live-quote-smoke-20261011.yml",
+      "git_blob_sha": "754fb7f46203c142fedeeea7fc7c5d95932aa692",
+      "role": "jra-v312-live-quote-smoke-20261011.yml"
+    },
+    {
+      "path": "docs/data/jra_v312_purchase_coverage_policy.json",
+      "git_blob_sha": "62047dd2b5f4ea199a04544adced3704a7df2987",
+      "role": "jra_v312_purchase_coverage_policy.json"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.12.txt",
+      "git_blob_sha": "56d6b7247434224d382f11c0f1f0856cab1160bf",
+      "role": "競馬予想_完全版プロンプト_v3.12.txt"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prompt-v312.mjs",
+      "git_blob_sha": "fe5202cd33a520dbd95a29a20f3f4d4dfed6a7a3",
+      "role": "v312_formal_validation_or_full_real_market_e2e"
+    },
+    {
+      "path": ".github/workflows/jra-v312-shadow-e2e-20261011.yml",
+      "git_blob_sha": "acf9821a0c1d9a97154fdb309181acac1f7840e2",
+      "role": "v312_formal_validation_or_full_real_market_e2e"
+    },
+    {
+      "path": ".github/scripts/validate-jra-ci-forward-v312.mjs",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "8c1fe9cbd078d2616b0fb1dd692a03ba5e153fba"
+    },
+    {
+      "path": ".github/scripts/validate-bet-type-coverage-v312.mjs",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "5c70a51921ed333104f0a2fa35733c65b5ae3441"
+    },
+    {
+      "path": "docs/data/jra_ci_supersession_v312.json",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "2347314a47f75e051f3000c243238d3119d36675"
+    },
+    {
+      "path": "e2e_validation/validate_manifests.py",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "9939d10a7303af778f580602c750e90edc16915e"
+    },
+    {
+      "path": ".github/workflows/e2e-validation.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "072a4e8e8965954ba3ad259694326a7739ec3398"
+    },
+    {
+      "path": ".github/workflows/validate-jra-portfolio-v310.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "4637085fe87c2813868d8118bb1334133a331ee0"
+    },
+    {
+      "path": ".github/workflows/validate-jra-strategy-v39.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "a3234651aa1fb7bbeca94ec5360dedc37baf33c7"
+    },
+    {
+      "path": ".github/workflows/validate-jra-strategy-v38.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "59370e68f96aaf22ed1322cbccecb76e1d6fd88a"
+    },
+    {
+      "path": ".github/workflows/validate-jra-reader-v37.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "0be1f657b4fa8e710aca446d8537785d3b1d6c86"
+    },
+    {
+      "path": ".github/workflows/validate-jra-completion-addendum.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "0ae549e0ebbf829cbd5515dba086e5dc606511ee"
+    },
+    {
+      "path": ".github/scripts/validate-jra-archived-compact-v312.mjs",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "668adea090c2cf85313128991cc7a9ae29b4b034"
+    },
+    {
+      "path": "e2e_validation/validate_experience_history_v312.py",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "a53d4e602ed70e697530e8970bb35efeeccaa80a"
+    },
+    {
+      "path": ".github/workflows/validate-v34-purchase-gate.yml",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "04d027943cbc5a242f2c4cdebe2bc0a9c0adc501"
+    },
+    {
+      "path": ".github/workflows/validate-v35-multi-candidate.yml",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "3346ee4d7cf7214ff5d3e4ebe9fa457b3ef2aed6"
+    },
+    {
+      "path": ".github/workflows/validate-jra-one-shot-v36.yml",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "25b0882c1bb387a7478026d4f5f6426bad10f42a"
+    },
+    {
+      "path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.6-20261010-prestart.json",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "05f803f17f9d07d03b7e8e9498ccfa345703874b"
+    },
+    {
+      "path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.6-20261010-prestart.json",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "1827c6244e3b5194e8f6c1fec7cae2b8b6082fca"
+    },
+    {
+      "path": "e2e_validation/cases/2026-10-10-mimuro-stakes/case.json",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "f833d33b480e1f845d80a0160e60fb8ad194788a"
+    },
+    {
+      "path": ".github/workflows/jra-prerace-rerun-v312.yml",
+      "git_blob_sha": "abc138b4f8d709a5df520d6f01ce69bb863c96f6",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": ".github/scripts/jra-promote-prerace-v312.py",
+      "git_blob_sha": "dfe21d4aefd03dcc4f03352061fc44a87519744d",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": "docs/data/jra_prerace_overwrite_policy_v312.json",
+      "git_blob_sha": "18a18fdb3ad0c1975df4804d91cdb66e20903b59",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prerace-v312.mjs",
+      "git_blob_sha": "40c741dea0d2b87a1dfb0e9deaf1691f0dc963a9",
+      "role": "v312_prepost_revision_or_forward_release_gate"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.13.txt",
+      "git_blob_sha": "d5db6de95483088a68c6c81277ddb64da6f02a1c",
+      "role": "v313_formal_prompt"
+    },
+    {
+      "path": "docs/data/jra_v313_historical_adapter_v1.json",
+      "git_blob_sha": "485329ae93c79fa2ab0920819320c629a1b3532a",
+      "role": "v313_policy"
+    },
+    {
+      "path": "docs/data/jra_fresh_odds_policy_v313_exec.json",
+      "git_blob_sha": "f2047ff79794ba3fbdef05d4067850e0a67ef3f1",
+      "role": "v313_policy"
+    },
+    {
+      "path": "docs/data/jra_prerace_overwrite_policy_v313.json",
+      "git_blob_sha": "ddde521e4713beed8dffb2eabf87472aa6570943",
+      "role": "v313_policy"
+    },
+    {
+      "path": ".github/scripts/jra-prestart-pipeline-v313.mjs",
+      "git_blob_sha": "c0a65bf008843cb5c8f8de81cc1e9ed10c6f7c8c",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/validate-jra-portfolio-v313.mjs",
+      "git_blob_sha": "6588a695289d2e3bf67ae858bfe2f2a96b31047a",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/jra-render-live-v313.py",
+      "git_blob_sha": "a6e337847ad01c877ab220804f22e1754015c684",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-content-v313.py",
+      "git_blob_sha": "2cfc3fdba039a1a9ce7dc43384f0a402a5367825",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/jra-odds-full-refresh-v313-exec.py",
+      "git_blob_sha": "ab8240eb7bd28efe892045847731b88903cf4444",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/jra-check-fresh-quotes-v313-exec.py",
+      "git_blob_sha": "b4ae477de0ded32cf06e9d5ac628b112cd74a012",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/jra-publish-live-v313.py",
+      "git_blob_sha": "362687fa8133a6b15e849bf2cde348e1e4ead828",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/jra-promote-prerace-v313.py",
+      "git_blob_sha": "93c5075653eb262eff995837bb08f9fe9a96bd4c",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/test-jra-win-stake-real-replay-v313.mjs",
+      "git_blob_sha": "4b19cc37c849613ba56070077f8d438fd17bcc7e",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/test-jra-v313-formal-real.mjs",
+      "git_blob_sha": "791d28610f9cbc3bde0084e0c93c3de2568737b3",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prompt-v313.mjs",
+      "git_blob_sha": "cffe4389546d094c2435cef7b93fe6e0c0f7efd4",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/jra-win-recovery-stake-shadow-v1.mjs",
+      "git_blob_sha": "15ac34f11b5fc0e19a7552a74ac439a325eb78d0",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs",
+      "git_blob_sha": "991a26e01b654385d9ab7efc6c90b65eb89691c4",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/workflows/jra-prestart-pipeline-fresh-v313.yml",
+      "git_blob_sha": "2359020f0f29e406d2a35bed3bc6f0bd07d43f68",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/workflows/jra-prerace-rerun-fresh-v313.yml",
+      "git_blob_sha": "7fded7f89f835347908440916c21095f5c583a7f",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/workflows/validate-jra-v313-formal.yml",
+      "git_blob_sha": "db2d5505d76edcec6cf8785fc2a0855fb0faccc1",
+      "role": "v313_script_workflow_or_test"
+    },
+    {
+      "path": ".github/workflows/validate-jra-win-stake-real-v313.yml",
+      "git_blob_sha": "04bb7f26ac31834ab7c76b1c41ca531461cecb25",
+      "role": "v313_script_workflow_or_test"
+    }
+  ]
+}
