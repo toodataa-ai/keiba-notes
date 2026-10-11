@@ -227,7 +227,7 @@ export function assemble(input,freezeAt,proofCommit=null){
  };
  // Do not classify a completely unobserved market as no-value; it is a blocker.
  must(rowsCount>0,'BLOCKER: no independently verified exact odds for any ticket type');
- const portfolio=optimizePurchasePortfolio({budget_yen:6000,strategies,
+ const portfolio=optimizeBalancedPortfolio({budget_yen:6000,strategies,
   outcome_distributions:dist,frame_map:frame,race_context:race,freeze_at:freezeAt});
  const pid='P-'+input.race_id+'-v311';
  const selected=portfolio.selected_lines.map((line,i)=>({...line,id:'B'+String(i+1).padStart(2,'0')}));
