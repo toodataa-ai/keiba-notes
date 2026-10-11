@@ -13,4 +13,5 @@ list.textContent='';const h=el('p','現在の正式画面：'+d.current_version)
 for(const r of [...d.versions].reverse()){const b=el('section','');b.className='release';let head=el('div',r.version+(r.version===d.current_version?'　現在公開中':'　保管済み'));head.style.fontWeight='700';b.append(head,el('div',r.description||''));b.append(el('p','タグ：'+r.tag));list.append(b)}
 if(d.events?.length){const h=el('h2','公開・復元の操作履歴');list.append(h);for(const x of [...d.events].reverse().slice(0,30)){const p=el('p',x.at+' ／ '+x.action+' ／ '+x.version);p.className='sub';list.append(p)}}
 }).catch(()=>{list.textContent='';list.append(el('div','現在の正式画面は v1.00。初回の承認済みリリース時に公開台帳が作成されます。'))});
-</script></body></html>
+</script>  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+</body></html>
