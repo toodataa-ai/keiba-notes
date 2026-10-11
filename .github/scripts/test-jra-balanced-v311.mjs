@@ -17,7 +17,7 @@ function priced(id,odds){
  return {type:'単勝',selection:[id],stake_yen:100,market_odds:odds,quote_verified:true,
   market_selection_id:key,source_url:'https://example.org/synthetic',observed_at:time};
 }
-const strategies=[1,2,3,4].map((id,i)=>({strategy_id:'S'+id,lines:[priced(id,[5,4.6,3.88,1][i])]}));
+const strategies=[1,2,3,4].map((id,i)=>({strategy_id:'S'+id,lines:[priced(id,[5,4.6,3.88,1.2][i])]}));
 const args={...settings,strategies};
 const exact=optimizePurchasePortfolio(args);
 const balanced=optimizeBalancedPortfolio(args);
