@@ -46,6 +46,13 @@ with tempfile.TemporaryDirectory(prefix='jra-v312-pdf-') as d:
  proc=subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-content-v312.py',
                       '--html',str(html),'--pdf',str(pdf),'--prediction',str(prediction)],
                      cwd=ROOT,text=True,capture_output=True)
+ if proc.returncode:
+  import fitz
+  with fitz.open(pdf) as doc:
+   for i,page in enumerate(doc):
+    t=page.get_text()
+    if len(''.join(t.split()))<260:
+     print('DEBUG SPARSE PAGE',i+1,'CHARS',len(''.join(t.split())),'CONTENT',repr(t[:800]),file=sys.stderr)
  assert proc.returncode==0,proc.stdout+'\n'+proc.stderr
  tampered=p/'tampered.html';tampered.write_text(source.replace('<td>T040</td>','<td>欠落</td>'),encoding='utf-8')
  fail=subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-content-v312.py',
