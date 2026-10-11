@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {TYPES,MODES,expandStrategy,ticketKey} from './jra-strategy-engine-v39.mjs';
 import {fullFieldOutcomes,assemble} from './jra-prestart-pipeline-v311.mjs';
-import {validateV310} from './validate-jra-portfolio-v311.mjs';
+import {validateV311} from './validate-jra-portfolio-v311.mjs';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const fixed='2030-10-11T08:00:00+09:00',planAt='2030-10-11T08:01:00+09:00';
 const quoteAt='2030-10-11T08:05:00+09:00',freeze='2030-10-11T08:10:00+09:00';
@@ -72,7 +72,7 @@ for(const r of raw.step1.runners){
  assert(Math.abs(p-r.win_probability)<1e-9);
 }
 const sealed=assemble(raw,freeze,'a'.repeat(40));
-assert.deepEqual(validateV310(sealed),[]);
+assert.deepEqual(validateV311(sealed),[]);
 assert.equal(sealed.purchase_budget_yen,6000);
 assert(sealed.final_bets.length>1,'multiple strategies may be selected');
 assert(sealed.final_bets.length*100===sealed.total_stake_yen);
@@ -86,7 +86,7 @@ console.log('PASS 9-runner three-scenario complete universe; 8-type combinations
 let p=deep(raw);p.market_quotes=p.market_quotes.filter(x=>x.type!=='三連単');const partial=assemble(p,freeze,'a'.repeat(40));
 assert.equal(partial.strategy_coverage_audit.length,8);
 assert(partial.market_quote_audit.missing_individual_lines>0);
-assert.deepEqual(validateV310(partial),[]);
+assert.deepEqual(validateV311(partial),[]);
 console.log('PASS partial market quotes do not stop independent eligible ticket processing');
 p=deep(raw);p.market_quotes=[];check('no live price is not a value pass',p,'no independently verified exact odds');
 p=deep(raw);p.market_quotes[0].market_odds=null;check('no invented odds',p,'capture lacks exact selection');
