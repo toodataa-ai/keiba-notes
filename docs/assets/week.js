@@ -12,6 +12,29 @@ function card(r){
   if(r.pdf)links.push(`<a class="btn secondary" href="${encodeURI(r.pdf)}">PDF</a>`);
   return `<article class="race-card"><div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race||'')}</h3></div><span class="status">AI予想公開済み</span></div>${marks}${links.length?`<div class="actions">${links.join('')}</div>`:''}</article>`;
 }
+// Display the newest audited v3.11 report, while preserving historical prereace proof.
+// This overlay only changes visitor-facing links: settlement/analysis history is untouched.
+function displayNewestPredictions(rows, parallel){
+  if(parallel?.schema_version!==1 || parallel.original_v310_immutable!==true || !Array.isArray(parallel.races)) return rows;
+  const originalById=new Map(rows.map(r=>[r.id,r]));
+  const overrides=new Map();
+  for(const x of parallel.races){
+    if(!x || x.prompt_version!=='v3.11' || typeof x.race_id!=='string') continue;
+    const previous=originalById.get(x.race_id);
+    if(!previous || previous.scope!=='jra-main' || previous.status!=='predicted' ||
+       previous.prompt_version!=='v3.10' || previous.date!==x.date) continue;
+    if(x.report!==`reports/${x.race_id}-v311.html` || x.pdf!==`pdfs/${x.race_id}-v311.pdf`) continue;
+    if(!/^[a-f0-9]{40}$/.test(x.proof_commit||'') ||
+       !Number.isInteger(x.pdf_pages) || x.pdf_pages<(previous.field_size||0)+8) continue;
+    if(!Array.isArray(x.final_bets) || x.final_bets.some(b=>!b.id || !b.type || !Array.isArray(b.selection))) continue;
+    overrides.set(x.race_id,{...previous,prompt_version:'v3.11',
+      report:x.report,pdf:x.pdf,full_report_pages:x.pdf_pages,
+      pdf_mode:'full',proof_commit:x.proof_commit,
+      purchase_decision:x.decision,total_stake_yen:x.total_stake_yen,
+      final_bets:x.final_bets});
+  }
+  return rows.map(r=>overrides.get(r.id)||r);
+}
 function estimateHtml(day,publishedCount,policy){
   const total=(day.races||[]).length;
   if(!total||publishedCount>=total)return '';
@@ -56,15 +79,19 @@ function selectNextBlock(days,rows){
   const period=document.getElementById('weekPeriod');
   const scheduleTitle=document.getElementById('scheduleTitle');
   try{
-    const [raceRes,scheduleRes,policyRes]=await Promise.all([
+    const [raceRes,scheduleRes,policyRes,parallelRes]=await Promise.all([
       fetch('data/races.json',{cache:'no-store'}),
       fetch('data/upcoming_schedule.json',{cache:'no-store'}),
-      fetch('data/prediction_publication_policy.json',{cache:'no-store'})
+      fetch('data/prediction_publication_policy.json',{cache:'no-store'}),
+      fetch('data/jra-v311-parallel-2026-10-11.json',{cache:'no-store'}).catch(()=>null)
     ]);
     const db=await raceRes.json();
     const schedule=scheduleRes.ok?await scheduleRes.json():{days:[]};
     const policy=policyRes.ok?await policyRes.json():{};
-    const allRows=(db.races||[]).filter(r=>r.scope==='jra-main'&&!(r.source==='legacy-performance-list'&&!hasReview(r)));
+    const parallel=parallelRes?.ok?await parallelRes.json():null;
+    const allRows=displayNewestPredictions(
+      (db.races||[]).filter(r=>r.scope==='jra-main'&&!(r.source==='legacy-performance-list'&&!hasReview(r))),
+      parallel);
     const days=selectNextBlock(schedule.days||[],allRows);
     if(scheduleTitle)scheduleTitle.textContent='次回の対象レース';
     if(days.length){
