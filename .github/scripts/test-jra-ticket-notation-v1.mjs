@@ -24,8 +24,8 @@ const cases=[
  [{type:'三連単',method:'two_key_fixed',definition:{axes:[2,9],positions:[1,2],partners:[1,4]}},'2→9→（1・4）'],
  [{type:'三連単',method:'two_key_fixed',definition:{axes:[2,9],positions:[1,3],partners:[1,4]}},'2→（1・4）→9'],
  [{type:'三連単',method:'one_key_fixed',definition:{key:2,position:1,partners:[1,9,10]}},'2→（1・9・10）→（1・9・10）（相手は異なる2頭）'],
- [{type:'三連単',method:'one_key_multi',definition:{key:2,partners:[1,9,10]}},'2＋（1・9・10）から2頭（3連単全着順マルチ）'],
- [{type:'三連単',method:'two_key_multi',definition:{axes:[9,2],partners:[1,4]}},'2・9＋（1・4）から1頭（3連単全着順マルチ）'],
+ [{type:'三連単',method:'one_key_multi',definition:{key:2,partners:[1,9,10]}},'軸：2 ／ 相手：1・9・10（三連単マルチ）'],
+ [{type:'三連単',method:'two_key_multi',definition:{axes:[9,2],partners:[1,4]}},'軸：2・9 ／ 相手：1・4（三連単マルチ）'],
  [{type:'三連単',method:'formation',definition:{slots:[[2,4],[9],[1,10]]}},'（2・4）→（9）→（1・10）'],
  [{type:'三連複',method:'formation',definition:{slots:[[2],[9,4],[1,10]]}},'（2）－（4・9）－（1・10）'],
  [{type:'馬単',method:'formation',definition:{slots:[[2],[9,4]]}},'（2）→（4・9）'],
@@ -54,7 +54,7 @@ for(const filename of fpaths){
   frame_map:d.frame_map,race_context:d.race_context,freeze_at:d.final_bets_fixed_at});
  assert.deepEqual(res.regular_commands.map(x=>x.jra_input),
   res.regular_commands.map(x=>f(x)),'display drift from canonical notation');
- if(res.ana_command.method!=='pass')assert.equal(res.ana_command.jra_input,f(res.ana_command));
+ for(const side of [res.medium_command,res.large_command])if(side.method!=='pass')assert.equal(side.jra_input,f(side));
  assert.equal(Buffer.compare(original,fs.readFileSync(filename)),0,'sealed formal original changed');
  assert.ok(res.regular_commands.length<=3,'3 row UI cap');
  console.log('PASS_NOTATION_REAL_SEALED',d.race_id,JSON.stringify(res.regular_commands.map(x=>[x.type,x.jra_input])));
