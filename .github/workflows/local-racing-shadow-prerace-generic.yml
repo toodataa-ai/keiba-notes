@@ -1,0 +1,93 @@
+name: Local Racing Shadow PRE-RACE All NAR Venues
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'local_racing_shadow_v1/prerace_request.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: local-racing-shadow-publish
+  cancel-in-progress: false
+jobs:
+  full-day-prerace:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify current-JST-date and research-only contract
+        id: request
+        shell: bash
+        run: |
+          python - <<'PY'
+          import datetime, json, os
+          r=json.load(open('local_racing_shadow_v1/prerace_request.json',encoding='utf-8'))
+          from datetime import timezone,timedelta
+          today=datetime.datetime.now(timezone(timedelta(hours=9))).date().isoformat()
+          assert r.get('date')==today, f'Only same-day PRE-RACE allowed: {r.get("date")} != {today}'
+          assert r.get('scope')=='PRE-RACE'
+          assert r.get('production_effect') is False
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('date='+today+'\n')
+          PY
+      - name: Install isolated official parser dependencies
+        run: python -m pip install requests beautifulsoup4
+      - name: Capture all official active venue race programs and safe pre-start snapshots
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
+        run: python local_racing_shadow_v1/prerace_all_venues.py --date "$RACE_DATE"
+      - name: Check GitHub cutoff safety and restrict writes to local Shadow
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
+        run: |
+          python local_racing_shadow_v1/prerace_all_venues.py --date "$RACE_DATE" --verify-commit-window
+          git diff --exit-code -- local_racing_shadow_v1/config.json local_racing_shadow_v1/shadow_prompt_v0_1.txt docs/data/races.json
+      - name: Commit pre-start predictions and factual coverage diagnostics
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add local_racing_shadow_v1/predictions local_racing_shadow_v1/diagnostics
+          git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert all(x.startswith(("local_racing_shadow_v1/predictions/","local_racing_shadow_v1/diagnostics/")) for x in p), p'
+          if ! git diff --cached --quiet; then
+            git commit -m "Freeze official local PRE-RACE Shadow snapshots and full-day coverage"
+            git push
+          fi
+      - name: Verify committed proof and publish only local Shadow public artifacts
+        run: python local_racing_shadow_v1/publish_audit.py
+      - name: Commit audited public mirrors and coverage manifest
+        shell: bash
+        run: |
+          git add docs/data/local-racing-shadow docs/data/local_racing_shadow_public.json docs/data/local_racing_shadow_status.json
+          git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert all(x.startswith(("docs/data/local-racing-shadow/","docs/data/local_racing_shadow_public.json","docs/data/local_racing_shadow_status.json")) for x in p), p'
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish audited local NAR Shadow population and coverage"
+            git push
+          fi
+      - name: Confirm committed manifest includes truthful coverage counts
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
+        run: |
+          python - <<'PY'
+          import json, os
+          d=os.environ["RACE_DATE"]
+          r=json.load(open("local_racing_shadow_v1/diagnostics/"+d+"-all-venues-prerace-run.json"))
+          m=json.load(open("docs/data/local_racing_shadow_public.json"))
+          rows=[x for x in m.get("daily_coverage",[]) if x["date"]==d]
+          assert len(rows)==1, rows
+          assert rows[0]["official_total_races"]==r["official_total_races"]
+          assert rows[0]["created_count"]==r["created_count"]
+          assert rows[0]["gap_count"]==r["gap_count"]
+          ids={x["race_id"] for x in m["races"]}
+          assert all(x in ids for x in r["created_race_ids"])
+          assert r["official_total_races"] == r["created_count"] + r["gap_count"], r
+          assert not os.popen("git status --porcelain").read().strip()
+          print("AUDITED: "+str(rows[0]))
+          PY
