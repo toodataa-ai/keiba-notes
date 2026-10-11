@@ -60,11 +60,11 @@ export function formatPurchaseCommand(c){
  }
  if(method==='one_key_wheel'){
    requireValue(type==='三連複'&&isHorse(d.key),'trio one-axis wheel');
-   return d.key+'－'+list(d.partners)+'から2頭';
+   return '軸：'+d.key+' ／ 相手：'+dots(d.partners);
  }
  if(method==='two_key_wheel'){
    requireValue(type==='三連複'&&d.axes?.length===2,'trio two-axis wheel');
-   return sort(validate(d.axes)).join('－')+'－'+list(d.partners)+'から1頭';
+   return '軸：'+dots(d.axes)+' ／ 相手：'+dots(d.partners);
  }
  if(method==='two_key_fixed'){
    requireValue(type==='三連単'&&d.axes?.length===2&&d.positions?.length===2,'trifecta two-key fixed');
