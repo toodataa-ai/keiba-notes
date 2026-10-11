@@ -17,6 +17,19 @@ assert.equal(now.prompt_version,'v3.12');
 assert.deepEqual(now.components.slice(0,old.components.length),old.components,
   'historical v3.11 SHA-pinned components must remain byte-identical');
 assert(now.components.length>=old.components.length+16,'v3.12 components incomplete');
+// Narrow v3.13 supersession: old SHA-pinned historical source remains available
+// at the exact approved original commit. Only these two version-acceptance adapters
+// may differ in the working tree; every model, historical bet, and original CI
+// contract continues to be verified against v3.12's immutable manifest.
+const v313Sup=latest.version==='v3.13'?json('docs/data/jra_v313_historical_adapter_v1.json'):null;
+const v313Replacements=new Map((v313Sup?.superseded_components||[]).map(x=>[x.path,x]));
+if(v313Sup){
+ assert.deepEqual([...v313Replacements.keys()].sort(),[
+  '.github/scripts/validate-jra-ci-forward-v312.mjs',
+  '.github/scripts/validate-jra-prompt-v312.mjs'
+ ],'v3.13 exception exceeds legacy pointer acceptance adapters');
+ assert(/^[a-f0-9]{40}$/.test(v313Sup.historical_anchor_commit));
+}
 const unique=new Set();
 for(const {path,git_blob_sha} of now.components){
  assert(!unique.has(path),'duplicate SHA pin for '+path);
@@ -48,6 +61,19 @@ for(const {path,git_blob_sha} of now.components){
      'blob','original approved v3.11 workflow Git blob missing');
    assert(fs.readFileSync(path,'utf8').includes(ciReplacement.required_compatibility_marker),
      'compatibility check is missing from authorized successor CI workflow');
+ } else if(v313Replacements.has(path)){
+   const exception=v313Replacements.get(path);
+   assert.equal(exception.original_blob_sha,git_blob_sha,'protected SHA pin cannot be replaced '+path);
+   assert.equal(actual,exception.current_blob_sha,'unexpected version adapter source '+path);
+   const ancestor=v313Sup.historical_anchor_commit;
+   try{
+     execFileSync('git',['cat-file','-e',ancestor+':'+path],{stdio:'ignore'});
+   }catch{
+     execFileSync('git',['fetch','--no-tags','--depth=1','origin',ancestor],
+       {stdio:['ignore','ignore','pipe']});
+   }
+   assert.equal(execFileSync('git',['rev-parse',ancestor+':'+path],{encoding:'utf8'}).trim(),
+    git_blob_sha,'the approved prior v3.12 validator must remain historically available');
  } else assert.equal(actual,git_blob_sha,'Git SHA mismatch '+path);
 }
 assert(hist.entries.some(x=>x.version==='v3.12'&&x.previous_version==='v3.11'&&x.path==='競馬予想_完全版プロンプト_v3.12.txt'),'v3.12 additive history missing');
@@ -56,7 +82,7 @@ assert.equal(policy.purchase_budget_yen,6000);
 assert.equal(policy.source_provenance.strict_quote_coverage,true);
 assert.equal(policy.comparison.joint_outcome_union,true);
 assert.equal(policy.report.max_pdf_pages,null);
-assert(['v3.11','v3.12'].includes(latest.version),'unexpected canonical pointer');
+assert(['v3.11','v3.12','v3.13'].includes(latest.version),'unexpected canonical pointer');
 if(latest.version==='v3.12')
  assert.equal(latest.path,'競馬予想_完全版プロンプト_v3.12.txt');
 const prompt=fs.readFileSync('競馬予想_完全版プロンプト_v3.12.txt','utf8');
