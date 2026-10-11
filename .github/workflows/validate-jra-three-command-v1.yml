@@ -1,0 +1,37 @@
+name: Validate max-three real JRA purchase commands (shadow-only)
+on:
+  push:
+    branches:
+      - feature/jra-three-purchase-commands-v1
+    paths:
+      - '.github/scripts/jra-three-command-shadow-v1.mjs'
+      - '.github/scripts/test-jra-three-command-v1.mjs'
+      - '.github/workflows/validate-jra-three-command-v1.yml'
+      - 'docs/data/jra-three-command-policy-v1.json'
+  pull_request:
+    paths:
+      - '.github/scripts/jra-three-command-shadow-v1.mjs'
+      - '.github/scripts/test-jra-three-command-v1.mjs'
+      - '.github/workflows/validate-jra-three-command-v1.yml'
+      - 'docs/data/jra-three-command-policy-v1.json'
+permissions:
+  contents: read
+jobs:
+  three-command-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile and independently replay sealed actual 2026-10-12 races
+        run: |
+          node --check .github/scripts/jra-three-command-shadow-v1.mjs
+          node --check .github/scripts/test-jra-three-command-v1.mjs
+          node .github/scripts/test-jra-three-command-v1.mjs
+      - name: Verify historical predictions have not changed in the PR
+        run: |
+          git diff --name-only HEAD^ HEAD -- e2e_validation/predictions/ docs/reports/ docs/pdfs/ docs/data/races.json | tee /tmp/mutated
+          test ! -s /tmp/mutated
+
