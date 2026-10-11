@@ -18,8 +18,11 @@ assert.deepEqual(now.components.slice(0,old.components.length),old.components,
 assert(now.components.length>=old.components.length+18,'v3.13 manifest missing new formal components');
 const overrides=new Map(allowed.superseded_components.map(x=>[x.path,x]));
 assert.deepEqual([...overrides.keys()].sort(),[
+ '.github/scripts/validate-jra-archived-compact-v312.mjs',
  '.github/scripts/validate-jra-ci-forward-v312.mjs',
- '.github/scripts/validate-jra-prompt-v312.mjs'
+ '.github/scripts/validate-jra-prerace-v312.mjs',
+ '.github/scripts/validate-jra-prompt-v312.mjs',
+ 'e2e_validation/validate_manifests.py'
  ]);
 const seen=new Set();
 for(const {path,git_blob_sha} of now.components){
