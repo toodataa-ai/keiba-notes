@@ -78,7 +78,11 @@ def run(date):
     enabled={k:v for k,v in cfg["venues"].items() if v.get("enabled")}
     if len(enabled)!=15:
         raise ValueError(f"Expected all 15 NAR venues enabled; actual {len(enabled)}")
+    if expected and (set(expected)-set(enabled)):
+        raise ValueError(f"Official active venue contains unconfigured code: {sorted(set(expected)-set(enabled))}")
     for key,venue in enabled.items():
+        if expected and key not in expected:
+            continue  # Officially inactive today; active venues are explicitly enumerated and audited
         code=venue.get("nar_baba_code")
         if not isinstance(code,int):
             raise ValueError(f"Missing verified official baba code for {key}")
