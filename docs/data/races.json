@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-11T12:17:08.761+09:00",
+  "updated_at": "2026-10-11T12:21:10.679+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -734,15 +734,15 @@
       "venue": "東京",
       "race": "アイルランドトロフィー",
       "scope": "jra-main",
-      "prompt_version": "v3.11",
+      "prompt_version": "v3.12",
       "status": "predicted",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 16,
-      "report": "reports/2026-10-11-ireland-trophy-v311.html",
-      "pdf": "pdfs/2026-10-11-ireland-trophy-v311.pdf",
+      "report": "reports/2026-10-11-ireland-trophy-v3.12-rerun38107956218-attempt2-v312.html",
+      "pdf": "pdfs/2026-10-11-ireland-trophy-v3.12-rerun38107956218-attempt2-v312.pdf",
       "pdf_mode": "full",
-      "full_report_pages": 56,
+      "full_report_pages": 53,
       "marks": {
         "win": "16 カムニャック",
         "second": "10 セキトバイースト",
@@ -753,6 +753,8 @@
         "ワイド 10-16",
         "三連単 1-10-16",
         "三連単 1-16-10",
+        "三連単 10-1-16",
+        "三連単 10-16-1",
         "単勝 10",
         "枠連 1-5",
         "枠連 2-5",
@@ -763,7 +765,7 @@
       ],
       "purchase_decision": "buy",
       "purchase_reason_code": "bought",
-      "total_stake_yen": 1100,
+      "total_stake_yen": 1300,
       "final_bets": [
         {
           "id": "B01",
@@ -827,6 +829,34 @@
         },
         {
           "id": "B05",
+          "type": "三連単",
+          "selection": [
+            10,
+            1,
+            16
+          ],
+          "stake_yen": 100,
+          "market_odds": 783.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040411?umaBan=10&position=1",
+          "observed_at": "2026-10-11T03:20:19.077+00:00",
+          "market_selection_id": "三連単:[10,1,16]"
+        },
+        {
+          "id": "B06",
+          "type": "三連単",
+          "selection": [
+            10,
+            16,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 603.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040411?umaBan=10&position=1",
+          "observed_at": "2026-10-11T03:20:19.077+00:00",
+          "market_selection_id": "三連単:[10,16,1]"
+        },
+        {
+          "id": "B07",
           "type": "単勝",
           "selection": [
             10
@@ -838,7 +868,7 @@
           "market_selection_id": "単勝:[10]"
         },
         {
-          "id": "B06",
+          "id": "B08",
           "type": "枠連",
           "selection": [
             1,
@@ -851,7 +881,7 @@
           "market_selection_id": "枠連:[1,5]"
         },
         {
-          "id": "B07",
+          "id": "B09",
           "type": "枠連",
           "selection": [
             2,
@@ -864,7 +894,7 @@
           "market_selection_id": "枠連:[2,5]"
         },
         {
-          "id": "B08",
+          "id": "B10",
           "type": "枠連",
           "selection": [
             3,
@@ -877,7 +907,7 @@
           "market_selection_id": "枠連:[3,8]"
         },
         {
-          "id": "B09",
+          "id": "B11",
           "type": "枠連",
           "selection": [
             5,
@@ -890,7 +920,7 @@
           "market_selection_id": "枠連:[5,6]"
         },
         {
-          "id": "B10",
+          "id": "B12",
           "type": "複勝",
           "selection": [
             10
@@ -905,7 +935,7 @@
           "market_selection_id": "複勝:[10]"
         },
         {
-          "id": "B11",
+          "id": "B13",
           "type": "馬連",
           "selection": [
             10,
@@ -918,10 +948,10 @@
           "market_selection_id": "馬連:[10,15]"
         }
       ],
-      "final_bets_fixed_at": "2026-10-11T01:23:16.814Z",
+      "final_bets_fixed_at": "2026-10-11T03:20:19.653Z",
       "step1_fixed_at": "2026-10-11T09:12:43.462+09:00",
-      "e2e_prediction": "e2e_validation/predictions/2026-10-11-ireland-trophy/v3.11-run38101635486-attempt1.json",
-      "proof_commit": "3b253d7534d65e928514f428ddffb0454e23953f",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38107956218-attempt2.json",
+      "proof_commit": "647c45a5d014f39dc7b4fe6969c964a644e4776a",
       "purchase_budget_yen": 6000,
       "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
     },
