@@ -79,7 +79,7 @@ jobs:
           PY
           RACE_ID=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["race_id"])' "$INPUT")
           [[ "$RACE_ID" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$ ]] || exit 1
-          LABEL="v3.12-rerun${RUN_NUMBER}-attempt${RUN_ATTEMPT}"
+          LABEL="v3.12-rerun${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
           SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
           PREDICTION="e2e_validation/predictions/$RACE_ID/$LABEL.json"
           REPORT="docs/reports/$RACE_ID-$LABEL-v312.html"
@@ -97,8 +97,8 @@ jobs:
       - name: Recover and attest each missing actual priced ticket before STEP2
         run: |
           set -euo pipefail
-          RECOVERED_INPUT="e2e_validation/inputs/v312-recovered/${RACE_ID}-rerun${RUN_NUMBER}-attempt${RUN_ATTEMPT}.json"
-          RECOVERED_EVIDENCE="e2e_validation/quote-evidence/${RACE_ID}/v312-rerun${RUN_NUMBER}-attempt${RUN_ATTEMPT}"
+          RECOVERED_INPUT="e2e_validation/inputs/v312-recovered/${RACE_ID}-rerun${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}.json"
+          RECOVERED_EVIDENCE="e2e_validation/quote-evidence/${RACE_ID}/v312-rerun${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
           python3 .github/scripts/jra-odds-recovery-v312.py --input "$INPUT" --output "$RECOVERED_INPUT" --evidence-dir "$RECOVERED_EVIDENCE"
           echo "RECOVERED_INPUT=$RECOVERED_INPUT" >> "$GITHUB_ENV"
           echo "RECOVERED_EVIDENCE=$RECOVERED_EVIDENCE" >> "$GITHUB_ENV"
