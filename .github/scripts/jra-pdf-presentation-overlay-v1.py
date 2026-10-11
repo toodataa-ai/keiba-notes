@@ -167,6 +167,19 @@ def _valid_box_lines(st, keys):
     )
 
 
+
+PURCHASE_MODES_BY_TYPE = {
+    "単勝": {"multiple_singles"},
+    "複勝": {"multiple_singles"},
+    "枠連": {"box","key_wheel","formation"},
+    "馬連": {"box","key_wheel","formation"},
+    "馬単": {"box","key_wheel_first","key_wheel_second","key_wheel_multi","formation"},
+    "ワイド": {"box","key_wheel","formation"},
+    "三連複": {"box","one_key_wheel","two_key_wheel","formation"},
+    "三連単": {"box","one_key_fixed","two_key_fixed","one_key_multi","two_key_multi","formation"},
+}
+
+
 def purchase_commands(prediction):
     """Prove each on-screen instruction expands to *exactly* the sealed final_bets.
 
@@ -191,7 +204,7 @@ def purchase_commands(prediction):
                 "two_key_multi":1, "formation":2, "multiple_singles":3}
     for st in prediction.get("purchase_strategy_evaluations") or []:
         kind = st.get("strategy_kind")
-        if kind in ignored or kind not in priority or st.get("type") not in TYPE_ORDER:
+        if kind in ignored or kind not in priority or kind not in PURCHASE_MODES_BY_TYPE.get(st.get("type"), set()):
             continue
         lines = st.get("lines") or []
         keys = {bet_key(x) for x in lines}
