@@ -79,14 +79,14 @@ def git_commit_time(repo_root: Path, commit: str) -> datetime:
 
 
 def normalize_formal_v312_for_e2e(prediction: dict) -> dict:
-    """Read-only E2E projection of the SHA-frozen v3.12 formal record.
+    """Read-only E2E projection of SHA-frozen v3.12/v3.13 formal records.
 
     The canonical pre-race JSON is NEVER rewritten. Its step1_ranking is in
     horse-number order (not ability rank), so no synthetic winner rank is made.
     Seal times are conservative lower-bound evidence of completed generation.
     Probability calibration is unavailable; do not invent Brier coverage.
     """
-    if prediction.get("prompt_version") != "v3.12" or prediction.get("stage") != "formal_prestart":
+    if prediction.get("prompt_version") not in ("v3.12", "v3.13") or prediction.get("stage") != "formal_prestart":
         return prediction
     mark_entries = prediction.get("step1_ranking") or []
     mark_codes = {"◎": "win", "○": "second", "▲": "third"}
@@ -120,7 +120,7 @@ def normalize_formal_v312_for_e2e(prediction: dict) -> dict:
                          "selection": b["selection"], "stake_yen": b["stake_yen"]}
                          for b in bets]
     projected["step1_ranking"] = None
-    projected["prompt_manifest"] = "e2e_validation/manifests/v3.12.json"
+    projected["prompt_manifest"] = "e2e_validation/manifests/" + prediction["prompt_version"] + ".json"
     projected["e2e_projection_note"] = (
         "Read-only projection of prestart commit. The manifest is version-resolved; "
         "seal timestamps are not JRA publication times. "
