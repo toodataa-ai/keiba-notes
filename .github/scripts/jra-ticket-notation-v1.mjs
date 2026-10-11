@@ -79,7 +79,7 @@ export function formatPurchaseCommand(c){
  }
  if(method==='two_key_multi'){
    requireValue(type==='三連単'&&d.axes?.length===2,'trifecta two-axis multi');
-   return sort(validate(d.axes)).join('・')+'＋'+list(d.partners)+'から1頭（3連単全着順マルチ）';
+   return '軸：'+dots(d.axes)+' ／ 相手：'+dots(d.partners)+'（三連単マルチ）';
  }
  if(method==='one_key_fixed'){
    requireValue(type==='三連単'&&[1,2,3].includes(d.position)&&isHorse(d.key),'trifecta one-axis fixed');
@@ -89,7 +89,7 @@ export function formatPurchaseCommand(c){
  }
  if(method==='one_key_multi'){
    requireValue(type==='三連単'&&isHorse(d.key),'trifecta one-axis multi');
-   return d.key+'＋'+list(d.partners)+'から2頭（3連単全着順マルチ）';
+   return '軸：'+d.key+' ／ 相手：'+dots(d.partners)+'（三連単マルチ）';
  }
  throw Error('JRA_NOTATION_BLOCKER: unsupported method '+method+' / '+type);
 }
