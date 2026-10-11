@@ -32,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           node -e "const x=require('./docs/data/latest_prompt.json');if(x.version!=='v3.12')throw Error('v3.12 is not canonical yet; staging cannot publish')"
-          node .github/scripts/validate-jra-balanced-prompt-v311.mjs || true
+          node .github/scripts/validate-jra-v312-manifest.mjs
           node .github/scripts/validate-prompt-history.mjs
           node .github/scripts/test-jra-v312.mjs
           node .github/scripts/test-jra-balanced-v311.mjs
