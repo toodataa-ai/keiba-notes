@@ -1,0 +1,53 @@
+name: Validate generic JRA prereace intake v3.14
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-gather-live-v314.py'
+      - '.github/scripts/test-jra-generic-v314.py'
+      - '.github/workflows/jra-generic-one-shot-v314.yml'
+      - '.github/workflows/validate-jra-generic-v314.yml'
+      - 'docs/operations/jra_generic_execution_v314.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure the versioned collector parses, without calling live market sites
+        run: |
+          python3 -m pip install -q requests beautifulsoup4 pyyaml
+          python3 -m py_compile .github/scripts/jra-gather-live-v314.py .github/scripts/test-jra-generic-v314.py
+          python3 .github/scripts/test-jra-generic-v314.py -v
+      - name: Check Workflow YAML and no surprise additional triggers
+        run: |
+          python3 - <<'PY'
+          import yaml
+          from pathlib import Path
+          p=Path('.github/workflows/jra-generic-one-shot-v314.yml')
+          x=yaml.load(p.read_text(),Loader=yaml.BaseLoader)
+          events=x['on']
+          assert events['push']['branches']==['main']
+          assert events['push']['paths']==['e2e_validation/requests/v314/*.json']
+          assert 'workflow_dispatch' in events
+          assert x['permissions']['contents']=='write'
+          flow=p.read_text()
+          for required in ['jra-gather-live-v314.py','jra-odds-full-refresh-v313-exec.py',
+                           'validate-jra-pdf-content-v313.py','git add -- "$INPUT_PATH"',
+                           'JRA_V313_NEW_RACE_FULL_PUBLIC_HTTP_VERIFIED']:
+              assert required in flow,required
+          print('PASS: one-shot workflow static contract')
+          PY
+      - name: Existing formal predictor and optimizer compatibility checks
+        run: |
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/test-jra-v313-formal-real.mjs
+          node .github/scripts/validate-jra-prompt-v313.mjs
