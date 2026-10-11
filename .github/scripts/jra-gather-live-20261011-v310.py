@@ -256,7 +256,7 @@ def build(race,preview):
  # Import the canonical JS expander list via a local Node subprocess; do not maintain
  # a separate Python copy of the trading strategy expansion rules.
  import subprocess
- js='''import {expandStrategy} from "./.github/scripts/jra-strategy-engine-v39.mjs";import fs from "node:fs";const a=JSON.parse(fs.readFileSync(0,"utf8"));process.stdout.write(JSON.stringify(a.map(x=>{try{return expandStrategy(x.type,x.strategy_kind,x.definition)}catch(e){throw Error(x.type+' '+x.strategy_kind+' '+e.message)}}))));'''
+ js='''import {expandStrategy} from "./.github/scripts/jra-strategy-engine-v39.mjs";import fs from "node:fs";const a=JSON.parse(fs.readFileSync(0,"utf8"));process.stdout.write(JSON.stringify(a.map(x=>{try{return expandStrategy(x.type,x.strategy_kind,x.definition)}catch(e){throw Error(x.type+' '+x.strategy_kind+' '+e.message)}})));'''
  p=subprocess.run(['node','--input-type=module','-e',js],input=json.dumps(st,ensure_ascii=False),encoding='utf-8',capture_output=True)
  require(p.returncode==0,'canonical strategy expansion failed: '+p.stderr[-2000:])
  selection_universe=set()
