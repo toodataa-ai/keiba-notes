@@ -1,0 +1,33 @@
+name: Validate staged JRA UI release and rollback invariants
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/jra-site-ui-release-v1.py'
+      - '.github/scripts/test-jra-site-ui-release-v1.py'
+      - '.github/workflows/validate-jra-site-ui-release-v1.yml'
+  pull_request:
+    paths:
+      - '.github/scripts/jra-site-ui-release-v1.py'
+      - '.github/scripts/test-jra-site-ui-release-v1.py'
+      - '.github/workflows/validate-jra-site-ui-release-v1.yml'
+permissions:
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate script syntax
+        run: python3 -m py_compile .github/scripts/jra-site-ui-release-v1.py .github/scripts/test-jra-site-ui-release-v1.py
+      - name: Rehearse v1.01 approval and immutable v1.00 rollback in isolated Git
+        run: python3 .github/scripts/test-jra-site-ui-release-v1.py
+      - name: Assert approval queue is not present and formal predictions are unchanged by infrastructure setup
+        run: |
+          set -euo pipefail
+          if test -d docs/site-release-requests;then
+            echo "::error::Production approval requests must not be created before user staging approval";exit 1
+          fi
+          test -f docs/staging/index.html
+          test -f docs/staging/purchase-preview.html
