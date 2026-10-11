@@ -40,7 +40,7 @@ jobs:
             python3 .github/scripts/jra-check-fresh-quotes-v313.py --input "$OUT" --fresh-seconds 600 --max-spread-seconds 180
             SNAP="/tmp/$NAME-v313-shadow-snapshot.json"
             node .github/scripts/jra-prestart-pipeline-v312.mjs --input "$OUT" --output "$SNAP"
-            node -e "const o=require('./'+process.argv[1]); console.log(JSON.stringify({race:o.race_id,stage:o.stage,priced:o.exact_quote_coverage_v312,stake:o.total_stake_yen,lines:o.final_bets,diagnostic:o.purchase_set_comparisons_v312.search_diagnostic},null,2))" "$SNAP"
+            node -e "const o=require(process.argv[1]); console.log(JSON.stringify({race:o.race_id,stage:o.stage,priced:o.exact_quote_coverage_v312,stake:o.total_stake_yen,lines:o.final_bets,diagnostic:o.purchase_set_comparisons_v312.search_diagnostic},null,2))" "$SNAP"
           done
       - name: Publish proof artefacts to Actions only, not public JRA
         if: always()
