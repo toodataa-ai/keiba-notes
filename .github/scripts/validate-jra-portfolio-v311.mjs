@@ -10,7 +10,7 @@ const time=x=>typeof x==='string'&&Number.isFinite(Date.parse(x));
 const text=x=>typeof x==='string'&&x.trim().length>0;
 const SC=['low','central','high'];
 const metrics=['expected_payout_yen_scenarios','roi_scenarios','hit_probability_scenarios','full_loss_probability_scenarios','loss_probability_scenarios'];
-export function validateV310(data){
+export function validateV311(data){
  const errors=[],err=s=>errors.push(s);
  if(data.prompt_version!=='v3.11')return errors;
  const gate=data.purchase_gate?.candidates||[];
@@ -102,7 +102,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===path.resolve(new URL(import.
    for(const file of fs.readdirSync(path.join(root,folder.name)).filter(n=>n.endsWith('.json'))){
      const p=path.join(root,folder.name,file),data=JSON.parse(fs.readFileSync(p,'utf8'));
      if(data.prompt_version!=='v3.11')continue;checked++;
-     for(const e of validateV310(data))errors.push(p+': '+e);
+     for(const e of validateV311(data))errors.push(p+': '+e);
    }
  }
  if(errors.length){console.error(errors.join('\n'));process.exit(1);}
