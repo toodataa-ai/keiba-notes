@@ -1,7 +1,7 @@
 地方競馬 Daily Shadow v0.1
 
 目的：
-南関4場（大井・川崎・船橋・浦和）＋園田＋名古屋を、JRA本番とは分離した研究用Shadowとして毎日観測する。
+NAR公式により当日開催が確認できた全地方競馬場を、JRA本番とは分離した研究用Shadowとして毎日観測する。初期パイロット6場から、現行config.jsonでは全国15場（ばんえい帯広を含む）に拡張済み。
 地方の結果を直接JRA本番へ学習させない。複数場・複数条件で再現する抽象的な改善候補を発見し、JRA側で改めてE2E検証する。
 
 【不変条件】
@@ -9,12 +9,12 @@
 - JRAの正式◎○▲△×、STEP1順位、STEP2、買い目、正式プロンプトを地方Shadowが直接変更してはならない。
 - 予想snapshotは必ず発走前に固定し、cutoff後は改変しない。
 - prediction作成時に着順、払戻、レース後記事、結果を知り得る情報を取得・混入しない。
-- 地方6場を一つの均質な母集団として扱わず、venue別・条件別に保存する。
+- 地方の全開催場を一つの均質な母集団として扱わず、venue別・条件別に保存する。ばんえい競馬は異なる競技特性を明示して別扱いにする。
 - 一日単位の結果だけで一般化しない。
 
 【対象】
 config.jsonでenabled=trueの競馬場。
-初期対象：大井、川崎、船橋、浦和、園田、名古屋。
+現行対象：NAR全国15競馬場。必ずconfig.jsonのenabled=trueと当日のNAR公式開催番組を突合し、その日に実際に開催される場の全レースを母集団とする。旧6場が非開催でも、他の開催場があれば『対象なし』としてスキップしてはならない。
 開催日の全レースを母集団とする。
 
 【PRE-RACE】
@@ -79,3 +79,11 @@ JRA historical replay / Grade A E2E等で別途比較し、明示承認がある
 【公開】
 個別の地方Shadow予想は正式予想アーカイブへ載せない。
 公開サイトでは、研究目的、対象競馬場、観測件数、進捗、主要finding、transfer candidateの状態だけを表示する。
+
+【2026-10-11運用明確化：開催全場・全レースと欠損監査】
+- 日付はJSTで確定し、NAR公式の全開催場と全レース数を最初に確認する。初期6場だけで『開催なし』と判断することは禁止。
+- 現行の実行プログラムは local_racing_shadow_v1/prerace_all_venues.py、手動ChatGPT発火は prerace_request.json の単独変更（request_seqを更新）から local-racing-shadow-prerace-generic.yml を起動する。
+- 最新のconfig.jsonにenabled=trueの全場を保持し、当日の実開催場を公式で列挙したうえで実行する。レース数不一致を成功扱いしない。
+- 発走時刻前にGitHubにコミットする時間を証明できないレースは後付けのpredictionを絶対作らず、公式レース母集団から除外もしない。coverage_gapsとしてrace_id、発走時刻、理由を残す。
+- 件数は official_total_races = immutable_prediction_count + coverage_gap_count で監査し、欠損がある日はPARTIAL。GitHub Actionsが緑でも全レース予想完了と誤報しない。
+- 予想を保存したrace_idは、改変不可の原本、proof_commit、公開manifest、公開mirrorおよびPages実体まで検証する。JRA関連ファイルは一切変更しない。
