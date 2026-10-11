@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Render complete v3.11 formal JRA report in approved reader-v1 layout.
 No outside market data, probabilities, or new marks may enter at this point."""
-import html,json,sys
+import html,json,sys,os
 from pathlib import Path
 from itertools import islice
 LABELS=['斤量','展開','馬場','ローテ','コース','血統','調教','騎手','基礎能力']
@@ -136,7 +136,11 @@ def make(report):
  if not isinstance(excluded,list):raise RuntimeError('PDF BLOCKER: excluded candidates not in frozen model')
  unpriced=[x for x in report.get('ticket_candidate_comparisons',[]) if x.get('eligibility')=='unpriced']
  # Publish exact final_bets, including more than 60 rows if the purchase contract ever permits.
- select_chunks=paginate_records(lines,10)
+ selected_page_rows=int(os.getenv('JRA_SELECTED_ROWS_PER_PAGE','10'))
+ rejected_page_rows=int(os.getenv('JRA_REJECTED_ROWS_PER_PAGE','7'))
+ if selected_page_rows<1 or rejected_page_rows<1:
+  raise RuntimeError('Rows-per-page must be positive; no restriction applies to total pages')
+ select_chunks=paginate_records(lines,selected_page_rows)
  for i,block in enumerate(select_chunks,1):
   entries=[(x['id'],x['type'],'-'.join(map(str,x['selection'])),str(x['stake_yen'])+'円',quote(x)) for x in block]
   intro=paragraph('購入は個別チケット全件の発走前確定候補です。重複馬券は除き、券種・買い目・購入額・観測したオッズを一意に列記します。')
@@ -151,7 +155,7 @@ def make(report):
   reasons.append(('X'+str(i).zfill(4),x.get('type',''),'-'.join(map(str,x.get('selection') or [])),number(x.get('expected_profit_yen'))+'円',reason))
  for i,x in enumerate(unpriced,1):
   reasons.append(('U'+str(i).zfill(4),x.get('type',''),'-'.join(map(str,x.get('selection') or [])),'算定不可','発走前の当該買い目の実オッズ未確認。買い目の購入資格がない。'))
- reject_chunks=paginate_records(reasons,7)
+ reject_chunks=paginate_records(reasons,rejected_page_rows)
  for i,block in enumerate(reject_chunks,1):
   body+=page(f'不採用買い目｜{i}/{len(reject_chunks)}',
    paragraph('不採用候補を省略せず全件掲載します。Xは価格確認済みで不採用、Uは個別実オッズ未確認です。')
