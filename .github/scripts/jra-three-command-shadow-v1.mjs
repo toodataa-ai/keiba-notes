@@ -78,6 +78,9 @@ export function compareThreeCommandPortfolio(args){
   must(Array.isArray(args.formal_final_bets),'formal final_bets required');
   must(args.freeze_at&&Date.parse(args.freeze_at)<Date.parse(args.race_context?.start_at),
     'must use sealed prestart data');
+  const spendCeiling=args.max_spend_yen??THREE_COMMAND_POLICY.budget_yen;
+  must(Number.isInteger(spendCeiling)&&spendCeiling>=100&&spendCeiling<=THREE_COMMAND_POLICY.budget_yen&&spendCeiling%100===0,
+    'invalid max spend ceiling');
   const {all,audit}=buildTicketUniverse({...args,max_ticket_stake_yen:100});
   const priced=new Map(all.map(x=>[key(x),x]));
   const original=args.formal_final_bets.map(x=>{
@@ -97,7 +100,7 @@ export function compareThreeCommandPortfolio(args){
   let enumerated=0,feasible=0;
   const offer=selected=>{
     const spent=sum(selected,x=>x.stake_yen);
-    if(spent>THREE_COMMAND_POLICY.budget_yen)return;
+    if(spent>spendCeiling)return;
     const keys=selected.flatMap(x=>x.ticket_keys);
     if(new Set(keys).size!==keys.length)return;
     const ev=sum(selected,x=>x.ev);
@@ -159,7 +162,7 @@ export function compareThreeCommandPortfolio(args){
   return {status:best?'three_command_shadow_candidate':'no_qualifying_three_command_set',
     formal_prediction_unchanged:true,formal_bets_unchanged:true,
     formal_adoption_authorized:false,not_global_optimum:true,
-    algorithm:'three_command_bounded_joint_outcome_shadow_v1',
+    algorithm:'three_command_bounded_joint_outcome_shadow_v1', max_spend_yen:spendCeiling,
     baseline,proposed:best?.metrics??null,
     commands:best?.commands??[],proposed_lines:best?.lines??[],
     comparison:best?{expected_profit_delta_yen:round(best.metrics.expected_net_profit_yen-baseline.expected_net_profit_yen),
