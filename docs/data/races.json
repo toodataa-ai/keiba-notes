@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-11T14:12:35.361+09:00",
+  "updated_at": "2026-10-12T06:39:00+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -735,7 +735,7 @@
       "race": "アイルランドトロフィー",
       "scope": "jra-main",
       "prompt_version": "v3.12",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 16,
@@ -966,7 +966,253 @@
       "e2e_prediction": "e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json",
       "proof_commit": "9a750056ef1dc7c25cb62860d9729e1fa8521233",
       "purchase_budget_yen": 6000,
-      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
+      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers.",
+      "result": {
+        "summary": "16→15→11 / ◎16は1着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 16,
+            "horse": "カムニャック"
+          },
+          {
+            "pos": 2,
+            "no": 15,
+            "horse": "ジョスラン"
+          },
+          {
+            "pos": 3,
+            "no": 11,
+            "horse": "ラヴァンダ"
+          }
+        ],
+        "finish_order": [
+          16,
+          15,
+          11,
+          5,
+          12,
+          7,
+          1,
+          3,
+          14,
+          6,
+          13,
+          2,
+          8,
+          9,
+          10,
+          4
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html",
+        "verified_at": "2026-10-12T06:39:00+09:00",
+        "verified_at_basis": "verified during this postrace review; not JRA's initial publication timestamp"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "ワイド",
+          "selection": [
+            10,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B02",
+          "type": "ワイド",
+          "selection": [
+            10,
+            16
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B03",
+          "type": "三連単",
+          "selection": [
+            1,
+            10,
+            16
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B04",
+          "type": "三連単",
+          "selection": [
+            10,
+            1,
+            16
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B05",
+          "type": "三連単",
+          "selection": [
+            10,
+            16,
+            1
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B06",
+          "type": "単勝",
+          "selection": [
+            10
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B07",
+          "type": "枠連",
+          "selection": [
+            1,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B08",
+          "type": "枠連",
+          "selection": [
+            2,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B09",
+          "type": "枠連",
+          "selection": [
+            3,
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B10",
+          "type": "枠連",
+          "selection": [
+            5,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B11",
+          "type": "枠連",
+          "selection": [
+            5,
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B12",
+          "type": "複勝",
+          "selection": [
+            10
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B13",
+          "type": "馬単",
+          "selection": [
+            10,
+            16
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        },
+        {
+          "bet_id": "B14",
+          "type": "馬連",
+          "selection": [
+            10,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/datafile/seiseki/replay/2026/093.html"
+        }
+      ],
+      "performance": {
+        "stake_yen": 1400,
+        "payout_yen": 0,
+        "profit_yen": -1400,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 1,
+        "honmei_win": true,
+        "honmei_place": true,
+        "second_mark_finish": 15,
+        "third_mark_finish": 8,
+        "top_marks_in_top3": 1,
+        "hit_bets": [],
+        "miss_bets": [
+          "ワイド 10-15",
+          "ワイド 10-16",
+          "三連単 1-10-16",
+          "三連単 10-1-16",
+          "三連単 10-16-1",
+          "単勝 10",
+          "枠連 1-5",
+          "枠連 2-5",
+          "枠連 3-8",
+          "枠連 5-6",
+          "枠連 5-8",
+          "複勝 10",
+          "馬単 10-16",
+          "馬連 10-15"
+        ]
+      },
+      "review": "発走前STEP1の◎16は上位入線し、能力・適性評価の方向性は概ね整合。一方、○10は序盤から先行し、終盤の持続力が不足。▲3も想定上位に届かなかった。最終の購入セットでは10を中心に複数券種の相関した買い目を組み、16の単勝や実際の上位組合せを含めなかった。STEP1の評価とSTEP2の購入セットの間に乖離があったこと、10依存のポートフォリオで同時不的中リスクが高かった可能性を、事前の確率・価格・損失リスク監査と対比して検証対象とする。結果判明後の買い目変更や勝ち馬の機械的な昇格は禁止。今回は因果が確証されたモデル欠陥とは判断せず、改善候補を観察として保留。",
+      "review_at": "2026-10-12T06:39:00+09:00",
+      "e2e_case": "e2e_validation/cases/2026-10-11-ireland-trophy/case.json"
     },
     {
       "id": "2026-10-11-uzumasa-stakes",
@@ -975,7 +1221,7 @@
       "race": "太秦ステークス",
       "scope": "jra-main",
       "prompt_version": "v3.12",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 14,
@@ -1071,7 +1317,134 @@
       "e2e_prediction": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38113827050-attempt2.json",
       "proof_commit": "a2adc0d4daafe54f8dee2b00736fd795fe54786f",
       "purchase_budget_yen": 6000,
-      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
+      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers.",
+      "result": {
+        "summary": "3→8→4 / ◎13は8着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 3,
+            "horse": "バスタードサフラン"
+          },
+          {
+            "pos": 2,
+            "no": 8,
+            "horse": "シュラザック"
+          },
+          {
+            "pos": 3,
+            "no": 4,
+            "horse": "ハナウマビーチ"
+          }
+        ],
+        "finish_order": [
+          3,
+          8,
+          4,
+          12,
+          7,
+          2,
+          1,
+          13,
+          9,
+          11,
+          10,
+          6,
+          14,
+          5
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47",
+        "verified_at": "2026-10-12T06:39:00+09:00",
+        "verified_at_basis": "verified during this postrace review; not JRA's initial publication timestamp"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "三連単",
+          "selection": [
+            3,
+            4,
+            13
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47"
+        },
+        {
+          "bet_id": "B02",
+          "type": "三連単",
+          "selection": [
+            4,
+            2,
+            1
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47"
+        },
+        {
+          "bet_id": "B03",
+          "type": "単勝",
+          "selection": [
+            4
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47"
+        },
+        {
+          "bet_id": "B04",
+          "type": "馬単",
+          "selection": [
+            4,
+            1
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47"
+        },
+        {
+          "bet_id": "B05",
+          "type": "馬単",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604041120261011%2F47"
+        }
+      ],
+      "performance": {
+        "stake_yen": 500,
+        "payout_yen": 0,
+        "profit_yen": -500,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 8,
+        "honmei_win": false,
+        "honmei_place": false,
+        "second_mark_finish": 14,
+        "third_mark_finish": 7,
+        "top_marks_in_top3": 0,
+        "hit_bets": [],
+        "miss_bets": [
+          "三連単 3-4-13",
+          "三連単 4-2-1",
+          "単勝 4",
+          "馬単 4-1",
+          "馬単 4-5"
+        ]
+      },
+      "review": "STEP1の◎13、○5、▲1がいずれも上位3着内に入らず、能力・適性の上位順位および展開シナリオの識別に課題が残った。△3・△4を候補として扱っていたが、3を含む採用3連単の相手構成と実際の入線順は異なり、採用した馬単・単勝も不的中。特に先行勢の隊列、京都ダート1800mでの再現性、斤量、穴馬の分岐シナリオについて発走前根拠の密度を再監査する。少数事例の結果から特定の騎手・斤量・馬番を有利と決め付ける過剰適合はしない。STEP1・購入セット・オッズは発走前原本を保持したまま比較する。",
+      "review_at": "2026-10-12T06:39:00+09:00",
+      "e2e_case": "e2e_validation/cases/2026-10-11-uzumasa-stakes/case.json"
     }
   ]
 }

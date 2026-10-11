@@ -77,6 +77,58 @@ def git_commit_time(repo_root: Path, commit: str) -> datetime:
     return parse_dt(proc.stdout.strip())
 
 
+
+def normalize_formal_v312_for_e2e(prediction: dict) -> dict:
+    """Read-only E2E projection of the SHA-frozen v3.12 formal record.
+
+    The canonical pre-race JSON is NEVER rewritten. Its step1_ranking is in
+    horse-number order (not ability rank), so no synthetic winner rank is made.
+    Seal times are conservative lower-bound evidence of completed generation.
+    Probability calibration is unavailable; do not invent Brier coverage.
+    """
+    if prediction.get("prompt_version") != "v3.12" or prediction.get("stage") != "formal_prestart":
+        return prediction
+    mark_entries = prediction.get("step1_ranking") or []
+    mark_codes = {"◎": "win", "○": "second", "▲": "third"}
+    marks = {}
+    for horse in mark_entries:
+        if not isinstance(horse, dict):
+            raise ValidationError("v3.12 STEP1 horse rows must be objects")
+        code = mark_codes.get(horse.get("mark"))
+        if code:
+            if code in marks:
+                raise ValidationError("v3.12 duplicate STEP1 mark " + code)
+            marks[code] = int(horse["horse_number"])
+    if set(marks) != set(mark_codes.values()):
+        raise ValidationError("v3.12 STEP1 top three marks are incomplete")
+    bets = prediction.get("final_bets")
+    if not isinstance(bets, list) or not bets:
+        raise ValidationError("v3.12 immutable final_bets missing")
+    if len({str(b.get("id")) for b in bets}) != len(bets):
+        raise ValidationError("v3.12 duplicate final bet id")
+    raw_stamps = [prediction.get("step1_fixed_at"),
+                  prediction.get("final_bets_fixed_at"),
+                  prediction.get("market_coverage_snapshot_at")]
+    if not all(isinstance(v, str) and v for v in raw_stamps):
+        raise ValidationError("v3.12 missing immutable seal timestamps")
+    last_observed = max((parse_dt(t) for t in raw_stamps)).isoformat()
+    projected = dict(prediction)
+    projected["generated_at"] = last_observed
+    projected["information_cutoff_at"] = last_observed
+    projected["marks"] = marks
+    projected["bets"] = [{"id": b["id"], "type": b["type"],
+                         "selection": b["selection"], "stake_yen": b["stake_yen"]}
+                         for b in bets]
+    projected["step1_ranking"] = None
+    projected["prompt_manifest"] = "e2e_validation/manifests/v3.12.json"
+    projected["e2e_projection_note"] = (
+        "Read-only projection of prestart commit. The manifest is version-resolved; "
+        "seal timestamps are not JRA publication times. "
+        "Uncalibrated probabilities are not counted as calibration evidence."
+    )
+    return projected
+
+
 def load_prediction(
     repo_root: Path,
     spec: dict,
@@ -118,6 +170,8 @@ def load_prediction(
         raise ValidationError(
             f"prompt_version_mismatch: spec={version}, prediction={prediction.get('prompt_version')}"
         )
+
+    prediction = normalize_formal_v312_for_e2e(prediction)
 
     generated_at = parse_dt(prediction.get("generated_at"))
     info_cutoff = parse_dt(prediction.get("information_cutoff_at"))
