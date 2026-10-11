@@ -1,0 +1,206 @@
+name: JRA 2026-10-11 v3.11 non-destructive parallel formal run
+# Executes once on addition of this dedicated workflow. Preserves every previously frozen v3.10 artifact.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-v311-parallel-20261011.yml'
+permissions:
+  contents: write
+concurrency:
+  group: jra-v311-parallel-20261011
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify formal v3.11 and completion addendum pins
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          a=json.loads(Path('docs/data/latest_prompt.json').read_text())
+          assert a['version']=='v3.11'
+          b=a['mandatory_execution_addendum']
+          assert subprocess.check_output(['git','hash-object',b['path']],text=True).strip()==b['git_blob_sha']
+          manifest=json.loads(Path('e2e_validation/manifests/v3.11.json').read_text())
+          for c in manifest['components']:
+              actual=subprocess.check_output(['git','hash-object',c['path']],text=True).strip()
+              assert actual==c['git_blob_sha'],c['path']
+          print('PASS latest prompt, append-only components and mandatory execution SHA')
+          PY
+          node .github/scripts/test-jra-balanced-v311.mjs
+          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/test-jra-prestart-pipeline-v311.mjs
+          node .github/scripts/test-jra-portfolio-v311.mjs
+          node .github/scripts/test-jra-strategy-v39.mjs
+      - name: Install pinned PDF and font tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Build genuinely new v3.11 pending snapshots from pre-price immutable STEP1 and saved source-captured odds
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/jra-v311-inputs
+          RUN_LABEL="v3.11-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
+          echo "RUN_LABEL=$RUN_LABEL" >> "$GITHUB_ENV"
+          : > /tmp/jra-v311-files.tsv
+          for SLUG in 2026-10-11-ireland-trophy 2026-10-11-uzumasa-stakes; do
+            SOURCE="e2e_validation/inputs/$SLUG.json"
+            INPUT="/tmp/jra-v311-inputs/$SLUG.json"
+            SNAPSHOT="e2e_validation/snapshots/$SLUG/$RUN_LABEL.json"
+            PREDICTION="e2e_validation/predictions/$SLUG/$RUN_LABEL.json"
+            REPORT="docs/reports/$SLUG-v311.html"
+            PDF="docs/pdfs/$SLUG-v311.pdf"
+            for P in "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF"; do
+              if [[ -e "$P" ]]; then echo "::error::Existing artifact cannot be overwritten: $P"; exit 1; fi
+            done
+            python3 - "$SOURCE" "$INPUT" "$SLUG" <<'PY'
+          import json,sys
+          from pathlib import Path
+          p=Path(sys.argv[1]);o=json.loads(p.read_text())
+          assert o['race_id']==sys.argv[3] and o['prompt_version']=='v3.10'
+          assert o['step1']['no_odds_used_to_change_marks'] is True
+          assert o['market_quotes'] and o['step1']['runners']
+          # v3.11 changes the purchase overlay only. Prior validated STEP1, quote captures
+          # and all source timestamps remain completely unchanged.
+          o['prompt_version']='v3.11'
+          Path(sys.argv[2]).write_text(json.dumps(o,ensure_ascii=False,indent=2)+'\n')
+          print('Versioned purchase overlay input:',o['race_id'],'quotes',len(o['market_quotes']))
+          PY
+            node .github/scripts/jra-prestart-pipeline-v311.mjs --input "$INPUT" --output "$SNAPSHOT"
+            printf '%s\t%s\t%s\t%s\t%s\n' "$SLUG" "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF" >> /tmp/jra-v311-files.tsv
+          done
+      - name: Strict preflight all horse pages and every selected and rejected bet; retry denser pagination safely
+        run: |
+          set -euo pipefail
+          while IFS=$'\t' read -r SLUG SNAPSHOT PREDICTION REPORT PDF; do
+            python3 - "$SNAPSHOT" "/tmp/$SLUG-preview.json" <<'PY'
+          import json,sys
+          from pathlib import Path
+          d=json.loads(Path(sys.argv[1]).read_text())
+          d['stage']='formal_prestart';d['proof_commit']='a'*40
+          Path(sys.argv[2]).write_text(json.dumps(d,ensure_ascii=False))
+          PY
+            PASS=0
+            for ROWS in 10:7 8:5 6:4 4:3 2:2 1:1; do
+              SELECTED_ROWS="${ROWS%:*}"; REJECTED_ROWS="${ROWS#*:}"
+              echo "Preflight $SLUG selected=$SELECTED_ROWS rejected=$REJECTED_ROWS"
+              if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" \
+                   python3 .github/scripts/jra-render-live-v311.py "/tmp/$SLUG-preview.json" "$REPORT" &&
+                   python -m weasyprint "$REPORT" "/tmp/$SLUG-preview.pdf" &&
+                   python3 .github/scripts/validate-jra-pdf-content-v311.py \
+                     --html "$REPORT" --pdf "/tmp/$SLUG-preview.pdf" --prediction "/tmp/$SLUG-preview.json"; then
+                PASS=1;break
+              fi
+            done
+            if [[ $PASS -ne 1 ]]; then echo "::error::Real PDF/HTML audit failed $SLUG"; exit 1; fi
+            echo "PAGE_ROWS_${SLUG//-/_}=$ROWS" >> "$GITHUB_ENV"
+            printf '%s\t%s\n' "$SLUG" "$ROWS" >> /tmp/jra-v311-page-rows.tsv
+          done < /tmp/jra-v311-files.tsv
+      - name: Freeze both immutable snapshot originals in a real Git commit BEFORE either post
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime,json
+          from pathlib import Path
+          now=datetime.datetime.now(datetime.timezone.utc)
+          for row in Path('/tmp/jra-v311-files.tsv').read_text().splitlines():
+              slug,snapshot,*_=row.split('\t')
+              o=json.loads(Path(snapshot).read_text())
+              start=datetime.datetime.fromisoformat(o['race_context']['start_at'])
+              assert now<start,'BLOCKER: post time passed, cannot freeze '+slug
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          while IFS=$'\t' read -r SLUG SNAPSHOT PREDICTION REPORT PDF; do git add -- "$SNAPSHOT"; done < /tmp/jra-v311-files.tsv
+          git diff --cached --name-only | grep -E '^e2e_validation/snapshots/2026-10-11-'
+          git commit -m "Freeze 2026-10-11 JRA v3.11 parallel prestart purchase and joint-risk snapshots"
+          git push origin HEAD:main
+          PROOF=$(git rev-parse HEAD)
+          echo "PROOF=$PROOF" >> "$GITHUB_ENV"
+      - name: Seal v3.11 official prediction with immutable proof commit; render full PDF with no page limit
+        run: |
+          set -euo pipefail
+          while IFS=$'\t' read -r SLUG SNAPSHOT PREDICTION REPORT PDF; do
+            node .github/scripts/jra-prestart-pipeline-v311.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
+            ROWS=$(awk -v slug="$SLUG" '$1==slug {print $2}' /tmp/jra-v311-page-rows.tsv)
+            export JRA_SELECTED_ROWS_PER_PAGE="${ROWS%:*}"
+            export JRA_REJECTED_ROWS_PER_PAGE="${ROWS#*:}"
+            python3 .github/scripts/jra-render-live-v311.py "$PREDICTION" "$REPORT"
+            python -m weasyprint "$REPORT" "$PDF"
+            python3 .github/scripts/validate-jra-pdf-content-v311.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
+          done < /tmp/jra-v311-files.tsv
+      - name: Register parallel v3.11 reports separately without changing legacy race records
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,fitz
+          from pathlib import Path
+          rows=[]
+          for record in Path('/tmp/jra-v311-files.tsv').read_text().splitlines():
+              slug,snapshot,pred,report,pdf=record.split('\t')
+              o=json.loads(Path(pred).read_text())
+              with fitz.open(pdf) as p:pages=len(p)
+              rows.append({'race_id':slug,'date':'2026-10-11','prompt_version':'v3.11',
+                  'prediction_path':pred,'snapshot_path':snapshot,'proof_commit':o['proof_commit'],
+                  'report':report.removeprefix('docs/'),'pdf':pdf.removeprefix('docs/'),
+                  'pdf_pages':pages,'decision':o['purchase_decision'],
+                  'total_stake_yen':o['total_stake_yen'],
+                  'final_bets':o['final_bets'],
+                  'step1_frozen_at':o['step1_fixed_at'],'final_bets_frozen_at':o['final_bets_fixed_at']})
+          p=Path('docs/data/jra-v311-parallel-2026-10-11.json')
+          assert not p.exists(),'Never replace parallel publication registry'
+          p.write_text(json.dumps({'schema_version':1,'scope':'non-destructive new v3.11 prediction run',
+                 'original_v310_immutable':True,'races':rows},ensure_ascii=False,indent=2)+'\n')
+          print('PUBLIC_V311_PARALLEL',[(r['race_id'],r['decision'],r['total_stake_yen'],r['pdf_pages']) for r in rows])
+          PY
+      - name: Commit verified reports and prove only new files are published
+        run: |
+          set -euo pipefail
+          while IFS=$'\t' read -r SLUG SNAPSHOT PREDICTION REPORT PDF; do
+            git add -- "$PREDICTION" "$REPORT" "$PDF"
+          done < /tmp/jra-v311-files.tsv
+          git add docs/data/jra-v311-parallel-2026-10-11.json
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          expected={'docs/data/jra-v311-parallel-2026-10-11.json'}
+          for row in Path('/tmp/jra-v311-files.tsv').read_text().splitlines():
+              slug,snap,pred,html,pdf=row.split('\t')
+              expected.update([pred,html,pdf])
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert expected==actual,('Unexpected staged paths',actual^expected)
+          print('PASS non-destructive published paths',len(actual))
+          PY
+          git commit -m "Publish both fully validated JRA v3.11 purchase-balanced HTML PDF and proof links"
+          git push origin HEAD:main
+      - name: Verify actual GitHub Pages HTML PDF and JSON bytes, not just green CI
+        run: |
+          set -euo pipefail
+          BASE="https://toodataa-ai.github.io/keiba-notes"
+          FILES=(docs/data/jra-v311-parallel-2026-10-11.json)
+          while IFS=$'\t' read -r SLUG SNAPSHOT PREDICTION REPORT PDF; do FILES+=("$REPORT" "$PDF"); done < /tmp/jra-v311-files.tsv
+          for i in $(seq 1 30); do
+            ALL_OK=1
+            for FILE in "${FILES[@]}"; do
+              REL="${FILE#docs/}"
+              if ! curl -fsSL --max-time 20 --retry 1 -o "/tmp/jra-published-$(basename "$FILE")" "$BASE/$REL" ||
+                 ! cmp -s "$FILE" "/tmp/jra-published-$(basename "$FILE")"; then ALL_OK=0;break;fi
+            done
+            if [[ $ALL_OK -eq 1 ]]; then echo "PUBLIC_HTTP_VERIFIED: both PDFs, HTMLs and JSON match committed files exactly";exit 0;fi
+            sleep 15
+          done
+          echo "::error::GitHub commit succeeded but public Pages verification incomplete";exit 1
