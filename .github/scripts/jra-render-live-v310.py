@@ -100,8 +100,8 @@ def make(report):
   note=r.get('evidence','')[:240]
   body+=f'<section class="horse"><div class="chapter">全頭診断・個別評価　{idx+1}/{n}</div>'
   body+=f'<h1>{h(mark)} {num} {h(name)}</h1>'
-  body+=f'<div class="hero"><b>総合 {h(r["overall_grade"])}</b>　負担重量 {h(r.get("weight_kg"))}kg'
-  +f'　騎手 {h(r.get("jockey"))}</div>'
+  body+=(f'<div class="hero"><b>総合 {h(r["overall_grade"])}</b>　負担重量 {h(r.get("weight_kg"))}kg'
+  +f'　騎手 {h(r.get("jockey"))}</div>')
   body+=paragraph('能力と今回適性：'+note)
   body+='<h3>①〜⑨：評価軸別グレード</h3>'+factors
   body+='<h3>JRA公式・直近4走（同条件優先）</h3>'+rows_table(['日付','場','距離','クラス','着順','時計','比較'],rows)
