@@ -274,7 +274,7 @@
     },
     {
       "path": ".github/workflows/validate-jra-v312.yml",
-      "git_blob_sha": "8ca41f5e04ed8dea651eb34408f61d81e1e41be5",
+      "git_blob_sha": "a9f4b97f38af88a196796f9d088e327acf9c1a86",
       "role": "validate-jra-v312.yml"
     },
     {
@@ -299,7 +299,7 @@
     },
     {
       "path": ".github/scripts/validate-jra-prompt-v312.mjs",
-      "git_blob_sha": "4ba1e05ed1bf345d8cd2c389458b3a89b466cb38",
+      "git_blob_sha": "fe5202cd33a520dbd95a29a20f3f4d4dfed6a7a3",
       "role": "v312_formal_validation_or_full_real_market_e2e"
     },
     {
@@ -320,7 +320,7 @@
     {
       "path": "docs/data/jra_ci_supersession_v312.json",
       "role": "v312_compatibility_or_e2e_regression",
-      "git_blob_sha": "a033d978ca4b0c7d0592a71993c9d5b63ad578de"
+      "git_blob_sha": "2347314a47f75e051f3000c243238d3119d36675"
     },
     {
       "path": "e2e_validation/validate_manifests.py",
@@ -330,7 +330,7 @@
     {
       "path": ".github/workflows/e2e-validation.yml",
       "role": "v312_compatibility_or_e2e_regression",
-      "git_blob_sha": "c61fc70bc267da4e55817396e340b46fdf1959ba"
+      "git_blob_sha": "072a4e8e8965954ba3ad259694326a7739ec3398"
     },
     {
       "path": ".github/workflows/validate-jra-portfolio-v310.yml",
@@ -356,9 +356,49 @@
       "path": ".github/workflows/validate-jra-completion-addendum.yml",
       "role": "v312_compatibility_or_e2e_regression",
       "git_blob_sha": "0ae549e0ebbf829cbd5515dba086e5dc606511ee"
+    },
+    {
+      "path": ".github/scripts/validate-jra-archived-compact-v312.mjs",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "668adea090c2cf85313128991cc7a9ae29b4b034"
+    },
+    {
+      "path": "e2e_validation/validate_experience_history_v312.py",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "a53d4e602ed70e697530e8970bb35efeeccaa80a"
+    },
+    {
+      "path": ".github/workflows/validate-v34-purchase-gate.yml",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "04d027943cbc5a242f2c4cdebe2bc0a9c0adc501"
+    },
+    {
+      "path": ".github/workflows/validate-v35-multi-candidate.yml",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "3346ee4d7cf7214ff5d3e4ebe9fa457b3ef2aed6"
+    },
+    {
+      "path": ".github/workflows/validate-jra-one-shot-v36.yml",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "25b0882c1bb387a7478026d4f5f6426bad10f42a"
+    },
+    {
+      "path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.6-20261010-prestart.json",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "05f803f17f9d07d03b7e8e9498ccfa345703874b"
+    },
+    {
+      "path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.6-20261010-prestart.json",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "1827c6244e3b5194e8f6c1fec7cae2b8b6082fca"
+    },
+    {
+      "path": "e2e_validation/cases/2026-10-10-mimuro-stakes/case.json",
+      "role": "v312_archival_compatibility_or_unchanged_original_proof",
+      "git_blob_sha": "f833d33b480e1f845d80a0160e60fb8ad194788a"
     }
   ],
   "previous_manifest_sha": "b0570e7a928a15fb82f81b29aa01dc0999d36a7c",
   "scope": "append_only_future_JRA_prerace",
-  "note": "v3.12 canonical ready: earlier 42 SHA pins unchanged; one historically pinned CI workflow has an explicit cryptographically verified successor under docs/data/jra_ci_supersession_v312.json; archived Git blob remains present. Legacy v3.6 compact forecasts validated by exact original SHA, never edited. Real Ireland 171/171 ticket quotes and 53-page shadow PDF confirmed; no backfill of postrace predictions."
+  "note": "Formal v3.12: all historical v3.11 pins unchanged, except one audited v3.11 CI workflow current file whose original blob survives in Git and whose authorized new SHA is pinned in docs/data/jra_ci_supersession_v312.json. Exact SHA-pinned compact v3.6 archival predictions and prospective case are protected against any alteration. v3.12 full 171-ticket actual-odds shadow E2E PDF 53 pages passed."
 }
