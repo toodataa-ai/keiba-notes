@@ -8,6 +8,11 @@ const now=json('e2e_validation/manifests/v3.12.json');
 const latest=json('docs/data/latest_prompt.json');
 const hist=json('docs/data/prompt_history.json');
 const policy=json('docs/data/jra_v312_purchase_coverage_policy.json');
+const supersession=json('docs/data/jra_ci_supersession_v312.json');
+assert.equal(supersession.applies_to,'v3.12');
+assert.equal(supersession.fail_closed_on_any_other_sha_mismatch,true);
+const replacements=new Map(supersession.superseded_components.map(x=>[x.path,x]));
+assert.equal(replacements.size,1,'only the explicitly approved historical v3.11 CI workflow may be superseded');
 assert.equal(now.prompt_version,'v3.12');
 assert.deepEqual(now.components.slice(0,old.components.length),old.components,
   'historical v3.11 SHA-pinned components must remain byte-identical');
@@ -17,8 +22,18 @@ for(const {path,git_blob_sha} of now.components){
  assert(!unique.has(path),'duplicate SHA pin for '+path);
  unique.add(path);
  assert(fs.existsSync(path),'missing v3.12 or baseline artifact '+path);
- assert.equal(execFileSync('git',['hash-object',path],{encoding:'utf8'}).trim(),git_blob_sha,
-   'Git SHA mismatch '+path);
+ const actual=execFileSync('git',['hash-object',path],{encoding:'utf8'}).trim();
+ const ciReplacement=replacements.get(path);
+ if(ciReplacement){
+   assert.equal(git_blob_sha,ciReplacement.historical_blob_sha,
+     'legacy v3.11 manifest SHA pin was altered: '+path);
+   assert.equal(actual,ciReplacement.current_blob_sha,
+     'CI compatibility workflow differs from audited v3.12 successor');
+   assert.equal(execFileSync('git',['cat-file','-t',ciReplacement.historical_blob_sha],{encoding:'utf8'}).trim(),
+     'blob','original approved v3.11 workflow Git blob no longer available');
+   assert(fs.readFileSync(path,'utf8').includes(ciReplacement.required_compatibility_marker),
+     'compatibility check is missing from authorized successor CI workflow');
+ } else assert.equal(actual,git_blob_sha,'Git SHA mismatch '+path);
 }
 assert(hist.entries.some(x=>x.version==='v3.12'&&x.previous_version==='v3.11'&&x.path==='競馬予想_完全版プロンプト_v3.12.txt'),'v3.12 additive history missing');
 assert.equal(policy.effective_prompt_version,'v3.12');
