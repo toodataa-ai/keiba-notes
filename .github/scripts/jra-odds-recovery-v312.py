@@ -128,7 +128,7 @@ def recover(input_path,output_path,evidence):
     js=session.get(script_url,timeout=25);js.raise_for_status()
     require("location.href=link_base+'?umaBan='+umaban+'&position='+position" in js.text,
        'live source JS no longer documents exact umaBan and position query')
-    m=re.search(r"link_base:\\s*['\\\"]([^'\\\"]+)['\\\"]",inline)
+    m=re.search(r"link_base:\s*'([^']+)'",inline)
     require(m is not None,'live odds searchBox missing explicit link_base')
     action=urljoin(response.url,m.group(1))
     require(urlparse(action).hostname=='sports.yahoo.co.jp' and
