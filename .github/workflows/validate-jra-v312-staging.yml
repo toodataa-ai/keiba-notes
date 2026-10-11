@@ -9,6 +9,8 @@ on:
       - '.github/scripts/validate-jra-pdf-content-v312.py'
       - '.github/scripts/test-jra-v312*.mjs'
       - '.github/workflows/validate-jra-v312-staging.yml'
+      - 'e2e_validation/manifests/v3.12.json'
+      - '競馬予想_完全版プロンプト_v3.12.txt'
   workflow_dispatch:
 permissions:
   contents: read
@@ -23,8 +25,9 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Ensure historical v3.11 contracts remain unchanged
+      - name: Verify canonical history and pinned v3.12 staged SHA manifest
         run: |
+          node .github/scripts/validate-jra-v312-manifest.mjs
           node .github/scripts/validate-jra-balanced-prompt-v311.mjs
           node .github/scripts/test-jra-balanced-v311.mjs
       - name: Exact trifecta-quote coverage and correlated set comparison regression
