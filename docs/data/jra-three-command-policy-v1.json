@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "version": "three-purchase-command-shadow-v1",
+  "status": "research_only_requires_formal_v3.15_release",
+  "scope": "Future JRA official predictions only after E2E formal validation; current v3.13 final_bets are immutable",
+  "goal": "A user can execute at most 3 distinct JRA betting-form purchase commands. Each must be a verified complete BOX, wheel, multi, formation or single selection, with actual numbered inputs and per-ticket amount.",
+  "max_purchase_commands": 3,
+  "max_stake_yen_per_race": 6000,
+  "step1_and_marks": "unchanged",
+  "price_catalog": "All 8 offered ticket types still considered by independently verified source quotes; never impute missing odds.",
+  "formal_stake_optimizer": "Retain v3.13 WIN-stake rules until versioned enhancement tested. This shadow only compares uniformly priced 100-yen whole groups.",
+  "selection_model": "Deterministic bounded search of non-overlapping whole priced mode expansions; positive model expected net profit; optimize expected net profit then joint hit probability and number of commands, with downside and hit-rate deltas disclosed.",
+  "disclosure": "Never disguise 60 independently purchased lines as 3 executable commands; the three-command counterfactual may select a materially different basket. Explain EV/hit/loss differences and note model calibration is not proven.",
+  "audit_guards": [
+    "All displayed expanded tickets exactly match actual selected candidate lines, with no doubles or omissions",
+    "Complete odds, 3 scenario joint probability, no postrace recompute",
+    "Total purchase units <=3 and purchase total <=6000 yen",
+    "No forced buy when no positive expected net profit candidate",
+    "Legacy SHA, STEP1, v3.13 and historic PDFs immutable",
+    "Shadow never changes final_bets or PDF canonical pointers"
+  ],
+  "version_promotion": "Formal activation needs separate v3.15 model, new SHA-pinned manifest, comparable live market E2E, budget/price/portfolio proof and validated PDF and public HTTP before modifying any future canonical selection.",
+  "table_layout": "Only 1-3 actionable rows on first page; show type/mode, exact horses or columns/axes, points×stake and subtotal. The full scientific audit may remain in details, never pretend it is the purchase operation list."
+}
