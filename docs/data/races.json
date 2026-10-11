@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-11T14:10:39.973+09:00",
+  "updated_at": "2026-10-11T14:12:35.361+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -979,10 +979,10 @@
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 14,
-      "report": "reports/2026-10-11-uzumasa-stakes-v3.12-rerun38108909783-attempt2-v312.html",
-      "pdf": "pdfs/2026-10-11-uzumasa-stakes-v3.12-rerun38108909783-attempt2-v312.pdf",
+      "report": "reports/2026-10-11-uzumasa-stakes-v3.12-rerun38113827050-attempt2-v312.html",
+      "pdf": "pdfs/2026-10-11-uzumasa-stakes-v3.12-rerun38113827050-attempt2-v312.pdf",
       "pdf_mode": "full",
-      "full_report_pages": 51,
+      "full_report_pages": 39,
       "marks": {
         "win": "13 メルカントゥール",
         "second": "5 タガノバビロン",
@@ -990,13 +990,14 @@
       },
       "bets": [
         "三連単 3-4-13",
+        "三連単 4-2-1",
         "単勝 4",
         "馬単 4-1",
         "馬単 4-5"
       ],
       "purchase_decision": "buy",
       "purchase_reason_code": "bought",
-      "total_stake_yen": 400,
+      "total_stake_yen": 500,
       "final_bets": [
         {
           "id": "B01",
@@ -1007,13 +1008,27 @@
             13
           ],
           "stake_yen": 100,
-          "market_odds": 790,
+          "market_odds": 806.4,
           "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040411?umaBan=3&position=1",
-          "observed_at": "2026-10-11T03:37:50.392+00:00",
+          "observed_at": "2026-10-11T05:11:58.277+00:00",
           "market_selection_id": "三連単:[3,4,13]"
         },
         {
           "id": "B02",
+          "type": "三連単",
+          "selection": [
+            4,
+            2,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 752.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040411?umaBan=4&position=1",
+          "observed_at": "2026-10-11T05:11:58.311+00:00",
+          "market_selection_id": "三連単:[4,2,1]"
+        },
+        {
+          "id": "B03",
           "type": "単勝",
           "selection": [
             4
@@ -1021,40 +1036,40 @@
           "stake_yen": 100,
           "market_odds": 12.3,
           "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040411?ninki=0",
-          "observed_at": "2026-10-11T03:37:50.984+00:00",
+          "observed_at": "2026-10-11T05:11:58.664+00:00",
           "market_selection_id": "単勝:[4]"
-        },
-        {
-          "id": "B03",
-          "type": "馬単",
-          "selection": [
-            4,
-            1
-          ],
-          "stake_yen": 100,
-          "market_odds": 84.8,
-          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040411?ninki=0",
-          "observed_at": "2026-10-11T03:37:51.496+00:00",
-          "market_selection_id": "馬単:[4,1]"
         },
         {
           "id": "B04",
           "type": "馬単",
           "selection": [
             4,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 86.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040411?ninki=0",
+          "observed_at": "2026-10-11T05:11:59.104+00:00",
+          "market_selection_id": "馬単:[4,1]"
+        },
+        {
+          "id": "B05",
+          "type": "馬単",
+          "selection": [
+            4,
             5
           ],
           "stake_yen": 100,
-          "market_odds": 75.4,
+          "market_odds": 77.1,
           "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040411?ninki=0",
-          "observed_at": "2026-10-11T03:37:51.496+00:00",
+          "observed_at": "2026-10-11T05:11:59.104+00:00",
           "market_selection_id": "馬単:[4,5]"
         }
       ],
-      "final_bets_fixed_at": "2026-10-11T03:37:51.988Z",
+      "final_bets_fixed_at": "2026-10-11T05:11:59.462Z",
       "step1_fixed_at": "2026-10-11T09:12:47.712+09:00",
-      "e2e_prediction": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38108909783-attempt2.json",
-      "proof_commit": "3dc001ea330d6ed08aae8159ec6ee9f3750b0d1d",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38113827050-attempt2.json",
+      "proof_commit": "a2adc0d4daafe54f8dee2b00736fd795fe54786f",
       "purchase_budget_yen": 6000,
       "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
     }
