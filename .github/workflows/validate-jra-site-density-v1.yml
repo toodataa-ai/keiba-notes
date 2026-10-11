@@ -1,0 +1,26 @@
+name: Validate site typography without JRA regression
+on:
+  pull_request:
+    paths:
+      - 'docs/assets/style.css'
+      - 'docs/assets/methodology.css'
+      - '.github/scripts/test-jra-site-density-v1.py'
+      - '.github/workflows/validate-jra-site-density-v1.yml'
+  push:
+    branches: [main, 'style/jra-site-editorial-density-20261011']
+    paths:
+      - 'docs/assets/style.css'
+      - 'docs/assets/methodology.css'
+      - '.github/scripts/test-jra-site-density-v1.py'
+      - '.github/workflows/validate-jra-site-density-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  site-density:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Verify responsive styles and no change to any original HTML/prediction/PDF
+        run: python3 .github/scripts/test-jra-site-density-v1.py
