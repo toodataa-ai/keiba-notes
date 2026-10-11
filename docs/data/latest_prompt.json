@@ -67,11 +67,11 @@
     "scope": "HTML/PDF presentation only: final purchase decision is placed on page 1, original STEP1/STEP2/bets/odds/proof/CSS/historical PDF bytes untouched",
     "script": {
       "path": ".github/scripts/jra-pdf-presentation-overlay-v1.py",
-      "git_blob_sha": "08d3708ad8e6962ae6b815f44c5c67fdf2e1ee85"
+      "git_blob_sha": "5d461f5356ea2f957574315c72cf180b9b39017f"
     },
     "test": {
       "path": ".github/scripts/test-jra-pdf-presentation-overlay-v1.py",
-      "git_blob_sha": "89d1b145a58e7c7d15eb26a5c3179f73e4a3d12d"
+      "git_blob_sha": "fd99ef19e88603e990baece86c3c49cecbb9ede9"
     },
     "audit_rows_per_page": "Try (selected,rejected,audit) rows in descending verified density: (14,12,14),(12,10,14),(10,9,14),(10,8,14),(10,7,14), then smaller fallback. Persist chosen triple from successful complete A4 PDF inspection, never impose a total-page ceiling.",
     "naming": "For all actual v3.12 prestart purchase_strategy_evaluations, show readable Japanese method labels, concrete ticket-number definitions of box, flows, formations, axes, multipliers and how many component lines are adopted by final_bets (complete/partial/not adopted); never imply a whole BOX was purchased if only subset is selected. Use compact single-line parentheses to minimize A4 rows and avoid an extra page; if density cannot pass prior full PDF validation, do not publish.",
@@ -94,7 +94,8 @@
         "Retain existing 1-horse-per-page A4 and numbered exclusions in tail",
         "Allowed strategy methods are explicitly type-checked for each of the eight JRA ticket types",
         "Independently re-expand each eligible BOX/formation/axis wheel/multi definition and require exact equality with its frozen expanded ticket lines",
-        "No false BOX label for incomplete set; independent enumeration of grouped combinations and same-stake proof against frozen final_bets"
+        "No false BOX label for incomplete set; independent enumeration of grouped combinations and same-stake proof against frozen final_bets",
+        "Derived BOX discovery runs on complete purchased edges/triples only; never enumerate all combinations across all runner numbers"
       ]
     }
   },
