@@ -213,7 +213,7 @@ def make(report):
    ('比較評価した代替セット数',str(risk_diag['tested_portfolios'])),
    ('的中事象を追加できる不採用候補',str(risk_diag['positive_marginal_hit_candidates'])),
    ('的中事象が重複する不採用候補',str(risk_diag['no_marginal_hit_gain'])),
-   ('比較試行ゼロの理由コード',str(risk_diag.get('zero_trial_reason') or '該当なし'))])
+   ('比較試行ゼロの理由コード',{'every_priced_excluded_ticket_is_already_covered_by_selected_events':'未採用の価格確認済み買い目はすべて既存買い目と的中事象が重複', 'v311_neighbourhood_pruned_all_proposals_before_full_evaluation_check_profit_floor_and_loss_guard':'利益下限や損失制約等の事前検査で候補が消え、精査対象0件', 'no_excluded_priced_candidates':'価格確認済みの追加候補なし'}.get(risk_diag.get('zero_trial_reason'),risk_diag.get('zero_trial_reason') or '該当なし'))])
   +paragraph('発走前に実際の買い目価格・市場時刻を固定。的中率優先セットのシナリオ比較は購入推奨と区別します。')
   +paragraph('一部の馬券を増やしても「少なくとも1点的中」は上がりませんが、同時払戻によって期待純利益や純損失確率が変わり得ます。')
   +paragraph('本モデルは未校正であり、期待利益・的中確率の実現を保証しません。'))
