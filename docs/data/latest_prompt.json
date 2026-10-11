@@ -67,14 +67,14 @@
     "scope": "HTML and PDF presentation only in fresh prestart initial/revision workflows; immutable prediction JSON, STEP1/STEP2/odds/approved CSS and prior PDF artifacts unchanged",
     "script": {
       "path": ".github/scripts/jra-pdf-presentation-overlay-v1.py",
-      "git_blob_sha": "b765ddfce26bcb4392387df77d92154ba18681b9"
+      "git_blob_sha": "063f7dda1f8a7b187528ed57cfcff42f9725707b"
     },
     "test": {
       "path": ".github/scripts/test-jra-pdf-presentation-overlay-v1.py",
-      "git_blob_sha": "8ad689ccbc473d41f09ee032190e6a9e518ed66f"
+      "git_blob_sha": "3913804ae6d7690702d7eef690f5cb61fbd32c15"
     },
     "audit_rows_per_page": "Try (selected,rejected,audit) rows in descending verified density: (14,12,14),(12,10,14),(10,9,14),(10,8,14),(10,7,14), then smaller fallback. Persist chosen triple from successful complete A4 PDF inspection, never impose a total-page ceiling.",
-    "naming": "For all actual v3.12 prestart purchase_strategy_evaluations, show readable Japanese method labels, concrete ticket-number definitions of box, flows, formations, axes, multipliers and how many component lines are adopted by final_bets (complete/partial/not adopted); never imply a whole BOX was purchased if only subset is selected.",
+    "naming": "For all actual v3.12 prestart purchase_strategy_evaluations, show readable Japanese method labels, concrete ticket-number definitions of box, flows, formations, axes, multipliers and how many component lines are adopted by final_bets (complete/partial/not adopted); never imply a whole BOX was purchased if only subset is selected. Use compact single-line parentheses to minimize A4 rows and avoid an extra page; if density cannot pass prior full PDF validation, do not publish.",
     "requires_acceptance": "Every PDF page validated by existing v3.12 PDF content/layout gate and new A4 density CI"
   }
 }
