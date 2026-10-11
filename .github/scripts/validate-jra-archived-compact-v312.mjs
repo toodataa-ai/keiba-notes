@@ -19,7 +19,7 @@ function run(path){
  return p.status;
 }
 const latest=JSON.parse(fs.readFileSync('docs/data/latest_prompt.json','utf8'));
-if(latest.version!=='v3.12')process.exit(run(script)??1);
+if(!['v3.12','v3.13'].includes(latest.version))process.exit(run(script)??1);
 assert.equal(run('.github/scripts/validate-bet-type-coverage-v312.mjs'),0,
   'must validate authentic compact historical schema first');
 const moved=[];

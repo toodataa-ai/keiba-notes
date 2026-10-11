@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-11T11:30:00+09:00",
+  "updated_at": "2026-10-11T16:00:00+09:00",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -396,6 +396,39 @@
         "承認済みA4縦・1頭1ページ・評価色CSSとWIN5除外"
       ],
       "reason": "2026-10-11のJRA東京11Rで三連単78点が市場価格未取得により比較対象から落ち、11点購入時の集合的中率と1点/5点との差異・最適化試行ゼロが帳票に説明されなかったため。"
+    },
+    {
+      "version": "v3.13",
+      "date": "2026-10-11",
+      "path": "競馬予想_完全版プロンプト_v3.13.txt",
+      "source": "formal_STEP2_win_stake_recovery_after_bounded_shadow_validation",
+      "previous_version": "v3.12",
+      "approval_class": "user-requested-STEP2-only",
+      "summary": "単勝の購入額100円固定を解除し、発走前の実オッズと全券種同時損益から回収可能性・期待利益・損失確率を考慮した条件付きの100円刻み配分を正式採用。採用組番・STEP1・過去予想は不変。",
+      "changes": [
+        "単勝1点の投資額を100円刻み、最大1,200円の候補として評価。レース上限6,000円。",
+        "全着順同時分布に基づく購入セット全体の非損失確率を優先し、期待利益・低位シナリオ悪化ガードを適用。",
+        "増額不可なら100円を保持。旧v3.12購入セットを明示的に保存し、最終金額とPDFの合計・券種別金額を独立再監査。",
+        "発走前のGit proof、価格証跡、PDF実体・公開HTTP検品を新v3.13ワークフローで運用。"
+      ],
+      "unchanged": [
+        "STEP1と印・全頭①〜⑨評価",
+        "能力評価と市場オッズの分離",
+        "v3.12の券種・方式・買い目最適化の集合選択",
+        "既存の発走前確定予想・proof_commit・PDF/HTML",
+        "A4縦1頭1ページ・評価色・不採用全件理由",
+        "地方競馬Shadow"
+      ],
+      "evidence": {
+        "prestart_replay_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38116735569",
+        "races": [
+          "2026-10-11-ireland-trophy",
+          "2026-10-11-uzumasa-stakes"
+        ],
+        "real_race_result": "Both remain 100 yen; no forced overinvestment",
+        "synthetic_stake_change": "100 to 200 yen when positive modeled full-portfolio nonloss improvement"
+      },
+      "reason": "単勝は実オッズと他券種への投資額次第で100円以上の配分が購入セット全体の非損失確率を改善し得る。反面、強制増額を避けるため利益・損失リスクの制約を満たした場合に限る。"
     }
   ],
   "execution_addenda": [

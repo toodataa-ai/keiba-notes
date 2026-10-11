@@ -1,0 +1,105 @@
+name: JRA v3.13 formal release acceptance
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/*v313*'
+      - '.github/workflows/jra-*v313.yml'
+      - '.github/workflows/validate-jra-v313-release.yml'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'docs/data/jra_v313_historical_adapter_v1.json'
+      - 'e2e_validation/manifests/v3.13.json'
+      - '競馬予想_完全版プロンプト_v3.13.txt'
+  push:
+    branches: [main, 'feature/jra-v313-win-stake-formal-20261011']
+    paths:
+      - '.github/scripts/*v313*'
+      - '.github/workflows/jra-*v313.yml'
+      - '.github/workflows/validate-jra-v313-release.yml'
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'docs/data/jra_v313_historical_adapter_v1.json'
+      - 'e2e_validation/manifests/v3.13.json'
+      - '競馬予想_完全版プロンプト_v3.13.txt'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  version-and-stakes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Historical 83-SHA proof and official v3.13 pointer
+        run: |
+          node .github/scripts/validate-jra-prompt-v312.mjs
+          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/validate-prompt-history.mjs
+      - name: Full STEP2 real prereace and synthetic investment comparison
+        run: |
+          node .github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs
+          node .github/scripts/test-jra-v313-formal-real.mjs
+          node .github/scripts/test-jra-win-stake-real-replay-v313.mjs
+      - name: Install exact immutable PDF renderer and Japanese fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Re-render two prestart formal predictions without changing archived sources
+        run: |
+          set -euo pipefail
+          for RACE in ireland-trophy uzumasa-stakes; do
+            if [[ "$RACE" == ireland-trophy ]]; then
+              SOURCE=e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json
+            else
+              SOURCE=e2e_validation/predictions/2026-10-11-uzumasa-stakes/v3.12-rerun38113827050-attempt2.json
+            fi
+            mkdir -p jra-v313-release-audit
+            OUT="jra-v313-release-audit/$RACE.json"
+            node --input-type=module - "$SOURCE" "$OUT" <<'NODE'
+          import fs from 'node:fs';
+          import {upgradeToV313} from './.github/scripts/jra-prestart-pipeline-v313.mjs';
+          import {validateV313} from './.github/scripts/validate-jra-portfolio-v313.mjs';
+          const [source,dest]=process.argv.slice(2);
+          const original=fs.readFileSync(source,'utf8');
+          const upgraded=upgradeToV313(JSON.parse(original));
+          const failures=validateV313(upgraded);
+          if(failures.length)throw Error(failures.join('; '));
+          fs.writeFileSync(dest,JSON.stringify(upgraded,null,2)+'\n');
+          if(fs.readFileSync(source,'utf8')!==original)throw Error('historical file changed');
+          console.log('V313_TICKET_AND_GIT_PROOF_VALID',upgraded.race_id);
+          NODE
+            PREVIEW_HTML="jra-v313-release-audit/$RACE.html"
+            PREVIEW_PDF="jra-v313-release-audit/$RACE.pdf"
+            PASS=0
+            for ROWS in 14:12:14:6 12:10:14:6 10:9:14:6 10:8:14:6 10:7:14:6 8:5:10:4 6:4:8:3 4:3:6:2 2:2:4:1 1:1:2:1; do
+              IFS=: read -r SEL REJ AUD COVER <<< "$ROWS"
+              if JRA_SELECTED_ROWS_PER_PAGE="$SEL" JRA_REJECTED_ROWS_PER_PAGE="$REJ" JRA_AUDIT_ROWS_PER_PAGE="$AUD" \
+                python3 .github/scripts/jra-render-live-v313.py "$OUT" "$PREVIEW_HTML" &&
+                 JRA_COVER_BETS_PER_TYPE="$COVER" python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$PREVIEW_HTML" --prediction "$OUT" &&
+                python3 -m weasyprint "$PREVIEW_HTML" "$PREVIEW_PDF" &&
+                python3 .github/scripts/validate-jra-pdf-content-v313.py --html "$PREVIEW_HTML" --pdf "$PREVIEW_PDF" --prediction "$OUT"; then
+                PASS=1;echo "V313_FULL_A4_PDF_PASS $RACE $ROWS";break
+              fi
+            done
+            [[ "$PASS" == 1 ]] || { echo "::error::v3.13 full PDF audit failed for $RACE";exit 1; }
+          done
+      - name: Historical predictions, CSS and PDF files are unchanged
+        run: |
+          set -euo pipefail
+          git diff --quiet HEAD -- e2e_validation/predictions docs/pdfs docs/reports docs/assets/jra-pdf-reader-v1.css
+          echo 'PASS: historic JRA predictions, PDF bytes, styling and publicly sealed original proofs remain untouched'
+      - name: Attach E2E comparison and A4 preview PDFs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-v313-formal-release-audit
+          path: |
+            jra-v313-release-audit/
+            jra-v313-replay-artifacts/
+          if-no-files-found: ignore

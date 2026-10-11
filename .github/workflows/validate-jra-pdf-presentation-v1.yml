@@ -34,7 +34,7 @@ jobs:
           import json, subprocess
           from pathlib import Path
           j=json.loads(Path('docs/data/latest_prompt.json').read_text(encoding='utf-8'))
-          assert j['version']=='v3.12'
+          assert j['version'] in ('v3.12','v3.13')
           addon=j['pdf_presentation_overlay']
           for k in ('script','test'):
               obj=addon[k]

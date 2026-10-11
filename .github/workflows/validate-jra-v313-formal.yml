@@ -1,0 +1,36 @@
+name: JRA v3.13 formal WIN stake sizing E2E validator
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/*v313.mjs'
+      - '.github/scripts/test-jra-v313-formal-real.mjs'
+      - '.github/scripts/jra-win-recovery-stake-shadow-v1.mjs'
+      - '.github/workflows/validate-jra-v313-formal.yml'
+  push:
+    branches: [main, 'feature/jra-v313-win-stake-formal-20261011']
+    paths:
+      - '.github/scripts/*v313.mjs'
+      - '.github/scripts/test-jra-v313-formal-real.mjs'
+      - '.github/scripts/jra-win-recovery-stake-shadow-v1.mjs'
+      - '.github/workflows/validate-jra-v313-formal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Regression test frozen baseline and bounded WIN amounts
+        run: |
+          node .github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs
+          node .github/scripts/test-jra-v313-formal-real.mjs
+          node .github/scripts/test-jra-win-stake-real-replay-v313.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v313-prestart-comparison
+          path: jra-v313-replay-artifacts/prestart-stakes-comparison.json

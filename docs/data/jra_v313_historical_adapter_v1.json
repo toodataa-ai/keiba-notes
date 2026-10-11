@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "release": "v3.13",
+  "purpose": "Scoped version-aware validation adapters for v3.13 only; original sources are retained and checked against historical Git commit. Prediction data, historical PDFs, STEP1 and approved CSS never change.",
+  "historical_anchor_commit": "e8e0bec266cb8ed66c485989dc3852cb5abdebd4",
+  "superseded_components": [
+    {
+      "path": ".github/scripts/validate-jra-ci-forward-v312.mjs",
+      "original_blob_sha": "8c1fe9cbd078d2616b0fb1dd692a03ba5e153fba",
+      "current_blob_sha": "d7b00f240040864ae7dd15671b200266fd4d722f"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prompt-v312.mjs",
+      "original_blob_sha": "fe5202cd33a520dbd95a29a20f3f4d4dfed6a7a3",
+      "current_blob_sha": "d4c90b17b33040e91b029fa39b98e50ebf3eb7ef"
+    },
+    {
+      "path": ".github/scripts/validate-jra-archived-compact-v312.mjs",
+      "original_blob_sha": "668adea090c2cf85313128991cc7a9ae29b4b034",
+      "current_blob_sha": "45979221cdf04bc40c62394f74e21d59bbde5316"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prerace-v312.mjs",
+      "original_blob_sha": "40c741dea0d2b87a1dfb0e9deaf1691f0dc963a9",
+      "current_blob_sha": "42f9ea0a563c63868c7ed35b4e1ec7e9aed38e68"
+    },
+    {
+      "path": "e2e_validation/validate_manifests.py",
+      "original_blob_sha": "9939d10a7303af778f580602c750e90edc16915e",
+      "current_blob_sha": "12feea5ae57f6c0a338a492a40b82de2ee0fd1f6"
+    }
+  ],
+  "fail_closed_on_other_changes": true,
+  "scope": "Only v3.13 current-version acceptance; never relax historical manifest, frozen portfolios or quoted lines."
+}
