@@ -44,7 +44,7 @@ function fixture(){
    source_url:synthetic,source_capture_sha256:'a'.repeat(64),quote_verified:true});
  }
  const capturePath='e2e_validation/quote-evidence/fixture-synthetic-only.json';
- const captureData=JSON.stringify({source_url:synthetic,observed_at:quoteAt,lines:[...odds.values()].map(q=>({type:q.type,selection:q.selection,market_odds:q.market_odds}))});
+ const captureData=JSON.stringify({source_url:synthetic,observed_at:quoteAt,entries:[...odds.values()].map(q=>({type:q.type,selection:q.selection,market_odds:q.market_odds}))});
  fs.mkdirSync('e2e_validation/quote-evidence',{recursive:true});
  fs.writeFileSync(capturePath,captureData);
  const realDigest=createHash('sha256').update(captureData).digest('hex');
