@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scope": "PRE-RACE",
   "date": "2026-10-11",
-  "request_seq": 1,
+  "request_seq": 2,
   "production_effect": false,
   "official_calendar_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TodayRaceInfoTop",
   "expected_races_by_venue": {
@@ -12,5 +12,5 @@
     "kochi": 11,
     "saga": 11
   },
-  "reason": "User requires all official races of the day, not a skip when the original six configured venues do not race. Preserve immutable cutoff and account for all 56 races, including coverage gaps."
+  "reason": "Idempotent re-audit of 56 official races and six pre-start frozen predictions; verify manifest and actual GitHub Pages live files. Never modify original predictions."
 }
