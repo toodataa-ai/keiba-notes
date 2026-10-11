@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "release": "v3.13",
+  "purpose": "Version-aware legacy CI only: permit two historical prompt pointer acceptance adapters to work with latest v3.13; every original prior JRA predictor, manifest SHA, strategy, STEP1, PDF CSS and published prediction remains immutable.",
+  "historical_anchor_commit": "e8e0bec266cb8ed66c485989dc3852cb5abdebd4",
+  "superseded_components": [
+    {
+      "path": ".github/scripts/validate-jra-ci-forward-v312.mjs",
+      "original_blob_sha": "8c1fe9cbd078d2616b0fb1dd692a03ba5e153fba",
+      "current_blob_sha": "d7b00f240040864ae7dd15671b200266fd4d722f"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prompt-v312.mjs",
+      "original_blob_sha": "fe5202cd33a520dbd95a29a20f3f4d4dfed6a7a3",
+      "current_blob_sha": "0b792ef491e004c92af38e27e86a48c71cd9c3d0"
+    }
+  ],
+  "fail_closed_on_other_changes": true,
+  "scope": "Only v3.13 current-version acceptance; never relax historical manifest, frozen portfolios or quoted lines."
+}
