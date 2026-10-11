@@ -48,6 +48,7 @@ jobs:
           for k in ('workflow','new_race_workflow'):
               script=Path(x[k]['path']).read_text()
               assert script.count('jra-pdf-presentation-overlay-v1.py')>=2
+              assert script.count(' --prediction ')>=2
               assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS' in script
               assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"' in script
           PY
@@ -74,7 +75,7 @@ jobs:
               IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS <<< "$ROWS"
               if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
                    python3 .github/scripts/jra-render-live-v312.py "$PRED" "$OUTPUT_HTML" &&
-                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML" &&
+                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML" --prediction "$PRED" &&
                  python3 -m weasyprint "$OUTPUT_HTML" "$OUTPUT_PDF" &&
                  python3 .github/scripts/validate-jra-pdf-content-v312.py \
                    --html "$OUTPUT_HTML" --pdf "$OUTPUT_PDF" --prediction "$PRED"; then
