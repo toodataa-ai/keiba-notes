@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-11",
+  "updated_at": "2026-10-11T10:36:00+09:00",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -392,6 +392,26 @@
         "承認済みPDF仕様・地方競馬Shadow"
       ],
       "reason": "ユーザーが『課題やエラーがあった場合は止めて構わないが、何もないのに途中でやめない』を実行の基本方針として明示したため。"
+    },
+    {
+      "id": "jra-prerace-canonical-overwrite-v1",
+      "date": "2026-10-11",
+      "applies_to_prompt_version": "v3.11",
+      "path": "docs/operations/jra_prerace_overwrite_v1.txt",
+      "policy": "docs/data/jra_prerace_overwrite_policy_v1.json",
+      "type": "prepost_publication_and_replacement_only",
+      "summary": "発走前の同一JRAレースは検証済み新予想で公開上の最新版に上書き可能。旧固定原本・旧proofは履歴保全し、発走後の更新は禁止。",
+      "changes": [
+        "正式予想の現行公開参照を同レースの発走前に限って差し替え可能",
+        "新版の発走前Git proofと実オッズ出典、PDF検品を要求",
+        "旧版の公開レコード全体を改訂台帳へ退避し、旧原本はGitに残す",
+        "発走後・回顧済み・未検証公開では自動停止"
+      ],
+      "unchanged": [
+        "v3.11のSTEP1・STEP2・馬券セット選択と期待値",
+        "旧immutable prediction/snapshot/commit/PDFの内容",
+        "既存の結果/反省会/成績・地方Shadow"
+      ]
     }
   ]
 }
