@@ -33,9 +33,9 @@ jobs:
       - name: Demonstrate trifecta eligibility and negative tests
         run: node .github/scripts/test-multi-candidate-v35.mjs
       - name: Scan formal v3.5+ predictions for candidate-level evidence
-        run: node .github/scripts/validate-multi-candidate-v35.mjs
+        run: node .github/scripts/validate-jra-archived-compact-v312.mjs .github/scripts/validate-multi-candidate-v35.mjs
       - name: Preserve legacy eight-/nine-ticket policy validity
         run: |
           node .github/scripts/test-purchase-gate-v34.mjs
           node .github/scripts/test-jra-conditional-ticket-probability.mjs
-          node .github/scripts/validate-bet-type-coverage.mjs
+          node .github/scripts/validate-bet-type-coverage-v312.mjs
