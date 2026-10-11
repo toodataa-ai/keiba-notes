@@ -1,0 +1,44 @@
+name: Validate JRA v3.12 execution-only full live odds recapture
+on:
+  pull_request:
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/jra_fresh_odds_policy_v312_exec.json'
+      - '.github/scripts/jra-odds-full-refresh-v312-exec.py'
+      - '.github/scripts/jra-check-fresh-quotes-v312-exec.py'
+      - '.github/scripts/validate-jra-fresh-exec-v312.mjs'
+      - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+  push:
+    branches: [feature/jra-v313-fresh-odds-constrained-search, main]
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/jra_fresh_odds_policy_v312_exec.json'
+      - '.github/scripts/jra-odds-full-refresh-v312-exec.py'
+      - '.github/scripts/jra-check-fresh-quotes-v312-exec.py'
+      - '.github/scripts/validate-jra-fresh-exec-v312.mjs'
+      - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+permissions:
+  contents: read
+jobs:
+  sha-and-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify original JRA v3.12 SHA-pinned immutable model and all earlier versions
+        run: |
+          node .github/scripts/validate-jra-prompt-v312.mjs
+          node .github/scripts/validate-jra-prerace-v312.mjs
+          node .github/scripts/validate-jra-fresh-exec-v312.mjs
+          python3 e2e_validation/validate_manifests.py
+      - name: Syntax and old source-parser fixture regression
+        run: |
+          python3 -m py_compile .github/scripts/jra-odds-full-refresh-v312-exec.py .github/scripts/jra-check-fresh-quotes-v312-exec.py
+          python3 -m pip install -q requests beautifulsoup4
+          python3 .github/scripts/test-jra-odds-recovery-v312.py
+          node .github/scripts/test-jra-purchase-audit-v312.mjs
