@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 import fitz
 
-BASE=Path(__file__).with_name('validate-jra-pdf-layout.py')
+BASE=Path(__file__).with_name('validate-jra-pdf-layout-v312.py')
 spec=importlib.util.spec_from_file_location('jra_v37_reader_gate', BASE)
 mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
 
