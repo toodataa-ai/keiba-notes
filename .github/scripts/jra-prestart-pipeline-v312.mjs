@@ -235,7 +235,7 @@ export function assemble(input,freezeAt,proofCommit=null){
    budget_yen:6000,strategies,outcome_distributions:dist,
    frame_map:frame,race_context:race,freeze_at:freezeAt
  },portfolio);
- const pid='P-'+input.race_id+'-v311';
+ const pid='P-'+input.race_id+'-v312';
  const selected=portfolio.selected_lines.map((line,i)=>({...line,id:'B'+String(i+1).padStart(2,'0')}));
  const finalBets=selected.map(x=>({id:x.id,type:x.type,selection:x.selection,stake_yen:x.stake_yen,
   market_odds:x.market_odds,source_url:x.source_url,observed_at:x.observed_at,market_selection_id:x.market_selection_id}));
