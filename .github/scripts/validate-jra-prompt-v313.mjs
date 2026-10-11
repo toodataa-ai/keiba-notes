@@ -9,6 +9,8 @@ const now=json('e2e_validation/manifests/v3.13.json');
 const latest=json('docs/data/latest_prompt.json');
 const history=json('docs/data/prompt_history.json');
 const allowed=json('docs/data/jra_v313_historical_adapter_v1.json');
+const oldSup=json('docs/data/jra_ci_supersession_v312.json');
+const oldWorkflowExemptions=new Map(oldSup.superseded_components.map(x=>[x.path,x]));
 const hash=p=>execFileSync('git',['hash-object',p],{encoding:'utf8'}).trim();
 assert.equal(now.prompt_version,'v3.13');
 assert.deepEqual(now.components.slice(0,old.components.length),old.components,
@@ -24,7 +26,16 @@ for(const {path,git_blob_sha} of now.components){
  assert(!seen.has(path),'duplicate manifest path '+path);seen.add(path);
  assert(fs.existsSync(path),'required original or new v3.13 file absent '+path);
  const actual=hash(path);
- if(overrides.has(path)){
+ if(oldWorkflowExemptions.has(path)){
+  const x=oldWorkflowExemptions.get(path);
+  assert.equal(git_blob_sha,x.historical_blob_sha,'v3.11 workflow manifest SHA pin replaced '+path);
+  assert.equal(actual,x.current_blob_sha,'not approved inherited v3.12 CI workflow '+path);
+  const originalCommit=oldSup.historical_base_commit_sha;
+  try{execFileSync('git',['cat-file','-e',originalCommit+':'+path],{stdio:'ignore'});}
+  catch{execFileSync('git',['fetch','--no-tags','--depth=1','origin',originalCommit],{stdio:'ignore'});}
+  assert.equal(execFileSync('git',['rev-parse',originalCommit+':'+path],{encoding:'utf8'}).trim(),
+    git_blob_sha,'original v3.11 approved CI workflow missing');
+ } else if(overrides.has(path)){
   const x=overrides.get(path);
   assert.equal(git_blob_sha,x.original_blob_sha,'historical legacy SHA was overwritten '+path);
   assert.equal(actual,x.current_blob_sha,'unauthorized historic validator change '+path);
