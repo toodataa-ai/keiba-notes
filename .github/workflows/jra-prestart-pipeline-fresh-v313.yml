@@ -27,8 +27,8 @@ jobs:
       - name: Run v3.13 balanced optimisation, history and regression CI
         run: |
           node .github/scripts/test-jra-balanced-v311.mjs
-          node .github/scripts/test-jra-purchase-audit-v313.mjs
-          python3 -m py_compile .github/scripts/jra-odds-recovery-v313.py .github/scripts/jra-render-live-v313.py .github/scripts/validate-jra-pdf-content-v313.py
+          node .github/scripts/test-jra-purchase-audit-v312.mjs
+          python3 -m py_compile .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v313.py .github/scripts/validate-jra-pdf-content-v313.py
           node .github/scripts/validate-jra-prompt-v313.mjs
           node .github/scripts/validate-prompt-history.mjs
           node .github/scripts/test-jra-v313-formal-real.mjs
