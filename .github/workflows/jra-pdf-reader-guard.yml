@@ -56,6 +56,19 @@ jobs:
               source=Path('docs') / race['report'] if race.get('report') else None
               if not source or not source.exists():
                   raise SystemExit('Missing authored HTML for eligible new JRA report: '+race['id'])
+              # v3.12 immutable published PDFs are validated AS SAVED with
+              # their dedicated pinned v3.12 pagination contract, not by
+              # generic v3.7 rerender which falsely rejects v3.12 tail pages.
+              # Never regenerate or mutate a post-start PDF during review.
+              if race.get('prompt_version')=='v3.12':
+                  pdf=Path('docs') / race['pdf']
+                  prediction=Path(race['e2e_prediction'])
+                  if not pdf.is_file() or not prediction.is_file():
+                      raise SystemExit('Missing immutable v3.12 PDF / prediction: '+race['id'])
+                  subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-content-v312.py',
+                      '--html',str(source),'--pdf',str(pdf),'--prediction',str(prediction)],check=True)
+                  checked+=1
+                  continue
               dest=out / (race['id']+'.pdf')
               subprocess.run([sys.executable,'-m','weasyprint',str(source),str(dest)],check=True)
               subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-layout.py',

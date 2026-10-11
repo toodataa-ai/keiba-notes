@@ -43,6 +43,10 @@ def resolve_repo_path(value: str | None) -> Path | None:
 
 
 def preview_prediction(pred: dict) -> dict:
+    # Only interpret the sealed v3.12 proof-compatible projection for display.
+    # Original GitHub prediction JSON and purchase decisions never change.
+    from e2e_validation.evaluate import normalize_formal_v312_for_e2e
+    pred = normalize_formal_v312_for_e2e(pred)
     ctx = pred.get("race_context") or {}
     return {
         "version": pred.get("prompt_version"),

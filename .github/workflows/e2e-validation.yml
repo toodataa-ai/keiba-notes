@@ -68,9 +68,9 @@ jobs:
             --cases e2e_validation/cases \
             --output docs/data/e2e_status.json
 
-      - name: Evaluate E0 E1 E2 shadow diagnostics
+      - name: Calculate E0 E1 E2 shadow coverage and retain all evidence gaps
         run: |
-          python e2e_validation/validate_experience_history_v312.py
+          python experience_regime_v1/analyze.py --cases e2e_validation/cases --output docs/data/experience_regime_status.json --allow-errors > /dev/null
 
       - name: Build public JRA E2E Shadow data
         run: python e2e_validation/build_public_data.py
@@ -98,3 +98,10 @@ jobs:
           git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/e2e-shadow
           git commit -m 'Update E2E validation and public Shadow data'
           git push
+
+      # This is intentionally LAST: even an incomplete orthogonal E0/E1/E2
+      # Shadow dataset must not prevent immutable formal Grade A E2E metrics
+      # and its explicit error report from being published. A failing Shadow
+      # audit still fails the overall workflow; no silent passing waiver.
+      - name: Enforce experience-regime evidence completeness (fail closed)
+        run: python e2e_validation/validate_experience_history_v312.py
