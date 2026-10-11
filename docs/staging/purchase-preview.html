@@ -10,7 +10,7 @@ h1{font-size:23px;margin:14px 0 8px}h2{font-size:18px;margin:0 0 8px}p{line-heig
 .card{background:#fff;border:1px solid #dadfe5;padding:15px;border-radius:9px;margin:18px 0}.card .report{font-size:12px;color:#5c6876;margin-bottom:12px}
 .action-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.action-table th{background:#f1f3f6;padding:9px;text-align:left;font-size:12px;border-bottom:1px solid #d0d6dd}.action-table td{vertical-align:top;padding:10px 8px;border-bottom:1px solid #e0e4e9;overflow-wrap:anywhere}
 .action-table col:nth-child(1){width:18%}.action-table col:nth-child(2){width:49%}.action-table col:nth-child(3){width:33%}
-.action-table strong{font-weight:750}.action-table .ana{background:#fff8f1}.method{font-size:11px;color:#556374}.ana-heading{font-size:11px;font-weight:700;color:#8c562e;margin:12px 0 5px;padding-left:2px}.ana-table{border-top:1px solid #e0c9aa}.numbers{line-height:1.8;font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:.01em}.money{font-weight:700;font-variant-numeric:tabular-nums}
+.action-table strong{font-weight:750}.action-table .ana{background:#fff8f1}.action-table .big{background:#fff4ed}.method{font-size:11px;color:#556374}.ana-heading{font-size:11px;font-weight:700;color:#8c562e;margin:12px 0 5px;padding-left:2px}.ana-table{border-top:1px solid #e0c9aa}.big-heading{color:#8e4425}.big-table{border-top:1px solid #c8997b}.numbers{line-height:1.8;font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:.01em}.money{font-weight:700;font-variant-numeric:tabular-nums}
 .metrics{display:flex;gap:12px;flex-wrap:wrap;background:#f6f7f8;padding:9px 10px;margin-top:12px;font-size:12px}
 small{color:#677380;line-height:1.5}.skip{color:#9a5b20}.nav a{color:#285784;margin-right:14px;font-size:12px}
 @media(max-width:550px){.audit-wrap{padding:10px 9px}.card{padding:10px}.action-table{font-size:11px}.action-table td,.action-table th{padding:8px 5px}.action-table col:nth-child(1){width:20%}.action-table col:nth-child(2){width:48%}.action-table col:nth-child(3){width:32%}h1{font-size:19px}}
@@ -20,10 +20,10 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 .staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
 </style>
 </head><body>
-<div class="staging-visual-marker" role="status">STAGING <small>844c8f1</small></div>
+<div class="staging-visual-marker" role="status">STAGING <small>e7af563</small></div>
 <main class="audit-wrap"><div class="nav"><a href="staging/index.html">← ステージングトップ</a><a href="staging/release-history.html">公開履歴・復元方式</a></div>
-<h1>買いやすい購入方法：最大3操作＋穴狙い1行</h1>
-<p class="subtle">通常の購入方法は最大3行、穴狙いを別枠で1行だけ表示します。三連単は原則6点以上、三連複は3点以上のまとまった買い目を候補とし、1点に絞る推奨は避けます。券種・馬番・JRA画面での指定方法・点数・合計を確認できます。元の正式買い目を無理に3行に隠したものではなく、別の購入セットに選び直す実験です。</p>
+<h1>買いやすい購入方法：最大3操作＋中穴1行＋大穴1行</h1>
+<p class="subtle">通常の購入方法は最大3行、さらに中穴（20倍以上100倍未満）と大穴（100倍以上・的中時1万円以上）をそれぞれ表の外に見出しを置き、最大1行ずつ表示します。各区分の実測オッズとモデル期待利益が採用条件に合わなければ見送ります。三連単は原則6点以上、三連複は3点以上のまとまった買い目を候補とし、1点に絞る推奨は避けます。券種・馬番・JRA画面での指定方法・点数・合計を確認できます。元の正式買い目を無理に3行に隠したものではなく、別の購入セットに選び直す実験です。</p>
 <p class="subtle" style="margin:5px 0 12px"><strong>馬券の表記：</strong>馬連・ワイド・三連複＝「－」（着順を問わない）／馬単・三連単＝「→」（着順あり）／BOXの「・」＝選ぶ馬番一覧</p>
 <div id="raceCards" aria-live="polite"><p>2026年10月12日の固定済み予想を検証中…</p></div>
 <p class="subtle">モデルは未校正です。実オッズは取得時点の値で最終オッズではありません。画面の結果は反実仮想の研究用であり、発走前の正式予想を変更しません。</p></main>
@@ -44,10 +44,10 @@ async function loadRace(id,name){
  const table=el('table','action-table');addCols(table);
  const head=el('thead');const hrow=el('tr');
  for(const text of ['券種・買い方','指定馬番／購入操作','点数 × 単価＝金額'])hrow.append(el('th','',text));
- head.append(hrow);table.append(head);const tbody=el('tbody'),anaBody=el('tbody');const rows=[...d.regular_commands,d.ana_command];
- if(d.regular_commands.length>3||rows.length>4)throw Error('購入行数が制約を超過');
+ head.append(hrow);table.append(head);const tbody=el('tbody'),mediumBody=el('tbody'),largeBody=el('tbody');const rows=[...d.regular_commands,d.medium_command,d.large_command];
+ if(d.regular_commands.length>3||rows.length>5||!d.medium_command||!d.large_command)throw Error('購入行数または区分が不正');
  for(const c of rows){
-   const tr=el('tr',c.category==='穴狙い'?'ana':'');
+   const tr=el('tr',c.category==='中穴'?'ana':c.category==='大穴'?'big':'');
    const first=el('td');first.append(el('strong','',c.type||'見送り'),el('div','method',({
    box:'BOX',formation:'フォーメーション',single:'個別指定',key_wheel:'1頭軸流し',
    key_wheel_first:'1着固定流し',key_wheel_second:'2着固定流し',key_wheel_multi:'マルチ',
@@ -57,14 +57,17 @@ async function loadRace(id,name){
    const second=el('td','numbers'+(c.method==='pass'?' skip':''),c.jra_input);
    const third=el('td','money',c.points?c.points+'点 × '+yen(c.unit_stake_yen)+' = '+yen(c.stake_yen):'購入なし・0円');
    tr.append(first,second,third);
-   (c.category==='穴狙い'?anaBody:tbody).append(tr);
+   (c.category==='中穴'?mediumBody:c.category==='大穴'?largeBody:tbody).append(tr);
  }
  table.append(tbody);section.append(table);
- // The classification sits OUTSIDE the betting grid, so all four ticket rows
- // retain identical columns (type/method, horses, points and amount).
- section.append(el('div','ana-heading','穴狙い'));
- const anaTable=el('table','action-table ana-table');addCols(anaTable);anaTable.append(anaBody);
- anaTable.setAttribute('aria-label','穴狙い購入候補');section.append(anaTable);
+ // Both longshot class labels are OUTSIDE the table. The three columns
+ // always retain type/method, selection, points×unit=stake.
+ section.append(el('div','ana-heading','中穴（20〜100倍未満）'));
+ const mediumTable=el('table','action-table ana-table');addCols(mediumTable);mediumTable.append(mediumBody);
+ mediumTable.setAttribute('aria-label','中穴購入候補');section.append(mediumTable);
+ section.append(el('div','ana-heading big-heading','大穴（100倍以上・万馬券狙い）'));
+ const largeTable=el('table','action-table big-table');addCols(largeTable);largeTable.append(largeBody);
+ largeTable.setAttribute('aria-label','大穴購入候補');section.append(largeTable);
  const m=d.summary;
  if(m){
  const metrics=el('div','metrics');
@@ -76,7 +79,7 @@ async function loadRace(id,name){
  const contrast=d.change_vs_formal;
  if(contrast)section.append(el('p','subtle','正式版との差：期待純利益 '+yen(contrast.expected_profit_yen)+
  '／的中確率 '+signed(contrast.union_hit_pp)+'pt／損失確率 '+signed(contrast.net_loss_pp)+'pt'));
- section.append(el('small','','注意：穴狙いは高配当・低い推定事象確率の別枠。採用基準に合わなければ見送ります。新正式版の審査前は実際の購入推奨として使用しないでください。'));
+ section.append(el('small','','注意：大穴は的中した100円券の払戻が1万円以上になるオッズを条件にしますが、的中や利益を保証しません。中穴・大穴とも条件を満たさなければ見送りです。新正式版の審査前は実際の購入推奨として使用しないでください。'));
  return section;
 }
 (async()=>{const host=document.getElementById('raceCards');host.textContent='';
