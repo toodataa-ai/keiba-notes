@@ -113,8 +113,24 @@ def main():
                          "reviewed_races": data.get("reviewed_races", 0),
                          "summary": data.get("summary"), "findings": data.get("findings", []),
                          "path": "data/local-racing-shadow/analysis/" + path.name})
+    # Surface coverage gaps even when no legitimate pre-start predictions exist.
+    coverage = []
+    for path in sorted((ROOT / "diagnostics").glob("*-all-venues-prerace-run.json")):
+        report = read(path)
+        if report.get("scope") != "PRE-RACE_ALL_OFFICIAL_VENUES":
+            continue
+        changed |= write_if_changed(PUBLIC / "coverage" / path.name, report)
+        coverage.append({
+            "date": report.get("date"),
+            "official_total_races": report.get("official_total_races"),
+            "created_count": report.get("created_count"),
+            "gap_count": report.get("gap_count"),
+            "status": report.get("status"),
+            "path": "data/local-racing-shadow/coverage/" + path.name
+        })
     # Preserve timestamp if nothing changed, so scheduled runs do not cause noise.
     desired = dict(previous)
+    desired["daily_coverage"] = coverage
     desired.update({"races": entries, "daily_analysis": analyses})
     before = dict(previous)
     before.pop("updated_at", None)
@@ -131,6 +147,10 @@ def main():
         status["totals"]["pre_race_snapshots"] = len(entries)
         status["totals"]["results_joined"] = sum(x["status"] == "reviewed" for x in entries)
         venue_data = status.get("venues", {})
+        if isinstance(venue_data, dict):
+            for key, label in enabled.items():
+                venue_data.setdefault(key, {"label": label, "enabled": True, "races_observed": 0})
+            status["venues"] = venue_data
         venue_rows = venue_data.values() if isinstance(venue_data, dict) else venue_data
         for venue in venue_rows:
             if isinstance(venue, dict):
