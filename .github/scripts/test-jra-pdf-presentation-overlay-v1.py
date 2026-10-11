@@ -64,7 +64,8 @@ assert "BOX" not in converted  # Actual Japanese descriptions, not English short
 assert len(overlay.PAGE.findall(converted)) == 2
 assert converted.index('最終購入結論｜本日の正式予想') < converted.index('採用買い目｜1/1')
 assert converted.index('不採用買い目｜1/1') < converted.index('方式別セット比較')
-assert "馬連</td><td>1-2" in converted and "購入予定額 100円" in converted
+assert "個別指定（1点）</td><td>1-2</td><td>1点×100円＝100円" in converted
+assert "購入予定額 100円" in converted
 assert "期待純利益（推定）" in converted and "12.5円" in converted
 assert "除外理由は後半" not in converted.split('</section>', 1)[0]
 assert not any("<td>"+code+"</td>" in converted for code in codes)
@@ -124,8 +125,74 @@ many["purchase_decision"] = "buy"
 many["total_stake_yen"] = 3000
 full, _, _ = overlay.apply(source, many)
 assert "採用 30点／購入予定額 3,000円" in full
-assert "ほか24点（後半に全件記載）" in full
+assert "残り24操作・24点" in full
 assert "B01" not in full.split('</section>', 1)[0]
 assert "馬連" in full.split('</section>', 1)[0]
+
+
+# Realistic explicit purchase instructions: never turn part of a box into a BOX.
+def line(typ, nums, idx, stake=100):
+    return {"type": typ, "selection": nums, "stake_yen": stake, "id": f"B{idx:02d}"}
+
+box_lines = [[2, 5], [2, 8], [5, 8]]
+box_def = {"strategy_id": "BOX1", "type": "馬連",
+           "strategy_kind": "box", "definition": {"horses": [2,5,8]},
+           "lines": [{"type":"馬連", "selection":x} for x in box_lines]}
+full_box = {"final_bets":[line("馬連", nums, i+1) for i,nums in enumerate(box_lines)],
+            "purchase_strategy_evaluations":[box_def]}
+full_command = overlay.purchase_commands(full_box)
+assert len(full_command) == 1 and full_command[0]["method"] == "ボックス"
+assert full_command[0]["numbers"] == "2,5,8"
+assert full_command[0]["tickets"] == 3 and full_command[0]["amount_yen"] == 300
+partial_box = {"final_bets":[line("馬連",[2,5],1),line("馬連",[2,8],2)],
+               "purchase_strategy_evaluations":[box_def]}
+partial_command = overlay.purchase_commands(partial_box)
+assert len(partial_command) == 2
+assert all(x["method"] == "個別指定（1点）" for x in partial_command)
+assert {x["numbers"] for x in partial_command} == {"2-5","2-8"}
+assert sum(x["amount_yen"] for x in partial_command) == 200
+# 1,2,3 exact ordered permutations: six trifecta BOX tickets, not three unordered lines.
+from itertools import permutations
+ordered = [list(p) for p in permutations([1, 2, 3])]
+trifecta = {"final_bets":[line("三連単", nums, i+1) for i,nums in enumerate(ordered)],
+    "purchase_strategy_evaluations":[{"strategy_id":"TBOX","type":"三連単",
+    "strategy_kind":"box","definition":{"horses":[1,2,3]},
+    "lines":[{"type":"三連単","selection":x} for x in ordered]}]}
+trifecta_cmd = overlay.purchase_commands(trifecta)
+assert len(trifecta_cmd) == 1 and trifecta_cmd[0]["method"] == "ボックス"
+assert trifecta_cmd[0]["tickets"] == 6 and trifecta_cmd[0]["amount_yen"] == 600
+trifecta["final_bets"].pop()
+assert all(x["method"] == "個別指定（1点）" for x in overlay.purchase_commands(trifecta))
+# Full axis wheel must be clearly specified; a partial wheel becomes individual tickets.
+wheel = {"strategy_id":"W1","type":"馬連","strategy_kind":"key_wheel",
+         "definition":{"key":2,"partners":[5,8]},
+         "lines":[{"type":"馬連","selection":[2,5]},{"type":"馬連","selection":[2,8]}]}
+wheel_all = {"final_bets":[line("馬連",[2,5],1),line("馬連",[2,8],2)],
+             "purchase_strategy_evaluations":[wheel]}
+wheel_cmd = overlay.purchase_commands(wheel_all)
+assert len(wheel_cmd) == 1
+assert wheel_cmd[0]["method"] == "1頭軸流し" and wheel_cmd[0]["numbers"] == "軸:2／相手:5,8"
+wheel_all["final_bets"] = [line("馬連",[2,5],1)]
+assert overlay.purchase_commands(wheel_all)[0]["method"] == "個別指定（1点）"
+# Do not label as BOX when there are multiple stakes, even with all combinations present.
+different_stakes = {"final_bets":[line("馬連",nums,i+1,200 if i==0 else 100)
+                                 for i,nums in enumerate(box_lines)],
+                    "purchase_strategy_evaluations":[box_def]}
+assert all(x["method"] != "ボックス" for x in overlay.purchase_commands(different_stakes))
+# Include a cross-type purchase plan and ensure the HTML describes the actual operation.
+screen_prediction = prediction_for(source)
+screen_prediction["purchase_strategy_evaluations"].append(box_def)
+screen_prediction["final_bets"] = [line("馬連",n,i+1) for i,n in enumerate(box_lines)]
+screen_prediction["total_stake_yen"] = 300
+screen_html, _, _ = overlay.apply(source, screen_prediction)
+assert "ボックス</td><td>2,5,8</td><td>3点×100円＝300円" in screen_html
+assert "一部採用の場合は「個別指定（1点）」" in screen_html
+assert "不採用買い目｜1/1" in screen_html
+screen_prediction["final_bets"] = [line("馬連",[2,5],1)]
+screen_prediction["total_stake_yen"] = 100
+screen_html, _, _ = overlay.apply(source, screen_prediction)
+first_page = screen_html.split('</section>', 1)[0]
+assert "ボックス</td>" not in first_page
+assert "個別指定（1点）</td><td>2-5" in first_page
 
 print("PASS: every strategy-mode label and concrete bundle definition; full/partial adoption, 14-row A4 PDF")
