@@ -1,8 +1,8 @@
 {
   "version": "v3.11",
   "path": "競馬予想_完全版プロンプト_v3.11.txt",
-  "updated_at": "2026-10-11T01:16:43.887Z",
-  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail chapters with unlimited dynamic pagination, no dummy pages, print every adopted/rejected ticket, rerender as needed. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal. MANDATORY EXECUTION ADDENDUM: At the start of each JRA run read docs/operations/jra_run_completion_addendum_v1.txt and verify its git blob SHA against mandatory_execution_addendum.git_blob_sha. Unless there is a concrete blocker, error, explicit time/tool limit or instruction to stop, CONTINUE WITHOUT EARLY TERMINATION through all requested races, STEP1/STEP2, prereace snapshot/proof, complete HTML/PDF (no page ceiling), validation, GitHub commit/publication and actual public HTTP/file verification. Progress reports, a completed substep, CI green status alone and user absence are never completion or stop criteria. On a real blocker, report the precise failure, completed/remaining stages, changed files and safe next action; never invent missing odds, bypass prereace freezing, modify historical originals, or claim unverified publication.",
+  "updated_at": "2026-10-11T10:36:00+09:00",
+  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail chapters with unlimited dynamic pagination, no dummy pages, print every adopted/rejected ticket, rerender as needed. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal. MANDATORY EXECUTION ADDENDUM: At the start of each JRA run read docs/operations/jra_run_completion_addendum_v1.txt and verify its git blob SHA against mandatory_execution_addendum.git_blob_sha. Unless there is a concrete blocker, error, explicit time/tool limit or instruction to stop, CONTINUE WITHOUT EARLY TERMINATION through all requested races, STEP1/STEP2, prereace snapshot/proof, complete HTML/PDF (no page ceiling), validation, GitHub commit/publication and actual public HTTP/file verification. Progress reports, a completed substep, CI green status alone and user absence are never completion or stop criteria. On a real blocker, report the precise failure, completed/remaining stages, changed files and safe next action; never invent missing odds, bypass prereace freezing, modify historical originals, or claim unverified publication. PRE-POST CANONICAL REVISION (user-approved): Read docs/operations/jra_prerace_overwrite_v1.txt and docs/data/jra_prerace_overwrite_policy_v1.json and verify prereace_overwrite_policy SHA pins for every formal run. Before the actual scheduled start of EACH race, a newer duly sealed, timestamped, audited formal prediction MAY replace that race's current public canonical report/PDF/final_bets/registry record. Published pages must show only the newest formal prestart version. Preserve previous immutable prediction JSON, snapshot, proof_commit, previous PDF/HTML as auditable historical artifacts and log the superseded canonical record. Reject all post-start revisions, unproven odds, missing Git proof, unvalidated PDFs and partial HTTP publication. This is a narrow explicit exception to no-overwrite of currently published prestart canonical pointers; historical originals, evaluated past races, reviews, results, STEP1/STEP2 logic and local Shadow remain immutable.",
   "mandatory_execution_addendum": {
     "version": "v1",
     "path": "docs/operations/jra_run_completion_addendum_v1.txt",
@@ -10,5 +10,22 @@
     "read_each_new_jra_run": true,
     "scope": "execution_orchestration_and_completion_only",
     "applies_to": "all formal JRA runs on v3.11 without modifying prediction algorithm or prior artefacts"
+  },
+  "prerace_overwrite_policy": {
+    "version": "v1",
+    "read_each_new_jra_run": true,
+    "applies_to": "canonical_publication_only_not_frozen_historical_artifacts",
+    "policy": {
+      "path": "docs/data/jra_prerace_overwrite_policy_v1.json",
+      "git_blob_sha": "01da6f714013b3ef7219a60d3e08b71d546ebd28"
+    },
+    "instructions": {
+      "path": "docs/operations/jra_prerace_overwrite_v1.txt",
+      "git_blob_sha": "71b9d805b1eccd4f3be732770ec94b190bfbac0d"
+    },
+    "publisher": {
+      "path": ".github/scripts/jra-promote-prerace-v311.py",
+      "git_blob_sha": "9aa14741606032a83e75ee4bb4cf97b11c37f7fe"
+    }
   }
 }
