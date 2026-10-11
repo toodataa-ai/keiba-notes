@@ -18,7 +18,9 @@ assert.equal(policy.require_all_line_source_evidence_sha256,true);
 assert.equal(policy.max_quote_age_at_seal_seconds,600);
 assert.equal(policy.max_capture_spread_seconds,180);
 assert.equal(policy.optimizer_v311_decision_unchanged,true);
-for(const group of ['policy','collector','freshness_gate','workflow']){
+assert.equal(policy.new_race_requires_same_full_price_refresh,true);
+assert.equal(addon.new_race_workflow.path,policy.new_race_execution_workflow);
+for(const group of ['policy','collector','freshness_gate','workflow','new_race_workflow']){
  const {path,git_blob_sha}=addon[group];
  assert.equal(execFileSync('git',['hash-object',path],{encoding:'utf8'}).trim(),git_blob_sha,
    'source changed without synchronized versioned formal pointer: '+group);
@@ -27,7 +29,13 @@ assert.equal(addon.workflow.path,'.github/workflows/jra-prerace-rerun-fresh-v312
 assert.equal(p.prerace_overwrite_policy.rerun_workflow.path,'.github/workflows/jra-prerace-rerun-v312.yml',
    'original SHA-pinned rerun remains historically intact');
 const x=read(addon.workflow.path),source=read(addon.collector.path),checker=read(addon.freshness_gate.path);
+const first=read(addon.new_race_workflow.path);
 assert(x.includes('v312fresh/*.json'),'fresh input routing missing');
+assert(first.includes('--refresh-all'),'first predictions would reuse morning odds');
+assert((first.match(/jra-check-fresh-quotes-v312-exec\.py/g)||[]).length===3,'first prediction must be checked before proof+seal');
+for(const marker of ['jra-prestart-pipeline-v312.mjs','validate-jra-pdf-content-v312.py',
+ 'jra-publish-live-v312.py','git push origin HEAD:main'])
+ assert(first.includes(marker),'new-race first publication missing '+marker);
 assert(x.includes('--refresh-all'),'fresh workflow still doing missing-only recovery');
 assert(!x.includes('python3 .github/scripts/jra-odds-recovery-v312.py'),'legacy collector may not run');
 assert((x.match(/jra-check-fresh-quotes-v312-exec\.py/g)||[]).length===3,
