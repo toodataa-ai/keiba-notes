@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "policy_id": "jra_v311_balanced_portfolio",
+  "effective_prompt_version": "v3.11",
+  "scope": "STEP2_purchase_only",
+  "original_expected_profit_optimizer": ".github/scripts/jra-portfolio-optimizer-v310.mjs",
+  "balanced_optimizer": ".github/scripts/jra-balanced-optimizer-v311.mjs",
+  "objective": "maximize_joint_hit_probability_under_profit_floor_and_loss_risk_guard",
+  "budget_yen": 6000,
+  "unit_stake_yen": 100,
+  "expected_profit_floor": {
+    "min_fraction_of_exact_v310_max_profit": 0.9,
+    "max_sacrifice_yen": 200,
+    "requires_positive_portfolio_expected_profit": true
+  },
+  "risk_guard": {
+    "max_increase_in_net_loss_probability": 0.02,
+    "min_improvement_in_hit_probability": 0.01
+  },
+  "search": {
+    "method": "deterministic_local_neighbourhood",
+    "max_rounds": 3,
+    "max_trials_per_round": 12,
+    "globally_optimal": false
+  },
+  "outputs": {
+    "all_winning_tickets_jointly_correlated": true,
+    "rejected_tickets_with_individual_reason": true,
+    "unknown_odds_not_eligible": true,
+    "pdf_tail_sections": [
+      "採用買い目",
+      "不採用買い目",
+      "購入最適化監査"
+    ]
+  },
+  "preservation": {
+    "immutable_v310_components": true,
+    "existing_predictions_unchanged": true,
+    "STEP1_unchanged": true,
+    "previous_final_bets_unchanged": true,
+    "approved_pdf_css_unchanged": true,
+    "horse_per_page": true,
+    "local_shadow_unchanged": true,
+    "WIN5_excluded": true
+  },
+  "fail_closed": [
+    "stale_or_unverified_quote",
+    "missing_joint_distribution",
+    "missing_rejection_reason",
+    "pdf_suppresses_selected_bets",
+    "pdf_spare_dummy_tail_page",
+    "pdf_blank_or_bad_grade_colors",
+    "post_start_freeze"
+  ]
+}
