@@ -73,7 +73,7 @@ def run(date):
         raise ValueError("Explicit date/scope mismatch")
     base.DATE=date
     base.OUT=ROOT/"predictions"/date
-    entries=[]; gaps=[]; venue_counts={}; program_urls={}
+    entries=[]; gaps=[]; existing_ids=[]; venue_counts={}; program_urls={}
     expected=request.get("expected_races_by_venue") or {}
     enabled={k:v for k,v in cfg["venues"].items() if v.get("enabled")}
     if len(enabled)!=15:
@@ -103,8 +103,12 @@ def run(date):
             race_id=f"{date.replace('-','')}-{key}-{p['race_no']:02d}"
             dest=base.OUT/(race_id+".json")
             if dest.exists():
-                gaps.append({"venue":key,"race_id":race_id,"status":"IMMUTABLE_EXISTS",
-                             "reason":"The committed original must not be modified"})
+                frozen=load_json(dest)
+                if frozen.get("race_id")!=race_id or frozen.get("date")!=date or frozen.get("venue")!=label:
+                    raise ValueError(f"Immutable identity mismatch: {dest}")
+                if dt.datetime.fromisoformat(frozen["information_cutoff_at"])>=p["scheduled_start_at"]:
+                    raise ValueError(f"Existing prediction lacks a pre-start cutoff: {dest}")
+                existing_ids.append(race_id)
                 continue
             now=dt.datetime.now(JST)
             if now+dt.timedelta(minutes=SAFETY_MINUTES)>=p["scheduled_start_at"]:
@@ -143,6 +147,10 @@ def run(date):
         dest.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
         created.append(obj["race_id"])
     # Non-empty official program with uncollected races is partial, never a skip.
+    # Existing immutable snapshots remain part of the daily captured population.
+    saved_ids=sorted(set(created+existing_ids))
+    if len(saved_ids)!=len(created)+len(existing_ids):
+        raise ValueError("Duplicate saved race ids")
     diag={
         "schema_version":1,"date":date,"scope":"PRE-RACE_ALL_OFFICIAL_VENUES",
         "status":"COMPLETE" if not gaps else "PARTIAL_WITH_COVERAGE_GAPS",
@@ -150,7 +158,9 @@ def run(date):
         "official_total_races":sum(venue_counts.values()),
         "official_races_by_venue":venue_counts,
         "official_source_urls":program_urls,
-        "created_race_ids":created,"created_count":len(created),
+        "created_race_ids":saved_ids,"created_count":len(saved_ids),
+        "newly_created_race_ids":created,"newly_created_count":len(created),
+        "already_frozen_race_ids":existing_ids,"already_frozen_count":len(existing_ids),
         "coverage_gaps":gaps,"gap_count":len(gaps),
         "minimum_precommit_lead_minutes":SAFETY_MINUTES,
         "prediction_commit_sha":"Must be resolved independently from Git history AFTER push; this diagnostic file is not temporal proof.",
@@ -161,8 +171,8 @@ def run(date):
     audit=ROOT/"diagnostics"/f"{date}-all-venues-prerace-run.json"
     audit.parent.mkdir(parents=True,exist_ok=True)
     audit.write_text(json.dumps(diag,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    print(f"PRE-RACE {date}: scheduled={diag['official_total_races']} captured={len(created)} gaps={len(gaps)}",flush=True)
-    if len(created)==0 and not gaps:
+    print(f"PRE-RACE {date}: scheduled={diag['official_total_races']} archived={len(saved_ids)} new={len(created)} gaps={len(gaps)}",flush=True)
+    if len(saved_ids)==0 and not gaps:
         raise ValueError("Nonempty official racing population but no coverage data captured")
 
 def check_commit_window(date):
