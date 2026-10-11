@@ -2,7 +2,7 @@
 // exact same ticket selection and immutable original JSON byte hash.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
-import {upgradeToV313} from './jra-prestart-pipeline-v313.mjs';
+import {upgradeToV313,assembleV313} from './jra-prestart-pipeline-v313.mjs';
 import {validateV313} from './validate-jra-portfolio-v313.mjs';
 import {evaluateStrategy,ticketKey} from './jra-strategy-engine-v39.mjs';
 const races=[
@@ -11,6 +11,20 @@ const races=[
 ];
 for(const file of races){
  const original=fs.readFileSync(file,'utf8'),record=JSON.parse(original);
+ // Replay the actual new-race entry point on the frozen quote-evidence INPUT.
+ // Never use Date.now or the race result in this historical offline reproduction.
+ const revision=file.match(/v3\\.12-rerun(\\d+-attempt\\d+)\\.json$/);
+ assert(revision,'must identify saved source quote revision '+file);
+ const source='e2e_validation/inputs/v312-recovered/'+record.race_id+'-rerun'+revision[1]+'.json';
+ const verifiedSource=JSON.parse(fs.readFileSync(source,'utf8'));
+ assert.equal(verifiedSource.prompt_version,'v3.12');
+ const pending=assembleV313({...verifiedSource,prompt_version:'v3.13'},record.final_bets_fixed_at);
+ assert.equal(pending.stage,'pending_git_proof');
+ assert.equal(pending.proof_commit,null);
+ assert.equal(pending.prompt_version,'v3.13');
+ assert.deepEqual(pending.v312_balanced_baseline.final_bets,record.final_bets,'fresh v313 assembly must independently reconstruct legacy tickets');
+ assert.equal(pending.total_stake_yen,record.total_stake_yen);
+ console.log('PASS_V313_FRESH_INPUT_ASSEMBLY',record.race_id,pending.total_stake_yen);
  const changed=upgradeToV313(record);
  assert.equal(changed.prompt_version,'v3.13');
  assert.equal(changed.v312_balanced_baseline.total_stake_yen,record.total_stake_yen);
