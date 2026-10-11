@@ -1,13 +1,6 @@
 name: JRA v3.10 LIVE official prediction and approved PDFs 2026-10-11
+# Historical date-specific backfill, retained for provenance; no more push retries.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/jra-live-20261011-v310.yml'
-      - '.github/scripts/test-jra-prestart-pipeline-v310.mjs'
-      - '.github/scripts/jra-gather-live-20261011-v310.py'
-      - '.github/scripts/jra-render-live-v310.py'
-      - '.github/scripts/jra-prestart-pipeline-v310.mjs'
   workflow_dispatch:
 permissions:
   contents: write
