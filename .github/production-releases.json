@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "current_public_release": "release/2026-10-12-baseline",
+  "current_public_version": "1.00",
+  "policy": {
+    "snapshot_scope": "successfully_deployed_production_only",
+    "rollback_scope": "entries_in_this_registry_only",
+    "staging_commits_are_rollback_targets": false,
+    "ui_release_requires_explicit_user_approval": true,
+    "never_rollback_prediction_result_or_proof": true,
+    "staging_and_production_ui_separate": true,
+    "data_release_separate": true,
+    "deployment_switch_status": "legacy_main_docs_active; branch-composition activation pending"
+  },
+  "releases": [
+    {
+      "release_id": "release/2026-10-12-baseline",
+      "branch": "release/2026-10-12-baseline",
+      "commit_sha": "1baf39bd3944350eea94cf28681966a18fdd239b",
+      "deployed_at": null,
+      "workflow_run_id": null,
+      "public_version": "1.00",
+      "note": "既存公開済み競馬サイトの基準HTML断面。公開日時は未確証のため記録しない。リリース履歴は正式本番公開が確認された断面だけを追加。",
+      "user_approved_baseline": true
+    }
+  ]
+}
