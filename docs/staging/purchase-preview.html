@@ -106,4 +106,5 @@ async function loadRace(id,name){
 (async()=>{const host=document.getElementById('raceCards');host.textContent='';
  for(const [id,name] of ids){try{host.append(await loadRace(id,name))}catch(e){host.append(el('p','skip',e.message))}}})();
 </script>
+  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
