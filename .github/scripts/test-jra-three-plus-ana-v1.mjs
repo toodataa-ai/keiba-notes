@@ -13,6 +13,21 @@ for(const input of samples){
  assert.equal(p.formal_final_bets_unchanged,true);
  assert.equal(p.regular_commands.length<=3,true);
  assert.equal(p.medium_command.row,4);assert.equal(p.large_command.row,5);
+ const order=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単'];
+ const positions=p.regular_commands.map(c=>order.indexOf(c.type));
+ assert.ok(positions.every((n,i)=>i===0||positions[i-1]<=n),'JRA type ordering must be consistent');
+ assert.deepEqual(p.regular_commands.map(x=>x.row),p.regular_commands.map((_,i)=>i+1));
+ for(const e of p.exacta_coverage_audit||[]){
+   assert.ok(['key_wheel_first','key_wheel_second','key_wheel_multi'].includes(e.selected_method));
+   assert.ok(e.variants?.key_wheel_first&&e.variants?.key_wheel_second&&e.variants?.key_wheel_multi,
+     'All exacta directional variants must have audited market coverage');
+   if(e.selected_method!==e.original_method){
+     assert.equal(e.variants[e.selected_method].status,'eligible');
+     assert.ok(e.variants[e.selected_method].metrics.hit_probability>=e.initial_portfolio.hit_probability-0.00001);
+     assert.ok(e.variants[e.selected_method].metrics.expected_net_profit_yen>=e.initial_portfolio.expected_net_profit_yen-0.00001);
+     assert.ok(e.variants[e.selected_method].metrics.net_loss_probability<=e.initial_portfolio.net_loss_probability+0.00001);
+   }
+ }
  assert.ok(p.regular_commands.every(c=>!['三連単','三連複'].includes(c.type)||
    (c.type==='三連単'?c.points>=6:c.points>=3)),
    'No 1-point or undersized triple combinations in regular purchases');
