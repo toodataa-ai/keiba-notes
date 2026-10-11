@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory(prefix='jra-v312-pdf-') as d:
  p=Path(d);prediction=p/'prediction.json';prediction.write_text(json.dumps(fixture,ensure_ascii=False),encoding='utf-8')
  html=p/'report.html';pdf=p/'report.pdf'
  env={**os.environ,'JRA_SELECTED_ROWS_PER_PAGE':'4','JRA_REJECTED_ROWS_PER_PAGE':'4',
-      'JRA_AUDIT_ROWS_PER_PAGE':'4'}
+      'JRA_AUDIT_ROWS_PER_PAGE':'7'}
  subprocess.run([sys.executable,'.github/scripts/jra-render-live-v312.py',str(prediction),str(html)],
                 cwd=ROOT,env=env,check=True)
  source=html.read_text(encoding='utf-8')
