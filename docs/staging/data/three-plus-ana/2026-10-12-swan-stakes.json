@@ -3,7 +3,7 @@
   "formal_prediction_sha256": "b3e9e949823e149f347d6441ec46a4cebc454682c22a67de3291e5842e32f543",
   "formal_proof_commit": "fc737a16b5aba0d9f9f153248eb49c743b231d10",
   "created_from_frozen_source_only": true,
-  "algorithm": "three_regular_plus_optional_medium_and_100x_large_shadow_v2",
+  "algorithm": "three_regular_plus_optional_medium_and_100x_large_shadow_v3_exacta_audit",
   "status": "three_plus_two_holes_shadow_candidate",
   "formal_version_unchanged": true,
   "formal_final_bets_unchanged": true,
@@ -415,6 +415,46 @@
   },
   "regular_commands": [
     {
+      "type": "馬連",
+      "method": "single",
+      "definition": {
+        "selection": [
+          2,
+          4
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬連:[2,4]"
+      ],
+      "source_strategy_id": "single:馬連:[2,4]",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "2－4"
+    },
+    {
+      "type": "馬単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          2,
+          9
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬単:[2,9]"
+      ],
+      "source_strategy_id": "single:馬単:[2,9]",
+      "row": 2,
+      "category": "通常",
+      "jra_input": "2→9"
+    },
+    {
       "type": "三連複",
       "method": "box",
       "definition": {
@@ -453,51 +493,12 @@
         "三連複:[9,10,13]"
       ],
       "source_strategy_id": "S24",
-      "row": 1,
-      "category": "通常",
-      "jra_input": "1・2・4・9・10・13 BOX"
-    },
-    {
-      "type": "馬連",
-      "method": "single",
-      "definition": {
-        "selection": [
-          2,
-          4
-        ]
-      },
-      "points": 1,
-      "unit_stake_yen": 100,
-      "stake_yen": 100,
-      "ticket_keys": [
-        "馬連:[2,4]"
-      ],
-      "source_strategy_id": "single:馬連:[2,4]",
-      "row": 2,
-      "category": "通常",
-      "jra_input": "2－4"
-    },
-    {
-      "type": "馬単",
-      "method": "single",
-      "definition": {
-        "selection": [
-          2,
-          9
-        ]
-      },
-      "points": 1,
-      "unit_stake_yen": 100,
-      "stake_yen": 100,
-      "ticket_keys": [
-        "馬単:[2,9]"
-      ],
-      "source_strategy_id": "single:馬単:[2,9]",
       "row": 3,
       "category": "通常",
-      "jra_input": "2→9"
+      "jra_input": "1・2・4・9・10・13 BOX"
     }
   ],
+  "exacta_coverage_audit": [],
   "medium_command": {
     "row": 4,
     "category": "中穴",
