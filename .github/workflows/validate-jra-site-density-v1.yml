@@ -24,3 +24,14 @@ jobs:
         with: {fetch-depth: 0}
       - name: Verify responsive styles and no change to any original HTML/prediction/PDF
         run: python3 .github/scripts/test-jra-site-density-v1.py
+      - name: Render mobile and desktop layout in Chromium
+        run: |
+          python3 -m pip install --disable-pip-version-check -q selenium==4.36.0
+          python3 .github/scripts/test-jra-site-density-browser-v1.py
+      - name: Save visual QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-site-typography-preview
+          path: site-typography-screenshots/
+          if-no-files-found: ignore
