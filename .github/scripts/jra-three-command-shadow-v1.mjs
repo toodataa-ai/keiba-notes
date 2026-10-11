@@ -30,12 +30,13 @@ const stats=(lines,args)=>{
     net_loss_probability:round(s.loss_probability_scenarios.central)};
 };
 const commandRank=(a,b)=>b.ev-a.ev||b.count-a.count||a.id.localeCompare(b.id,'en');
-function candidates(strategies,all){
+function candidates(strategies,all,excludedKeys=new Set()){
   const byKey=new Map(all.map(x=>[key(x),x])),groups=new Map();
-  const rejected={partial:0,unpriced:0,over_budget:0,unsupported:0,too_narrow:0};
+  const rejected={partial:0,unpriced:0,over_budget:0,unsupported:0,too_narrow:0,excluded:0};
   const offer=(id,type,mode,definition,wanted)=>{
     const ks=wanted.map(key),unique=new Set(ks);
     if(unique.size!==ks.length){rejected.unsupported++;return;}
+    if(ks.some(k=>excludedKeys.has(k))){rejected.excluded++;return;}
     if(ks.some(k=>!byKey.has(k))){rejected.unpriced++;return;}
     // Buying a lone 3-way exact outcome is too brittle for a regular recommendation.
     // A "command" can contain multiple valid JRA tickets (BOX/formation/wheel).
@@ -100,7 +101,9 @@ export function compareThreeCommandPortfolio(args){
   must(sum(original,x=>x.stake_yen)<=THREE_COMMAND_POLICY.budget_yen,
     'official portfolio over budget');
   const baseline=stats(original,args);
-  const {groups,rejected,candidate_group_count}=candidates(args.strategies,all);
+  const excludedKeys=new Set(args.exclude_ticket_keys||[]);
+  must([...excludedKeys].every(x=>typeof x==='string'&&x.length<=64),'invalid excluded ticket key');
+  const {groups,rejected,candidate_group_count}=candidates(args.strategies,all,excludedKeys);
   // Exact 0/1 search over complete, disjoint JRA actions. No synthetic "basket" rows.
   const seen=new Map(),top=[];
   let enumerated=0,feasible=0;
