@@ -82,7 +82,12 @@ def main():
  data=json.loads(Path(a.input).read_text(encoding='utf8'))
  commands=data['regular_commands']+[data['ana_command']]
  target=Path(a.pdf);target.parent.mkdir(parents=True,exist_ok=True)
- HTML(string=make(data),base_url=str(Path('.').resolve())).write_pdf(str(target))
+ rendered_html=make(data)
+ assert rendered_html.count('<table')==2,'regular and annotated special row must use separate tables'
+ assert '<p class="ana-heading">穴狙い</p>' in rendered_html,'hole category must be outside the table'
+ assert '<td><b>穴狙い</b>' not in rendered_html,'hole category cannot replace ticket type'
+ assert 'class="ana-label"' not in rendered_html,'no redundant hole label inside ticket cell'
+ HTML(string=rendered_html,base_url=str(Path('.').resolve())).write_pdf(str(target))
  with fitz.open(str(target)) as pdf:
   assert len(pdf)==1,f'preview must be exactly one A4 page; got {len(pdf)}'
   page=pdf[0]
