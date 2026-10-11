@@ -35,4 +35,28 @@ except ValueError as e:
     assert 'unmapped ticket method' in str(e)
 else:
     raise AssertionError('unknown strategy must fail closed')
+
+# The approved reader-v1 A4 CSS must fit 14 comparison rows on one page.
+# This prevents reverting to seven short rows per page or silently overflowing.
+import tempfile
+import fitz
+from weasyprint import HTML
+css = (SCRIPT.parents[2] / "docs/assets/jra-pdf-reader-v1.css").read_text(encoding="utf-8")
+dense_html = ('<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>' +
+              css + '</style></head><body data-tail-pagination="dynamic">')
+dense_html += section(0, 3, (codes * 2)[:14])
+dense_html += section(1, 3, (codes * 2)[2:16])
+dense_html += section(2, 3, (codes * 2)[12:19])
+dense_html += '</body></html>'
+localized, row_count, page_count = overlay.apply(dense_html)
+assert row_count == 35 and page_count == 3
+with tempfile.TemporaryDirectory() as tmp:
+    pdf = Path(tmp) / 'compact-audit.pdf'
+    HTML(string=localized).write_pdf(str(pdf))
+    with fitz.open(pdf) as doc:
+        assert len(doc) == 3, f'14-row audit must fit A4; got {len(doc)} pages'
+        assert all('方式別セット比較' in p.get_text() and len(p.get_text().strip()) > 200
+                   for p in doc), 'blank or clipped audit page'
+print('PASS: 14 comparison rows per A4 page under immutable v3.7 reader CSS')
+
 print('PASS: all real JRA strategy methods localized; unknown codes rejected; rows/pages preserved')
