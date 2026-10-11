@@ -1,6 +1,14 @@
 {
   "version": "v3.11",
   "path": "競馬予想_完全版プロンプト_v3.11.txt",
-  "updated_at": "2026-10-11T00:52:17.081Z",
-  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail chapters with unlimited dynamic pagination, no dummy pages, print every adopted/rejected ticket, rerender as needed. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal."
+  "updated_at": "2026-10-11T01:16:43.887Z",
+  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail chapters with unlimited dynamic pagination, no dummy pages, print every adopted/rejected ticket, rerender as needed. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal. MANDATORY EXECUTION ADDENDUM: At the start of each JRA run read docs/operations/jra_run_completion_addendum_v1.txt and verify its git blob SHA against mandatory_execution_addendum.git_blob_sha. Unless there is a concrete blocker, error, explicit time/tool limit or instruction to stop, CONTINUE WITHOUT EARLY TERMINATION through all requested races, STEP1/STEP2, prereace snapshot/proof, complete HTML/PDF (no page ceiling), validation, GitHub commit/publication and actual public HTTP/file verification. Progress reports, a completed substep, CI green status alone and user absence are never completion or stop criteria. On a real blocker, report the precise failure, completed/remaining stages, changed files and safe next action; never invent missing odds, bypass prereace freezing, modify historical originals, or claim unverified publication.",
+  "mandatory_execution_addendum": {
+    "version": "v1",
+    "path": "docs/operations/jra_run_completion_addendum_v1.txt",
+    "git_blob_sha": "f9431ea85dde3d58622432dd8e8c67ff5cf31f8e",
+    "read_each_new_jra_run": true,
+    "scope": "execution_orchestration_and_completion_only",
+    "applies_to": "all formal JRA runs on v3.11 without modifying prediction algorithm or prior artefacts"
+  }
 }

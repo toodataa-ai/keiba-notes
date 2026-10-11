@@ -1,0 +1,35 @@
+name: Validate JRA run completion until blocker
+on:
+  pull_request:
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'docs/operations/jra_run_completion_addendum_v1.txt'
+      - '.github/scripts/validate-jra-completion-addendum-v1.mjs'
+      - '.github/workflows/validate-jra-completion-addendum.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/prompt_history.json'
+      - 'docs/operations/jra_run_completion_addendum_v1.txt'
+      - '.github/scripts/validate-jra-completion-addendum-v1.mjs'
+      - '.github/workflows/validate-jra-completion-addendum.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  completion-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Confirm mandatory formal execution addendum and negative tests
+        run: node .github/scripts/validate-jra-completion-addendum-v1.mjs
+      - name: Confirm immutable v3.11 analysis and purchase prompt SHA pins
+        run: |
+          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/validate-prompt-history.mjs
