@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Reusable audited JRA fixture adapter, version 3.14 execution-only. Scrapes primary JRA form and actual (non-predicted)
-Sportnavi odds, then emits v3.10 audited prereace inputs. Never fetches race results.
+Sportnavi odds, then emits canonical v3.13 audited prereace inputs. Never fetches race results.
 The fixed, pre-market STEP1 marks are loaded from the immutable prior research file.
 No odds are used for ranking, factor grades, weight generation, or strategy planning."""
 import hashlib, json, re, sys
