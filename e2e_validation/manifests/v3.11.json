@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "prompt_version": "v3.11",
+  "components": [
+    {
+      "path": "競馬予想_完全版プロンプト_v3.0.txt",
+      "git_blob_sha": "8cb18e5cd2bab88bfaf5a04f103a402acb9aac90",
+      "role": "base_prompt"
+    },
+    {
+      "path": "closing_index_v1/production_profile_v1_1.json",
+      "git_blob_sha": "a72db216545cc481644c8f066b52e66c9b0083eb",
+      "role": "aci_production_profile"
+    },
+    {
+      "path": "closing_index_v1/adoption_decision_v1_1.json",
+      "git_blob_sha": "831bebfb4133856bd9284901594ecea30cc7ba27",
+      "role": "aci_adoption_decision"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.1.txt",
+      "git_blob_sha": "688ff0c06a441ca2634c73810aa2708bcbdec949",
+      "role": "aci_delta_prompt"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.2.txt",
+      "git_blob_sha": "1c2feb336575376c0736f78e7313ac7301e197e7",
+      "role": "final_bet_decision_delta"
+    },
+    {
+      "path": "docs/data/bet_type_coverage_policy_v1.json",
+      "git_blob_sha": "f88a1c8678853b5401e0d41e9404c42110813168",
+      "role": "bet_type_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.3.txt",
+      "git_blob_sha": "28479c99b02932739890e7b22de8e8fe043a9eac",
+      "role": "all_bet_types_delta"
+    },
+    {
+      "path": "docs/data/purchase_gate_policy_v1.json",
+      "git_blob_sha": "8a5f1a9b987579d0938a760e6271c6e632d5ca63",
+      "role": "race_local_purchase_gate_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.4.txt",
+      "git_blob_sha": "872458bd29bf467837fdcb0db402f336954bef28",
+      "role": "v3.4_purchase_decision_delta"
+    },
+    {
+      "path": "docs/data/multi_candidate_selection_policy_v1.json",
+      "git_blob_sha": "784f9ba08e72c297abba6b0e688f204afa338ef7",
+      "role": "multi_candidate_ticket_selection_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.5.txt",
+      "git_blob_sha": "073f691d7ef6bbb532395598785f3bfaa004f8e0",
+      "role": "v3.5_multi_candidate_delta"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.6.txt",
+      "git_blob_sha": "ec136aceecada66dd65f17997c616c6f94d04762",
+      "role": "one_shot_jra_execution_orchestrator"
+    },
+    {
+      "path": "docs/data/jra_pdf_layout_policy_v1.json",
+      "git_blob_sha": "4c935f56b8249a022f1e41bb56c62349f82f23ef",
+      "role": "approved_pdf_layout_policy"
+    },
+    {
+      "path": "docs/assets/jra-pdf-reader-v1.css",
+      "git_blob_sha": "290f9cd673371bff5cce61f5a682fd84ddb05822",
+      "role": "approved_pdf_layout_css"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.7.txt",
+      "git_blob_sha": "259aa148d80d6ad47bbb6935342ba6c7bca929e1",
+      "role": "fail_closed_pdf_layout_delta"
+    },
+    {
+      "path": "docs/data/ticket_portfolio_policy_v1.json",
+      "git_blob_sha": "e4bb71f2cdd3b821af801e1032cbcdd067fc88f3",
+      "role": "trifecta_multi_ticket_strategy_policy"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.8.txt",
+      "git_blob_sha": "bf31f79d14e007d2a5dca01167acb657fc5f8ba9",
+      "role": "purchase_only_portfolio_delta"
+    },
+    {
+      "path": "docs/data/all_bet_strategy_policy_v1.json",
+      "git_blob_sha": "bdb6c936de08636070488d201cc52c73c81977b8",
+      "role": "eight_ticket_types_all_major_purchase_modes"
+    },
+    {
+      "path": ".github/scripts/jra-strategy-engine-v39.mjs",
+      "git_blob_sha": "8ecc37094181385cfd320b124bde084eaa8a4e9b",
+      "role": "joint_order_event_and_expansion_engine"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.9.txt",
+      "git_blob_sha": "f07d07a0620bb0763488953a9d66a2591ba59c9a",
+      "role": "eight_type_purchase_strategy_delta"
+    },
+    {
+      "path": "docs/data/jra_portfolio_6000_policy_v1.json",
+      "git_blob_sha": "7743e90cf7cd66874255f690ec02fecf3bf88319",
+      "role": "multi_strategy_6000_budget_policy"
+    },
+    {
+      "path": ".github/scripts/jra-portfolio-optimizer-v310.mjs",
+      "git_blob_sha": "1b362cc7779c218bd50ccd9931793090e8dfef0c",
+      "role": "deterministic_cross_type_exact_profit_optimizer"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.10.txt",
+      "git_blob_sha": "1b8bfd91e7e89cb1f85f297f956dcc11b80bd913",
+      "role": "v310_cross_type_portfolio_purchase_delta"
+    },
+    {
+      "path": "docs/data/jra_balanced_portfolio_policy_v1.json",
+      "git_blob_sha": "2c22d3edeaadd37f7bd6827e244f832fac757324",
+      "role": "balanced_profit_hit_loss_constraints"
+    },
+    {
+      "path": ".github/scripts/jra-balanced-optimizer-v311.mjs",
+      "git_blob_sha": "ac9e0f223176460dea5e7afff0844d068faa1a27",
+      "role": "bounded_risk_neighbourhood_optimiser"
+    },
+    {
+      "path": ".github/scripts/jra-prestart-pipeline-v311.mjs",
+      "git_blob_sha": "09f82e86fdf935549294fa9a9c7c3bfdddd335e5",
+      "role": "prestart_joint_outcome_and_prereace_proof_pipeline"
+    },
+    {
+      "path": ".github/scripts/validate-jra-portfolio-v311.mjs",
+      "git_blob_sha": "458f4c9148ba93b7f3419951a0c2fb13c4e99cb4",
+      "role": "deterministic_risk_portfolio_verifier"
+    },
+    {
+      "path": ".github/scripts/jra-render-live-v311.py",
+      "git_blob_sha": "7f958bbb627cd65495d46d9bbf6fd1c66dc47caf",
+      "role": "approved_css_three_meaningful_tail_pages"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-content-v311.py",
+      "git_blob_sha": "16e57872e594341c7b3f7fdf9b161164775624c5",
+      "role": "empty_tail_and_excluded_bet_pdf_guard"
+    },
+    {
+      "path": ".github/scripts/test-jra-balanced-v311.mjs",
+      "git_blob_sha": "0ce495176de40c0565c994a1b5b285a35c956e0a",
+      "role": "synthetic_multi_ticket_hedge_regressions"
+    },
+    {
+      "path": ".github/scripts/test-jra-prestart-pipeline-v311.mjs",
+      "git_blob_sha": "55e6d983b8c3aacad5cc11caa451e9791ed8b3cb",
+      "role": "prerace_freeze_and_price_provenance_regressions"
+    },
+    {
+      "path": "競馬予想_完全版プロンプト_v3.11.txt",
+      "git_blob_sha": "54c205f9736ccfeb4252102a3f98f55cb970c246",
+      "role": "v311_purchase_only_prompt"
+    },
+    {
+      "path": ".github/scripts/jra-publish-live-v311.py",
+      "git_blob_sha": "4296b9506a54a3fa43cffa498d63ed7301fbc8f1",
+      "role": "dynamic_pagecount_public_registry"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-layout.py",
+      "git_blob_sha": "ce07e779e652e465d35a3bbc9d5941355c6c5fa6",
+      "role": "backward_compatible_dynamic_tail_count_with_colored_grade_audit"
+    },
+    {
+      "path": ".github/scripts/test-jra-pdf-dynamic-v311.py",
+      "git_blob_sha": "fcdb3086ba15d6fba6800ffd6c12947013309c9b",
+      "role": "synthetic_unlimited_page_pdf_integrity_stress"
+    },
+    {
+      "path": ".github/scripts/validate-jra-balanced-prompt-v311.mjs",
+      "git_blob_sha": "0e438bd9912eec522516f5b224bec115e54053a8",
+      "role": "append_only_manifest_gate"
+    },
+    {
+      "path": ".github/workflows/jra-prestart-pipeline-v311.yml",
+      "git_blob_sha": "89d34dea09b4f1542179b4343848e5ad93a52d16",
+      "role": "post_commit_v311_dynamic_prestart_publish_workflow"
+    },
+    {
+      "path": ".github/workflows/validate-jra-balanced-v311.yml",
+      "git_blob_sha": "aef1675b63c1a41b0cdfdad91a45e51b336b1488",
+      "role": "full_positive_negative_dynamic_pdf_ci"
+    }
+  ],
+  "note": "Append-only from v3.10. Frozen prior 23 SHA-pinned components unchanged. New v3.11 considers profit, union hit probability and downside risk; unlimited A4 tail pagination with all adopted/rejected lines and no upper page count. Multi-objective search is deterministic neighbourhood heuristic, not globally optimal."
+}

@@ -55,8 +55,22 @@ def validate(html_path, pdf_path, policy_path):
     expected_horses = len(HORSE_TAG.findall(html))
     if not expected_horses or expected_horses > 22:
         errors.append(f"Invalid number of horse pages: {expected_horses}")
-    base_pages = policy["front_and_tail_pages"]
-    if len(PAGE_TAG.findall(html)) != base_pages:
+    dynamic_tail = 'data-tail-pagination="dynamic"' in html
+    base_pages = len(PAGE_TAG.findall(html)) if dynamic_tail else policy["front_and_tail_pages"]
+    if dynamic_tail:
+        # v3.11 explicitly authorizes any number of substantive tail pages, without changing v3.7 CSS.
+        sections = re.findall(r'<section class="page"><div class="chapter">(.*?)</div>', html, re.S)
+        if base_pages < 8 or len(sections) != base_pages:
+            errors.append("Dynamic PDF must contain five front pages and >=3 substantive tail pages")
+        if len(sections) >= 8:
+            tail = sections[5:]
+            adopted = [x for x in tail if x.startswith('採用買い目｜')]
+            rejected = [x for x in tail if x.startswith('不採用買い目｜')]
+            audit = [x for x in tail if x.startswith('購入最適化監査｜')]
+            if len(adopted)<1 or len(rejected)<1 or len(audit)!=1 or (
+                tail != adopted+rejected+audit):
+                errors.append("Dynamic PDF has missing or misordered selected/rejected/risk pages")
+    elif base_pages != len(PAGE_TAG.findall(html)):
         errors.append(f"Expected exactly {base_pages} non-horse .page sections")
     horses = HORSE_HEAD.findall(html)
     horse_sections = HORSE_SECTION.findall(html)

@@ -17,6 +17,12 @@ FILLER = "発走前の客観的な能力評価と適性の根拠を丁寧に記�
 def section(kind, title, number=None):
     heading = f'<h1>◎ {number} サンプル馬{number}</h1>' if kind == "horse" else f'<h2>{title}</h2>'
     sub = f"<h2>全頭診断・個別評価</h2><p>{number-4}/2　1頭1ページ</p>" if kind == "horse" else ""
+    if kind == "horse":
+        # The canonical grade-color guard now requires one overall and nine factor badges.
+        overall = '<div class="hero"><b>総合 <span class="g gA">A</span></b></div>'
+        axes = '<h3>①〜⑨：評価軸別グレード</h3><table class="table"><tr>' + (
+            '<td><span class="g gA">A</span></td>' * 9) + '</tr></table>'
+        return f'<section class="{kind}">{sub}{heading}{overall}{axes}<p>{FILLER}</p></section>'
     return f'<section class="{kind}">{sub}{heading}<p>{FILLER}</p></section>'
 
 def run(html, pdf, expect_ok=True):
