@@ -1,0 +1,101 @@
+name: Promote newest prestart JRA prediction as single public canonical version
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-prerace-overwrite-v311.yml'
+  workflow_dispatch:
+    inputs:
+      revision_manifest:
+        description: 'Verified newer pre-start report manifest under docs/data/'
+        required: true
+        type: string
+        default: 'docs/data/jra-v311-parallel-2026-10-11.json'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install pinned PDF auditor
+        run: |
+          set -euo pipefail
+          python -m pip install -q pymupdf==1.26.4
+      - name: Enforce pre-post policy pins and audit the immutable prior/new proofs and full report
+        env:
+          REQUEST_MANIFEST: ${{ inputs.revision_manifest }}
+        run: |
+          set -euo pipefail
+          FILE="${REQUEST_MANIFEST:-docs/data/jra-v311-parallel-2026-10-11.json}"
+          case "$FILE" in docs/data/*.json) ;; *) echo 'BLOCKER: input must be from docs/data';exit 1;; esac
+          if [[ "$FILE" == *..* || ! -f "$FILE" || -L "$FILE" ]]; then echo 'BLOCKER: unsafe revision manifest';exit 1;fi
+          echo "$FILE" > /tmp/jra-revision-manifest-path
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          d=json.loads(Path('docs/data/latest_prompt.json').read_text())
+          p=d['prerace_overwrite_policy']
+          assert d['version']=='v3.11' and p['read_each_new_jra_run'] is True
+          for k in ['policy','instructions','publisher']:
+              part=p[k];path=part['path']
+              actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+              assert actual==part['git_blob_sha'],(k,path,actual)
+          print('PASS: formally pinned prestart replacement policy/instructions/publisher')
+          PY
+          python3 .github/scripts/jra-promote-prerace-v311.py "$FILE"
+      - name: Stage only two authorized current-index/audit files and commit without amending the old predictions
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import subprocess
+          a=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          e={'docs/data/races.json','docs/data/jra_publication_revision_log.json'}
+          assert a==e,('No existing prediction, proof, PDF, result or Shadow file may change',a^e)
+          PY
+          git commit -m "Make validated newer prerace JRA version the sole canonical public report"
+          git push origin HEAD:main
+          echo 'JRA_PREPOST_CANONICAL_COMMITTED'
+      - name: Verify GitHub Pages JSON and latest HTML/PDF are the actual committed bytes
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          reg=json.loads(Path('docs/data/races.json').read_text())
+          aud=json.loads(Path('/tmp/jra-revision-manifest-path').read_text().strip()) if False else json.loads(Path('docs/data/jra_publication_revision_log.json').read_text())
+          latest=aud['revisions'][-2:]
+          files=['docs/data/races.json','docs/data/jra_publication_revision_log.json']
+          for r in latest:
+              current=next(x for x in reg['races'] if x['id']==r['race_id'])
+              assert current['proof_commit']==r['new_canonical']['proof_commit']
+              files.extend(['docs/'+current['report'],'docs/'+current['pdf']])
+          Path('/tmp/jra-revision-verify-paths').write_text('\n'.join(files)+'\n')
+          PY
+          BASE="https://toodataa-ai.github.io/keiba-notes"
+          for try in $(seq 1 24); do
+            OK=1
+            while IFS= read -r FILE; do
+              REL="${FILE#docs/}"
+              if ! curl -LfsS --max-time 15 --retry 1 "$BASE/$REL" -o "/tmp/canonical-$(basename "$FILE")" ||
+                 ! cmp -s "$FILE" "/tmp/canonical-$(basename "$FILE")"; then
+                OK=0;break
+              fi
+            done < /tmp/jra-revision-verify-paths
+            if [[ $OK -eq 1 ]];then echo 'PASS: public canonical index, journal, two PDFs and HTMLs match committed originals';exit 0;fi
+            sleep 15
+          done
+          echo 'BLOCKER: public HTTP byte verification did not converge';exit 1
