@@ -119,7 +119,7 @@
     },
     {
       "path": "docs/data/jra_balanced_portfolio_policy_v1.json",
-      "git_blob_sha": "7679a0ec3d60bcfe928f6c934bad2dadd80ed2bc",
+      "git_blob_sha": "2c22d3edeaadd37f7bd6827e244f832fac757324",
       "role": "balanced_profit_hit_loss_constraints"
     },
     {
@@ -129,22 +129,22 @@
     },
     {
       "path": ".github/scripts/jra-prestart-pipeline-v311.mjs",
-      "git_blob_sha": "375e799c70cfc8b6c3573fce3602c55be686aaca",
+      "git_blob_sha": "fe5da9587c5100e31a33634b5151146dbe084234",
       "role": "prestart_joint_outcome_and_prereace_proof_pipeline"
     },
     {
       "path": ".github/scripts/validate-jra-portfolio-v311.mjs",
-      "git_blob_sha": "bd704bdda5e8b55264bebb26c8d144b31c9bd30a",
+      "git_blob_sha": "458f4c9148ba93b7f3419951a0c2fb13c4e99cb4",
       "role": "deterministic_risk_portfolio_verifier"
     },
     {
       "path": ".github/scripts/jra-render-live-v311.py",
-      "git_blob_sha": "0ee2347a1a25cd5c827cc6a4200b4480d23565c2",
+      "git_blob_sha": "7f958bbb627cd65495d46d9bbf6fd1c66dc47caf",
       "role": "approved_css_three_meaningful_tail_pages"
     },
     {
       "path": ".github/scripts/validate-jra-pdf-content-v311.py",
-      "git_blob_sha": "878ee64b4c3604b3888258be6b4e8890ec278a47",
+      "git_blob_sha": "16e57872e594341c7b3f7fdf9b161164775624c5",
       "role": "empty_tail_and_excluded_bet_pdf_guard"
     },
     {
@@ -154,14 +154,44 @@
     },
     {
       "path": ".github/scripts/test-jra-prestart-pipeline-v311.mjs",
-      "git_blob_sha": "0c12e5094a7de16dfcb19f25b1bacbd9d7c5cf19",
+      "git_blob_sha": "55e6d983b8c3aacad5cc11caa451e9791ed8b3cb",
       "role": "prerace_freeze_and_price_provenance_regressions"
     },
     {
       "path": "競馬予想_完全版プロンプト_v3.11.txt",
-      "git_blob_sha": "366046d1116e3c8af0bce31f89d7ab07a1942451",
+      "git_blob_sha": "54c205f9736ccfeb4252102a3f98f55cb970c246",
       "role": "v311_purchase_only_prompt"
+    },
+    {
+      "path": ".github/scripts/jra-publish-live-v311.py",
+      "git_blob_sha": "4296b9506a54a3fa43cffa498d63ed7301fbc8f1",
+      "role": "dynamic_pagecount_public_registry"
+    },
+    {
+      "path": ".github/scripts/validate-jra-pdf-layout.py",
+      "git_blob_sha": "ce07e779e652e465d35a3bbc9d5941355c6c5fa6",
+      "role": "backward_compatible_dynamic_tail_count_with_colored_grade_audit"
+    },
+    {
+      "path": ".github/scripts/test-jra-pdf-dynamic-v311.py",
+      "git_blob_sha": "fcdb3086ba15d6fba6800ffd6c12947013309c9b",
+      "role": "synthetic_unlimited_page_pdf_integrity_stress"
+    },
+    {
+      "path": ".github/scripts/validate-jra-balanced-prompt-v311.mjs",
+      "git_blob_sha": "0e438bd9912eec522516f5b224bec115e54053a8",
+      "role": "append_only_manifest_gate"
+    },
+    {
+      "path": ".github/workflows/jra-prestart-pipeline-v311.yml",
+      "git_blob_sha": "89d34dea09b4f1542179b4343848e5ad93a52d16",
+      "role": "post_commit_v311_dynamic_prestart_publish_workflow"
+    },
+    {
+      "path": ".github/workflows/validate-jra-balanced-v311.yml",
+      "git_blob_sha": "aef1675b63c1a41b0cdfdad91a45e51b336b1488",
+      "role": "full_positive_negative_dynamic_pdf_ci"
     }
   ],
-  "note": "Append-only from v3.10. Frozen prior 23 SHA-pinned components unchanged. Purchase-only B preference plus substantive three-tail-page PDF audit. The risk-aware search is heuristic and cannot claim global joint optimum."
+  "note": "Append-only from v3.10. Frozen prior 23 SHA-pinned components unchanged. New v3.11 considers profit, union hit probability and downside risk; unlimited A4 tail pagination with all adopted/rejected lines and no upper page count. Multi-objective search is deterministic neighbourhood heuristic, not globally optimal."
 }
