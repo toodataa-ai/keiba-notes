@@ -310,20 +310,20 @@ def safe_path(raw,prefix):
 def validate_request(req):
  require(isinstance(req,dict) and isinstance(req.get('race'),dict),'single race request required')
  date=req.get('date','')
- require(re.fullmatch(r'20\\d{2}-\\d{2}-\\d{2}',date) is not None,'ISO date required')
+ require(re.fullmatch(r'20\d{2}-\d{2}-\d{2}',date) is not None,'ISO date required')
  from datetime import date as day
  day.fromisoformat(date)
  race=dict(req['race'])
  fields=('slug','venue','name','race_no','start_at','race_code','official','surface','distance_m')
  require(all(race.get(k) is not None for k in fields),'incomplete official race context')
- require(re.fullmatch(r'20\\d{2}-\\d{2}-\\d{2}-[a-z0-9-]+',race['slug']) is not None,
+ require(re.fullmatch(r'20\d{2}-\d{2}-\d{2}-[a-z0-9-]+',race['slug']) is not None,
          'unsafe race ID')
  require(race['slug'].startswith(date+'-'),'race ID date mismatch')
  require(race['venue'] in ('札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'),
          'unrecognized JRA racecourse')
  require(race['race_no']==11 and race['surface'] in ('芝','ダート') and 1000<=race['distance_m']<=3600,
          'main-race context invalid')
- require(re.fullmatch(r'\\d{10}',race['race_code']) is not None,'invalid official odds race code')
+ require(re.fullmatch(r'\d{10}',race['race_code']) is not None,'invalid official odds race code')
  require(race['official'].startswith('https://www.jra.go.jp/JRADB/accessD.html?CNAME=') or
          race['official'].startswith('https://sp.jra.jp/JRADB/accessD.html?CNAME='),
          'independent official JRA form required')
