@@ -20,7 +20,7 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 .staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
 </style>
 </head><body>
-<div class="staging-visual-marker" role="status">STAGING <small>a99054c</small></div>
+<div class="staging-visual-marker" role="status">STAGING <small>804b469</small></div>
 <main class="audit-wrap"><div class="nav"><a href="staging/index.html">← ステージングトップ</a><a href="staging/release-history.html">公開履歴・復元方式</a></div>
 <h1>買いやすい購入方法：最大3操作＋中穴1行＋大穴1行</h1>
 <p class="subtle">通常の購入方法は最大3行、さらに中穴（20倍以上100倍未満）と大穴（100倍以上・的中時1万円以上）をそれぞれ表の外に見出しを置き、最大1行ずつ表示します。各区分の実測オッズとモデル期待利益が採用条件に合わなければ見送ります。三連単は原則6点以上、三連複は3点以上のまとまった買い目を候補とし、1点に絞る推奨は避けます。券種・馬番・JRA画面での指定方法・点数・合計を確認できます。元の正式買い目を無理に3行に隠したものではなく、別の購入セットに選び直す実験です。</p>
@@ -60,6 +60,27 @@ async function loadRace(id,name){
    (c.category==='中穴'?mediumBody:c.category==='大穴'?largeBody:tbody).append(tr);
  }
  table.append(tbody);section.append(table);
+ // Optional evidence for why 2nd-fixed, 1st-fixed or a one-axis MULTI was adopted.
+ // Keep the purchase table to three lines; detailed numerical evidence is collapsed.
+ if(Array.isArray(d.exacta_coverage_audit)&&d.exacta_coverage_audit.length){
+   const details=el('details','subtle'),summary=el('summary','','馬単：1着固定・2着固定・マルチの比較根拠');
+   summary.style.cssText='cursor:pointer;margin:8px 0;font-weight:600';
+   details.append(summary);
+   const names={key_wheel_first:'1着固定',key_wheel_second:'2着固定',key_wheel_multi:'1頭軸マルチ'};
+   for(const info of d.exacta_coverage_audit){
+     const header=el('p','',`軸${info.axis} ／ 相手：${info.partners.join('・')} ／ 採用：${names[info.selected_method]||info.selected_method}`);
+     details.append(header);
+     for(const mode of ['key_wheel_first','key_wheel_second','key_wheel_multi']){
+       const v=info.variants?.[mode];
+       const str=v?.status==='eligible'
+        ? `${names[mode]}：${v.points}点、ポートフォリオ期待純利益${yen(v.metrics.expected_net_profit_yen)}、推定的中${pct(v.metrics.hit_probability)}、損失${pct(v.metrics.net_loss_probability)}`
+        : `${names[mode]}：比較対象外（${v?.status||'未検証'}）`;
+       const line=el('div','',str);line.style.margin='3px 0';details.append(line);
+     }
+     details.append(el('small','','追加点数の費用、重複、価格未確認、全体期待値を確認した結果です。'));
+   }
+   section.append(details);
+ }
  // Both longshot class labels are OUTSIDE the table. The three columns
  // always retain type/method, selection, points×unit=stake.
  section.append(el('div','ana-heading','中穴（20〜100倍未満）'));
