@@ -274,12 +274,12 @@
     },
     {
       "path": ".github/workflows/validate-jra-v312.yml",
-      "git_blob_sha": "e004fe65a0403e69822039d2582caaa7e82e4b05",
+      "git_blob_sha": "8ca41f5e04ed8dea651eb34408f61d81e1e41be5",
       "role": "validate-jra-v312.yml"
     },
     {
       "path": ".github/workflows/jra-prestart-pipeline-v312.yml",
-      "git_blob_sha": "6a97b22e8a4362bf0f73826a4bc8412a82db60e8",
+      "git_blob_sha": "1f7e94ec4d8836cb2db085a880d8fb68e4f95c67",
       "role": "jra-prestart-pipeline-v312.yml"
     },
     {
@@ -299,16 +299,66 @@
     },
     {
       "path": ".github/scripts/validate-jra-prompt-v312.mjs",
-      "git_blob_sha": "a59cdfaff9ce7657abababc2cdf44a0e495bbb8c",
+      "git_blob_sha": "4ba1e05ed1bf345d8cd2c389458b3a89b466cb38",
       "role": "v312_formal_validation_or_full_real_market_e2e"
     },
     {
       "path": ".github/workflows/jra-v312-shadow-e2e-20261011.yml",
       "git_blob_sha": "acf9821a0c1d9a97154fdb309181acac1f7840e2",
       "role": "v312_formal_validation_or_full_real_market_e2e"
+    },
+    {
+      "path": ".github/scripts/validate-jra-ci-forward-v312.mjs",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "8c1fe9cbd078d2616b0fb1dd692a03ba5e153fba"
+    },
+    {
+      "path": ".github/scripts/validate-bet-type-coverage-v312.mjs",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "5c70a51921ed333104f0a2fa35733c65b5ae3441"
+    },
+    {
+      "path": "docs/data/jra_ci_supersession_v312.json",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "a033d978ca4b0c7d0592a71993c9d5b63ad578de"
+    },
+    {
+      "path": "e2e_validation/validate_manifests.py",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "9939d10a7303af778f580602c750e90edc16915e"
+    },
+    {
+      "path": ".github/workflows/e2e-validation.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "c61fc70bc267da4e55817396e340b46fdf1959ba"
+    },
+    {
+      "path": ".github/workflows/validate-jra-portfolio-v310.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "4637085fe87c2813868d8118bb1334133a331ee0"
+    },
+    {
+      "path": ".github/workflows/validate-jra-strategy-v39.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "a3234651aa1fb7bbeca94ec5360dedc37baf33c7"
+    },
+    {
+      "path": ".github/workflows/validate-jra-strategy-v38.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "59370e68f96aaf22ed1322cbccecb76e1d6fd88a"
+    },
+    {
+      "path": ".github/workflows/validate-jra-reader-v37.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "0be1f657b4fa8e710aca446d8537785d3b1d6c86"
+    },
+    {
+      "path": ".github/workflows/validate-jra-completion-addendum.yml",
+      "role": "v312_compatibility_or_e2e_regression",
+      "git_blob_sha": "0ae549e0ebbf829cbd5515dba086e5dc606511ee"
     }
   ],
   "previous_manifest_sha": "b0570e7a928a15fb82f81b29aa01dc0999d36a7c",
   "scope": "append_only_future_JRA_prerace",
-  "note": "v3.12 append-only: v3.11 frozen 42 SHA pins are unchanged. Newly versioned components include exact official candidate odds recovery (171/171 Ireland shadow), multi-point joint-hit audit, 53-page validated E2E shadow PDF and forward canonical SHA gate. Canonical migration is held pending legacy gate compatibility."
+  "note": "v3.12 canonical ready: earlier 42 SHA pins unchanged; one historically pinned CI workflow has an explicit cryptographically verified successor under docs/data/jra_ci_supersession_v312.json; archived Git blob remains present. Legacy v3.6 compact forecasts validated by exact original SHA, never edited. Real Ireland 171/171 ticket quotes and 53-page shadow PDF confirmed; no backfill of postrace predictions."
 }
