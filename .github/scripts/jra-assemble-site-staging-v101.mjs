@@ -10,7 +10,6 @@ const preview=(source,target)=>{
  content=content.replaceAll('href="index.html"','href="staging/index.html"')
    .replaceAll('href="this-week.html"','href="staging/this-week.html"');
  content=content.replace(/<script src="assets\/visitor-counter\.js[^"]*" defer><\/script>/g,'');
- content=content.replace('<body>','<body><div style="background:#fff2d2;border-bottom:1px solid #e4cd84;padding:8px 12px;color:#574110;font:700 12px Meiryo,sans-serif">STAGING v1.01 ｜ 承認前・本番には未反映</div>');
  fs.writeFileSync(target,content);
  if(content.includes('special-2026-10-11-tokyo12.html'))throw Error('temporary Tokyo12 still linked: '+target);
  if(!content.includes('staging/purchase-preview.html'))throw Error('missing purchase preview link: '+target);
