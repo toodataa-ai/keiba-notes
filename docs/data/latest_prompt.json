@@ -1,8 +1,8 @@
 {
-  "version": "v3.12",
-  "path": "競馬予想_完全版プロンプト_v3.12.txt",
-  "updated_at": "2026-10-11T12:30:00+09:00",
-  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail chapters with unlimited dynamic pagination, no dummy pages, print every adopted/rejected ticket, rerender as needed. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal. MANDATORY EXECUTION ADDENDUM: At the start of each JRA run read docs/operations/jra_run_completion_addendum_v1.txt and verify its git blob SHA against mandatory_execution_addendum.git_blob_sha. Unless there is a concrete blocker, error, explicit time/tool limit or instruction to stop, CONTINUE WITHOUT EARLY TERMINATION through all requested races, STEP1/STEP2, prereace snapshot/proof, complete HTML/PDF (no page ceiling), validation, GitHub commit/publication and actual public HTTP/file verification. Progress reports, a completed substep, CI green status alone and user absence are never completion or stop criteria. On a real blocker, report the precise failure, completed/remaining stages, changed files and safe next action; never invent missing odds, bypass prereace freezing, modify historical originals, or claim unverified publication. PRE-POST CANONICAL REVISION (user-approved): Read docs/operations/jra_prerace_overwrite_v1.txt and docs/data/jra_prerace_overwrite_policy_v1.json and verify prereace_overwrite_policy SHA pins for every formal run. Before the actual scheduled start of EACH race, a newer duly sealed, timestamped, audited formal prediction MAY replace that race's current public canonical report/PDF/final_bets/registry record. Published pages must show only the newest formal prestart version. Preserve previous immutable prediction JSON, snapshot, proof_commit, previous PDF/HTML as auditable historical artifacts and log the superseded canonical record. Reject all post-start revisions, unproven odds, missing Git proof, unvalidated PDFs and partial HTTP publication. This is a narrow explicit exception to no-overwrite of currently published prestart canonical pointers; historical originals, evaluated past races, reviews, results, STEP1/STEP2 logic and local Shadow remain immutable. ROUTE EXISTING RACE RERUNS: For the active v3.12 prompt, dispatch .github/workflows/jra-prerace-rerun-v312.yml with a new source-verified e2e_validation/inputs/revisions/v312/*.json input strictly before that race starts. The workflow must first independently recover all exact prices and seal a distinct immutable prestart proof, then validate every new A4 PDF page, append the superseded public record to the revision journal, switch the current canonical pointer and verify public HTTP byte equality. Historical originals remain byte-identical. The older v3.11 rerun workflow is retained only for historical source auditing, NOT for new v3.12 bets. V3.12 PURCHASE-ONLY CANONICAL RELEASE: Read the new SHA-pinned e2e_validation/manifests/v3.12.json and docs/data/jra_v312_purchase_coverage_policy.json. All historical STEP1/①〜⑨/marks, the v3.11 B-set profit floor and loss guards, and existing prediction/PDF/proof stay unchanged. For NEW future JRA prereace races, require exact priced ticket coverage before sealing; recover missing trifecta quotes ONLY through source-advertised Sportnavi JavaScript selectors, compare full joint-outcome 1/5/10-point and all-mode sets, record why search trials are zero, and author complete unbounded A4/PDF pages through .github/workflows/jra-prestart-pipeline-v312.yml. v3.11 rerun workflow is NOT allowed for v3.12 predictions. The dedicated v3.12 prereace revision workflow is version and SHA pinned; no downgrade, postrace substitution or historical overwrite is permitted. Approved prereace overwrite remains restricted to new verified proofs before scheduled start; no postrace changes. The historical SHA-compatible validation route is .github/scripts/validate-jra-ci-forward-v312.mjs; the only authorized historical CI workflow replacement is recorded in docs/data/jra_ci_supersession_v312.json. FRESH ODDS EXECUTION OVERLAY: For current/latest-odds JRA runs, prefer odds_freshness_execution_overlay.workflow instead of the historic missing-only v3.12 rerun workflow. First re-fetch EVERY exact odds quote for the entire candidate catalog through source-advertised URLs; refuse inherited quotes, incomplete coverage, missing SHA-verified evidence, >180-second capture spread or any oldest quote >600 seconds before sealing. Re-check immediately before proof and seal, preserve all old records and STEP1. The market site may cache odds; these are latest observed source values, not guaranteed end-of-betting final odds. The execution-only overlay does NOT adopt experimental v3.13 portfolio heuristics or amend the frozen v3.12 source manifest. INITIAL NEW-RACE EXECUTION: odds_freshness_execution_overlay.new_race_workflow is also mandatory for every new formal JRA race where the full current odds catalog is requested. The old .github/workflows/jra-prestart-pipeline-v312.yml is retained SHA-pinned for archival evidence, not recommended for current-odds executions. Both initial and same-race revision paths independently re-fetch every candidate price and verify provenance, <=180s market capture span and <=600s oldest quote age before proof and seal. PDF PRESENTATION-ONLY OVERLAY: In current/fresh v3.12 new or revised prereace publishing, apply SHA-pinned pdf_presentation_overlay.script after the unchanged historical renderer before WeasyPrint. Japanese-display only for strategy/mode names, preserve raw model keys/proofs and v3.7 CSS; try compact selected/rejected/audit row-count triples, default to 14 audit rows and fall back on the complete A4 PDF validator until a safe configuration passes. Persist chosen pagination to final rendering; never rewrite historical reports, horse pages or prediction data. Verify the translation and complete, nonblank PDF in CI. STRATEGY EXPRESSION: Use sealed purchase_strategy_evaluations definitions and final_bets only to label every ticket-group audit row with actual numbered BOX/formation/key-wheel/multi composition and exact all/partial/zero adoption; do NOT impute that a full bundle was bought where the optimizer adopted just a subset. Never modify odds, strategies, expected values or selected bets. FIRST PAGE FINAL-BETS PRESENTATION: In the SHA-pinned presentation overlay, replace only the front report cover with the frozen final buy/pass verdict, exact ordered ticket-number/type and money summary, grouped subset if needed with per-type totals and clear reference to complete adopted bets; include overall joint-outcome hit/expected net profit/net-loss risk. Keep omitted-on-cover lines in unchanged full adopted chapter; keep reasons for excluded bets in later original tail chapters, and preserve A4 one horse/page and full page-count/color/ID checks. Do not change STEP1/STEP2, odds or old published reports. FINAL PURCHASE ACTIONABILITY: At top of every new v3.12 PDF, communicate exact ticket-purchase operations in Japanese, not just a list of mode names or strategy candidates. Given frozen final_bets and purchase_strategy_evaluations, derive whole-mode BOX/axis wheel/multi/formation instructions only where the fully expanded mode set is included in final_bets at one uniform stake; otherwise show actual individual ticket/horse-number purchases. Always show type, method, specific betting-screen horse or frame inputs, number of tickets, stake per ticket and subtotals. Independently reconcile every output instruction against immutable final_bets exactly once; do not misrepresent partial BOX. Keep detailed adopted lines and rejected reasons at the tail and preserve frozen CSS/STEP1/odds/proof. DISPLAY-GROUP EXPANSION AUDIT: Every whole-group purchase instruction must independently reconstruct exactly its sealed expanded ticket selections from the mode definition, never trust a string mode name or strategy label alone. On mismatch, fall back to literal individual selections rather than buy extra tickets. PRESENTATION V2: Full BOX ticket patterns are labeled BOX, complete formations are vertically tree-rendered with numbered columns or finish order, and 馬連1頭軸流し shows 軸馬 and 相手馬. Full BOX/wheel candidate detection may derive strictly from sealed final_bets; all grouped commands independently reconstruct selections and spend to exactly frozen final_bets. This is display-only and does NOT authorize changes to already sealed odds, ticket amounts, or bets.",
+  "version": "v3.13",
+  "path": "競馬予想_完全版プロンプト_v3.13.txt",
+  "updated_at": "2026-10-11T15:30:00+09:00",
+  "rule": "Read latest_prompt.json then verify e2e_validation/manifests/v3.11.json append-only SHA pins. Keep STEP1, past race reports, historical bets and v3.7 approved PDF CSS immutable. For new prereace races, run v3.11 bounded-risk B-choice purchase overlay: compare exact max-EV baseline with multi-ticket sets constrained by positive expected net profit, >=90% baseline EV with max 200-yen sacrifice, and <=2pp net-loss increase; use joint finish outcomes for union hit rate; require >=1pp union-hit gain or keep baseline. Generate selected/rejected/risk-audit as three meaningful tail chapters with unlimited dynamic pagination, no dummy pages, print every adopted/rejected ticket, rerender as needed. Seal all final_bets/proof before report; no invented odds, no post-race adjustment. The balanced search is deterministic heuristic, not globally optimal. MANDATORY EXECUTION ADDENDUM: At the start of each JRA run read docs/operations/jra_run_completion_addendum_v1.txt and verify its git blob SHA against mandatory_execution_addendum.git_blob_sha. Unless there is a concrete blocker, error, explicit time/tool limit or instruction to stop, CONTINUE WITHOUT EARLY TERMINATION through all requested races, STEP1/STEP2, prereace snapshot/proof, complete HTML/PDF (no page ceiling), validation, GitHub commit/publication and actual public HTTP/file verification. Progress reports, a completed substep, CI green status alone and user absence are never completion or stop criteria. On a real blocker, report the precise failure, completed/remaining stages, changed files and safe next action; never invent missing odds, bypass prereace freezing, modify historical originals, or claim unverified publication. PRE-POST CANONICAL REVISION (user-approved): Read docs/operations/jra_prerace_overwrite_v1.txt and docs/data/jra_prerace_overwrite_policy_v1.json and verify prereace_overwrite_policy SHA pins for every formal run. Before the actual scheduled start of EACH race, a newer duly sealed, timestamped, audited formal prediction MAY replace that race's current public canonical report/PDF/final_bets/registry record. Published pages must show only the newest formal prestart version. Preserve previous immutable prediction JSON, snapshot, proof_commit, previous PDF/HTML as auditable historical artifacts and log the superseded canonical record. Reject all post-start revisions, unproven odds, missing Git proof, unvalidated PDFs and partial HTTP publication. This is a narrow explicit exception to no-overwrite of currently published prestart canonical pointers; historical originals, evaluated past races, reviews, results, STEP1/STEP2 logic and local Shadow remain immutable. ROUTE EXISTING RACE RERUNS: For the active v3.12 prompt, dispatch .github/workflows/jra-prerace-rerun-v312.yml with a new source-verified e2e_validation/inputs/revisions/v312/*.json input strictly before that race starts. The workflow must first independently recover all exact prices and seal a distinct immutable prestart proof, then validate every new A4 PDF page, append the superseded public record to the revision journal, switch the current canonical pointer and verify public HTTP byte equality. Historical originals remain byte-identical. The older v3.11 rerun workflow is retained only for historical source auditing, NOT for new v3.12 bets. V3.12 PURCHASE-ONLY CANONICAL RELEASE: Read the new SHA-pinned e2e_validation/manifests/v3.12.json and docs/data/jra_v312_purchase_coverage_policy.json. All historical STEP1/①〜⑨/marks, the v3.11 B-set profit floor and loss guards, and existing prediction/PDF/proof stay unchanged. For NEW future JRA prereace races, require exact priced ticket coverage before sealing; recover missing trifecta quotes ONLY through source-advertised Sportnavi JavaScript selectors, compare full joint-outcome 1/5/10-point and all-mode sets, record why search trials are zero, and author complete unbounded A4/PDF pages through .github/workflows/jra-prestart-pipeline-v312.yml. v3.11 rerun workflow is NOT allowed for v3.12 predictions. The dedicated v3.12 prereace revision workflow is version and SHA pinned; no downgrade, postrace substitution or historical overwrite is permitted. Approved prereace overwrite remains restricted to new verified proofs before scheduled start; no postrace changes. The historical SHA-compatible validation route is .github/scripts/validate-jra-ci-forward-v312.mjs; the only authorized historical CI workflow replacement is recorded in docs/data/jra_ci_supersession_v312.json. FRESH ODDS EXECUTION OVERLAY: For current/latest-odds JRA runs, prefer odds_freshness_execution_overlay.workflow instead of the historic missing-only v3.12 rerun workflow. First re-fetch EVERY exact odds quote for the entire candidate catalog through source-advertised URLs; refuse inherited quotes, incomplete coverage, missing SHA-verified evidence, >180-second capture spread or any oldest quote >600 seconds before sealing. Re-check immediately before proof and seal, preserve all old records and STEP1. The market site may cache odds; these are latest observed source values, not guaranteed end-of-betting final odds. The execution-only overlay does NOT adopt experimental v3.13 portfolio heuristics or amend the frozen v3.12 source manifest. INITIAL NEW-RACE EXECUTION: odds_freshness_execution_overlay.new_race_workflow is also mandatory for every new formal JRA race where the full current odds catalog is requested. The old .github/workflows/jra-prestart-pipeline-v312.yml is retained SHA-pinned for archival evidence, not recommended for current-odds executions. Both initial and same-race revision paths independently re-fetch every candidate price and verify provenance, <=180s market capture span and <=600s oldest quote age before proof and seal. PDF PRESENTATION-ONLY OVERLAY: In current/fresh v3.12 new or revised prereace publishing, apply SHA-pinned pdf_presentation_overlay.script after the unchanged historical renderer before WeasyPrint. Japanese-display only for strategy/mode names, preserve raw model keys/proofs and v3.7 CSS; try compact selected/rejected/audit row-count triples, default to 14 audit rows and fall back on the complete A4 PDF validator until a safe configuration passes. Persist chosen pagination to final rendering; never rewrite historical reports, horse pages or prediction data. Verify the translation and complete, nonblank PDF in CI. STRATEGY EXPRESSION: Use sealed purchase_strategy_evaluations definitions and final_bets only to label every ticket-group audit row with actual numbered BOX/formation/key-wheel/multi composition and exact all/partial/zero adoption; do NOT impute that a full bundle was bought where the optimizer adopted just a subset. Never modify odds, strategies, expected values or selected bets. FIRST PAGE FINAL-BETS PRESENTATION: In the SHA-pinned presentation overlay, replace only the front report cover with the frozen final buy/pass verdict, exact ordered ticket-number/type and money summary, grouped subset if needed with per-type totals and clear reference to complete adopted bets; include overall joint-outcome hit/expected net profit/net-loss risk. Keep omitted-on-cover lines in unchanged full adopted chapter; keep reasons for excluded bets in later original tail chapters, and preserve A4 one horse/page and full page-count/color/ID checks. Do not change STEP1/STEP2, odds or old published reports. FINAL PURCHASE ACTIONABILITY: At top of every new v3.12 PDF, communicate exact ticket-purchase operations in Japanese, not just a list of mode names or strategy candidates. Given frozen final_bets and purchase_strategy_evaluations, derive whole-mode BOX/axis wheel/multi/formation instructions only where the fully expanded mode set is included in final_bets at one uniform stake; otherwise show actual individual ticket/horse-number purchases. Always show type, method, specific betting-screen horse or frame inputs, number of tickets, stake per ticket and subtotals. Independently reconcile every output instruction against immutable final_bets exactly once; do not misrepresent partial BOX. Keep detailed adopted lines and rejected reasons at the tail and preserve frozen CSS/STEP1/odds/proof. DISPLAY-GROUP EXPANSION AUDIT: Every whole-group purchase instruction must independently reconstruct exactly its sealed expanded ticket selections from the mode definition, never trust a string mode name or strategy label alone. On mismatch, fall back to literal individual selections rather than buy extra tickets. PRESENTATION V2: Full BOX ticket patterns are labeled BOX, complete formations are vertically tree-rendered with numbered columns or finish order, and 馬連1頭軸流し shows 軸馬 and 相手馬. Full BOX/wheel candidate detection may derive strictly from sealed final_bets; all grouped commands independently reconstruct selections and spend to exactly frozen final_bets. This is display-only and does NOT authorize changes to already sealed odds, ticket amounts, or bets. FORMAL v3.13 WIN STAKE AMOUNT: After source-verified all 8 types, frozen STEP1 and v3.12 identical ticket selection, optimize only selected WIN line 100-yen multiples <=1200 yen each, within race budget <=6000. Adopt increases only when central modeled probability of nonnegative portfolio return gains >=1 percentage point, expected net profit stays >0 and sacrifices no more than min(10%,200 yen) vs baseline, low scenario profit declines <=200 yen, and low scenario net-loss risk rises <=2pp. Freeze independent v3.12 baseline before changing any final stake, independently recompute all scenario probabilities, expected profit and ROI. If proof fails or no beneficial stake, retain all 100-yen lines. All new v3.13 formal prestart prediction HTML/PDF/publication MUST use v3.13 versioned scripts/workflows and independent validation; no historical file edits or post-start revision. The WIN5 exclusion, old STEP1, approved A4 PDF CSS, Japanese BOX/flow/formation display, and E2E historical SHA remain unchanged.",
   "mandatory_execution_addendum": {
     "version": "v1",
     "path": "docs/operations/jra_run_completion_addendum_v1.txt",
@@ -34,32 +34,32 @@
     }
   },
   "odds_freshness_execution_overlay": {
-    "version": "v1",
-    "status": "formal_after_required_CI_and_activation",
+    "version": "v2_v313",
+    "status": "formal_v313_prestart_future_only",
     "policy": {
-      "path": "docs/data/jra_fresh_odds_policy_v312_exec.json",
-      "git_blob_sha": "b011af7663113d1f62c91ce615687c439fa30d47"
+      "path": "docs/data/jra_fresh_odds_policy_v313_exec.json",
+      "git_blob_sha": "f2047ff79794ba3fbdef05d4067850e0a67ef3f1"
     },
     "collector": {
-      "path": ".github/scripts/jra-odds-full-refresh-v312-exec.py",
-      "git_blob_sha": "3428438f5662e0e4a57f172470dcd3488e455d60"
+      "path": ".github/scripts/jra-odds-full-refresh-v313-exec.py",
+      "git_blob_sha": "ab8240eb7bd28efe892045847731b88903cf4444"
     },
     "freshness_gate": {
-      "path": ".github/scripts/jra-check-fresh-quotes-v312-exec.py",
+      "path": ".github/scripts/jra-check-fresh-quotes-v313-exec.py",
       "git_blob_sha": "b4ae477de0ded32cf06e9d5ac628b112cd74a012"
     },
     "workflow": {
-      "path": ".github/workflows/jra-prerace-rerun-fresh-v312.yml",
-      "git_blob_sha": "df72d4e2326d070a22a3ccd31361d6eebedeb58a"
+      "path": ".github/workflows/jra-prerace-rerun-fresh-v313.yml",
+      "git_blob_sha": "7fded7f89f835347908440916c21095f5c583a7f"
     },
-    "required_for": "all next JRA prestart executions requesting current odds",
-    "immutable_bet_model": "v3.12 with frozen STEP1 + v3.11 balanced optimizer; purchase logic unchanged",
+    "required_for": "all next formal JRA prestart v3.13 executions requesting fresh quotes",
+    "immutable_bet_model": "v3.13 WIN amounts allocated only after 100-yen v3.12 balanced purchase ticket selection; original v312 predictions and STEP1 untouched",
     "max_source_quote_age_at_seal_seconds": 600,
     "market_capture_window_max_seconds": 180,
     "prior_quote_reuse_prohibited": true,
     "new_race_workflow": {
-      "path": ".github/workflows/jra-prestart-pipeline-fresh-v312.yml",
-      "git_blob_sha": "bffdfc35b6ab6756f45117323364360feba50a9c"
+      "path": ".github/workflows/jra-prestart-pipeline-fresh-v313.yml",
+      "git_blob_sha": "2359020f0f29e406d2a35bed3bc6f0bd07d43f68"
     }
   },
   "pdf_presentation_overlay": {
@@ -106,5 +106,73 @@
       "git_blob_sha": "e6cbbb9cd3406dd3fc3fd7f6083d488a14087684"
     },
     "activation_rule": "Do not alter v3.12 formal predictions, final_bets or preserved artifacts. Pilot 100-yen increments for selected winning tickets under max 6000, conservative source odds and joint net-loss/profit floors; explicitly version and approve future pipeline before enabling."
+  },
+  "win_stake_formal_v313": {
+    "status": "formal_new_prestart_only",
+    "activation": "New valid v3.13 formal input: e2e_validation/inputs/v313/*.json or e2e_validation/inputs/revisions/v313fresh/*.json (only before scheduled race post). All historical v3.12 formal predictions immutable.",
+    "pipeline": {
+      "path": ".github/scripts/jra-prestart-pipeline-v313.mjs",
+      "git_blob_sha": "c0a65bf008843cb5c8f8de81cc1e9ed10c6f7c8c"
+    },
+    "validator": {
+      "path": ".github/scripts/validate-jra-portfolio-v313.mjs",
+      "git_blob_sha": "6588a695289d2e3bf67ae858bfe2f2a96b31047a"
+    },
+    "renderer": {
+      "path": ".github/scripts/jra-render-live-v313.py",
+      "git_blob_sha": "a6e337847ad01c877ab220804f22e1754015c684"
+    },
+    "pdf_validator": {
+      "path": ".github/scripts/validate-jra-pdf-content-v313.py",
+      "git_blob_sha": "2cfc3fdba039a1a9ce7dc43384f0a402a5367825"
+    },
+    "prestart_workflow": {
+      "path": ".github/workflows/jra-prestart-pipeline-fresh-v313.yml",
+      "git_blob_sha": "2359020f0f29e406d2a35bed3bc6f0bd07d43f68"
+    },
+    "prerace_workflow": {
+      "path": ".github/workflows/jra-prerace-rerun-fresh-v313.yml",
+      "git_blob_sha": "7fded7f89f835347908440916c21095f5c583a7f"
+    },
+    "stake_optimizer": {
+      "path": ".github/scripts/jra-win-recovery-stake-shadow-v1.mjs",
+      "git_blob_sha": "15ac34f11b5fc0e19a7552a74ac439a325eb78d0"
+    },
+    "promotion_policy": {
+      "path": "docs/data/jra_prerace_overwrite_policy_v313.json",
+      "git_blob_sha": "ddde521e4713beed8dffb2eabf87472aa6570943"
+    },
+    "publisher": {
+      "path": ".github/scripts/jra-publish-live-v313.py",
+      "git_blob_sha": "362687fa8133a6b15e849bf2cde348e1e4ead828"
+    },
+    "promoter": {
+      "path": ".github/scripts/jra-promote-prerace-v313.py",
+      "git_blob_sha": "93c5075653eb262eff995837bb08f9fe9a96bd4c"
+    },
+    "prompt": {
+      "path": "競馬予想_完全版プロンプト_v3.13.txt",
+      "git_blob_sha": "d5db6de95483088a68c6c81277ddb64da6f02a1c"
+    },
+    "manifest": {
+      "path": "e2e_validation/manifests/v3.13.json",
+      "git_blob_sha": "7244def36e968ebd75cef3aa8ccb940ebb4b002d"
+    },
+    "historical_adapter": {
+      "path": "docs/data/jra_v313_historical_adapter_v1.json",
+      "git_blob_sha": "485329ae93c79fa2ab0920819320c629a1b3532a"
+    },
+    "original_prestart_replay_ci": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38116735569",
+    "win_stake_bounds": {
+      "increment_yen": 100,
+      "max_per_win_bet_yen": 1200,
+      "race_budget_yen": 6000,
+      "required_modeled_nonloss_gain_pp": 1,
+      "max_expected_profit_sacrifice_fraction": 0.1,
+      "max_expected_profit_sacrifice_yen": 200,
+      "max_low_scenario_loss_probability_increase_pp": 2,
+      "max_low_scenario_profit_sacrifice_yen": 200
+    },
+    "historical_bets_can_be_changed": false
   }
 }
