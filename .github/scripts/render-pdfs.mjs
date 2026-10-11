@@ -91,6 +91,9 @@ restoreCanonicalStyledReports();
 for (const name of fs.readdirSync(reportsDir).filter(file => file.endsWith('.html'))) {
   const reportPath = path.join(reportsDir, name);
   const authoredHtml = fs.readFileSync(reportPath, 'utf8');
+  // Historical >=2026-10-11 prereace reports are immutable; never rewrite them to inject a script.
+  const race = racesById.get(name.replace(/\.html$/, ''));
+  if (race?.date >= '2026-10-11') continue;
   if (!authoredHtml.includes('visitor-counter.js') && authoredHtml.includes('</body>')) {
     const tag = '<script src="../assets/visitor-counter.js?v=20261006-1" defer></script>';
     fs.writeFileSync(reportPath, authoredHtml.replace('</body>', `  ${tag}\n</body>`));
@@ -183,6 +186,13 @@ for (const file of files) {
   const reportPath = path.join(reportsDir, file);
   const out = path.resolve('docs', race.pdf);
   fs.mkdirSync(path.dirname(out), { recursive: true });
+
+  // Future formal releases commit a fully audited PDF with the prediction.
+  // A background renderer must never rewrite any published JRA v3.10/v3.11 original.
+  if (fs.existsSync(out)) {
+    console.log(`Preserved immutable official PDF: ${slug}`);
+    continue;
+  }
 
   // The authored originals were rendered with WeasyPrint 68. Render the authored
   // HTML directly so its CSS colors, type sizes, tables and fixed A4 layout survive.
