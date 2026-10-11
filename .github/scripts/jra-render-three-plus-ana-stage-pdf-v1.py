@@ -25,14 +25,14 @@ def make(data):
   'one_key_multi':'1頭軸マルチ'}
  for c in commands:
   is_ana=c['category']=='穴狙い'
-  method='見送り' if c['method']=='pass' else (
-    (c['type']+' 個別指定') if is_ana else methods.get(c['method'],c['method']))
-  type_label=('穴狙い' if is_ana else c['type'])
+  method='購入なし' if c['method']=='pass' else methods.get(c['method'],c['method'])
+  type_label=c.get('type','見送り')
+  category_label='<span class="ana-label">穴狙い</span>' if is_ana else ''
   number_text=c['jra_input']
   pay=(f"{c['points']}点 × {yen(c['unit_stake_yen'])} ＝ {yen(c['stake_yen'])}"
        if c['points'] else '購入なし・0円')
   out.append(f'<tr class="{"ana" if is_ana else "normal"}"><td><b>{esc(type_label)}</b>'
-   f'<small>{esc(method)}</small></td><td class="spec">{esc(number_text)}</td>'
+   f'<small>{esc(method)}</small>{category_label}</td><td class="spec">{esc(number_text)}</td>'
    f'<td class="money">{esc(pay)}</td></tr>')
  title='東京11R オクトーバーステークス' if 'october-stakes' in data['race_id'] else '京都11R スワンステークス'
  m=data['summary']
@@ -50,6 +50,7 @@ th{background:#f0f2f5;font-size:9pt;color:#344151;text-align:left;padding:9px 8p
 td{border-bottom:1px solid #d7dce2;padding:10px 8px;vertical-align:top;overflow-wrap:anywhere}
 th:nth-child(1),td:nth-child(1){width:21%}th:nth-child(2),td:nth-child(2){width:43%}th:nth-child(3),td:nth-child(3){width:36%}
 td small{display:block;font-size:8pt;color:#657386;margin-top:2px}
+.ana-label{display:block;font-size:7.5pt;font-weight:bold;color:#8c562e;margin-top:3px}
 td.spec{font-weight:550;line-height:1.8}td.money{font-weight:bold;font-size:9pt}
 tr.ana{background:#fff7ed}tr.ana td{border-top:2px solid #d8b682}
 .metrics{padding:11px;background:#f2f4f7;border-radius:5px;margin-top:14px;font-size:9pt}
