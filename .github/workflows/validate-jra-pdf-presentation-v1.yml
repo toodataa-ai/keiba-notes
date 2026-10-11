@@ -69,12 +69,21 @@ jobs:
             ORIGINAL="docs/pdfs/$RACE-v3.12-rerun${RUN}-attempt2-v312.pdf"
             OUTPUT_HTML="/tmp/$RACE-japanese.html"
             OUTPUT_PDF="/tmp/$RACE-japanese.pdf"
-            JRA_AUDIT_ROWS_PER_PAGE=14 JRA_SELECTED_ROWS_PER_PAGE=14 JRA_REJECTED_ROWS_PER_PAGE=12 \
-              python3 .github/scripts/jra-render-live-v312.py "$PRED" "$OUTPUT_HTML"
-            python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML"
-            python3 -m weasyprint "$OUTPUT_HTML" "$OUTPUT_PDF"
-            python3 .github/scripts/validate-jra-pdf-content-v312.py \
-              --html "$OUTPUT_HTML" --pdf "$OUTPUT_PDF" --prediction "$PRED"
+            PASS=0
+            for ROWS in 14:12:14 12:10:14 10:9:14 10:8:14 10:7:14 8:5:10 6:4:8 4:3:6 2:2:4 1:1:2; do
+              IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS <<< "$ROWS"
+              if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
+                   python3 .github/scripts/jra-render-live-v312.py "$PRED" "$OUTPUT_HTML" &&
+                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML" &&
+                 python3 -m weasyprint "$OUTPUT_HTML" "$OUTPUT_PDF" &&
+                 python3 .github/scripts/validate-jra-pdf-content-v312.py \
+                   --html "$OUTPUT_HTML" --pdf "$OUTPUT_PDF" --prediction "$PRED"; then
+                PASS=1
+                echo "SUCCESS_DENSE_A4 $RACE selected=$SELECTED_ROWS rejected=$REJECTED_ROWS audit=$AUDIT_ROWS"
+                break
+              fi
+            done
+            [[ $PASS -eq 1 ]] || { echo "BLOCKER: no dense pagination fits complete A4"; exit 1; }
             python3 - "$ORIGINAL" "$OUTPUT_PDF" <<'PY'
           import fitz, sys
           with fitz.open(sys.argv[1]) as old, fitz.open(sys.argv[2]) as new:
