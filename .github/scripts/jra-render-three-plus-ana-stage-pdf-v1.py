@@ -79,7 +79,7 @@ def main():
   assert len(pdf)==1,f'preview must be exactly one A4 page; got {len(pdf)}'
   page=pdf[0]
   assert abs(page.rect.width-595.28)<1 and abs(page.rect.height-841.89)<1
-  text=page.get_text()
+  text=re.sub(r'\s+','',page.get_text()) # normalize PDF line breaks, never skip or shorten content
   for token in ('STAGING','穴狙い','モデル期待純利益','6,000円以内','購入指示として使用しないでください'):
    assert token in text,'A4 missing '+token
   for block in page.get_text('dict')['blocks']:
