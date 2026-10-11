@@ -39,7 +39,7 @@ ROW_COUNT = re.compile(r'<tbody>(.*?)</tbody>', re.S)
 def numbers(values):
     if not isinstance(values, list) or not values or any(not isinstance(x, int) for x in values):
         raise ValueError("JRA presentation blocker: incomplete strategy horse-number definition")
-    return "・".join(map(str, values))
+    return ",".join(map(str, values))
 
 
 def method_definition(st):
@@ -52,7 +52,7 @@ def method_definition(st):
         return numbers(d["horses"])
     if kind == "formation":
         slots = d["slots"]
-        return "／".join(f"{i}列:{numbers(slot)}" for i, slot in enumerate(slots, 1))
+        return "/".join(numbers(slot) for slot in slots)
     if kind in ("key_wheel", "key_wheel_first", "key_wheel_second", "key_wheel_multi",
                 "one_key_wheel", "one_key_fixed", "one_key_multi"):
         prefix = ("1着" if kind == "key_wheel_first" else
@@ -127,7 +127,7 @@ def apply(html_source, prediction):
             detail = html_module.escape(method_definition(st), quote=True)
             state = "全点採用" if adopted == total else "一部採用" if adopted else "不採用"
             label = html_module.escape(METHOD_NAMES[raw], quote=True)
-            shown = (f"{label}<div class=\"tiny\">{detail}｜{state}{adopted}/{total}点</div>")
+            shown = f"{label} {detail}（採用{adopted}/{total}点）"
             seen.add(sid)
             changed[0] += 1
             return row.group(1) + shown + row.group(5)
@@ -146,9 +146,8 @@ def apply(html_source, prediction):
         raise ValueError("JRA presentation blocker: comparison page count changed")
     # The original final_bets table remains unchanged. Explain when a final cross-type
     # portfolio contains only part of a listed BOX/formation/wheel.
-    selected_note = ("採用した個別買い目は、ボックス・流し・フォーメーション等の"
-                     "全点購入案と必ずしも一致しません。監査表には馬番の組合せと"
-                     "全点採用／一部採用／不採用を区別して表示。重複購入は計上しません。")
+    selected_note = ("ボックス・流し・フォーメーション等は馬番と採用点数を監査表に記載。"
+                     "採用が全点未満なら全点購入ではありません。重複買い目は計上しません。")
     anchor = re.compile(r'(<section class="page"><div class="chapter">採用買い目｜1/\d+</div>)')
     converted, count = anchor.subn(
         lambda m: m.group(1) + '<p>' + html_module.escape(selected_note) + '</p>',
