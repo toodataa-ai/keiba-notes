@@ -1,14 +1,61 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-10T05:51:59+00:00",
+  "generated_at": "2026-10-11T03:04:46+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 0,
+    "strict": 2,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 0
+    "prediction_entries": 2
   },
-  "versions": {},
+  "versions": {
+    "v3.2": {
+      "all_non_synthetic": {
+        "cases": 2,
+        "honmei_win_rate": 0.5,
+        "honmei_top3_rate": 1.0,
+        "top3_marks_capture_rate": 0.333333,
+        "winner_in_top3_marks_rate": 0.5,
+        "winner_mean_rank": 2.5,
+        "winner_mrr": 0.625,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "going_log_loss": 0.040822,
+        "pace_log_loss": null,
+        "stake_yen": 300,
+        "payout_yen": 1080,
+        "roi_pct": 360.0,
+        "bet_cases": 2,
+        "probability_cases": {
+          "win": 0,
+          "top3": 0
+        }
+      },
+      "strict": {
+        "cases": 2,
+        "honmei_win_rate": 0.5,
+        "honmei_top3_rate": 1.0,
+        "top3_marks_capture_rate": 0.333333,
+        "winner_in_top3_marks_rate": 0.5,
+        "winner_mean_rank": 2.5,
+        "winner_mrr": 0.625,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "going_log_loss": 0.040822,
+        "pace_log_loss": null,
+        "stake_yen": 300,
+        "payout_yen": 1080,
+        "roi_pct": 360.0,
+        "bet_cases": 2,
+        "probability_cases": {
+          "win": 0,
+          "top3": 0
+        }
+      }
+    }
+  },
   "comparison": {
     "baseline": "v3.0",
     "candidate": "v3.1",
@@ -30,10 +77,91 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 0
+    "strict_bet_cases": 2
   },
   "errors": [],
-  "entries": [],
+  "entries": [
+    {
+      "race_id": "2026-10-10-mimuro-stakes",
+      "date": "2026-10-10",
+      "venue": "京都",
+      "surface": "dirt",
+      "race": "御陵ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.2",
+      "prediction_path": "e2e_validation/predictions/2026-10-10-mimuro-stakes/v3.2.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "7e7247b8a46e997c79bdcd58d45854211e176864",
+        "proof_commit_at": "2026-10-10T08:12:05+09:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.2.json",
+        "component_count": 5
+      },
+      "metrics": {
+        "honmei_win": 1,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 1,
+        "winner_rank": 1,
+        "winner_mrr": 1.0,
+        "stake_yen": 100,
+        "payout_yen": 1080,
+        "roi_pct": 1080.0,
+        "going_log_loss": 0.040822,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-10-saudi-arabia-royal-cup",
+      "date": "2026-10-10",
+      "venue": "東京",
+      "surface": "turf",
+      "race": "サウジアラビアロイヤルカップ",
+      "grade": "prospective_strict",
+      "version": "v3.2",
+      "prediction_path": "e2e_validation/predictions/2026-10-10-saudi-arabia-royal-cup/v3.2.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "7e7247b8a46e997c79bdcd58d45854211e176864",
+        "proof_commit_at": "2026-10-10T08:12:05+09:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.2.json",
+        "component_count": 5
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 0,
+        "winner_rank": 4,
+        "winner_mrr": 0.25,
+        "stake_yen": 200,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": 0.040822,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    }
+  ],
   "interpretation": {
     "strict_only_for_promotion": true,
     "historical_replay_is_supporting_only": true,
