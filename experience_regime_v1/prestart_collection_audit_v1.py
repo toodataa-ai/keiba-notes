@@ -9,12 +9,15 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from datetime import datetime,timezone
 from pathlib import Path
 
 CATEGORIES={"debut","maiden","class_1","class_2","class_3","open_listed","graded"}
 ORIGINS={"official_prediction","stratified_sample"}
 ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0,str(ROOT))
 
 def audit(payload, input_bytes:bytes, at:datetime):
     ctx=payload.get("race_context") or {}
