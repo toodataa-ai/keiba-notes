@@ -46,6 +46,21 @@ jobs:
           python3 -m py_compile .github/scripts/jra-site-ui-release-v1.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Enforce family-events branch-composed deployment cutover gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f .github/jra-branch-composition-activated.json ]];then
+            echo '::error::Legacy main/docs direct UI promotion disabled until user-approved family-events branch-composite deployment is activated'
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          with open('.github/jra-branch-composition-activated.json',encoding='utf8') as f:
+              d=json.load(f)
+          if d.get('active') is not True or not d.get('user_approved') or d.get('production_branch')!='production':
+              raise SystemExit('BLOCKER: explicit activation approval missing')
+          PY
       - name: Prepare user-approved UI only, archive v1.00 release snapshot if needed
         shell: bash
         run: |
