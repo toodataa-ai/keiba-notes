@@ -1,5 +1,9 @@
-name: JRA v3.10 prestart prediction pipeline
+name: JRA v3.10 prestart forecast plus complete approved PDF
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/inputs/*.json'
   workflow_dispatch:
     inputs:
       input_path:
@@ -14,7 +18,7 @@ concurrency:
 jobs:
   prestart:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,6 +60,15 @@ jobs:
           REL="v3.10-run${RUN_ID}-attempt${ATTEMPT}.json"
           SNAPSHOT="e2e_validation/snapshots/${RACE_ID}/${REL}"
           PREDICTION="e2e_validation/predictions/${RACE_ID}/${REL}"
+          REPORT="docs/reports/$RACE_ID.html"
+          PDF="docs/pdfs/$RACE_ID.pdf"
+          if [[ -e "$REPORT" || -e "$PDF" ]];then echo "::error::Prior official report/PDF exists; cannot overwrite";exit 1;fi
+          python3 - "$RACE_ID" <<'PY'
+          import json,sys
+          from pathlib import Path
+          registry=json.loads(Path('docs/data/races.json').read_text())
+          if any(r['id']==sys.argv[1] for r in registry['races']):raise SystemExit('BLOCKER: race already published')
+          PY
           if [[ -e "$SNAPSHOT" || -e "$PREDICTION" ]]; then
             echo "::error::Immutable snapshot/prediction path already occupied"; exit 1
           fi
@@ -63,12 +76,30 @@ jobs:
             echo "INPUT_PATH=$INPUT_PATH"
             echo "SNAPSHOT=$SNAPSHOT"
             echo "PREDICTION=$PREDICTION"
+            echo "REPORT=$REPORT"
+            echo "PDF=$PDF"
           } >> "$GITHUB_ENV"
+      - name: Install exactly approved JRA PDF renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
       - name: Generate and audit the complete unsealed betting snapshot
         run: |
           set -euo pipefail
           node .github/scripts/jra-prestart-pipeline-v310.mjs --input "$INPUT_PATH" --output "$SNAPSHOT"
           node -e "const p=require('./'+process.argv[1]);if(p.stage!=='pending_git_proof'||p.proof_commit!==null||p.prompt_version!=='v3.10')process.exit(1)" "$SNAPSHOT"
+      - name: Test full original HTML/PDF against approved reader-v1 layout before freezing
+        run: |
+          set -euo pipefail
+          python3 - "$SNAPSHOT" /tmp/jra-v310-layout-only.json <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]));d['stage']='formal_prestart';d['proof_commit']='a'*40
+          with open(sys.argv[2],'w') as f:json.dump(d,f,ensure_ascii=False)
+          PY
+          python3 .github/scripts/jra-render-live-v310.py /tmp/jra-v310-layout-only.json "$REPORT"
+          python -m weasyprint "$REPORT" /tmp/jra-v310-layout-only.pdf
+          python3 .github/scripts/validate-jra-pdf-layout.py --html "$REPORT" --pdf /tmp/jra-v310-layout-only.pdf --policy docs/data/jra_pdf_layout_policy_v1.json
       - name: Freeze snapshot in a real Git commit before race start
         run: |
           set -euo pipefail
@@ -86,11 +117,23 @@ jobs:
           node .github/scripts/jra-prestart-pipeline-v310.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
           node .github/scripts/validate-jra-portfolio-v310.mjs
           node .github/scripts/validate-jra-portfolio-prompt-v310.mjs
-      - name: Publish structured formal prediction only (no fabricated HTML/PDF)
+      - name: Generate final PDF from immutable proof, validate every page and append public registry
         run: |
           set -euo pipefail
-          git add -- "$PREDICTION"
-          git commit -m "Seal JRA v3.10 prediction with verified prereace commit"
+          python3 .github/scripts/jra-render-live-v310.py "$PREDICTION" "$REPORT"
+          python -m weasyprint "$REPORT" "$PDF"
+          python3 .github/scripts/validate-jra-pdf-layout.py --html "$REPORT" --pdf "$PDF" --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 .github/scripts/jra-publish-live-v310.py "$PREDICTION"
+      - name: Commit only new prediction PDF HTML and appended race registry
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" docs/data/races.json
+          python3 - "$PREDICTION" "$REPORT" "$PDF" <<'PY'
+          import subprocess,sys
+          expected=set(sys.argv[1:])|{'docs/data/races.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          if actual!=expected:raise SystemExit('BLOCKER: unexpected historical file changes: '+str(actual^expected))
+          PY
+          git commit -m "Publish validated v3.10 full JRA original prediction HTML PDF and public registry"
           git push origin HEAD:main
-          echo "Formal JSON prediction: $PREDICTION"
-          echo "Report and official PDF are separately BLOCKED until full authored report and page-level checks pass."
+          echo "PUBLISHED_JRA_V310_JSON_HTML_PDF $RACE_ID proof=$PROOF"
