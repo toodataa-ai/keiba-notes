@@ -181,6 +181,14 @@ def strategies(top,frame):
     ability_reason='STEP1固定順位上位と同条件実績/展開根拠による価格非参照の事前候補',
     risk_reason='先行競合・馬場変動・未校正勝率および多点数の資金損失',
     decision_reason='発走前に事前計画。最終採否は正確な個別オッズを取得後に決定') for i,(t,m,d) in enumerate(configs)]
+def frame_allocation(n):
+ require(isinstance(n,int) and 9<=n<=18,'supported JRA field size must be 9..18')
+ sizes=[1]*8
+ for idx in range(n-8):sizes[7-(idx%8)]+=1
+ frames=[f+1 for f,size in enumerate(sizes) for _ in range(size)]
+ require(len(frames)==n,'invalid eight-frame partition')
+ return frames
+
 def build(race,preview):
  require(datetime.now(JST).isoformat()<race['start_at'],'already past post time')
  official,going,officialsha=official_form(race)
@@ -213,10 +221,7 @@ def build(race,preview):
  # Prefer JRA official frame cell; when absent use the official conventional 8-frame assignment
  # for 14 and 16 runners, cross-check with market race card AFTER plan generated.
  n=len(scored)
- frame_counts=[1]*8
- for idx in range(n-8):frame_counts[7-(idx%8)]+=1
- expected_frame=[i+1 for i,count in enumerate(frame_counts) for _ in range(count)]
- require(len(expected_frame)==n,'bad official frame allocation')
+ expected_frame=frame_allocation(n)
  require(9<=n<=18,'unsupported field size requires official frame parser audit')
  frame={h['horse_number']:expected_frame[h['horse_number']-1] for h in scored}
  st=strategies(top,frame)
