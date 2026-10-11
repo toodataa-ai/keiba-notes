@@ -116,11 +116,12 @@ jobs:
           set +e
           VALIDATED=0
           # Each retry uses smaller rows per A4 page. Total pages are unrestricted.
-          for ROWS in 10:7 8:5 6:4 4:3 2:2 1:1; do
-            SELECTED_ROWS="${ROWS%:*}"; REJECTED_ROWS="${ROWS#*:}"
+          for ROWS in 14:12:14 12:10:14 10:9:14 10:8:14 10:7:14 8:5:10 6:4:8 4:3:6 2:2:4 1:1:2; do
+            IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS <<< "$ROWS"
             echo "Rendering candidate rows/page selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
-            JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$REJECTED_ROWS" \
+            JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
               python3 .github/scripts/jra-render-live-v312.py /tmp/jra-v311-layout-only.json "$REPORT" &&
+             python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction /tmp/jra-v311-layout-only.json &&
             python3 -m weasyprint "$REPORT" /tmp/jra-v311-layout-only.pdf &&
             python3 .github/scripts/validate-jra-pdf-content-v312.py \
               --html "$REPORT" --pdf /tmp/jra-v311-layout-only.pdf --prediction /tmp/jra-v311-layout-only.json
@@ -128,6 +129,7 @@ jobs:
               VALIDATED=1; echo "SUCCESS chosen pagination: selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
               echo "JRA_SELECTED_ROWS_PER_PAGE=$SELECTED_ROWS" >> "$GITHUB_ENV"
               echo "JRA_REJECTED_ROWS_PER_PAGE=$REJECTED_ROWS" >> "$GITHUB_ENV"
+               echo "JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"
               break
             fi
           done
@@ -159,6 +161,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 .github/scripts/jra-render-live-v312.py "$PREDICTION" "$REPORT"
+           python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction "$PREDICTION"
           python -m weasyprint "$REPORT" "$PDF"
           python3 .github/scripts/validate-jra-pdf-content-v312.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
           python3 .github/scripts/jra-publish-live-v312.py "$PREDICTION"

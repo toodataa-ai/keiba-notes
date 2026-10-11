@@ -1,0 +1,97 @@
+name: JRA PDF Japanese display and compact audit acceptance
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-pdf-presentation-overlay-v1.py'
+      - '.github/scripts/test-jra-pdf-presentation-overlay-v1.py'
+      - '.github/workflows/jra-prestart-pipeline-fresh-v312.yml'
+      - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+      - 'docs/data/latest_prompt.json'
+      - '.github/workflows/validate-jra-pdf-presentation-v1.yml'
+  push:
+    branches: [main, 'fix/jra-v312-pdf-ja-compact-audit-20261011']
+    paths:
+      - '.github/scripts/jra-pdf-presentation-overlay-v1.py'
+      - '.github/scripts/test-jra-pdf-presentation-overlay-v1.py'
+      - '.github/workflows/jra-prestart-pipeline-fresh-v312.yml'
+      - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+      - 'docs/data/latest_prompt.json'
+      - '.github/workflows/validate-jra-pdf-presentation-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  presentation-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Check immutable original and SHA-pinned presentation overlay
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          j=json.loads(Path('docs/data/latest_prompt.json').read_text(encoding='utf-8'))
+          assert j['version']=='v3.12'
+          addon=j['pdf_presentation_overlay']
+          for k in ('script','test'):
+              obj=addon[k]
+              digest=subprocess.check_output(['git','hash-object',obj['path']],text=True).strip()
+              assert digest==obj['git_blob_sha'], (k,digest,obj['git_blob_sha'])
+          x=j['odds_freshness_execution_overlay']
+          for k in ('workflow','new_race_workflow'):
+              obj=x[k]
+              digest=subprocess.check_output(['git','hash-object',obj['path']],text=True).strip()
+              assert digest==obj['git_blob_sha'], (k,digest,obj['git_blob_sha'])
+          for k in ('workflow','new_race_workflow'):
+              script=Path(x[k]['path']).read_text()
+              assert script.count('jra-pdf-presentation-overlay-v1.py')>=2
+              assert script.count(' --prediction ')>=2
+              assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS' in script
+              assert 'JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"' in script
+          PY
+      - name: Verify real 14-row A4 pages with pinned renderer dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python -m py_compile .github/scripts/jra-pdf-presentation-overlay-v1.py
+          python .github/scripts/test-jra-pdf-presentation-overlay-v1.py
+
+      - name: Re-render two sealed 2026-10-11 races without changing predictions and assert fewer pages
+        run: |
+          set -euo pipefail
+          for ITEM in "ireland-trophy" "uzumasa-stakes"; do
+            RACE="2026-10-11-$ITEM"
+            if [[ "$ITEM" == "ireland-trophy" ]]; then RUN=38109097973; else RUN=38108909783; fi
+            PRED="e2e_validation/predictions/$RACE/v3.12-rerun${RUN}-attempt2.json"
+            ORIGINAL="docs/pdfs/$RACE-v3.12-rerun${RUN}-attempt2-v312.pdf"
+            OUTPUT_HTML="/tmp/$RACE-japanese.html"
+            OUTPUT_PDF="/tmp/$RACE-japanese.pdf"
+            PASS=0
+            for ROWS in 14:12:14 12:10:14 10:9:14 10:8:14 10:7:14 8:5:10 6:4:8 4:3:6 2:2:4 1:1:2; do
+              IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS <<< "$ROWS"
+              if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
+                   python3 .github/scripts/jra-render-live-v312.py "$PRED" "$OUTPUT_HTML" &&
+                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML" --prediction "$PRED" &&
+                 python3 -m weasyprint "$OUTPUT_HTML" "$OUTPUT_PDF" &&
+                 python3 .github/scripts/validate-jra-pdf-content-v312.py \
+                   --html "$OUTPUT_HTML" --pdf "$OUTPUT_PDF" --prediction "$PRED"; then
+                PASS=1
+                echo "SUCCESS_DENSE_A4 $RACE selected=$SELECTED_ROWS rejected=$REJECTED_ROWS audit=$AUDIT_ROWS"
+                break
+              fi
+            done
+            [[ $PASS -eq 1 ]] || { echo "BLOCKER: no dense pagination fits complete A4"; exit 1; }
+            python3 - "$ORIGINAL" "$OUTPUT_PDF" <<'PY'
+          import fitz, sys
+          with fitz.open(sys.argv[1]) as old, fitz.open(sys.argv[2]) as new:
+              assert len(new) < len(old), f"expected fewer pages: before={len(old)}, after={len(new)}"
+              text="\n".join(p.get_text() for p in new)
+              assert "方式別セット比較" in text and "フォーメーション" in text
+              assert not any(f"<td>{x}</td>" in text for x in ("single", "multiple_singles"))
+              print(f"PASS: complete verified Japanese PDF, {len(old)} -> {len(new)} pages")
+          PY
+          done
