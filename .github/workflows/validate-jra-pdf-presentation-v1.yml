@@ -9,7 +9,7 @@ on:
       - 'docs/data/latest_prompt.json'
       - '.github/workflows/validate-jra-pdf-presentation-v1.yml'
   push:
-    branches: [main, 'fix/jra-v312-actionable-ticket-instructions-20261011']
+    branches: [main, 'fix/jra-v312-box-formation-tree-wheel-display-20261011']
     paths:
       - '.github/scripts/jra-pdf-presentation-overlay-v1.py'
       - '.github/scripts/test-jra-pdf-presentation-overlay-v1.py'
@@ -95,7 +95,7 @@ jobs:
               first = new[0].get_text()
               assert "最終購入結論" in first and "最終の買い目" in first and "購入予定額" in first
               assert "買い方" in first and "指定する馬番・枠番" in first
-              assert "個別指定" in first or "ボックス" in first or "流し" in first or "フォーメーション" in first
+              assert "個別指定" in first or "BOX" in first or "流し" in first or "フォーメーション" in first
               assert "不採用買い目｜" not in first
               assert "不採用買い目" in "\\n".join(page.get_text() for page in list(new)[1:])
               assert not any(f"<td>{x}</td>" in text for x in ("single", "multiple_singles"))

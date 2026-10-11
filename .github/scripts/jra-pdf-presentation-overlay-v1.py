@@ -13,7 +13,7 @@ from pathlib import Path
 METHOD_NAMES = {
     "single": "1点買い",
     "multiple_singles": "複数頭の単点買い",
-    "box": "ボックス",
+    "box": "BOX",
     "key_wheel": "1頭軸流し",
     "key_wheel_first": "1着固定流し",
     "key_wheel_second": "2着固定流し",
@@ -119,17 +119,19 @@ def input_numbers(st):
             raise ValueError("JRA purchase blocker: malformed formation slots")
         labels = (["1着", "2着", "3着"] if st["type"] in ("馬単", "三連単")
                   else ["1列", "2列", "3列"])
-        return "／".join(f"{labels[i]}:{numbers(slot)}" for i, slot in enumerate(slots))
+        return "／".join(f"{labels[i]}：{numbers(slot)}" for i, slot in enumerate(slots))
     if kind in ("single",):
         return "-".join(map(str, d["selection"]))
     if kind in ("box", "multiple_singles"):
-        return numbers(d["horses"])
+        return "・".join(numbers(d["horses"]).split(","))
     if kind in ("key_wheel", "key_wheel_first", "key_wheel_second", "key_wheel_multi",
                 "one_key_wheel", "one_key_fixed", "one_key_multi"):
         position = ("1着" if kind == "key_wheel_first" else
                     "2着" if kind == "key_wheel_second" else
                     f"{d['position']}着" if kind == "one_key_fixed" else "軸")
-        return f"{position}:{d['key']}／相手:{numbers(d['partners'])}"
+        if st["type"] == "馬連" and kind == "key_wheel":
+            return f"軸馬：{d['key']}／相手馬：{'・'.join(numbers(d['partners']).split(','))}"
+        return f"{position}：{d['key']}／相手：{'・'.join(numbers(d['partners']).split(','))}"
     if kind in ("two_key_wheel", "two_key_fixed", "two_key_multi"):
         if kind == "two_key_fixed":
             axis = {pos: val for pos, val in zip(d["positions"], d["axes"])}
@@ -241,6 +243,84 @@ PURCHASE_MODES_BY_TYPE = {
 }
 
 
+
+def _display_only_group_candidates(final_by_key):
+    """Find safe JRA BOX/馬連流し presentations directly from sealed final tickets.
+
+    Candidate construction changes *no bets*: accepted only when independent
+    ticket expansion matches every line at one common stake.
+    """
+    from itertools import combinations, permutations
+    from math import comb, factorial
+    by_type_stake = {}
+    for key, bet in final_by_key.items():
+        by_type_stake.setdefault((key[0], bet["stake_yen"]), set()).add(key)
+    derived = []
+    for (typ, unit), available in by_type_stake.items():
+        if typ in ("枠連", "馬連", "馬単", "ワイド", "三連複", "三連単"):
+            arity = 3 if typ in ("三連複","三連単") else 2
+            ordered = typ in ("馬単", "三連単")
+            max_horses = 5 if typ == "三連単" else 8
+            horses = sorted(set(h for _, selection in available for h in selection))
+
+            def box_keys(hs):
+                return {
+                    bet_key({"type":typ,"selection":list(row)})
+                    for picked in combinations(hs, arity)
+                    for row in (permutations(picked) if ordered else (picked,))
+                }
+
+            # Enumerate actual purchased 2/3-horse edges first and extend only
+            # complete cliques. NEVER use combinations(all race horses, 8):
+            # that causes millions of irrelevant candidates for 20+ selected
+            # horse numbers, delaying PDF CI and risk of timeout.
+            seeds = set(tuple(sorted(sel)) for _,sel in available
+                        if len(sel) == arity and len(set(sel)) == arity)
+            visited = set()
+            def explore(hs):
+                if hs in visited:
+                    return
+                visited.add(hs)
+                keys = box_keys(hs)
+                if not keys.issubset(available):
+                    return
+                if len(keys) >= 2:
+                    sid = f"DISPLAY_BOX_{typ}_{unit}_{'_'.join(map(str,hs))}"
+                    derived.append({"strategy_id":sid, "type":typ,
+                                    "strategy_kind":"box",
+                                    "definition":{"horses":list(hs)},
+                                    "lines":[{"type":k[0],"selection":list(k[1])}
+                                             for k in sorted(keys)]})
+                if len(hs) >= max_horses:
+                    return
+                for h in horses:
+                    if h > hs[-1]:
+                        # A new node must connect to EVERY complete edge/triple.
+                        # Failed branches cannot become valid BOX supersets.
+                        explore((*hs, h))
+            for hs in sorted(seeds):
+                explore(hs)
+        if typ == "馬連":
+            horses = sorted(set(h for _, selection in available for h in selection))
+            for axis in horses:
+                partners = sorted({
+                    next(h for h in selection if h != axis)
+                    for _,selection in available if axis in selection and
+                    len(selection) == 2 and selection[0] != selection[1]
+                })
+                if len(partners) < 2:
+                    continue
+                keys = {bet_key({"type":"馬連","selection":[axis,p]}) for p in partners}
+                if keys.issubset(available):
+                    sid = f"DISPLAY_WHEEL_{typ}_{unit}_{axis}"
+                    derived.append({"strategy_id":sid,"type":typ,
+                                    "strategy_kind":"key_wheel",
+                                    "definition":{"key":axis,"partners":partners},
+                                    "lines":[{"type":"馬連","selection":[axis,p]}
+                                             for p in partners]})
+    return derived
+
+
 def purchase_commands(prediction):
     """Prove each on-screen instruction expands to *exactly* the sealed final_bets.
 
@@ -263,7 +343,7 @@ def purchase_commands(prediction):
                 "key_wheel_multi":1, "one_key_wheel":1, "two_key_wheel":1,
                 "one_key_fixed":1, "two_key_fixed":1, "one_key_multi":1,
                 "two_key_multi":1, "formation":2, "multiple_singles":3}
-    for st in prediction.get("purchase_strategy_evaluations") or []:
+    for st in (prediction.get("purchase_strategy_evaluations") or []) + _display_only_group_candidates(final_by_key):
         kind = st.get("strategy_kind")
         if kind in ignored or kind not in priority or kind not in PURCHASE_MODES_BY_TYPE.get(st.get("type"), set()):
             continue
@@ -292,7 +372,9 @@ def purchase_commands(prediction):
         unit = final_by_key[next(iter(keys))]["stake_yen"]
         commands.append({"type":st["type"],"method":METHOD_NAMES[st["strategy_kind"]],
                          "numbers":specification,"tickets":len(keys),"unit_yen":unit,
-                         "amount_yen":unit*len(keys),"_keys":keys})
+                         "amount_yen":unit*len(keys),"_keys":keys,
+                         "_formation_slots": [list(x) for x in st["definition"]["slots"]]
+                              if st["strategy_kind"] == "formation" else None})
         used.update(keys)
 
     for k, line in sorted(final_by_key.items(), key=lambda x:
@@ -311,6 +393,31 @@ def purchase_commands(prediction):
         raise ValueError("JRA purchase blocker: instructions differ from immutable final_bets")
     return sorted(commands,key=lambda x:(TYPE_ORDER.index(x["type"]),
                                           -x["tickets"], x["method"],x["numbers"]))
+
+
+
+def _format_purchase_numbers(cmd):
+    """Show actual betting-screen entry, tree for an ordered/unordered formation."""
+    if cmd.get("_formation_slots") is None:
+        return html_module.escape(cmd["numbers"], quote=True)
+    slots = cmd["_formation_slots"]
+    typ = cmd["type"]
+    if typ not in ("枠連", "馬連", "馬単", "ワイド", "三連複", "三連単"):
+        raise ValueError("JRA purchase blocker: invalid formation type")
+    if len(slots) not in (2, 3):
+        raise ValueError("JRA purchase blocker: invalid formation tree depth")
+    labels = (("1着", "2着", "3着") if typ in ("馬単", "三連単")
+              else ("1列目", "2列目", "3列目"))
+    branches = []
+    for i, slot in enumerate(slots):
+        branch = "●" if i == 0 else "└─"
+        selection = "・".join(numbers(slot).split(","))
+        branches.append(f'<div style="margin:0 0 0 {i*12}px;white-space:nowrap;">' +
+                        html_module.escape(f"{branch} {labels[i]}：{selection}", quote=True) +
+                        '</div>')
+    return ('<div class="jra-formation-tree" '
+            'style="font-size:10pt;line-height:1.3;white-space:nowrap;">' +
+            "".join(branches) + '</div>')
 
 
 def cover_conclusion(prediction, original_cover):
@@ -366,7 +473,7 @@ def cover_conclusion(prediction, original_cover):
             typ_cmds = [x for x in commands if x["type"] == typ]
             for cmd in typ_cmds[:max_items]:
                 table += ('<tr><td>'+esc(typ)+'</td><td>'+esc(cmd["method"])+'</td>'
-                          '<td>'+esc(cmd["numbers"])+'</td><td>'+
+                          '<td>'+_format_purchase_numbers(cmd)+'</td><td>'+
                           f'{cmd["tickets"]}点×{cmd["unit_yen"]:,}円＝{cmd["amount_yen"]:,}円'
                           '</td></tr>')
             hidden = typ_cmds[max_items:]
@@ -377,8 +484,9 @@ def cover_conclusion(prediction, original_cover):
                           f'{sum(x["amount_yen"] for x in hidden):,}円</td></tr>')
         table += "</tbody></table>"
         details = ('<p class="tiny">各行を「券種→買い方→指定馬番→金額」の順に入力。'
-                   'ボックス・流し・フォーメーションは採用全組番と完全一致する場合のみ表示し、'
-                   '一部採用の場合は「個別指定（1点）」に分解しています。</p>'+table)
+                   'BOX・流し・フォーメーションは表示された購入操作が採用組番と一致する場合だけ使用。'
+                   'フォーメーションは着順・列ごとのツリー表記。'
+                   '一部しか再現できない場合は「個別指定（1点）」です。</p>'+table)
 
     portfolio = prediction.get("purchase_portfolio_selection") or {}
     prof = (portfolio.get("expected_net_profit_yen_scenarios") or {}).get("central")

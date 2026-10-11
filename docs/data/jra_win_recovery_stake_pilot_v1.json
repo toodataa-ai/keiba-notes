@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "feature": "win_stake_recovery",
+  "status": "SHADOW_ONLY_NOT_ACTIVE_IN_FORMAL_V312",
+  "scope": "STEP2 future-version proposal only; v3.12 and every sealed race remain immutable",
+  "script": {
+    "path": ".github/scripts/jra-win-recovery-stake-shadow-v1.mjs",
+    "git_blob_sha": "15ac34f11b5fc0e19a7552a74ac439a325eb78d0"
+  },
+  "test": {
+    "path": ".github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs",
+    "git_blob_sha": "991a26e01b654385d9ab7efc6c90b65eb89691c4"
+  },
+  "investment_limits": {
+    "race_budget_yen": 6000,
+    "stake_step_yen": 100,
+    "max_stake_per_win_bet_yen": 1200,
+    "no_compulsory_full_budget_spend": true
+  },
+  "method": "Trial 100-yen increments on unchanged selected WIN ticket combinations; compute exact modeled cross-type P(net payout >= total spend) using the already sealed odds and correlated top-three outcome distributions; choose largest material non-loss probability improvement with expected-profit and low-scenario risk floors; report win-only break-even stake and full portfolio odds.",
+  "guards": [
+    "Must not change any original prestart sealed final_bets, STEP1, history, source odds, results, or currently active formal optimizer.",
+    "Only candidate win-ticket stake amounts can change; no ticket additions, no changes to other bet types.",
+    "Never compute stakes from known finish results; all future activation requires a new prestart version and verification.",
+    "Preserve baseline central EV within smaller of 10 percent or 200 yen; require positive modeled portfolio EV.",
+    "Reject a low-scenario modeled profit decline over 200 yen and low-scenario net-loss increase over 2 percentage points.",
+    "Require at least +1 percentage point central probability of nonnegative portfolio profit; no automatic spend-to-limit.",
+    "Historical model is uncalibrated; outputs are exploratory and not actual odds guarantee."
+  ],
+  "activation": "Only after a separately approved formally versioned pipeline and end-to-end regression. This policy commits a tested pilot, not a change in the latest approved official JRA prediction."
+}

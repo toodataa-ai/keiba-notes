@@ -1,0 +1,45 @@
+name: JRA win-stake recovery SHADOW research acceptance
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-win-recovery-stake-shadow-v1.mjs'
+      - '.github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs'
+      - 'docs/data/jra_win_recovery_stake_pilot_v1.json'
+      - '.github/workflows/validate-jra-win-recovery-stake-shadow-v1.yml'
+  push:
+    branches: [main, 'fix/jra-v312-box-formation-tree-wheel-display-20261011']
+    paths:
+      - '.github/scripts/jra-win-recovery-stake-shadow-v1.mjs'
+      - '.github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs'
+      - 'docs/data/jra_win_recovery_stake_pilot_v1.json'
+      - '.github/workflows/validate-jra-win-recovery-stake-shadow-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  stake-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify immutable formal-v312 separation and pilot SHA pins
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          const p=JSON.parse(fs.readFileSync('docs/data/jra_win_recovery_stake_pilot_v1.json'));
+          assert.equal(p.status,'SHADOW_ONLY_NOT_ACTIVE_IN_FORMAL_V312');
+          for(const x of [p.script,p.test]){
+            assert.equal(execFileSync('git',['hash-object',x.path],{encoding:'utf8'}).trim(),x.git_blob_sha);
+          }
+          const formal=fs.readFileSync('.github/scripts/jra-prestart-pipeline-v312.mjs','utf8');
+          assert(!formal.includes('jra-win-recovery-stake-shadow-v1'));
+          assert.equal(JSON.parse(fs.readFileSync('docs/data/latest_prompt.json')).version,'v3.12');
+          console.log('PASS: shadow pilot not activated and approved v3.12 remains unchanged');
+          NODE
+      - name: Evaluate odds-sensitive stakes and invariant guards
+        run: |
+          node .github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs
