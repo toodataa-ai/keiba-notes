@@ -4,14 +4,18 @@
 <a class="link" href="index.html">← 研究所トップ</a><h1>サイト公開履歴</h1>
 <p class="sub">画面の公開版とレース予想・結果データは独立管理しています。復元は画面ファイルだけに適用し、過去の予想や最新レース台帳を変更しません。</p>
 <div id="versions" aria-live="polite"><p>公開履歴を読み込み中…</p></div>
-<h2>リリースの運用</h2><p class="small">改修はステージングで表示とテストを確認し、明示承認後に正式版へ切り替えます。各正式公開版にはGitの不変タグを付けます。旧版への復元は別の承認リクエストでそのタグから画面を再現し、公開HTTPを照合します。</p>
+<h2>リリースの運用</h2><p class="small">改修はステージングで表示とテストを確認し、明示承認後に正式版へ切り替えます。正式公開済み画面をGitのリリースブランチで保存し、指定版へ画面のみ復元します。予想・回顧などのデータ更新は検証合格後に承認不要で本番反映します。</p>
 <p class="boundary small">正式な購入候補を変更する場合は、画面だけでなく別途予測モデルの版管理・新規レースでのE2E監査が必要です。未承認の検証版を実購入指示として公開しません。</p>
 </main><script>
 const list=document.getElementById('versions');const el=(t,s)=>{let e=document.createElement(t);e.textContent=s;return e};
-fetch('data/jra-site-ui-history.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{
-list.textContent='';const h=el('p','現在の正式画面：'+d.current_version);h.className='sub';list.append(h);
-for(const r of [...d.versions].reverse()){const b=el('section','');b.className='release';let head=el('div',r.version+(r.version===d.current_version?'　現在公開中':'　保管済み'));head.style.fontWeight='700';b.append(head,el('div',r.description||''));b.append(el('p','タグ：'+r.tag));list.append(b)}
-if(d.events?.length){const h=el('h2','公開・復元の操作履歴');list.append(h);for(const x of [...d.events].reverse().slice(0,30)){const p=el('p',x.at+' ／ '+x.action+' ／ '+x.version);p.className='sub';list.append(p)}}
-}).catch(()=>{list.textContent='';list.append(el('div','現在の正式画面は v1.00。初回の承認済みリリース時に公開台帳が作成されます。'))});
+fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{
+list.textContent='';const h=el('p','現在の正式画面：v'+(d.current_public_version||'—'));h.className='sub';list.append(h);
+for(const r of [...(d.releases||[])].reverse()){const b=el('section','');b.className='release';
+ const title=el('div','v'+r.public_version+(r.public_version===d.current_public_version?'　現在公開中':'　過去の正式版'));title.style.fontWeight='700';b.append(title);
+ const date=el('p',r.deployed_at?'公開検証日：'+new Date(r.deployed_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'公開日時：記録なし');date.className='sub';b.append(date);
+ b.append(el('p',r.note||'')); const backup=el('p','保存ブランチ：'+r.branch);backup.className='sub';b.append(backup);
+ list.append(b);
+}
+}).catch(()=>{list.textContent='';list.append(el('div','公開履歴の取得に失敗しました。'));});
 </script>  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "effective_date": "2026-10-12",
+  "source_reference": "tokyo-family-events-ai",
+  "ui": {
+    "stage_branch": "staging/jra-ui-v101-three-plus-ana",
+    "production_branch": "production",
+    "current_public_source": "main/docs",
+    "user_approval_required": true,
+    "release_history": ".github/production-releases.json",
+    "rollback_scope": "UI only"
+  },
+  "data": {
+    "sources": [
+      "official JRA prereace",
+      "official JRA postrace"
+    ],
+    "update_requires_user_approval": false,
+    "auto_publish_after_validation": true,
+    "required_gates": [
+      "prestart race time",
+      "real recent odds verified (prerace)",
+      "immutable Git proof for new forecast",
+      "PDF all-page content/format audited",
+      "registry points only at latest formally sealed report",
+      "all published byte consistency"
+    ],
+    "include": [
+      "docs/data/races.json",
+      "docs/reports/<race>.html",
+      "docs/pdfs/<race>.pdf",
+      "e2e_validation/{snapshots,predictions,quote-evidence}/**",
+      "review/result/performance"
+    ],
+    "exclude": [
+      "docs/index.html",
+      "docs/this-week.html",
+      "docs/assets/*.css",
+      "docs/assets/*.js",
+      "docs/data/production-releases.json",
+      ".github/production-releases.json"
+    ],
+    "restore_previous_prediction_in_public_UI": false,
+    "preserve_all_prior_prediction_archives": true
+  },
+  "legacy_pages_source": "main/docs",
+  "branch_composition_activation_pending": true,
+  "caveat": "Legacy JRA rerun CI already data-auto-publishes; final branch-composite hosting migration requires an audited independent change, never silent Pages cutover."
+}
