@@ -13,7 +13,7 @@ for(const file of races){
  const original=fs.readFileSync(file,'utf8'),record=JSON.parse(original);
  // Replay the actual new-race entry point on the frozen quote-evidence INPUT.
  // Never use Date.now or the race result in this historical offline reproduction.
- const revision=file.match(/v3\\.12-rerun(\\d+-attempt\\d+)\\.json$/);
+ const revision=file.match(/v3\.12-rerun(\d+-attempt\d+)\.json$/);
  assert(revision,'must identify saved source quote revision '+file);
  const source='e2e_validation/inputs/v312-recovered/'+record.race_id+'-rerun'+revision[1]+'.json';
  const verifiedSource=JSON.parse(fs.readFileSync(source,'utf8'));
