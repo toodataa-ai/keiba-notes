@@ -97,5 +97,13 @@
         "No false BOX label for incomplete set; independent enumeration of grouped combinations and same-stake proof against frozen final_bets"
       ]
     }
+  },
+  "win_stake_recovery_research": {
+    "status": "SHADOW_ONLY_NOT_ACTIVE_IN_FORMAL_V312",
+    "policy": {
+      "path": "docs/data/jra_win_recovery_stake_pilot_v1.json",
+      "git_blob_sha": "e6cbbb9cd3406dd3fc3fd7f6083d488a14087684"
+    },
+    "activation_rule": "Do not alter v3.12 formal predictions, final_bets or preserved artifacts. Pilot 100-yen increments for selected winning tickets under max 6000, conservative source odds and joint net-loss/profit floors; explicitly version and approve future pipeline before enabling."
   }
 }
