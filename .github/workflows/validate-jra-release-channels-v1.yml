@@ -1,0 +1,57 @@
+name: Guard JRA stage-approved UI and auto-published race data
+on:
+  push:
+    branches: [main, feature/jra-ui-approved-data-auto-v101]
+    paths:
+      - '.github/production-releases.json'
+      - 'docs/data/production-releases.json'
+      - 'docs/data/jra_release_channel_policy_v1.json'
+      - 'docs/release-history.html'
+      - '.github/workflows/validate-jra-release-channels-v1.yml'
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  release-channel-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enforce verified UI versions, approval boundary and independent auto JRA data updates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,re,subprocess
+          from pathlib import Path
+          source=Path('.github/production-releases.json').read_bytes()
+          display=Path('docs/data/production-releases.json').read_bytes()
+          assert source==display,'GitHub UI release registry and public UI history disagree'
+          d=json.loads(source)
+          p=json.loads(Path('docs/data/jra_release_channel_policy_v1.json').read_text())
+          assert d['current_public_version']=='1.01'
+          assert p['ui']['user_approval_required'] is True
+          assert p['data']['update_requires_user_approval'] is False
+          assert p['data']['auto_publish_after_validation'] is True
+          assert d['policy']['data_release_requires_user_approval'] is False
+          assert d['policy']['ui_release_requires_explicit_user_approval'] is True
+          assert len(d['releases'])>=2 and d['releases'][-1]['public_version']=='1.01'
+          assert d['releases'][-1]['workflow_run_id']==38185706485
+          assert d['releases'][-1]['commit_sha']=='632146ccb581847ae5d4cb9535fb868b8b4517d8'
+          versions=[x['public_version'] for x in d['releases']]
+          assert len(set(versions))==len(versions)
+          for x in d['releases']:
+            assert re.fullmatch(r'[a-f0-9]{40}',x['commit_sha'])
+            subprocess.run(['git','cat-file','-e',x['commit_sha']+'^{commit}'],check=True)
+            assert x['branch'].startswith('release/')
+          history=Path('docs/release-history.html').read_text()
+          assert "fetch('data/production-releases.json'" in history
+          assert 'user approval' not in str(p['data']).lower()
+          autorevise=Path('.github/workflows/jra-prerace-rerun-fresh-v313.yml').read_text()
+          assert 'e2e_validation/inputs/revisions/v313fresh/*.json' in autorevise
+          assert 'docs/data/races.json' in autorevise
+          assert 'Verify newly published HTML PDF current registry and revised journal over public HTTP' in autorevise
+          assert 'docs/site-release-requests/' not in autorevise
+          print('PASS_APPROVAL_UI_ONLY_AND_AUTOMATIC_JRA_DATA_WITH_IMMUTABLE_PROOFS')
+          PY
