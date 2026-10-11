@@ -1,0 +1,53 @@
+name: v3.13 experimental complete live odds refetch and repricing
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/jra-v313-fresh-odds-constrained-search]
+    paths:
+      - '.github/scripts/jra-odds-full-refresh-v313.py'
+      - '.github/scripts/jra-check-fresh-quotes-v313.py'
+      - '.github/workflows/jra-v313-fresh-odds-shadow-20261011.yml'
+permissions:
+  contents: read
+jobs:
+  live-odds-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install source extraction
+        run: python3 -m pip install -q requests beautifulsoup4
+      - name: Refetch every quoted line from actual source at runtime
+        run: |
+          set -euo pipefail
+          for NAME in 2026-10-11-uzumasa-stakes 2026-10-11-ireland-trophy; do
+            echo "RACE=$NAME"
+            SRC="e2e_validation/inputs/$NAME.json"
+            OUT="e2e_validation/inputs/v313-shadow/$NAME.json"
+            EVIDENCE="e2e_validation/quote-evidence/$NAME/v313-shadow-run${GITHUB_RUN_ID}"
+            mkdir -p "$(dirname "$OUT")"
+            python3 - "$SRC" "/tmp/$NAME-v313-source.json" <<'PY'
+          import sys,json
+          d=json.load(open(sys.argv[1]));d['prompt_version']='v3.12'
+          with open(sys.argv[2],'w') as f:json.dump(d,f,ensure_ascii=False)
+          PY
+            python3 .github/scripts/jra-odds-full-refresh-v313.py --refresh-all --input "/tmp/$NAME-v313-source.json" --output "$OUT" --evidence-dir "$EVIDENCE" --max-capture-spread-seconds 180
+            python3 .github/scripts/jra-check-fresh-quotes-v313.py --input "$OUT" --fresh-seconds 600 --max-spread-seconds 180
+            SNAP="/tmp/$NAME-v313-shadow-snapshot.json"
+            node .github/scripts/jra-prestart-pipeline-v312.mjs --input "$OUT" --output "$SNAP"
+            node -e "const o=require('./'+process.argv[1]); console.log(JSON.stringify({race:o.race_id,stage:o.stage,priced:o.exact_quote_coverage_v312,stake:o.total_stake_yen,lines:o.final_bets,diagnostic:o.purchase_set_comparisons_v312.search_diagnostic},null,2))" "$SNAP"
+          done
+      - name: Publish proof artefacts to Actions only, not public JRA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v313-fresh-quote-shadow-${{ github.run_id }}
+          path: |
+            e2e_validation/inputs/v313-shadow/
+            e2e_validation/quote-evidence/*/v313-shadow-run*/
+          if-no-files-found: warn
