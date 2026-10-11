@@ -8,6 +8,7 @@ on:
       - '.github/scripts/jra-check-fresh-quotes-v312-exec.py'
       - '.github/scripts/validate-jra-fresh-exec-v312.mjs'
       - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+      - '.github/workflows/jra-prestart-pipeline-fresh-v312.yml'
   push:
     branches: [feature/jra-v313-fresh-odds-constrained-search, main]
     paths:
@@ -17,6 +18,7 @@ on:
       - '.github/scripts/jra-check-fresh-quotes-v312-exec.py'
       - '.github/scripts/validate-jra-fresh-exec-v312.mjs'
       - '.github/workflows/jra-prerace-rerun-fresh-v312.yml'
+      - '.github/workflows/jra-prestart-pipeline-fresh-v312.yml'
 permissions:
   contents: read
 jobs:

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "effective_for": "v3.12 future formal JRA prestart revision executions",
-  "scope": "execution_and_market_quote_capture_only",
+  "scope": "all v3.12 future formal JRA prereace revisions AND first predictions; unchanged original proven historical artifacts",
   "max_quote_age_at_seal_seconds": 600,
   "max_capture_spread_seconds": 180,
   "refresh_all_expected_ticket_lines": true,
@@ -19,5 +19,7 @@
   "strict_on_missing_quote": true,
   "workflow": ".github/workflows/jra-prerace-rerun-fresh-v312.yml",
   "stop_on_age_expiry": true,
-  "note": "For future v3.12 JRA runs, use fresh workflow for user-requested latest odds; historic v3.12 workflow remains intact only for historical audit. The constraints-sensitive alternative search remains a separate v3.13 candidate, not silently mixed into frozen v3.12 bets."
+  "note": "For future v3.12 JRA runs, use fresh workflow for user-requested latest odds; historic v3.12 workflow remains intact only for historical audit. The constraints-sensitive alternative search remains a separate v3.13 candidate, not silently mixed into frozen v3.12 bets. For a newly discovered race, use the fresh-first-publication workflow instead of the historic missing-only new-race workflow.",
+  "new_race_execution_workflow": ".github/workflows/jra-prestart-pipeline-fresh-v312.yml",
+  "new_race_requires_same_full_price_refresh": true
 }
