@@ -202,10 +202,14 @@ def make(report):
  # No omission or page cap; if the table is too tall the existing PDF validation fails closed.
  mode_chunks=paginate_records(comparison_rows,int(os.getenv('JRA_AUDIT_ROWS_PER_PAGE','7')))
  for i,group in enumerate(mode_chunks,1):
+  complete=sum(1 for x in group if x[4]!='未確認')
+  positive=sum(1 for x in group if x[4]!='未確認' and x[5].endswith('円') and float(x[5][:-1].replace(',',''))>0)
+  distinct=len(set(x[1] for x in group))
   body+=page('購入最適化監査｜方式別セット比較 '+str(i)+'/'+str(len(mode_chunks)),
    paragraph('券種別・購入方式別の全点購入案を重複除去して評価。未確認の価格は期待利益を創作しません。')
    +rows_page(['ID','券種','方式','点数','集合的中率','期待純利益','実損率'],group)
-   +paragraph('比較セットは購入を確定しません。最終採否は発走前固定の全券種横断セットのみです。'))
+   +paragraph(f'このページは{len(group)}方式・{distinct}券種、全点価格確認済み{complete}方式、個別に期待利益が正の方式{positive}方式。価格が欠けた方式については、セット期待値を推測せず未確認と表示しています。')
+   +paragraph('単点や多点セットは同時着順事象を共有しているため、券種別の的中確率を単純加算しません。出走馬に共通する条件付き分布を通して集合的中と複数払戻を別集計します。'))
  body+=page('購入最適化監査｜探索と価格網羅性',
   rows_table(['検証項目','実数値'],[
    ('価格確認済み候補',str(coverage['priced'])+'/'+str(coverage['total_candidates'])),
@@ -214,6 +218,9 @@ def make(report):
    ('的中事象を追加できる不採用候補',str(risk_diag['positive_marginal_hit_candidates'])),
    ('的中事象が重複する不採用候補',str(risk_diag['no_marginal_hit_gain'])),
    ('比較試行ゼロの理由コード',{'every_priced_excluded_ticket_is_already_covered_by_selected_events':'未採用の価格確認済み買い目はすべて既存買い目と的中事象が重複', 'v311_neighbourhood_pruned_all_proposals_before_full_evaluation_check_profit_floor_and_loss_guard':'利益下限や損失制約等の事前検査で候補が消え、精査対象0件', 'no_excluded_priced_candidates':'価格確認済みの追加候補なし'}.get(risk_diag.get('zero_trial_reason'),risk_diag.get('zero_trial_reason') or '該当なし'))])
+  +rows_table(['券種','候補数','実価格','欠損'],[
+    (r['type'],r['generated'],r['priced'],r['missing']) for r in coverage.get('by_type',[])])
+  +paragraph('発走前の価格が揃っていない券種を「非採算」と判定しません。上表に不足があれば、正式予想作成を止めて欠損組番と取得先の監査に差し戻します。')
   +paragraph('発走前に実際の買い目価格・市場時刻を固定。的中率優先セットのシナリオ比較は購入推奨と区別します。')
   +paragraph('一部の馬券を増やしても「少なくとも1点的中」は上がりませんが、同時払戻によって期待純利益や純損失確率が変わり得ます。')
   +paragraph('本モデルは未校正であり、期待利益・的中確率の実現を保証しません。'))
