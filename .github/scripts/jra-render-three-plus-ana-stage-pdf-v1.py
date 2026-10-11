@@ -83,6 +83,12 @@ def main():
   text=re.sub(r'\s+','',page.get_text()) # normalize PDF line breaks, never skip or shorten content
   for token in ('STAGING','穴狙い','モデル期待純利益','6,000円以内','購入指示として使用しないでください'):
    assert token in text,'A4 missing '+token
+  # Standard ordered notation must survive actual rendered PDF glyph extraction.
+  if any(x['type'] in ('馬単','三連単') and x['method']=='single' for x in commands if x.get('type')):
+   assert '→' in text,'A4 arrow glyph not rendered/readable'
+  for x in commands:
+   if x.get('method')=='single' and x.get('type') in ('馬連','ワイド','枠連','三連複'):
+    assert '－' in text,'A4 unordered separator not rendered/readable'
   for block in page.get_text('dict')['blocks']:
    if 'lines' not in block:continue
    for line in block['lines']:
