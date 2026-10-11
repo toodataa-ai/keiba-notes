@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "applies_to": "v3.12",
+  "purpose": "Explicitly authorize only the v3.11 CI workflow adapter to use current version-aware checks while preserving the original v3.11 workflow Git blob and all data/prediction provenance.",
+  "superseded_components": [
+    {
+      "path": ".github/workflows/validate-jra-balanced-v311.yml",
+      "historical_blob_sha": "aef1675b63c1a41b0cdfdad91a45e51b336b1488",
+      "current_blob_sha": "99ab82da152bbc18026ad3aeb1f87838dea745b7",
+      "required_compatibility_marker": "validate-jra-ci-forward-v312.mjs",
+      "scope": "CI trigger and validator command only"
+    }
+  ],
+  "immutable_classes": [
+    "historic prediction JSON",
+    "STEP1 marks and factors",
+    "final_bets",
+    "proof_commit",
+    "approved A4 CSS",
+    "existing race PDF and HTML",
+    "JRA result/review",
+    "local racing Shadow"
+  ],
+  "fail_closed_on_any_other_sha_mismatch": true
+}
