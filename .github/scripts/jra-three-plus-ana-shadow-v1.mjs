@@ -5,97 +5,155 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {compareThreeCommandPortfolio} from './jra-three-command-shadow-v1.mjs';
 import {buildTicketUniverse} from './jra-portfolio-optimizer-v310.mjs';
-import {evaluateStrategy,oddsFloor,ticketKey} from './jra-strategy-engine-v39.mjs';
+import {evaluateStrategy,oddsFloor,ticketKey,expandStrategy} from './jra-strategy-engine-v39.mjs';
 import {formatPurchaseCommand} from './jra-ticket-notation-v1.mjs';
 const must=(v,msg)=>{if(!v)throw Error('THREE_PLUS_ANA_BLOCKER: '+msg);};
 const sum=(xs,f)=>xs.reduce((a,x)=>a+f(x),0);
 const key=x=>ticketKey(x.type,x.selection);
 const round=x=>Math.round(x*10000)/10000;
 export const PURCHASE_ACTION_POLICY=Object.freeze({
- version:'v3.15-candidate-shadow',max_regular_commands:3,max_ana_lines:1,
- budget_total_yen:6000,ana_line_stake_yen:100,
- min_longshot_market_odds:20,max_longshot_central_event_probability:0.10,
+ version:'v3.15-candidate-shadow',max_regular_commands:3,max_medium_rows:1,max_large_rows:1,
+ budget_total_yen:6000,minimum_unit_yen:100,
+ medium_min_odds:20,large_min_odds:100,
+ medium_max_odds_exclusive:100,max_rare_event_probability:0.10,
  require_positive_edge:true,formal_release:false
 });
 export const instructions=formatPurchaseCommand;
+const pctSafe=x=>Number.isFinite(x)?x:0;
+const amount=x=>x.stake_yen??100;
+function identifyHoles(args,all){
+ const quotes=new Map(all.map(x=>[key(x),x]));
+ const h=[];
+ const tryCandidate=(type,method,definition,wanted,source)=>{
+   if(!Array.isArray(wanted)||!wanted.length)return;
+   const ks=wanted.map(key),uniq=new Set(ks);
+   if(uniq.size!==ks.length||ks.some(x=>!quotes.has(x)))return;
+   const lines=ks.map(x=>quotes.get(x));
+   const odds=lines.map(x=>oddsFloor(x.market_odds));
+   const ev=sum(lines,x=>x.expected_profit_yen);
+   const stake=lines.length*100;
+   if(odds.some(x=>!Number.isFinite(x))||ev<=0||stake>=6000)return;
+   const centralProb=Math.max(...lines.map(x=>pctSafe(x.probabilities?.central)));
+   const minimum=Math.min(...odds);
+   // The whole command is eligible for a labelled class, not merely one
+   // extraordinary-priced ticket hidden among ordinary-priced lines.
+   const tier=minimum>=100?'大穴':minimum>=20&&Math.max(...odds)<100?'中穴':null;
+   if(!tier||centralProb>PURCHASE_ACTION_POLICY.max_rare_event_probability)return;
+   h.push({tier,type,method,definition,ticket_keys:[...uniq],lines,
+     points:lines.length,stake_yen:stake,expected_profit_yen:ev,
+     minimum_odds:minimum,maximum_odds:Math.max(...odds),source});
+ };
+ for(const x of all){
+   if(['三連複','三連単'].includes(x.type))continue; // no 1-point triple bet
+   tryCandidate(x.type,'single',{selection:x.selection},
+      [{type:x.type,selection:x.selection}],'verified-single');
+ }
+ for(const st of args.strategies){
+   if(!['三連複','三連単'].includes(st.type)||st.strategy_kind==='single')continue;
+   let expanded;
+   try{expanded=expandStrategy(st.type,st.strategy_kind,st.definition);}
+   catch{continue;}
+   const actual=(st.lines||[]).map(key),expected=expanded.map(key);
+   if(expected.length!==actual.length||new Set(actual).size!==actual.length||
+     expected.some(k=>!actual.includes(k)))continue;
+   if(expanded.length<(st.type==='三連単'?6:3))continue;
+   tryCandidate(st.type,st.strategy_kind,st.definition,expanded,'verified-complete-group');
+ }
+ const unique=new Map();
+ for(const x of h){
+   const signature=x.tier+':'+[...x.ticket_keys].sort().join('|');
+   const prev=unique.get(signature);
+   if(!prev||x.method==='box'&&prev.method!=='box')unique.set(signature,x);
+ }
+ return [...unique.values()].sort((a,b)=>
+   b.expected_profit_yen/b.stake_yen-a.expected_profit_yen/a.stake_yen||
+   b.expected_profit_yen-a.expected_profit_yen||a.points-b.points);
+}
+function allocateHoles(pool){
+ const med=pool.filter(x=>x.tier==='中穴').slice(0,60);
+ const large=pool.filter(x=>x.tier==='大穴').slice(0,60);
+ // Jointly choose the medium and high-return rows. Never choose a duplicate
+ // selection, a negative-edge command or more than 5,900 yen of side bets.
+ const options=(xs)=>[null,...xs];
+ let best={medium:null,large:null,ev:0,spend:0};
+ for(const m of options(med))for(const l of options(large)){
+   const spend=amount(m||{stake_yen:0})+amount(l||{stake_yen:0});
+   if(spend>5900)continue;
+   if(m&&l&&m.ticket_keys.some(k=>l.ticket_keys.includes(k)))continue;
+   const ev=(m?.expected_profit_yen??0)+(l?.expected_profit_yen??0);
+   if(ev>best.ev+1e-9||Math.abs(ev-best.ev)<1e-9&&spend<best.spend)
+     best={medium:m,large:l,ev,spend};
+ }
+ return best;
+}
+const holeRow=(candidate,tier,row)=>candidate?{
+ row,category:tier,type:candidate.type,method:candidate.method,
+ definition:candidate.definition,jra_input:instructions(candidate),
+ points:candidate.points,unit_stake_yen:100,stake_yen:candidate.stake_yen,
+ ticket_keys:candidate.ticket_keys,
+ minimum_verified_odds:round(candidate.minimum_odds),
+ maximum_verified_odds:round(candidate.maximum_odds),
+ indicative_minimum_payout_yen:Math.floor(candidate.minimum_odds*100),
+ model_expected_profit_yen:round(candidate.expected_profit_yen),
+ pricing_source:candidate.source,
+ reason:tier==='大穴'?'100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。':'実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。'
+}:{
+ row,category:tier,method:'pass',type:'見送り',jra_input:
+ tier==='大穴'?'100倍以上で期待値がプラスの購入セットなし':'20倍以上100倍未満で期待値がプラスの購入セットなし',
+ points:0,unit_stake_yen:0,stake_yen:0,ticket_keys:[],
+ reason:'条件に合わないため購入を強制しない。'
+};
 export function compareThreePlusAna(args){
  const {all}=buildTicketUniverse({...args,max_ticket_stake_yen:100});
- // Longshot defined as a rare winning event at observed >=20x, not as
- // a result-based guess or an obligation to spend the full budget.
- // A speculative single is allowed only for ticket types where a one-point
- // selection is a normal, meaningful standalone wager. Triples are reserved
- // for fully priced grouped strategies in the 3-command regular comparison.
- const anaCandidates=all.filter(x=>!['三連単','三連複'].includes(x.type)&&x.stake_yen===100&&
-   oddsFloor(x.market_odds)>=PURCHASE_ACTION_POLICY.min_longshot_market_odds&&
-   x.probabilities.central<=PURCHASE_ACTION_POLICY.max_longshot_central_event_probability&&
-   x.expected_profit_yen>0)
-   .sort((a,b)=>b.expected_profit_yen-a.expected_profit_yen||
-      b.market_odds-a.market_odds||key(a).localeCompare(key(b),'en'));
- const coreArgs={...args,formal_final_bets:args.formal_final_bets};
- // Release of 100 yen is allowed only if a legitimately priced longshot exists.
- const core=compareThreeCommandPortfolio({...coreArgs,
-   max_spend_yen:anaCandidates.length?5900:6000});
- let selectedAna=null;
- if(core.proposed){
-   const purchased=new Set(core.proposed_lines.map(key));
-   selectedAna=anaCandidates.find(x=>!purchased.has(key(x)))??null;
- }
- // If there is no distinct longshot after core search, release the reservation
- // and restore the best unrestricted 3-command reference before presenting it.
- const regular=selectedAna?core:
-   anaCandidates.length?compareThreeCommandPortfolio({...coreArgs,max_spend_yen:6000}):core;
+ const eligibleHoles=identifyHoles(args,all);
+ const allocation=allocateHoles(eligibleHoles);
+ const medium=holeRow(allocation.medium,'中穴',4);
+ const large=holeRow(allocation.large,'大穴',5);
+ const excluded=[...medium.ticket_keys,...large.ticket_keys];
+ const regular=compareThreeCommandPortfolio({...args,formal_final_bets:args.formal_final_bets,
+   max_spend_yen:6000-allocation.spend,exclude_ticket_keys:excluded});
  const commands=regular.commands.map((c,i)=>({...c,
    row:i+1,category:'通常',jra_input:instructions(c)}));
- const ana=selectedAna?{
-    row:4,category:'穴狙い',type:selectedAna.type,method:'single',
-    definition:{selection:selectedAna.selection},jra_input:instructions({type:selectedAna.type,method:'single',definition:{selection:selectedAna.selection}}),
-    points:1,unit_stake_yen:100,stake_yen:100,ticket_keys:[key(selectedAna)],
-    observed_odds_floor:oddsFloor(selectedAna.market_odds),
-    modeled_central_event_probability:round(selectedAna.probabilities.central),
-    modeled_profit_yen:round(selectedAna.expected_profit_yen),
-    reason:'実測オッズ20倍以上・推定事象確率10%以下・モデル上の期待純利益プラス。高配当狙いの別枠で的中保証なし。'
-  }:{
-    row:4,category:'穴狙い',method:'pass',type:'見送り',jra_input:'実オッズと期待値の採用条件を満たす別枠なし',
-    points:0,unit_stake_yen:0,stake_yen:0,ticket_keys:[],
-    reason:'条件不足で穴馬券を無理に追加しない。'
-  };
  const selectedRegular=regular.proposed_lines;
- const selectedAnaLine=selectedAna?{type:selectedAna.type,selection:selectedAna.selection,
-   stake_yen:100,market_odds:selectedAna.market_odds,observed_at:selectedAna.observed_at,
-   source_url:selectedAna.source_url,market_selection_id:selectedAna.market_selection_id}:null;
- const lines=[...selectedRegular,...(selectedAnaLine?[selectedAnaLine]:[])];
- must(commands.length<=3,'more than three main purchase operations');
- must(new Set(lines.map(key)).size===lines.length,'overlapping main and longshot tickets');
+ const quoteLookup=new Map(all.map(x=>[key(x),x]));
+ const selectedHole=[...excluded].map(k=>{
+   const x=quoteLookup.get(k);must(x,'special selection quote disappeared');
+   return {type:x.type,selection:x.selection,stake_yen:100,market_odds:x.market_odds,
+     source_url:x.source_url,observed_at:x.observed_at,market_selection_id:x.market_selection_id};
+ });
+ const lines=[...selectedRegular,...selectedHole];
+ must(commands.length<=3,'too many regular commands');
+ must(new Set(lines.map(key)).size===lines.length,'overlapping candidate tickets');
  const total=sum(lines,x=>x.stake_yen);
- must(total<=6000,'max budget exceeded');
- const commandKeys=[...commands,ana].flatMap(c=>c.ticket_keys);
+ must(total<=6000,'budget exceeded');
+ const commandKeys=[...commands,medium,large].flatMap(c=>c.ticket_keys);
  must(commandKeys.length===lines.length&&new Set(commandKeys).size===lines.length&&
-   commandKeys.every(k=>lines.some(x=>key(x)===k)),
-   'shown commands do not reproduce purchased counterfactual lines exactly');
- let stat=null;
- if(lines.length){
-   const x=evaluateStrategy(lines,args.outcome_distributions,args.frame_map,args.race_context);
-   stat={stake_yen:total,ticket_count:lines.length,command_count:commands.length+(selectedAna?1:0),
-     modeled_expected_net_profit_yen:round(x.expected_payout_yen_scenarios.central-total),
-     modeled_low_expected_net_profit_yen:round(x.expected_payout_yen_scenarios.low-total),
-     modeled_union_hit_probability:round(x.hit_probability_scenarios.central),
-     modeled_net_loss_probability:round(x.loss_probability_scenarios.central)};
- }
+    commandKeys.every(k=>lines.some(x=>key(x)===k)),'screen commands differ from priced actual lines');
+ const s=lines.length?evaluateStrategy(lines,args.outcome_distributions,args.frame_map,args.race_context):null;
+ const stat=s?{
+   stake_yen:total,ticket_count:lines.length,
+   command_count:commands.length+(medium.points?1:0)+(large.points?1:0),
+   modeled_expected_net_profit_yen:round(s.expected_payout_yen_scenarios.central-total),
+   modeled_low_expected_net_profit_yen:round(s.expected_payout_yen_scenarios.low-total),
+   modeled_union_hit_probability:round(s.hit_probability_scenarios.central),
+   modeled_net_loss_probability:round(s.loss_probability_scenarios.central)
+ }:null;
  const formal=regular.baseline;
- return {algorithm:'three_regular_plus_optional_longshot_shadow_v1',
-   status:regular.proposed?'three_plus_ana_shadow_candidate':'no_profitable_regular_command',
+ return {algorithm:'three_regular_plus_optional_medium_and_100x_large_shadow_v2',
+   status:regular.proposed?'three_plus_two_holes_shadow_candidate':'no_qualifying_regular_command',
    formal_version_unchanged:true,formal_final_bets_unchanged:true,
-   eligible_longshot_count:anaCandidates.length,
-   max_regular_commands:3,max_ana_rows:1,max_total_budget_yen:6000,
-   formal_baseline:formal,regular_research:regular,
-   summary:stat,regular_commands:commands,ana_command:ana,
-   proposed_lines:lines,
+   candidate_medium_count:eligibleHoles.filter(x=>x.tier==='中穴').length,
+   candidate_large_count:eligibleHoles.filter(x=>x.tier==='大穴').length,
+   max_regular_commands:3,max_medium_rows:1,max_large_rows:1,
+   max_total_budget_yen:6000,formal_baseline:formal,regular_research:regular,
+   summary:stat,regular_commands:commands,
+   medium_command:medium,large_command:large,proposed_lines:lines,
    change_vs_formal:stat?{
      expected_profit_yen:round(stat.modeled_expected_net_profit_yen-formal.expected_net_profit_yen),
      union_hit_pp:round(100*(stat.modeled_union_hit_probability-formal.hit_probability)),
      net_loss_pp:round(100*(stat.modeled_net_loss_probability-formal.net_loss_probability))
    }:null,
-   warning:'STAGING RESEARCH ONLY. Never use as actual official purchase instruction before new formal model/CI/live E2E approval. Probability model not calibrated.'};
+   warning:'STAGING SHADOW ONLY. 100x is a conditional estimated payout on a winning 100-yen ticket, not a guarantee. Model probabilities are uncalibrated. Formal source is immutable.'};
 }
 if(process.argv[1]?.endsWith('/jra-three-plus-ana-shadow-v1.mjs')){
  try{
@@ -115,6 +173,6 @@ if(process.argv[1]?.endsWith('/jra-three-plus-ana-shadow-v1.mjs')){
  fs.writeFileSync(out,JSON.stringify({race_id:o.race_id,formal_prediction_sha256:createHash('sha256').update(bytes).digest('hex'),
    formal_proof_commit:o.proof_commit,created_from_frozen_source_only:true,...v},null,2)+'\n');
  console.log('THREE_PLUS_ANA_STAGED',o.race_id,'regular',v.regular_commands.length,
-   'ana',v.ana_command.method,'budget',v.summary?.stake_yen,'delta_ev',v.change_vs_formal?.expected_profit_yen);
+   'medium',v.medium_command.method,'large',v.large_command.method,'budget',v.summary?.stake_yen,'delta_ev',v.change_vs_formal?.expected_profit_yen);
  }catch(e){console.error(e.stack??String(e));process.exitCode=1;}
 }
