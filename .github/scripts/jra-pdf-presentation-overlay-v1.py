@@ -108,6 +108,137 @@ COVER = re.compile(
 TYPE_ORDER = ("単勝", "複勝", "枠連", "馬連", "馬単", "ワイド", "三連複", "三連単")
 
 
+
+def input_numbers(st):
+    """Turn the frozen strategy definition into the exact betting-screen input."""
+    d = st.get("definition") or {}
+    kind = st["strategy_kind"]
+    if kind == "formation":
+        slots = d["slots"]
+        if len(slots) not in (2, 3):
+            raise ValueError("JRA purchase blocker: malformed formation slots")
+        labels = (["1着", "2着", "3着"] if st["type"] in ("馬単", "三連単")
+                  else ["1列", "2列", "3列"])
+        return "／".join(f"{labels[i]}:{numbers(slot)}" for i, slot in enumerate(slots))
+    if kind in ("single",):
+        return "-".join(map(str, d["selection"]))
+    if kind in ("box", "multiple_singles"):
+        return numbers(d["horses"])
+    if kind in ("key_wheel", "key_wheel_first", "key_wheel_second", "key_wheel_multi",
+                "one_key_wheel", "one_key_fixed", "one_key_multi"):
+        position = ("1着" if kind == "key_wheel_first" else
+                    "2着" if kind == "key_wheel_second" else
+                    f"{d['position']}着" if kind == "one_key_fixed" else "軸")
+        return f"{position}:{d['key']}／相手:{numbers(d['partners'])}"
+    if kind in ("two_key_wheel", "two_key_fixed", "two_key_multi"):
+        if kind == "two_key_fixed":
+            axis = {pos: val for pos, val in zip(d["positions"], d["axes"])}
+            slots = "／".join(f"{p}着:{axis[p]}" for p in sorted(axis))
+            return slots + f"／相手:{numbers(d['partners'])}"
+        return f"軸:{numbers(d['axes'])}／相手:{numbers(d['partners'])}"
+    raise ValueError("JRA purchase blocker: undefined betting method " + kind)
+
+
+def _valid_box_lines(st, keys):
+    """Never call an incomplete or inconsistent set a JRA BOX."""
+    from itertools import combinations, permutations
+    from math import comb
+    d = st.get("definition") or {}
+    h = d.get("horses")
+    if not isinstance(h, list) or len(set(h)) != len(h) or len(h) < 2:
+        return False
+    kind = st["type"]
+    arity = 3 if kind in ("三連複", "三連単") else 2
+    if len(h) < arity:
+        return False
+    unordered = kind in ("枠連", "馬連", "ワイド", "三連複")
+    if kind not in ("枠連", "馬連", "馬単", "ワイド", "三連複", "三連単"):
+        return False
+    # Build independently of the prestart strategy mode. Restrict Box to distinct
+    # numbers: frame-box repeated-frame bets are deliberately not synthesized.
+    expected = {
+        bet_key({"type":kind,"selection":list(combo)})
+        for pick in combinations(h, arity)
+        for combo in ([pick] if unordered else permutations(pick))
+    }
+    return keys == expected and len(keys) == (
+        comb(len(h), arity) if unordered else
+        comb(len(h), arity) * (2 if arity == 2 else 6)
+    )
+
+
+def purchase_commands(prediction):
+    """Prove each on-screen instruction expands to *exactly* the sealed final_bets.
+
+    A partial box/wheel/formation is NEVER advertised as a full-form purchase.
+    Remaining lines are individual purchase instructions; duplicates are forbidden.
+    """
+    final = prediction.get("final_bets")
+    if not isinstance(final, list):
+        raise ValueError("JRA purchase blocker: missing immutable final bets")
+    final_by_key = {bet_key(x): x for x in final}
+    if len(final_by_key) != len(final):
+        raise ValueError("JRA purchase blocker: duplicate final purchase keys")
+    for x in final:
+        if x["type"] not in TYPE_ORDER or not isinstance(x.get("stake_yen"), int) or x["stake_yen"] <= 0:
+            raise ValueError("JRA purchase blocker: incorrect final ticket amount/type")
+
+    eligible = []
+    ignored = {"single"}
+    priority = {"box":0, "key_wheel":1, "key_wheel_first":1, "key_wheel_second":1,
+                "key_wheel_multi":1, "one_key_wheel":1, "two_key_wheel":1,
+                "one_key_fixed":1, "two_key_fixed":1, "one_key_multi":1,
+                "two_key_multi":1, "formation":2, "multiple_singles":3}
+    for st in prediction.get("purchase_strategy_evaluations") or []:
+        kind = st.get("strategy_kind")
+        if kind in ignored or kind not in priority or st.get("type") not in TYPE_ORDER:
+            continue
+        lines = st.get("lines") or []
+        keys = {bet_key(x) for x in lines}
+        if len(keys) < 2 or len(keys) != len(lines) or not keys.issubset(final_by_key):
+            continue
+        amounts = {final_by_key[k]["stake_yen"] for k in keys}
+        if len(amounts) != 1:
+            continue
+        if kind == "box" and not _valid_box_lines(st, keys):
+            continue
+        eligible.append((-len(keys), priority[kind], TYPE_ORDER.index(st["type"]),
+                         st["strategy_id"], st, keys))
+    eligible.sort(key=lambda x:x[:4])
+
+    used = set()
+    commands = []
+    for _, _, _, sid, st, keys in eligible:
+        if keys & used:
+            continue
+        try:
+            specification = input_numbers(st)
+        except (KeyError, TypeError, ValueError) as e:
+            raise ValueError(f"JRA purchase blocker: invalid group definition {sid}: {e}") from e
+        unit = final_by_key[next(iter(keys))]["stake_yen"]
+        commands.append({"type":st["type"],"method":METHOD_NAMES[st["strategy_kind"]],
+                         "numbers":specification,"tickets":len(keys),"unit_yen":unit,
+                         "amount_yen":unit*len(keys),"_keys":keys})
+        used.update(keys)
+
+    for k, line in sorted(final_by_key.items(), key=lambda x:
+                          (TYPE_ORDER.index(x[0][0]), x[0][1])):
+        if k not in used:
+            unit = line["stake_yen"]
+            commands.append({"type":line["type"],"method":"個別指定（1点）",
+                             "numbers":"-".join(map(str,line["selection"])),
+                             "tickets":1,"unit_yen":unit,"amount_yen":unit,"_keys":{k}})
+            used.add(k)
+
+    count = sum(x["tickets"] for x in commands)
+    yen = sum(x["amount_yen"] for x in commands)
+    if used != set(final_by_key) or count != len(final) or yen != sum(
+            x["stake_yen"] for x in final):
+        raise ValueError("JRA purchase blocker: instructions differ from immutable final_bets")
+    return sorted(commands,key=lambda x:(TYPE_ORDER.index(x["type"]),
+                                          -x["tickets"], x["method"],x["numbers"]))
+
+
 def cover_conclusion(prediction, original_cover):
     """Place the final buy/no-buy decision and ticket types first; preserve all tail details."""
     final = prediction.get("final_bets")
@@ -150,26 +281,30 @@ def cover_conclusion(prediction, original_cover):
     if not bought:
         details = '<p>最終採用の買い目はありません。購入見送りの詳しい理由は後半の購入監査を参照してください。</p>'
     else:
+        # "BOX" / "軸流し" is printed ONLY when every generated line is
+        # present in the sealed final_bets with matching unit stake. Otherwise
+        # list the exact individual selections, never the enticing whole BOX.
+        commands = purchase_commands(prediction)
         table = ('<table class="table dense"><thead><tr>'
-                 '<th>券種</th><th>購入する組番（馬番・枠番）</th>'
-                 '<th>点数</th><th>購入額</th></tr></thead><tbody>')
+                 '<th>券種</th><th>買い方</th><th>指定する馬番・枠番</th>'
+                 '<th>点数×単価＝購入額</th></tr></thead><tbody>')
         for typ in TYPE_ORDER:
-            lines = by_type.get(typ, [])
-            if not lines:
-                continue
-            rendered = []
-            for line in lines[:max_items]:
-                sel = "-".join(map(str, line["selection"]))
-                amount = line["stake_yen"]
-                rendered.append(sel if amount == 100 else f"{sel}({amount:,}円)")
-            extra = len(lines) - len(rendered)
-            if extra:
-                rendered.append(f"ほか{extra}点（後半に全件記載）")
-            table += ("<tr><td>" + esc(typ) + "</td><td>" + esc("、".join(rendered)) +
-                      "</td><td>" + str(len(lines)) + "点</td><td>" +
-                      f"{sum(x['stake_yen'] for x in lines):,}円</td></tr>")
+            typ_cmds = [x for x in commands if x["type"] == typ]
+            for cmd in typ_cmds[:max_items]:
+                table += ('<tr><td>'+esc(typ)+'</td><td>'+esc(cmd["method"])+'</td>'
+                          '<td>'+esc(cmd["numbers"])+'</td><td>'+
+                          f'{cmd["tickets"]}点×{cmd["unit_yen"]:,}円＝{cmd["amount_yen"]:,}円'
+                          '</td></tr>')
+            hidden = typ_cmds[max_items:]
+            if hidden:
+                table += ('<tr><td>'+esc(typ)+'</td><td>続きは後半</td><td>'+
+                          f'残り{len(hidden)}操作・{sum(x["tickets"] for x in hidden)}点。'
+                          '採用買い目の全件明細を参照</td><td>'+
+                          f'{sum(x["amount_yen"] for x in hidden):,}円</td></tr>')
         table += "</tbody></table>"
-        details = table
+        details = ('<p class="tiny">各行を「券種→買い方→指定馬番→金額」の順に入力。'
+                   'ボックス・流し・フォーメーションは採用全組番と完全一致する場合のみ表示し、'
+                   '一部採用の場合は「個別指定（1点）」に分解しています。</p>'+table)
 
     portfolio = prediction.get("purchase_portfolio_selection") or {}
     prof = (portfolio.get("expected_net_profit_yen_scenarios") or {}).get("central")
@@ -256,8 +391,9 @@ def apply(html_source, prediction):
         raise ValueError("JRA presentation blocker: comparison page count changed")
     # The original final_bets table remains unchanged. Explain when a final cross-type
     # portfolio contains only part of a listed BOX/formation/wheel.
-    selected_note = ("ボックス・流し・フォーメーション等は馬番と採用点数を監査表に記載。"
-                     "採用が全点未満なら全点購入ではありません。重複買い目は計上しません。")
+    selected_note = ("1ページ目の購入方法は、確定買い目と完全一致する買い方だけを表示。"
+                     "ボックス等の一部だけ採用した場合は「個別指定」に分解します。"
+                     "以下は実際に選ぶ個別組番の全件明細です。重複買い目は計上しません。")
     anchor = re.compile(r'(<section class="page"><div class="chapter">採用買い目｜1/\d+</div>)')
     converted, count = anchor.subn(
         lambda m: m.group(1) + '<p>' + html_module.escape(selected_note) + '</p>',
