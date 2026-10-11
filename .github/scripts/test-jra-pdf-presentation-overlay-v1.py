@@ -29,7 +29,6 @@ assert len(converted) == len(converted.encode('utf-8').decode('utf-8'))
 assert all(f'<td>{label}</td>' in converted for label in overlay.METHOD_NAMES.values())
 assert not any(f'<td>{code}</td>' in converted for code in codes)
 assert len(overlay.PAGE.findall(converted)) == 2
-assert overlay.apply(converted) if False else True  # overlay must not be applied twice
 try:
     overlay.apply(html.replace('<td>single</td>', '<td>unknown_purchase_code</td>', 1))
 except ValueError as e:
