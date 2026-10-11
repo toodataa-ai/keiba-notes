@@ -186,7 +186,7 @@
     "files": {
       "collector": {
         "path": ".github/scripts/jra-gather-live-v314.py",
-        "git_blob_sha": "bb6f18ff04aa1f8e1211d672351b98706a186da9"
+        "git_blob_sha": "294fb588c0bd686892fc501b98997f786db50636"
       },
       "workflow": {
         "path": ".github/workflows/jra-generic-one-shot-v314.yml",
@@ -194,7 +194,7 @@
       },
       "tests": {
         "path": ".github/scripts/test-jra-generic-v314.py",
-        "git_blob_sha": "c4b71d27cb5d12d7bc7b8e7c474aa6405c069e55"
+        "git_blob_sha": "55878b6e19f0a4e2069bbda15ee4e7b77bd78f4f"
       },
       "tests_workflow": {
         "path": ".github/workflows/validate-jra-generic-v314.yml",
@@ -202,11 +202,12 @@
       },
       "instructions": {
         "path": "docs/operations/jra_generic_execution_v314.md",
-        "git_blob_sha": "e9b18d62e30ad0bf981127f05d36f4022e6c2060"
+        "git_blob_sha": "884ebeae588475c184ec7b1f2e4acbcc1ad14afa"
       }
     },
     "blockers": "JRA official source may return HTTP403 in Actions; require verified <=24h raw official source capture otherwise do not seal or publish. STOP on incomplete prices or any failure of CI, true prestart Git proof, complete A4/PDF audit or published HTTP bytes.",
     "immutable": "Do not modify formal v3.13 STEP1/STEP2, previous prompts and manifests, selected legacy tickets, historical predictions/results/PDFs, JRA v3.12, local Shadow or site CSS",
-    "mandatory_completion": "Source record, all real odds (8 bet types), complete purchase-set audit, immutable prestart proof and final bets, full PDF, GitHub commit and byte-identical public HTTP verification"
+    "mandatory_completion": "Source record, all real odds (8 bet types), complete purchase-set audit, immutable prestart proof and final bets, full PDF, GitHub commit and byte-identical public HTTP verification",
+    "ticket_sales_gate": "Require an official-source-backed JST market_open_at per race, do not attempt unoffered odds before sales begin; classify as NOT_YET_ON_SALE, distinct from source/network failure. 2026-10-12 ordinary races start 2026-10-11 19:30 JST; Swans GII has earlier advance sale."
   }
 }
