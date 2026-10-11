@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 const read=p=>fs.readFileSync(p,'utf8');
 const j=p=>JSON.parse(read(p));
 const latest=j('docs/data/latest_prompt.json');
-assert.equal(latest.version,'v3.12');
+assert(['v3.12','v3.13'].includes(latest.version),'only historical/current v312-v313 are supported');
 const refs=latest.prerace_overwrite_policy;
 assert.equal(refs.version,'v312');
 assert.equal(refs.read_each_new_jra_run,true);

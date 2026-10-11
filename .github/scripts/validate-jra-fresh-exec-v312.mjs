@@ -4,6 +4,12 @@ import {execFileSync} from 'node:child_process';
 const read=p=>fs.readFileSync(p,'utf8');
 const json=p=>JSON.parse(read(p));
 const p=json('docs/data/latest_prompt.json');
+if(p.version==='v3.13'){
+ const run=execFileSync(process.execPath,['.github/scripts/validate-jra-fresh-exec-v313.mjs'],
+   {stdio:'inherit'});
+ console.log('PASS: v3.13 current-odds checks, original v3.12 gate source untouched');
+ process.exit(0);
+}
 assert.equal(p.version,'v3.12');
 assert.equal(p.path,'競馬予想_完全版プロンプト_v3.12.txt');
 const addon=p.odds_freshness_execution_overlay;
