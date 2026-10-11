@@ -49,6 +49,15 @@ jobs:
           for sc in scripts:
               body=sc.string or sc.get_text()
               if 'new window.sn.hr.searchBox' in body:print('ODDS_SEARCH_CONFIG',body[:1600])
+          from urllib.parse import urljoin
+          src=next((x.get('src') for x in scripts if x.get('src') and '/keiba/js/pc/script.js' in x.get('src')),None)
+          if src:
+              u=urljoin(r.url,src)
+              js=requests.get(u,timeout=25);js.raise_for_status()
+              print('SEARCH_JS_URL',u,'BYTES',len(js.content),'OCCURRENCES',js.text.count('searchBox'))
+              for m in list(re.finditer(r'searchBox|initSearch|umaban_id|link_base',js.text))[:18]:
+                  i=m.start()
+                  print('SEARCH_IMPL',js.text[max(0,i-450):i+1450].replace('\\n',' '))
           for h in s.select('[data-testid],[data-reactroot]')[:8]:
               print('ROOT_STRUCTURE',h.name,h.get('data-testid'),h.get('id'),h.get('class'))
           for f in s.select('form'):
