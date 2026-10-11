@@ -1,4 +1,8 @@
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {upgradeToV313} from './jra-prestart-pipeline-v313.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {compareSetPreferredPortfolio} from './jra-set-preference-v1.mjs';
@@ -113,4 +117,30 @@ for(const file of archive){
   active:result.activated,candidates:result.candidate_group_count,considered:result.considered,
   baseline:result.baseline,proposed:result.proposed
  }));
+}
+
+{
+ const archive=fs.readFileSync('e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json','utf8');
+ const source=JSON.parse(archive),formal=upgradeToV313(source);
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'jra-set-shadow-'));
+ const input=path.join(temp,'sealed.json'),output='docs/data/jra-set-preference/'+source.race_id+'.json';
+ const sealed={...formal,stage:'formal_prestart',proof_commit:source.proof_commit};
+ fs.writeFileSync(input,JSON.stringify(sealed));
+ try{
+  const captured=execFileSync(process.execPath,
+    ['.github/scripts/jra-set-preference-v1.mjs','--input',input,'--output',output],
+    {encoding:'utf8'});
+  assert.match(captured,/JRA_SET_PREFERENCE_SHADOW_CREATED/);
+  const saved=JSON.parse(fs.readFileSync(output,'utf8'));
+  assert.equal(saved.status,'shadow_comparison_only');
+  assert.equal(saved.formal_bets_selection_unchanged,true);
+  assert.equal(saved.comparison.proposed.total_stake_yen<=6000,true);
+  assert.deepEqual(saved.comparison.baseline.ticket_count,source.purchase_portfolio_selection.selected_lines.length);
+  assert.equal(saved.formal_proof_commit,source.proof_commit);
+  assert.equal(fs.readFileSync('e2e_validation/predictions/2026-10-11-ireland-trophy/v3.12-rerun38113832729-attempt1.json','utf8'),archive);
+  console.log('PASS_SET_PREFERENCE_REAL_FORMAL_SIDECAR_OUTPUT',saved.race_id,saved.comparison.status);
+ }finally{
+  fs.rmSync(temp,{recursive:true,force:true});
+  fs.rmSync(output,{force:true});
+ }
 }
