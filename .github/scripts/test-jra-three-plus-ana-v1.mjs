@@ -13,6 +13,11 @@ for(const input of samples){
  assert.equal(p.formal_final_bets_unchanged,true);
  assert.equal(p.regular_commands.length<=3,true);
  assert.equal(p.ana_command.row,4);
+ assert.ok(p.regular_commands.every(c=>!['三連単','三連複'].includes(c.type)||
+   (c.type==='三連単'?c.points>=6:c.points>=3)),
+   'No 1-point or undersized triple combinations in regular purchases');
+ assert.ok(p.ana_command.method==='pass'||!['三連単','三連複'].includes(p.ana_command.type),
+   'No 1-point triples in speculative longshot');
  assert.equal(p.summary.stake_yen<=6000,true);
  const commands=[...p.regular_commands,...(p.ana_command.method==='pass'?[]:[p.ana_command])];
  let bought=[];
