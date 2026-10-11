@@ -1,0 +1,60 @@
+name: Verify public JRA v3.10 2026-10-11 live site HTTP artifacts
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-jra-live-20261011.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  http-and-invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check 2026-10-11 formal predictions and no prior-history mutations
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          data=json.loads(pathlib.Path('docs/data/races.json').read_text())
+          today=[r for r in data['races'] if r['date']=='2026-10-11' and r['scope']=='jra-main']
+          assert len(today)==2
+          assert {r['venue'] for r in today}=={'東京','京都'}
+          expected={'東京':1100,'京都':200}
+          for r in today:
+            assert r['prompt_version']=='v3.10'
+            assert r['total_stake_yen']==expected[r['venue']]
+            assert r['total_stake_yen']==sum(b['stake_yen'] for b in r['final_bets'])
+            assert r['proof_commit']=='fcd74f558aa09c9d41e649918bcb94b2f4d198ee'
+            assert (pathlib.Path('docs')/r['report']).exists()
+            assert (pathlib.Path('docs')/r['pdf']).is_file()
+            assert len(r['final_bets'])==r['total_stake_yen']//100
+          print('PASS: both official race records, immutable proof and exact stakes match')
+          PY
+      - name: Validate direct Pages HTTP availability and PDF byte signatures
+        run: |
+          set -euo pipefail
+          BASE="https://toodataa-ai.github.io/keiba-notes"
+          for SLUG in 2026-10-11-ireland-trophy 2026-10-11-uzumasa-stakes; do
+            for EXT in html pdf; do
+              if [[ "$EXT" == "html" ]]; then
+                URL="$BASE/reports/$SLUG.html"
+                OUT="/tmp/$SLUG.html"
+              else
+                URL="$BASE/pdfs/$SLUG.pdf"
+                OUT="/tmp/$SLUG.pdf"
+              fi
+              curl --fail --location --show-error --retry 5 --retry-delay 2 --retry-all-errors \
+                   --connect-timeout 12 --max-time 60 --output "$OUT" "$URL"
+              test -s "$OUT"
+              if [[ "$EXT" == "pdf" ]]; then
+                head -c 5 "$OUT" | grep -q '%PDF-'
+                SIZE=$(wc -c < "$OUT")
+                test "$SIZE" -gt 5000
+              else
+                grep -q 'data-full-report="true"' "$OUT"
+                grep -q 'data-authored-report="true"' "$OUT"
+              fi
+              echo "PASS public Pages HTTP $URL bytes=$(wc -c < "$OUT")"
+            done
+          done
