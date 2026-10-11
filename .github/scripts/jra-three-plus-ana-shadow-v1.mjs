@@ -22,7 +22,10 @@ export function compareThreePlusAna(args){
  const {all}=buildTicketUniverse({...args,max_ticket_stake_yen:100});
  // Longshot defined as a rare winning event at observed >=20x, not as
  // a result-based guess or an obligation to spend the full budget.
- const anaCandidates=all.filter(x=>x.stake_yen===100&&
+ // A speculative single is allowed only for ticket types where a one-point
+ // selection is a normal, meaningful standalone wager. Triples are reserved
+ // for fully priced grouped strategies in the 3-command regular comparison.
+ const anaCandidates=all.filter(x=>!['三連単','三連複'].includes(x.type)&&x.stake_yen===100&&
    oddsFloor(x.market_odds)>=PURCHASE_ACTION_POLICY.min_longshot_market_odds&&
    x.probabilities.central<=PURCHASE_ACTION_POLICY.max_longshot_central_event_probability&&
    x.expected_profit_yen>0)
