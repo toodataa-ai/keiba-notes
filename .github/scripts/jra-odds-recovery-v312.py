@@ -111,6 +111,44 @@ def recover(input_path,output_path,evidence):
   pages=[(response.content,response.url)]
   if kind=='st':
    missing_axes=sorted({sel[0] for t,sel in missing if t=='三連単'})
+   # The actual source declares new window.sn.hr.searchBox({umaban_id,
+   # position_id, link_base}) and the served JS defines:
+   # location.href=link_base+'?umaBan='+umaban+'&position='+position.
+   # Inspect BOTH artifacts on each run; never guess query names or axis values.
+   source_soup=BeautifulSoup(response.content,'html.parser')
+   inline='\\n'.join(x.get_text() for x in source_soup.select('script') if 'new window.sn.hr.searchBox' in x.get_text())
+   select_horse=source_soup.select_one('#js-umaBan')
+   select_pos=source_soup.select_one('#js-position')
+   script_src=next((x.get('src') for x in source_soup.select('script[src]')
+      if '/keiba/js/pc/script.js' in (x.get('src') or '')),None)
+   if 'link_base:' in inline and select_horse is not None and select_pos is not None and script_src:
+    from urllib.parse import urljoin
+    script_url=urljoin(response.url,script_src)
+    require(urlparse(script_url).hostname=='sports.yahoo.co.jp','unsupported source JavaScript host')
+    js=session.get(script_url,timeout=25);js.raise_for_status()
+    require("location.href=link_base+'?umaBan='+umaban+'&position='+position" in js.text,
+       'live source JS no longer documents exact umaBan and position query')
+    m=re.search(r"link_base:\\s*['\\\"]([^'\\\"]+)['\\\"]",inline)
+    require(m is not None,'live odds searchBox missing explicit link_base')
+    action=urljoin(response.url,m.group(1))
+    require(urlparse(action).hostname=='sports.yahoo.co.jp' and
+      urlparse(action).path=='/keiba/race/odds/st/'+race_code,'unsafe odds link_base')
+    allowed_axes={o.get('value') for o in select_horse.select('option')}
+    first_option=next((o for o in select_pos.select('option')
+       if '1着' in o.get_text(' ',strip=True)),None)
+    require(first_option is not None and first_option.get('value'),
+      'first-place position value not verified from HTML')
+    first_value=first_option['value']
+    print('PROVIDER_QUERY_CONTRACT',action,'umaBan + position',first_value,'axes',len(allowed_axes),flush=True)
+    for axis in missing_axes:
+     require(str(axis) in allowed_axes,'requested axis not in source picker: '+str(axis))
+     quote_response=session.get(action,params={'umaBan':str(axis),'position':first_value},timeout=25)
+     quote_response.raise_for_status()
+     require(urlparse(quote_response.url).hostname=='sports.yahoo.co.jp' and
+       urlparse(quote_response.url).path==urlparse(action).path,'unsafe odds request redirect')
+     requests_made+=1
+     pages.append((quote_response.content,quote_response.url))
+     require(requests_made<=64,'too many source-defined odds requests')
    discovered=set()
    for axis in missing_axes:
     for action,params in form_queries(response.url,BeautifulSoup(response.content,'html.parser'),axis):
