@@ -168,6 +168,67 @@ def _valid_box_lines(st, keys):
 
 
 
+
+def _strategy_lines_match_definition(st, actual_keys):
+    """Independently re-expand the exact JRA purchase operation before printing it.
+
+    The mode name alone must never authorize a whole BOX / wheel purchase.
+    """
+    from itertools import combinations, permutations, product
+    typ, kind = st["type"], st["strategy_kind"]
+    d = st.get("definition") or {}
+    if kind == "box":
+        return _valid_box_lines(st, actual_keys)
+    try:
+        raw = []
+        uniq = lambda xs: list(dict.fromkeys(xs))
+        if kind == "multiple_singles":
+            raw = [[x] for x in d["horses"]]
+        elif kind == "formation":
+            raw = [list(x) for x in product(*d["slots"])]
+        elif kind == "key_wheel":
+            raw = [[d["key"], h] for h in d["partners"]]
+        elif kind in ("key_wheel_first","key_wheel_second","key_wheel_multi"):
+            for h in d["partners"]:
+                if kind != "key_wheel_second":
+                    raw.append([d["key"],h])
+                if kind != "key_wheel_first":
+                    raw.append([h,d["key"]])
+        elif kind == "one_key_wheel":
+            raw = [[d["key"],a,b] for a,b in combinations(uniq(d["partners"]),2)]
+        elif kind == "two_key_wheel":
+            raw = [list(d["axes"])+[h] for h in d["partners"]]
+        elif kind in ("one_key_fixed", "one_key_multi"):
+            for a,b in combinations(uniq(d["partners"]),2):
+                for ordered in permutations([d["key"],a,b]):
+                    if kind == "one_key_multi" or ordered[d["position"]-1] == d["key"]:
+                        raw.append(list(ordered))
+        elif kind in ("two_key_fixed", "two_key_multi"):
+            for h in d["partners"]:
+                values = [*d["axes"],h]
+                if kind == "two_key_multi":
+                    raw.extend([list(p) for p in permutations(values)])
+                else:
+                    row = [None,None,None]
+                    row[d["positions"][0]-1] = d["axes"][0]
+                    row[d["positions"][1]-1] = d["axes"][1]
+                    row[row.index(None)] = h
+                    raw.append(row)
+        else:
+            return False
+        arity = 1 if typ in ("単勝","複勝") else 3 if typ in ("三連複","三連単") else 2
+        keys = set()
+        for sel in raw:
+            if len(sel) != arity or not all(type(x) is int and x > 0 for x in sel):
+                return False
+            if typ != "枠連" and len(set(sel)) != len(sel):
+                continue
+            keys.add(bet_key({"type":typ, "selection":sel}))
+        return keys == actual_keys and bool(keys)
+    except (KeyError, TypeError, ValueError, IndexError):
+        return False
+
+
 PURCHASE_MODES_BY_TYPE = {
     "単勝": {"multiple_singles"},
     "複勝": {"multiple_singles"},
@@ -213,7 +274,7 @@ def purchase_commands(prediction):
         amounts = {final_by_key[k]["stake_yen"] for k in keys}
         if len(amounts) != 1:
             continue
-        if kind == "box" and not _valid_box_lines(st, keys):
+        if not _strategy_lines_match_definition(st, keys):
             continue
         eligible.append((-len(keys), priority[kind], TYPE_ORDER.index(st["type"]),
                          st["strategy_id"], st, keys))
