@@ -4,7 +4,7 @@
 
 地方競馬の高頻度な開催を、JRA本番予想とは分離した研究用Shadow母集団として利用する。
 
-対象はまず以下の6場。
+初期パイロット対象は以下の6場（2026-10-11時点では全国15場へ拡張済み）。
 
 - 大井
 - 川崎
@@ -18,7 +18,7 @@
 
 ## 基本サイクル
 
-1. 当日の対象6場の開催有無と全レースを公式情報で確認する。
+1. 当日のNAR全国15場について、実開催場と全レースを公式情報で確認する。旧パイロット6場が非開催でも実開催場があればスキップしない。
 2. 発走前に各レースのcompact Shadow predictionを固定する。
 3. cutoff後はpredictionを変更しない。
 4. 公式結果確定後にresultを結合する。
@@ -68,7 +68,7 @@
 
 ## 研究単位
 
-地方6場を一つの均質な母集団として扱わない。
+地方15場を一つの均質な母集団として扱わない。ばんえいとサラブレッド競走は特に別の研究母集団とする。
 
 最低でも以下で分ける。
 
@@ -132,3 +132,15 @@ Daily Shadow → repeated finding → transferable candidate → JRA historical/
 - No frozen prediction for target date: BLOCKED_NO_PREDICTIONS, never create hindsight predictions. Existing reviewed artifacts are verified and reused; conflicts are blocked, not overwritten.
 - Verify official NAR finish data, immutable proof, result/review/analysis commits, public manifest, GitHub Pages live bytes, and all race IDs. One unresolved race causes FAILED/PARTIAL, not SUCCESS.
 - The request file controls POST-RACE ONLY; it cannot trigger PRE-RACE and must never change JRA-related assets or frozen predictions. PRE-RACE new-day population needs its own separately approved execution flow.
+
+## PRE-RACE generic full-day dispatch (2026-10-11)
+
+- Canonical PRE-RACE prompt: `shadow_prompt_v0_1.txt` (2026-10-11 operational clarification); config: `config.json` with all 15 NAR venues enabled.
+- The original date-guarded `.github/workflows/local-racing-shadow-prerace-20261008.yml` is historical only. Use `.github/workflows/local-racing-shadow-prerace-generic.yml` with `prerace_request.json` push trigger.
+- Request fields: `schema_version=1`, `scope="PRE-RACE"`, explicit JST `date`, monotonically increasing `request_seq`, `production_effect=false`, and `expected_races_by_venue` from the official NAR daily calendar. Update only the request file to trigger a new run.
+- Actual venue/race totals are verified against NAR's official RaceList. No race should disappear from the daily denominator just because the original 6-site pilot or an individual capture fails.
+- For races that have already started or cannot be safely committed before cutoff, NEVER fabricate or commit hindsight predictions. Log `EXPIRED_OR_TOO_CLOSE` coverage gaps and report `PARTIAL_WITH_COVERAGE_GAPS`.
+- New snapshots are immutable and audited by initial GitHub commit timestamps. Re-runs preserve existing frozen snapshots byte-for-byte, retry only still-eligible new races, and do not count existing predictions as errors.
+- Audit records: `diagnostics/YYYY-MM-DD-all-venues-prerace-run.json`; published mirror: `docs/data/local-racing-shadow/coverage/`; manifest `docs/data/local_racing_shadow_public.json` has `daily_coverage` with official count, saved count, and gap count.
+- Success requires action steps, original `proof_commit`, GitHub commit files, manifest, mirror and live Pages file verification. GitHub Action result alone is insufficient. `PARTIAL` is not an error-free full-day forecast.
+- No changes to JRA prompts, predictions, reports, workflows, or scoring. `production_effect=false`.
