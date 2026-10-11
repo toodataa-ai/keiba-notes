@@ -102,3 +102,14 @@ p=deep(raw);p.mode_exclusions.pop();check('no forgotten mode',p,'missing mode au
 p=deep(raw);p.step1.runners[0].factor_grades.pop();check('nine axes for every horse',p,'all nine grades');
 assert.throws(()=>assemble(raw,'2030-10-11T16:00:00+09:00'),'no post-start freezing');
 console.log('PASS JRA v3.11 new pipeline tests finished');
+
+// A synthetic report fixture exercises unlimited-page PDF rendering; not a publishable prediction.
+const pdfFixture=deep(sealed);
+pdfFixture.race_context={...pdfFixture.race_context,date:'2030-10-11',race_name:'合成レース・PDF監査',surface:'芝',distance_m:1600,official_going:'良'};
+pdfFixture.step1_ranking=pdfFixture.step1_ranking.map((horse,i)=>({
+ ...horse,overall_grade:'A',weight_kg:55,jockey:'テスト騎手'+(i+1),
+ past_performances:[{date:'2030-09-01',course:'東京',distance_m:1600,surface:'芝',class_name:'OP',
+ finish:i+1,time:'1:34.1',same_condition:false,source_excerpt:'合成テストの過去走'}]
+}));
+fs.writeFileSync('/tmp/jra-v311-pdf-fixture.json',JSON.stringify(pdfFixture,null,2));
+console.log('PASS synthetic PDF fixture generated /tmp/jra-v311-pdf-fixture.json');
