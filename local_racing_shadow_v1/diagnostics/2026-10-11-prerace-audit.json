@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-11",
   "scope": "PRE-RACE_FULL_OFFICIAL_DAY",
-  "status": "BLOCKED_FULL_COVERAGE",
+  "status": "SUPERSEDED_BY_ALL_VENUES_EXECUTION",
   "model_version": "local-daily-shadow-v0.1",
   "production_effect": false,
   "rule_sources": {
@@ -75,5 +75,15 @@
     "BLOCKED_TIMING: races that have already started cannot be assigned new or retroactively committed prediction snapshots; no hindsight predictions.",
     "BLOCKED_REPRODUCIBILITY: the public manifest's 46 existing entries are from 2026-10-08 and 2026-10-09, not proof of a 2026-10-11 prediction."
   ],
-  "note": "Correction of prior incorrect SKIPPED_NO_ELIGIBLE_RACES finding: all 56 races at the five officially active venues are within the user's requested coverage. The 6-venue config mismatch is a blocker requiring remediation, not grounds to declare the day a successful skip. Prior predictions and JRA files remain unchanged."
+  "note": "Earlier point-in-time audit has been superseded by the full-day all-venue execution, which captured and committed six legitimate pre-start forecasts and counted the 50 uncovered races as gaps. Keep earlier point-in-time values for audit history; refer to superseded_by for current totals.",
+  "superseded_by": "local_racing_shadow_v1/diagnostics/2026-10-11-all-venues-prerace-run.json",
+  "superseded_at": "2026-10-11T19:37:51+09:00",
+  "latest_verified_summary": {
+    "official_total_races": 56,
+    "frozen_pre_race_predictions": 6,
+    "coverage_gaps": 50,
+    "proof_commit": "6b428ec3c53e438bd9ff57107d0fd1b8cdf98e39",
+    "public_manifest": "docs/data/local_racing_shadow_public.json",
+    "status": "PARTIAL_WITH_COVERAGE_GAPS"
+  }
 }
