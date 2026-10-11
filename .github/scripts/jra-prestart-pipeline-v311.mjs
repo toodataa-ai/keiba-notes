@@ -8,7 +8,7 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {TYPES,MODES,expandStrategy,ticketKey,oddsFloor,matches,evaluateStrategy} from './jra-strategy-engine-v39.mjs';
 import {optimizeBalancedPortfolio} from './jra-balanced-optimizer-v311.mjs';
-import {validateV310} from './validate-jra-portfolio-v311.mjs';
+import {validateV311} from './validate-jra-portfolio-v311.mjs';
 
 const scenes=['low','central','high'];
 const isTime=s=>typeof s==='string'&&Number.isFinite(Date.parse(s));
@@ -259,7 +259,7 @@ export function assemble(input,freezeAt,proofCommit=null){
  };
  if(proofCommit){
   must(/^[a-f0-9]{40}$/.test(proofCommit),'proof_commit must be real Git SHA');
-  const errors=validateV310(payload);
+  const errors=validateV311(payload);
   must(errors.length===0,'v3.11 official validator rejects prediction: '+errors.join('; '));
  }
  return payload;
@@ -277,7 +277,7 @@ function main(){
   must(timestamp(commitTime)<timestamp(proofObj.race_context.start_at),'BLOCKER: proof commit after race post');
   must(Date.now()<timestamp(proofObj.race_context.start_at),'BLOCKER: cannot seal after race post');
   const result={...proofObj,stage:'formal_prestart',proof_commit:proof};
-  const errors=validateV310(result);
+  const errors=validateV311(result);
   must(errors.length===0,'v3.11 validator rejects sealed prediction: '+errors.join('; '));
   must(!fs.existsSync(output),'immutable prediction path already exists');
   fs.mkdirSync((awaitImportPath(output)),{recursive:true});
