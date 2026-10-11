@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-12T06:55:57.320+09:00",
+  "updated_at": "2026-10-12T06:59:45.942+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -2367,6 +2367,934 @@
       "step1_fixed_at": "2026-10-12T06:52:59.468+09:00",
       "e2e_prediction": "e2e_validation/predictions/2026-10-12-october-stakes/v3.13-run38177939515-attempt2.json",
       "proof_commit": "49867444915081298778464b1e6f615b8f0e0073",
+      "purchase_budget_yen": 6000,
+      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
+    },
+    {
+      "id": "2026-10-12-swan-stakes",
+      "date": "2026-10-12",
+      "venue": "京都",
+      "race": "スワンステークス",
+      "scope": "jra-main",
+      "prompt_version": "v3.13",
+      "status": "predicted",
+      "source": "jra-live-source-capture-prerace-fixed",
+      "eligible_for_learning": false,
+      "field_size": 18,
+      "report": "reports/2026-10-12-swan-stakes.html",
+      "pdf": "pdfs/2026-10-12-swan-stakes.pdf",
+      "pdf_mode": "full",
+      "full_report_pages": 43,
+      "marks": {
+        "win": "9 オフトレイル",
+        "second": "13 マイネルチケット",
+        "third": "1 ダイヤモンドノット"
+      },
+      "bets": [
+        "ワイド 1-2",
+        "ワイド 2-13",
+        "ワイド 2-4",
+        "ワイド 2-9",
+        "三連単 10-1-9",
+        "三連単 10-2-9",
+        "三連単 10-4-9",
+        "三連単 10-9-1",
+        "三連単 10-9-2",
+        "三連単 10-9-4",
+        "三連単 13-1-10",
+        "三連単 13-2-10",
+        "三連単 13-2-4",
+        "三連単 2-1-4",
+        "三連単 2-10-9",
+        "三連単 2-13-4",
+        "三連単 2-4-1",
+        "三連単 2-4-13",
+        "三連単 2-4-9",
+        "三連単 2-9-10",
+        "三連単 2-9-4",
+        "三連単 4-1-2",
+        "三連単 4-13-2",
+        "三連単 4-2-1",
+        "三連単 4-2-13",
+        "三連単 4-2-9",
+        "三連単 4-9-2",
+        "三連単 9-10-2",
+        "三連単 9-2-10",
+        "三連複 1-10-13",
+        "三連複 1-2-10",
+        "三連複 1-2-4",
+        "三連複 1-4-10",
+        "三連複 2-10-13",
+        "三連複 2-4-10",
+        "三連複 2-4-13",
+        "三連複 2-4-9",
+        "三連複 2-9-10",
+        "三連複 4-10-13",
+        "単勝 2",
+        "枠連 1-2",
+        "枠連 1-6",
+        "枠連 2-5",
+        "枠連 2-7",
+        "枠連 5-6",
+        "複勝 1",
+        "複勝 13",
+        "複勝 2",
+        "複勝 9",
+        "馬単 10-9",
+        "馬単 13-2",
+        "馬単 2-1",
+        "馬単 2-13",
+        "馬単 2-4",
+        "馬単 2-9",
+        "馬単 4-1",
+        "馬単 4-2",
+        "馬連 2-13",
+        "馬連 2-4",
+        "馬連 2-9"
+      ],
+      "purchase_decision": "buy",
+      "purchase_reason_code": "bought",
+      "total_stake_yen": 6000,
+      "final_bets": [
+        {
+          "id": "B01",
+          "type": "ワイド",
+          "selection": [
+            1,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            21.1,
+            22.4
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:26.192+00:00",
+          "market_selection_id": "ワイド:[1,2]"
+        },
+        {
+          "id": "B02",
+          "type": "ワイド",
+          "selection": [
+            2,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            21.7,
+            23.2
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:26.192+00:00",
+          "market_selection_id": "ワイド:[2,13]"
+        },
+        {
+          "id": "B03",
+          "type": "ワイド",
+          "selection": [
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            46.1,
+            47.8
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:26.192+00:00",
+          "market_selection_id": "ワイド:[2,4]"
+        },
+        {
+          "id": "B04",
+          "type": "ワイド",
+          "selection": [
+            2,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            16.1,
+            17.1
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:26.192+00:00",
+          "market_selection_id": "ワイド:[2,9]"
+        },
+        {
+          "id": "B05",
+          "type": "三連単",
+          "selection": [
+            10,
+            1,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 1165.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=10&position=1",
+          "observed_at": "2026-10-11T21:57:25.328+00:00",
+          "market_selection_id": "三連単:[10,1,9]"
+        },
+        {
+          "id": "B06",
+          "type": "三連単",
+          "selection": [
+            10,
+            2,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 2474,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=10&position=1",
+          "observed_at": "2026-10-11T21:57:25.328+00:00",
+          "market_selection_id": "三連単:[10,2,9]"
+        },
+        {
+          "id": "B07",
+          "type": "三連単",
+          "selection": [
+            10,
+            4,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 2047.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=10&position=1",
+          "observed_at": "2026-10-11T21:57:25.328+00:00",
+          "market_selection_id": "三連単:[10,4,9]"
+        },
+        {
+          "id": "B08",
+          "type": "三連単",
+          "selection": [
+            10,
+            9,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 1112,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=10&position=1",
+          "observed_at": "2026-10-11T21:57:25.328+00:00",
+          "market_selection_id": "三連単:[10,9,1]"
+        },
+        {
+          "id": "B09",
+          "type": "三連単",
+          "selection": [
+            10,
+            9,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 2108.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=10&position=1",
+          "observed_at": "2026-10-11T21:57:25.328+00:00",
+          "market_selection_id": "三連単:[10,9,2]"
+        },
+        {
+          "id": "B10",
+          "type": "三連単",
+          "selection": [
+            10,
+            9,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 1694.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=10&position=1",
+          "observed_at": "2026-10-11T21:57:25.328+00:00",
+          "market_selection_id": "三連単:[10,9,4]"
+        },
+        {
+          "id": "B11",
+          "type": "三連単",
+          "selection": [
+            13,
+            1,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 1626.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=13&position=1",
+          "observed_at": "2026-10-11T21:57:25.387+00:00",
+          "market_selection_id": "三連単:[13,1,10]"
+        },
+        {
+          "id": "B12",
+          "type": "三連単",
+          "selection": [
+            13,
+            2,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 2231.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=13&position=1",
+          "observed_at": "2026-10-11T21:57:25.387+00:00",
+          "market_selection_id": "三連単:[13,2,10]"
+        },
+        {
+          "id": "B13",
+          "type": "三連単",
+          "selection": [
+            13,
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 1792.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=13&position=1",
+          "observed_at": "2026-10-11T21:57:25.387+00:00",
+          "market_selection_id": "三連単:[13,2,4]"
+        },
+        {
+          "id": "B14",
+          "type": "三連単",
+          "selection": [
+            2,
+            1,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 1952.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,1,4]"
+        },
+        {
+          "id": "B15",
+          "type": "三連単",
+          "selection": [
+            2,
+            10,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 2552.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,10,9]"
+        },
+        {
+          "id": "B16",
+          "type": "三連単",
+          "selection": [
+            2,
+            13,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 2255.4,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,13,4]"
+        },
+        {
+          "id": "B17",
+          "type": "三連単",
+          "selection": [
+            2,
+            4,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 2366.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,4,1]"
+        },
+        {
+          "id": "B18",
+          "type": "三連単",
+          "selection": [
+            2,
+            4,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 2556.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,4,13]"
+        },
+        {
+          "id": "B19",
+          "type": "三連単",
+          "selection": [
+            2,
+            4,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 1717.4,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,4,9]"
+        },
+        {
+          "id": "B20",
+          "type": "三連単",
+          "selection": [
+            2,
+            9,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 1897.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,9,10]"
+        },
+        {
+          "id": "B21",
+          "type": "三連単",
+          "selection": [
+            2,
+            9,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 1426.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=2&position=1",
+          "observed_at": "2026-10-11T21:57:25.128+00:00",
+          "market_selection_id": "三連単:[2,9,4]"
+        },
+        {
+          "id": "B22",
+          "type": "三連単",
+          "selection": [
+            4,
+            1,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 2044.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=4&position=1",
+          "observed_at": "2026-10-11T21:57:25.186+00:00",
+          "market_selection_id": "三連単:[4,1,2]"
+        },
+        {
+          "id": "B23",
+          "type": "三連単",
+          "selection": [
+            4,
+            13,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 2216.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=4&position=1",
+          "observed_at": "2026-10-11T21:57:25.186+00:00",
+          "market_selection_id": "三連単:[4,13,2]"
+        },
+        {
+          "id": "B24",
+          "type": "三連単",
+          "selection": [
+            4,
+            2,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 2298.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=4&position=1",
+          "observed_at": "2026-10-11T21:57:25.186+00:00",
+          "market_selection_id": "三連単:[4,2,1]"
+        },
+        {
+          "id": "B25",
+          "type": "三連単",
+          "selection": [
+            4,
+            2,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 2424.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=4&position=1",
+          "observed_at": "2026-10-11T21:57:25.186+00:00",
+          "market_selection_id": "三連単:[4,2,13]"
+        },
+        {
+          "id": "B26",
+          "type": "三連単",
+          "selection": [
+            4,
+            2,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 1463.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=4&position=1",
+          "observed_at": "2026-10-11T21:57:25.186+00:00",
+          "market_selection_id": "三連単:[4,2,9]"
+        },
+        {
+          "id": "B27",
+          "type": "三連単",
+          "selection": [
+            4,
+            9,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 1364.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=4&position=1",
+          "observed_at": "2026-10-11T21:57:25.186+00:00",
+          "market_selection_id": "三連単:[4,9,2]"
+        },
+        {
+          "id": "B28",
+          "type": "三連単",
+          "selection": [
+            9,
+            10,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 1320.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=9&position=1",
+          "observed_at": "2026-10-11T21:57:25.244+00:00",
+          "market_selection_id": "三連単:[9,10,2]"
+        },
+        {
+          "id": "B29",
+          "type": "三連単",
+          "selection": [
+            9,
+            2,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 1144.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2608040511?umaBan=9&position=1",
+          "observed_at": "2026-10-11T21:57:25.244+00:00",
+          "market_selection_id": "三連単:[9,2,10]"
+        },
+        {
+          "id": "B30",
+          "type": "三連複",
+          "selection": [
+            1,
+            10,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 300.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[1,10,13]"
+        },
+        {
+          "id": "B31",
+          "type": "三連複",
+          "selection": [
+            1,
+            2,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 623.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[1,2,10]"
+        },
+        {
+          "id": "B32",
+          "type": "三連複",
+          "selection": [
+            1,
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 379.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[1,2,4]"
+        },
+        {
+          "id": "B33",
+          "type": "三連複",
+          "selection": [
+            1,
+            4,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 667,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[1,4,10]"
+        },
+        {
+          "id": "B34",
+          "type": "三連複",
+          "selection": [
+            2,
+            10,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 455.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[2,10,13]"
+        },
+        {
+          "id": "B35",
+          "type": "三連複",
+          "selection": [
+            2,
+            4,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 1001.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[2,4,10]"
+        },
+        {
+          "id": "B36",
+          "type": "三連複",
+          "selection": [
+            2,
+            4,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 355.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[2,4,13]"
+        },
+        {
+          "id": "B37",
+          "type": "三連複",
+          "selection": [
+            2,
+            4,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 205.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[2,4,9]"
+        },
+        {
+          "id": "B38",
+          "type": "三連複",
+          "selection": [
+            2,
+            9,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 287.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[2,9,10]"
+        },
+        {
+          "id": "B39",
+          "type": "三連複",
+          "selection": [
+            4,
+            10,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 464.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:22.945+00:00",
+          "market_selection_id": "三連複:[4,10,13]"
+        },
+        {
+          "id": "B40",
+          "type": "単勝",
+          "selection": [
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 17.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "単勝:[2]"
+        },
+        {
+          "id": "B41",
+          "type": "枠連",
+          "selection": [
+            1,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 40.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "枠連:[1,2]"
+        },
+        {
+          "id": "B42",
+          "type": "枠連",
+          "selection": [
+            1,
+            6
+          ],
+          "stake_yen": 100,
+          "market_odds": 30.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "枠連:[1,6]"
+        },
+        {
+          "id": "B43",
+          "type": "枠連",
+          "selection": [
+            2,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": 35,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "枠連:[2,5]"
+        },
+        {
+          "id": "B44",
+          "type": "枠連",
+          "selection": [
+            2,
+            7
+          ],
+          "stake_yen": 100,
+          "market_odds": 32.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "枠連:[2,7]"
+        },
+        {
+          "id": "B45",
+          "type": "枠連",
+          "selection": [
+            5,
+            6
+          ],
+          "stake_yen": 100,
+          "market_odds": 26.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "枠連:[5,6]"
+        },
+        {
+          "id": "B46",
+          "type": "複勝",
+          "selection": [
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            2.4,
+            3
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "複勝:[1]"
+        },
+        {
+          "id": "B47",
+          "type": "複勝",
+          "selection": [
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            2.4,
+            3
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "複勝:[13]"
+        },
+        {
+          "id": "B48",
+          "type": "複勝",
+          "selection": [
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            4.7,
+            6
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "複勝:[2]"
+        },
+        {
+          "id": "B49",
+          "type": "複勝",
+          "selection": [
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            1.9,
+            2.2
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.675+00:00",
+          "market_selection_id": "複勝:[9]"
+        },
+        {
+          "id": "B50",
+          "type": "馬単",
+          "selection": [
+            10,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 143.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[10,9]"
+        },
+        {
+          "id": "B51",
+          "type": "馬単",
+          "selection": [
+            13,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 122.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[13,2]"
+        },
+        {
+          "id": "B52",
+          "type": "馬単",
+          "selection": [
+            2,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 143,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[2,1]"
+        },
+        {
+          "id": "B53",
+          "type": "馬単",
+          "selection": [
+            2,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 150.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[2,13]"
+        },
+        {
+          "id": "B54",
+          "type": "馬単",
+          "selection": [
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 310.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[2,4]"
+        },
+        {
+          "id": "B55",
+          "type": "馬単",
+          "selection": [
+            2,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 119.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[2,9]"
+        },
+        {
+          "id": "B56",
+          "type": "馬単",
+          "selection": [
+            4,
+            1
+          ],
+          "stake_yen": 100,
+          "market_odds": 187.8,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[4,1]"
+        },
+        {
+          "id": "B57",
+          "type": "馬単",
+          "selection": [
+            4,
+            2
+          ],
+          "stake_yen": 100,
+          "market_odds": 300.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.983+00:00",
+          "market_selection_id": "馬単:[4,2]"
+        },
+        {
+          "id": "B58",
+          "type": "馬連",
+          "selection": [
+            2,
+            13
+          ],
+          "stake_yen": 100,
+          "market_odds": 61.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.823+00:00",
+          "market_selection_id": "馬連:[2,13]"
+        },
+        {
+          "id": "B59",
+          "type": "馬連",
+          "selection": [
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 156.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.823+00:00",
+          "market_selection_id": "馬連:[2,4]"
+        },
+        {
+          "id": "B60",
+          "type": "馬連",
+          "selection": [
+            2,
+            9
+          ],
+          "stake_yen": 100,
+          "market_odds": 43.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2608040511?ninki=0",
+          "observed_at": "2026-10-11T21:57:25.823+00:00",
+          "market_selection_id": "馬連:[2,9]"
+        }
+      ],
+      "final_bets_fixed_at": "2026-10-11T21:57:46.343Z",
+      "step1_fixed_at": "2026-10-12T06:56:49.668+09:00",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-12-swan-stakes/v3.13-run38177942081-attempt2.json",
+      "proof_commit": "fc737a16b5aba0d9f9f153248eb49c743b231d10",
       "purchase_budget_yen": 6000,
       "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
     }
