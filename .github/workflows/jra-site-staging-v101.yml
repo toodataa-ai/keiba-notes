@@ -10,6 +10,7 @@ on:
       - '.github/scripts/jra-three-plus-ana-shadow-v1.mjs'
       - '.github/scripts/test-jra-three-plus-ana-v1.mjs'
       - '.github/scripts/jra-assemble-site-staging-v101.mjs'
+      - '.github/scripts/jra-render-three-plus-ana-stage-pdf-v1.py'
       - '.github/workflows/jra-site-staging-v101.yml'
   workflow_dispatch:
 permissions:
@@ -54,6 +55,17 @@ jobs:
               assert 'staging/purchase-preview.html' in text
           print('PASS_STAGE_HTML_AND_TEMP12R_REMOVAL')
           PY
+      - name: Render two independent A4 staging PDF purchase summaries and validate every page
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          for RACE in 2026-10-12-october-stakes 2026-10-12-swan-stakes; do
+            python3 .github/scripts/jra-render-three-plus-ana-stage-pdf-v1.py \
+              --input "docs/staging/data/three-plus-ana/$RACE.json" \
+              --pdf "docs/staging/pdfs/$RACE-three-plus-ana.pdf"
+          done
       - name: Atomically publish ONLY docs/staging files to main with bounded push-conflict retry
         shell: bash
         run: |
@@ -105,6 +117,8 @@ jobs:
               docs/staging/this-week.html \
               docs/staging/purchase-preview.html \
               docs/staging/release-history.html \
+              docs/staging/pdfs/2026-10-12-october-stakes-three-plus-ana.pdf \
+              docs/staging/pdfs/2026-10-12-swan-stakes-three-plus-ana.pdf \
               docs/staging/data/three-plus-ana/2026-10-12-october-stakes.json \
               docs/staging/data/three-plus-ana/2026-10-12-swan-stakes.json; do
               url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
