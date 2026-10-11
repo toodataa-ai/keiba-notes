@@ -69,7 +69,7 @@ jobs:
             ORIGINAL="docs/pdfs/$RACE-v3.12-rerun${RUN}-attempt2-v312.pdf"
             OUTPUT_HTML="/tmp/$RACE-japanese.html"
             OUTPUT_PDF="/tmp/$RACE-japanese.pdf"
-            JRA_AUDIT_ROWS_PER_PAGE=14 JRA_SELECTED_ROWS_PER_PAGE=10 JRA_REJECTED_ROWS_PER_PAGE=7 \
+            JRA_AUDIT_ROWS_PER_PAGE=14 JRA_SELECTED_ROWS_PER_PAGE=14 JRA_REJECTED_ROWS_PER_PAGE=12 \
               python3 .github/scripts/jra-render-live-v312.py "$PRED" "$OUTPUT_HTML"
             python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$OUTPUT_HTML"
             python3 -m weasyprint "$OUTPUT_HTML" "$OUTPUT_PDF"
