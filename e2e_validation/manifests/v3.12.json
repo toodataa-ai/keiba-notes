@@ -274,12 +274,12 @@
     },
     {
       "path": ".github/workflows/validate-jra-v312.yml",
-      "git_blob_sha": "aee443ed3d1de2c2836dedacb8ba0e56b20beec3",
+      "git_blob_sha": "e004fe65a0403e69822039d2582caaa7e82e4b05",
       "role": "validate-jra-v312.yml"
     },
     {
       "path": ".github/workflows/jra-prestart-pipeline-v312.yml",
-      "git_blob_sha": "d44d44ad31737c0936b03ade4721544fe0ec6fde",
+      "git_blob_sha": "6a97b22e8a4362bf0f73826a4bc8412a82db60e8",
       "role": "jra-prestart-pipeline-v312.yml"
     },
     {
@@ -296,9 +296,19 @@
       "path": "競馬予想_完全版プロンプト_v3.12.txt",
       "git_blob_sha": "56d6b7247434224d382f11c0f1f0856cab1160bf",
       "role": "競馬予想_完全版プロンプト_v3.12.txt"
+    },
+    {
+      "path": ".github/scripts/validate-jra-prompt-v312.mjs",
+      "git_blob_sha": "a59cdfaff9ce7657abababc2cdf44a0e495bbb8c",
+      "role": "v312_formal_validation_or_full_real_market_e2e"
+    },
+    {
+      "path": ".github/workflows/jra-v312-shadow-e2e-20261011.yml",
+      "git_blob_sha": "acf9821a0c1d9a97154fdb309181acac1f7840e2",
+      "role": "v312_formal_validation_or_full_real_market_e2e"
     }
   ],
   "previous_manifest_sha": "b0570e7a928a15fb82f81b29aa01dc0999d36a7c",
   "scope": "append_only_future_JRA_prerace",
-  "note": "v3.11 SHA pins unchanged, v3.12 is staged pending canonical pointer migration; old predictions, Step1, PDFs and proof untouched. All new exact quotes must be verifiable before the race post."
+  "note": "v3.12 append-only: v3.11 frozen 42 SHA pins are unchanged. Newly versioned components include exact official candidate odds recovery (171/171 Ireland shadow), multi-point joint-hit audit, 53-page validated E2E shadow PDF and forward canonical SHA gate. Canonical migration is held pending legacy gate compatibility."
 }
