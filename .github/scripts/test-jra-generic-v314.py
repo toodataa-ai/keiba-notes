@@ -63,8 +63,11 @@ class TestGenericJRAIntake(unittest.TestCase):
     with self.assertRaisesRegex(RuntimeError,'unrecognized'):a.validate_request(bad)
     bad=json.loads(json.dumps(req));bad['preview_path']='docs/research/../../etc/passwd'
     with self.assertRaises(RuntimeError):a.validate_request(bad)
-   with patch.object(a,'datetime',datetime):
-    with self.assertRaisesRegex(RuntimeError,'begun'):a.validate_request(req) if datetime.now(a.JST)>=datetime.fromisoformat(req['race']['start_at']) else None
+   class AfterPostDatetime(datetime):
+    @classmethod
+    def now(cls,tz=None):return cls(2026,10,13,12,0,0,tzinfo=tz)
+   with patch.object(a,'datetime',AfterPostDatetime):
+    with self.assertRaisesRegex(RuntimeError,'begun'):a.validate_request(req)
   finally:
    testpath.unlink(missing_ok=True)
 
