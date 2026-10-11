@@ -1,0 +1,63 @@
+name: Validate JRA set-preference STEP2 shadow comparison
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-set-preference-v1.mjs'
+      - '.github/scripts/test-jra-set-preference-v1.mjs'
+      - '.github/workflows/validate-jra-set-preference-v1.yml'
+      - 'docs/operations/jra_set_preference_v1.md'
+      - '.github/scripts/jra-pdf-presentation-overlay-v2.py'
+      - '.github/scripts/test-jra-purchase-display-v2.py'
+      - '.github/workflows/jra-generic-one-shot-v314.yml'
+      - 'docs/data/latest_prompt.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  set-preference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Real archived 2026-10-11 prestart replays + safety economics
+        run: node .github/scripts/test-jra-set-preference-v1.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify 8-type faithful JRA betting-screen group display
+        run: |
+          python3 -m py_compile .github/scripts/jra-pdf-presentation-overlay-v2.py
+          python3 .github/scripts/test-jra-purchase-display-v2.py
+      - name: Prove shadow JSON is HTTPS-publication-gated and exact group UI keeps final bets frozen
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          latest=json.loads(Path('docs/data/latest_prompt.json').read_text())
+          assert latest['version']=='v3.13'
+          spec=latest['purchase_set_preference_shadow_v1']
+          files={name:entry for name,entry in spec.items() if isinstance(entry,dict) and 'git_blob_sha' in entry}
+          for name,entry in files.items():
+              observed=subprocess.check_output(['git','hash-object',entry['path']],text=True).strip()
+              assert observed==entry['git_blob_sha'],(name,entry['path'])
+          generic=latest['generic_one_shot_execution_v314']['files']['workflow']
+          assert subprocess.check_output(['git','hash-object',generic['path']],text=True).strip()==generic['git_blob_sha']
+          workflow=Path(generic['path']).read_text()
+          assert workflow.count('jra-pdf-presentation-overlay-v2.py')==2
+          for marker in ('JRA_SET_RESEARCH=docs/data/jra-set-preference/$RACE_ID.json',
+                         'jra-set-preference-v1.mjs --input',
+                         'git add -- "$PREDICTION" "$REPORT" "$PDF" "$JRA_SET_RESEARCH"',
+                         'for FILE in docs/data/races.json "$REPORT" "$PDF" "$JRA_SET_RESEARCH"'):
+              assert marker in workflow,marker
+          print('PASS: v3.13 final_bets unmodified, all new overlay bytes are pinned, HTTP sidecar verified')
+          PY
+      - name: v3.13 and all established purchase strategy regressions
+        run: |
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/test-jra-balanced-v311.mjs
+          node .github/scripts/test-jra-purchase-audit-v312.mjs
+          node .github/scripts/test-jra-v313-formal-real.mjs
+          node .github/scripts/validate-jra-prompt-v313.mjs

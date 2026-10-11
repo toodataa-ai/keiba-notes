@@ -112,6 +112,7 @@ jobs:
             echo "PREDICTION=$PREDICTION"
             echo "REPORT=$REPORT"
             echo "PDF=$PDF"
+            echo "JRA_SET_RESEARCH=docs/data/jra-set-preference/$RACE_ID.json"
           } >> "$GITHUB_ENV"
       - name: Resolve exact live odds using only source-advertised forms
         env:
@@ -154,7 +155,7 @@ jobs:
             echo "Rendering candidate rows/page selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
             JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
               python3 .github/scripts/jra-render-live-v313.py /tmp/jra-v311-layout-only.json "$REPORT" &&
-             JRA_COVER_BETS_PER_TYPE="$COVER_BETS" python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction /tmp/jra-v311-layout-only.json &&
+             JRA_COVER_BETS_PER_TYPE="$COVER_BETS" python3 .github/scripts/jra-pdf-presentation-overlay-v2.py "$REPORT" --prediction /tmp/jra-v311-layout-only.json &&
             python3 -m weasyprint "$REPORT" /tmp/jra-v311-layout-only.pdf &&
             python3 .github/scripts/validate-jra-pdf-content-v313.py \
               --html "$REPORT" --pdf /tmp/jra-v311-layout-only.pdf --prediction /tmp/jra-v311-layout-only.json
@@ -192,19 +193,31 @@ jobs:
           node .github/scripts/jra-prestart-pipeline-v313.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
           node .github/scripts/validate-jra-portfolio-v313.mjs "$PREDICTION"
           node .github/scripts/validate-jra-prompt-v313.mjs
+      - name: Audit entire purchasable sets against the unchanged sealed formal ticket portfolio
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-set-preference-v1.mjs --input "$PREDICTION" --output "$JRA_SET_RESEARCH"
+          node - "$JRA_SET_RESEARCH" "$PROOF" <<'JS'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(d.status!=='shadow_comparison_only'||d.formal_bets_selection_unchanged!==true||
+             d.formal_proof_commit!==process.argv[3]||d.comparison.proposed.total_stake_yen>6000)
+             process.exit(1);
+          console.log('JRA_COMPLETE_PURCHASE_SETS_COMPARED_BUT_FINAL_BETS_UNCHANGED',d.race_id);
+          JS
       - name: Generate final PDF from immutable proof, validate every page and append public registry
         run: |
           set -euo pipefail
           python3 .github/scripts/jra-render-live-v313.py "$PREDICTION" "$REPORT"
-           python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction "$PREDICTION"
+           python3 .github/scripts/jra-pdf-presentation-overlay-v2.py "$REPORT" --prediction "$PREDICTION"
           python -m weasyprint "$REPORT" "$PDF"
           python3 .github/scripts/validate-jra-pdf-content-v313.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
           python3 .github/scripts/jra-publish-live-v313.py "$PREDICTION"
       - name: Commit only new prediction PDF HTML and appended race registry
         run: |
           set -euo pipefail
-          git add -- "$PREDICTION" "$REPORT" "$PDF" docs/data/races.json
-          python3 - "$PREDICTION" "$REPORT" "$PDF" <<'PY'
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$JRA_SET_RESEARCH" docs/data/races.json
+          python3 - "$PREDICTION" "$REPORT" "$PDF" "$JRA_SET_RESEARCH" <<'PY'
           import subprocess,sys
           expected=set(sys.argv[1:])|{'docs/data/races.json'}
           actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
@@ -218,7 +231,7 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 24); do
             OK=1
-            for FILE in docs/data/races.json "$REPORT" "$PDF"; do
+            for FILE in docs/data/races.json "$REPORT" "$PDF" "$JRA_SET_RESEARCH"; do
               URL="https://toodataa-ai.github.io/keiba-notes/${FILE#docs/}"
               if ! curl -LfsS --max-time 20 "$URL" -o "/tmp/jra-v313-http-$(basename "$FILE")" ||
                 ! cmp -s "$FILE" "/tmp/jra-v313-http-$(basename "$FILE")"; then
