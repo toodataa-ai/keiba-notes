@@ -75,7 +75,7 @@ function fixture(badPrice=25){
 }
 {
  const data=fixture();
- data.strategies[0].lines[0].quote_verified=false;
+ data.strategies[0].lines.find(x=>x.selection.includes(6)).quote_verified=false;
  const res=compareSetPreferredPortfolio(data);
  assert.equal(res.activated,false,'group must require full priced source evidence');
  console.log('PASS_SET_PREFERENCE_refuse_unpriced_group');
