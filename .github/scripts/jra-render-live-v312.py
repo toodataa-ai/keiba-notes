@@ -164,10 +164,20 @@ def make(report):
  for i,x in enumerate(unpriced,1):
   reasons.append(('U'+str(i).zfill(4),x.get('type',''),'-'.join(map(str,x.get('selection') or [])),'算定不可','発走前の当該買い目の実オッズ未確認。買い目の購入資格がない。'))
  reject_chunks=paginate_records(reasons,rejected_page_rows)
+ no_rejected_analysis=''
+ if not reasons:
+  complete=report['exact_quote_coverage_v312']
+  selection_count=len(lines)
+  by_type=complete.get('by_type',[])
+  no_rejected_analysis=rows_table(['券種','候補数','価格確認','価格欠損'],[
+    (v['type'],v['generated'],v['priced'],v['missing']) for v in by_type])
+  no_rejected_analysis+=paragraph(f'生成した個別買い目{complete["total_candidates"]}点に対し価格確認{complete["priced"]}点、欠損{complete["missing_count"]}点、最終採用{selection_count}点。該当する不採用候補はありません。価格確認の完了と実際の投票行為は異なります。')
+  no_rejected_analysis+=paragraph('この検証では存在しない不採用行を水増しせず、券種別の市場価格取得率を原本の実数で表示しています。追加候補が生じた場合は元の発走前入力から再作成が必要で、発走後に予想を調整することはできません。')
  for i,block in enumerate(reject_chunks,1):
   body+=page(f'不採用買い目｜{i}/{len(reject_chunks)}',
    paragraph('不採用候補を省略せず全件掲載します。Xは価格確認済みで不採用、Uは個別実オッズ未確認です。')
    +rows_page(['ID','券種','買い目','期待利益','不採用理由'],block)
+   +no_rejected_analysis
    +paragraph(f'全不採用候補 {len(reasons)}点（価格確認済 {len(excluded)}点、実オッズ未確認 {len(unpriced)}点）。')
    +paragraph('個別期待利益が低い理由と、個別期待利益がプラスでも集合の投資最適性で落とした理由を区別。')
    +paragraph('予想時点の不採用理由と、発走後に採用馬券が不的中となった回顧理由は別です。'))
