@@ -1,0 +1,81 @@
+name: Seal 2026-10-11 JRA v3.10 frozen proof and publish full PDFs
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-v310-resume-20261011.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jra-v310-20261011-resume-proof
+  cancel-in-progress: false
+jobs:
+  seal-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify the actual immutable prior proof, not the current clock
+        run: |
+          set -euo pipefail
+          PROOF=fcd74f558aa09c9d41e649918bcb94b2f4d198ee
+          for SLUG in 2026-10-11-ireland-trophy 2026-10-11-uzumasa-stakes; do
+            SNAPSHOT="e2e_validation/snapshots/$SLUG/v3.10-run38097626417-attempt1.json"
+            git cat-file -e "$PROOF:$SNAPSHOT"
+            echo "$SLUG|$SNAPSHOT" >> /tmp/jra-v310-races.txt
+          done
+          git show -s --format='%H %cI %s' "$PROOF"
+          echo "$PROOF" > /tmp/jra-proof-commit.txt
+      - name: Seal both predictions from actual 09:13 proof commit
+        run: |
+          set -euo pipefail
+          PROOF=$(cat /tmp/jra-proof-commit.txt)
+          while IFS='|' read -r SLUG SNAPSHOT; do
+            PRED="e2e_validation/predictions/$SLUG/$(basename "$SNAPSHOT")"
+            if [[ -e "$PRED" ]]; then echo "::error::Prediction already exists $PRED"; exit 1; fi
+            node .github/scripts/jra-prestart-pipeline-v310.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PRED"
+            echo "$PRED" >> /tmp/jra-final-predictions.txt
+          done < /tmp/jra-v310-races.txt
+          node .github/scripts/validate-jra-portfolio-v310.mjs
+      - name: Install approved fixed CSS renderer and PDF audit
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Render both immutable one-horse-one-page official reports and verify
+        run: |
+          set -euo pipefail
+          mkdir -p docs/reports docs/pdfs
+          while IFS= read -r PRED; do
+            SLUG=$(basename "$(dirname "$PRED")")
+            python .github/scripts/jra-render-live-v310.py "$PRED" "docs/reports/$SLUG.html"
+            python -m weasyprint "docs/reports/$SLUG.html" "docs/pdfs/$SLUG.pdf"
+            python .github/scripts/validate-jra-pdf-layout.py \
+              --html "docs/reports/$SLUG.html" --pdf "docs/pdfs/$SLUG.pdf" \
+              --policy "docs/data/jra_pdf_layout_policy_v1.json"
+          done < /tmp/jra-final-predictions.txt
+          python .github/scripts/jra-publish-live-v310.py $(cat /tmp/jra-final-predictions.txt)
+      - name: Publish only new official predictions reports PDF and today's registry
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/races.json
+          while IFS= read -r PRED; do
+            SLUG=$(basename "$(dirname "$PRED")")
+            git add -- "$PRED" "docs/reports/$SLUG.html" "docs/pdfs/$SLUG.pdf"
+          done < /tmp/jra-final-predictions.txt
+          git diff --cached --name-only | tee /tmp/publish-files.txt
+          if grep -Ev '^((docs/data/races.json)|(docs/reports/2026-10-11-(ireland-trophy|uzumasa-stakes).html)|(docs/pdfs/2026-10-11-(ireland-trophy|uzumasa-stakes).pdf)|(e2e_validation/predictions/2026-10-11-(ireland-trophy|uzumasa-stakes)/.*json))$' /tmp/publish-files.txt; then
+            echo "::error::Unsafe historical file change";exit 1
+          fi
+          git commit -m "Publish complete verified 2026-10-11 JRA v3.10 formal predictions and PDF"
+          git push origin HEAD:main
+          echo "SUCCESS_FORMAL_JSON_HTML_PDF_REGISTRY"
+          echo "Proof $(cat /tmp/jra-proof-commit.txt)"
