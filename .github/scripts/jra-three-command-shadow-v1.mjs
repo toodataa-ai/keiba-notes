@@ -9,6 +9,7 @@ import {expandStrategy,ticketKey,evaluateStrategy} from './jra-strategy-engine-v
 export const THREE_COMMAND_POLICY=Object.freeze({
   budget_yen:6000,unit_yen:100,max_purchase_commands:3,
   max_group_candidates:48,max_single_candidates:12,max_exact_evaluations:90,
+  minimum_grouped_points:{'三連単':6,'三連複':3},
   formal_adoption:false,tradeoff_requires_explicit_review:true
 });
 const must=(p,msg)=>{if(!p)throw Error('THREE_COMMAND_BLOCKER: '+msg);};
@@ -31,11 +32,16 @@ const stats=(lines,args)=>{
 const commandRank=(a,b)=>b.ev-a.ev||b.count-a.count||a.id.localeCompare(b.id,'en');
 function candidates(strategies,all){
   const byKey=new Map(all.map(x=>[key(x),x])),groups=new Map();
-  const rejected={partial:0,unpriced:0,over_budget:0,unsupported:0};
+  const rejected={partial:0,unpriced:0,over_budget:0,unsupported:0,too_narrow:0};
   const offer=(id,type,mode,definition,wanted)=>{
     const ks=wanted.map(key),unique=new Set(ks);
     if(unique.size!==ks.length){rejected.unsupported++;return;}
     if(ks.some(k=>!byKey.has(k))){rejected.unpriced++;return;}
+    // Buying a lone 3-way exact outcome is too brittle for a regular recommendation.
+    // A "command" can contain multiple valid JRA tickets (BOX/formation/wheel).
+    // This is a staged UX/risk constraint, not a rewrite of the prediction model.
+    const minimum=THREE_COMMAND_POLICY.minimum_grouped_points[type]??1;
+    if(wanted.length<minimum){rejected.too_narrow=(rejected.too_narrow??0)+1;return;}
     const lines=ks.map(k=>byKey.get(k));
     if(lines.length*100>THREE_COMMAND_POLICY.budget_yen){rejected.over_budget++;return;}
     const ev=sum(lines,price);
