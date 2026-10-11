@@ -410,9 +410,9 @@ def _format_purchase_numbers(cmd):
               else ("1列目", "2列目", "3列目"))
     branches = []
     for i, slot in enumerate(slots):
-        branch = "└─" if i == len(slots) - 1 else "├─"
+        branch = "●" if i == 0 else "└─"
         selection = "・".join(numbers(slot).split(","))
-        branches.append('<div style="margin:0;white-space:nowrap;">' +
+        branches.append(f'<div style="margin:0 0 0 {i*12}px;white-space:nowrap;">' +
                         html_module.escape(f"{branch} {labels[i]}：{selection}", quote=True) +
                         '</div>')
     return ('<div class="jra-formation-tree" '
