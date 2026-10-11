@@ -1,0 +1,115 @@
+name: Publish postrace JRA Grade A evidence independently of E0/E1/E2 Shadow
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-postrace-e2e-public-v1.yml'
+      - 'e2e_validation/cases/2026-10-11-*/case.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jra-postrace-e2e-public-v1
+  cancel-in-progress: false
+jobs:
+  formal-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Verify SHA-pinned historical prompt manifests without modifying them
+        run: python e2e_validation/validate_manifests.py
+      - name: Validate formal JRA E2E strict results and sealed proof commits
+        run: |
+          python e2e_validation/evaluate.py --cases e2e_validation/cases --output docs/data/e2e_status.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('docs/data/e2e_status.json').read_text())
+          assert not s['errors'],s['errors']
+          expected={'2026-10-11-ireland-trophy','2026-10-11-uzumasa-stakes'}
+          entries=[e for e in s['entries'] if e['race_id'] in expected]
+          assert len(entries)==2
+          assert {e['race_id'] for e in entries}==expected
+          assert all(e['grade']=='prospective_strict' and e['proof']['read_from_proof_commit'] for e in entries)
+          assert s['comparison']['state']=='insufficient_data'
+          print('FORMAL_E2E_V312_STRICT_APPROVED:',len(entries),'of',s['case_counts']['strict'],'total')
+          PY
+      - name: Calculate and disclose independent E0/E1/E2 Shadow evidence gaps without waiver
+        run: |
+          python experience_regime_v1/analyze.py --cases e2e_validation/cases --output docs/data/experience_regime_status.json --allow-errors > /dev/null
+          python3 - <<'PY'
+          import json
+          x=json.load(open('docs/data/experience_regime_status.json'))
+          print('SHADOW_STILL_BLOCKED:',len(x.get('errors',[])),'known missing prereace experience records')
+          for e in x.get('errors',[]):print(e['race_id'],e['error'])
+          assert not x['interpretation']['no_automatic_promotion']==False
+          PY
+      - name: Publish complete public E2E status and original-source-derived display
+        run: |
+          python e2e_validation/build_public_data.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          e=json.loads(Path('docs/data/e2e_public.json').read_text())
+          assert all(x['status']=='reviewed' for x in e['races'] if x['race_id'] in ('2026-10-11-ireland-trophy','2026-10-11-uzumasa-stakes'))
+          assert e['totals']['prospective_strict_races']>=4
+          print('E2E_PUBLIC_FOUR_CASES_VERIFIED')
+          PY
+      - name: Commit only derived public reports
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/e2e-shadow/
+          if git diff --cached --quiet; then
+            echo 'No derived public changes'
+          else
+            git commit -m 'Publish postrace JRA Grade A results; explicitly retain incomplete Shadow errors'
+            for i in 1 2 3 4; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then break; fi
+              if [ "$i" = 4 ]; then echo 'Could not push public report'; exit 1; fi
+              sleep 2
+            done
+          fi
+      - name: Verify actual published Pages byte parity for all reviewed Sunday JRA main artifacts
+        run: |
+          set -euo pipefail
+          BASE=https://toodataa-ai.github.io/keiba-notes
+          python3 - <<'PY' >/tmp/jra-postrace-files.txt
+          import json
+          from pathlib import Path
+          reg=json.loads(Path('docs/data/races.json').read_text())
+          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json']
+          for r in reg['races']:
+              if r['date']=='2026-10-11' and r['scope']=='jra-main':
+                  assert r['status']=='reviewed'
+                  paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json'])
+          for p in paths:
+              assert Path(p).is_file(),p
+              print(p)
+          PY
+          for attempt in $(seq 1 24); do
+            ok=1
+            while IFS= read -r FILE; do
+              mkdir -p "/tmp/jra-public/$(dirname "${FILE#docs/}")"
+              TARGET="/tmp/jra-public/${FILE#docs/}"
+              if ! curl -LfsS --connect-timeout 8 --max-time 25 -H 'Cache-Control: no-cache' "${BASE}/${FILE#docs/}?postrace=${GITHUB_RUN_ID}-${attempt}" -o "$TARGET" 2>/dev/null ||
+                ! cmp -s "$FILE" "$TARGET"; then
+                ok=0
+                echo "Published file not yet equal: $FILE (attempt $attempt)"
+                break
+              fi
+            done </tmp/jra-postrace-files.txt
+            if [ "$ok" = 1 ]; then
+              echo 'JRA_POSTRACE_HTTP_BYTES_VERIFIED: all reviewed race HTML, frozen PDF and public records match Git byte-for-byte'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::PUBLIC_HTTP_BYTES_UNVERIFIED after Pages propagation retries'
+          exit 1
