@@ -9,36 +9,96 @@
     "oi": {
       "label": "大井",
       "group": "nankan",
-      "enabled": true
+      "enabled": true,
+      "nar_baba_code": 20
     },
     "kawasaki": {
       "label": "川崎",
       "group": "nankan",
-      "enabled": true
+      "enabled": true,
+      "nar_baba_code": 21
     },
     "funabashi": {
       "label": "船橋",
       "group": "nankan",
-      "enabled": true
+      "enabled": true,
+      "nar_baba_code": 19
     },
     "urawa": {
       "label": "浦和",
       "group": "nankan",
-      "enabled": true
+      "enabled": true,
+      "nar_baba_code": 18
     },
     "sonoda": {
       "label": "園田",
       "group": "hyogo",
-      "enabled": true
+      "enabled": true,
+      "nar_baba_code": 27
     },
     "nagoya": {
       "label": "名古屋",
       "group": "aichi",
-      "enabled": true
+      "enabled": true,
+      "nar_baba_code": 24
+    },
+    "obihiro": {
+      "label": "帯広ば",
+      "group": "banei",
+      "enabled": true,
+      "nar_baba_code": 3
+    },
+    "morioka": {
+      "label": "盛岡",
+      "group": "iwate",
+      "enabled": true,
+      "nar_baba_code": 10
+    },
+    "kanazawa": {
+      "label": "金沢",
+      "group": "kanazawa",
+      "enabled": true,
+      "nar_baba_code": 22
+    },
+    "kochi": {
+      "label": "高知",
+      "group": "kochi",
+      "enabled": true,
+      "nar_baba_code": 31
+    },
+    "saga": {
+      "label": "佐賀",
+      "group": "saga",
+      "enabled": true,
+      "nar_baba_code": 32
+    },
+    "monbetsu": {
+      "label": "門別",
+      "group": "hokkaido",
+      "enabled": true,
+      "nar_baba_code": 36
+    },
+    "mizusawa": {
+      "label": "水沢",
+      "group": "iwate",
+      "enabled": true,
+      "nar_baba_code": 11
+    },
+    "kasamatsu": {
+      "label": "笠松",
+      "group": "tokai",
+      "enabled": true,
+      "nar_baba_code": 23
+    },
+    "himeji": {
+      "label": "姫路",
+      "group": "hyogo",
+      "enabled": true,
+      "nar_baba_code": 28
     }
   },
   "collection": {
-    "population_scope": "all official races held at enabled venues",
+    "population_scope": "all official races held at every enabled NAR venue, dynamically selected by official daily program",
     "sampling": "all_races",
     "pre_race_snapshot_required": true,
     "result_join_after_official_confirmation": true,
@@ -63,8 +123,8 @@
     "reliability"
   ],
   "daily_cycle": {
-    "pre_race": "Freeze compact shadow predictions before the first relevant race and never edit them after cutoff.",
-    "post_race": "Join official results and aggregate errors after all relevant results are confirmed."
+    "pre_race": "Enumerate every scheduled race at all enabled NAR venues; freeze only provably before start. All uncaptured races are coverage gaps with explicit status, never treated as zero eligible races.",
+    "post_race": "Join official results only to immutable and provably pre-start snapshots; report uncovered races separately."
   },
   "weekly_cycle": {
     "purpose": "Generate transferable-feature candidates from repeated errors and stable effects.",
