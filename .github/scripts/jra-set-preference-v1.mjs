@@ -200,7 +200,7 @@ if(process.argv[1]&&process.argv[1].endsWith('/jra-set-preference-v1.mjs')){
    models_compared:'v3.12 100-yen selected-line baseline vs grouped complete-strategy counterfactual; not v3.13 WIN-stake-sized final',
    comparison:comparisons};
   fs.mkdirSync(path.dirname(output),{recursive:true});
-  fs.writeFileSync(output,JSON.stringify(payload,null,2)+'\\n');
+  fs.writeFileSync(output,JSON.stringify(payload,null,2)+'\n');
   console.log('JRA_SET_PREFERENCE_SHADOW_CREATED',source.race_id,
    comparisons.status,comparisons.baseline.command_count,comparisons.proposed.command_count);
  }catch(e){console.error('JRA_SET_PREFERENCE_BLOCKER',e.message);process.exitCode=1;}
