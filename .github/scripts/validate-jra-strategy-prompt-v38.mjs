@@ -8,7 +8,7 @@ const manifest=JSON.parse(read('e2e_validation/manifests/v3.8.json'));
 const legacy=JSON.parse(read('e2e_validation/manifests/v3.7.json'));
 const policy=JSON.parse(read('docs/data/ticket_portfolio_policy_v1.json'));
 const prompt=read(promptPath),errors=[];
-if(!['v3.8','v3.9','v3.10'].includes(latest.version)||(latest.version==='v3.8'&&latest.path!==promptPath))errors.push('unexpected latest pointer for v3.8 historical contract');
+if(!['v3.8','v3.9','v3.10','v3.11'].includes(latest.version)||(latest.version==='v3.8'&&latest.path!==promptPath))errors.push('unexpected latest pointer for v3.8 historical contract');
 if(!history.entries.some(e=>e.version==='v3.8'&&e.path===promptPath&&e.previous_version==='v3.7'))errors.push('missing formal v3.8 history');
 if(manifest.prompt_version!=='v3.8'||manifest.components.length!==17)errors.push('unexpected manifest version or component count');
 if(JSON.stringify(manifest.components.slice(0,15))!==JSON.stringify(legacy.components))errors.push('v3.0-v3.7 frozen prompt/CSS dependencies changed');
