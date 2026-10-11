@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 import {compareThreeCommandPortfolio} from './jra-three-command-shadow-v1.mjs';
 import {buildTicketUniverse} from './jra-portfolio-optimizer-v310.mjs';
 import {evaluateStrategy,oddsFloor,ticketKey} from './jra-strategy-engine-v39.mjs';
+import {formatPurchaseCommand} from './jra-ticket-notation-v1.mjs';
 const must=(v,msg)=>{if(!v)throw Error('THREE_PLUS_ANA_BLOCKER: '+msg);};
 const sum=(xs,f)=>xs.reduce((a,x)=>a+f(x),0);
 const key=x=>ticketKey(x.type,x.selection);
@@ -16,24 +17,7 @@ export const PURCHASE_ACTION_POLICY=Object.freeze({
  min_longshot_market_odds:20,max_longshot_central_event_probability:0.10,
  require_positive_edge:true,formal_release:false
 });
-export function instructions(c){
- const d=c.definition||{},s=(xs)=>Array.isArray(xs)?xs.join('・'):'';
- const kind=c.method,type=c.type;
- if(kind==='box')return 'BOX '+s(d.horses);
- if(kind==='single')return s(d.selection);
- if(kind==='key_wheel')return '軸：'+d.key+'／相手：'+s(d.partners);
- if(kind==='key_wheel_first')return '1着：'+d.key+'／相手：'+s(d.partners);
- if(kind==='key_wheel_second')return '2着：'+d.key+'／相手：'+s(d.partners);
- if(kind==='key_wheel_multi')return '軸：'+d.key+'／相手：'+s(d.partners)+'（マルチ）';
- if(kind==='one_key_wheel')return '1頭軸：'+d.key+'／相手：'+s(d.partners);
- if(kind==='two_key_wheel')return '2頭軸：'+s(d.axes)+'／相手：'+s(d.partners);
- if(kind==='two_key_fixed')return d.positions.map((v,i)=>v+'着：'+d.axes[i]).join('／')+'／残り：'+s(d.partners);
- if(kind==='two_key_multi')return '2頭軸：'+s(d.axes)+'／相手：'+s(d.partners)+'（マルチ）';
- if(kind==='one_key_fixed')return d.position+'着：'+d.key+'／相手：'+s(d.partners);
- if(kind==='one_key_multi')return '1頭軸：'+d.key+'／相手：'+s(d.partners)+'（マルチ）';
- if(kind==='formation')return (d.slots||[]).map((p,i)=>i+1+'列目：'+s(p)).join('／');
- return type+'（方式は実買い目を確認）';
-}
+export const instructions=formatPurchaseCommand;
 export function compareThreePlusAna(args){
  const {all}=buildTicketUniverse({...args,max_ticket_stake_yen:100});
  // Longshot defined as a rare winning event at observed >=20x, not as
@@ -61,7 +45,7 @@ export function compareThreePlusAna(args){
    row:i+1,category:'通常',jra_input:instructions(c)}));
  const ana=selectedAna?{
     row:4,category:'穴狙い',type:selectedAna.type,method:'single',
-    definition:{selection:selectedAna.selection},jra_input:selectedAna.selection.join('・'),
+    definition:{selection:selectedAna.selection},jra_input:instructions({type:selectedAna.type,method:'single',definition:{selection:selectedAna.selection}}),
     points:1,unit_stake_yen:100,stake_yen:100,ticket_keys:[key(selectedAna)],
     observed_odds_floor:oddsFloor(selectedAna.market_odds),
     modeled_central_event_probability:round(selectedAna.probabilities.central),
