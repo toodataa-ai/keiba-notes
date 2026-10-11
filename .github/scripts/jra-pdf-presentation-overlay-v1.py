@@ -260,27 +260,46 @@ def _display_only_group_candidates(final_by_key):
         if typ in ("枠連", "馬連", "馬単", "ワイド", "三連複", "三連単"):
             arity = 3 if typ in ("三連複","三連単") else 2
             ordered = typ in ("馬単", "三連単")
-            # 60×100円 is the maximum user budget. Avoid a huge combinatorial
-            # search; every declared BOX must contain at least two line items.
             max_horses = 5 if typ == "三連単" else 8
             horses = sorted(set(h for _, selection in available for h in selection))
-            for count in range(min(len(horses), max_horses), arity, -1):
-                combos = comb(count, arity) * (factorial(arity) if ordered else 1)
-                if combos < 2 or combos > len(available):
-                    continue
-                for hs in combinations(horses, count):
-                    keys = {
-                        bet_key({"type":typ,"selection":list(ordered_combo)})
-                        for picked in combinations(hs, arity)
-                        for ordered_combo in (permutations(picked) if ordered else (picked,))
-                    }
-                    if keys.issubset(available) and len(keys) == combos:
-                        sid = f"DISPLAY_BOX_{typ}_{unit}_{'_'.join(map(str,hs))}"
-                        derived.append({"strategy_id":sid, "type":typ,
-                                        "strategy_kind":"box",
-                                        "definition":{"horses":list(hs)},
-                                        "lines":[{"type":k[0],"selection":list(k[1])}
-                                                 for k in sorted(keys)]})
+
+            def box_keys(hs):
+                return {
+                    bet_key({"type":typ,"selection":list(row)})
+                    for picked in combinations(hs, arity)
+                    for row in (permutations(picked) if ordered else (picked,))
+                }
+
+            # Enumerate actual purchased 2/3-horse edges first and extend only
+            # complete cliques. NEVER use combinations(all race horses, 8):
+            # that causes millions of irrelevant candidates for 20+ selected
+            # horse numbers, delaying PDF CI and risk of timeout.
+            seeds = set(tuple(sorted(sel)) for _,sel in available
+                        if len(sel) == arity and len(set(sel)) == arity)
+            visited = set()
+            def explore(hs):
+                if hs in visited:
+                    return
+                visited.add(hs)
+                keys = box_keys(hs)
+                if not keys.issubset(available):
+                    return
+                if len(keys) >= 2:
+                    sid = f"DISPLAY_BOX_{typ}_{unit}_{'_'.join(map(str,hs))}"
+                    derived.append({"strategy_id":sid, "type":typ,
+                                    "strategy_kind":"box",
+                                    "definition":{"horses":list(hs)},
+                                    "lines":[{"type":k[0],"selection":list(k[1])}
+                                             for k in sorted(keys)]})
+                if len(hs) >= max_horses:
+                    return
+                for h in horses:
+                    if h > hs[-1]:
+                        # A new node must connect to EVERY complete edge/triple.
+                        # Failed branches cannot become valid BOX supersets.
+                        explore((*hs, h))
+            for hs in sorted(seeds):
+                explore(hs)
         if typ == "馬連":
             horses = sorted(set(h for _, selection in available for h in selection))
             for axis in horses:
