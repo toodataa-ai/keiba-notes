@@ -16,7 +16,7 @@ import fitz
 ROOT=Path('.')
 INDEX=ROOT/'docs/data/races.json'
 LOG=ROOT/'docs/data/jra_publication_revision_log.json'
-POLICY=ROOT/'docs/data/jra_prerace_overwrite_policy_v1.json'
+POLICY=ROOT/'docs/data/jra_prerace_overwrite_policy_v312.json'
 TEMPLATE=None
 
 def need(ok,msg):
@@ -65,7 +65,7 @@ def main():
     manifest=Path(sys.argv[1])
     need(manifest.is_file(),'revision manifest absent')
     policy=load(POLICY)
-    need(policy['allow_prestart_canonical_replacement'] is True and policy['no_replacement_after_post'] is True,
+    need(policy['applies_to_prompt_version']=='v3.12' and policy['allow_prestart_canonical_replacement'] is True and policy['no_replacement_after_post'] is True,
          'official policy not enabled')
     root=load(INDEX)
     prevlog=load(LOG) if LOG.exists() else {'schema_version':1,'policy_id':policy['policy_id'],'revisions':[]}
