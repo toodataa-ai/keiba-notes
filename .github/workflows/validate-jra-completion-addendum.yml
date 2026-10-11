@@ -28,8 +28,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Confirm mandatory formal execution addendum and negative tests
-        run: node .github/scripts/validate-jra-completion-addendum-v1.mjs
+        run: node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-completion-addendum-v1.mjs
       - name: Confirm immutable v3.11 analysis and purchase prompt SHA pins
         run: |
-          node .github/scripts/validate-jra-balanced-prompt-v311.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-balanced-prompt-v311.mjs
           node .github/scripts/validate-prompt-history.mjs
