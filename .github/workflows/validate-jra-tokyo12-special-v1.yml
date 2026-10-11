@@ -1,0 +1,24 @@
+name: JRA Tokyo 12R special reference page acceptance
+on:
+  push:
+    branches: ['special/tokyo12-20261011-prerace', main]
+    paths:
+      - docs/special-2026-10-11-tokyo12.html
+      - docs/data/special-2026-10-11-tokyo12.json
+      - docs/index.html
+      - docs/this-week.html
+      - .github/scripts/validate-jra-tokyo12-special-v1.py
+  pull_request:
+    paths:
+      - docs/special-2026-10-11-tokyo12.html
+      - docs/data/special-2026-10-11-tokyo12.json
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Verify special page without changing JRA official race registry
+        run: python3 .github/scripts/validate-jra-tokyo12-special-v1.py
