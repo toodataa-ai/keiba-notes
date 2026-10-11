@@ -34,4 +34,4 @@ for path in sys.argv[1:]:
   note='Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers.'))
 root['updated_at']=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).isoformat(timespec='milliseconds')
 races_file.write_text(json.dumps(root,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-print('JRA_PUBLIC_REGISTRY',[(x['id'],x['total_stake_yen'],x['full_report_pages']) for x in root['races'] if x['date']=='2026-10-11'])
+print('JRA_PUBLIC_REGISTRY',[(x['id'],x['total_stake_yen'],x['full_report_pages']) for x in root['races'] if x['prompt_version']=='v3.12'])
