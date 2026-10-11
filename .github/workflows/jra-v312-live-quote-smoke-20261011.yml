@@ -36,6 +36,16 @@ jobs:
           r=requests.get(u,timeout=20);r.raise_for_status()
           s=BeautifulSoup(r.content,'html.parser')
           print('SOURCE_FORMS',len(s.select('form')),'HTML_BYTES',len(r.content))
+          import re
+          scripts=s.select('script')
+          print('SOURCE_SCRIPTS',len(scripts))
+          for script in scripts:
+              body=script.string or script.get_text()
+              markers=[w for w in ['__NEXT_DATA__','__INITIAL_STATE__','race/odds','trifecta','sanrentan','3-10-16'] if w in body]
+              if markers or len(body)>2000:
+                  print('SCRIPT_STRUCTURE',script.get('id'),script.get('type'),script.get('src'),'BYTES',len(body),'MARKERS',markers,'PREFIX',body[:220].replace('\\n',' '))
+          for h in s.select('[data-testid],[data-reactroot]')[:8]:
+              print('ROOT_STRUCTURE',h.name,h.get('data-testid'),h.get('id'),h.get('class'))
           for f in s.select('form'):
               opts=[]
               for sel in f.select('select'):
