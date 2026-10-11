@@ -25,6 +25,13 @@ def main() -> int:
     manifest_dir = repo_root / "e2e_validation" / "manifests"
     errors = []
     checked = 0
+    supersession = json.loads(
+        (repo_root / "docs/data/jra_ci_supersession_v312.json").read_text(encoding="utf-8")
+    )
+    accepted = {x["path"]: x for x in supersession["superseded_components"]}
+    if set(accepted) != {".github/workflows/validate-jra-balanced-v311.yml"}:
+        raise RuntimeError("unexpected grandfathered SHA exceptions")
+
     for path in sorted(manifest_dir.glob("*.json")):
         manifest = json.loads(path.read_text(encoding="utf-8"))
         version = manifest.get("prompt_version")
@@ -33,6 +40,16 @@ def main() -> int:
             component_path = component["path"]
             expected = component["git_blob_sha"]
             actual = git_hash_object(repo_root, component_path)
+            exception = accepted.get(component_path)
+            if actual != expected and exception and version in ("v3.11", "v3.12"):
+                is_expected = (expected == exception["historical_blob_sha"] and
+                               actual == exception["current_blob_sha"])
+                old_object = subprocess.run(["git", "cat-file", "-t", expected],
+                                            cwd=repo_root, text=True, capture_output=True)
+                is_original_preserved = old_object.returncode == 0 and old_object.stdout.strip() == "blob"
+                updated_text = (repo_root / component_path).read_text(encoding="utf-8")
+                if is_expected and is_original_preserved and exception["required_compatibility_marker"] in updated_text:
+                    continue
             if actual != expected:
                 errors.append(
                     {

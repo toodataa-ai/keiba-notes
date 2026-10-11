@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "effective_prompt_version": "v3.12",
+  "scope": "future_jra_prerace_only",
+  "purchase_budget_yen": 6000,
+  "source_provenance": {
+    "require_per_line_quote": true,
+    "validate_capture_sha256": true,
+    "strict_quote_coverage": true,
+    "allow_unverified_expected_value": false,
+    "source_form_discovery_only": true,
+    "formal_publication_if_partial": false
+  },
+  "comparison": {
+    "illustrative_sizes": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20,
+      60
+    ],
+    "evaluate_all_planned_modes": true,
+    "scenario_names": [
+      "low",
+      "central",
+      "high"
+    ],
+    "joint_outcome_union": true,
+    "selected_purchase_unchanged_from_v311": true,
+    "explain_zero_trial": true
+  },
+  "report": {
+    "front_overview": true,
+    "all_modes_in_dynamic_audit": true,
+    "max_pdf_pages": null,
+    "one_horse_one_page": true,
+    "approved_css_unchanged": true
+  },
+  "preservation": {
+    "step1_immutable": true,
+    "prior_prompts_predictions_and_reports_immutable": true,
+    "local_shadow_immutable": true,
+    "win5_excluded": true
+  }
+}

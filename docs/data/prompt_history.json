@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-10-11T10:36:00+09:00",
+  "updated_at": "2026-10-11T11:30:00+09:00",
   "policy": {
     "required_on_prompt_update": true,
     "required_fields": [
@@ -370,6 +370,32 @@
         "WIN5除外と最大予算6000円、1点原則100円"
       ],
       "reason": "ユーザー指定のB案に基づき、単数の買い目では当たりにくい複数点購入方式もセットの集合的中率・期待利益で評価し、落とした理由とPDFの空白問題を解消するため。 ページ総数に上限を設けないことはユーザーが明示的に指定。"
+    },
+    {
+      "version": "v3.12",
+      "date": "2026-10-11",
+      "path": "競馬予想_完全版プロンプト_v3.12.txt",
+      "source": "user-requested-improve-missing-trifecta-quotes-and-multi-ticket-hit-rate-explanation",
+      "approval_class": "C-user-requested",
+      "previous_version": "v3.11",
+      "manifest": "e2e_validation/manifests/v3.12.json",
+      "status": "canonical_enabled_pending_required_ci_and_publication",
+      "summary": "三連単78点の個別オッズ未取得を解消する実サイトのJS連動URL取得を追加。1・5・10点及び全方式の集合的中率・期待利益比較をPDFに掲載。旧予想・STEP1を一切変更せずv3.11の購入制約を継承。",
+      "changes": [
+        "各券種の生成買い目と取得市場オッズの正確な組番単位照合。欠損があれば正式予想をfail closedにする。",
+        "スポーツナビのDOM＋実際のJavaScript searchBoxが宣言する軸馬選択GETパラメータのみを利用し三連単候補を追加照合する。",
+        "複数点の集合的中率、期待利益、純損失確率、同時払戻を1/5/10点・最終セット・全戦略方式別に同時分布で比較する。",
+        "ゼロ回探索の原因を監査に明記し、比較用セットと最終購入指示を区別する。",
+        "v3.12専用PDF/HTMLの動的監査ページ、実レンダリング・省略検出・A4色・完全履歴の回帰検査を追加する。",
+        "v3.11現行公開は事前検査と正式ポインタ移行の完了まで維持する。",
+        "最新正式版へのポインタをv3.12に変更し、旧CI新旧版互換アダプタと原本SHAを維持した専用例外を追加。過去のv3.6予想2件は当時形式と原本SHAのまま監査。"
+      ],
+      "unchanged": [
+        "v3.0〜v3.11のSTEP1、印、①〜⑨、確率モデルとB案の購入採否制約",
+        "旧予想・購入行・proof_commit・発表済PDF・結果・回顧・地方Shadow",
+        "承認済みA4縦・1頭1ページ・評価色CSSとWIN5除外"
+      ],
+      "reason": "2026-10-11のJRA東京11Rで三連単78点が市場価格未取得により比較対象から落ち、11点購入時の集合的中率と1点/5点との差異・最適化試行ゼロが帳票に説明されなかったため。"
     }
   ],
   "execution_addenda": [

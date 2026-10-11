@@ -43,8 +43,8 @@ jobs:
       - name: Test coherent eight-ticket conditional finishing probabilities
         run: node .github/scripts/test-jra-conditional-ticket-probability.mjs
       - name: Validate all saved v3.4+ purchase decisions
-        run: node .github/scripts/validate-purchase-gate-v34.mjs
+        run: node .github/scripts/validate-jra-archived-compact-v312.mjs .github/scripts/validate-purchase-gate-v34.mjs
       - name: Verify pre-race v3.4 research with original immutable proof
         run: node .github/scripts/validate-v34-research-snapshots.mjs
       - name: Verify legacy nine-type coverage rules are retained
-        run: node .github/scripts/validate-bet-type-coverage.mjs
+        run: node .github/scripts/validate-bet-type-coverage-v312.mjs

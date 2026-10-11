@@ -1,0 +1,84 @@
+name: JRA v3.12 Ireland actual-odds shadow E2E (no publication)
+on:
+  push:
+    branches: [feature/jra-v312-odds-portfolio-audit]
+    paths: ['.github/workflows/jra-v312-shadow-e2e-20261011.yml']
+permissions:
+  contents: read
+jobs:
+  shadow-dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install matching approved render dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q requests beautifulsoup4 'weasyprint==68.0' 'pymupdf==1.26.4'
+      - name: Recover 171 actual per-ticket prices from documented market selectors
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('e2e_validation/inputs/2026-10-11-ireland-trophy.json').read_text())
+          a['prompt_version']='v3.12'
+          Path('/tmp/jra-v312-ireland-source.json').write_text(json.dumps(a,ensure_ascii=False))
+          print('SHADOW only: preserving existing STEP1, final_bets, proof, races registry')
+          PY
+          python3 .github/scripts/jra-odds-recovery-v312.py \
+            --input /tmp/jra-v312-ireland-source.json \
+            --output /tmp/jra-v312-ireland-priced.json \
+            --evidence-dir e2e_validation/quote-evidence/2026-10-11-ireland-trophy/v312-shadow
+      - name: Assemble and verify all purchase candidate sets with fresh exact odds
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-prestart-pipeline-v312.mjs \
+            --input /tmp/jra-v312-ireland-priced.json \
+            --output /tmp/jra-v312-ireland-unsealed.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/jra-v312-ireland-unsealed.json').read_text())
+          assert d['stage']=='pending_git_proof' and d['proof_commit'] is None
+          assert d['exact_quote_coverage_v312']['missing_count']==0
+          assert d['exact_quote_coverage_v312']['total_candidates']==171
+          assert d['purchase_set_comparisons_v312']['comparison_sets']
+          print('UNSEALED_SHADOW candidates',len(d['ticket_candidate_comparisons']),
+                'actual_quotes',d['exact_quote_coverage_v312']['priced'],
+                'final_bets',len(d['final_bets']),'stake',d['total_stake_yen'],
+                'trial_count',d['purchase_set_comparisons_v312']['search_diagnostic']['tested_portfolios'])
+          # Fake stage is local ONLY to exercise the printer; never commit/publish this unproven preview.
+          d['stage']='formal_prestart'
+          d['proof_commit']='a'*40
+          Path('/tmp/jra-v312-ireland-print-fixture.json').write_text(json.dumps(d,ensure_ascii=False))
+          PY
+      - name: Render actual full-page candidate PDF with unlimited adaptive A4 pagination and gate
+        run: |
+          set -uo pipefail
+          COMPLETE=0
+          for ROWS in 10:7 8:5 6:4 4:3 2:2 1:1; do
+            SELECTED="${ROWS%:*}"
+            EXCLUDED="${ROWS#*:}"
+            echo "PDF DENSITY selected=$SELECTED excluded=$EXCLUDED"
+            JRA_SELECTED_ROWS_PER_PAGE="$SELECTED" JRA_REJECTED_ROWS_PER_PAGE="$EXCLUDED" \
+              JRA_AUDIT_ROWS_PER_PAGE="$EXCLUDED" \
+              python .github/scripts/jra-render-live-v312.py \
+                /tmp/jra-v312-ireland-print-fixture.json /tmp/jra-v312-ireland.html &&
+            python -m weasyprint /tmp/jra-v312-ireland.html /tmp/jra-v312-ireland.pdf &&
+            python .github/scripts/validate-jra-pdf-content-v312.py \
+              --html /tmp/jra-v312-ireland.html --pdf /tmp/jra-v312-ireland.pdf \
+              --prediction /tmp/jra-v312-ireland-print-fixture.json
+            if [[ $? == 0 ]]; then COMPLETE=1;break;fi
+          done
+          if [[ $COMPLETE != 1 ]]; then echo "::error::actual v3.12 shadow PDF failed all density audits";exit 1;fi
+          python - <<'PY'
+          import fitz
+          d=fitz.open('/tmp/jra-v312-ireland.pdf')
+          print('SHADOW E2E PDF PASS pages',len(d),'originals unchanged; not a published or sealed prediction')
+          PY

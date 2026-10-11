@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: '22'
       - name: Validate compact one-shot contract and all pinned components
-        run: node .github/scripts/validate-jra-one-shot-v36.mjs
+        run: node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-one-shot-v36.mjs
       - name: Validate formal prompt pointer and history
         run: node .github/scripts/validate-prompt-history.mjs
       - name: Validate prior bet-type selection behaviors

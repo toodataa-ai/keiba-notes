@@ -40,7 +40,7 @@ jobs:
           node-version: '22'
       - name: Check SHA-pinned scope and formal pointer
         run: |
-          node .github/scripts/validate-jra-strategy-prompt-v38.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-strategy-prompt-v38.mjs
           node .github/scripts/validate-prompt-history.mjs
       - name: Verify multi-ticket portfolio and old one-point regressions
         run: |
@@ -53,5 +53,5 @@ jobs:
       # Do not edit or silently normalize those immutable predictions as part of v3.8; retain original synthetic regression tests above.
       - name: Preserve old PDF and execution contracts
         run: |
-          node .github/scripts/validate-jra-reader-v37.mjs
-          node .github/scripts/validate-jra-one-shot-v36.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-reader-v37.mjs
+          node .github/scripts/validate-jra-ci-forward-v312.mjs .github/scripts/validate-jra-one-shot-v36.mjs
