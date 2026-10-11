@@ -59,6 +59,7 @@ tr.ana{background:#fff7ed}tr.ana td{border-top:2px solid #d8b682}
 <p class="warn">これは発走前に封印された正式版v3.13とは異なる、3操作＋穴狙いの研究案です。
 実際の購入指示として使用しないでください。</p>
 <h2>通常最大3操作 ＋ 穴狙い1行</h2>
+<p style="font-size:8pt;color:#647082;margin:0 0 7px">馬連・三連複などは「－」／馬単・三連単などは「→」／BOXの「・」は候補馬の一覧。</p>
 <table><thead><tr><th>券種・買い方</th><th>JRA画面に指定する馬番</th><th>点数 × 単価 ＝ 金額</th></tr></thead>
 <tbody>'''+''.join(out)+'''</tbody></table>
 <div class="metrics"><b>合計：'''+yen(tot)+'''</b>（'''+str(m['command_count'])+'''操作）
