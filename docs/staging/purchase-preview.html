@@ -31,6 +31,8 @@ async function loadRace(id,name){
  if(!res.ok)throw Error(id+'の検証ファイルが未公開: HTTP '+res.status);
  const d=await res.json();const section=el('section','card'),title=el('h2','',name);
  section.append(title,el('p','report','試験モデル v3.15候補 ｜ 正式版 v3.13は変更なし'));
+ const pdflink=el('a','','A4購入指示PDF見本を開く →');pdflink.href='staging/pdfs/'+id+'-three-plus-ana.pdf';pdflink.target='_blank';pdflink.rel='noopener';pdflink.style.cssText='display:inline-block;margin:0 0 10px;font-size:12px;color:#285784';
+ section.append(pdflink);
  const table=el('table','action-table');const head=el('thead');const hrow=el('tr');
  for(const text of ['券種・買い方','指定馬番／購入操作','点数 × 単価＝金額'])hrow.append(el('th','',text));
  head.append(hrow);table.append(head);const tbody=el('tbody');const rows=[...d.regular_commands,d.ana_command];
