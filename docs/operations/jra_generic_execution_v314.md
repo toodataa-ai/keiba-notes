@@ -7,14 +7,15 @@
 ## 実行経路
 1. 「明日のJRA予想」などの依頼から `docs/data/upcoming_schedule.json` の対象日と全競馬場11Rを照合する。記録が古い場合は、実際のJRA公式番組と付き合わせ、正本の変更を別監査する。
 2. 対象1レースごとに、JRA公式出馬表のURL・競馬場・発走時刻・馬番と、**オッズを見る前に独立評価した**全頭の◎○▲△×、能力A+〜C、各馬固有の判断理由を `docs/research/` の研究ファイルに保存する。正式入力がないからと言って作業を止めず、この工程を実施する。根拠のない評価は創作しない。9評価の根拠は独立に収集する。読めない項目は未確認と表示。
-3. **競馬場×日付の固定コードを使わず**、当該レースの実データに基づいて`e2e_validation/requests/v314/<date>-<slug>.json`を新規作成する。1コミットにつき1レース。requestは`date`,`preview_path`,`race`を持つ。race必須: `slug,venue,name,race_no,start_at,race_code,official,surface,distance_m`。race_codeは市場サイト実表示から確認し、勝手に番号を算出しない。
-4. GitHub Actions の `jra-generic-one-shot-v314.yml` を **1ファイルの新規push** または既存request_pathを指定した手動実行で開始する。GitHub connectorにdispatch APIがなくても、書込み権限のあるコネクタからrequestファイル作成で開始できる。GitHub Actionsに新規起動要求を送れないという理由だけで停止しない。
-5. 汎用収集スクリプトが日付・公式番組・研究ファイルをクロスチェックし、公式JRA出馬表で馬番・馬名・斤量を照合。出走馬9〜18頭の外枠まで監査。オッズと独立したSTEP1をロック後、事前プランの8券種を展開して全オッズを取得。準備ファイル `e2e_validation/inputs/v313/*.json` を生成する。
-6. 続く**同じワークフロー内**でv3.13正式パイプラインの全てのオッズを再取得し、180秒以内の収集幅・600秒以内の古さ・個別買い目のSHA証跡を要求する。検査成功後のみGit snapshotとproof_commitを作成し、PDF/HTMLを生成、全ページ検証、GitHub反映、公開HTTPバイト照合を行う。
-7. request／研究／オリジナル取得元を記録し、個別価格証跡とともに監査可能とする。PDF/サイトの公開をActions緑表示だけで完了扱いしない。
+3. **競馬場×日付の固定コードを使わず**、当該レースの実データに基づいて`e2e_validation/requests/v314/<date>-<slug>.json`を新規作成する。1コミットにつき1レース。requestは`date`,`preview_path`,`race`を持つ。race必須: `slug,venue,name,race_no,start_at,race_code,official,surface,distance_m`。request自体に、販売開始時刻をJSTの `market_open_at` とJRA公式告知URLの `market_open_source_url` として必ず記録する。race_codeは市場サイト実表示から確認し、勝手に番号を算出しない。
+4. **販売時刻ゲート**：発走前出馬表とSTEP1は先行確認できても、該当レースの発売開始前ならその券種の実オッズは存在しない。v3.14収集は `market_open_at` より前に実オッズへ進まず、`NOT_YET_ON_SALE`（真の時間的未提供状態）と明示し、`HTTP403` やソース異常と混同しない。2026-10-12（月祝）ではGⅡスワンステークスが前日発売対象だが、Lオクトーバーステークス等の全レース通常発売は2026-10-11（日）19:30開始（JRA https://www.jra.go.jp/news/202610/100402.html）。時刻に達してから当該レースの正式価格取得→STEP2を実行し、出馬表・STEP1はオッズ取得前に評価する。到達前の実行は完了・公開と扱わず、時刻を明示して再実行する。
+5. GitHub Actions の `jra-generic-one-shot-v314.yml` を **1ファイルの新規push** または既存request_pathを指定した手動実行で開始する。GitHub connectorにdispatch APIがなくても、書込み権限のあるコネクタからrequestファイル作成で開始できる。GitHub Actionsに新規起動要求を送れないという理由だけで停止しない。
+6. 汎用収集スクリプトが日付・公式番組・研究ファイルをクロスチェックし、公式JRA出馬表で馬番・馬名・斤量を照合。出走馬9〜18頭の外枠まで監査。オッズと独立したSTEP1をロック後、事前プランの8券種を展開して全オッズを取得。準備ファイル `e2e_validation/inputs/v313/*.json` を生成する。
+7. 続く**同じワークフロー内**でv3.13正式パイプラインの全てのオッズを再取得し、180秒以内の収集幅・600秒以内の古さ・個別買い目のSHA証跡を要求する。検査成功後のみGit snapshotとproof_commitを作成し、PDF/HTMLを生成、全ページ検証、GitHub反映、公開HTTPバイト照合を行う。
+8. request／研究／オリジナル取得元を記録し、個別価格証跡とともに監査可能とする。PDF/サイトの公開をActions緑表示だけで完了扱いしない。
 
 ## 重要な外部制約（fail-closed）
-GitHub ActionsからJRA公式出馬表が **403** になる場合がある。公式出馬表HTMLを事前に合法的に取得できた場合のみ、`e2e_validation/source-evidence/`に原文を保持し、requestに`official_snapshot_path`,`official_snapshot_sha256`,`official_snapshot_captured_at`を明記する。24時間を超える証跡、HTMLとのハッシュ不一致、当日の登録馬との不一致、取得不能は**本当のblocker**として明示。公式出馬表や実オッズを推測生成して突破しない。ChatGPT側が資料を収集できた場合は、その内容で検証入力を作成する。
+GitHub ActionsからJRA公式出馬表が **403** になる事例はあり得るが、恒常的な障害だと断定しない。2026-10-11 09:11（JST）の既存v3.10実行 #38097556440 ではJRA出馬表照合と東京・京都両メインの6種類のSportnaviオッズページ取得が成功しており、同実行の失敗点は後続PDF preflightであった。2026-10-11 14:09（JST）のv3.12実行 #38113832729 では171個の買い目を11ソースで検証し公開HTTPまで成功している。**発売開始前の無オッズはHTTP403でない。**公式出馬表HTMLを事前に合法的に取得できた場合のみ、`e2e_validation/source-evidence/`に原文を保持し、requestに`official_snapshot_path`,`official_snapshot_sha256`,`official_snapshot_captured_at`を明記する。24時間を超える証跡、HTMLとのハッシュ不一致、当日の登録馬との不一致、取得不能は**本当のblocker**として明示。公式出馬表や実オッズを推測生成して突破しない。ChatGPT側が資料を収集できた場合は、その内容で検証入力を作成する。
 
 ※ v3.14は「入力の完全自律作成」ではない。STEP1の全頭独立評価と一次出典の証跡準備が必要。将来の取得方式を十分に検証するまでは誤って全自動と表現しない。
 
