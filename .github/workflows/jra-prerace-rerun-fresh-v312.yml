@@ -118,11 +118,11 @@ jobs:
           Path(sys.argv[2]).write_text(json.dumps(o,ensure_ascii=False))
           PY
           PASS=0
-          for ROWS in 14:12:14 12:10:14 10:9:14 10:8:14 10:7:14 8:5:10 6:4:8 4:3:6 2:2:4 1:1:2; do
-            IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS <<< "$ROWS"
+          for ROWS in 14:12:14:6 12:10:14:6 10:9:14:6 10:8:14:6 10:7:14:6 8:5:10:4 6:4:8:3 4:3:6:2 2:2:4:1 1:1:2:1; do
+            IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS COVER_BETS <<< "$ROWS"
             if JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
                 python3 .github/scripts/jra-render-live-v312.py /tmp/jra-v312-revision-preview.json "$REPORT" &&
-                 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction /tmp/jra-v312-revision-preview.json &&
+                 JRA_COVER_BETS_PER_TYPE="$COVER_BETS" python3 .github/scripts/jra-pdf-presentation-overlay-v1.py "$REPORT" --prediction /tmp/jra-v312-revision-preview.json &&
                 python3 -m weasyprint "$REPORT" /tmp/jra-v312-revision-preview.pdf &&
                 python3 .github/scripts/validate-jra-pdf-content-v312.py --html "$REPORT" \
                   --pdf /tmp/jra-v312-revision-preview.pdf --prediction /tmp/jra-v312-revision-preview.json; then
@@ -133,6 +133,7 @@ jobs:
           echo "JRA_SELECTED_ROWS_PER_PAGE=$SELECTED_ROWS" >> "$GITHUB_ENV"
           echo "JRA_REJECTED_ROWS_PER_PAGE=$REJECTED_ROWS" >> "$GITHUB_ENV"
            echo "JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"
+              echo "JRA_COVER_BETS_PER_TYPE=$COVER_BETS" >> "$GITHUB_ENV"
       - name: Strict start gate and immutable prereace Git snapshot
         run: |
           set -euo pipefail
