@@ -35,8 +35,8 @@ jobs:
       - name: Validate pinned prompt manifests
         run: python e2e_validation/validate_manifests.py
 
-      - name: Audit all nine JRA bet types for v3.3+ predictions
-        run: node .github/scripts/validate-bet-type-coverage.mjs
+      - name: Audit SHA-frozen v3.6 legacy and all eight JRA ticket types through v3.12
+        run: node .github/scripts/validate-bet-type-coverage-v312.mjs
 
       - name: Unit tests
         run: |
