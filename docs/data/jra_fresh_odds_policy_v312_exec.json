@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "effective_for": "v3.12 future formal JRA prestart revision executions",
+  "scope": "execution_and_market_quote_capture_only",
+  "max_quote_age_at_seal_seconds": 600,
+  "max_capture_spread_seconds": 180,
+  "refresh_all_expected_ticket_lines": true,
+  "reuse_previous_market_quotes": false,
+  "require_all_line_source_evidence_sha256": true,
+  "quote_age_at_prerace_proof_required": true,
+  "race_must_be_before_official_start": true,
+  "source_last_market_update_time_verified": false,
+  "unverified_latest_market_time_disclaimer": "Captured the newest odds the source served at HTTP request time; cannot guarantee upstream exchange/provider updated prices immediately.",
+  "budget_yen": 6000,
+  "step1_frozen": true,
+  "optimizer_v311_decision_unchanged": true,
+  "previous_prediction_proof_pdf_immutable": true,
+  "original_v312_prompt_manifest_sha_pins_unchanged": true,
+  "strict_on_missing_quote": true,
+  "workflow": ".github/workflows/jra-prerace-rerun-fresh-v312.yml",
+  "stop_on_age_expiry": true,
+  "note": "For future v3.12 JRA runs, use fresh workflow for user-requested latest odds; historic v3.12 workflow remains intact only for historical audit. The constraints-sensitive alternative search remains a separate v3.13 candidate, not silently mixed into frozen v3.12 bets."
+}
