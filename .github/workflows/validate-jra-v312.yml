@@ -39,6 +39,7 @@ jobs:
           node .github/scripts/test-jra-portfolio-v311.mjs
           node .github/scripts/test-jra-prestart-pipeline-v311.mjs
           node .github/scripts/validate-prompt-history.mjs
+          node .github/scripts/validate-jra-prompt-v312.mjs
       - name: Protect historical SHA pins and approved reader CSS
         run: |
           set -euo pipefail
