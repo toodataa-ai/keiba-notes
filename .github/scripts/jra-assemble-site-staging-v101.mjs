@@ -23,11 +23,16 @@ const sources=['2026-10-12-october-stakes','2026-10-12-swan-stakes'];
 for(const race of sources){
  const file=path.join(root,'data/three-plus-ana',race+'.json');
  const d=JSON.parse(fs.readFileSync(file,'utf8'));
- if(d.regular_commands.length>3||d.ana_command.row!==4||
-   d.summary.stake_yen>6000||d.formal_final_bets_unchanged!==true)
+ if(d.regular_commands.length>3||d.medium_command?.row!==4||d.large_command?.row!==5||
+   !d.summary||d.summary.stake_yen>6000||d.formal_final_bets_unchanged!==true)
    throw Error('staging purchase safety invariant failed: '+race);
+ for(const c of [d.medium_command,d.large_command]){
+   if(c.method==='pass'&&c.stake_yen!==0)throw Error('ineligible special candidate charged budget');
+   if(c.method!=='pass'&&c.points<1)throw Error('special candidate missing priced points');
+ }
  console.log('STAGING_CHECK',race,'regular_ops',d.regular_commands.length,
-   'ana',d.ana_command.method,'total',d.summary.stake_yen);
+   'medium',d.medium_command.method,'large',d.large_command.method,
+   'total',d.summary.stake_yen);
 }
 console.log('JRA_STAGING_PAGESET_PREPARED',sources.length);
 
