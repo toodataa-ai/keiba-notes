@@ -1,17 +1,26 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>競馬研究所｜公開履歴・旧バージョン復元</title><link rel="stylesheet" href="assets/style.css">
-<style>body{font:13px/1.7 Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;background:#f6f7f8;color:#252b34}.shell{max-width:900px;margin:0 auto;padding:24px 15px 48px}h1{font-size:22px}h2{font-size:17px}.release{background:#fff;border:1px solid #dce1e8;border-radius:10px;padding:13px;margin:12px 0}.pill{font-size:11px;padding:2px 7px;border-radius:5px;background:#f1f2f4}.sub{font-size:12px;color:#677381}.grid{display:grid;grid-template-columns:1fr auto;gap:8px}.small{font-size:12px;color:#556476;line-height:1.65}.link{color:#1d527b}.boundary{background:#fff7ef;padding:10px;border-left:3px solid #bd8852}</style></head><body><main class="shell">
-<a class="link" href="index.html">← 研究所トップ</a><h1>サイト公開履歴</h1>
-<p class="sub">画面の公開版とレース予想・結果データは独立管理しています。復元は画面ファイルだけに適用し、過去の予想や最新レース台帳を変更しません。</p>
-<div id="versions" aria-live="polite"><p>公開履歴を読み込み中…</p></div>
-<h2>リリースの運用</h2><p class="small">改修はステージングで表示とテストを確認し、明示承認後に正式版へ切り替えます。各正式公開版にはGitの不変タグを付けます。旧版への復元は別の承認リクエストでそのタグから画面を再現し、公開HTTPを照合します。</p>
-<p class="boundary small">正式な購入候補を変更する場合は、画面だけでなく別途予測モデルの版管理・新規レースでのE2E監査が必要です。未承認の検証版を実購入指示として公開しません。</p>
+<title>正式サイト公開履歴｜AI競馬予想研究所</title><link rel="stylesheet" href="assets/style.css?v=20261006-red1">
+<style>body{font:13px/1.7 "Meiryo UI",Meiryo,sans-serif;background:#f5f6f8;color:#252b34}.wrap{width:min(860px,calc(100% - 30px));margin:0 auto;padding:20px 0 40px}h1{font-size:21px;margin:15px 0}h2{font-size:16px}.release{margin:10px 0;padding:13px;background:#fff;border:1px solid #dbe1e7;border-radius:10px}.release strong{font-size:15px}.current{border-left:3px solid #b5172a}.muted{color:#687382;font-size:12px}.note{margin-top:7px}.safe{background:#fff9f1;border-left:3px solid #bd8852;padding:11px}.link{color:#22577a}</style></head><body>
+<main class="wrap"><a class="link" href="index.html">← トップページ</a><h1>正式サイトの公開履歴</h1>
+<p class="muted">実際に公開・検証済みの画面版だけを表示します。ステージングは履歴に含めません。</p>
+<div id="current" class="muted">正式版を読み込み中…</div><div id="history" aria-live="polite"></div>
+<h2>過去版に戻すとき</h2>
+<p>復元したい版を指定してください。記録されたGitの公開断面から<strong>画面のみ</strong>を復元し、現行のレース予想・結果・払戻・発走前証跡・データ更新を維持したまま、公開後に実体を照合します。</p>
+<p class="safe">例：「競馬サイトの正式画面をv1.00へ戻して」。誤操作を防ぐため、ウェブ上にワンクリックの復元ボタンは設けていません。</p>
 </main><script>
-const list=document.getElementById('versions');const el=(t,s)=>{let e=document.createElement(t);e.textContent=s;return e};
-fetch('data/jra-site-ui-history.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{
-list.textContent='';const h=el('p','現在の正式画面：'+d.current_version);h.className='sub';list.append(h);
-for(const r of [...d.versions].reverse()){const b=el('section','');b.className='release';let head=el('div',r.version+(r.version===d.current_version?'　現在公開中':'　保管済み'));head.style.fontWeight='700';b.append(head,el('div',r.description||''));b.append(el('p','タグ：'+r.tag));list.append(b)}
-if(d.events?.length){const h=el('h2','公開・復元の操作履歴');list.append(h);for(const x of [...d.events].reverse().slice(0,30)){const p=el('p',x.at+' ／ '+x.action+' ／ '+x.version);p.className='sub';list.append(p)}}
-}).catch(()=>{list.textContent='';list.append(el('div','現在の正式画面は v1.00。初回の承認済みリリース時に公開台帳が作成されます。'))});
-</script>  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
-</body></html>
+const container=document.getElementById('history'),current=document.getElementById('current');
+const make=(name,txt)=>{const e=document.createElement(name);e.textContent=txt;return e};
+fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{
+ if(!Array.isArray(d.releases)||!d.releases.length)throw Error('履歴未登録');
+ current.textContent='現在の正式公開版：v'+d.current_public_version;
+ container.textContent='';
+ for(const v of [...d.releases].reverse()){
+  const card=make('section','');card.className='release'+(v.public_version===d.current_public_version?' current':'');
+  card.append(make('strong','v'+v.public_version+(v.public_version===d.current_public_version?' ／ 現在公開中':'')));
+  const day=make('div',v.deployed_at?'公開確認：'+v.deployed_at.replace('T',' ').slice(0,16):'公開日：記録なし（既存版）');day.className='muted';card.append(day);
+  const notes=make('div',v.note||'公開版の保存断面');notes.className='note';card.append(notes);
+  const code=make('div','復元用：'+(v.rollback_branch||v.branch||v.release_id||'保存断面未登録'));code.className='muted';card.append(code);
+  container.append(card);
+ }
+}).catch(e=>{current.textContent='公開履歴の読み込みに失敗しました';container.textContent=e.message});
+</script></body></html>
