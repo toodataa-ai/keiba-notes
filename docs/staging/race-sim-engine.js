@@ -111,7 +111,11 @@ function create(data,options={}){
    const finalStretch=m.isFinalStraight?clamp(1-remaining/profile.straight_m,0,1):0;
    const finishing=finalStretch*h.lateKick;
    let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue;
-   if(h.blocked)speed-=clamp(1.2-(nearby[0]?.d-h.d||0)*.065,.30,1.2);
+   if(h.blocked){
+     const front=laneAI.nearestAhead(h,horses,h.lane);
+     const gap=front?Math.max(0,front.d-h.d):7.2;
+     speed-=clamp(1.2-gap*.065,.30,1.2);
+   }
    speed=Math.max(base*.84,speed);
    const before=h.d;
    const physical=speed*dt;
