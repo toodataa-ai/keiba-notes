@@ -1,4 +1,4 @@
-/* Staging race simulator v0.7. Adaptive full-field chase camera; moving numbers = runner locations. */
+/* Staging race simulator v0.8. Stable full-field camera and pre-race running-style source. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -57,7 +57,9 @@ function parseHorseReport(markup,entry){
   const grades=[...section.querySelectorAll('.factor-grid .grade')].map(x=>x.textContent.trim());
   const winMatch=(section.querySelector('.supplement')?.textContent||'').match(/モデル単勝確率[:：]\s*([\d.]+)%/);
   if(!winMatch)throw Error('原本の勝率情報が未確認です（'+m[1]+'番）');
-  return {number:Number(m[1]),name:m[2],mark:m[3],grade,pace_grade:grades[1]||'B',win_pct:Number(winMatch[1])};
+  const styleMeta=RaceRunnerStyle.inferFromLastRace(section.querySelector('.assessment')?.textContent||'');
+  return {number:Number(m[1]),name:m[2],mark:m[3],grade,
+    pace_grade:grades[1]||'B',win_pct:Number(winMatch[1]),style:styleMeta.style,styleMeta};
  });
  RaceSimEngine.validData({...entry,horses});
  const numbers=new Set(horses.map(h=>h.number));
