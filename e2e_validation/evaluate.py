@@ -9,6 +9,7 @@ prediction.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import subprocess
@@ -129,6 +130,53 @@ def normalize_formal_v312_for_e2e(prediction: dict) -> dict:
     return projected
 
 
+def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, prediction: dict) -> dict:
+    """Read-only Grade A bridge: pinned v3.13 STEP1 and v3.15 purchased bets."""
+    if prediction.get("purchase_strategy_version") != "v3.15":
+        return prediction
+    source_path = prediction.get("source_prediction_path")
+    source_commit = prediction.get("source_prediction_proof")
+    source_sha256 = prediction.get("source_prediction_sha256")
+    if not all(isinstance(x, str) and x for x in (source_path, source_commit, source_sha256)):
+        raise ValidationError("v3.15 missing pinned STEP1 provenance")
+    original_bytes = git_text(repo_root, publication_commit, source_path)
+    earlier_bytes = git_text(repo_root, source_commit, source_path)
+    if original_bytes != earlier_bytes or hashlib.sha256(original_bytes.encode("utf-8")).hexdigest() != source_sha256:
+        raise ValidationError("v3.15 source STEP1 differs from prestart SHA-pinned proof")
+    source = json.loads(original_bytes)
+    if source.get("prompt_version") != "v3.13" or source.get("stage") != "formal_prestart":
+        raise ValidationError("v3.15 source must be formal v3.13 STEP1")
+    if source.get("race_id") != prediction.get("source_race_id"):
+        raise ValidationError("v3.15 source race id mismatch")
+    source = normalize_formal_v312_for_e2e(source)
+    if not all(isinstance((source.get("marks") or {}).get(k), int) for k in ("win", "second", "third")):
+        raise ValidationError("v3.15 missing source STEP1 marks")
+    frozen = prediction.get("formal_bets")
+    if not isinstance(frozen, list) or not frozen or len(frozen) != prediction.get("ticket_count"):
+        raise ValidationError("v3.15 missing/incorrect sealed purchase list")
+    seen, stake, bets = set(), 0, []
+    for i, b in enumerate(frozen, 1):
+        typ, sel, cost = b.get("type"), b.get("selection"), b.get("stake_yen")
+        if not typ or not isinstance(sel, list) or not sel or not isinstance(cost, int) or cost <= 0 or cost % 100:
+            raise ValidationError("v3.15 malformed sealed ticket")
+        key = (typ, tuple(sel))
+        if key in seen:
+            raise ValidationError("v3.15 duplicate sealed ticket")
+        seen.add(key)
+        stake += cost
+        bets.append({"id": f"B{i:02d}", "type": typ, "selection": sel, "stake_yen": cost})
+    if stake != prediction.get("total_stake_yen") or stake > 6000:
+        raise ValidationError("v3.15 purchase total mismatch or over budget")
+    timestamp = prediction.get("final_bets_fixed_at")
+    if parse_dt(timestamp) < parse_dt(source["generated_at"]):
+        raise ValidationError("v3.15 purchased before sealed STEP1")
+    out = dict(source)
+    out.update({"bets": bets, "generated_at": timestamp,
+                "information_cutoff_at": timestamp, "purchase_strategy_version": "v3.15",
+                "e2e_projection_note": "Sealed prestart v3.13 STEP1 + exact v3.15 purchased bets; source SHA256 validated; no postrace edits."})
+    return out
+
+
 def load_prediction(
     repo_root: Path,
     spec: dict,
@@ -165,6 +213,9 @@ def load_prediction(
         proof["read_from_proof_commit"] = True
     else:
         prediction = read_json(repo_root / path)
+
+    if grade == "prospective_strict" and prediction.get("purchase_strategy_version") == "v3.15":
+        prediction = normalize_v315_for_e2e(repo_root, spec["proof_commit"], prediction)
 
     if prediction.get("prompt_version") != version:
         raise ValidationError(

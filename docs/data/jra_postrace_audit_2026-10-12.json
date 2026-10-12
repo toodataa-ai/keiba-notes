@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-12",
+  "observed_at": "2026-10-12T10:35:01.309Z",
+  "status": "REVIEW_EVIDENCE_COMMITTED_CI_AND_PAGES_VERIFICATION_PENDING",
+  "immutable_forecasts": true,
+  "immutable_final_bets": true,
+  "reviewed_races": [
+    "2026-10-12-october-stakes",
+    "2026-10-12-swan-stakes"
+  ],
+  "proof_publication_commits": {
+    "2026-10-12-october-stakes": "459a92146a178b6812c92a2575bb726f324fabcf",
+    "2026-10-12-swan-stakes": "5c174b4ff4c1884d67965e714fc6a1b189a20dc3"
+  },
+  "jra_official_result_urls": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604051120261012%2FBA",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604051120261012%2F98"
+  ],
+  "e2e_schema_adapter": "read-only sealed v3.15 with SHA256-pinned v3.13 STEP1",
+  "weekly_change_decision": "no_change",
+  "weekly_reason": "paired strict E2E comparison fewer than 20; no automatic A/B/C promotion",
+  "manual_approval_rules": "A/B/C retained",
+  "overfit_control": "no single-race threshold change",
+  "preserved_versions": true,
+  "preserved_inflight_e2e_comparison": true,
+  "shadow_evidence_gaps_are_separate": true,
+  "files_changed": [
+    "e2e_validation/evaluate.py",
+    "e2e_validation/results/2026-10-12-october-stakes.json",
+    "e2e_validation/cases/2026-10-12-october-stakes/case.json",
+    "e2e_validation/results/2026-10-12-swan-stakes.json",
+    "e2e_validation/cases/2026-10-12-swan-stakes/case.json",
+    "docs/data/races.json",
+    "docs/data/jra_postrace_audit_2026-10-12.json"
+  ]
+}
