@@ -381,7 +381,9 @@ jobs:
             assert.equal(simMap.hidden,true);
             assert.equal(realFigure.hidden,false);
             assert.equal(w.document.getElementById('tokyoCourseImage')
-              .getAttribute('src'),'https://upload.wikimedia.org/wikipedia/commons/8/8d/Tokyo2000c.svg');
+              .getAttribute('src'),'https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse_1.jpg');
+            assert.equal(w.document.getElementById('kyotoCourseImage')
+              .getAttribute('src'),'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg');
             assert.equal(start.disabled,false,'Start enabled after sealed source parsed');
             assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
             assert.match(w.document.getElementById('raceMeta').textContent,new RegExp(entry.distance_m));
