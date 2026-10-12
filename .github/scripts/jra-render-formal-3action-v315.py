@@ -87,6 +87,9 @@ def main():
    assert abs(page.rect.width-595.28)<1 and abs(page.rect.height-841.89)<1
    t=page.get_text()
    assert len(t)>100 and ('STEP1' in t if i>0 else '総投資額' in t)
+   if i>0:
+    assert '評価内訳' in t and '判断根拠' in t and '近走成績' in t,('PDF horse page omitted a required section',i)
+    assert not any(raw in t for raw in ('overall_grade','factor_grades','past_performances','source_url','workout_data_status')),('unformatted model data leaked into reader PDF',i)
    for block in page.get_text('dict')['blocks']:
     if 'lines' not in block:continue
     for l in block['lines']:
