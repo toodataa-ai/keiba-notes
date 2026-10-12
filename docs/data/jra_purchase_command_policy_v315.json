@@ -32,11 +32,11 @@
     "publisher": ".github/scripts/jra-promote-formal-3action-v315.py",
     "publisher_git_blob_sha": "8eb076698a30ba38f2548cc88f8cc121fc194e74",
     "renderer": ".github/scripts/jra-render-formal-3action-v315.py",
-    "renderer_git_blob_sha": "b5a0e3a7b8313861fc4cc4ac899db31e2f98c922",
+    "renderer_git_blob_sha": "c67580bd40e954cde005c3b4ef90901605102e3e",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
     "workflow_git_blob_sha": "6da41d15760039f13d105908ccce0f51db1dfff5",
     "horse_renderer_helper": ".github/scripts/jra_v315_horse_layout.py",
-    "horse_renderer_helper_git_blob_sha": "da58a9b6e00e969de8df2cc1ed43286dd92390c1"
+    "horse_renderer_helper_git_blob_sha": "ac3bfe9a50134be72588c2597b2d9c1297ff8f7c"
   },
   "currently_unautomated": "The standard v3.13 intake workflow does not itself chain v3.15. The JRA one-shot executor (human or assistant) MUST launch the second v3.15 request; no user approval is needed for a validated data-only publication. This is an execution-orchestration item, not permission to publish 60-point v3.13 as completed.",
   "immutable_prior_predictions": true,
@@ -50,8 +50,10 @@
       "no serialized internals",
       "one A4 page per horse",
       "block rather than publish when page count or content fail",
-      "A+/A/B+/B/B-/C grade-chip colors must render in extracted PDF spans"
+      "A+/A/B+/B/B-/C grade-chip colors must render in extracted PDF spans",
+      "Grade colors (A+/A/B+/B/B-/C): exact #RGB values of approved v3.13 CSS, validated both in generated HTML and PDF colored rectangle fills"
     ],
-    "approval_note": "Historical predictions, market snapshots, bets and PDFs may not be rewritten merely to stage the renderer."
+    "approval_note": "Historical predictions, market snapshots, bets and PDFs may not be rewritten merely to stage the renderer.",
+    "approved_grade_palette_source": "docs/reports/2026-10-12-october-stakes-v3.13-rerun38185599767-attempt2-v313.html"
   }
 }
