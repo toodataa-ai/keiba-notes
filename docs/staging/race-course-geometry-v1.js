@@ -128,7 +128,11 @@ function point(profile,d,lane=0){
  const p=cubic(s,t);
  // Lane zero is the inside running line. Lateral scale is illustrative,
  // but physical width in metres is applied separately in the simulator.
- const offset=(lane*2.25-7.9)*(profile.turn==='左'?1:-1);
+ // Map physical lane spacing to the JRA-reported minimum track width.
+ // Leave ~1.8m per side for a safe rail buffer. This shares the lane model's
+ // 1.65m spacing; outside horses must not be drawn beyond the turf rail.
+ const railBuffer=1.8,minWidth=Math.min(...profile.track_width_m);
+ const offset=(lane*1.65-(minWidth/2-railBuffer))*(profile.turn==='左'?1:-1);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset,tx:p.tx,ty:p.ty,segment:s,t};
 }
 function heading(profile,d,lane=0,laneVelocity=0){
