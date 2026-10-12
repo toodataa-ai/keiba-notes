@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13161f">
 <title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
 <link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="race-simulator.css?v=20261012-15">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-16">
 </head>
 <body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
@@ -40,28 +40,27 @@
   <p class="change-notice" id="changeNotice" hidden>条件を変更しました。再スタートすると、新しい条件で走行します。</p>
  </section>
 
- <section class="broadcast panel" aria-labelledby="liveTitle">
-  <div class="broadcast-top"><div><span class="live-indicator">LIVE SIMULATION</span><h2 id="liveTitle">実況ビュー</h2></div>
+ <section class="broadcast panel dual-view" aria-labelledby="liveTitle">
+  <div class="broadcast-top"><div><span class="live-indicator">LIVE SIMULATION</span><h2 id="liveTitle">実況ビュー ＋ 全体図</h2></div>
    <div class="race-distance"><span id="raceMeta">レースを準備中…</span><strong id="remaining">— m</strong></div>
   </div>
+  <div class="live-display-grid" aria-label="実況と全体図の同時表示">
+   <div class="live-picture">
   <div class="track-stage">
    <canvas id="raceCanvas" width="1000" height="470" role="img" aria-label="馬番の数字そのものが東京または京都の走路に沿って移動する実況。番号の中心が出走馬のシミュレーション位置を表します"></canvas>
    <div class="stage-top"><span id="stageCaption">発走前</span><span id="elapsed">00:00</span></div>
    <div class="stage-bottom"><span id="moment">スタートを押すとレースが始まります</span><span id="lap">0%</span></div>
   </div>
   <div class="meter"><div id="meterFill"></div></div>
-  <div class="track-tools"><span id="courseSegment">コース区間を読み込み中…</span><span id="laneStatus">内ラチ優先・進路選択中…</span><label><input id="pathToggle" type="checkbox" checked> 進路の軌跡を表示</label></div>
-  <div id="wakuLegend" class="waku-legend" role="list" aria-label="JRA 1枠から8枠の枠色一覧"></div>
- </section>
-
+   </div>
  <section class="panel course-panel course-panel-wide" aria-label="コース俯瞰図">
-   <div class="panel-head"><h2>実際のコース図・走行位置</h2><span id="courseLabel">芝・距離</span></div>
-   <label class="reference-map-switch">表示<select id="courseMapMode" aria-label="実コース図または仮想走行位置">
+   <div class="panel-head"><h2>全体図 <span class="map-sync-status">● 実況と同期</span></h2><span id="courseLabel">芝・距離</span></div>
+   <div class="map-control-row"><label class="reference-map-switch">表示<select id="courseMapMode" aria-label="実コース図または仮想走行位置">
      <option value="reference" selected>実際のコース図（標準）</option>
      <option value="sim">仮想走行位置・高低差</option>
    </select></label>
    <div class="map-view-toolbar"><button id="mapExpandBtn" type="button" aria-expanded="false" aria-label="全体コース図を全画面に拡大">⛶ 全画面で見る</button><span class="map-view-hint">余白を省いてコース部分を拡大表示。さらに拡大すると横スクロールできます。</span></div>
-   <label class="reference-scale-switch">図の大きさ<select id="referenceScale"><option value="fit" selected>コースを大きく表示（標準）</option><option value="zoom150">さらに拡大（1.5倍）</option><option value="zoom200">最大拡大（2倍）</option><option value="native">等倍表示（横スクロール）</option><option value="uncropped">元画像（余白も表示）</option></select></label>
+   <label class="reference-scale-switch">図の大きさ<select id="referenceScale"><option value="fit" selected>コースを大きく表示（標準）</option><option value="zoom150">さらに拡大（1.5倍）</option><option value="zoom200">最大拡大（2倍）</option><option value="native">等倍表示（横スクロール）</option><option value="uncropped">元画像（余白も表示）</option></select></label></div>
    <div class="reference-map-figure" id="referenceMapFigure">
      <div id="tokyoRealCourseMap" hidden>
        <div class="real-course-scroll"><div class="real-course-viewport"><div class="real-course-track"><img id="tokyoCourseImage"
@@ -81,10 +80,17 @@
    </div>
    <canvas id="courseCanvas" width="580" height="270" role="img" hidden aria-label="仮説の走行位置と高低差を示す旧シミュレーション用俯瞰図。実コース図とは別表示です。"></canvas>
    <p id="courseMapWarning" class="small-muted" hidden>配布サイトの画像に接続できませんでした。素材の元ページをご確認いただくか「仮想走行位置」に切り替えてください。</p>
+   <details class="course-reference-details"><summary>コースの説明・公式寸法・素材の利用条件</summary>
    <p class="small-muted" id="courseFeatures">JRA公式の競馬場資料に基づきコースを確認しています。</p>
    <p class="small-muted" id="courseMeasurements">コース寸法を読み込み中…</p>
    <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRAのコース公式数値と説明を確認</a> ／ 図素材は<a href="https://umapot.com/?page_id=116" target="_blank" rel="noopener noreferrer">うまぽっと（無料素材・再配布禁止）</a>を使用。コース計算座標は近似です。実画像上の馬番位置は表示専用の手動調整で、GPSや測量原本ではありません。</p>
+   </details>
   </section>
+  </div>
+  <div class="track-tools"><span id="courseSegment">コース区間を読み込み中…</span><span id="laneStatus">内ラチ優先・進路選択中…</span><label><input id="pathToggle" type="checkbox" checked> 進路の軌跡を表示</label></div>
+  <div id="wakuLegend" class="waku-legend" role="list" aria-label="JRA 1枠から8枠の枠色一覧"></div>
+ </section>
+
  <div class="bottom-grid ranking-grid">
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
@@ -110,7 +116,7 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.15 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.16 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-11"></script>
 <script src="race-lane-ai-v1.js?v=20261012-14"></script>
 <script src="race-runner-style-v1.js?v=20261012-8"></script>

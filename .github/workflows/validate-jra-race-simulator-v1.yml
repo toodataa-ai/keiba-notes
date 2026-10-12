@@ -56,7 +56,7 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.15' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.16' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.js?v=20261012-13' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
@@ -71,7 +71,7 @@ jobs:
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-1' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261012-15' in html
+          assert 'race-simulator.css?v=20261012-16' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-15' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
@@ -84,6 +84,11 @@ jobs:
           assert 'race-sim-engine.js?v=20261012-14' in html
           assert 'race-lane-ai-v1.js?v=20261012-14' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
+          assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
+          assert 'broadcast panel dual-view' in html
+          assert 'course-reference-details' in html and 'map-sync-status' in html
+          assert '.live-display-grid{display:grid;grid-template-columns:' in style
+          assert '@media(max-width:999px)' in style
           assert 'ranking-grid' in html
           assert '実際のコース図（標準）' in html
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -415,6 +420,17 @@ jobs:
             expand.click();assert.equal(expand.getAttribute('aria-expanded'),'false');
             assert.ok(!w.document.body.classList.contains('map-expanded'));
             assert.equal(simMap.hidden,true,'default course plan must NOT be our approximate curve');
+            const broadcast=w.document.querySelector('.broadcast.dual-view');
+            const split=broadcast.querySelector('.live-display-grid');
+            const livePicture=split.querySelector('.live-picture');
+            const realPanel=split.querySelector('.course-panel-wide');
+            assert.equal(livePicture.contains(w.document.getElementById('raceCanvas')),true);
+            assert.equal(realPanel.contains(realFigure),true);
+            assert.equal(livePicture.nextElementSibling,realPanel,'map must be adjacent to live picture');
+            assert.equal(broadcast.contains(realPanel),true,'integrated layout shares one live broadcast');
+            assert.equal(realPanel.closest('.broadcast'),broadcast);
+            assert.equal(realPanel.querySelector('.course-reference-details').open,false,
+              'details must stay collapsed for simultaneous viewing');
             assert.equal(realTokyo.hidden,entry.venue!=='東京');
             assert.equal(realKyoto.hidden,entry.venue!=='京都');
             mapMode.value='sim';

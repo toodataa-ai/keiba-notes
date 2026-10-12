@@ -95,3 +95,43 @@ body.map-expanded{overflow:hidden}
  .course-panel-wide.is-expanded{padding:10px}
  .map-view-hint{flex-basis:100%}
 }
+
+/* Stage v0.16: the simulcast and full track are siblings in ONE broadcast,
+   desktop split view and tightly stacked mobile view. */
+.broadcast.dual-view{overflow:hidden}
+.live-display-grid{display:grid;grid-template-columns:minmax(0,1.07fr) minmax(0,1fr);gap:0;align-items:start;background:#f7faf8}
+.live-display-grid .live-picture{min-width:0;background:#9acbdd}
+.live-display-grid .track-stage canvas{display:block;width:100%;height:auto}
+.live-display-grid .course-panel-wide{min-width:0;width:100%;margin:0;padding:10px 11px;box-shadow:none;border:0;border-left:1px solid #bacbd0;border-radius:0;background:#fbfcfb}
+.live-display-grid .course-panel-wide .panel-head{margin-bottom:4px}
+.live-display-grid .course-panel-wide .panel-head h2{font-size:13px}
+.map-sync-status{font:700 10px "Meiryo UI",Meiryo,sans-serif;color:#247453;white-space:nowrap}
+.live-display-grid .map-control-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0}
+.live-display-grid .reference-map-switch,.live-display-grid .reference-scale-switch{display:flex;gap:5px;align-items:center;justify-content:flex-start;margin:0;font-size:10px}
+.live-display-grid .reference-map-switch select,.live-display-grid .reference-scale-switch select{max-width:min(240px,100%);font-size:11px;padding:5px 7px}
+.live-display-grid .map-view-toolbar{margin:5px 0;gap:5px}
+.live-display-grid .map-view-toolbar button{padding:5px 8px;font-size:10px}
+.live-display-grid .map-view-hint{display:none}
+.live-display-grid .reference-map-figure{margin:6px 0 0;padding:3px;border:0;background:#fff}
+.live-display-grid .reference-map-figure .real-map-credit{font-size:9px;line-height:1.35;margin:3px 2px}
+.live-display-grid .reference-map-figure>.small-muted{font-size:9px;margin:5px 3px 2px}
+.live-display-grid .course-reference-details{margin:8px 1px 0}
+.live-display-grid .course-reference-details summary{font-size:10px;cursor:pointer;color:#586779}
+.live-display-grid .course-reference-details .small-muted{font-size:10px;margin:8px 0}
+.live-display-grid .course-panel-wide #courseCanvas{width:100%}
+.live-display-grid .track-stage,.live-display-grid .meter{min-width:0}
+@media(max-width:999px){
+ .live-display-grid{grid-template-columns:minmax(0,1fr)}
+ .live-display-grid .course-panel-wide{border-left:0;border-top:3px solid #293746;padding:8px 8px 10px}
+ .live-display-grid .reference-map-figure{margin:3px 0 0}
+ .live-display-grid .map-view-toolbar{margin:3px 0}
+ .live-display-grid .course-panel-wide .panel-head h2{font-size:12px}
+ .live-display-grid .map-control-row{gap:5px}
+}
+@media(max-width:499px){
+ .live-display-grid .course-panel-wide{padding:6px}
+ .live-display-grid .map-control-row{gap:6px}
+ .live-display-grid .reference-map-switch select{max-width:180px}
+ .live-display-grid .reference-scale-switch select{max-width:240px}
+ .live-display-grid .reference-map-figure>.small-muted{font-size:9px}
+}
