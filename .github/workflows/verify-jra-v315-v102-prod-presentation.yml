@@ -38,10 +38,16 @@ jobs:
             pdf=Path('docs/pdfs/'+slug+'-v315-readable-v102.pdf')
             stage=Path('docs/staging/jra-v315-20261012')
             stage_html=(stage/(short+'.html')).read_text()
-            # The visitor counter uses a different relative depth in docs/reports vs docs/staging/....
-            expected_html=stage_html.replace('<meta name="robots" content="noindex,nofollow">','').replace(
+            # Staging keeps exactly the same report, plus its unified visual badge and marker stripe.
+            expected_html=stage_html.replace(
+                '<meta name="robots" content="noindex,nofollow">','').replace(
                 'src="../../assets/visitor-counter.js','src="../assets/visitor-counter.js')
-            assert hp.read_text()==expected_html,(slug,'only robots and asset relative path may differ')
+            expected_html=expected_html.replace('<html lang="ja" data-stage="preview">','<html lang="ja">')
+            expected_html=expected_html.replace(
+                '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\\n','')
+            expected_html=expected_html.replace(
+                '<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>\\n','')
+            assert hp.read_text()==expected_html,(slug,'stage marker/robots/relative asset only')
             assert pdf.read_bytes()==(stage/(short+'.pdf')).read_bytes()
             for grade,a,b in [('A+','gAp','g-Aplus'),('A','gA','g-A'),('B+','gBp','g-Bplus'),
                               ('B','gB','g-B'),('B-','gBm','g-Bminus'),('C','gC','g-C')]:

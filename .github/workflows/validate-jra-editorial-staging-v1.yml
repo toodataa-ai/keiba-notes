@@ -67,7 +67,8 @@ jobs:
             assert not (set(sp.fragments)-sp.ids),('INVALID_FRAGMENT',name,set(sp.fragments)-sp.ids)
             assert set(op.ids).issubset(sp.ids),('ORIGINAL_SECTION_DELETED',name)
             assert all(x in sp.ids for x in new_id_list)
-            assert [x.replace('assets/','') for x in op.styles]==[x.replace('../assets/','') for x in sp.styles]
+            assert [x.replace('assets/','') for x in op.styles]==[
+                x.replace('../assets/','') for x in sp.styles if 'stage-indicator.css' not in x]
             assert [x.replace('assets/','') for x in op.scripts]==[x.replace('../assets/','') for x in sp.scripts]
             assert 'name="robots" content="noindex,nofollow"' in stage
             assert '<base href=' not in stage,('TOC_MUST_LINK_WITHIN_STAGING_PAGE',name)
