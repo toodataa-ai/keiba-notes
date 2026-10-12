@@ -153,9 +153,30 @@ def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, source_publ
         raise ValidationError("v3.15 source must be formal v3.13 STEP1")
     if source.get("race_id") != prediction.get("source_race_id"):
         raise ValidationError("v3.15 source race id mismatch")
-    source = normalize_formal_v312_for_e2e(source)
-    if not all(isinstance((source.get("marks") or {}).get(k), int) for k in ("win", "second", "third")):
-        raise ValidationError("v3.15 missing source STEP1 marks")
+    # v3.13's raw step1_ranking is in horse-number order, and some formal
+    # records do not embed all three printed marks in its rows. Never infer
+    # an ability ranking from row order or reconstruct marks postrace.
+    # Read exact top-three marks and final purchase selections from the
+    # historical registry sealed in the SAME prestart publication commit.
+    registry = json.loads(git_text(repo_root, publication_commit, "docs/data/races.json"))
+    historical = [r for r in registry.get("races", [])
+                  if r.get("id") == prediction.get("source_race_id")]
+    if len(historical) != 1:
+        raise ValidationError("v3.15 prestart canonical registry entry absent/duplicate")
+    snapshot = historical[0]
+    if (snapshot.get("status") != "predicted" or
+            snapshot.get("prompt_version") != "v3.13" or
+            snapshot.get("e2e_prediction") != prediction.get("_case_prediction_path")):
+        raise ValidationError("v3.15 prereace registry provenance mismatch")
+    marks = {}
+    for key in ("win", "second", "third"):
+        value = (snapshot.get("marks") or {}).get(key)
+        try:
+            marks[key] = int(value.split()[0])
+        except (ValueError, AttributeError, IndexError, TypeError) as exc:
+            raise ValidationError("v3.15 prestart mark missing: " + key) from exc
+    if len(set(marks.values())) != 3:
+        raise ValidationError("v3.15 duplicate prestart STEP1 marks")
     frozen = prediction.get("formal_bets")
     if not isinstance(frozen, list) or not frozen or len(frozen) != prediction.get("ticket_count"):
         raise ValidationError("v3.15 missing/incorrect sealed purchase list")
@@ -172,13 +193,20 @@ def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, source_publ
         bets.append({"id": f"B{i:02d}", "type": typ, "selection": sel, "stake_yen": cost})
     if stake != prediction.get("total_stake_yen") or stake > 6000:
         raise ValidationError("v3.15 purchase total mismatch or over budget")
+    if frozen != snapshot.get("final_bets"):
+        raise ValidationError("v3.15 purchased bets not equal prestart canonical registry")
     timestamp = prediction.get("final_bets_fixed_at")
-    if parse_dt(timestamp) < parse_dt(source["generated_at"]):
-        raise ValidationError("v3.15 purchased before sealed STEP1")
+    if timestamp != snapshot.get("final_bets_fixed_at"):
+        raise ValidationError("v3.15 seal timestamp differs from prestart canonical registry")
+    if parse_dt(timestamp) < parse_dt(snapshot["step1_fixed_at"]):
+        raise ValidationError("v3.15 purchase sealed before STEP1")
     out = dict(source)
-    out.update({"bets": bets, "generated_at": timestamp,
-                "information_cutoff_at": timestamp, "purchase_strategy_version": "v3.15",
-                "e2e_projection_note": "Sealed prestart v3.13 STEP1 + exact v3.15 purchased bets; source SHA256 validated; no postrace edits."})
+    out.update({"stage": "e2e_readonly_v315_projection", "marks": marks,
+                "bets": bets, "step1_ranking": None,
+                "generated_at": timestamp, "information_cutoff_at": timestamp,
+                "prompt_manifest": "e2e_validation/manifests/v3.13.json",
+                "purchase_strategy_version": "v3.15",
+                "e2e_projection_note": "Prestart v3.13 STEP1 source SHA256, prestart registry marks and exact sealed v3.15 purchases. No changes to historical prediction."})
     return out
 
 
@@ -220,6 +248,9 @@ def load_prediction(
         prediction = read_json(repo_root / path)
 
     if grade == "prospective_strict" and prediction.get("purchase_strategy_version") == "v3.15":
+        # This transient key exists only in evaluator memory and never alters
+        # the JSON read from the immutable prestart Git commit.
+        prediction["_case_prediction_path"] = path
         source_commit = spec.get("source_publication_proof_commit")
         if not source_commit or git_commit_time(repo_root, source_commit) > cutoff:
             raise ValidationError("v3.15 source prediction publication proof is missing or after cutoff")
