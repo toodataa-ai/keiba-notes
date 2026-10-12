@@ -87,7 +87,14 @@ jobs:
             h=hp.read_text()
             assert h.startswith('<!doctype html>') and 'overall_grade</strong>' not in h
             assert 'name="viewport"' in h
-            hp.write_text(h.replace('<head>','<head><meta name="robots" content="noindex,nofollow">',1))
+            # Keep the same non-layout stage badge/stripe as every other stage page.
+            marker='<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>'
+            h=h.replace('<html lang="ja">','<html lang="ja" data-stage="preview">',1)
+            h=h.replace('<head>','<head><meta name="robots" content="noindex,nofollow">',1)
+            h=h.replace('</head>','<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\\n</head>',1)
+            h=h.replace('<body>','<body>\\n'+marker,1)
+            assert h.count('class="staging-shell-marker"')==1
+            hp.write_text(h)
             with fitz.open(pdf) as document:
               expected=1+entry['field_size']
               assert len(document)==expected
@@ -111,7 +118,12 @@ jobs:
               f'<p>全頭診断を印順（◎→○→▲→△→×）で表示。原本・評価色・近走・根拠を維持（全{n}ページ）。</p>',
               f'<a href="{short}.html">修正後HTMLを見る</a><a href="{short}.pdf">修正後PDFを見る</a></section>'])
           page.append('<p>GitHub PR #42 の表示順修正候補。公開用の正式データを更新する操作ではありません。</p></main></body></html>')
-          (dest/'index.html').write_text(''.join(page),encoding='utf8')
+          landing=''.join(page)
+          landing=landing.replace('<html lang="ja">','<html lang="ja" data-stage="preview">',1)
+          landing=landing.replace('</head>','<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1"></head>',1)
+          landing=landing.replace('<body>','<body>'+marker,1)
+          assert landing.count('class="staging-shell-marker"')==1
+          (dest/'index.html').write_text(landing,encoding='utf8')
           assert set(x.name for x in dest.iterdir())=={'index.html','tokyo11.html','tokyo11.pdf','kyoto11.html','kyoto11.pdf'}
           print('PASS_STAGING_PREVIEW_FIVE_FILES_NO_PRODUCTION_MODIFICATIONS')
           PY
