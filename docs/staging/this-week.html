@@ -20,9 +20,51 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 <main class="wrap page-main">
 <section class="page-section"><h2 id="scheduleTitle">次回の対象レース</h2><p id="weekPeriod" class="muted"></p><div id="weekSchedule"><p class="muted">読み込み中…</p></div></section>
 
+<section class="page-section" aria-labelledby="stagingJraReportTitle" id="stagingJraReports">
+<h2 id="stagingJraReportTitle">表示改善中のAI予想（ステージング）</h2>
+<p class="muted" style="font-size:12px;margin:0 0 12px">2026年10月12日の正式予想を読みやすく整形した確認版です。STEP1の評価・印・買い目は変更していません。本番への反映は未承認です。</p>
+<div class="race-list">
+<article class="race-card">
+<div class="race-top"><div><div class="meta">2026-10-12 · 東京11R · 購入セット v3.15</div><h3>オクトーバーステークス</h3></div><span class="status">STAGING</span></div>
+<div class="actions"><a class="btn" href="staging/jra-v315-20261012/tokyo11.html">修正版の予想を見る</a><a class="btn secondary" href="staging/jra-v315-20261012/tokyo11.pdf">修正版PDF</a></div>
+</article>
+<article class="race-card">
+<div class="race-top"><div><div class="meta">2026-10-12 · 京都11R · 購入セット v3.15</div><h3>スワンステークス</h3></div><span class="status">STAGING</span></div>
+<div class="actions"><a class="btn" href="staging/jra-v315-20261012/kyoto11.html">修正版の予想を見る</a><a class="btn secondary" href="staging/jra-v315-20261012/kyoto11.pdf">修正版PDF</a></div>
+</article>
+</div>
+</section>
 <section class="page-section"><h2>公開中のAI予想</h2><div id="weekPredictions" class="race-list"><p class="muted">読み込み中…</p></div></section>
 </main>
 <script src="assets/week.js?v=20261011-v311"></script>
+<script id="staging-jra-v315-link-override">
+/* Staging-only visitor link overlay. Preserve the common latest-data updater and immutable predictions. */
+(()=>{
+ const root=document.getElementById('weekPredictions');
+ if(!root)return;
+ const reports={
+  '2026-10-12-october-stakes':'tokyo11',
+  '2026-10-12-swan-stakes':'kyoto11'
+ };
+ const rewrite=()=>{
+  for(const a of root.querySelectorAll('.race-card a[href]')){
+   const current=a.getAttribute('href')||'';
+   for(const [slug,short] of Object.entries(reports)){
+    if(!current.includes(slug))continue;
+    if(current.startsWith('reports/')&&current.endsWith('.html')){
+     a.setAttribute('href','staging/jra-v315-20261012/'+short+'.html');
+     a.textContent='AI予想詳細を見る（修正版）';
+    }else if(current.startsWith('pdfs/')&&current.endsWith('.pdf')){
+     a.setAttribute('href','staging/jra-v315-20261012/'+short+'.pdf');
+     a.textContent='修正版PDF';
+    }
+   }
+  }
+ };
+ new MutationObserver(rewrite).observe(root,{childList:true,subtree:true});
+ rewrite();
+})();
+</script>
 
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
