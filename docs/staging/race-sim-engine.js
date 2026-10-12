@@ -94,7 +94,7 @@ function create(data,options={}){
    // reduces instantaneous speed and drains a little energy, downhill can restore pace.
    // Coefficients are explicitly provisional; curvature/altitude breakpoints are estimates.
    const bendPenalty=m.bend*(.10+Math.max(0,h.lane-1)*.025);
-   const hillEffect=m.grade>0? -26*m.grade:-Math.min(.32,Math.abs(m.grade)*16);
+   const hillEffect=m.grade>0? -26*m.grade:0;
    const downhillBoost=m.grade<0? Math.min(.25,Math.abs(m.grade)*12):0;
    h.fatigue+=Math.max(0,m.grade)*dt*6;
    h.fatigue=clamp(h.fatigue,0,.22);
