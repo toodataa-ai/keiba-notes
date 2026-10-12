@@ -37,9 +37,9 @@ def line(c):
  method='見送り' if c['method']=='pass' else NAMES.get(c['method'],c['method'])
  return f"<tr><td><b>{e(c.get('type','見送り'))}</b><div class='method'>{e(method)}</div></td><td class='numbers'>{e(c['jra_input'])}</td><td>{e(str(c['points']))}点 × {yen(c['unit_stake_yen'])} ＝ <b>{yen(c['stake_yen'])}</b></td></tr>" if c['points'] else f"<tr><td>見送り</td><td>{e(c['jra_input'])}</td><td>購入なし・0円</td></tr>"
 def ticket_table(rows,heads=True):
- return '<table><colgroup><col/><col/><col/></colgroup>'+(
- '<thead><tr><th>券種・買い方</th><th>馬番／購入操作</th><th>点数 × 単価＝金額</th></tr></thead>' if heads else '')+
- '<tbody>'+''.join(line(x) for x in rows)+'</tbody></table>'
+ return ('<table><colgroup><col/><col/><col/></colgroup>'+
+         ('<thead><tr><th>券種・買い方</th><th>馬番／購入操作</th><th>点数 × 単価＝金額</th></tr></thead>' if heads else '')+
+         '<tbody>'+''.join(line(x) for x in rows)+'</tbody></table>')
 def html_report(p,source):
  ctx=p['race_context']
  title=f"{ctx['date']}　{ctx['venue']}{ctx['race_no']}R　{ctx['race_name']}"
@@ -106,7 +106,7 @@ def main():
   for i,page in enumerate(d):
    assert abs(page.rect.width-595.28)<1 and abs(page.rect.height-841.89)<1
    t=page.get_text()
-   assert len(t)>100 and 'STEP1' in t if i>0 else '総投資額' in t
+   assert len(t)>100 and ('STEP1' in t if i>0 else '総投資額' in t)
    for block in page.get_text('dict')['blocks']:
     if 'lines' not in block:continue
     for l in block['lines']:
