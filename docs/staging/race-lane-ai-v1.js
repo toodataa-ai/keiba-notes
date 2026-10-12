@@ -39,7 +39,7 @@ function laneSafe(h,horses,toLane,cfg){
 }
 function nearestAhead(h,horses,atLane=h.lane){
  return horses.filter(o=>o!==h&&!o.finished&&o.d>=h.d-.01&&
-   Math.abs(o.lane-atLane)<.83).sort((a,b)=>a.d-b.d||a.number-b.number)[0]||null;
+   Math.abs(o.lane-atLane)<.62).sort((a,b)=>a.d-b.d||a.number-b.number)[0]||null;
 }
 function plan(h,horses,cfg,courseMetrics,bias,t){
  const m=courseMetrics;
