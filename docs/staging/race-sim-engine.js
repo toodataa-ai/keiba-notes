@@ -49,7 +49,9 @@ function create(data,options={}){
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
  log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
- const base=length/54;
+ // A representative 17 m/s illustrates realistic race-duration scale
+ // (~118s for 2000m, ~82s for 1400m), NOT official lap or winner timing.
+ const base=17.0;
  function step(delta){
   if(state.finished)return state;
   const dt=clamp(Number(delta)||0,0,.16);
