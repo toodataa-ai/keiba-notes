@@ -5,7 +5,7 @@
 (function(global){
 'use strict';
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
-const LANE_METRES=1.65, HORSE_LENGTH_M=2.35;
+const LANE_METRES=1.65, HORSE_LENGTH_M=2.55;
 function config(profile){
  if(!profile||!Array.isArray(profile.track_width_m))throw Error('LANE_WIDTH_SOURCE_MISSING');
  const minWidth=Math.min(...profile.track_width_m);
