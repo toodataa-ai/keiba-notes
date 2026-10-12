@@ -1,4 +1,4 @@
-/* Stage race engine v0.18: evidence-grounded traits, contested pace. */
+/* Stage engine v0.19: immutable finish time, independent visual runoff. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -98,9 +98,11 @@ function create(data,options={}){
    surge:(rng()-.5)*.10,tempo:(rng()-.5)*.12,
    ability:traits.baseSpeed+traits.courseSpeed,paceFit:traits.paceSpeed,
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
+   displayD:0,runoffSpeed:0,
    trail:[],events:0,phase:rng()*6,lateKick:traits.kick+(rng()-.5)*.08,
    fatigue:0,effortDebt:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
+ const RUNOFF_M=32;
  const events=[];
  const loggedLandmarks=new Set();
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
@@ -109,6 +111,7 @@ function create(data,options={}){
     laneModel:'v0.6-style-early-inside',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
     finalStraightPasses:0,lastOvertakeLog:-100,
+    runoffMeters:RUNOFF_M,allCrossedAt:null,displayFinished:false,goalCamera:false,
     pacePressure:.13,pacePeak:.13,paceBand:'S',peakPaceBand:'S',
     paceContestants:0,paceEscapers:0,paceStalkers:0,paceHistory:[],lastPaceLog:'S'};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
@@ -121,6 +124,12 @@ function create(data,options={}){
   const dt=clamp(Number(delta)||0,0,.16);
   if(!dt)return state;
   state.t+=dt;
+  for(const h of horses){
+   if(!h.finished)continue;
+   const fatigued=clamp((h.displayD-length)/RUNOFF_M,0,1);
+   h.displayD=Math.min(length+RUNOFF_M,h.displayD+
+      dt*Math.max(11,h.runoffSpeed)*(.94-.16*fatigued));
+  }
   const fraction=clamp(state.leader/length,0,1);
   // Take one snapshot BEFORE any horse is advanced. Without this,
   // processing order changes the tactical contest and breaks determinism.
@@ -256,11 +265,13 @@ function create(data,options={}){
    }else if(!choice){h.blocked=false}
    h.distancePenaltyM+=safe.distance*(m.pathStretch-1);
    h.d+=safe.distance;
+   h.displayD=h.d;
    if(h.d>=length){
      h.finishTime=state.t-dt+dt*clamp((length-before)/(h.d-before),0,1);
+     h.runoffSpeed=Math.max(11,speed/m.pathStretch);
      h.d=length;
      h.finished=true;
-     log('finish',h.number+'番 '+h.name+'がゴール',h);
+     log('finish',h.number+'番 '+h.name+'がゴール板を通過',h);
      if(state.firstFinishTime===null)state.firstFinishTime=h.finishTime;
    }
    // Path and separation events are emitted above; do not duplicate every tick.
@@ -304,6 +315,7 @@ function create(data,options={}){
   }
   state.leadingNo=leaders[0].number;
   state.progress=clamp(state.leader/length,0,1);
+  state.goalCamera=state.leader>=length-125;
   state.tick++;
   if(state.tick%150===0){
     state.paceHistory.push({d:Math.round(state.leader),pressure:Number(state.pacePressure.toFixed(3)),
@@ -311,10 +323,12 @@ function create(data,options={}){
     if(state.paceHistory.length>60)state.paceHistory.shift();
   }
   if(state.tick%110===0&&!state.firstFinishTime)log('pace',Math.round(state.progress*100)+'%地点。先頭は'+state.leadingNo+'番');
-  if(horses.every(h=>h.finished) || (state.firstFinishTime!==null&&state.t>state.firstFinishTime+15)){
-    state.finished=true;
-    horses.forEach(h=>{if(!h.finished){h.finished=true;h.finishTime=state.t+(length-h.d)/base}});
-    log('summary','シミュレーション終了。着順は予測の保証ではありません');
+  if(state.allCrossedAt===null&&horses.every(h=>h.finished)){
+    state.allCrossedAt=state.t;log('finish','全馬がゴール板を通過・余走中');
+  }
+  if(horses.every(h=>h.finished&&h.displayD>=length+RUNOFF_M-1e-7)){
+    state.finished=true;state.displayFinished=true;
+    log('summary','全馬がゴールを駆け抜けました（仮想シミュレーション終了）');
   }
   return state;
  }
