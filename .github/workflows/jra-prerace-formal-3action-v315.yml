@@ -1,0 +1,151 @@
+name: JRA formal v3.15 PURCHASE 3 actions + mid/large, fully audited prestart replacement
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/v315/*.json'
+  workflow_dispatch:
+    inputs:
+      request_path:
+        required: true
+        type: string
+        description: 'Existing new v3.15 purchase-only formal request'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  purchase-only-v315:
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Validate new action estimator and historical v3.13 predictor
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/test-jra-three-command-v1.mjs
+          node .github/scripts/test-jra-ticket-notation-v1.mjs
+          node .github/scripts/test-jra-exacta-wheel-comparison-v1.mjs
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+          node --check .github/scripts/jra-build-formal-3action-v315.mjs
+          python3 -m py_compile .github/scripts/jra-render-formal-3action-v315.py .github/scripts/jra-promote-formal-3action-v315.py
+      - name: Resolve exactly one prereace purchase-only request and current verified source
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          UI_PATH: ${{ inputs.request_path }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == push ]]; then
+            mapfile -t ADD < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- e2e_validation/requests/v315)
+            [[ ${#ADD[@]} -eq 1 ]] || { echo '::error::exactly one new request required';exit 1; }
+            REQ="${ADD[0]}"
+          else REQ="$UI_PATH";fi
+          case "$REQ" in e2e_validation/requests/v315/*.json) ;; *) echo '::error::unsafe request';exit 1;; esac
+          test -f "$REQ"
+          RACE_ID=$(python3 - "$REQ" <<'PY'
+          import json,re,sys
+          o=json.load(open(sys.argv[1]))
+          rid=o['race_id']
+          assert re.fullmatch(r'2026-10-12-(october-stakes|swan-stakes)',rid)
+          assert o.get('user_authorized_max_regular_purchase_operations')==3
+          assert o.get('adopt_medium_large_if_positive_edge') is True
+          print(rid)
+          PY
+          )
+          SOURCE=$(python3 - "$RACE_ID" <<'PY'
+          import json,sys
+          races=json.load(open('docs/data/races.json'))['races']
+          a=[x for x in races if x['id']==sys.argv[1] and x['scope']=='jra-main']
+          assert len(a)==1 and a[0]['status']=='predicted'
+          assert a[0]['prompt_version']=='v3.13'
+          assert 'purchase_strategy_version' not in a[0]
+          print(a[0]['e2e_prediction'])
+          PY
+          )
+          [[ "$SOURCE" == e2e_validation/predictions/"$RACE_ID"/*.json && -f "$SOURCE" ]] ||
+            { echo '::error::Verified existing source prediction absent';exit 1; }
+          LABEL="v3.15-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
+          SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
+          PREDICTION="e2e_validation/predictions/$RACE_ID/$LABEL-sealed.json"
+          REPORT="docs/reports/$RACE_ID-$LABEL-v315.html"
+          PDF="docs/pdfs/$RACE_ID-$LABEL-v315.pdf"
+          MANIFEST="docs/data/jra-v315-revision-manifest-$RACE_ID-$LABEL.json"
+          for f in "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST";do
+            [[ ! -e "$f" ]] || { echo "::error::immutable output collision";exit 1; }
+          done
+          for k in RACE_ID SOURCE LABEL SNAPSHOT PREDICTION REPORT PDF MANIFEST;do echo "$k=${!k}" >> "$GITHUB_ENV";done
+      - name: Generate actual grouped purchased lines from fresh sealed original (hard 10-minute odds gate)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-build-formal-3action-v315.mjs --source "$SOURCE" --output "$SNAPSHOT"
+      - name: Create immutable pending purchase proof before generating final formal artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$SNAPSHOT"
+          test "$(git diff --cached --name-only)" = "$SNAPSHOT"
+          git commit -m "Freeze price-audited v3.15 3+2 action purchase recommendation before JRA race"
+          git push origin HEAD:main
+          echo "PROOF=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Seal against actual Git snapshot, render full per-horse A4, replace only current pointer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 - "$SNAPSHOT" "$PREDICTION" "$PROOF" <<'PY'
+          import json,sys
+          from datetime import datetime,timezone
+          from pathlib import Path
+          a,b,proof=sys.argv[1:]
+          p=json.loads(Path(a).read_text())
+          assert p['status']=='pending_git_proof' and p['proof_commit'] is None
+          assert datetime.now(timezone.utc)<datetime.fromisoformat(p['race_context']['start_at'])
+          p['status']='formal_prestart';p['proof_commit']=proof
+          Path(b).parent.mkdir(parents=True,exist_ok=True)
+          Path(b).write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+          PY
+          python3 .github/scripts/jra-render-formal-3action-v315.py \
+            --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          python3 .github/scripts/jra-promote-formal-3action-v315.py \
+            "$PREDICTION" "$SOURCE" "$REPORT" "$PDF" "$MANIFEST"
+      - name: Commit only approved data artifacts, current pointer and immutable audit journal
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST" docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import os,subprocess
+          expected=set(os.environ[x] for x in ('PREDICTION','REPORT','PDF','MANIFEST'))|{'docs/data/races.json','docs/data/jra_publication_revision_log.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert expected==actual,('no UI changes or partial canonical replacements allowed',expected^actual)
+          PY
+          git commit -m "Publish official JRA v3.15 purchase-only three actions + medium/large with full A4 and immutable proof"
+          git push origin HEAD:main
+      - name: Verify public current record, regenerated HTML, PDF and full audit journal byte equality
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 32);do
+            ok=1
+            for f in docs/data/races.json docs/data/jra_publication_revision_log.json "$MANIFEST" "$REPORT" "$PDF";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra-v315-public ||
+                 ! cmp -s "$f" /tmp/jra-v315-public;then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]];then echo "PASS_FORMAL_THREE_PURCHASE_COMMANDS_PUBLIC_VERIFIED $RACE_ID $LABEL";exit 0;fi
+            sleep 12
+          done
+          echo '::error::Published report and actual public HTTP did not match';exit 1
