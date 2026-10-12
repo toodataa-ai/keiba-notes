@@ -35,11 +35,25 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Historical 83-SHA proof and official v3.13 pointer
+      - name: Verify current E2E CI supersession and immutable historical evidence
         run: |
-          node .github/scripts/validate-jra-prompt-v312.mjs
-          node .github/scripts/validate-jra-prompt-v313.mjs
-          node .github/scripts/validate-prompt-history.mjs
+          python e2e_validation/validate_manifests.py
+          python e2e_validation/validate_experience_history_v312.py
+      - name: Historical 83-SHA proof at immutable original v3.13 release snapshot
+        run: |
+          set -euo pipefail
+          SNAPSHOT=34a4d82683e2e7115538d70d463b46f22f68277e
+          test "$(git rev-parse "$SNAPSHOT:docs/data/jra_v313_historical_adapter_v1.json")" = 7a4488d1d6e0ad1354890c7c7881216ff9f17a9b
+          test "$(git rev-parse "$SNAPSHOT:e2e_validation/validate_manifests.py")" = 12feea5ae57f6c0a338a492a40b82de2ee0fd1f6
+          mkdir -p "$RUNNER_TEMP/jra-v313-audit"
+          git worktree add --detach "$RUNNER_TEMP/jra-v313-audit/release" "$SNAPSHOT"
+          (
+            cd "$RUNNER_TEMP/jra-v313-audit/release"
+            node .github/scripts/validate-jra-prompt-v312.mjs
+            node .github/scripts/validate-jra-prompt-v313.mjs
+            node .github/scripts/validate-prompt-history.mjs
+          )
+          echo 'JRA_V313_HISTORICAL_83_SHA_GUARD_PASS: immutable historic release validated, current CI checked separately'
       - name: Full STEP2 real prereace and synthetic investment comparison
         run: |
           node .github/scripts/test-jra-win-recovery-stake-shadow-v1.mjs
