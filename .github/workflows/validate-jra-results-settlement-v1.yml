@@ -20,7 +20,7 @@ permissions:
 jobs:
   settlement-staging:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Check JRA outcome matching and historic settlement regressions
@@ -35,3 +35,26 @@ jobs:
           grep -q 'assets/results.js?v=' docs/results.html
           test -f docs/data/races.json
           echo PASS_JRA_PREVIEW_ISOLATION
+      - name: Verify actual published staging HTML and JavaScript bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://toodataa-ai.github.io/keiba-notes
+          # Pages deployment is asynchronous to push validation.
+          for attempt in $(seq 1 45); do
+            ok=1
+            for file in staging/results.html staging/assets/results.js; do
+              if ! curl -fLsS --max-time 15 "$base/$file" -o /tmp/jra-staging-results-http ||
+                 ! cmp -s "docs/$file" /tmp/jra-staging-results-http; then
+                ok=0
+                break
+              fi
+            done
+            if [[ "$ok" == 1 ]]; then
+              echo PASS_JRA_STAGING_RESULTS_HTTP_BYTES
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Staging results deployment is not yet byte-identical to the approved GitHub preview'
+          exit 1
