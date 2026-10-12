@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13161f">
 <title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
 <link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="race-simulator.css?v=20261012-9">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-13">
 </head>
 <body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
@@ -61,28 +61,29 @@
      <option value="reference" selected>実際のコース図（標準）</option>
      <option value="sim">仮想走行位置・高低差</option>
    </select></label>
+   <label class="reference-scale-switch">図の大きさ<select id="referenceScale"><option value="fit" selected>全体表示</option><option value="native">等倍表示（横スクロール）</option></select></label>
    <div class="reference-map-figure" id="referenceMapFigure">
      <div id="tokyoRealCourseMap" hidden>
-       <img id="tokyoCourseImage"
+       <div class="real-course-track"><img id="tokyoCourseImage"
          src="https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse_1.jpg"
          width="620" height="430" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-         alt="うまぽっと公開の東京競馬場・主要コース図。実際の走路と芝2000mのスタート位置を含む図。">
+         alt="うまぽっと公開の東京競馬場・主要コース図。実際の走路と芝2000mのスタート位置を含む図。"><canvas id="tokyoCourseOverlay" class="real-course-overlay" width="620" height="430" role="img" aria-label="うまぽっとの実コース図の上を仮想馬番が移動"></canvas></div>
        <p class="real-map-credit">コース図：<a href="https://umapot.com/?p=13273" target="_blank" rel="noopener noreferrer">うまぽっと「東京競馬場コース素材」</a>。フリー素材を図として表示しています。</p>
      </div>
      <div id="kyotoRealCourseMap" hidden>
-       <img id="kyotoCourseImage"
+       <div class="real-course-track"><img id="kyotoCourseImage"
          src="https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg"
          width="620" height="430" loading="lazy" decoding="async" referrerpolicy="no-referrer"
-         alt="うまぽっと公開の京都競馬場・主要コース図。芝内回りと外回り、および芝1400m外回りのスタート位置を含む図。">
+         alt="うまぽっと公開の京都競馬場・主要コース図。芝内回りと外回り、および芝1400m外回りのスタート位置を含む図。"><canvas id="kyotoCourseOverlay" class="real-course-overlay" width="620" height="430" role="img" aria-label="うまぽっとの実コース図の上を仮想馬番が移動"></canvas></div>
        <p class="real-map-credit">コース図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと「京都競馬場コース素材」</a>。フリー素材を図として表示しています。</p>
      </div>
-     <p class="small-muted">うまぽっとの公開画像を直接表示しています。<strong>馬番はこの素材画像にまだ位置合わせしていません。</strong>馬番の走行は上の実況ビュー、または「仮想走行位置」で確認できます。</p>
+     <p class="small-muted">うまぽっとのコース図の上を全頭の馬番が移動します。<strong>馬番の位置はコース図への手動の近似位置合わせ</strong>で、GPSやレース映像からの実測ではありません。</p>
    </div>
    <canvas id="courseCanvas" width="580" height="270" role="img" hidden aria-label="仮説の走行位置と高低差を示す旧シミュレーション用俯瞰図。実コース図とは別表示です。"></canvas>
    <p id="courseMapWarning" class="small-muted" hidden>配布サイトの画像に接続できませんでした。素材の元ページをご確認いただくか「仮想走行位置」に切り替えてください。</p>
    <p class="small-muted" id="courseFeatures">JRA公式の競馬場資料に基づきコースを確認しています。</p>
    <p class="small-muted" id="courseMeasurements">コース寸法を読み込み中…</p>
-   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRAのコース公式数値と説明を確認</a> ／ 図素材は<a href="https://umapot.com/?page_id=116" target="_blank" rel="noopener noreferrer">うまぽっと（無料素材・再配布禁止）</a>を使用。既存の走行計算・仮想俯瞰図の曲線は測量図ではない近似で、素材画像とはまだ位置合わせしていません。</p>
+   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRAのコース公式数値と説明を確認</a> ／ 図素材は<a href="https://umapot.com/?page_id=116" target="_blank" rel="noopener noreferrer">うまぽっと（無料素材・再配布禁止）</a>を使用。コース計算座標は近似です。実画像上の馬番位置は表示専用の手動調整で、GPSや測量原本ではありません。</p>
   </section>
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
@@ -107,12 +108,13 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.12 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.13 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-11"></script>
 <script src="race-lane-ai-v1.js?v=20261012-8"></script>
 <script src="race-runner-style-v1.js?v=20261012-8"></script>
+<script src="race-umapot-overlay-v1.js?v=20261012-1"></script>
 <script src="race-sim-engine.js?v=20261012-8"></script>
-<script src="race-simulator.js?v=20261012-12"></script>
+<script src="race-simulator.js?v=20261012-13"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>

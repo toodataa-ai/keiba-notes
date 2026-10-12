@@ -521,6 +521,7 @@ function drawRace(){
    String(visibleNumbers.length)+' / '+String(state.horses.length)+'頭 表示中',788,55);
  ctx.textAlign='start';
  drawCourse();
+ if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,ui.path.checked,RaceSimNumbers.marker);
 }
 /* DISPLAY-ONLY course-plan aspect correction. Tokyo's hand-fitted
    schematic has an overly flat north/south extent relative to the JRA
