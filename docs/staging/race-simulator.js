@@ -3,7 +3,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const ui={
- race:$('raceSelect'),pace:$('paceSelect'),bias:$('biasSelect'),seed:$('seedInput'),
+ camera:$('cameraSelect'),race:$('raceSelect'),pace:$('paceSelect'),bias:$('biasSelect'),seed:$('seedInput'),
  speed:$('speedSelect'),start:$('startBtn'),pause:$('pauseBtn'),
  restart:$('restartBtn'),newSeed:$('newSeedBtn'),path:$('pathToggle'),
  focus:$('focusSelect'),change:$('changeNotice'),
@@ -210,72 +210,155 @@ function horseSprite(ctx,x,y,h,time,selected){
  }
  ctx.restore();
 }
+/* v0.3: north-up course camera. Every runner points along the actual
+   Bezier tangent, plus small yaw when changing lanes. Former fixed right-
+   facing side sprite is retained only for historical v0.2 compatibility. */
+function traceCommands(ctx,parts){
+ ctx.beginPath();
+ for(const op of parts){
+  if(op[0]==='M')ctx.moveTo(op[1],op[2]);
+  else if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
+ }
+}
+function traceRace(ctx,course){
+ ctx.beginPath();ctx.moveTo(...course.segments[0].p0);
+ for(const segment of course.segments){
+  ctx.bezierCurveTo(...segment.p1,...segment.p2,...segment.p3);
+ }
+}
+function strokePath(ctx,width,color){
+ ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';
+ ctx.lineJoin='round';ctx.stroke();
+}
+function drawTopHorse(ctx,horse,world,angle,zoom,simTime,selected){
+ // Keep the sprites readable even as the camera zooms between overview
+ // and tracking modes. Body forward is local +x, rotation is the actual
+ // race heading at this d, not a fixed screen-right gallop.
+ const scale=(zoom>2?.88:.49)/zoom;
+ ctx.save();
+ ctx.translate(world.x,world.y);
+ ctx.rotate(angle);
+ ctx.scale(scale,scale);
+ const gait=Math.sin(simTime*15+horse.phase);
+ const coat=baseColor[(horse.number-1)%baseColor.length];
+ ctx.fillStyle='rgba(6,18,10,.26)';
+ ctx.beginPath();ctx.ellipse(0,4,17,9,0,0,2*Math.PI);ctx.fill();
+ if(selected){ctx.strokeStyle='#fcecb8';ctx.lineWidth=2.2;
+   ctx.strokeRect(-23,-16,49,33);}
+ // Four galloping legs, changing silhouette with the replay clock.
+ const wig=gait*4;
+ rect(ctx,-9,-9+wig*.32,5,6,'#503b32');
+ rect(ctx,-9,4-wig*.32,5,6,'#503b32');
+ rect(ctx,7,-11-wig*.32,5,7,'#594538');
+ rect(ctx,7,4+wig*.32,5,7,'#594538');
+ // Body, tail, neck, muzzle and ears form a readable top-down horse.
+ rect(ctx,-14,-6,25,12,'#806047');
+ rect(ctx,-18,-4,8,7,'#4a3228');
+ rect(ctx,7,-4,11,9,'#8e7057');
+ rect(ctx,16,-4,10,8,'#a58a67');
+ rect(ctx,23,-3,4,2,'#302a27');
+ rect(ctx,16,-9,3,6,'#51392f');
+ rect(ctx,16,5,3,5,'#51392f');
+ // Saddle cloth is the same identifying color as the standings.
+ rect(ctx,-8,-7,13,14,coat);
+ rect(ctx,-4,-6,7,12,'#f7f4e9');
+ // Rider and helmet; horse heads towards +x before course rotation.
+ ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(-2,0,5.4,5,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#f4d8b2';ctx.beginPath();ctx.arc(2,0,2.4,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#202c38';ctx.beginPath();ctx.arc(3,0,2.7,0,Math.PI*2);ctx.fill();
+ ctx.restore();
+}
 function drawRace(){
  if(!sim||!race){drawIdle('出走馬の原本を確認中…');return}
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
- const w=1000,h=470,s=sim.state,hs=s.horses;
+ const w=1000,h=470,state=sim.state,profile=RaceCourseGeometry.get(race.course_id);
+ if(!profile)return;
+ const mode=ui.camera?.value==='overview'?'overview':'follow';
+ const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
+       state.horses.find(x=>String(x.number)===ui.focus.value);
+ const target=focus||state.horses[0];
+ const current=RaceCourseGeometry.point(profile,target.d,target.lane);
+ const zoom=mode==='overview'?1.72:3.36;
+ const origin=mode==='overview'?{x:306,y:119}:current;
  ctx.clearRect(0,0,w,h);
- rect(ctx,0,0,w,112,'#81b9d2');
- for(let i=0;i<8;i++){
-  rect(ctx,0,i*12,w,2,i%2?'#8bc8e0':'#78acc7');
+ // World camera stays north-up. As horses travel the curved course,
+ // head/torso visibly rotate in the world coordinate system.
+ rect(ctx,0,0,w,h,'#315b40');
+ ctx.save();
+ ctx.translate(w*.50,h*.52);
+ ctx.scale(zoom,zoom);
+ ctx.translate(-origin.x,-origin.y);
+ ctx.fillStyle='#345f41';ctx.fillRect(-600,-600,1800,1500);
+ for(let k=0;k<80;k++){
+   const x=(k*149)%860-110,y=(k*41)%370-74;
+   rect(ctx,x,y,24,3,k%2?'#3b6c48':'#2e573d');
  }
- // Distant low-res silhouette grandstand.
- for(let i=0;i<25;i++){
-  const x=i*44-20;
-  rect(ctx,x,65+(i%3)*4,40,46,'#526b73');
-  rect(ctx,x+5,72+(i%3)*4,29,3,'#9daeb3');
-  for(let k=0;k<4;k++)rect(ctx,x+5+k*7,83,4,3,k%2?'#d4cfb0':'#c37868');
+ // Off-route racetrack remains visible but muted.
+ traceCommands(ctx,profile.background);strokePath(ctx,44,'#2a4233');
+ traceCommands(ctx,profile.background);strokePath(ctx,38,'#738a65');
+ traceCommands(ctx,profile.background);strokePath(ctx,32,'#63884c');
+ if(profile.inner_turn){
+   traceCommands(ctx,profile.inner_turn);strokePath(ctx,33,'#2a4233');
+   traceCommands(ctx,profile.inner_turn);strokePath(ctx,27,'#73925d');
  }
- rect(ctx,0,111,w,8,'#d8ece5');rect(ctx,0,119,w,15,'#829c69');
- rect(ctx,0,134,w,306,'#4e8d48');
- const laneTop=150,laneGap=35;
- for(let i=0;i<8;i++){
-   rect(ctx,0,laneTop+i*laneGap,w,laneGap,i%2===0?'#56974d':'#5a9c52');
-   for(let k=0;k<40;k++) {
-     const scroll=Math.floor(s.leader*3)%42;
-     rect(ctx,k*42-scroll+(i%2)*14,laneTop+i*laneGap+27,13,1,'#7db46e');
+ if(profile.branch){
+   traceCommands(ctx,profile.branch);strokePath(ctx,35,'#2a4233');
+   traceCommands(ctx,profile.branch);strokePath(ctx,29,'#648c59');
+ }
+ // Race-specific running route with clear inner and outer rails.
+ traceRace(ctx,profile);strokePath(ctx,41,'#274832');
+ traceRace(ctx,profile);strokePath(ctx,35,'#d9d7b7');
+ traceRace(ctx,profile);strokePath(ctx,31,'#87af65');
+ traceRace(ctx,profile);strokePath(ctx,27,'#75a85f');
+ traceRace(ctx,profile);strokePath(ctx,1.2,'rgba(234,249,208,.5)');
+ // Distance markings use the shared physical race d-axis.
+ const marks=[0,profile.distance_m-profile.straight_m,profile.distance_m-400,profile.distance_m-200,profile.distance_m];
+ for(const d of marks){
+   if(d<0||d>profile.distance_m)continue;
+   const q=RaceCourseGeometry.point(profile,d,0);
+   ctx.fillStyle=d===profile.distance_m?'#faf2b8':'#e8f5d4';
+   ctx.beginPath();ctx.arc(q.x,q.y,2.8,0,Math.PI*2);ctx.fill();
+ }
+ if(ui.path.checked){
+   for(const horse of state.horses){
+     const important=horse.number===state.leadingNo||horse===target||horse.mark==='◎';
+     if(!important)continue;
+     const pts=horse.trail;
+     if(!pts.length)continue;
+     ctx.beginPath();
+     pts.forEach((q,i)=>{
+       const p=RaceCourseGeometry.point(profile,q.d,q.lane);
+       if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+     });
+     strokePath(ctx,horse===target?1.75:1.2,horse===target?'#fff0ad':'#f0e6c3');
    }
  }
- for(let i=0;i<9;i++)rect(ctx,0,laneTop+i*laneGap,w,2,'rgba(255,255,255,.15)');
- // Shadowed track rail.
- rect(ctx,0,144,w,4,'#ecf2df');rect(ctx,0,148,w,3,'#7b8885');
- rect(ctx,0,434,w,5,'#eef0e8');rect(ctx,0,440,w,30,'#385e32');
- const lead=Math.max(0,s.leader);
- const anchor=Math.max(0,lead-98);
- const xAt=d=>140+(d-anchor)*5.15;
- const finishX=xAt(race.distance_m);
- if(finishX>=-12&&finishX<w+45){
-   rect(ctx,finishX-5,137,12,305,'#f4f4eb');
-   for(let i=0;i<36;i++)for(let j=0;j<2;j++)rect(ctx,finishX-5+j*6,142+i*8,6,8,(i+j)%2===0?'#1c2534':'#f2f2ee');
+ // Correct overlap ordering is part of the broadcast effect: a selected
+ // horse renders last, over the back marker of other horses when clustered.
+ const group=state.horses.slice().sort((a,b)=>a.d-b.d||a.lane-b.lane);
+ group.sort((a,b)=>(a===target?1:0)-(b===target?1:0)||a.d-b.d||a.number-b.number);
+ for(const horse of group){
+   const pos=RaceCourseGeometry.point(profile,horse.d,horse.lane);
+   const angle=RaceCourseGeometry.heading(profile,horse.d,horse.lane,horse.laneVelocity);
+   drawTopHorse(ctx,horse,pos,angle,zoom,state.t,horse===target);
  }
- for(const d of [400,200,100,0]){
-   const x=xAt(race.distance_m-d);
-   if(x>0&&x<w){rect(ctx,x,128,3,14,'#fcfafa');ctx.fillStyle='#202932';ctx.font='bold 12px monospace';ctx.fillText(d===0?'GOAL':d+'m',x+7,136)}
+ // Label leader & focus without rotating the Japanese names with horse bodies.
+ for(const horse of [state.horses.find(x=>x.number===state.leadingNo),target]){
+   if(!horse)continue;
+   const p=RaceCourseGeometry.point(profile,horse.d,horse.lane);
+   ctx.font='bold 8px Meiryo';ctx.textAlign='left';ctx.lineWidth=2.5;
+   const label=horse.mark+' '+horse.number+' '+horse.name;
+   ctx.strokeStyle='rgba(12,27,19,.9)';ctx.strokeText(label,p.x+8,p.y-8);
+   ctx.fillStyle='#fff7d8';ctx.fillText(label,p.x+8,p.y-8);
  }
- const focused=ui.focus.value==='leader'?null:hs.find(x=>String(x.number)===ui.focus.value);
- const sorted=hs.slice().sort((a,b)=>a.lane-b.lane||a.d-b.d);
- if(ui.path.checked){
-  for(const horse of hs){
-    if(focused&&horse!==focused && horse.number!==s.leadingNo)continue;
-    if(!focused&&horse.number!==s.leadingNo&&horse.mark!=='◎'&&horse.mark!=='○')continue;
-    ctx.beginPath();ctx.strokeStyle=horse===focused?'rgba(255,226,120,.9)':'rgba(243,250,249,.60)';
-    ctx.lineWidth=2;
-    horse.trail.forEach((pos,i)=>{const x=xAt(pos.d),y=laneTop+17+pos.lane*laneGap;
-      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});
-    ctx.stroke();
-  }
- }
- for(const horse of sorted){
-    const x=xAt(horse.d);
-    if(x<-80||x>w+80)continue;
-    const y=laneTop+12+horse.lane*laneGap;
-    horseSprite(ctx,x,y,horse,s.t,horse===focused);
- }
- // Stylized broadcast overlays.
- rect(ctx,13,33,216,32,'rgba(15,23,34,.78)');
- ctx.font='bold 16px Meiryo';ctx.textAlign='left';ctx.fillStyle='#fff';ctx.fillText(race.venue+' '+race.surface+race.distance_m+'m',24,55);
- rect(ctx,790,33,192,32,'rgba(15,23,34,.78)');
- ctx.font='bold 13px Meiryo';ctx.fillStyle='#ffe6a8';ctx.fillText(s.finished?'PHOTO FINISH':'仮想レース実況',811,55);
+ ctx.restore();
+ // Television overlays are static on screen, not rotated with the course.
+ rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
+ ctx.font='bold 17px Meiryo';ctx.textAlign='left';ctx.fillStyle='#f7f6ee';
+ ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':'馬群を追走'),23,56);
+ rect(ctx,773,34,213,33,'rgba(13,27,28,.84)');
+ ctx.font='bold 13px Meiryo';ctx.fillStyle='#f1e3b0';
+ ctx.fillText(state.finished?'PHOTO FINISH':'実際の走路方向に旋回',788,55);
  ctx.textAlign='start';
  drawCourse();
 }
@@ -415,6 +498,7 @@ ui.newSeed.addEventListener('click',()=>{
  reset(true);
 });
 ui.focus.addEventListener('change',render);
+if(ui.camera)ui.camera.addEventListener('change',render);
 ui.path.addEventListener('change',render);
 ui.speed.addEventListener('change',render);
 window.addEventListener('pagehide',()=>{running=false;cancelAnimationFrame(frameId)});
