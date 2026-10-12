@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="theme-color" content="#13161f">
+<title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
+<link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-1">
+</head>
+<body>
+<div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
+<header class="site-header">
+ <div class="shell header-line">
+  <a href="this-week.html" class="back">← 今週のAI予想に戻る</a>
+  <span class="edition">RACING LAB / EXPERIMENT 01</span>
+ </div>
+ <div class="shell heading">
+  <div><div class="eyebrow">HYPOTHETICAL RACE ANIMATION</div><h1>レースシミュレータ</h1>
+  <p class="subtitle">実際の出走馬を、仮想の馬群・進路・展開で走らせる。レトロな実況画面で展開を比較。</p></div>
+  <div class="demo-stamp"><span>SCENARIO</span><strong>SIM</strong><small>JRA正式予想とは別</small></div>
+ </div>
+</header>
+<main class="shell">
+ <section class="toolbar panel" aria-label="シミュレーションの条件">
+  <div class="control-grid">
+   <label>対象レース<select id="raceSelect" aria-label="対象レースを選ぶ"><option>読み込み中…</option></select></label>
+   <label>想定ペース<select id="paceSelect"><option value="S">スロー（S）</option><option value="M" selected>平均（M）</option><option value="H">ハイ（H）</option></select></label>
+   <label>進路バイアス<select id="biasSelect"><option value="inner">内有利</option><option value="neutral" selected>フラット</option><option value="outer">外有利</option></select></label>
+   <label>再現番号（乱数シード）<input id="seedInput" type="number" min="1" max="999999" step="1" value="2026" inputmode="numeric"></label>
+  </div>
+  <div class="controls">
+   <button id="startBtn" type="button" class="primary">▶ レーススタート</button>
+   <button id="pauseBtn" type="button" disabled>一時停止</button>
+   <button id="restartBtn" type="button">同条件でもう一度</button>
+   <button id="newSeedBtn" type="button">別展開を試す</button>
+   <label class="speed-label">再生速度<select id="speedSelect"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="4">4倍</option></select></label>
+  </div>
+  <p class="change-notice" id="changeNotice" hidden>条件を変更しました。再スタートすると、新しい条件で走行します。</p>
+ </section>
+
+ <section class="broadcast panel" aria-labelledby="liveTitle">
+  <div class="broadcast-top"><div><span class="live-indicator">LIVE SIMULATION</span><h2 id="liveTitle">実況ビュー</h2></div>
+   <div class="race-distance"><span id="raceMeta">レースを準備中…</span><strong id="remaining">— m</strong></div>
+  </div>
+  <div class="track-stage">
+   <canvas id="raceCanvas" width="1000" height="470" role="img" aria-label="走行中の馬群。馬番・進路・先頭位置をアニメーション表示"></canvas>
+   <div class="stage-top"><span id="stageCaption">発走前</span><span id="elapsed">00:00</span></div>
+   <div class="stage-bottom"><span id="moment">スタートを押すとレースが始まります</span><span id="lap">0%</span></div>
+  </div>
+  <div class="meter"><div id="meterFill"></div></div>
+  <div class="track-tools"><span>馬群の位置・左右の進路は**仮説**に基づく演出です。</span><label><input id="pathToggle" type="checkbox" checked> 進路の軌跡を表示</label></div>
+ </section>
+
+ <div class="bottom-grid">
+  <section class="panel course-panel" aria-label="コース俯瞰図">
+   <div class="panel-head"><h2>コース俯瞰図</h2><span id="courseLabel">芝・距離</span></div>
+   <canvas id="courseCanvas" width="580" height="186" role="img" aria-label="仮想周回路上の全出走馬の位置"></canvas>
+   <p class="small-muted">芝コースの概略図です。実際のコース形状・高低差・走行軌跡を再現した地図ではありません。</p>
+  </section>
+  <section class="panel standings-panel" aria-labelledby="rankTitle">
+   <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
+   <div id="standings" class="standings" aria-live="off"><p class="small-muted">出走馬を読み込んでいます。</p></div>
+  </section>
+ </div>
+ <section class="panel race-events" aria-labelledby="eventTitle">
+  <div class="panel-head"><h2 id="eventTitle">展開ログ</h2><span class="muted-label">進路取り・詰まり・追い上げ</span></div>
+  <ol id="raceEvents"><li>レースの準備をしています。</li></ol>
+ </section>
+ <section class="notes panel">
+  <h2>このシミュレーションで分かること・分からないこと</h2>
+  <p>出走馬名・馬番・印・STEP1の評価（未校正の勝率を含む）は、既に保存済みの予想レポートから読み取ります。仮想エンジンが馬群の位置取り、進路変更、前が詰まる状況、ペースの変化、直線の追い上げを計算します。</p>
+  <p><strong>ここでの到達順は公式予想やレース結果ではありません。</strong>過去の実際の通過順、騎手の指示、実測ラップ、進路の映像データは使っていません。脚質・初期位置やコース形状は演出用の仮定です。同じシード・設定なら再現可能ですが、現段階で統計的な勝率評価や買い目の変更には利用しません。</p>
+  <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
+ </section>
+</main>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.1 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<script src="race-sim-engine.js?v=20261012-1"></script>
+<script src="race-simulator.js?v=20261012-1"></script>
+</body>
+</html>
