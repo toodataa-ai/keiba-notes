@@ -490,6 +490,32 @@ function drawRace(){
  ctx.textAlign='start';
  drawCourse();
 }
+/* DISPLAY-ONLY course-plan aspect correction. Tokyo's hand-fitted
+   schematic has an overly flat north/south extent relative to the JRA
+   flat plan. Apply a slight 16% Y-axis expansion around its center.
+   This must NEVER alter RaceCourseGeometry.point() or physics metres.
+   Kyoto's map is left IDENTICAL. */
+const COURSE_PLAN_Y=Object.freeze({tokyo_turf_2000:1.16});
+function planPoint(profile,p){
+ const ratio=COURSE_PLAN_Y[profile?.id]||1;
+ return {x:p.x,y:112+(p.y-112)*ratio};
+}
+function planCoordinates(profile,commands){
+ return commands.map(op=>{
+   if(op[0]==='M'){
+     const p=planPoint(profile,{x:op[1],y:op[2]});
+     return ['M',p.x,p.y];
+   }
+   if(op[0]==='C'){
+     const a=planPoint(profile,{x:op[1],y:op[2]});
+     const b=planPoint(profile,{x:op[3],y:op[4]});
+     const c=planPoint(profile,{x:op[5],y:op[6]});
+     return ['C',a.x,a.y,b.x,b.y,c.x,c.y];
+   }
+   throw Error('UNKNOWN_PLAN_SEGMENT');
+ });
+}
+window.RaceSimMapView=Object.freeze({point:planPoint,commands:planCoordinates,verticalRatio:COURSE_PLAN_Y});
 function drawCourse(){
  if(!sim||!race)return;
  const ctx=ui.map.getContext('2d');if(!ctx)return;
@@ -504,7 +530,9 @@ function drawCourse(){
  // cubic outlines (topologically matched to official descriptions, not GPS).
  function path(commands){
    ctx.beginPath();
-   for(const op of commands){
+   // Background, inside/outside rails and racing line share the same
+   // plan transform as every numbered horse and landmark.
+   for(const op of planCoordinates(prof,commands)){
      if(op[0]==='M')ctx.moveTo(op[1],op[2]);
      if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
    }
@@ -532,7 +560,7 @@ function drawCourse(){
  // All landmark locations use EXACTLY the same d-axis as the engine.
  for(const land of prof.landmarks){
    if(land.label==='2角'||land.label==='3角'||land.label==='4角'||land.label==='直線入口')continue;
-   const p=RaceCourseGeometry.point(prof,land.d,0);
+   const p=planPoint(prof,RaceCourseGeometry.point(prof,land.d,0));
    if(land.label==='START'||land.label==='GOAL'){
       ctx.strokeStyle=land.label==='START'?'#fff6b1':'#fff';
       ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(p.x-7,p.y-11);ctx.lineTo(p.x+7,p.y+11);ctx.stroke();
@@ -560,7 +588,7 @@ function drawCourse(){
    // Subsample the full route every 6m in addition to the most recent trail;
    // all pixels and physics consult RaceCourseGeometry.point().
    for(const pt of h.trail){
-     const pos=RaceCourseGeometry.point(prof,pt.d,pt.lane);
+     const pos=planPoint(prof,RaceCourseGeometry.point(prof,pt.d,pt.lane));
      if(!started){ctx.moveTo(pos.x,pos.y);started=true}
      else ctx.lineTo(pos.x,pos.y);
    }
@@ -568,7 +596,7 @@ function drawCourse(){
  }
  const horses=sim.state.horses.slice().sort((x,y)=>x.d-y.d);
  for(const h of horses){
-   const p=RaceCourseGeometry.point(prof,h.d,h.lane);
+   const p=planPoint(prof,RaceCourseGeometry.point(prof,h.d,h.lane));
    const waku=jraWaku(h.number,race.field_size);
    ctx.fillStyle=waku.fill;
    ctx.beginPath();ctx.arc(p.x,p.y,h.number===sim.state.leadingNo?6.3:5.1,0,Math.PI*2);ctx.fill();
