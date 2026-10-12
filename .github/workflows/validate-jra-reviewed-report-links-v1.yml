@@ -1,0 +1,57 @@
+name: Stage guard JRA reviewed reports use readable approved originals
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/assets/results.js'
+      - 'docs/staging/results.html'
+      - '.github/scripts/test-jra-reviewed-report-links-v1.mjs'
+      - '.github/workflows/validate-jra-reviewed-report-links-v1.yml'
+      - 'docs/data/races.json'
+  pull_request:
+    paths:
+      - 'docs/staging/assets/results.js'
+      - 'docs/staging/results.html'
+      - '.github/scripts/test-jra-reviewed-report-links-v1.mjs'
+      - '.github/workflows/validate-jra-reviewed-report-links-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  review-display:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check immutable settlement, same approved HTML/PDF and fallback safety
+        run: |
+          set -euo pipefail
+          node --check docs/staging/assets/results.js
+          node --check .github/scripts/test-jra-reviewed-report-links-v1.mjs
+          node .github/scripts/test-jra-results-settlement-v1.mjs
+          node .github/scripts/test-jra-reviewed-report-links-v1.mjs
+      - name: Check actual Pages public stage and HTML/PDF HTTP byte equality
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 45); do
+            ok=1
+            for file in \
+              staging/results.html \
+              staging/assets/results.js \
+              reports/2026-10-12-swan-stakes-v315-readable-v103.html \
+              pdfs/2026-10-12-swan-stakes-v315-readable-v103.pdf \
+              reports/2026-10-12-october-stakes-v315-readable-v103.html \
+              pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf; do
+              if ! curl -fLsS --max-time 20 "https://toodataa-ai.github.io/keiba-notes/$file" -o /tmp/jra-stage-reviewed-readable ||
+                 ! cmp -s "docs/$file" /tmp/jra-stage-reviewed-readable; then
+                ok=0; break
+              fi
+            done
+            if [[ "$ok" == 1 ]]; then
+              echo PASS_STAGING_REVIEWED_READABLE_HTML_PDF_HTTP_BYTES
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Published stage/or approved readable reports are not byte-identical"
+          exit 1
