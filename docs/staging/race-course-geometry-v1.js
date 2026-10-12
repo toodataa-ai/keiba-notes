@@ -129,6 +129,12 @@ function segmentAt(profile,d){
 }
 function point(profile,d,lane=0){
  if(d>profile.distance_m){
+  const end=point(profile,profile.distance_m,lane);
+  const last=profile.segments.at(-1);
+  const shift=Math.min(40,d-profile.distance_m)*arcTable(last).total/(last.to-last.from);
+  return {...end,x:end.x+end.tx*shift,y:end.y+end.ty*shift,segment:last,t:1};
+ }
+ if(d>profile.distance_m){
    const end=point(profile,profile.distance_m,lane),last=profile.segments.at(-1);
    const pxPerMeter=arcTable(last).total/(last.to-last.from);
    const extra=clamp(d-profile.distance_m,0,40)*pxPerMeter;
