@@ -26,28 +26,5 @@
 </main>
 <script src="assets/week.js?v=20261011-v311"></script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
-<script id="jra-staging-report-link-override">
-(() => {
-  const root=document.getElementById('weekPredictions');
-  if(!root)return;
-  const reviewOnly = {
-    '2026-10-12-october-stakes':'tokyo11',
-    '2026-10-12-swan-stakes':'kyoto11'
-  };
-  const update=()=>{
-    for(const a of root.querySelectorAll('.race-card a[href]')){
-      const href=a.getAttribute('href')||'';
-      for(const [slug,short] of Object.entries(reviewOnly)){
-        if(!href.includes(slug))continue;
-        if(href.startsWith('reports/') && href.endsWith('.html'))
-          a.setAttribute('href','staging/jra-v315-20261012/'+short+'.html');
-        else if(href.startsWith('pdfs/') && href.endsWith('.pdf'))
-          a.setAttribute('href','staging/jra-v315-20261012/'+short+'.pdf');
-      }
-    }
-  };
-  new MutationObserver(update).observe(root,{subtree:true,childList:true});
-  update();
-})();
-</script>
+
 </body></html>

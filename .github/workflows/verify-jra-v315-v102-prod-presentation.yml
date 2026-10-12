@@ -1,0 +1,79 @@
+name: Verify approved JRA v1.02 report display and production HTTP
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/assets/week.js'
+      - 'docs/reports/*v315-readable-v102.html'
+      - 'docs/pdfs/*v315-readable-v102.pdf'
+      - 'docs/staging/this-week.html'
+      - '.github/workflows/verify-jra-v315-v102-prod-presentation.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  site-presentation-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Enforce source immutability and original grade palette
+        run: |
+          set -euo pipefail
+          node --check docs/assets/week.js
+          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,re
+          race=json.loads(Path('docs/data/races.json').read_text())['races']
+          js=Path('docs/assets/week.js').read_text()
+          legacy=Path('docs/reports/2026-10-12-october-stakes-v3.13-rerun38185599767-attempt2-v313.html').read_text()
+          for slug,short in [('2026-10-12-october-stakes','tokyo11'),('2026-10-12-swan-stakes','kyoto11')]:
+            r=next(x for x in race if x['id']==slug)
+            assert r['purchase_strategy_version']=='v3.15' and r['status']=='predicted'
+            assert r['report'].endswith('-v315.html') and '-readable-' not in r['report']
+            assert r['pdf'].endswith('-v315.pdf') and '-readable-' not in r['pdf']
+            assert r['e2e_prediction'] and r['proof_commit'] and r['final_bets']
+            hp=Path('docs/reports/'+slug+'-v315-readable-v102.html')
+            pdf=Path('docs/pdfs/'+slug+'-v315-readable-v102.pdf')
+            stage=Path('docs/staging/jra-v315-20261012')
+            assert hp.read_text()==(stage/(short+'.html')).read_text().replace(
+                '<meta name="robots" content="noindex,nofollow">','')
+            assert pdf.read_bytes()==(stage/(short+'.pdf')).read_bytes()
+            for grade,a,b in [('A+','gAp','g-Aplus'),('A','gA','g-A'),('B+','gBp','g-Bplus'),
+                              ('B','gB','g-B'),('B-','gBm','g-Bminus'),('C','gC','g-C')]:
+              old=re.search(r'\\.'+a+r'\\{background:(#[0-9a-f]{6});color:(#[0-9a-f]{6})\\}',legacy)
+              new=re.search(r'\\.horse-page \\.'+b+r'\\{([^}]+)\\}',hp.read_text())
+              assert old is not None and new is not None,(slug,grade,'grade css')
+              assert 'background:'+old.group(1) in new.group(1)
+              assert 'color:'+old.group(2) in new.group(1)
+            assert slug in js and hp.name in js and pdf.name in js
+          assert 'stagingJraReports' not in Path('docs/staging/this-week.html').read_text()
+          print('PASS_RELEASED_JRA_V102_STAGE_TO_PRODUCTION_IDENTICAL_AND_IMMUTABLE')
+          PY
+      - name: Verify six public HTTP assets exact byte equality
+        run: |
+          set -euo pipefail
+          files=(
+            docs/assets/week.js
+            docs/this-week.html
+            docs/staging/this-week.html
+            docs/reports/2026-10-12-october-stakes-v315-readable-v102.html
+            docs/pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf
+            docs/reports/2026-10-12-swan-stakes-v315-readable-v102.html
+            docs/pdfs/2026-10-12-swan-stakes-v315-readable-v102.pdf
+          )
+          for try in $(seq 1 35);do
+            ok=1
+            for f in "${files[@]}";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 22 "$url" -o /tmp/jra-v102-prod-http ||
+                 ! cmp -s "$f" /tmp/jra-v102-prod-http;then ok=0;break;fi
+            done
+            if [[ $ok == 1 ]];then
+              echo 'PASS_JRA_V102_SEVEN_PUBLIC_FILES_BYTE_MATCH'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::JRA v1.02 source commit does not match public HTML/PDF';exit 1

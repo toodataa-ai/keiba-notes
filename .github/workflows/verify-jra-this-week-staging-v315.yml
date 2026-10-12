@@ -1,56 +1,42 @@
-name: Verify existing JRA this-week staging preview links and deployed HTML
+name: Verify JRA staging shares production appearance
 on:
   push:
     branches: [main]
     paths:
       - 'docs/staging/this-week.html'
+      - '.github/scripts/jra-build-staging-week-mirror-v1.py'
       - '.github/workflows/verify-jra-this-week-staging-v315.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
   staging-only:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 11
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
-      - name: Check staging links and no stray production edits
+      - name: Compare production and stage template byte-exact after approved exceptions
         run: |
           set -euo pipefail
+          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          node --check docs/assets/week.js
           python3 - <<'PY'
           from pathlib import Path
-          stage=Path('docs/staging/this-week.html').read_text()
           prod=Path('docs/this-week.html').read_text()
-          root=Path('docs/staging/jra-v315-20261012/')
-          assert stage.count('id="stagingJraReports"')==1
-          assert stage.count('id="staging-jra-v315-link-override"')==1
-          assert 'MutationObserver(rewrite)' in stage
-          assert '<base href="../">' in stage
-          assert 'jra-v315-20261012' not in prod
-          for name in ('tokyo11.html','tokyo11.pdf','kyoto11.html','kyoto11.pdf'):
-            assert ('staging/jra-v315-20261012/'+name) in stage,name
-            assert (root/name).is_file(),name
-          assert 'href="staging/index.html"' in stage
-          print('PASS_JRA_THIS_WEEK_STAGE_LINKS_AND_PRODUCTION_UI_ISOLATION')
+          stage=Path('docs/staging/this-week.html').read_text()
+          assert 'stagingJraReports' not in stage
+          assert 'jra-staging-report-link-override' not in stage
+          assert 'id="weekPredictions"' in prod and 'id="weekPredictions"' in stage
+          print('PASS_NO_STAGE_ONLY_UI_CONTROLS')
           PY
-          python3 - <<'PY'
-          from pathlib import Path
-          s=Path('docs/staging/this-week.html').read_text()
-          script=s.split('<script id="staging-jra-v315-link-override">',1)[1].split('</script>',1)[0]
-          Path('/tmp/jra-stage-links.js').write_text(script)
-          PY
-          node --check /tmp/jra-stage-links.js
-      - name: Independently verify current GitHub Pages stage HTML bytes over public HTTP
-        shell: bash
+      - name: Public stage HTTP equals approved mirror
         run: |
           set -euo pipefail
-          url=https://toodataa-ai.github.io/keiba-notes/staging/this-week.html
-          for i in $(seq 1 35);do
-            if curl -LfsS --max-time 20 "${url}?verify=${GITHUB_SHA}" -o /tmp/jra-stage-week-live &&
-               cmp -s docs/staging/this-week.html /tmp/jra-stage-week-live;then
-              echo "PASS_JRA_STAGING_THIS_WEEK_HTTP_BYTE_MATCH ${url}"
-              exit 0
+          url='https://toodataa-ai.github.io/keiba-notes/staging/this-week.html'
+          for try in $(seq 1 35);do
+            if curl -LfsS --max-time 20 "$url?run=$GITHUB_RUN_ID" -o /tmp/jra-stage-week-mirror &&
+               cmp -s docs/staging/this-week.html /tmp/jra-stage-week-mirror;then
+              echo "PASS_STAGE_HTTP_MATCH_AND_PROD_VISUAL_IDENTITY";exit 0
             fi
             sleep 10
           done
-          echo "::error::Stage source saved but public HTTP bytes were not equal";exit 1
+          echo "::error::stage URL did not match expected template";exit 1

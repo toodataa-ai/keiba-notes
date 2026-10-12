@@ -16,30 +16,7 @@ PRODUCTION = Path("docs/this-week.html")
 STAGING = Path("docs/staging/this-week.html")
 START = "<head>"
 HOME = 'href="index.html"'
-OVERRIDE = r"""<script id="jra-staging-report-link-override">
-(() => {
-  const root=document.getElementById('weekPredictions');
-  if(!root)return;
-  const reviewOnly = {
-    '2026-10-12-october-stakes':'tokyo11',
-    '2026-10-12-swan-stakes':'kyoto11'
-  };
-  const update=()=>{
-    for(const a of root.querySelectorAll('.race-card a[href]')){
-      const href=a.getAttribute('href')||'';
-      for(const [slug,short] of Object.entries(reviewOnly)){
-        if(!href.includes(slug))continue;
-        if(href.startsWith('reports/') && href.endsWith('.html'))
-          a.setAttribute('href','staging/jra-v315-20261012/'+short+'.html');
-        else if(href.startsWith('pdfs/') && href.endsWith('.pdf'))
-          a.setAttribute('href','staging/jra-v315-20261012/'+short+'.pdf');
-      }
-    }
-  };
-  new MutationObserver(update).observe(root,{subtree:true,childList:true});
-  update();
-})();
-</script>"""
+OVERRIDE = ""
 MARKER_CSS = """<style id="jra-staging-nonlayout-marker">
 .staging-visual-marker{position:fixed;right:6px;bottom:6px;z-index:2147483647;
   border-radius:4px;padding:3px 6px;font:700 9px "Meiryo UI",Meiryo,sans-serif;
@@ -63,7 +40,7 @@ def render(production: str) -> str:
 def main():
     prod=PRODUCTION.read_text(encoding='utf8')
     expected=render(prod)
-    assert expected.count('id="jra-staging-report-link-override"')==1
+    assert 'jra-staging-report-link-override' not in expected
     assert expected.count('id="weekPredictions"')==1
     if '--check' in sys.argv[1:]:
         assert STAGING.read_text(encoding='utf8')==expected, 'JRA_STAGING_NOT_1_TO_1_PRODUCTION_TEMPLATE'

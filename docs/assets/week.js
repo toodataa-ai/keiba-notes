@@ -5,11 +5,34 @@ function isoUtc(s){const [y,m,d]=s.split('-').map(Number);return new Date(Date.U
 function dayGap(a,b){return Math.round((isoUtc(b)-isoUtc(a))/86400000);}
 function hasReview(r){if(typeof r?.review==='string')return r.review.trim().length>0;return !!(r?.review&&typeof r.review==='object'&&String(r.review.summary||'').trim());}
 function niceDate(s,weekday=''){const [,m,d]=s.split('-').map(Number);return `${m}/${d}${weekday?`（${weekday}）`:''}`;}
+// Approved v1.02 presentation aliases. Immutable historical prediction and bets are NOT altered.
+const JRA_V102_READABLE_REPORT_ALIASES={
+  "2026-10-12-october-stakes": {
+    "sourceReport": "reports/2026-10-12-october-stakes-v3.15-run38189408717-attempt1-v315.html",
+    "sourcePdf": "pdfs/2026-10-12-october-stakes-v3.15-run38189408717-attempt1-v315.pdf",
+    "report": "reports/2026-10-12-october-stakes-v315-readable-v102.html",
+    "pdf": "pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf"
+  },
+  "2026-10-12-swan-stakes": {
+    "sourceReport": "reports/2026-10-12-swan-stakes-v3.15-run38189073744-attempt1-v315.html",
+    "sourcePdf": "pdfs/2026-10-12-swan-stakes-v3.15-run38189073744-attempt1-v315.pdf",
+    "report": "reports/2026-10-12-swan-stakes-v315-readable-v102.html",
+    "pdf": "pdfs/2026-10-12-swan-stakes-v315-readable-v102.pdf"
+  }
+};
+function jraReadableLinks(r){
+ const approved=JRA_V102_READABLE_REPORT_ALIASES[r.id];
+ if(!approved || r.purchase_strategy_version!=='v3.15' || r.status!=='predicted' ||
+    r.report!==approved.sourceReport || r.pdf!==approved.sourcePdf)
+   return {report:r.report,pdf:r.pdf};
+ return {report:approved.report,pdf:approved.pdf};
+}
 function card(r){
   const marks=r.marks?`<div class="marks"><span class="mark"><b>◎</b>${esc(r.marks.win||'—')}</span><span class="mark"><b>○</b>${esc(r.marks.second||'—')}</span><span class="mark"><b>▲</b>${esc(r.marks.third||'—')}</span></div>`:'';
   const links=[];
-  if(r.report)links.push(`<a class="btn" href="${encodeURI(r.report)}">AI予想詳細を見る</a>`);
-  if(r.pdf)links.push(`<a class="btn secondary" href="${encodeURI(r.pdf)}">PDF</a>`);
+  const display=jraReadableLinks(r);
+  if(display.report)links.push(`<a class="btn" href="${encodeURI(display.report)}">AI予想詳細を見る</a>`);
+  if(display.pdf)links.push(`<a class="btn secondary" href="${encodeURI(display.pdf)}">PDF</a>`);
   return `<article class="race-card"><div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race||'')}</h3></div><span class="status">AI予想公開済み</span></div>${marks}${links.length?`<div class="actions">${links.join('')}</div>`:''}</article>`;
 }
 // Display the newest audited v3.11 report, while preserving historical prereace proof.
