@@ -169,7 +169,7 @@ function create(data,options={}){
      // The pack gently contracts during the opening 100m. Each style
      // has distinct inner-side "slots" so runners are not all assigned
      // to the identical rail coordinate. No lateral teleporting.
-     const ratio=smoothstep(state.leader/100);
+     const ratio=smoothstep(state.leader/82);
      const desired=h.initialLane+(h.launchTargetLane-h.initialLane)*ratio;
      const speed=lateralSpeedAt(state.leader);
      const amount=clamp(desired-h.lane,-dt*speed,dt*speed);
