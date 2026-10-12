@@ -96,18 +96,54 @@ function cubic(s,t){
  const m=Math.hypot(tx,ty)||1;tx/=m;ty/=m;
  return {x,y,tx,ty};
 }
+// Sample Bezier arc length, so on-screen horses move evenly along actual drawn bends.
+const arcTables=new Map();
+function arcTable(segment){
+ if(arcTables.has(segment))return arcTables.get(segment);
+ const samples=[{t:0,length:0}],N=80;
+ let prev=cubic(segment,0),dist=0;
+ for(let i=1;i<=N;i++){
+   const t=i/N,p=cubic(segment,t);
+   dist+=Math.hypot(p.x-prev.x,p.y-prev.y);
+   samples.push({t,length:dist});prev=p;
+ }
+ const table={total:dist,samples};
+ arcTables.set(segment,table);return table;
+}
+function tByLength(segment,ratio){
+ const tab=arcTable(segment),target=clamp(ratio,0,1)*tab.total;
+ let lo=0,hi=tab.samples.length-1;
+ while(lo<hi){const m=(lo+hi)>>1;if(tab.samples[m].length<target)lo=m+1;else hi=m;}
+ const high=tab.samples[lo],low=tab.samples[Math.max(0,lo-1)];
+ return low.t+(high.t-low.t)*(target-low.length)/(high.length-low.length||1);
+}
 function segmentAt(profile,d){
  const x=clamp(d,0,profile.distance_m);
  return profile.segments.find(s=>x<=s.to+1e-8)||profile.segments.at(-1);
 }
 function point(profile,d,lane=0){
  const s=segmentAt(profile,d);
- const t=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
+ const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
+ const t=tByLength(s,ratio);
  const p=cubic(s,t);
  // Lane zero is the inside running line. Lateral scale is illustrative,
  // but physical width in metres is applied separately in the simulator.
  const offset=(lane*2.25-7.9)*(profile.turn==='左'?1:-1);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset,tx:p.tx,ty:p.ty,segment:s,t};
+}
+function heading(profile,d,lane=0,laneVelocity=0){
+ // Direction vector from arc-length normalized course coordinates (not
+ // simply a horizontal right-facing sprite). Lateral movement gently changes
+ // nose angle to show real lane transitions during overtaking.
+ const before=point(profile,clamp(d-1.5,0,profile.distance_m),lane);
+ const after=point(profile,clamp(d+1.5,0,profile.distance_m),lane);
+ let x=after.x-before.x,y=after.y-before.y;
+ if(Math.hypot(x,y)<.001){const p=point(profile,d,lane);x=p.tx;y=p.ty}
+ const side=profile.turn==='左'?1:-1;
+ const lateral=Math.max(-.8,Math.min(.8,laneVelocity))*.14;
+ const scale=Math.hypot(x,y)||1;
+ x/=scale;y/=scale;
+ return Math.atan2(y+x*lateral*side,x-y*lateral*side);
 }
 function height(profile,d){
  const values=profile.profile;
@@ -139,5 +175,5 @@ function metrics(profile,d,lane=0){
 }
 for(const c of Object.values(COURSE))validate(c);
 function get(id){return COURSE[id]||null}
-global.RaceCourseGeometry=Object.freeze({get,validate,point,segmentAt,height,slope,metrics,COURSE});
+global.RaceCourseGeometry=Object.freeze({get,validate,point,heading,segmentAt,height,slope,metrics,COURSE});
 })(typeof window!=='undefined'?window:globalThis);
