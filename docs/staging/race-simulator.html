@@ -60,7 +60,7 @@
    <canvas id="courseCanvas" width="580" height="270" role="img" aria-label="東京芝2000mと京都芝1400m外回りそれぞれのコースの特徴に沿った俯瞰図、仮想進路、発走・ゴール・高低差"></canvas>
    <p class="small-muted" id="courseFeatures">JRA公式の競馬場資料に基づきコースを確認しています。</p>
    <p class="small-muted" id="courseMeasurements">コース寸法を読み込み中…</p>
-   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRA公式コース図を確認</a> ／ 図形のカーブと勾配区間は実測座標ではない近似です。</p>
+   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRA公式コース図を確認</a> ／ 東京の俯瞰図は縦方向を約16％補正した模式図です。曲線と勾配区間は実測座標ではありません。京都と走行計算には補正を適用しません。</p>
   </section>
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
@@ -85,12 +85,12 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.9 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.10 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-3"></script>
 <script src="race-lane-ai-v1.js?v=20261012-8"></script>
 <script src="race-runner-style-v1.js?v=20261012-8"></script>
 <script src="race-sim-engine.js?v=20261012-8"></script>
-<script src="race-simulator.js?v=20261012-9"></script>
+<script src="race-simulator.js?v=20261012-10"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>

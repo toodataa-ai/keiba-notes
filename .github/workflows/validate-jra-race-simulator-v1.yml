@@ -55,8 +55,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.9' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-9' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.10' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-10' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -198,6 +198,47 @@ jobs:
             w.RaceSimNumbers.marker(paintCtx,1,130,180,1,false,true,18);
             assert.equal(paintColors[1],wc.forHorse(1,18).fill,
               'race leader must keep its actual white frame, not leader tint');
+            // Tokyo course-plan aspect ratio: the old drawing was squashed
+            // north-south. ONLY the 580x270 overhead schematic is corrected;
+            // simulation physics coordinates and Kyoto geometry stay identical.
+            const map=w.RaceSimMapView;
+            assert.ok(map&&typeof map.point==='function','overhead map projection exists');
+            const baseSpline=course.segments.flatMap(segment=>[segment.p0,segment.p1,segment.p2,segment.p3]);
+            const coord=baseSpline.map(p=>({x:p[0],y:p[1]}));
+            const projectedMap=coord.map(p=>map.point(course,p));
+            const span=(v,k)=>Math.max(...v.map(q=>q[k]))-Math.min(...v.map(q=>q[k]));
+            const expectedRatio=entry.venue==='東京'?1.16:1;
+            assert.ok(Math.abs(span(projectedMap,'y')/span(coord,'y')-expectedRatio)<1e-8,
+              'Tokyo overhead shape must be ~16 percent taller, Kyoto unchanged');
+            assert.ok(Math.abs(span(projectedMap,'x')/span(coord,'x')-1)<1e-8,
+              'overhead ratio correction does not modify the east-west dimension');
+            for(let i=0;i<coord.length;i++){
+              assert.equal(projectedMap[i].x,coord[i].x);
+              if(entry.venue!=='東京')assert.equal(projectedMap[i].y,coord[i].y);
+              assert.ok(projectedMap[i].y>15&&projectedMap[i].y<211,
+                'corrected turf drawing fits above the altitude strip');
+            }
+            const commands=[['M',...course.segments[0].p0],
+              ...course.segments.map(s=>['C',...s.p1,...s.p2,...s.p3])];
+            const rendered=map.commands(course,commands);
+            assert.equal(rendered.length,commands.length);
+            for(let i=0;i<commands.length;i++){
+              assert.equal(rendered[i][0],commands[i][0]);
+              const triplets=commands[i][0]==='M'?1:3;
+              for(let j=0;j<triplets;j++){
+                const original={x:commands[i][1+j*2],y:commands[i][2+j*2]};
+                const p=map.point(course,original);
+                assert.equal(rendered[i][1+j*2],p.x);
+                assert.equal(rendered[i][2+j*2],p.y);
+              }
+            }
+            for(const d of [0,100,700,course.distance_m-1]){
+              const physical=w.RaceCourseGeometry.point(course,d,1);
+              const visual=map.point(course,physical);
+              assert.equal(visual.x,physical.x,'never change course distance/horse x');
+              assert.ok(Math.abs(visual.y-(112+(physical.y-112)*expectedRatio))<1e-7,
+                'horse markers, landmarks and course lines must align');
+            }
             assert.ok(w.RaceSimNumbers,'runner positions must be rendered as moving numbers');
             const raw=Array.from({length:entry.field_size},(_,i)=>({number:i+1,d:120+i*1.85,lane:i%8}));
             const origin=w.RaceCourseGeometry.point(course,raw[0].d,raw[0].lane);
