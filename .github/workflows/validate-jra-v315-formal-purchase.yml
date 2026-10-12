@@ -22,6 +22,7 @@ jobs:
           node .github/scripts/test-jra-three-plus-ana-v1.mjs
           node --check .github/scripts/jra-build-formal-3action-v315.mjs
           python3 -m py_compile .github/scripts/jra-render-formal-3action-v315.py .github/scripts/jra-promote-formal-3action-v315.py
+          node .github/scripts/test-jra-v315-formal-artifacts.mjs
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -31,3 +32,17 @@ jobs:
             assert o['e2e_prediction'] and Path(o['e2e_prediction']).exists()
           print('PASS_FORMAL_V315_PRERELEASE_PRESTART_BOTH_REAL_SOURCES')
           PY
+      - name: Generate both new official-style full PDFs to catch print overflow
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          for DATA in 2026-10-12-october-stakes 2026-10-12-swan-stakes;do
+            SRC="$(find "e2e_validation/predictions/$DATA" -name '*rerun38185*.json' | head -n 1)"
+            test -f "$SRC"
+            python3 .github/scripts/jra-render-formal-3action-v315.py \
+              --plan "/tmp/jra-v315-preview-$DATA.json" --source "$SRC" \
+              --html "/tmp/jra-v315-preview-$DATA.html" --pdf "/tmp/jra-v315-preview-$DATA.pdf"
+          done
+          echo PASS_V315_TWO_COMPLETE_PURCHASE_PDFS
