@@ -4,12 +4,12 @@
   const host=document.getElementById('weekPredictions');
   if (!host) return;
   const reportOverrides=new Map([
-    ['reports/2026-10-12-october-stakes-v315-readable-v102.html','staging/jra-v315-20261012/tokyo11.html'],
-    ['reports/2026-10-12-swan-stakes-v315-readable-v102.html','staging/jra-v315-20261012/kyoto11.html']
+    ['reports/2026-10-12-october-stakes-v315-readable-v103.html','staging/jra-v315-20261012/tokyo11.html'],
+    ['reports/2026-10-12-swan-stakes-v315-readable-v103.html','staging/jra-v315-20261012/kyoto11.html']
   ]);
   const pdfOverrides=new Map([
-    ['pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf','staging/jra-v315-20261012/tokyo11.pdf'],
-    ['pdfs/2026-10-12-swan-stakes-v315-readable-v102.pdf','staging/jra-v315-20261012/kyoto11.pdf']
+    ['pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf','staging/jra-v315-20261012/tokyo11.pdf'],
+    ['pdfs/2026-10-12-swan-stakes-v315-readable-v103.pdf','staging/jra-v315-20261012/kyoto11.pdf']
   ]);
   const iconText='全頭診断をページ内で開く';
   let sequence=0;

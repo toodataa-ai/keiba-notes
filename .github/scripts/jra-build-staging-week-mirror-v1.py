@@ -10,9 +10,8 @@ import sys
 PROD=Path("docs/this-week.html")
 STAGE=Path("docs/staging/this-week.html")
 STAGE_MARKER='<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>'
-STAGE_STYLES='''<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="staging/stage-week-preview.css?v=20261012-1">'''
-STAGE_SCRIPT='<script src="staging/stage-week-preview.js?v=20261012-1"></script>'
+STAGE_STYLES='<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">'
+STAGE_SCRIPT=''
 def render(prod):
     assert prod.count('<html lang="ja">')==1
     assert prod.count('<head>')==1 and prod.count('</head>')==1
@@ -24,6 +23,8 @@ def render(prod):
     h=h.replace('</head>',STAGE_STYLES+'\n</head>',1)
     h=h.replace('<body>','<body>\n'+STAGE_MARKER,1)
     h=h.replace('href="index.html"','href="staging/index.html"',1)
+    h=h.replace('src="assets/jra-inline-report.js?v=20261012-v103"',
+                'src="staging/stage-week-preview.js?v=20261012-v103"',1)
     h=h.replace('</body>',STAGE_SCRIPT+'\n</body>',1)
     return h
 def main():
@@ -31,6 +32,8 @@ def main():
     expected=render(prod)
     assert expected.count('class="staging-shell-marker"')==1
     assert expected.count('stage-week-preview.js')==1
+    assert expected.count('jra-inline-report.js')==0
+    assert expected.count('jra-inline-report.css')==1
     assert expected.count('id="weekPredictions"')==1
     if '--check' in sys.argv[1:]:
         assert STAGE.read_text(encoding='utf8')==expected,'JRA_WEEK_STAGING_NOT_PRODUCTION_MIRROR'

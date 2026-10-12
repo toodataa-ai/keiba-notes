@@ -5,19 +5,19 @@ function isoUtc(s){const [y,m,d]=s.split('-').map(Number);return new Date(Date.U
 function dayGap(a,b){return Math.round((isoUtc(b)-isoUtc(a))/86400000);}
 function hasReview(r){if(typeof r?.review==='string')return r.review.trim().length>0;return !!(r?.review&&typeof r.review==='object'&&String(r.review.summary||'').trim());}
 function niceDate(s,weekday=''){const [,m,d]=s.split('-').map(Number);return `${m}/${d}${weekday?`（${weekday}）`:''}`;}
-// Approved v1.02 presentation aliases. Immutable historical prediction and bets are NOT altered.
+// Approved v1.03 presentation aliases; v1.02 files stay immutable. Immutable historical prediction and bets are NOT altered.
 const JRA_V102_READABLE_REPORT_ALIASES={
   "2026-10-12-october-stakes": {
     "sourceReport": "reports/2026-10-12-october-stakes-v3.15-run38189408717-attempt1-v315.html",
     "sourcePdf": "pdfs/2026-10-12-october-stakes-v3.15-run38189408717-attempt1-v315.pdf",
-    "report": "reports/2026-10-12-october-stakes-v315-readable-v102.html",
-    "pdf": "pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf"
+    "report": "reports/2026-10-12-october-stakes-v315-readable-v103.html",
+    "pdf": "pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf"
   },
   "2026-10-12-swan-stakes": {
     "sourceReport": "reports/2026-10-12-swan-stakes-v3.15-run38189073744-attempt1-v315.html",
     "sourcePdf": "pdfs/2026-10-12-swan-stakes-v3.15-run38189073744-attempt1-v315.pdf",
-    "report": "reports/2026-10-12-swan-stakes-v315-readable-v102.html",
-    "pdf": "pdfs/2026-10-12-swan-stakes-v315-readable-v102.pdf"
+    "report": "reports/2026-10-12-swan-stakes-v315-readable-v103.html",
+    "pdf": "pdfs/2026-10-12-swan-stakes-v315-readable-v103.pdf"
   }
 };
 function jraReadableLinks(r){
