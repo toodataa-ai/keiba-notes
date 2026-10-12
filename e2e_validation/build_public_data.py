@@ -43,11 +43,21 @@ def resolve_repo_path(value: str | None) -> Path | None:
     return p if p.is_absolute() else ROOT / p
 
 
-def preview_prediction(pred: dict) -> dict:
-    # Only interpret the sealed v3.12 proof-compatible projection for display.
-    # Original GitHub prediction JSON and purchase decisions never change.
-    from evaluate import normalize_formal_v312_for_e2e
-    pred = normalize_formal_v312_for_e2e(pred)
+def preview_prediction(pred: dict, prediction_spec: dict) -> dict:
+    # Display the proven sealed purchase list without modifying the source record.
+    # The v3.15 published JSON is purchase-only; STEP1 marks and bets must be
+    # derived from the same prestart proof using the strict read-only E2E adapter.
+    from evaluate import normalize_formal_v312_for_e2e, normalize_v315_for_e2e
+    if pred.get("purchase_strategy_version") == "v3.15":
+        proof = prediction_spec.get("proof_commit")
+        source_proof = prediction_spec.get("source_publication_proof_commit")
+        if not proof or not source_proof:
+            raise ValueError("v3.15 E2E public display requires both prestart publication proofs")
+        verified = dict(pred)
+        verified["_case_prediction_path"] = prediction_spec["path"]
+        pred = normalize_v315_for_e2e(ROOT, proof, source_proof, verified)
+    else:
+        pred = normalize_formal_v312_for_e2e(pred)
     ctx = pred.get("race_context") or {}
     return {
         "version": pred.get("prompt_version"),
@@ -77,7 +87,7 @@ def build_case_entry(case_path: Path, grade: str) -> dict:
         filename = src.name if src else f"{p.get('version','unknown')}.json"
         public_rel = Path("data/e2e-shadow/predictions") / race_id / filename
         copied = copy_json(src, public_rel) if src else None
-        item = preview_prediction(pred)
+        item = preview_prediction(pred, p)
         item.update(
             {
                 "version": p.get("version") or item.get("version"),
