@@ -44,9 +44,9 @@ jobs:
                 'src="../../assets/visitor-counter.js','src="../assets/visitor-counter.js')
             expected_html=expected_html.replace('<html lang="ja" data-stage="preview">','<html lang="ja">')
             expected_html=expected_html.replace(
-                '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\\n','')
+                '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\n','')
             expected_html=expected_html.replace(
-                '<body>\\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
+                '<body>\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
             # The unapproved staging change intentionally reorders horse pages by
             # ◎○▲△×. The unchanged v1.02 production PDF must NOT equal its preview.
             # Verify identical purchase front, per-horse body, footer and coverage
