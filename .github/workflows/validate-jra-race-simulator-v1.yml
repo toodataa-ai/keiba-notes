@@ -5,6 +5,7 @@ on:
     paths:
       - 'docs/staging/race-sim-*'
       - 'docs/staging/race-lane-ai-v1.js'
+      - 'docs/staging/race-runner-style-v1.js'
       - 'docs/staging/race-course-geometry-v1.js'
       - 'docs/staging/race-simulator.*'
       - 'docs/staging/stage-week-preview.js'
@@ -24,6 +25,7 @@ jobs:
           set -euo pipefail
           node --check docs/staging/race-course-geometry-v1.js
           node --check docs/staging/race-lane-ai-v1.js
+          node --check docs/staging/race-runner-style-v1.js
           node --check docs/staging/race-sim-engine.js
           node --check docs/staging/race-simulator.js
           node --check docs/staging/stage-week-preview.js
@@ -53,8 +55,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.7' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-7' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.8' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-8' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -98,6 +100,7 @@ jobs:
             };
             w.eval(read('docs/staging/race-course-geometry-v1.js'));
             w.eval(read('docs/staging/race-lane-ai-v1.js'));
+            w.eval(read('docs/staging/race-runner-style-v1.js'));
             const course=w.RaceCourseGeometry.get(entry.course_id);
             assert.ok(course,'official layout required');
             assert.equal(course.distance_m,entry.distance_m);
@@ -123,7 +126,36 @@ jobs:
             const bendPos=course.segments.find(x=>x.kind==='turn').from+2;
             assert.ok(w.RaceCourseGeometry.metrics(course,bendPos,7).pathStretch>
               w.RaceCourseGeometry.metrics(course,bendPos,0).pathStretch);
+            const styleSource=new JSDOM(read('docs/'+entry.report)).window.document;
+            const realReports=[...styleSource.querySelectorAll('section.horse-page')];
+            assert.equal(realReports.length,entry.field_size);
+            const styled=realReports.map(section=>{
+              const m=(section.querySelector('h1')?.textContent||'').match(/^(\d+)番/);
+              assert.ok(m,'pre-race number must exist');
+              return {number:Number(m[1]),...w.RaceRunnerStyle.inferFromLastRace(
+                section.querySelector('.assessment')?.textContent)};
+            });
+            assert.ok(styled.filter(x=>x.style==='nige').length>=1,
+              'pre-race running positions reveal at least one probable pace setter');
+            assert.ok(styled.filter(x=>x.style==='oikomi').length>=1,
+              'pre-race running positions reveal back-of-field horses');
+            assert.ok(w.RaceRunnerStyle.positionAdjustment('nige',4,50,4)>
+              w.RaceRunnerStyle.positionAdjustment('oikomi',4,50,4),
+              'escape horse self-accelerates ahead of closers');
+            assert.ok(w.RaceRunnerStyle.positionAdjustment('oikomi',2,70,6)<0,
+              'closer holds back early');
+            assert.ok(w.RaceSimCamera.stableCameraFrame,'smooth camera must be supplied');
+            const geometryFrame=w.RaceSimCamera.frameEntireField(
+              [{d:0,lane:0},{d:0,lane:8}],course,'follow',1000,730,375);
+            const moved={...geometryFrame,origin:{x:geometryFrame.origin.x+6,
+              y:geometryFrame.origin.y+4},time:.05};
+            const eased=w.RaceSimCamera.stableCameraFrame(geometryFrame,moved,.10,1000,730,375);
+            assert.ok(eased.zoom>0,'camera does not jump to invalid zoom at gate release');
+            assert.ok(Math.abs(eased.origin.x-moved.origin.x)<6,
+              'camera motion is interpolated rather than instant');
             w.eval(read('docs/staging/race-sim-engine.js'));
+            assert.ok(w.RaceSimEngine.startSpeedFactor(.1)<.20,
+              'standing start cannot instantly reach full pace');
             w.eval(read('docs/staging/race-simulator.js'));
             await new Promise(resolve=>setTimeout(resolve,80));
             assert.ok(w.RaceSimNumbers,'runner positions must be rendered as moving numbers');
@@ -247,6 +279,12 @@ jobs:
               const name=x.querySelector('.standing-name').textContent;
               return {number,name,mark:x.querySelector('.standing-mark').textContent,win_pct:6,pace_grade:'B'};
             });
+            const styleLookup=new Map(styled.map(x=>[x.number,x]));
+            for(const h of horses){
+              const x=styleLookup.get(h.number);
+              h.style=x?.style||'unknown';
+              h.styleMeta=x||null;
+            }
             const source={...entry,horses};
             assert.equal(w.document.getElementById('courseMeasurements').textContent.includes(String(course.straight_m)),true);
             assert.equal(w.document.getElementById('courseMeasurements').textContent.includes(String(course.elevation_range_m)),true);
@@ -256,11 +294,22 @@ jobs:
             const c=engine.create(source,{seed:56,pace:'H',bias:'outer'});
             const meanLane=sim=>sim.state.horses.reduce((sum,h)=>sum+h.lane,0)/sim.state.horses.length;
             const initialMeanLane=meanLane(a);
-            let turnOneSnapshot=null;
+            let turnOneSnapshot=null,firstHundredSnapshot=null;
             for(let n=0;n<5000;n++){
               if(!a.state.finished)a.step(.05);
               if(!b.state.finished)b.step(.05);
               if(!c.state.finished)c.step(.05);
+              if(!firstHundredSnapshot&&a.state.leader>=100){
+                const front=a.state.horses.filter(h=>h.style==='nige');
+                const back=a.state.horses.filter(h=>h.style==='oikomi');
+                const avg=xs=>xs.reduce((sum,x)=>sum+x.d,0)/Math.max(1,xs.length);
+                firstHundredSnapshot={
+                  at:a.state.t,lead:a.state.leader,
+                  lanes:a.state.horses.map(h=>({n:h.number,l:h.lane,style:h.style,d:h.d})),
+                  meanLane:meanLane(a),frontAvg:avg(front),backAvg:avg(back),
+                  innerBy5:a.state.horses.filter(h=>h.lane<=5).length
+                };
+              }
               if(n===800)turnOneSnapshot={
                 meanLane:meanLane(a),
                 inwardCount:a.state.horses.filter(h=>h.inwardMoves>0).length,
@@ -269,6 +318,10 @@ jobs:
                 moveCount:a.state.totalInsideMoves
               };
             }
+            assert.ok(firstHundredSnapshot,'100m position snapshot is recorded');
+            console.log('SIM_FIRST_100M '+entry.id+' '+JSON.stringify(firstHundredSnapshot));
+            assert.ok(firstHundredSnapshot.frontAvg>firstHundredSnapshot.backAvg,
+              'escapers should hold a forward position relative to deep closers at 100m');
             assert.ok(turnOneSnapshot&&turnOneSnapshot.leading>100);
             console.log('PASS_SIM_RAIL_TENDENCY '+entry.id+' '+JSON.stringify(turnOneSnapshot));
             assert.ok(turnOneSnapshot.meanLane<initialMeanLane,
@@ -314,6 +367,7 @@ jobs:
             docs/staging/race-sim-engine.js
             docs/staging/race-course-geometry-v1.js
             docs/staging/race-lane-ai-v1.js
+            docs/staging/race-runner-style-v1.js
             docs/staging/race-sim-manifest-v1.json
             docs/staging/stage-week-preview.js
             docs/staging/index.html
@@ -328,7 +382,7 @@ jobs:
               fi
             done
             if [[ "$ok" == 1 ]];then
-              echo "PASS_SIM_NINE_PUBLIC_STAGE_ASSET_BYTE_MATCH"
+              echo "PASS_SIM_TEN_PUBLIC_STAGE_ASSET_BYTE_MATCH"
               exit 0
             fi
             sleep 10
