@@ -24,9 +24,14 @@ function inferFromLastRace(text){
  return {style,confidence:'single_previous_race',first,last:end,field:runners,positions,source:'pre_race_report_last_run'};
 }
 const styleGap={nige:0,senko:4.0,sashi:10.0,oikomi:19.0,unknown:10.0};
-function positionAdjustment(style,gap,d,t){
+function positionAdjustment(style,gap,d,t,prior){
  const category=TYPES.includes(style)?style:'unknown';
- const target=styleGap[category];
+ // Prior-race early passage gives each runner a DIFFERENT desired pack gap.
+ // This spreads a crowded middle group fore-and-aft, opening safe rail slots
+ // instead of forcing ten horses abreast into more than six inner lanes.
+ const priorPct=prior&&prior.source==='pre_race_report_last_run'&&prior.field>=2?
+    (prior.first-1)/(prior.field-1):.5;
+ const target=styleGap[category]+Math.max(-5,Math.min(5,(priorPct-.5)*12));
  const progress=Math.max(0,Number(d)||0);
  const early=progress<100?1:progress<350?.52*(350-progress)/250:0;
  const requested=Math.max(-2.4,Math.min(2.4,(gap-target)*.18));

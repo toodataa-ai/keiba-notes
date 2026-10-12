@@ -226,7 +226,7 @@ function create(data,options={}){
    // A runner self-selects a fore-aft position from its PREVIOUS race's
    // corner passage. No STEP1 marks, popularity, odds or target result.
    const leaderD=Math.max(...horses.map(o=>o.d));
-   speed+=tactic.positionAdjustment(h.style,Math.max(0,leaderD-h.d),h.d,state.t);
+   speed+=tactic.positionAdjustment(h.style,Math.max(0,leaderD-h.d),h.d,state.t,h.styleMeta);
    // Standing starts must build speed, not jump from 0 to ~17m/s.
    // Rider/runner launch variations allow the 18-horse field to stagger
    // naturally before safely merging towards the inner racing line.
