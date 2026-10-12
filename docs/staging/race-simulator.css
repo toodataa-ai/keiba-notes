@@ -19,3 +19,17 @@
 .waku-key{display:inline-flex;align-items:center;gap:4px;color:#465163;font-size:10px;font-weight:700;white-space:nowrap}
 .waku-swatch{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border:1px solid;border-radius:5px;font:bold 13px Arial,sans-serif}
 @media(max-width:640px){.waku-legend{column-gap:8px;row-gap:7px;padding:8px 10px}.waku-key{font-size:9px}.waku-swatch{width:20px;height:20px}}
+
+
+/* v0.9 licensed real-course reference switch. Real map must retain its
+   original aspect ratio, with no simulated number overlays. */
+#referenceMapFigure[hidden],#tokyoRealCourseMap[hidden],#kyotoRealCourseMap[hidden],#courseCanvas[hidden]{display:none!important}
+.reference-map-switch{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:8px 0 12px;font-size:11px;font-weight:800;color:#535e6d}
+.reference-map-switch select{border:1px solid #c8d0d9;border-radius:7px;background:#fff;color:#1f2937;padding:7px 9px;max-width:230px;min-width:0;font-size:12px}
+.reference-map-figure{margin:0 0 10px;border:1px solid #dce3df;background:#f9faf8;border-radius:8px;overflow:hidden;padding:8px}
+.reference-map-figure img{display:block;width:100%;height:auto;object-fit:contain;max-width:100%;background:#fff}
+.reference-map-figure iframe{display:block;width:100%;height:315px;border:0;border-radius:5px;background:#eff1ed}
+.reference-map-figure .real-map-credit{font-size:10px;line-height:1.65;margin:6px 3px 0;color:#647382;overflow-wrap:anywhere}
+.reference-map-figure .small-muted{margin:9px 3px 2px}
+.reference-map-figure a,.course-panel a{color:#356a77}
+@media(max-width:500px){.reference-map-figure iframe{height:265px}.reference-map-switch{justify-content:flex-start}.reference-map-switch select{max-width:250px}}
