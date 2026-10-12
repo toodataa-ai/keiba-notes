@@ -1,9 +1,15 @@
-/* Racing-lab scenario engine v0.3. Course and traffic aware, NOT calibrated odds. */
+/* Racing-lab scenario engine v0.5. Smooth gate acceleration and bounded 100m inward formation; NOT calibrated odds. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
 const GRADE={ 'A+':5,'A':4,'B+':3,'B':2,'B-':1,'C':0 };
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function smoothstep(v){const x=clamp(v,0,1);return x*x*(3-2*x)}
+function startSpeedFactor(t){return .12+.88*smoothstep(t/2.9)}
+function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
+ const taper=1-smoothstep((d-85)/35);
+ return .65+3.0*leadIn*taper;
+}
 function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function validData(data){
@@ -43,6 +49,7 @@ function create(data,options={}){
    desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
    stamina:0.9+rng()*.2,
+   launchVariation:(rng()-.5)*1.6,
    surge:(rng()-.5)*.46,tempo:(rng()-.5)*.28,ability:skill*.035,
    paceFit:((paceGrade-2)*.085)+(pace==='H'?(rng()-.5)*.14:0),
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
@@ -54,7 +61,7 @@ function create(data,options={}){
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
-    laneModel:'v0.3-inner-safe',laneCount:laneCfg.maxLane+1,
+    laneModel:'v0.5-early-inside',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
  log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
@@ -94,7 +101,11 @@ function create(data,options={}){
        h.desiredLane=h.lane;
    }
    const move=h.desiredLane-h.lane;
-   const laneAdvance=clamp(move,-dt*.60,dt*.60);
+   // Allow an early, progressively accelerating lane convergence (gate
+   // release -> ~100m). The move never jumps: it is limited per tick and
+   // every proposed crossing must pass the safety corridor checks above.
+   const lateralSpeed=lateralSpeedAt(h.d);
+   const laneAdvance=clamp(move,-dt*lateralSpeed,dt*lateralSpeed);
    h.laneVelocity=laneAdvance/(dt||1);
    h.lane=clamp(h.lane+laneAdvance,0,laneCfg.maxLane);
    const groundBias=(bias==='inner'?(laneCfg.maxLane/2-h.lane):bias==='outer'?(h.lane-laneCfg.maxLane/2):0)*.026;
@@ -111,12 +122,17 @@ function create(data,options={}){
    const finalStretch=m.isFinalStraight?clamp(1-remaining/profile.straight_m,0,1):0;
    const finishing=finalStretch*h.lateKick;
    let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue;
+   // Standing starts must build speed, not jump from 0 to ~17m/s.
+   // Rider/runner launch variations allow the 18-horse field to stagger
+   // naturally before safely merging towards the inner racing line.
+   const gateFactor=startSpeedFactor(state.t);
+   speed=(speed+(h.d<100?h.launchVariation:0))*gateFactor;
    if(h.blocked){
      const front=laneAI.nearestAhead(h,horses,h.lane);
      const gap=front?Math.max(0,front.d-h.d):7.2;
      speed-=clamp(1.2-gap*.065,.30,1.2);
    }
-   speed=Math.max(base*.84,speed);
+   speed=Math.max(base*.84*startSpeedFactor(state.t),speed);
    const before=h.d;
    const physical=speed*dt;
    const proposed=physical/m.pathStretch;
@@ -173,5 +189,5 @@ function create(data,options={}){
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
  return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
 }
-global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS});
+global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt});
 })(typeof window!=='undefined'?window:globalThis);
