@@ -3,6 +3,7 @@
 Not a rewrite of prior report or STEP1. One A4 page/horse plus purchase front.
 """
 import argparse,json,html,re
+from jra_v315_horse_layout import HORSE_STYLE, render_horse
 from pathlib import Path
 from weasyprint import HTML
 import fitz
@@ -62,34 +63,13 @@ def html_report(p,source):
 <p class='meta'>固定済み発走前原本：{e(p['source_prediction_proof'])}<br>
 新方式の発走前証跡：{e(p['proof_commit'])}／研究対象の旧買い目は履歴に保存</p>
 </section>"""
- # Include every STEP1 horse, exactly one A4 page each; never confuse any old 60
- # purchased tickets with the new current purchase plan.
+ # The v3.13 source remains sealed; labels and typography alone change here.
  ranked=source.get('step1_ranking') or []
- runners=source.get('step1',{}).get('runners',[]) if isinstance(source.get('step1'),dict) else []
- name_map={x.get('horse_number'):x for x in runners if isinstance(x,dict)}
  if not ranked:
   raise ValueError('JRA_FORMAL_V315_BLOCKER: source STEP1 per-horse ranking missing')
- bodies=[]
- for x in ranked:
-  n=x.get('horse_number')
-  info=name_map.get(n,{})
-  horse=x.get('horse_name') or info.get('horse_name') or ''
-  mark=x.get('mark','')
-  if not horse:raise ValueError('JRA_FORMAL_V315_BLOCKER: missing source horse name '+str(n))
-  lines=[]
-  for k,v in info.items():
-   if k in ('horse_number','horse_name') or v is None:continue
-   if isinstance(v,(dict,list)):
-    v=json.dumps(v,ensure_ascii=False)
-   lines.append(f'<p class="rider"><strong>{e(k)}</strong>：{e(v)}</p>')
-  for k,v in x.items():
-   if k in ('horse_number','horse_name','mark') or v is None:continue
-   lines.append(f'<p class="rider"><strong>{e(k)}</strong>：{e(v)}</p>')
-  body=f"<section class='page'><div class='kicker'>STEP1 発走前評価（v3.13原本から不変）</div><h1>{e(n)}番　{e(horse)}　{e(mark)}</h1>"+(
-    '<div class="fact">'+''.join(lines)+'</div>' if lines else
-    '<p>個別の評価理由は元の封印済み予想原本を参照してください。ここでは新規の評価や根拠を作りません。</p>')+f'<p class="meta">STEP1固定：{e(p["step1_fixed_at"])}　／　原本証跡：{e(p["source_prediction_proof"])}</p></section>'
-  bodies.append(body)
- return f'<!doctype html><html lang="ja"><head><meta charset="utf-8">{STYLE}</head><body>{front}{"".join(bodies)}</body></html>',1+len(bodies)
+ bodies=[render_horse(x,p['step1_fixed_at'],p['source_prediction_proof']) for x in ranked]
+ return f'<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{STYLE}{HORSE_STYLE}</head><body>{front}{"".join(bodies)}</body></html>',1+len(bodies)
+
 def main():
  ap=argparse.ArgumentParser()
  for x in ['plan','source','html','pdf']:ap.add_argument('--'+x,required=True)
@@ -107,6 +87,15 @@ def main():
    assert abs(page.rect.width-595.28)<1 and abs(page.rect.height-841.89)<1
    t=page.get_text()
    assert len(t)>100 and ('STEP1' in t if i>0 else '総投資額' in t)
+   if i>0:
+    assert '評価内訳' in t and '判断根拠' in t and '近走成績' in t,('PDF horse page omitted a required section',i)
+    assert not any(raw in t for raw in ('overall_grade','factor_grades','past_performances','source_url','workout_data_status')),('unformatted model data leaked into reader PDF',i)
+    palette={'A+':0x701622,'A':0x6e201c,'B+':0x734a10,'B':0x725518,'B-':0x4c6129,'C':0x2a5570}
+    grade_spans=[(span['text'].strip(),span['color'])
+                 for block in page.get_text('dict')['blocks']
+                 for line in block.get('lines',[]) for span in line['spans']]
+    for grade in source['step1_ranking'][i-1]['factor_grades']:
+     assert (grade,palette[grade]) in grade_spans,('PDF grade palette missing or wrong',i,grade)
    for block in page.get_text('dict')['blocks']:
     if 'lines' not in block:continue
     for l in block['lines']:

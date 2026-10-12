@@ -1,0 +1,56 @@
+name: Staging - JRA v3.15 readable horse reports (no publication)
+on:
+  push:
+    branches: ['staging/jra-v315-report-readability-20261012']
+    paths:
+      - '.github/scripts/jra-render-formal-3action-v315.py'
+      - '.github/scripts/jra_v315_horse_layout.py'
+      - '.github/scripts/test-jra-v315-report-readability.py'
+      - 'docs/data/jra_purchase_command_policy_v315.json'
+      - '.github/workflows/test-jra-v315-report-readability-stage.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/scripts/jra-render-formal-3action-v315.py'
+      - '.github/scripts/jra_v315_horse_layout.py'
+      - '.github/scripts/test-jra-v315-report-readability.py'
+      - 'docs/data/jra_purchase_command_policy_v315.json'
+permissions: {contents: read}
+jobs:
+  source-real-report-layout-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Check source-of-truth implementation SHA pins
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          obj=json.load(open('docs/data/jra_purchase_command_policy_v315.json'))['implementation']
+          for k in ('pipeline','publisher','renderer','workflow','horse_renderer_helper'):
+            path=obj[k]
+            actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+            assert actual==obj[k+'_git_blob_sha'],(k,path,actual)
+          print('PASS_READABLE_RENDERER_SHA_PIN')
+          PY
+      - name: Install stable PDF engine and Japanese fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Recreate Tokyo and Kyoto v3.15 documents without writing to docs
+        env:
+          JRA_V315_PREVIEW_DIR: /tmp/jra-v315-stage-preview
+        run: |
+          python3 -m py_compile .github/scripts/jra_v315_horse_layout.py .github/scripts/jra-render-formal-3action-v315.py
+          python3 .github/scripts/test-jra-v315-report-readability.py
+      - name: Attach non-publication PDF and HTML previews for human approval
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-v315-readable-stage-preview-tokyo-kyoto
+          path: /tmp/jra-v315-stage-preview/
+          retention-days: 10
+          if-no-files-found: error
