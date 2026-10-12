@@ -144,6 +144,11 @@ jobs:
               'escape horse self-accelerates ahead of closers');
             assert.ok(w.RaceRunnerStyle.positionAdjustment('oikomi',2,70,6)<0,
               'closer holds back early');
+            w.eval(read('docs/staging/race-sim-engine.js'));
+            assert.ok(w.RaceSimEngine.startSpeedFactor(.1)<.20,
+              'standing start cannot instantly reach full pace');
+            w.eval(read('docs/staging/race-simulator.js'));
+            await new Promise(resolve=>setTimeout(resolve,80));
             assert.ok(w.RaceSimCamera.stableCameraFrame,'smooth camera must be supplied');
             const geometryFrame=w.RaceSimCamera.frameEntireField(
               [{d:0,lane:0},{d:0,lane:8}],course,'follow',1000,730,375);
@@ -153,11 +158,7 @@ jobs:
             assert.ok(eased.zoom>0,'camera does not jump to invalid zoom at gate release');
             assert.ok(Math.abs(eased.origin.x-moved.origin.x)<6,
               'camera motion is interpolated rather than instant');
-            w.eval(read('docs/staging/race-sim-engine.js'));
-            assert.ok(w.RaceSimEngine.startSpeedFactor(.1)<.20,
-              'standing start cannot instantly reach full pace');
-            w.eval(read('docs/staging/race-simulator.js'));
-            await new Promise(resolve=>setTimeout(resolve,80));
+
             assert.ok(w.RaceSimNumbers,'runner positions must be rendered as moving numbers');
             const raw=Array.from({length:entry.field_size},(_,i)=>({number:i+1,d:120+i*1.85,lane:i%8}));
             const origin=w.RaceCourseGeometry.point(course,raw[0].d,raw[0].lane);
