@@ -3,7 +3,7 @@
 Not a rewrite of prior report or STEP1. One A4 page/horse plus purchase front.
 """
 import argparse,json,html,re
-from jra_v315_horse_layout import HORSE_STYLE, render_horse
+from jra_v315_horse_layout import HORSE_STYLE, render_horse, order_horses_by_mark
 from pathlib import Path
 from weasyprint import HTML
 import fitz
@@ -64,7 +64,7 @@ def html_report(p,source):
 新方式の発走前証跡：{e(p['proof_commit'])}／研究対象の旧買い目は履歴に保存</p>
 </section>"""
  # The v3.13 source remains sealed; labels and typography alone change here.
- ranked=source.get('step1_ranking') or []
+ ranked=order_horses_by_mark(source.get('step1_ranking') or [])
  if not ranked:
   raise ValueError('JRA_FORMAL_V315_BLOCKER: source STEP1 per-horse ranking missing')
  bodies=[render_horse(x,p['step1_fixed_at'],p['source_prediction_proof']) for x in ranked]
@@ -94,7 +94,7 @@ def main():
     grade_spans=[(span['text'].strip(),span['color'])
                  for block in page.get_text('dict')['blocks']
                  for line in block.get('lines',[]) for span in line['spans']]
-    for grade in source['step1_ranking'][i-1]['factor_grades']:
+    for grade in order_horses_by_mark(source['step1_ranking'])[i-1]['factor_grades']:
      assert (grade,palette[grade]) in grade_spans,('PDF grade palette missing or wrong',i,grade)
    for block in page.get_text('dict')['blocks']:
     if 'lines' not in block:continue
