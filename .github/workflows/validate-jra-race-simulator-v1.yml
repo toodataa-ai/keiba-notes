@@ -55,8 +55,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.8' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-8' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.9' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-9' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -165,6 +165,39 @@ jobs:
             assert.ok(Math.abs(eased.origin.x-moved.origin.x)<6,
               'camera motion is interpolated rather than instant');
 
+            const wc=w.RaceWakuColors;
+            assert.ok(wc,'official bracket colors are loaded');
+            assert.equal(wc.palette.length,8);
+            const expected18=[1,1,2,2,3,3,4,4,5,5,6,6,7,7,7,8,8,8];
+            const expectedNames=['白','黒','赤','青','黄','緑','橙','桃'];
+            for(let n=1;n<=18;n++){
+              const actual=wc.forHorse(n,18);
+              assert.equal(actual.waku,expected18[n-1],'18-runner official waku mapping '+n);
+              assert.equal(actual.name,expectedNames[actual.waku-1]);
+              assert.ok(/^#[0-9a-f]{6}$/i.test(actual.fill));
+              assert.ok(/^#[0-9a-f]{6}$/i.test(actual.text));
+            }
+            // 16 and 17 starters have different outer-frame allocation.
+            for(let n=1;n<=16;n++)assert.equal(wc.forHorse(n,16).waku,Math.ceil(n/2));
+            assert.equal(wc.forHorse(15,17).waku,8);
+            assert.equal(wc.forHorse(16,17).waku,8);
+            assert.equal(wc.forHorse(17,17).waku,8);
+            assert.equal(wc.forHorse(13,18).waku,7);
+            assert.equal(wc.forHorse(16,18).waku,8);
+            assert.throws(()=>wc.forHorse(19,18),/JRA_WAKU_FIELD_INVALID/);
+            assert.equal(w.document.querySelectorAll('#wakuLegend .waku-key').length,8,
+              'all frame colors and numbers must appear in the legend');
+            const paintCtx=mockCanvas(),paintColors=[],ringColors=[];
+            paintCtx.fill=()=>{paintColors.push(paintCtx.fillStyle)};
+            paintCtx.stroke=()=>{ringColors.push(paintCtx.strokeStyle)};
+            w.RaceSimNumbers.marker(paintCtx,13,110,150,1,true,false,18);
+            assert.equal(paintColors[0],wc.forHorse(13,18).fill,
+              'focused horse must KEEP orange official waku color');
+            assert.ok(ringColors.includes('#f9d46c'),
+              'selection halo must be separate from the bracket color');
+            w.RaceSimNumbers.marker(paintCtx,1,130,180,1,false,true,18);
+            assert.equal(paintColors[1],wc.forHorse(1,18).fill,
+              'race leader must keep its actual white frame, not leader tint');
             assert.ok(w.RaceSimNumbers,'runner positions must be rendered as moving numbers');
             const raw=Array.from({length:entry.field_size},(_,i)=>({number:i+1,d:120+i*1.85,lane:i%8}));
             const origin=w.RaceCourseGeometry.point(course,raw[0].d,raw[0].lane);
