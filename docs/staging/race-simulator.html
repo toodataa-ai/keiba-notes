@@ -63,6 +63,7 @@
   </section>
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
+   <p id="runnerStyleInfo" class="small-muted">前走通過順から脚質を確認中…</p>
    <div id="standings" class="standings" aria-live="off"><p class="small-muted">出走馬を読み込んでいます。</p></div>
   </section>
  </div>
@@ -72,6 +73,8 @@
  </section>
  <section class="notes panel">
   <h2>このシミュレーションで分かること・分からないこと</h2>
+  <p>脚質は保存済みの発走前レポートの「前走通過順」を出走頭数で補正して暫定分類します。逃げ馬は先頭を取りに行き、先行馬は前方、差し馬は中団、追込馬は後方を目指します。前走が確認できない馬は脚質不明として扱います。いずれも単一の前走からの推定で、実際の走法を保証するものではありません。</p>
+  <p>発走直後は速度とカメラの追従を滑らかにし、最初の100mで各馬が安全な内側の進路へ寄るよう優先します。全馬が同時に内ラチの最短線を通れるわけではないため、前後の間隔を保ちながら内寄りの馬群を形成します。</p>
   <p>進路の基本方針は内ラチ優先です。安全な空きがあれば積極的に内へ寄り、前が詰まったときだけ外へ回って追い越します。強引な割り込みや他馬との交錯は避けます。</p>
   <p>実況ビューは馬の絵を使わず、数字そのものが走路上を走ります。番号の中心が馬の位置で、引き出し線や移動したラベルはありません。注目馬は金色で表示します。密集時は正確な位置を優先するため、数字が一部重なる場合があります。</p>
   <p>標準の「全頭を自動追跡」は先頭だけでなく最後方の馬まで収まるよう、馬群の広がりに合わせてカメラの中心と倍率を毎フレーム調整します。後ろの馬も画面から消えません。全体をさらに広く見る切替もあります。マーカーが接近した場合に番号同士が重なることはありますが、実際の座標をずらして表示することはありません。</p>
@@ -80,11 +83,12 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.7 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.8 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-3"></script>
-<script src="race-lane-ai-v1.js?v=20261012-7"></script>
-<script src="race-sim-engine.js?v=20261012-3"></script>
-<script src="race-simulator.js?v=20261012-7"></script>
+<script src="race-lane-ai-v1.js?v=20261012-8"></script>
+<script src="race-runner-style-v1.js?v=20261012-8"></script>
+<script src="race-sim-engine.js?v=20261012-8"></script>
+<script src="race-simulator.js?v=20261012-8"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>
