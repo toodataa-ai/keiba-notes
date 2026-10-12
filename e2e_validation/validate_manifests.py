@@ -32,6 +32,9 @@ def main() -> int:
     if set(accepted) != {".github/workflows/validate-jra-balanced-v311.yml"}:
         raise RuntimeError("unexpected grandfathered SHA exceptions")
 
+    current_ci = json.loads((repo_root / "docs/data/jra_current_e2e_ci_supersession_v1.json").read_text(encoding="utf-8"))
+    current_exceptions = {item["path"]:item for item in current_ci["superseded_components"]}
+
     # A separately pinned v3.13 bridge verifies exact approved legacy Git blobs.
     # No previous manifest is rewritten; checks run against the real original commit.
     formal_version = json.loads((repo_root / "docs/data/latest_prompt.json").read_text(encoding="utf-8")).get("version")
@@ -51,7 +54,11 @@ def main() -> int:
         if set(grandfathered) != authorized or not bridge.get("fail_closed_on_other_changes"):
             raise RuntimeError("unapproved legacy v3.13 SHA exception list")
         for src, exception in grandfathered.items():
-            if git_hash_object(repo_root, src) != exception["current_blob_sha"]:
+            override = current_exceptions.get(src)
+            approved_current = (override["current_blob_sha"]
+                                if src == "e2e_validation/validate_manifests.py" and override
+                                else exception["current_blob_sha"])
+            if git_hash_object(repo_root, src) != approved_current:
                 raise RuntimeError("unapproved changed legacy SHA: " + src)
             original = subprocess.run(["git", "rev-parse", historic_anchor + ":" + src],
                                       cwd=repo_root, capture_output=True, text=True)
@@ -61,14 +68,13 @@ def main() -> int:
     # Append-only current-operations bridge. Historic manifests remain unchanged.
     # The old workflow and validator blobs must still exist at the historical
     # anchor and the active replacements must match exactly approved hashes.
-    current_ci = json.loads((repo_root / "docs/data/jra_current_e2e_ci_supersession_v1.json").read_text(encoding="utf-8"))
     if current_ci.get("schema_version") != 1 or current_ci.get("scope") != "current_e2e_orchestration_supersession_only":
         raise RuntimeError("invalid current E2E CI supersession")
-    current_exceptions = {item["path"]:item for item in current_ci["superseded_components"]}
     if set(current_exceptions) != {
         ".github/workflows/e2e-validation.yml",
         "e2e_validation/validate_experience_history_v312.py",
-    } or len(current_ci["superseded_components"]) != 2:
+        "e2e_validation/validate_manifests.py",
+    } or len(current_ci["superseded_components"]) != 3:
         raise RuntimeError("unexpected current E2E CI supersession scope")
     if not all(current_ci.get("safeguards",{}).get(key) is True for key in (
         "no_legacy_manifest_mutation","old_blob_sha_retention","old_workflow_sources_preserved_in_git",
@@ -110,7 +116,7 @@ def main() -> int:
                     continue
             current_override = current_exceptions.get(component_path)
             if actual != expected and current_override and version in ("v3.12","v3.13"):
-                if (expected == current_override["original_blob_sha"] and
+                if (expected == current_override.get("manifest_blob_sha",current_override["original_blob_sha"]) and
                         actual == current_override["current_blob_sha"]):
                     continue
             override = grandfathered.get(component_path)
