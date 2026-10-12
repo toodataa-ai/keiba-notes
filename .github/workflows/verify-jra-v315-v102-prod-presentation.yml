@@ -1,13 +1,17 @@
-name: Verify approved JRA v1.02 report display and production HTTP
+name: Verify approved JRA v1.03 report display and production HTTP
 on:
   push:
     branches: [main]
     paths:
       - 'docs/assets/week.js'
-      - 'docs/reports/*v315-readable-v102.html'
-      - 'docs/pdfs/*v315-readable-v102.pdf'
+      - 'docs/reports/*v315-readable-v103.html'
+      - 'docs/pdfs/*v315-readable-v103.pdf'
       - 'docs/staging/this-week.html'
-      - '.github/workflows/verify-jra-v315-v102-prod-presentation.yml'
+      - 'docs/assets/jra-inline-report.js'
+      - 'docs/assets/jra-inline-report.css'
+      - 'docs/methodology.html'
+      - 'docs/roadmap.html'
+      - '.github/workflows/verify-jra-v315-v103-prod-presentation.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -21,6 +25,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check docs/assets/week.js
+          node --check docs/assets/jra-inline-report.js
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           from pathlib import Path
@@ -34,8 +39,8 @@ jobs:
             assert r['report'].endswith('-v315.html') and '-readable-' not in r['report']
             assert r['pdf'].endswith('-v315.pdf') and '-readable-' not in r['pdf']
             assert r['e2e_prediction'] and r['proof_commit'] and r['final_bets']
-            hp=Path('docs/reports/'+slug+'-v315-readable-v102.html')
-            pdf=Path('docs/pdfs/'+slug+'-v315-readable-v102.pdf')
+            hp=Path('docs/reports/'+slug+'-v315-readable-v103.html')
+            pdf=Path('docs/pdfs/'+slug+'-v315-readable-v103.pdf')
             stage=Path('docs/staging/jra-v315-20261012')
             stage_html=(stage/(short+'.html')).read_text()
             # Staging keeps exactly the same report, plus its unified visual badge and marker stripe.
@@ -47,8 +52,8 @@ jobs:
                 '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\n','')
             expected_html=expected_html.replace(
                 '<body>\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
-            # The unapproved staging change intentionally reorders horse pages by
-            # ◎○▲△×. The unchanged v1.02 production PDF must NOT equal its preview.
+            # The approved v1.03 staging and production both order horse pages by
+            # ◎○▲△×. The approved v1.03 production PDF must exactly match the proven stage PDF.
             # Verify identical purchase front, per-horse body, footer and coverage
             # independently of horse order.
             def parts(document):
@@ -72,6 +77,9 @@ jobs:
             assert sorted(prod_horses)==sorted(stage_horses),(slug,'staging changed sealed horse contents')
             assert prod_footer==stage_footer,(slug,'unexpected footer alteration')
             assert pdf.read_bytes().startswith(b'%PDF'),(slug,'production PDF not present')
+            assert pdf.read_bytes()==(stage/(short+'.pdf')).read_bytes(),(slug,'stage PDF differs from released PDF')
+            assert Path('docs/reports/'+slug+'-v315-readable-v102.html').exists(),(slug,'prior v1.02 HTML must remain')
+            assert Path('docs/pdfs/'+slug+'-v315-readable-v102.pdf').exists(),(slug,'prior v1.02 PDF must remain')
             assert (stage/(short+'.pdf')).read_bytes().startswith(b'%PDF'),(slug,'staging PDF not present')
             marks=[re.search(r'<h1>[^<]+　([◎○▲△×])</h1>',x).group(1) for x in stage_horses]
             assert marks==sorted(marks,key='◎○▲△×'.index),(slug,'stage marks not sorted')
@@ -84,29 +92,33 @@ jobs:
               assert 'color:'+old.group(2) in new.group(1)
             assert slug in js and hp.name in js and pdf.name in js
           assert 'stagingJraReports' not in Path('docs/staging/this-week.html').read_text()
-          print('PASS_RELEASED_JRA_V102_STAGE_TO_PRODUCTION_IDENTICAL_AND_IMMUTABLE')
+          print('PASS_RELEASED_JRA_V103_STAGE_TO_PRODUCTION_IDENTICAL_AND_IMMUTABLE')
           PY
       - name: Verify six public HTTP assets exact byte equality
         run: |
           set -euo pipefail
           files=(
             docs/assets/week.js
+            docs/assets/jra-inline-report.js
+            docs/assets/jra-inline-report.css
+            docs/methodology.html
+            docs/roadmap.html
             docs/this-week.html
             docs/staging/this-week.html
-            docs/reports/2026-10-12-october-stakes-v315-readable-v102.html
-            docs/pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf
-            docs/reports/2026-10-12-swan-stakes-v315-readable-v102.html
-            docs/pdfs/2026-10-12-swan-stakes-v315-readable-v102.pdf
+            docs/reports/2026-10-12-october-stakes-v315-readable-v103.html
+            docs/pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf
+            docs/reports/2026-10-12-swan-stakes-v315-readable-v103.html
+            docs/pdfs/2026-10-12-swan-stakes-v315-readable-v103.pdf
           )
           for try in $(seq 1 35);do
             ok=1
             for f in "${files[@]}";do
               url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
-              if ! curl -LfsS --max-time 22 "$url" -o /tmp/jra-v102-prod-http ||
-                 ! cmp -s "$f" /tmp/jra-v102-prod-http;then ok=0;break;fi
+              if ! curl -LfsS --max-time 22 "$url" -o /tmp/jra-v103-prod-http ||
+                 ! cmp -s "$f" /tmp/jra-v103-prod-http;then ok=0;break;fi
             done
             if [[ $ok == 1 ]];then
-              echo 'PASS_JRA_V102_SEVEN_PUBLIC_FILES_BYTE_MATCH'
+              echo 'PASS_JRA_V103_SEVEN_PUBLIC_FILES_BYTE_MATCH'
               exit 0
             fi
             sleep 10

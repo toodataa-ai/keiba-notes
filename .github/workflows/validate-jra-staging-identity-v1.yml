@@ -54,8 +54,9 @@ jobs:
             assert (root/name).exists(),name
           week=(root/'this-week.html').read_text()
           assert week.count('stage-week-preview.js')==1
-          assert week.count('stage-week-preview.css')==1
+          assert week.count('jra-inline-report.css')==1
           assert 'stage-week-preview.js' not in Path('docs/this-week.html').read_text()
+          assert 'jra-inline-report.js' in Path('docs/this-week.html').read_text()
           js=(root/'stage-week-preview.js').read_text()
           assert "panel.hidden=true" in js and "panel.hidden=false" in js
           assert 'new MutationObserver' in js
@@ -65,8 +66,8 @@ jobs:
           assert 'docs/data/races.json' not in js
           # No active models, final tickets, historical PDF, or production shared assets changed.
           for p,sha in {
-            'docs/assets/week.js':'0241cc0a545153286df3f9bf04c32fc5a0c1b0fb',
-            'docs/this-week.html':'a9309f1f02d5b87b8700a2a850c593b1d488837c'
+            'docs/assets/week.js':'ad22854774a5a10626436bd938a661ba8261611d',
+            'docs/this-week.html':'c59b56117b0f46ff4cb2a756a51baf4b62b5c689'
           }.items():
             actual=subprocess.check_output(['git','hash-object',p],text=True).strip()
             assert actual==sha,('PROD_CONTENT_CHANGED',p,actual)
@@ -87,8 +88,8 @@ jobs:
             window.HTMLElement.prototype.scrollIntoView=function(){};
             window.eval(fs.readFileSync('docs/staging/stage-week-preview.js','utf8'));
             const host=window.document.getElementById('weekPredictions');
-            const tokyo='reports/2026-10-12-october-stakes-v315-readable-v102.html';
-            const pdf='pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf';
+            const tokyo='reports/2026-10-12-october-stakes-v315-readable-v103.html';
+            const pdf='pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf';
             host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="'+tokyo+'">AI予想詳細を見る</a><a class="btn secondary" href="'+pdf+'">PDF</a></div></article>';
             await Promise.resolve();
             let a=host.querySelector('a.btn');
@@ -104,7 +105,7 @@ jobs:
             a.dispatchEvent(new window.MouseEvent('click',{bubbles:true,cancelable:true,button:0}));
             assert.equal(panel.hidden,true,'repeat click closes in-place report');
             // Dynamically updated cards must be enhanced without a page reload.
-            host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="reports/2026-10-12-swan-stakes-v315-readable-v102.html">AI予想詳細を見る</a></div></article>';
+            host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="reports/2026-10-12-swan-stakes-v315-readable-v103.html">AI予想詳細を見る</a></div></article>';
             await Promise.resolve();
             assert.equal(host.querySelector('a.btn').getAttribute('href'),'staging/jra-v315-20261012/kyoto11.html');
             assert.ok(host.querySelector('.stage-inline-report'));

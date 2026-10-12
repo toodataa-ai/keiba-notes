@@ -35,10 +35,10 @@ jobs:
           assert policy['budget_yen']==6000 and policy['unit_yen']==100
           assert policy['max_quote_age_before_purchase_seal_seconds']==600
           assert policy['maximum_capture_span_seconds']==180
-          # The approved production editorial remains byte-identical to its baseline throughout this staging change.
+          # Approved v1.03 editorial is the release baseline; stage may differ only by its explicit marker/asset-depth.
           for p,sha in {
-             'docs/methodology.html':'35e48d417ab0cf36407f2c6140086a12c7ee7c15',
-             'docs/roadmap.html':'787ba3ee629e930c7c9716c5921e93a0581be6fa'
+             'docs/methodology.html':'a3f066ccf34f99f2766d8475718ee6323e6180c4',
+             'docs/roadmap.html':'87e22725a8adca31ac53ccfb24a7f70d7182b6c7'
           }.items():
             got=subprocess.check_output(['git','hash-object',p],text=True).strip()
             assert got==sha,('PRODUCTION_EDITORIAL_MUTATED',p,got)
