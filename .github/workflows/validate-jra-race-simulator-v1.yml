@@ -147,6 +147,12 @@ jobs:
             w.eval(read('docs/staging/race-sim-engine.js'));
             assert.ok(w.RaceSimEngine.startSpeedFactor(.1)<.20,
               'standing start cannot instantly reach full pace');
+            const gateSpeed=[0,.1,.4,.8,1.6,2.4,2.9].map(t=>w.RaceSimEngine.startSpeedFactor(t));
+            for(let i=1;i<gateSpeed.length;i++){
+              assert.ok(gateSpeed[i]>=gateSpeed[i-1],
+                'start acceleration factor must be continuous and monotonic');
+            }
+            assert.ok(Math.abs(gateSpeed.at(-1)-1)<1e-7,'launch acceleration reaches full speed');
             w.eval(read('docs/staging/race-simulator.js'));
             await new Promise(resolve=>setTimeout(resolve,80));
             assert.ok(w.RaceSimCamera.stableCameraFrame,'smooth camera must be supplied');
@@ -291,6 +297,10 @@ jobs:
             assert.equal(w.document.getElementById('courseMeasurements').textContent.includes(String(course.elevation_range_m)),true);
             engine.validData(source);
             const a=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
+            const gateProbe=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
+            gateProbe.step(.05);
+            assert.ok(gateProbe.state.leader>0&&gateProbe.state.leader<.18,
+              'gate release begins at low speed with no first-frame position jump');
             const b=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
             const c=engine.create(source,{seed:56,pace:'H',bias:'outer'});
             const meanLane=sim=>sim.state.horses.reduce((sum,h)=>sum+h.lane,0)/sim.state.horses.length;
@@ -323,6 +333,18 @@ jobs:
             console.log('SIM_FIRST_100M '+entry.id+' '+JSON.stringify(firstHundredSnapshot));
             assert.ok(firstHundredSnapshot.frontAvg>firstHundredSnapshot.backAvg,
               'escapers should hold a forward position relative to deep closers at 100m');
+            assert.ok(firstHundredSnapshot.lanes.every(h=>h.l<=6.1),
+              'ALL 18 runners must merge to the inner-side six lanes by leading horse at 100m');
+            assert.ok(firstHundredSnapshot.innerBy5>=16,
+              'most runners must already occupy inner five lanes by 100m');
+            for(let i=0;i<firstHundredSnapshot.lanes.length;i++){
+              const x=firstHundredSnapshot.lanes[i];
+              for(let j=0;j<i;j++){
+                const y=firstHundredSnapshot.lanes[j];
+                assert.ok(Math.abs(x.d-y.d)>=2.45 || Math.abs(x.l-y.l)>=.67,
+                  'first-100m convoy may never place two runners in the same racing space');
+              }
+            }
             assert.ok(turnOneSnapshot&&turnOneSnapshot.leading>100);
             console.log('PASS_SIM_RAIL_TENDENCY '+entry.id+' '+JSON.stringify(turnOneSnapshot));
             assert.ok(turnOneSnapshot.meanLane<initialMeanLane,
