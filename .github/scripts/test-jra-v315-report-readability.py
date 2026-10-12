@@ -3,6 +3,7 @@
 import hashlib
 import importlib.util
 import json
+import os
 import sys
 from pathlib import Path
 from weasyprint import HTML
@@ -33,6 +34,12 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
     for x in source['step1_ranking']:
         assert x['horse_name'] in htmltext
     pdf=HTML(string=htmltext,base_url=str(ROOT.resolve())).write_pdf()
+    preview_dir=os.environ.get('JRA_V315_PREVIEW_DIR')
+    if preview_dir:
+        dest=Path(preview_dir)
+        dest.mkdir(parents=True,exist_ok=True)
+        (dest/(rid+'-readable-v315.html')).write_text(htmltext,encoding='utf8')
+        (dest/(rid+'-readable-v315.pdf')).write_bytes(pdf)
     with fitz.open(stream=pdf,filetype='pdf') as pages:
         assert len(pages)==count,(rid,len(pages),count)
         for i,page in enumerate(pages):
