@@ -1,0 +1,37 @@
+name: Validate JRA results staging ticket settlement
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/results.html'
+      - 'docs/staging/assets/results.js'
+      - '.github/scripts/test-jra-results-settlement-v1.mjs'
+      - '.github/workflows/validate-jra-results-settlement-v1.yml'
+      - 'docs/data/races.json'
+  pull_request:
+    paths:
+      - 'docs/staging/results.html'
+      - 'docs/staging/assets/results.js'
+      - '.github/scripts/test-jra-results-settlement-v1.mjs'
+      - '.github/workflows/validate-jra-results-settlement-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  settlement-staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JRA outcome matching and historic settlement regressions
+        run: node .github/scripts/test-jra-results-settlement-v1.mjs
+      - name: Check preview isolation and syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/staging/assets/results.js
+          node --check .github/scripts/test-jra-results-settlement-v1.mjs
+          grep -q 'staging/assets/results.js?v=20261013-settlement1' docs/staging/results.html
+          grep -q 'assets/results.js?v=' docs/results.html
+          test -f docs/data/races.json
+          echo PASS_JRA_PREVIEW_ISOLATION
