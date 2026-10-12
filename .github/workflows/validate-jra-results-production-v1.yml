@@ -1,0 +1,52 @@
+name: Validate JRA production result settlement release
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/assets/results.js'
+      - 'docs/results.html'
+      - '.github/workflows/validate-jra-results-production-v1.yml'
+  pull_request:
+    paths:
+      - 'docs/assets/results.js'
+      - 'docs/results.html'
+      - '.github/workflows/validate-jra-results-production-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  production-results-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify approved staging code matches production and all 64 settlements
+        run: |
+          set -euo pipefail
+          cmp -s docs/staging/assets/results.js docs/assets/results.js
+          grep -q 'assets/results.js?v=20261013-settlement-v104' docs/results.html
+          grep -q 'staging/assets/results.js?v=20261013-settlement1' docs/staging/results.html
+          node --check docs/assets/results.js
+          node .github/scripts/test-jra-results-settlement-v1.mjs
+          echo PASS_JRA_64_TICKETS_PRODUCTION_RENDER
+      - name: Verify production published bytes and no stale results page
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://toodataa-ai.github.io/keiba-notes'
+          for attempt in $(seq 1 45); do
+            ok=1
+            for file in results.html assets/results.js; do
+              if ! curl -fLsS --max-time 20 "$base/$file" -o /tmp/jra-prod-results-bytecheck ||
+                 ! cmp -s "docs/$file" /tmp/jra-prod-results-bytecheck; then
+                ok=0; break
+              fi
+            done
+            if [ "$ok" = 1 ]; then
+              echo PASS_JRA_RESULTS_V104_PRODUCTION_HTTP_BYTES
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Production result page and JS have not been confirmed byte-identical"
+          exit 1

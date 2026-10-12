@@ -9,6 +9,21 @@ function periodKey(mode,r){if(mode==='year')return r.date.slice(0,4);if(mode==='
 function periodText(mode,key,rows){if(mode==='all')return '全期間';if(mode==='year')return `${key}年`;if(mode==='month'){const [y,m]=key.split('-');return `${y}年${Number(m)}月`;}if(mode==='week'){const sample=rows.find(r=>weekRange(r.date).key===key);const w=sample?weekRange(sample.date):{start:key,end:key};return `${w.start}〜${w.end}`;}return key;}
 function splitBet(text){const m=String(text||'').trim().match(/^(\S+)\s+(.+)$/);return m?{type:m[1],selection:m[2]}:{type:'買い目',selection:String(text||'—')};}
 function betTypeSummary(bets){const counts=new Map();for(const b of bets){const type=typeof b==='string'?splitBet(b).type:(b.type||'買い目');counts.set(type,(counts.get(type)||0)+1);}return [...counts.entries()].map(([k,v])=>`${k}${v}点`).join('・');}
+// Match settled tickets by their semantic identity when pre-race final_bets has no bet_id.
+// Unordered bet types are normalized; 馬単/三連単 retain the placing order.
+function ticketKey(type,selection){
+  const kind=String(type||'').trim();
+  const values=Array.isArray(selection)?selection:String(selection??'').match(/\d+/g);
+  if(!values||!values.length)return null;
+  const nums=values.map(Number);
+  if(!nums.every(n=>Number.isInteger(n)&&n>0))return null;
+  const lengths={'単勝':1,'複勝':1,'枠連':2,'馬連':2,'ワイド':2,'馬単':2,'三連複':3,'三連単':3};
+  if(!Object.prototype.hasOwnProperty.call(lengths,kind)||nums.length!==lengths[kind])return null;
+  const unordered=new Set(['単勝','複勝','枠連','馬連','ワイド','三連複']);
+  const ids=unordered.has(kind)?[...nums].sort((a,b)=>a-b):nums;
+  return kind+':'+ids.join('-');
+}
+function textTicketKey(s){const b=splitBet(s);return ticketKey(b.type,b.selection);}
 function betPanel(r){
   const p=r.performance||{};
   const structured=Array.isArray(r.final_bets)&&r.final_bets.length?r.final_bets:null;
@@ -18,7 +33,29 @@ function betPanel(r){
   const hitSet=new Set(Array.isArray(p.hit_bets)?p.hit_bets:[]);
   const missSet=new Set(Array.isArray(p.miss_bets)?p.miss_bets:[]);
   const settlementList=Array.isArray(r.settlements)?r.settlements:(Array.isArray(p.settlements)?p.settlements:[]);
-  const settlements=new Map(settlementList.map(x=>[x.bet_id,x]));
+  const settlements=new Map(settlementList.filter(x=>x.bet_id).map(x=>[x.bet_id,x]));
+  const byTicket=new Map();
+  for(const st of settlementList){
+    const key=ticketKey(st.type,st.selection);
+    if(!key)continue;
+    // Duplicated ticket identities are ambiguous; never assign a false settlement.
+    if(byTicket.has(key))byTicket.set(key,null);
+    else byTicket.set(key,st);
+  }
+  const hitKeys=new Set([...hitSet].map(textTicketKey).filter(Boolean));
+  const missKeys=new Set([...missSet].map(textTicketKey).filter(Boolean));
+  function settlementFor(b){
+    const key=ticketKey(b.type,b.selection);
+    const byId=b.id?settlements.get(b.id):null;
+    if(byId&&key&&ticketKey(byId.type,byId.selection)===key)return byId;
+    return key?byTicket.get(key)||null:null;
+  }
+  function verdict(b){
+    const st=settlementFor(b);
+    const key=ticketKey(b.type,b.selection);
+    return {st,isHit:st?st.hit===true:!!(key&&hitKeys.has(key)),
+      isMiss:st?st.hit===false:!!(key&&missKeys.has(key))};
+  }
   let bets=[];
   if(structured){
     bets=structured.map(b=>({id:b.id||'',type:b.type||'買い目',selection:String(b.selection||'—'),stake_yen:Number(b.stake_yen),layer:b.layer||'',reason:b.reason||'',legacy_text:`${b.type||''} ${b.selection||''}`.trim()}));
@@ -29,13 +66,11 @@ function betPanel(r){
   if(!bets.length)return '<div class="bet-panel"><div class="bet-empty">買い目ごとの内訳は記録されていません。</div></div>';
   const stake=Number(p.stake_yen??r.total_stake_yen??0),payout=Number(p.payout_yen||0),profit=Number(p.profit_yen??(payout-stake));
   const equal100=!structured&&stake===bets.length*100;
-  const knownHits=bets.filter(b=>{const st=settlements.get(b.id);return st?.hit===true||hitSet.has(b.legacy_text)}).length;
+  const knownHits=bets.filter(b=>verdict(b).isHit).length;
   const rows=bets.map(b=>{
-    const st=settlements.get(b.id);
-    const isHit=st?.hit===true||hitSet.has(b.legacy_text);
-    const isMiss=st?.hit===false||missSet.has(b.legacy_text);
+    const {st,isHit,isMiss}=verdict(b);
     const amount=Number.isFinite(b.stake_yen)?b.stake_yen:(equal100?100:null);
-    let rowPayout=Number.isFinite(Number(st?.payout_yen))?Number(st.payout_yen):null;
+    let rowPayout=st?.payout_yen!=null&&Number.isFinite(Number(st.payout_yen))?Number(st.payout_yen):null;
     if(rowPayout==null&&isHit&&knownHits===1&&payout>0)rowPayout=payout;
     if(rowPayout==null&&isMiss)rowPayout=0;
     const status=isHit?'的中':isMiss?'ハズレ':'結果不明';
