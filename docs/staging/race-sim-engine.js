@@ -1,4 +1,4 @@
-/* Racing-lab scenario engine v0.2. Course-informed hypotheses, NOT calibrated odds. */
+/* Racing-lab scenario engine v0.3. Course and traffic aware, NOT calibrated odds. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -27,6 +27,10 @@ function create(data,options={}){
  const pace=['S','M','H'].includes(options.pace)?options.pace:'M';
  const bias=['inner','neutral','outer'].includes(options.bias)?options.bias:'neutral';
  const rng=mulberry32(hash(data.id+'|'+seed));
+ const laneAI=global.RaceLaneAI;
+ if(!laneAI)throw Error('LANE_AI_MISSING');
+ const laneCfg=laneAI.config(profile);
+ const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
  const length=data.distance_m;
  const horses=data.horses.map((h,i)=>{
@@ -35,7 +39,10 @@ function create(data,options={}){
   const no=h.number;
   return { number:no,name:h.name,mark:h.mark,grade:h.grade,win_pct:h.win_pct,
    pace_grade:h.pace_grade,color:i,
-   d:0,lane:(no-1)%8,desiredLane:(no-1)%8,stamina:0.9+rng()*.2,
+   d:0,lane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
+   desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
+   laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
+   stamina:0.9+rng()*.2,
    surge:(rng()-.5)*.46,tempo:(rng()-.5)*.28,ability:skill*.035,
    paceFit:((paceGrade-2)*.085)+(pace==='H'?(rng()-.5)*.14:0),
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
@@ -46,7 +53,9 @@ function create(data,options={}){
  const loggedLandmarks=new Set();
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
-    tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null};
+    tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
+    laneModel:'v0.3-inner-safe',laneCount:laneCfg.maxLane+1,
+    totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
  log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
  // A representative 17 m/s illustrates realistic race-duration scale
@@ -62,36 +71,33 @@ function create(data,options={}){
   const sorted=horses.slice().sort((a,b)=>b.d-a.d);
   for(const h of sorted){
    if(h.finished)continue;
-   let nearby=horses.filter(x=>x!==h && !x.finished && x.d>=h.d-.35 && x.d<=h.d+7.2 && Math.abs(x.lane-h.lane)<.79);
-   h.blocked=nearby.length>0 && fraction>.05 && fraction<.94;
-   // Within the same race, check for a safe adjacent lane before overtaking.
+   // Inside rail is preferred on every course, but NEVER at the expense
+   // of cutting across occupied racing space. A blocked horse can choose
+   // an outside passing route; faster finishers find inside gaps gradually.
    const m=geo.metrics(profile,h.d,h.lane);
-   const atTurn=m.kind==='turn';
    h.gradeNow=m.grade;h.turnNow=m.bend;h.lastCourseSegment=m.segment;
-   if(h.blocked && state.t-h.lastChange>(atTurn?2.3:1.4)){
-    const targets=[h.lane-1,h.lane+1].filter(l=>l>=0&&l<=7);
-    targets.sort((a,b)=>{
-      const aw=bias==='inner'?a:bias==='outer'?7-a:Math.abs(a-h.desiredLane);
-      const bw=bias==='inner'?b:bias==='outer'?7-b:Math.abs(b-h.desiredLane);
-      return aw-bw;
-    });
-    const free=targets.find(l=>horses.every(x=>x===h||x.finished||
-       Math.abs(x.lane-l)>.85||Math.abs(x.d-h.d)>6));
-    if(free!==undefined){
-      h.desiredLane=free;h.lastChange=state.t;
-      if(h.events<3&&fraction>.15){log('lane',h.number+'番 '+h.name+'が進路を変更',h);h.events++}
-    }
-   }
-   if(!h.blocked && state.t-h.lastChange>3.1){
-     const ideal=bias==='inner'?1.4:bias==='outer'?6.3:3.4;
-     const target=clamp(Math.round(h.lane+Math.sign(ideal-h.lane)),0,7);
-     if(horses.every(x=>x===h||x.finished||Math.abs(x.lane-target)>1.0||Math.abs(x.d-h.d)>5.5)){
-       h.desiredLane=target;h.lastChange=state.t;
+   const choice=laneAI.plan(h,horses,laneCfg,m,bias,state.t);
+   if(choice){
+     h.desiredLane=choice.lane;h.lastChange=state.t;
+     h.laneChanges++;state.totalLaneChanges++;
+     if(choice.mode==='inward'){h.inwardMoves++;state.totalInsideMoves++}
+     else {h.outwardMoves++;state.totalOutsidePasses++}
+     if(h.events<5){
+        log('lane',h.number+'番 '+h.name+(choice.mode==='inward'?'が内の空いた進路へ':'が外の進路で前をかわす'),h);
+        h.events++;
      }
    }
+   // A planned crossing must remain safe throughout, including after other
+   // horses advance. Abort rather than cutting across a horse next to it.
+   if(Math.abs(h.desiredLane-h.lane)>.05 &&
+      !laneAI.laneSafe(h,horses,h.desiredLane,laneCfg)){
+       h.desiredLane=h.lane;
+   }
    const move=h.desiredLane-h.lane;
-   h.lane+=clamp(move,-dt*.72,dt*.72);
-   const groundBias=(bias==='inner'?(3.6-h.lane):bias==='outer'?(h.lane-3.6):0)*.045;
+   const laneAdvance=clamp(move,-dt*.60,dt*.60);
+   h.laneVelocity=laneAdvance/(dt||1);
+   h.lane=clamp(h.lane+laneAdvance,0,laneCfg.maxLane);
+   const groundBias=(bias==='inner'?(laneCfg.maxLane/2-h.lane):bias==='outer'?(h.lane-laneCfg.maxLane/2):0)*.026;
    // Separate geometry losses: turns cost extra metres for outer lanes, uphill
    // reduces instantaneous speed and drains a little energy, downhill can restore pace.
    // Coefficients are explicitly provisional; curvature/altitude breakpoints are estimates.
@@ -109,8 +115,18 @@ function create(data,options={}){
    speed=Math.max(base*.84,speed);
    const before=h.d;
    const physical=speed*dt;
+   const proposed=physical/m.pathStretch;
+   const safe=laneAI.throttle(h,horses,proposed,dt,laneCfg);
+   if(safe.held){
+     h.blocked=true;
+     h.trafficHoldSeconds+=dt;state.trafficHolds++;
+     if(!h.lastBlocked&&h.events<6&&fraction>.04){
+       log('traffic',h.number+'番 '+h.name+'は前が詰まり、進路を探す',h);
+       h.events++;
+     }
+   }else if(!choice){h.blocked=false}
    h.distancePenaltyM+=physical*(1-1/m.pathStretch);
-   h.d+=physical/m.pathStretch;
+   h.d+=safe.distance;
    if(h.d>=length){
      h.finishTime=state.t-dt+dt*clamp((length-before)/(h.d-before),0,1);
      h.d=length;
@@ -118,7 +134,7 @@ function create(data,options={}){
      log('finish',h.number+'番 '+h.name+'がゴール',h);
      if(state.firstFinishTime===null)state.firstFinishTime=h.finishTime;
    }
-   if(!h.lastBlocked&&h.blocked&&h.events<3&&fraction>.25){log('traffic',h.number+'番 '+h.name+'の前が詰まる',h);h.events++}
+   // Path and separation events are emitted above; do not duplicate every tick.
    h.lastBlocked=h.blocked;
    h.trail.push({d:h.d,lane:h.lane});
    if(h.trail.length>100)h.trail.shift();
@@ -151,7 +167,7 @@ function create(data,options={}){
  }
  function standings(){return horses.slice().sort((a,b)=>Number(b.finished)-Number(a.finished)||
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
- return {state,step,standings,rand:rng,course:profile};
+ return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
 }
 global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS});
 })(typeof window!=='undefined'?window:globalThis);
