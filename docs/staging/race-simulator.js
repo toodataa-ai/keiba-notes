@@ -1,4 +1,4 @@
-/* Staging race simulator v0.8. Camera easing and pre-race running-style tactics. */
+/* Staging race simulator v0.9. JRA official bracket colors on running numbers. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -212,7 +212,9 @@ function renderData(){
   const lead=state.leader-h.d;
   const gap=state.finished?Number(h.finishTime||0).toFixed(1)+'秒':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
   const focus=ui.focus.value===String(h.number);
-  return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+' <span class="small-muted">'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'？'}[h.style]||'？')+'</span></span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
+  return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle" style="background:'+jraWaku(h.number,race.field_size).fill+
+     ';color:'+jraWaku(h.number,race.field_size).text+';border:1px solid '+
+     jraWaku(h.number,race.field_size).border+'">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+' <span class="small-muted">'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'？'}[h.style]||'？')+'</span></span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
  }).join('');
  ui.events.innerHTML=state.events.slice(0,7).map(e=>'<li><strong>'+dur(e.t)+'</strong>　'+esc(e.message)+'</li>').join('');
 }
@@ -253,21 +255,59 @@ function horseSprite(ctx,x,y,h,time,selected){
 }
 /* A number marker IS the runner; its centre never leaves simulated track
    coordinates. No horse sprite, floating label, offset, leader line or tether. */
-function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false){
+/* JRA official eight frame colors and starter-card assignment.
+   18 starters: 1–6 frames two each, frames 7–8 three each.
+   NEVER infer color from horse number modulo eight. */
+const JRA_WAKU=Object.freeze([
+ {name:'白',fill:'#fffdf5',text:'#111827',border:'#111827'},
+ {name:'黒',fill:'#15191f',text:'#ffffff',border:'#f4f4f5'},
+ {name:'赤',fill:'#d9142f',text:'#ffffff',border:'#fff4f4'},
+ {name:'青',fill:'#164bb8',text:'#ffffff',border:'#f1f5ff'},
+ {name:'黄',fill:'#ffde30',text:'#171717',border:'#35301c'},
+ {name:'緑',fill:'#1d8c49',text:'#ffffff',border:'#edfff4'},
+ {name:'橙',fill:'#f9811f',text:'#111827',border:'#422509'},
+ {name:'桃',fill:'#f4a1c5',text:'#171717',border:'#542e3f'}
+]);
+function jraWaku(number,fieldSize=18){
+ if(!Number.isInteger(number)||!Number.isInteger(fieldSize)||
+   fieldSize<8||fieldSize>18||number<1||number>fieldSize)
+   throw Error('JRA_WAKU_FIELD_INVALID');
+ const base=Math.floor(fieldSize/8),extra=fieldSize%8;
+ let first=1;
+ for(let i=0;i<8;i++){
+   const n=base+(i>=8-extra?1:0);
+   if(number<first+n)return {waku:i+1,...JRA_WAKU[i]};
+   first+=n;
+ }
+ throw Error('JRA_WAKU_NOT_FOUND');
+}
+window.RaceWakuColors=Object.freeze({forHorse:jraWaku,palette:JRA_WAKU});
+function paintWakuLegend(){
+ const root=$('wakuLegend');if(!root)return;
+ root.innerHTML=JRA_WAKU.map((p,i)=>'<span class="waku-key" role="listitem"><span class="waku-swatch" style="background:'+
+   p.fill+';color:'+p.text+';border-color:'+p.border+'">'+(i+1)+'</span>'+
+   (i+1)+'枠 '+p.name+'</span>').join('');
+}
+function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,fieldSize=18){
  if(!Number.isInteger(number)||number<1||!Number.isFinite(x)||!Number.isFinite(y))
   throw Error('SIM_NUMBER_POSITION_INVALID');
  const radius=(focused?15.5:13.5)*scale;
+ const waku=jraWaku(number,fieldSize);
  ctx.save();
  ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
- ctx.fillStyle=focused?'#f1cf64':leading?'#f0ead7':'#172334';ctx.fill();
- ctx.lineWidth=(focused?3.4:2.4)*scale;
- ctx.strokeStyle=focused?'#fff9d6':'#ffffff';ctx.stroke();
+ ctx.fillStyle=waku.fill;ctx.fill();
+ ctx.lineWidth=(focused?2.8:2.1)*scale;
+ ctx.strokeStyle=waku.border;ctx.stroke();
+ if(focused){
+   ctx.beginPath();ctx.arc(x,y,radius+4.3*scale,0,Math.PI*2);
+   ctx.lineWidth=3.2*scale;ctx.strokeStyle='#f9d46c';ctx.stroke();
+ }
  ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.fillStyle=focused||leading?'#152339':'#ffffff';
+ ctx.fillStyle=waku.text;
  ctx.font='900 '+(number>9?16:18)*scale+'px Arial, sans-serif';
  ctx.fillText(String(number),x,y+.4*scale);
  ctx.restore();
- return {number,x,y};
+ return {number,x,y,waku:waku.waku};
 }
 function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo,anchor={x:width*.5,y:height*.52}){
  if(!Array.isArray(horses))throw Error('SIM_HORSES_MISSING');
@@ -279,14 +319,14 @@ function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,le
  }).sort((x,y)=>Number(x.focused)-Number(y.focused)||
   Number(x.leading)-Number(y.leading)||x.number-y.number);
 }
-function drawRaceNumbers(ctx,points,width,height,renderedWidth){
+function drawRaceNumbers(ctx,points,width,height,renderedWidth,fieldSize=18){
  const scale=width/Math.max(1,renderedWidth),visible=[];
  for(const p of points){
   const radius=(p.focused?15.5:13.5)*scale;
   // A number that is out of view stays out of view: never detach it
   // from the actual moving horse coordinates.
   if(p.x+radius<0||p.x-radius>width||p.y+radius<0||p.y-radius>height)continue;
-  visible.push(raceNumberMarker(ctx,p.number,p.x,p.y,scale,p.focused,p.leading));
+  visible.push(raceNumberMarker(ctx,p.number,p.x,p.y,scale,p.focused,p.leading,fieldSize));
  }
  return visible;
 }
@@ -438,7 +478,7 @@ function drawRace(){
  ctx.restore();
  const points=projectRaceNumbers(state.horses,profile,origin,zoom,w,h,
    target.number,state.leadingNo,anchor);
- const visibleNumbers=drawRaceNumbers(ctx,points,w,h,renderedWidth);
+ const visibleNumbers=drawRaceNumbers(ctx,points,w,h,renderedWidth,race.field_size);
  // Television overlays are static on screen, not rotated with the course.
  rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
  ctx.font='bold 17px Meiryo';ctx.textAlign='left';ctx.fillStyle='#f7f6ee';
@@ -529,10 +569,11 @@ function drawCourse(){
  const horses=sim.state.horses.slice().sort((x,y)=>x.d-y.d);
  for(const h of horses){
    const p=RaceCourseGeometry.point(prof,h.d,h.lane);
-   ctx.fillStyle=baseColor[(h.number-1)%baseColor.length];
+   const waku=jraWaku(h.number,race.field_size);
+   ctx.fillStyle=waku.fill;
    ctx.beginPath();ctx.arc(p.x,p.y,h.number===sim.state.leadingNo?6.3:5.1,0,Math.PI*2);ctx.fill();
    ctx.lineWidth=h.number===sim.state.leadingNo?2.5:1.5;
-   ctx.strokeStyle=h.number===sim.state.leadingNo?'#ffe694':'#1d3025';ctx.stroke();
+   ctx.strokeStyle=h.number===sim.state.leadingNo?'#ffe694':waku.border;ctx.stroke();
    if(h.number===sim.state.leadingNo || ui.focus.value===String(h.number)){
      ctx.font='bold 10px monospace';ctx.fillStyle='#fff';ctx.fillText(String(h.number),p.x+8,p.y-8);
    }
@@ -591,6 +632,7 @@ ui.path.addEventListener('change',render);
 ui.speed.addEventListener('change',render);
 window.addEventListener('resize',()=>{cameraMotion=null;resizeRaceCanvas();render()});
 resizeRaceCanvas();
+paintWakuLegend();
 window.addEventListener('pagehide',()=>{running=false;cancelAnimationFrame(frameId)});
 initialize();
 })();
