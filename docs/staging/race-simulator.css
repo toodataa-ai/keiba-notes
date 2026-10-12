@@ -46,3 +46,18 @@
 
 /* No floating labels when the externally hosted image fails to load. */
 .real-course-track canvas.real-course-overlay[hidden]{display:none!important}
+
+/* Stage v0.14 — full-width actual racecourse immediately after the broadcast.
+   The 620×430 image and number canvas scale together; no 2-column squeeze. */
+.course-panel-wide{margin:0 0 15px;padding:14px 16px}
+.course-panel-wide .reference-map-figure{width:100%;padding:10px 12px}
+.course-panel-wide .real-course-track{width:100%;max-width:none}
+.course-panel-wide #courseCanvas{display:block;width:100%;max-width:100%;height:auto}
+.ranking-grid{display:block}
+.ranking-grid .standings-panel{width:100%}
+.ranking-grid .standings{max-height:345px}
+@media(max-width:640px){
+ .course-panel-wide{padding:12px}
+ .course-panel-wide .reference-map-figure{padding:6px}
+ .ranking-grid .standings{max-height:300px}
+}

@@ -56,7 +56,7 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.13' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.14' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.js?v=20261012-13' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
@@ -71,7 +71,11 @@ jobs:
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-1' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261012-13' in html
+          assert 'race-simulator.css?v=20261012-14' in html
+          assert 'race-sim-engine.js?v=20261012-14' in html
+          assert 'race-lane-ai-v1.js?v=20261012-14' in html
+          assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
+          assert 'ranking-grid' in html
           assert '実際のコース図（標準）' in html
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
           PY
@@ -470,6 +474,16 @@ jobs:
               };
             }
             assert.ok(firstHundredSnapshot,'100m position snapshot is recorded');
+            assert.ok(Number.isInteger(a.state.finalStraightPasses) && a.state.finalStraightPasses>=0);
+            assert.equal(typeof engine.finishDrive,'function');
+            const closeRunner=a.state.horses.find(x=>x.style==='oikomi');
+            const frontRunner=a.state.horses.find(x=>x.style==='nige');
+            if(closeRunner&&frontRunner){
+              const r=course.straight_m*.20;
+              const closing=engine.finishDrive(closeRunner,r,course,'H');
+              const fading=engine.finishDrive(frontRunner,r,course,'H');
+              assert.ok(closing>fading,'stayers should have greater late drive than pace setters under H pace');
+            }
             console.log('SIM_FIRST_100M '+entry.id+' '+JSON.stringify(firstHundredSnapshot));
             assert.ok(firstHundredSnapshot.frontAvg>firstHundredSnapshot.backAvg,
               'escapers should hold a forward position relative to deep closers at 100m');

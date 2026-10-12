@@ -1,4 +1,4 @@
-/* Racing-lab scenario engine v0.5. Smooth gate acceleration and bounded 100m inward formation; NOT calibrated odds. */
+/* Racing-lab scenario engine v0.14. Start safety retained; staged, stochastic finish drive. NOT calibrated odds. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -9,6 +9,18 @@ function startSpeedFactor(t){return .12+.88*smoothstep(t/2.9)}
 function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
  const taper=1-smoothstep((d-85)/35);
  return .65+3.0*leadIn*taper;
+}
+// Stamina, prior running style and scenario pace yield a gradual—not
+// scripted—late-race speed difference. Every horse is determined at gate load.
+const LATE_STYLE_DRIVE=Object.freeze({nige:-.22,senko:.08,sashi:.61,oikomi:1.08,unknown:.27});
+function finishDrive(h,remaining,profile,pace){
+ const stretch=profile.straight_m;
+ // Begin wind-up on the final bend, reach full drive in the home straight.
+ const ramp=smoothstep((stretch+130-remaining)/(stretch*.85+130));
+ const reserve=(h.stamina-1)*1.65+h.lateKick*1.40;
+ const highPaceTax=pace==='H'?(h.style==='nige'?.42:h.style==='senko'?.17:-.10):
+                   pace==='M'?(h.style==='nige'?.21:0):0;
+ return ramp*(LATE_STYLE_DRIVE[h.style]??.27)+ramp*reserve-ramp*highPaceTax;
 }
 function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -78,7 +90,8 @@ function create(data,options={}){
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
     laneModel:'v0.6-style-early-inside',laneCount:laneCfg.maxLane+1,
-    totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0};
+    totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
+    finalStraightPasses:0,lastOvertakeLog:-100};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
  log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
  // A representative 17 m/s illustrates realistic race-duration scale
@@ -92,6 +105,7 @@ function create(data,options={}){
   const fraction=clamp(state.leader/length,0,1);
   const paceEffect=pace==='H'? (fraction<.48?1.22:-.92):pace==='S'?(fraction<.55?-.82:1.06):0;
   const sorted=horses.slice().sort((a,b)=>b.d-a.d);
+  const prior=horses.map(h=>({number:h.number,d:h.d,finished:h.finished}));
   for(const h of sorted){
    if(h.finished)continue;
    // Inside rail is preferred on every course, but NEVER at the expense
@@ -151,8 +165,7 @@ function create(data,options={}){
    h.fatigue=clamp(h.fatigue,0,.22);
    const staminaLoss=pace==='H'? Math.pow(fraction,1.9)*h.stamina*.28:Math.pow(fraction,2)*h.stamina*.16;
    const remaining=length-h.d;
-   const finalStretch=m.isFinalStraight?clamp(1-remaining/profile.straight_m,0,1):0;
-   const finishing=finalStretch*h.lateKick;
+   const finishing=finishDrive(h,remaining,profile,pace);
    let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue;
    // A runner self-selects a fore-aft position from its PREVIOUS race's
    // corner passage. No STEP1 marks, popularity, odds or target result.
@@ -165,8 +178,12 @@ function create(data,options={}){
    speed=(speed+(h.d<100?h.launchVariation:0))*gateFactor;
    if(h.blocked){
      const front=laneAI.nearestAhead(h,horses,h.lane);
-     const gap=front?Math.max(0,front.d-h.d):7.2;
-     speed-=clamp(1.2-gap*.065,.30,1.2);
+     // No artificial deceleration merely because another horse is
+     // 8–12m ahead. Brake only if materially boxed in.
+     if(front){
+       const gap=Math.max(0,front.d-h.d);
+       if(gap<5.0)speed-=clamp((5-gap)*.18,.12,.75);
+     }
    }
    speed=Math.max(base*.84*startSpeedFactor(state.t),speed);
    const before=h.d;
@@ -194,6 +211,25 @@ function create(data,options={}){
    h.lastBlocked=h.blocked;
    h.trail.push({d:h.d,lane:h.lane});
    if(h.trail.length>100)h.trail.shift();
+  }
+  // Count actual longitudinal position crossings, not "cinematic" fake
+  // passes. Do not count finish-line ties or movement between lanes alone.
+  if(state.leader>=length-profile.straight_m){
+    const old=new Map(prior.map(h=>[h.number,h]));
+    let firstPass=null;
+    for(let i=0;i<horses.length;i++)for(let j=i+1;j<horses.length;j++){
+      const x=horses[i],y=horses[j],px=old.get(x.number),py=old.get(y.number);
+      if(x.finished||y.finished||px.finished||py.finished)continue;
+      if((px.d<py.d && x.d>y.d)||(py.d<px.d&&y.d>x.d)){
+        state.finalStraightPasses++;
+        if(!firstPass)firstPass=x.d>y.d?[x,y]:[y,x];
+      }
+    }
+    if(firstPass && state.t-state.lastOvertakeLog>1.5){
+      const [attacker,victim]=firstPass;
+      log('pass',attacker.number+'番 '+attacker.name+'が直線で'+victim.number+'番をかわす',attacker);
+      state.lastOvertakeLog=state.t;
+    }
   }
   const leaders=horses.slice().sort((a,b)=>b.d-a.d||a.finishTime-b.finishTime||a.number-b.number);
   const previousLead=state.leader;
@@ -225,5 +261,5 @@ function create(data,options={}){
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
  return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
 }
-global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt});
+global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive});
 })(typeof window!=='undefined'?window:globalThis);

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13161f">
 <title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
 <link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="race-simulator.css?v=20261012-13">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-14">
 </head>
 <body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
@@ -54,14 +54,13 @@
   <div id="wakuLegend" class="waku-legend" role="list" aria-label="JRA 1枠から8枠の枠色一覧"></div>
  </section>
 
- <div class="bottom-grid">
-  <section class="panel course-panel" aria-label="コース俯瞰図">
+ <section class="panel course-panel course-panel-wide" aria-label="コース俯瞰図">
    <div class="panel-head"><h2>実際のコース図・走行位置</h2><span id="courseLabel">芝・距離</span></div>
    <label class="reference-map-switch">表示<select id="courseMapMode" aria-label="実コース図または仮想走行位置">
      <option value="reference" selected>実際のコース図（標準）</option>
      <option value="sim">仮想走行位置・高低差</option>
    </select></label>
-   <label class="reference-scale-switch">図の大きさ<select id="referenceScale"><option value="fit" selected>全体表示</option><option value="native">等倍表示（横スクロール）</option></select></label>
+   <label class="reference-scale-switch">図の大きさ<select id="referenceScale"><option value="fit" selected>画面幅いっぱい</option><option value="native">等倍表示（横スクロール）</option></select></label>
    <div class="reference-map-figure" id="referenceMapFigure">
      <div id="tokyoRealCourseMap" hidden>
        <div class="real-course-track"><img id="tokyoCourseImage"
@@ -85,6 +84,7 @@
    <p class="small-muted" id="courseMeasurements">コース寸法を読み込み中…</p>
    <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRAのコース公式数値と説明を確認</a> ／ 図素材は<a href="https://umapot.com/?page_id=116" target="_blank" rel="noopener noreferrer">うまぽっと（無料素材・再配布禁止）</a>を使用。コース計算座標は近似です。実画像上の馬番位置は表示専用の手動調整で、GPSや測量原本ではありません。</p>
   </section>
+ <div class="bottom-grid ranking-grid">
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
    <p id="runnerStyleInfo" class="small-muted">前走通過順から脚質を確認中…</p>
@@ -99,7 +99,8 @@
   <h2>このシミュレーションで分かること・分からないこと</h2>
   <p>脚質は保存済みの発走前レポートの「前走通過順」を出走頭数で補正して暫定分類します。逃げ馬は先頭を取りに行き、先行馬は前方、差し馬は中団、追込馬は後方を目指します。前走が確認できない馬は脚質不明として扱います。いずれも単一の前走からの推定で、実際の走法を保証するものではありません。</p>
   <p>発走直後は速度とカメラの追従を滑らかにし、最初の100mで各馬が安全な内側の進路へ寄るよう優先します。全馬が同時に内ラチの最短線を通れるわけではないため、前後の間隔を保ちながら内寄りの馬群を形成します。</p>
-  <p>進路の基本方針は内ラチ優先です。安全な空きがあれば積極的に内へ寄り、前が詰まったときだけ外へ回って追い越します。強引な割り込みや他馬との交錯は避けます。</p>
+  <p>進路の基本方針はコーナーでは内ラチ優先です。最後の直線では前が詰まる前から外側に空いた進路を探し、追い越しを試みます。無理な割り込みや馬体の交錯はしません。</p>
+  <p>直線の末脚は発走前の脚質分類、個体ごとに固定したスタミナ・加速特性、ペースと位置取りに応じて徐々に変わります。直線に入った時点の着順を固定せず、差し・追込の加速と先行勢の消耗を仮定します。必ず順位が変わるように決め打ちする演出ではありません。</p>
   <p>走る番号の丸いマーカーはJRAの公式枠色です（1枠白・2枠黒・3枠赤・4枠青・5枠黄・6枠緑・7枠橙・8枠桃）。18頭立ては1〜6枠が各2頭、7〜8枠が各3頭となり、馬番ごとに正しい枠色を付けます。</p>
   <p>実況ビューは馬の絵を使わず、数字そのものが走路上を走ります。番号の中心が馬の位置で、引き出し線や移動したラベルはありません。注目馬は元の枠色の外側を金色の輪で強調します。密集時は正確な位置を優先するため、数字が一部重なる場合があります。</p>
   <p>標準の「全頭を自動追跡」は先頭だけでなく最後方の馬まで収まるよう、馬群の広がりに合わせてカメラの中心と倍率を毎フレーム調整します。後ろの馬も画面から消えません。全体をさらに広く見る切替もあります。マーカーが接近した場合に番号同士が重なることはありますが、実際の座標をずらして表示することはありません。</p>
@@ -108,12 +109,12 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.13 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.14 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-11"></script>
-<script src="race-lane-ai-v1.js?v=20261012-8"></script>
+<script src="race-lane-ai-v1.js?v=20261012-14"></script>
 <script src="race-runner-style-v1.js?v=20261012-8"></script>
 <script src="race-umapot-overlay-v1.js?v=20261012-1"></script>
-<script src="race-sim-engine.js?v=20261012-8"></script>
+<script src="race-sim-engine.js?v=20261012-14"></script>
 <script src="race-simulator.js?v=20261012-13"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>

@@ -44,12 +44,15 @@ function nearestAhead(h,horses,atLane=h.lane){
 function plan(h,horses,cfg,courseMetrics,bias,t){
  const m=courseMetrics;
  const front=nearestAhead(h,horses);
- const obstructed=Boolean(front && front.d-h.d<7.5);
+ // Straight runners plan a pass before they are fully boxed in. A blocked
+ // finisher needs an alternative LINE, not a position teleport or speed cheat.
+ const finalStraight=Boolean(m.isFinalStraight);
+ const obstructed=Boolean(front && front.d-h.d<(finalStraight?12.5:7.5));
  h.blocked=obstructed;
  if(Math.abs(h.lane-h.desiredLane)>.07)return null;
  // Each move is gradual (engine clamps lateral velocity); check the whole
  // crossing corridor and the space ahead before choosing a route.
- const cooldown=m.bend>.5?1.50:1.0;
+ const cooldown=finalStraight?.65:m.bend>.5?1.50:1.0;
  if(t-h.lastChange<cooldown || h.d<8)return null;
  const old=h.lane;
  function freeForward(lane,buffer){
@@ -61,9 +64,17 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
    if(!freeForward(lane,8.5))return null;
    return {lane,mode,avoids:obstructed,scoreGain:1,reason};
  }
- // Savings from riding a shorter arc are continuous, not merely a
- // last-resort tactic. The default is to work inward whenever there
- // is a legitimately clear gap; no penalty for being near the rail.
+ // A fast finisher in the home straight must consider free outside lines
+ // BEFORE continuing its automatic inward drift into a boxed-in lane.
+ // Test more than one outside target: the adjacent lane may be occupied.
+ if(finalStraight&&obstructed){
+   for(const spread of [1,2,3]){
+     const outside=route(Math.min(cfg.maxLane,old+spread),'outward','home-straight-pass');
+     if(outside)return outside;
+   }
+ }
+ // Before the final straight: shorter inside arcs remain the default.
+ // In the straight, a clear inside lane is still a valid passing route.
  // "外有利" can keep a useful wider line on the final straight, but
  // cannot push a free runner out arbitrarily at every tick.
  const preferInside=bias!=='outer'||m.bend>.22||old>4;
