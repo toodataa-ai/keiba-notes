@@ -24,8 +24,9 @@ jobs:
           prod=Path('docs/this-week.html').read_text()
           stage=Path('docs/staging/this-week.html').read_text()
           assert 'stagingJraReports' not in stage
-          assert stage.count('id="jra-staging-report-link-override"')==1
-          assert 'jra-staging-report-link-override' not in prod
+          assert stage.count('class="staging-shell-marker"')==1
+          assert stage.count('stage-week-preview.js')==1
+          assert 'stage-week-preview.js' not in prod
           assert 'id="weekPredictions"' in prod and 'id="weekPredictions"' in stage
           print('PASS_NO_STAGE_ONLY_UI_CONTROLS')
           PY

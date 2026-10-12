@@ -1,73 +1,41 @@
 #!/usr/bin/env python3
-"""Derive a 1:1 JRA this-week staging page from current production HTML.
-
-Only intentional differences:
-  (1) invisible asset path base and noindex;
-  (2) staging home destination;
-  (3) a tiny non-layout STAGING marker;
-  (4) the reviewed race-specific preview target URL for only two 2026-10-12 races.
-Never edit the production template, races.json, predictions or final_bets.
+"""Maintain the exact production JRA week layout on staging, adding only:
+  - a common always-visible staging marker and four-pixel horizontal stripe,
+  - preview-only in-page diagnosis on selected report links,
+  - safe staging-home navigation and noindex.
+The public data, final_bets, CSS, and report renderer are not modified.
 """
 from pathlib import Path
-import re
 import sys
-
-PRODUCTION = Path("docs/this-week.html")
-STAGING = Path("docs/staging/this-week.html")
-START = "<head>"
-HOME = 'href="index.html"'
-OVERRIDE = r"""<script id="jra-staging-report-link-override">
-/* Staging only: same production card/typography, but target the unapproved mark-order reports. */
-(() => {
-  const root=document.getElementById('weekPredictions');
-  if(!root)return;
-  const replacements = {
-    'reports/2026-10-12-october-stakes-v315-readable-v102.html':'staging/jra-v315-20261012/tokyo11.html',
-    'pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf':'staging/jra-v315-20261012/tokyo11.pdf',
-    'reports/2026-10-12-swan-stakes-v315-readable-v102.html':'staging/jra-v315-20261012/kyoto11.html',
-    'pdfs/2026-10-12-swan-stakes-v315-readable-v102.pdf':'staging/jra-v315-20261012/kyoto11.pdf'
-  };
-  function replaceTargets() {
-    for(const a of root.querySelectorAll('.race-card a[href]')){
-      const dest=replacements[a.getAttribute('href')];
-      if(dest) a.setAttribute('href',dest);
-    }
-  }
-  new MutationObserver(replaceTargets).observe(root,{childList:true,subtree:true});
-  replaceTargets();
-})();
-</script>"""
-MARKER_CSS = """<style id="jra-staging-nonlayout-marker">
-.staging-visual-marker{position:fixed;right:6px;bottom:6px;z-index:2147483647;
-  border-radius:4px;padding:3px 6px;font:700 9px "Meiryo UI",Meiryo,sans-serif;
-  line-height:1.2;letter-spacing:.02em;color:#fff;background:rgba(110,69,33,.82);
-  pointer-events:none}
-</style>"""
-MARKER = '<div class="staging-visual-marker" aria-label="ステージング版">STAGING</div>'
-
-def render(production: str) -> str:
-    assert production.count(START)==1 and production.count('</head>')==1
-    assert production.count('<body>')==1 and production.count('</body>')==1
-    assert production.count(HOME)==1, 'production home link changed; update stage mirror generator intentionally'
-    assert 'id="weekPredictions"' in production and 'assets/week.js?' in production
-    result = production.replace(START,START+'\n<meta name="robots" content="noindex,nofollow"><base href="../">\n',1)
-    result = result.replace('</head>', MARKER_CSS+'\n</head>',1)
-    result = result.replace(HOME, 'href="staging/index.html"',1)
-    result = result.replace('<body>', '<body>\n'+MARKER,1)
-    result = result.replace('</body>', OVERRIDE+'\n</body>',1)
-    return result
-
+PROD=Path("docs/this-week.html")
+STAGE=Path("docs/staging/this-week.html")
+STAGE_MARKER='<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>'
+STAGE_STYLES='''<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+<link rel="stylesheet" href="staging/stage-week-preview.css?v=20261012-1">'''
+STAGE_SCRIPT='<script src="staging/stage-week-preview.js?v=20261012-1"></script>'
+def render(prod):
+    assert prod.count('<html lang="ja">')==1
+    assert prod.count('<head>')==1 and prod.count('</head>')==1
+    assert prod.count('</body>')==1 and prod.count('<body>')==1
+    assert prod.count('href="index.html"')==1
+    assert 'id="weekPredictions"' in prod and 'assets/week.js?' in prod
+    h=prod.replace('<html lang="ja">','<html lang="ja" data-stage="preview">',1)
+    h=h.replace('<head>','<head>\n<meta name="robots" content="noindex,nofollow"><base href="../">',1)
+    h=h.replace('</head>',STAGE_STYLES+'\n</head>',1)
+    h=h.replace('<body>','<body>\n'+STAGE_MARKER,1)
+    h=h.replace('href="index.html"','href="staging/index.html"',1)
+    h=h.replace('</body>',STAGE_SCRIPT+'\n</body>',1)
+    return h
 def main():
-    prod=PRODUCTION.read_text(encoding='utf8')
+    prod=PROD.read_text(encoding='utf8')
     expected=render(prod)
-    assert expected.count('id="jra-staging-report-link-override"')==1
-    assert all(name in expected for name in ('tokyo11.html','tokyo11.pdf','kyoto11.html','kyoto11.pdf'))
+    assert expected.count('class="staging-shell-marker"')==1
+    assert expected.count('stage-week-preview.js')==1
     assert expected.count('id="weekPredictions"')==1
     if '--check' in sys.argv[1:]:
-        assert STAGING.read_text(encoding='utf8')==expected, 'JRA_STAGING_NOT_1_TO_1_PRODUCTION_TEMPLATE'
-        print('PASS_JRA_THIS_WEEK_STAGE_EXACT_PRODUCTION_MIRROR_WITH_URL_ONLY_OVERLAY')
+        assert STAGE.read_text(encoding='utf8')==expected,'JRA_WEEK_STAGING_NOT_PRODUCTION_MIRROR'
+        print('PASS_JRA_WEEK_STAGING_EXACT_PRODUCTION_MIRROR_WITH_INPAGE_PREVIEW')
     else:
-        STAGING.write_text(expected,encoding='utf8')
-        print('PREPARED_JRA_THIS_WEEK_STAGE_EXACT_PRODUCTION_MIRROR',STAGING)
-if __name__ == '__main__':
-    main()
+        STAGE.write_text(expected,encoding='utf8')
+        print('WRITE_JRA_STAGE_MIRROR',STAGE)
+if __name__=='__main__':main()
