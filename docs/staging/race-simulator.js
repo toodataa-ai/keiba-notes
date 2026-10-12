@@ -1,4 +1,4 @@
-/* Staging race simulator v0.6. Moving horse numbers ARE the runner positions; physics unchanged. */
+/* Staging race simulator v0.7. Adaptive full-field chase camera; moving numbers = runner locations. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -29,7 +29,7 @@ function viewCamera(mode,screenWidth,canvasWidth){
  return Object.freeze({mode:chosen,zoom,spriteScale,horsePx});
 }
 // Pure sizing function is exposed for automated mobile/desktop pixel validation.
-window.RaceSimCamera=Object.freeze({viewCamera});
+// The complete camera API is exposed after the frame solver is initialized.
 function resizeRaceCanvas(){
  const tall=window.innerWidth<=640;
  const next=tall?730:470;
@@ -259,12 +259,12 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false){
  ctx.restore();
  return {number,x,y};
 }
-function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo){
+function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo,anchor={x:width*.5,y:height*.52}){
  if(!Array.isArray(horses))throw Error('SIM_HORSES_MISSING');
  return horses.map(h=>{
   const p=RaceCourseGeometry.point(profile,h.d,h.lane);
-  return {number:h.number,x:width*.5+zoom*(p.x-origin.x),
-    y:height*.52+zoom*(p.y-origin.y),
+  return {number:h.number,x:anchor.x+zoom*(p.x-origin.x),
+    y:anchor.y+zoom*(p.y-origin.y),
     focused:h.number===focusedNo,leading:h.number===leadingNo};
  }).sort((x,y)=>Number(x.focused)-Number(y.focused)||
   Number(x.leading)-Number(y.leading)||x.number-y.number);
@@ -283,6 +283,28 @@ function drawRaceNumbers(ctx,points,width,height,renderedWidth){
 window.RaceSimNumbers=Object.freeze({
  marker:raceNumberMarker,project:projectRaceNumbers,draw:drawRaceNumbers
 });
+/* Always keep EVERY runner in frame in the standard camera. Fit the
+   true world-coordinate bbox, including last place, and reserve space
+   for number circles and mobile HUD. No label displacement. */
+function frameEntireField(horses,profile,mode,width,height,renderedWidth){
+ if(!Array.isArray(horses)||!horses.length)throw Error('SIM_AUTOFRAME_EMPTY_FIELD');
+ const points=horses.map(h=>RaceCourseGeometry.point(profile,h.d,h.lane));
+ const left=Math.min(...points.map(p=>p.x)),right=Math.max(...points.map(p=>p.x));
+ const top=Math.min(...points.map(p=>p.y)),bottom=Math.max(...points.map(p=>p.y));
+ const pixelRatio=width/Math.max(1,renderedWidth);
+ const marginX=Math.min(width*.24,Math.max(48,22*pixelRatio));
+ const marginTop=Math.min(height*.30,Math.max(80,23*pixelRatio));
+ const marginBottom=Math.min(height*.30,Math.max(54,19*pixelRatio));
+ const availableW=Math.max(80,width-2*marginX);
+ const availableH=Math.max(80,height-marginTop-marginBottom);
+ const maxZoom=mode==='followWide'?6.2:(renderedWidth<640?34.5:13.8);
+ const zoom=Math.min(maxZoom,availableW/Math.max(.01,right-left),
+     availableH/Math.max(.01,bottom-top));
+ return {zoom,origin:{x:(left+right)/2,y:(top+bottom)/2},
+   anchor:{x:width/2,y:(marginTop+height-marginBottom)/2},
+   bounds:{left,right,top,bottom},count:horses.length,maxZoom};
+}
+window.RaceSimCamera=Object.freeze({viewCamera,frameEntireField});
 // Shared course rendering primitives, retained when replacing sprite display.
 function traceCommands(ctx,parts){
  ctx.beginPath();
@@ -312,15 +334,16 @@ function drawRace(){
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
  const target=focus||state.horses[0];
- const current=RaceCourseGeometry.point(profile,target.d,target.lane);
- const zoom=camera.zoom;
- const origin=mode==='overview'?{x:306,y:119}:current;
+ const frame=mode==='overview'
+   ?{zoom:camera.zoom,origin:{x:306,y:119},anchor:{x:w*.5,y:h*.52}}
+   :frameEntireField(state.horses,profile,mode,w,h,renderedWidth);
+ const {zoom,origin,anchor}=frame;
  ctx.clearRect(0,0,w,h);
  // World camera stays north-up. As horses travel the curved course,
  // head/torso visibly rotate in the world coordinate system.
  rect(ctx,0,0,w,h,'#315b40');
  ctx.save();
- ctx.translate(w*.50,h*.52);
+ ctx.translate(anchor.x,anchor.y);
  ctx.scale(zoom,zoom);
  ctx.translate(-origin.x,-origin.y);
  ctx.fillStyle='#345f41';ctx.fillRect(-600,-600,1800,1500);
@@ -370,15 +393,16 @@ function drawRace(){
  }
  ctx.restore();
  const points=projectRaceNumbers(state.horses,profile,origin,zoom,w,h,
-   target.number,state.leadingNo);
- drawRaceNumbers(ctx,points,w,h,renderedWidth);
+   target.number,state.leadingNo,anchor);
+ const visibleNumbers=drawRaceNumbers(ctx,points,w,h,renderedWidth);
  // Television overlays are static on screen, not rotated with the course.
  rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
  ctx.font='bold 17px Meiryo';ctx.textAlign='left';ctx.fillStyle='#f7f6ee';
  ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':mode==='followWide'?'馬群を広く':'馬番を追走'),23,56);
  rect(ctx,773,34,213,33,'rgba(13,27,28,.84)');
  ctx.font='bold 13px Meiryo';ctx.fillStyle='#f1e3b0';
- ctx.fillText(state.finished?'PHOTO FINISH':'馬番＝走行位置',788,55);
+ ctx.fillText(state.finished?'PHOTO FINISH':
+   String(visibleNumbers.length)+' / '+String(state.horses.length)+'頭 表示中',788,55);
  ctx.textAlign='start';
  drawCourse();
 }
