@@ -1,4 +1,4 @@
-/* Race Lane Decision v0.3 — deterministic hypothesis, not horse tracking data.
+/* Race Lane Decision v0.4 — safe inward convergence, deterministic hypothesis, not horse tracking data.
    Lane 0 is the inside rail on both turn directions.
    Model minimum observed JRA course width, leave safety buffers and score
    inward distance savings against traffic and safe overtaking room. */
@@ -43,35 +43,48 @@ function nearestAhead(h,horses,atLane=h.lane){
 }
 function plan(h,horses,cfg,courseMetrics,bias,t){
  const m=courseMetrics;
- const nearest=nearestAhead(h,horses);
- const obstruction=nearest&&nearest.d-h.d<7.5;
- h.blocked=Boolean(obstruction);
+ const front=nearestAhead(h,horses);
+ const obstructed=Boolean(front && front.d-h.d<7.5);
+ h.blocked=obstructed;
  if(Math.abs(h.lane-h.desiredLane)>.07)return null;
- const cooldown=m.bend>.5?1.65:1.18;
+ // Each move is gradual (engine clamps lateral velocity); check the whole
+ // crossing corridor and the space ahead before choosing a route.
+ const cooldown=m.bend>.5?1.50:1.0;
  if(t-h.lastChange<cooldown || h.d<8)return null;
- const candidates=[h.lane-1,h.lane,h.lane+1].map(x=>clamp(x,0,cfg.maxLane))
-   .filter((v,i,a)=>a.findIndex(x=>Math.abs(x-v)<.1)===i);
  const old=h.lane;
- function score(lane){
-    const insideEconomy=(bias==='outer'?.06:bias==='inner'?.48:.29)*(cfg.maxLane-lane);
-    const outerBias=bias==='outer'?lane*.30:0;
-    const crowding=horses.reduce((sum,o)=>{
-      if(o===h||o.finished)return sum;
-      const lateral=Math.abs(o.lane-lane),long=Math.abs(o.d-h.d);
-      return sum+(lateral<1.15&&long<13?(13-long)*(1.15-lateral)*.26:0);
-    },0);
-    const racingLine=m.bend>0? lane*m.bend*.14:lane*.025;
-    const spaceAhead=nearestAhead(h,horses,lane);
-    const blockedPenalty=spaceAhead && spaceAhead.d-h.d<9?3.4:0;
-    return insideEconomy+outerBias-racingLine-crowding-blockedPenalty- (lane>old?.06:0);
+ function freeForward(lane,buffer){
+   const other=nearestAhead(h,horses,lane);
+   return !other || other.d-h.d>=buffer;
  }
- const legal=candidates.filter(l=>Math.abs(l-old)<.1 || laneSafe(h,horses,l,cfg));
- legal.sort((a,b)=>score(b)-score(a)||a-b);
- const winner=legal[0];
- if(winner===undefined||Math.abs(winner-old)<.35)return null;
- if(score(winner)-score(old)<.07)return null;
- const mode=winner<old?'inward':'outward';
- return {lane:winner,mode,avoids:obstruction,scoreGain:score(winner)-score(old)};
+ function route(lane,mode,reason){
+   if(Math.abs(lane-old)<.35||!laneSafe(h,horses,lane,cfg))return null;
+   if(!freeForward(lane,8.5))return null;
+   return {lane,mode,avoids:obstructed,scoreGain:1,reason};
+ }
+ // Savings from riding a shorter arc are continuous, not merely a
+ // last-resort tactic. The default is to work inward whenever there
+ // is a legitimately clear gap; no penalty for being near the rail.
+ // "外有利" can keep a useful wider line on the final straight, but
+ // cannot push a free runner out arbitrarily at every tick.
+ const preferInside=bias!=='outer'||m.bend>.22||old>4;
+ if(preferInside&&old>.38){
+   const inside=route(Math.max(0,old-1),'inward','clear-inner');
+   if(inside)return inside;
+ }
+ // A blocked horse sometimes has to peel to the outside to pass;
+ // avoid inventing large outward moves when no traffic needs passing.
+ if(obstructed&&old<cfg.maxLane-.35){
+   const outside=route(Math.min(cfg.maxLane,old+1),'outward','outside-pass');
+   if(outside)return outside;
+ }
+ // In an outer-biased straight, allow moves toward the rail only
+ // when the lane remains conspicuously wide (left of the default
+ // target in clock-face terms). This never overrides safety.
+ if(bias==='outer'&&old>4.5){
+   const inside=route(Math.max(0,old-1),'inward','reduce-excess-width');
+   if(inside)return inside;
+ }
+ return null;
 }
 function throttle(h,horses,requestedTravel,dt,cfg){
  const front=nearestAhead(h,horses,h.lane);
