@@ -1,0 +1,33 @@
+name: JRA v3.15 formal three-command prerelease CI (no production mutation)
+on:
+  push:
+    branches: [feature/jra-formal-v315-3actions-20261012]
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  stage-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Source and exact group purchase tests against immutable races
+        run: |
+          set -euo pipefail
+          node .github/scripts/test-jra-three-command-v1.mjs
+          node .github/scripts/test-jra-ticket-notation-v1.mjs
+          node .github/scripts/test-jra-exacta-wheel-comparison-v1.mjs
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+          node --check .github/scripts/jra-build-formal-3action-v315.mjs
+          python3 -m py_compile .github/scripts/jra-render-formal-3action-v315.py .github/scripts/jra-promote-formal-3action-v315.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for p in ['2026-10-12-october-stakes','2026-10-12-swan-stakes']:
+            o=next(x for x in json.loads(Path('docs/data/races.json').read_text())['races'] if x['id']==p)
+            assert o['status']=='predicted' and o['prompt_version']=='v3.13'
+            assert o['e2e_prediction'] and Path(o['e2e_prediction']).exists()
+          print('PASS_FORMAL_V315_PRERELEASE_PRESTART_BOTH_REAL_SOURCES')
+          PY
