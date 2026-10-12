@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.03-20261012",
-  "current_public_version": "1.03",
+  "current_public_release": "release/jra-site-v1.04-20261013",
+  "current_public_version": "1.04",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -57,6 +57,20 @@
       "validation_workflow_run_id": 38199964480,
       "public_version": "1.03",
       "note": "ユーザー承認済み。本番で全頭診断をページ内開閉し、HTML/PDFを◎→○→▲→△→×順で表示。予想の思想と今後のブラッシュアップ思想をv3.15購入方式まで更新。STAGING識別横棒・ラベルは検証環境のみ表示。旧v1.02レポート・発走前予想・印・買い目・proofは不変。11ファイルの公開HTTP一致、ステージング全画面検査、v3.15 PDF検査を完了。",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true
+    },
+    {
+      "release_id": "release/jra-site-v1.04-20261013",
+      "branch": "release/jra-site-v1.04-20261013",
+      "commit_sha": "f22e876ff80af39da7195bfa5fabd088c587acf2",
+      "deployed_at": "2026-10-13T07:09:16+09:00",
+      "workflow_run_id": 38314935150,
+      "validation_workflow_run_id": 38314936388,
+      "public_version": "1.04",
+      "note": "ユーザー明示承認済み。JRA結果・反省会の馬券照合不具合を修正し、精算済みが「結果不明」と表示される問題を解消。ステージングで検証済みの結果表示JavaScriptを本番へ昇格、キャッシュバージョン更新。6レース計64点の回帰テスト成功、スワンステークス24点（的中1・不的中23、払戻9,380円、収支+6,980円）を確認。公開HTML/JSのHTTPバイト一致を確認。予想、final_bets、PDF、回顧データは不変。",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
