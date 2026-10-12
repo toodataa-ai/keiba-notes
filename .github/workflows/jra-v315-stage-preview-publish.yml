@@ -1,0 +1,165 @@
+name: Publish JRA v3.15 readable reports to staging only
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-v315-stage-preview-publish.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jra-v315-readable-staging-publication
+  cancel-in-progress: false
+jobs:
+  publish-stage-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Japanese PDF dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Retrieve SHA-pinned, reviewed staging-only renderer
+        shell: bash
+        run: |
+          set -euo pipefail
+          STAGE_SHA=49577948cac8951fa05e9a8bdc72c530260b34e4
+          git fetch origin staging/jra-v315-report-readability-20261012
+          test "$(git rev-parse FETCH_HEAD)" = "$STAGE_SHA" || { echo "::error::Unreviewed stage branch change";exit 1; }
+          mkdir -p /tmp/jra-v315-readability-render
+          git show "$STAGE_SHA":.github/scripts/jra-render-formal-3action-v315.py > /tmp/jra-v315-readability-render/jra-render-formal-3action-v315.py
+          git show "$STAGE_SHA":.github/scripts/jra_v315_horse_layout.py > /tmp/jra-v315-readability-render/jra_v315_horse_layout.py
+          STAGE_SHA="$STAGE_SHA" python3 - <<'PY'
+          import os,subprocess,json
+          b=os.environ['STAGE_SHA']
+          p=json.loads(subprocess.check_output(['git','show',b+':docs/data/jra_purchase_command_policy_v315.json'],text=True))
+          for k in ('renderer','horse_renderer_helper'):
+            file='/tmp/jra-v315-readability-render/'+p['implementation'][k].split('/')[-1]
+            got=subprocess.check_output(['git','hash-object',file],text=True).strip()
+            assert got==p['implementation'][k+'_git_blob_sha'],(k,got)
+          print('PASS_JRA_STAGING_FROZEN_RENDERER',b)
+          PY
+      - name: Generate stage-only HTML and PDF using current immutable source references
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,hashlib,subprocess,fitz,html
+          dest=Path('docs/staging/jra-v315-20261012')
+          dest.mkdir(parents=True,exist_ok=True)
+          registries=json.loads(Path('docs/data/races.json').read_text())['races']
+          links=[]
+          for slug,short,label in [
+              ('2026-10-12-october-stakes','tokyo11','東京11R オクトーバーステークス'),
+              ('2026-10-12-swan-stakes','kyoto11','京都11R スワンステークス')]:
+            entry=next(r for r in registries if r['id']==slug)
+            assert entry['purchase_strategy_version']=='v3.15' and entry['status']=='predicted'
+            planpath=Path(entry['e2e_prediction'])
+            plan=json.loads(planpath.read_text())
+            assert plan['status']=='formal_prestart' and plan['purchase_strategy_version']=='v3.15'
+            sourcepath=Path(plan['source_prediction_path'])
+            sourcebytes=sourcepath.read_bytes()
+            assert hashlib.sha256(sourcebytes).hexdigest()==plan['source_prediction_sha256']
+            source=json.loads(sourcebytes)
+            assert plan['step1_fixed_at']==source['step1_fixed_at']
+            assert plan['source_prediction_proof']==source['proof_commit']
+            assert entry['proof_commit']==plan['proof_commit']
+            assert entry['total_stake_yen']==plan['total_stake_yen']
+            assert entry['final_bets']==plan['formal_bets']
+            hp=dest/(short+'.html')
+            pdf=dest/(short+'.pdf')
+            subprocess.run(['python3','/tmp/jra-v315-readability-render/jra-render-formal-3action-v315.py',
+                '--plan',str(planpath),'--source',str(sourcepath),
+                '--html',str(hp),'--pdf',str(pdf)],check=True)
+            # The preview alone gets an explicit unapproved/staging banner.
+            h=hp.read_text()
+            assert h.startswith('<!doctype html>') and 'overall_grade</strong>' not in h
+            h=h.replace('<head>','<head><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'
+                '<style>.stage-banner{position:sticky;top:0;z-index:100;background:#704119;color:#fff;padding:7px 10px;'
+                'font-size:11px;font-weight:700;text-align:center}@media print{.stage-banner{display:none}}</style>',1)
+            h=h.replace('<body>','<body><div class="stage-banner">STAGING ｜ 未承認・本番未反映 ｜ 原本と買い目は変更なし</div>',1)
+            hp.write_text(h)
+            # Label the preview PDF without regenerating or changing the source forecast.
+            with fitz.open(pdf) as document:
+              expected=1+entry['field_size']
+              assert len(document)==expected
+              for page in document:
+                page.insert_text((390,16),'STAGING - NOT LIVE',fontsize=8,fontname='helv',color=(.48,.24,.09))
+              document.save(str(pdf)+'.tmp',garbage=3,deflate=True)
+            Path(str(pdf)+'.tmp').replace(pdf)
+            with fitz.open(pdf) as document:
+              assert len(document)==expected
+              assert all('STAGING - NOT LIVE' in page.get_text() for page in document)
+            links.append((short,label,expected))
+          page=['<!doctype html><html lang="ja"><head><meta charset="utf-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            '<meta name="robots" content="noindex,nofollow"><title>JRA予想レポート｜ステージング</title>',
+            '<style>body{margin:0;background:#f5f6f8;color:#263143;font-family:Meiryo,"Noto Sans CJK JP",sans-serif}',
+            'main{max-width:740px;margin:20px auto;padding:18px}h1{font-size:21px}p{font-size:13px;line-height:1.65}',
+            '.flag{display:inline-block;background:#704119;color:white;font-size:11px;padding:4px 9px;border-radius:4px}',
+            'section{border:1px solid #d9dfe7;border-radius:9px;background:white;padding:16px;margin:14px 0}',
+            'section h2{font-size:17px;margin:0 0 9px}a{display:inline-block;color:#31557d;margin:6px 12px 6px 0}',
+            '.notice{border-left:3px solid #986329;padding-left:12px;color:#5c4d3e}</style></head><body><main>',
+            '<span class="flag">STAGING / 承認前</span><h1>2026年10月12日 JRA予想レポート</h1>',
+            '<p class="notice">各馬の評価欄を読みやすくした修正版の確認ページです。本番ページ・PDF・馬券・原本は変更していません。現在の本番とは別のステージングです。</p>']
+          for short,label,n in links:
+            page.extend([f'<section><h2>{html.escape(label)}</h2>',
+              f'<p>STEP1 ①〜⑨の日本語評価・グレード色・近走・根拠を整形（全{n}ページ）。</p>',
+              f'<a href="{short}.html">修正後HTMLを見る</a><a href="{short}.pdf">修正後PDFを見る</a></section>'])
+          page.append('<p>GitHub PR #41 の修正候補。公開用の正式データを更新する操作ではありません。</p></main></body></html>')
+          (dest/'index.html').write_text(''.join(page),encoding='utf8')
+          assert set(x.name for x in dest.iterdir())=={'index.html','tokyo11.html','tokyo11.pdf','kyoto11.html','kyoto11.pdf'}
+          print('PASS_STAGING_PREVIEW_FIVE_FILES_NO_PRODUCTION_MODIFICATIONS')
+          PY
+      - name: Commit only five staging artifacts; never modify main report or racing data
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- docs/staging/jra-v315-20261012/
+          python3 - <<'PY'
+          import subprocess
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          required={'docs/staging/jra-v315-20261012/'+name for name in ('index.html','tokyo11.html','tokyo11.pdf','kyoto11.html','kyoto11.pdf')}
+          assert actual==required,('Only five staging preview files allowed',actual^required)
+          print('PASS_ONLY_STAGING_ARTIFACTS',sorted(actual))
+          PY
+          git commit -m 'Publish unapproved JRA v3.15 readable Tokyo and Kyoto previews in staging only'
+          for i in 1 2 3 4 5;do
+            if git push origin HEAD:main;then break;fi
+            test "$i" -lt 5 || { echo "::error::main moved concurrently"; exit 1; }
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort;exit 1; }
+            sleep 3
+          done
+      - name: Verify real public staging URL binary byte equality for all five files
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30);do
+            ok=1
+            for name in index.html tokyo11.html tokyo11.pdf kyoto11.html kyoto11.pdf;do
+              file="docs/staging/jra-v315-20261012/$name"
+              url="https://toodataa-ai.github.io/keiba-notes/staging/jra-v315-20261012/$name"
+              if ! curl -LfsS --max-time 20 "$url" -o "/tmp/jra-stage-public-$name" ||
+                 ! cmp -s "$file" "/tmp/jra-stage-public-$name";then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]];then
+              echo "PASS_STAGING_HTTP_BYTES_ALL_FIVE VERIFIED_URL=https://toodataa-ai.github.io/keiba-notes/staging/jra-v315-20261012/"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::GitHub staging files saved but deployed Pages bytes not verified";exit 1
