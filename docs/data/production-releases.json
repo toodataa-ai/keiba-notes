@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.01-20261012",
-  "current_public_version": "1.01",
+  "current_public_release": "release/jra-site-v1.02-20261012",
+  "current_public_version": "1.02",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -34,6 +34,19 @@
       "public_version": "1.01",
       "note": "ユーザー承認済み。タイトル中央寄せ・芝コース写真・試験版購入リンクと東京12R臨時導線削除・公開履歴表示。公開HTMLバイナリ一致確認済み。",
       "user_approved": true
+    },
+    {
+      "release_id": "release/jra-site-v1.02-20261012",
+      "branch": "release/jra-site-v1.02-20261012",
+      "commit_sha": "90c16de09cebba5a797f3706a4f665d92321f73b",
+      "deployed_at": "2026-10-12T10:40:58+09:00",
+      "workflow_run_id": 38192801326,
+      "validation_workflow_run_id": 38192801749,
+      "public_version": "1.02",
+      "note": "ユーザー承認済み。v3.15全頭評価の表示を日本語で整形し、旧正式版A+〜Cの色を完全復元。東京11R・京都11RのHTML/PDFを新規公開。ステージングと本番の画面構成統一。発走前予想・final_bets・既存レポートは不変。7ファイルHTTP一致検査済み。",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true
     }
   ]
 }

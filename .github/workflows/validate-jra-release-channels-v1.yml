@@ -30,15 +30,21 @@ jobs:
           assert source==display,'GitHub UI release registry and public UI history disagree'
           d=json.loads(source)
           p=json.loads(Path('docs/data/jra_release_channel_policy_v1.json').read_text())
-          assert d['current_public_version']=='1.01'
+          assert d['current_public_version']=='1.02'
           assert p['ui']['user_approval_required'] is True
           assert p['data']['update_requires_user_approval'] is False
           assert p['data']['auto_publish_after_validation'] is True
           assert d['policy']['data_release_requires_user_approval'] is False
           assert d['policy']['ui_release_requires_explicit_user_approval'] is True
-          assert len(d['releases'])>=2 and d['releases'][-1]['public_version']=='1.01'
-          assert d['releases'][-1]['workflow_run_id']==38185706485
-          assert d['releases'][-1]['commit_sha']=='632146ccb581847ae5d4cb9535fb868b8b4517d8'
+          assert len(d['releases'])>=3 and d['releases'][-1]['public_version']=='1.02'
+          assert d['releases'][-2]['workflow_run_id']==38185706485
+          assert d['releases'][-1]['workflow_run_id']==38192801326
+          assert d['releases'][-1]['validation_workflow_run_id']==38192801749
+          assert d['releases'][-2]['commit_sha']=='632146ccb581847ae5d4cb9535fb868b8b4517d8'
+          assert d['releases'][-1]['commit_sha']=='90c16de09cebba5a797f3706a4f665d92321f73b'
+          assert d['current_public_release']==d['releases'][-1]['branch']
+          assert d['releases'][-1]['user_approved'] is True
+          assert d['releases'][-1]['immutable_prediction_source_preserved'] is True
           versions=[x['public_version'] for x in d['releases']]
           assert len(set(versions))==len(versions)
           for x in d['releases']:
