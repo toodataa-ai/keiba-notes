@@ -293,8 +293,8 @@ function frameEntireField(horses,profile,mode,width,height,renderedWidth){
  const top=Math.min(...points.map(p=>p.y)),bottom=Math.max(...points.map(p=>p.y));
  const pixelRatio=width/Math.max(1,renderedWidth);
  const marginX=Math.min(width*.24,Math.max(48,22*pixelRatio));
- const marginTop=Math.min(height*.30,Math.max(80,23*pixelRatio));
- const marginBottom=Math.min(height*.30,Math.max(54,19*pixelRatio));
+ const marginTop=Math.min(height*.30,Math.max(110,82+19*pixelRatio));
+ const marginBottom=Math.min(height*.30,Math.max(86,64+19*pixelRatio));
  const availableW=Math.max(80,width-2*marginX);
  const availableH=Math.max(80,height-marginTop-marginBottom);
  const maxZoom=mode==='followWide'?6.2:(renderedWidth<640?34.5:13.8);
