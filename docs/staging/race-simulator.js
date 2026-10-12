@@ -1,4 +1,4 @@
-/* Staging retro racing simulator v0.1. All course lanes/outcomes are illustrative scenarios. */
+/* Staging retro racing simulator v0.4. Horse-scale aware camera; course physics unchanged. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -12,6 +12,29 @@ const ui={
  stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo')
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
+// A race-view preset changes how much of the track is visible. The horse sprite
+// also gets its OWN pixel target: previously /zoom cancelled magnification,
+// leaving horses roughly 40px across even with a closer track camera.
+const CAMERA_ZOOM=Object.freeze({follow:7.1,followWide:4.15,overview:1.72});
+function viewCamera(mode,screenWidth,canvasWidth){
+ const chosen=Object.prototype.hasOwnProperty.call(CAMERA_ZOOM,mode)?mode:'follow';
+ const width=Math.max(1,Number(screenWidth)||Number(canvasWidth)||1000);
+ const backing=Math.max(1,Number(canvasWidth)||1000);
+ const narrow=width<640;
+ const horsePx=chosen==='overview'?(narrow?22:35):
+               chosen==='followWide'?(narrow?38:62):(narrow?51:88);
+ const zoom=CAMERA_ZOOM[chosen];
+ // The source sprite measures ~45 local x pixels nose to tail.
+ const spriteScale=horsePx*backing/(width*45*zoom);
+ return Object.freeze({mode:chosen,zoom,spriteScale,horsePx});
+}
+// Pure sizing function is exposed for automated mobile/desktop pixel validation.
+window.RaceSimCamera=Object.freeze({viewCamera});
+function resizeRaceCanvas(){
+ const tall=window.innerWidth<=640;
+ const next=tall?730:470;
+ if(ui.canvas.height!==next)ui.canvas.height=next;
+}
 const baseColor=['#e13c58','#2b67b8','#e9b939','#299e72','#a064bf','#e57824','#4e7891','#c74997','#7d9840','#57a4b6','#e26262','#827bb8','#339b9a','#ba833c','#b64d63','#678551','#928e83','#385cab'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function notify(s){ui.change.hidden=!s;ui.change.textContent=s||''}
@@ -185,7 +208,7 @@ function renderData(){
 }
 function drawIdle(message){
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
- ctx.clearRect(0,0,1000,470);ctx.fillStyle='#202a36';ctx.fillRect(0,0,1000,470);
+ ctx.clearRect(0,0,ui.canvas.width,ui.canvas.height);ctx.fillStyle='#202a36';ctx.fillRect(0,0,ui.canvas.width,ui.canvas.height);
  ctx.fillStyle='#fff';ctx.font='18px Meiryo';ctx.fillText(message||'準備中',50,210);
 }
 function rect(ctx,x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
@@ -238,11 +261,12 @@ function strokePath(ctx,width,color){
  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';
  ctx.lineJoin='round';ctx.stroke();
 }
-function drawTopHorse(ctx,horse,world,angle,zoom,simTime,selected){
- // Keep the sprites readable even as the camera zooms between overview
- // and tracking modes. Body forward is local +x, rotation is the actual
- // race heading at this d, not a fixed screen-right gallop.
- const scale=(zoom>2?.88:.49)/zoom;
+function drawTopHorse(ctx,horse,world,angle,spriteScale,simTime,selected){
+ // The draw scale is calculated from the ACTUAL visible CSS canvas width.
+ // A nearby horse now occupies ~88px desktop / 51px mobile (nose to tail)
+ // rather than staying an unreadable ~40px / ~15px at every zoom setting.
+ // Keep course tangent rotation and movement unchanged.
+ const scale=spriteScale;
  ctx.save();
  ctx.translate(world.x,world.y);
  ctx.rotate(angle);
@@ -279,14 +303,16 @@ function drawTopHorse(ctx,horse,world,angle,zoom,simTime,selected){
 function drawRace(){
  if(!sim||!race){drawIdle('出走馬の原本を確認中…');return}
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
- const w=1000,h=470,state=sim.state,profile=RaceCourseGeometry.get(race.course_id);
+ const w=ui.canvas.width,h=ui.canvas.height,state=sim.state,profile=RaceCourseGeometry.get(race.course_id);
  if(!profile)return;
- const mode=ui.camera?.value==='overview'?'overview':'follow';
+ const mode=ui.camera?.value||'follow';
+ const renderedWidth=ui.canvas.getBoundingClientRect?.().width||w;
+ const camera=viewCamera(mode,renderedWidth,w);
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
  const target=focus||state.horses[0];
  const current=RaceCourseGeometry.point(profile,target.d,target.lane);
- const zoom=mode==='overview'?1.72:3.36;
+ const zoom=camera.zoom;
  const origin=mode==='overview'?{x:306,y:119}:current;
  ctx.clearRect(0,0,w,h);
  // World camera stays north-up. As horses travel the curved course,
@@ -348,22 +374,28 @@ function drawRace(){
  for(const horse of group){
    const pos=RaceCourseGeometry.point(profile,horse.d,horse.lane);
    const angle=RaceCourseGeometry.heading(profile,horse.d,horse.lane,horse.laneVelocity);
-   drawTopHorse(ctx,horse,pos,angle,zoom,state.t,horse===target);
+   drawTopHorse(ctx,horse,pos,angle,camera.spriteScale*(horse===target?1.07:1),state.t,horse===target);
  }
  // Label leader & focus without rotating the Japanese names with horse bodies.
  for(const horse of [state.horses.find(x=>x.number===state.leadingNo),target]){
    if(!horse)continue;
    const p=RaceCourseGeometry.point(profile,horse.d,horse.lane);
-   ctx.font='bold 8px Meiryo';ctx.textAlign='left';ctx.lineWidth=2.5;
+   ctx.save();
+   ctx.translate(p.x,p.y);
+   // Font is screen-pixel sized; at 7x zoom old world-space text
+   // became giant and covered multiple runners.
+   ctx.scale(1/zoom,1/zoom);
+   ctx.font='bold 14px Meiryo';ctx.textAlign='left';ctx.lineWidth=3;
    const label=horse.mark+' '+horse.number+' '+horse.name;
-   ctx.strokeStyle='rgba(12,27,19,.9)';ctx.strokeText(label,p.x+8,p.y-8);
-   ctx.fillStyle='#fff7d8';ctx.fillText(label,p.x+8,p.y-8);
+   ctx.strokeStyle='rgba(12,27,19,.9)';ctx.strokeText(label,34,-32);
+   ctx.fillStyle='#fff7d8';ctx.fillText(label,34,-32);
+   ctx.restore();
  }
  ctx.restore();
  // Television overlays are static on screen, not rotated with the course.
  rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
  ctx.font='bold 17px Meiryo';ctx.textAlign='left';ctx.fillStyle='#f7f6ee';
- ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':'馬群を追走'),23,56);
+ ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':mode==='followWide'?'馬群を広く':'馬群に接近'),23,56);
  rect(ctx,773,34,213,33,'rgba(13,27,28,.84)');
  ctx.font='bold 13px Meiryo';ctx.fillStyle='#f1e3b0';
  ctx.fillText(state.finished?'PHOTO FINISH':'実際の走路方向に旋回',788,55);
@@ -509,6 +541,8 @@ ui.focus.addEventListener('change',render);
 if(ui.camera)ui.camera.addEventListener('change',render);
 ui.path.addEventListener('change',render);
 ui.speed.addEventListener('change',render);
+window.addEventListener('resize',()=>{resizeRaceCanvas();render()});
+resizeRaceCanvas();
 window.addEventListener('pagehide',()=>{running=false;cancelAnimationFrame(frameId)});
 initialize();
 })();

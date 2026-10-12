@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13161f">
 <title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
 <link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="race-simulator.css?v=20261012-1">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-4">
 </head>
 <body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
@@ -34,7 +34,7 @@
    <button id="pauseBtn" type="button" disabled>一時停止</button>
    <button id="restartBtn" type="button">同条件でもう一度</button>
    <button id="newSeedBtn" type="button">別展開を試す</button>
-   <label class="speed-label">映像<select id="cameraSelect" aria-label="実況カメラ"><option value="follow" selected>馬群を追走</option><option value="overview">コース全体</option></select></label>
+   <label class="speed-label">映像<select id="cameraSelect" aria-label="実況カメラ"><option value="follow" selected>馬群を大きく（標準）</option><option value="followWide">馬群を広く</option><option value="overview">コース全体</option></select></label>
    <label class="speed-label">再生速度<select id="speedSelect"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="4">4倍</option></select></label>
   </div>
   <p class="change-notice" id="changeNotice" hidden>条件を変更しました。再スタートすると、新しい条件で走行します。</p>
@@ -72,16 +72,17 @@
  </section>
  <section class="notes panel">
   <h2>このシミュレーションで分かること・分からないこと</h2>
+  <p>実況カメラは馬群を大きく映す近距離表示が標準です。広く見たいときは「馬群を広く」「コース全体」に切り替えられます。スマートフォンでは縦長の実況画面で馬を見やすく表示します。</p>
   <p>出走馬名・馬番・印・STEP1の評価（未校正の勝率を含む）は、既に保存済みの予想レポートから読み取ります。馬の向きは走路の接線と横移動から計算します。通常は内側の短い進路を優先し、前後の安全間隔が足りなければ進路変更せず、状況によっては外からかわす動きを表現します。</p>
   <p><strong>ここでの到達順や騎乗判断は公式予想やレース結果ではありません。</strong>内寄りの進路選択、馬同士の間隔・進路の譲り合いも仮定した簡易モデルです。接触や落馬を扱う実際の競走シミュレータではありません。JRAが公表する直線距離・一周距離・高低差・内外のコース構造を区別して参照し、コースごとのスタート位置と走路を描いています。一方、カーブのベジェ座標、勾配の途中区間、騎手の進路判断・馬ごとの実測ラップは公開された測量原本から復元していない近似・仮定です。同じシード・設定なら再現可能ですが、統計的な勝率評価や正式買い目の変更には使いません。</p>
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.3 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.4 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-3"></script>
 <script src="race-lane-ai-v1.js?v=20261012-3"></script>
 <script src="race-sim-engine.js?v=20261012-3"></script>
-<script src="race-simulator.js?v=20261012-3"></script>
+<script src="race-simulator.js?v=20261012-4"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>

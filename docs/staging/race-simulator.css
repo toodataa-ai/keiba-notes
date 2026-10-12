@@ -8,3 +8,8 @@
 #laneStatus{color:#344c38;font-weight:700;font-variant-numeric:tabular-nums}
 .track-tools>label{margin-left:auto}
 @media(max-width:550px){#laneStatus{width:100%}.track-tools>label{margin-left:0}}
+
+/* v0.4: keep a usable vertical broadcast viewport on narrow phones. */
+.track-stage canvas{height:auto;aspect-ratio:auto}
+.controls .speed-label select#cameraSelect{width:min(210px,40vw)}
+@media(max-width:640px){.track-stage canvas{width:100%;height:auto}.controls .speed-label select#cameraSelect{width:min(205px,52vw)}}

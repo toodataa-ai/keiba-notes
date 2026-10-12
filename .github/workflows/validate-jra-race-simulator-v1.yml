@@ -53,6 +53,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.4' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-4' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -114,6 +116,25 @@ jobs:
               assert.ok(Math.hypot(p.x-p2.x,p.y-p2.y)<=Math.min(...course.track_width_m),'all mapped lanes lie on published turf width');
             }
             assert.equal(w.document.getElementById('cameraSelect').value,'follow');
+            const closeCamera=w.RaceSimCamera.viewCamera('follow',1000,1000);
+            const wideCamera=w.RaceSimCamera.viewCamera('followWide',1000,1000);
+            const fullCamera=w.RaceSimCamera.viewCamera('overview',1000,1000);
+            assert.ok(closeCamera.zoom>wideCamera.zoom && wideCamera.zoom>fullCamera.zoom,
+              'follow must be closer than wide/overview');
+            assert.ok(closeCamera.zoom>=6.5,'near camera has meaningful course magnification');
+            assert.ok(Math.abs(45*closeCamera.zoom*closeCamera.spriteScale-closeCamera.horsePx)<1e-8);
+            assert.ok(closeCamera.horsePx>=80,'desktop horses must be visible');
+            const mobileCamera=w.RaceSimCamera.viewCamera('follow',375,1000);
+            assert.ok(mobileCamera.horsePx>=48,'mobile horses must remain readable');
+            assert.ok(Math.abs(mobileCamera.spriteScale*45*mobileCamera.zoom*375/1000-51)<1e-7);
+            const mobileOriginal=w.innerWidth;
+            w.innerWidth=375;
+            w.dispatchEvent(new w.Event('resize'));
+            assert.equal(w.document.getElementById('raceCanvas').height,730,
+              'mobile broadcast must show a taller viewport');
+            w.innerWidth=mobileOriginal;
+            w.dispatchEvent(new w.Event('resize'));
+            assert.equal(w.document.getElementById('raceCanvas').height,470);
             const stages=course.segments.map(x=>x.kind);
             assert.ok(stages.includes('turn')&&stages.includes('straight'));
             const straightPos=course.distance_m-course.straight_m+3;
@@ -137,6 +158,8 @@ jobs:
             assert.equal(start.disabled,true);
             const camera=w.document.getElementById('cameraSelect');
             camera.value='overview';
+            camera.dispatchEvent(new w.Event('change',{bubbles:true}));
+            camera.value='followWide';
             camera.dispatchEvent(new w.Event('change',{bubbles:true}));
             camera.value='follow';
             camera.dispatchEvent(new w.Event('change',{bubbles:true}));
