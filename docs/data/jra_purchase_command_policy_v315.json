@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "policy_version": "v3.15",
+  "effective_date": "2026-10-12",
+  "formal_scope": "JRA main race STEP2 purchase and publication overlay; STEP1 engine stays SHA-pinned v3.13",
+  "current_status": "active_purchase_only_formal",
+  "max_regular_commands": 3,
+  "medium_command_max": 1,
+  "large_command_max": 1,
+  "medium_verified_odds_range": "20 <= odds < 100",
+  "large_verified_odds_range": "odds >= 100 with at least 10,000 yen potential payout per winning 100 yen ticket",
+  "budget_yen": 6000,
+  "unit_yen": 100,
+  "forbid_unverified_odds": true,
+  "max_quote_age_before_purchase_seal_seconds": 600,
+  "maximum_capture_span_seconds": 180,
+  "single_trifecta_disallowed": true,
+  "min_trifecta_command_points": 6,
+  "min_trio_command_points": 3,
+  "require_full_expansion_prices_and_no_duplicate_tickets": true,
+  "approval_requirement": "No per-race user approval is required for a validated data update; UI/layout redesign still requires staging and explicit approval.",
+  "mandatory_sequence": [
+    "Read latest_prompt.json and current v3.13 SHA-pinned STEP1 formal workflow; prepare/prerace validate fresh exact-odds source before race start.",
+    "Before telling users the prediction is complete, create a distinct immutable v3.15 request for every JRA main race, run .github/workflows/jra-prerace-formal-3action-v315.yml, and wait for verified success.",
+    "Publish only the v3.15 actual purchase commands and source-verified final_bets as the sole current races.json reference; preserve v3.13 preliminary 60-ticket originals as historical source only.",
+    "Verify new v3.15 snapshot/proof, complete one-A4-page-per-horse PDF, JRA purchase expansion, HTML, canonical registry and public HTTP exact binary match.",
+    "If quotes are >600s old, rerun v3.13 full-odds source collection and retry v3.15 before start; if race begins or blocker persists, report incomplete instead of promoting stale tickets."
+  ],
+  "implementation": {
+    "pipeline": ".github/scripts/jra-build-formal-3action-v315.mjs",
+    "pipeline_git_blob_sha": "4a10dda63fe2078e3a64c681412829b9b70efde1",
+    "publisher": ".github/scripts/jra-promote-formal-3action-v315.py",
+    "publisher_git_blob_sha": "8eb076698a30ba38f2548cc88f8cc121fc194e74",
+    "renderer": ".github/scripts/jra-render-formal-3action-v315.py",
+    "renderer_git_blob_sha": "b63b6ffba663f18b9ff04e4a4103b751795ca6af",
+    "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
+    "workflow_git_blob_sha": "6da41d15760039f13d105908ccce0f51db1dfff5"
+  },
+  "currently_unautomated": "The standard v3.13 intake workflow does not itself chain v3.15. The JRA one-shot executor (human or assistant) MUST launch the second v3.15 request; no user approval is needed for a validated data-only publication. This is an execution-orchestration item, not permission to publish 60-point v3.13 as completed.",
+  "immutable_prior_predictions": true
+}
