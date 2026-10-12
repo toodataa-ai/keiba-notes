@@ -62,7 +62,32 @@ function draw(state,race,focus,pathOn,paintNumber){
 }
 function setup(){
  const scale=document.getElementById('referenceScale'),figure=document.getElementById('referenceMapFigure');
- if(scale&&figure)scale.addEventListener('change',()=>figure.classList.toggle('native-scale',scale.value==='native'));
+ function applyScale(){
+   if(!scale||!figure)return;
+   figure.classList.toggle('native-scale',scale.value==='native');
+   for(const scroller of figure.querySelectorAll('.real-course-scroll')){
+     scroller.classList.toggle('zoom-150',scale.value==='zoom150');
+     scroller.classList.toggle('zoom-200',scale.value==='zoom200');
+     scroller.classList.toggle('show-original',scale.value==='uncropped');
+     scroller.scrollLeft=0;
+   }
+ }
+ if(scale&&figure){scale.addEventListener('change',applyScale);applyScale()}
+ const panel=document.querySelector('.course-panel-wide');
+ const expand=document.getElementById('mapExpandBtn');
+ function setExpanded(enabled){
+   if(!panel||!expand)return;
+   panel.classList.toggle('is-expanded',enabled);
+   document.body.classList.toggle('map-expanded',enabled);
+   expand.setAttribute('aria-expanded',String(enabled));
+   expand.textContent=enabled?'⨯ 全画面表示を閉じる':'⛶ 全画面で見る';
+ }
+ if(expand&&panel){
+   expand.addEventListener('click',()=>setExpanded(!panel.classList.contains('is-expanded')));
+   global.addEventListener('keydown',e=>{
+      if(e.key==='Escape'&&panel.classList.contains('is-expanded'))setExpanded(false)
+   });
+ }
  for(const prefix of ['tokyo','kyoto']){
   const im=document.getElementById(prefix+'CourseImage'),canvas=document.getElementById(prefix+'CourseOverlay');
   if(im&&canvas){im.addEventListener('error',()=>{canvas.hidden=true});im.addEventListener('load',()=>{canvas.hidden=false})}

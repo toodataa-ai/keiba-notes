@@ -56,7 +56,7 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.14' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.15' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.js?v=20261012-13' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
@@ -71,7 +71,16 @@ jobs:
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-1' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261012-14' in html
+          assert 'race-simulator.css?v=20261012-15' in html
+          assert 'race-umapot-overlay-v1.js?v=20261012-15' in html
+          assert html.count('class="real-course-scroll"') == 2
+          assert html.count('class="real-course-viewport"') == 2
+          assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html
+          style=Path('docs/staging/race-simulator.css').read_text()
+          assert '#tokyoRealCourseMap .real-course-viewport{aspect-ratio:510 / 295}' in style
+          assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
+          assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
+          assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
           assert 'race-sim-engine.js?v=20261012-14' in html
           assert 'race-lane-ai-v1.js?v=20261012-14' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
@@ -382,6 +391,29 @@ jobs:
             const mapMode=w.document.getElementById('courseMapMode');
             assert.equal(mapMode.value,'reference');
             assert.equal(realFigure.hidden,false);
+            assert.equal(w.document.querySelectorAll('.real-course-viewport').length,2);
+            for(const prefix of ['tokyo','kyoto']){
+              const im=w.document.getElementById(prefix+'CourseImage');
+              const canvas=w.document.getElementById(prefix+'CourseOverlay');
+              assert.equal(im.parentElement,canvas.parentElement,'runner overlay and raster share transform');
+              assert.equal(im.closest('.real-course-viewport'),canvas.closest('.real-course-viewport'));
+            }
+            const zoomSelect=w.document.getElementById('referenceScale');
+            const firstScroller=w.document.querySelector('.real-course-scroll');
+            assert.equal(zoomSelect.value,'fit','cropped course must be DEFAULT');
+            zoomSelect.value='zoom150';zoomSelect.dispatchEvent(new w.Event('change'));
+            assert.equal(firstScroller.classList.contains('zoom-150'),true);
+            zoomSelect.value='zoom200';zoomSelect.dispatchEvent(new w.Event('change'));
+            assert.equal(firstScroller.classList.contains('zoom-200'),true);
+            zoomSelect.value='uncropped';zoomSelect.dispatchEvent(new w.Event('change'));
+            assert.equal(firstScroller.classList.contains('show-original'),true);
+            zoomSelect.value='fit';zoomSelect.dispatchEvent(new w.Event('change'));
+            assert.equal(firstScroller.classList.contains('show-original'),false);
+            const expand=w.document.getElementById('mapExpandBtn');
+            expand.click();assert.equal(expand.getAttribute('aria-expanded'),'true');
+            assert.ok(w.document.querySelector('.course-panel-wide').classList.contains('is-expanded'));
+            expand.click();assert.equal(expand.getAttribute('aria-expanded'),'false');
+            assert.ok(!w.document.body.classList.contains('map-expanded'));
             assert.equal(simMap.hidden,true,'default course plan must NOT be our approximate curve');
             assert.equal(realTokyo.hidden,entry.venue!=='東京');
             assert.equal(realKyoto.hidden,entry.venue!=='京都');

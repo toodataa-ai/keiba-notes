@@ -61,3 +61,37 @@
  .course-panel-wide .reference-map-figure{padding:6px}
  .ranking-grid .standings{max-height:300px}
 }
+
+/* Stage v0.15: SOURCE IMAGE AND RUNNER CANVAS ARE CROPPED TOGETHER.
+   Original 620×430 rasters contain huge empty top/bottom margins. In the
+   standard view show the complete COURSE rather than the surrounding paper.
+   SOURCE IMAGE IS NOT REPACKAGED OR ALTERED. */
+.course-panel-wide .reference-map-figure{width:100%;max-width:none;overflow:visible;padding:8px;border:1px solid #dae2e7}
+.course-panel-wide .real-course-scroll{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable}
+.course-panel-wide .real-course-viewport{display:block;position:relative;overflow:hidden;width:100%;min-width:0}
+#tokyoRealCourseMap .real-course-viewport{aspect-ratio:510 / 295}
+#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}
+/* Keep the transparent 620×430 overlay and the image at precisely the same
+   transform, so projected horse number centres stay attached to the drawing. */
+.course-panel-wide .real-course-track{position:absolute;inset:0 auto auto 0;height:auto;aspect-ratio:620 / 430}
+#tokyoRealCourseMap .real-course-track{width:121.568627%;transform:translate(-8.870968%,-16.279070%)}
+#kyotoRealCourseMap .real-course-track{width:108.771930%;transform:translate(-3.225806%,-15.116279%)}
+.course-panel-wide .real-course-track img,.course-panel-wide .real-course-track canvas.real-course-overlay{width:100%;height:100%;border-radius:0}
+.course-panel-wide .real-course-scroll.zoom-150 .real-course-viewport{width:150%}
+.course-panel-wide .real-course-scroll.zoom-200 .real-course-viewport{width:200%}
+.course-panel-wide .real-course-scroll.show-original .real-course-viewport{aspect-ratio:620 / 430}
+.course-panel-wide .real-course-scroll.show-original .real-course-track{width:100%;transform:none}
+.course-panel-wide .native-scale .real-course-viewport{width:620px}
+.map-view-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+.map-view-toolbar button{font:700 12px "Meiryo UI",Meiryo,sans-serif;background:#fff;color:#293e50;border:1px solid #aabaca;padding:9px 12px;border-radius:7px;cursor:pointer}
+.map-view-toolbar button:focus-visible{outline:2px solid #a3263d;outline-offset:2px}
+.map-view-hint{font-size:10px;color:#6a7582}
+body.map-expanded{overflow:hidden}
+.course-panel-wide.is-expanded{position:fixed!important;inset:0;z-index:10001;margin:0;border-radius:0;overflow-y:auto;overscroll-behavior:contain;background:#fff;padding:15px;box-shadow:0 0 0 100vmax rgba(0,0,0,.5)}
+.course-panel-wide.is-expanded .reference-map-figure{max-width:1700px;margin:auto}
+.course-panel-wide.is-expanded .real-course-scroll:not(.zoom-150):not(.zoom-200):not(.show-original) .real-course-viewport{width:150%}
+@media(max-width:640px){
+ .course-panel-wide .reference-map-figure{padding:3px}
+ .course-panel-wide.is-expanded{padding:10px}
+ .map-view-hint{flex-basis:100%}
+}
