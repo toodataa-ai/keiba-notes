@@ -9,7 +9,7 @@ const ui={
  focus:$('focusSelect'),change:$('changeNotice'),
  canvas:$('raceCanvas'),map:$('courseCanvas'),courseMapMode:$('courseMapMode'),remaining:$('remaining'),meta:$('raceMeta'),
  caption:$('stageCaption'),elapsed:$('elapsed'),moment:$('moment'),lap:$('lap'),bar:$('meterFill'),paceDynamics:$('paceDynamics'),
- stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo')
+ stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo'),abilityInfo:$('abilityInfo')
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
 let cameraMotion=null;
@@ -56,11 +56,19 @@ function parseHorseReport(markup,entry){
   if(!m)throw Error('馬名・印を正確に読み取れません: '+title);
   const grade=section.querySelector('.horse-score .grade')?.textContent?.trim()||'B';
   const grades=[...section.querySelectorAll('.factor-grid .grade')].map(x=>x.textContent.trim());
+  if(grades.length!==9)throw Error('STEP1の評価9項目が不足: '+m[1]+'番');
+  const recentRuns=[...section.querySelectorAll('.run-table tbody tr')].slice(0,4).map(tr=>{
+    const td=[...tr.querySelectorAll('td')].map(x=>x.textContent.trim());
+    const distance=td[2]?.match(/^芝(\\d{3,4})m$/),finish=td[3]?.match(/^(\\d{1,2})着$/);
+    return {date:td[0],venue:td[1],distance_m:distance?Number(distance[1]):null,
+      finish:finish?Number(finish[1]):null};
+  }).filter(x=>x.date<entry.date);
   const winMatch=(section.querySelector('.supplement')?.textContent||'').match(/モデル単勝確率[:：]\s*([\d.]+)%/);
   if(!winMatch)throw Error('原本の勝率情報が未確認です（'+m[1]+'番）');
   const styleMeta=RaceRunnerStyle.inferFromLastRace(section.querySelector('.assessment')?.textContent||'');
   return {number:Number(m[1]),name:m[2],mark:m[3],grade,
-    pace_grade:grades[1]||'B',win_pct:Number(winMatch[1]),style:styleMeta.style,styleMeta};
+    pace_grade:grades[1]||'B',factorGrades:grades,recentRuns,
+    win_pct:Number(winMatch[1]),style:styleMeta.style,styleMeta};
  });
  RaceSimEngine.validData({...entry,horses});
  const numbers=new Set(horses.map(h=>h.number));
@@ -218,6 +226,17 @@ function render(full=false){
 function renderData(){
  if(!sim)return;
  const state=sim.state;
+ if(ui.abilityInfo){
+  const selected=ui.focus.value==='leader'?state.horses.find(h=>h.number===state.leadingNo):
+    state.horses.find(h=>String(h.number)===ui.focus.value);
+  if(selected){
+   const a=selected.abilityProfile;
+   ui.abilityInfo.textContent=selected.number+'番 '+selected.name+'｜根拠の確かさ：'+a.confidence+
+    '｜速度補正 '+(selected.ability+selected.paceFit).toFixed(2)+'m/秒（仮説）｜'+
+    a.evidence.join(' ／ ')+(a.missing.length?' ／ 不足:'+a.missing.join('、'):'')+
+    ' ／ 比較除外：'+a.excluded;
+  }
+ }
  if(ui.paceDynamics){
    const k={S:'スロー',M:'平均',H:'ハイ'}[state.paceBand]||'判定中';
    const peak={S:'スロー',M:'平均',H:'ハイ'}[state.peakPaceBand]||'判定中';

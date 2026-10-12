@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13161f">
 <title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
 <link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="race-simulator.css?v=20261012-17">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-18">
 </head>
 <body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
@@ -96,6 +96,7 @@
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
    <p id="runnerStyleInfo" class="small-muted">前走通過順から脚質を確認中…</p>
+   <p id="abilityInfo" class="ability-info" aria-live="off">各馬の能力根拠を読み込み中…</p>
    <div id="standings" class="standings" aria-live="off"><p class="small-muted">出走馬を読み込んでいます。</p></div>
   </section>
  </div>
@@ -109,6 +110,7 @@
   <p>発走直後は速度とカメラの追従を滑らかにし、最初の100mで各馬が安全な内側の進路へ寄るよう優先します。全馬が同時に内ラチの最短線を通れるわけではないため、前後の間隔を保ちながら内寄りの馬群を形成します。</p>
   <p>進路の基本方針はコーナーでは内ラチ優先です。最後の直線では前が詰まる前から外側に空いた進路を探し、追い越しを試みます。無理な割り込みや馬体の交錯はしません。</p>
   <p>ペースは標準で自動判定します。先頭付近にいる逃げ・先行馬が多いほど競り合い負荷が増え、前へ行った馬はエネルギーを消費します。前半の負荷は直線まで蓄積し、後方待機組は展開次第で差を詰めます。スロー／平均／ハイの手動設定は展開仮説の補正であり、実際の隊列による負荷を無効化しません。モデルは仮説であり実測ラップや騎手の判断を再現するものではありません。</p>
+  <p>能力は発走前の⑨基礎能力・⑤コース適性・③馬場・②展開、未校正の単勝確率、前走の通過順、近4走の距離と着順から仮説評価します。異条件の生時計や上がり3Fの直接比較、未取得調教の推測は行いません。速度補正値は実測値ではありません。</p>
   <p>直線の末脚は発走前の脚質分類、個体ごとに固定したスタミナ・加速特性、ペースと位置取りに応じて徐々に変わります。直線に入った時点の着順を固定せず、差し・追込の加速と先行勢の消耗を仮定します。必ず順位が変わるように決め打ちする演出ではありません。</p>
   <p>走る番号の丸いマーカーはJRAの公式枠色です（1枠白・2枠黒・3枠赤・4枠青・5枠黄・6枠緑・7枠橙・8枠桃）。18頭立ては1〜6枠が各2頭、7〜8枠が各3頭となり、馬番ごとに正しい枠色を付けます。</p>
   <p>実況ビューは馬の絵を使わず、数字そのものが走路上を走ります。番号の中心が馬の位置で、引き出し線や移動したラベルはありません。注目馬は元の枠色の外側を金色の輪で強調します。密集時は正確な位置を優先するため、数字が一部重なる場合があります。</p>
@@ -118,13 +120,14 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.17 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.18 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-11"></script>
 <script src="race-lane-ai-v1.js?v=20261012-14"></script>
-<script src="race-runner-style-v1.js?v=20261012-8"></script>
+<script src="race-runner-style-v1.js?v=20261012-18"></script>
+<script src="race-ability-model-v1.js?v=20261012-18"></script>
 <script src="race-umapot-overlay-v1.js?v=20261012-15"></script>
-<script src="race-sim-engine.js?v=20261012-17"></script>
-<script src="race-simulator.js?v=20261012-17"></script>
+<script src="race-sim-engine.js?v=20261012-18"></script>
+<script src="race-simulator.js?v=20261012-18"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>

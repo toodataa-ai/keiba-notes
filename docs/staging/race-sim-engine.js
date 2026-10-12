@@ -1,4 +1,4 @@
-/* Racing-lab scenario engine v0.17. Contested pace, effort debt and dynamic late effects; NOT calibrated odds. */
+/* Stage race engine v0.18: evidence-grounded traits, contested pace. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -12,7 +12,7 @@ function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
 }
 // Stamina, prior running style and scenario pace yield a gradual—not
 // scripted—late-race speed difference. Every horse is determined at gate load.
-const LATE_STYLE_DRIVE=Object.freeze({nige:-.22,senko:.08,sashi:.61,oikomi:1.08,unknown:.27});
+const LATE_STYLE_DRIVE=Object.freeze({nige:.12,senko:.13,sashi:.15,oikomi:.17,unknown:.14});
 /* Pace is created by the runners, rather than inferred from their finishing
    ranks or from popularity. Manual S/M/H is a +/- scenario modifier, not a
    frozen outcome. Near-front escape and stalker candidates raise pressure.
@@ -32,9 +32,8 @@ function finishDrive(h,remaining,profile,pace){
  const stretch=profile.straight_m;
  // Begin wind-up on the final bend, reach full drive in the home straight.
  const ramp=smoothstep((stretch+130-remaining)/(stretch*.85+130));
- const reserve=(h.stamina-1)*1.65+h.lateKick*1.40;
- const highPaceTax=pace==='H'?(h.style==='nige'?.42:h.style==='senko'?.17:-.10):
-                   pace==='M'?(h.style==='nige'?.21:0):0;
+ const reserve=(h.stamina-1)*.90+h.lateKick*.90;
+ const highPaceTax=pace==='H'?(h.style==='nige'?.13:h.style==='senko'?.05:0):0;
  return ramp*(LATE_STYLE_DRIVE[h.style]??.27)+ramp*reserve-ramp*highPaceTax;
 }
 function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
@@ -64,6 +63,8 @@ function create(data,options={}){
  if(!laneAI)throw Error('LANE_AI_MISSING');
  const tactic=global.RaceRunnerStyle;
  if(!tactic)throw Error('RUNNER_STYLE_ENGINE_MISSING');
+ const abilityModel=global.RaceSimAbility;
+ if(!abilityModel)throw Error('SIM_ABILITY_MODEL_MISSING');
  const laneCfg=laneAI.config(profile);
  const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
@@ -81,22 +82,23 @@ function create(data,options={}){
  }
  const horses=data.horses.map((h,i)=>{
   const skill=clamp((Number(h.win_pct)||mean)-mean,-12,15);
-  const paceGrade=GRADE[h.pace_grade]??2;
+  const traits=abilityModel.profile(h,data,mean);
   const no=h.number;
   return { number:no,name:h.name,mark:h.mark,grade:h.grade,win_pct:h.win_pct,
    pace_grade:h.pace_grade,color:i,style:h.style||'unknown',styleMeta:h.styleMeta||null,
+   abilityProfile:traits,
    d:0,lane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    initialLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    launchTargetLane:styleSlots.get(no)??2,
    desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    launchMergeMoves:0,
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
-   stamina:0.9+rng()*.2,
-   launchVariation:(rng()-.5)*1.6,
-   surge:(rng()-.5)*.46,tempo:(rng()-.5)*.28,ability:skill*.035,
-   paceFit:((paceGrade-2)*.085)+(pace==='H'?(rng()-.5)*.14:0),
+   stamina:traits.stamina,
+   launchVariation:traits.earlySpeed+(rng()-.5)*.30,
+   surge:(rng()-.5)*.10,tempo:(rng()-.5)*.12,
+   ability:traits.baseSpeed+traits.courseSpeed,paceFit:traits.paceSpeed,
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
-   trail:[],events:0,phase:rng()*6,lateKick:(rng()-.5)*.4+clamp(skill,-7,9)*.018,
+   trail:[],events:0,phase:rng()*6,lateKick:traits.kick+(rng()-.5)*.08,
    fatigue:0,effortDebt:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
  const events=[];
@@ -212,7 +214,7 @@ function create(data,options={}){
      h.effortDebt=clamp(h.effortDebt+dt*earlyDemand*
        (state.pacePressure**1.30)*.039*effortStyle,0,2.8);
    }
-   const lateExhaustion=h.effortDebt*smoothstep((fraction-.44)/.43);
+   const lateExhaustion=h.effortDebt*smoothstep((fraction-.44)/.43)/h.stamina;
    const sprintDemand=onFront?state.pacePressure*earlyDemand*
        (h.style==='nige'?1.02:.56):0;
    const staminaLoss=Math.pow(fraction,1.9)*h.stamina*

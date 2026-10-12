@@ -6,6 +6,7 @@ on:
       - 'docs/staging/race-sim-*'
       - 'docs/staging/race-lane-ai-v1.js'
       - 'docs/staging/race-runner-style-v1.js'
+      - 'docs/staging/race-ability-model-v1.js'
       - 'docs/staging/race-course-geometry-v1.js'
       - 'docs/staging/race-simulator.*'
       - 'docs/staging/stage-week-preview.js'
@@ -26,6 +27,7 @@ jobs:
           node --check docs/staging/race-course-geometry-v1.js
           node --check docs/staging/race-lane-ai-v1.js
           node --check docs/staging/race-runner-style-v1.js
+          node --check docs/staging/race-ability-model-v1.js
           node --check docs/staging/race-umapot-overlay-v1.js
           node --check docs/staging/race-sim-engine.js
           node --check docs/staging/race-simulator.js
@@ -56,8 +58,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.17' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-17' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.18' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-18' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
@@ -71,11 +73,12 @@ jobs:
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-1' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261012-17' in html
-          assert 'race-sim-engine.js?v=20261012-17' in html
-          assert 'race-simulator.js?v=20261012-17' in html
+          assert 'race-simulator.css?v=20261012-18' in html
+          assert 'race-sim-engine.js?v=20261012-18' in html
+          assert 'race-simulator.js?v=20261012-18' in html
           assert 'value="auto" selected' in html
           assert 'id="paceDynamics"' in html
+          assert 'race-ability-model-v1.js?v=20261012-18' in html and 'id="abilityInfo"' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-15' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
@@ -85,7 +88,7 @@ jobs:
           assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
-          assert 'race-sim-engine.js?v=20261012-17' in html
+          assert 'race-sim-engine.js?v=20261012-18' in html
           assert 'race-lane-ai-v1.js?v=20261012-14' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
@@ -137,6 +140,7 @@ jobs:
             w.eval(read('docs/staging/race-course-geometry-v1.js'));
             w.eval(read('docs/staging/race-lane-ai-v1.js'));
             w.eval(read('docs/staging/race-runner-style-v1.js'));
+            w.eval(read('docs/staging/race-ability-model-v1.js'));
             w.eval(read('docs/staging/race-umapot-overlay-v1.js'));
             const course=w.RaceCourseGeometry.get(entry.course_id);
             assert.ok(course,'official layout required');
@@ -450,6 +454,13 @@ jobs:
             assert.equal(w.document.getElementById('kyotoCourseImage')
               .getAttribute('src'),'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg');
             assert.equal(start.disabled,false,'Start enabled after sealed source parsed');
+            assert.match(w.document.getElementById('abilityInfo').textContent,/基礎能力⑨/);
+            assert.equal(w.RaceSimAbility.gradeValue('A+'),5);
+            assert.equal(w.RaceSimAbility.gradeValue('bad'),null);
+            const high=w.RaceSimAbility.profile({factorGrades:['B','B','B','B','A+','B','B','B','A+'],win_pct:25},entry,6);
+            const low=w.RaceSimAbility.profile({factorGrades:['B','B','B','B','C','B','B','B','C'],win_pct:1},entry,6);
+            assert.ok(high.baseSpeed+high.courseSpeed>low.baseSpeed+low.courseSpeed+.75);
+            assert.equal(high.kick,0,'unknown previous passage must remain neutral');
             assert.equal(w.document.getElementById('paceSelect').value,'auto');
             assert.match(w.document.getElementById('paceDynamics').textContent,/実効ペース/);
             assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
@@ -551,13 +562,15 @@ jobs:
             assert.ok(Number.isInteger(a.state.finalStraightPasses) && a.state.finalStraightPasses>=0);
             assert.ok(Number.isInteger(a.state.finalStraightPasses) && a.state.finalStraightPasses>=0);
             assert.equal(typeof engine.finishDrive,'function');
+            assert.ok(a.state.horses.every(h=>h.abilityProfile&&Number.isFinite(h.ability)));
             const closeRunner=a.state.horses.find(x=>x.style==='oikomi');
             const frontRunner=a.state.horses.find(x=>x.style==='nige');
             if(closeRunner&&frontRunner){
               const r=course.straight_m*.20;
               const closing=engine.finishDrive(closeRunner,r,course,'H');
               const fading=engine.finishDrive(frontRunner,r,course,'H');
-              assert.ok(closing>fading,'stayers should have greater late drive than pace setters under H pace');
+              assert.ok(Number.isFinite(closing)&&Number.isFinite(fading),
+                'no fixed rule that every closer is faster than a strong escape');
             }
             console.log('SIM_FIRST_100M '+entry.id+' '+JSON.stringify(firstHundredSnapshot));
             assert.ok(firstHundredSnapshot.frontAvg>firstHundredSnapshot.backAvg,

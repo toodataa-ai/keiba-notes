@@ -28,7 +28,7 @@ function positionAdjustment(style,gap,d,t){
  const category=TYPES.includes(style)?style:'unknown';
  const target=styleGap[category];
  const progress=Math.max(0,Number(d)||0);
- const early=progress<100?1:progress<350?.52:.14;
+ const early=progress<100?1:progress<350?.52*(350-progress)/250:0;
  const requested=Math.max(-2.4,Math.min(2.4,(gap-target)*.18));
  // Initially offer extra acceleration for leading runners and hold back
  // deep closers. Later allow racing ability and tactics to decide order.
