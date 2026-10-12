@@ -90,6 +90,12 @@ def main():
    if i>0:
     assert '評価内訳' in t and '判断根拠' in t and '近走成績' in t,('PDF horse page omitted a required section',i)
     assert not any(raw in t for raw in ('overall_grade','factor_grades','past_performances','source_url','workout_data_status')),('unformatted model data leaked into reader PDF',i)
+    palette={'A+':0x72500f,'A':0x254c83,'B+':0x285b45,'B':0x45505d,'B-':0x80562b,'C':0x8b4747}
+    grade_spans=[(span['text'].strip(),span['color'])
+                 for block in page.get_text('dict')['blocks']
+                 for line in block.get('lines',[]) for span in line['spans']]
+    for grade in source['step1_ranking'][i-1]['factor_grades']:
+     assert (grade,palette[grade]) in grade_spans,('PDF grade palette missing or wrong',i,grade)
    for block in page.get_text('dict')['blocks']:
     if 'lines' not in block:continue
     for l in block['lines']:
