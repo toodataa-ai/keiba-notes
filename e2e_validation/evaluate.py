@@ -220,7 +220,7 @@ def load_prediction(
         prediction = read_json(repo_root / path)
 
     if grade == "prospective_strict" and prediction.get("purchase_strategy_version") == "v3.15":
-            source_commit = spec.get("source_publication_proof_commit")
+        source_commit = spec.get("source_publication_proof_commit")
         if not source_commit or git_commit_time(repo_root, source_commit) > cutoff:
             raise ValidationError("v3.15 source prediction publication proof is missing or after cutoff")
         prediction = normalize_v315_for_e2e(repo_root, spec["proof_commit"], source_commit, prediction)
