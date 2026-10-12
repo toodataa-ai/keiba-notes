@@ -30,7 +30,8 @@ jobs:
           for k in ('id="weekPredictions"','id="weekSchedule"','class="race-list"'):
             assert prod.count(k)==stage.count(k),(k,prod.count(k),stage.count(k))
           assert 'stagingJraReports' not in stage
-          assert 'jra-staging-report-link-override' not in stage
+          assert stage.count('id="jra-staging-report-link-override"')==1
+          assert 'jra-staging-report-link-override' not in prod
           assert 'noindex' not in prod
           assert 'noindex' in stage
           print('PASS_JRA_STAGE_EXACT_PROD_TEMPLATES')
