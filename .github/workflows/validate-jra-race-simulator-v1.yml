@@ -96,7 +96,7 @@ jobs:
             assert.ok(course,'official layout required');
             assert.equal(course.distance_m,entry.distance_m);
             assert.equal(course.turn,entry.turn);
-            assert.equal(course.segments.at(-1).to-course.segments.at(-1).from,course.straight_m);
+            assert.ok(Math.abs(course.segments.at(-1).to-course.segments.at(-1).from-course.straight_m)<1e-7);
             const p0=w.RaceCourseGeometry.point(course,0,0);
             const p1=w.RaceCourseGeometry.point(course,course.distance_m,0);
             assert.ok(Math.hypot(p0.x-p1.x,p0.y-p1.y)>20);
