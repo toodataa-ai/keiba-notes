@@ -47,23 +47,29 @@ const COURSE={
   info:'2角を回り切った向正面から発走／3コーナーの坂を上って残り800m付近から下る／平坦な403.7m直線',
   official:'https://www.jra.go.jp/facilities/race/kyoto/course/',
   feature_source:'https://www.jra.go.jp/keiba/thisweek/2025/1013_1/race.html',
-  // Kyoto has separate inside and outside 3rd/4th turns. Show both,
-  // and select the OUTER running line for Swan Stakes.
+  // Kyoto: the backstretch gently inclines upward toward the right on
+  // the published plan; the LEFT 1st/2nd bend is broad and rounded.
+  // The outer 3rd/4th bend on the RIGHT opens wider than the inner bend.
+  // This drawing is an original schematic fitted to JRA's plane map,
+  // NOT a set of geographical/surveyed GPS measurements.
+  // Both 3rd/4th courses share the upper branch and 4th exit.
   background:[
-    ['M',178,181],['C',126,181,77,163,66,128],
-    ['C',51,85,89,49,158,48],['C',270,45,360,47,458,47],
-    ['C',519,48,549,72,548,112],['C',548,154,517,180,468,181],
-    ['C',383,181,267,181,178,181]
+    ['M',190,183],['C',116,184,77,166,71,123],
+    ['C',67,89,99,54,166,59],['C',268,52,372,31,446,35],
+    ['C',501,31,534,52,548,80],['C',563,124,550,153,521,168],
+    ['C',508,180,484,183,462,183],
+    ['C',377,183,272,183,190,183]
   ],
   inner_turn:[
-    ['M',458,47],['C',494,52,511,75,510,108],['C',511,143,496,163,468,181]
+    ['M',446,35],['C',488,39,508,62,512,99],
+    ['C',517,136,496,169,462,183]
   ],
   segments:[
-   {from:0,to:365,name:'向正面・先行争い',kind:'straight',bend:0,p0:[211,48],p1:[286,44],p2:[385,47],p3:[458,47]},
-   {from:365,to:570,name:'3コーナー・上り',kind:'turn',bend:.62,p0:[458,47],p1:[512,47],p2:[541,69],p3:[548,93]},
-   {from:570,to:805,name:'3〜4コーナー・急な下り',kind:'turn',bend:.83,p0:[548,93],p1:[559,120],p2:[547,149],p3:[515,166]},
-   {from:805,to:996.3,name:'4コーナー・直線へ',kind:'turn',bend:.66,p0:[515,166],p1:[503,177],p2:[490,181],p3:[468,181]},
-   {from:996.3,to:1400,name:'平坦な直線 403.7m',kind:'straight',bend:0,p0:[468,181],p1:[390,181],p2:[287,181],p3:[211,181]}
+   {from:0,to:365,name:'向正面・先行争い',kind:'straight',bend:0,p0:[195,56],p1:[282,52],p2:[381,33],p3:[446,35]},
+   {from:365,to:570,name:'3コーナー・上り',kind:'turn',bend:.62,p0:[446,35],p1:[502,31],p2:[531,49],p3:[548,80]},
+   {from:570,to:805,name:'3〜4コーナー・急な下り',kind:'turn',bend:.83,p0:[548,80],p1:[561,112],p2:[548,149],p3:[521,168]},
+   {from:805,to:996.3,name:'4コーナー・直線へ',kind:'turn',bend:.66,p0:[521,168],p1:[509,179],p2:[487,183],p3:[462,183]},
+   {from:996.3,to:1400,name:'平坦な直線 403.7m',kind:'straight',bend:0,p0:[462,183],p1:[377,183],p2:[277,183],p3:[195,183]}
   ],
   // Crest at approximately 800m remaining, then a sharp descent; external
   // source confirms total relief of 4.3m, while profile breakpoints are estimates.
