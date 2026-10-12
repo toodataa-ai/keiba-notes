@@ -146,13 +146,20 @@ function updateCourseReference(){
  if(mode==='sim'&&sim)drawCourse();
 }
 function setupReferenceMapErrorHandling(){
- const img=$('tokyoCourseImage');
- if(!img)return;
- img.addEventListener('error',()=>{
-   const warn=$('courseMapWarning');
-   if(warn){warn.hidden=false;warn.textContent='外部公開のCC0コース図を取得できませんでした。出典リンクから原図を確認するか、表示を「仮想走行位置」に切り替えてください。';}
-   img.hidden=true;
- });
+ for(const id of ['tokyoCourseImage','kyotoCourseImage']){
+   const img=$(id);
+   if(!img)continue;
+   img.addEventListener('error',()=>{
+     const warn=$('courseMapWarning');
+     if(warn){warn.hidden=false;
+       warn.textContent='うまぽっとのコース図を表示できませんでした。出典リンクから素材ページを開くか「仮想走行位置」に切り替えてください。';}
+     img.hidden=true;
+   });
+   img.addEventListener('load',()=>{
+     const warn=$('courseMapWarning');
+     if(warn && !Array.from(document.querySelectorAll('#referenceMapFigure img')).some(x=>x.hidden))warn.hidden=true;
+   });
+ }
 }
 
 function reset(startNow){

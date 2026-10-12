@@ -63,23 +63,26 @@
    </select></label>
    <div class="reference-map-figure" id="referenceMapFigure">
      <div id="tokyoRealCourseMap" hidden>
-       <img id="tokyoCourseImage" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Tokyo2000c.svg" width="1219" height="803" loading="lazy" decoding="async" referrerpolicy="strict-origin-when-cross-origin"
-         alt="東京競馬場の実際のコースを示す芝2000メートルの既存ベクター図。天皇賞秋コース図。">
-       <p class="real-map-credit">資料：<a href="https://commons.wikimedia.org/wiki/File:Tokyo2000c.svg" target="_blank" rel="noopener noreferrer">Tokyo2000c.svg — Sorani Sh (2024)、CC0 1.0（Wikimedia Commons）</a></p>
+       <img id="tokyoCourseImage"
+         src="https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse_1.jpg"
+         width="620" height="430" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+         alt="うまぽっと公開の東京競馬場・主要コース図。実際の走路と芝2000mのスタート位置を含む図。">
+       <p class="real-map-credit">コース図：<a href="https://umapot.com/?p=13273" target="_blank" rel="noopener noreferrer">うまぽっと「東京競馬場コース素材」</a>。フリー素材を図として表示しています。</p>
      </div>
      <div id="kyotoRealCourseMap" hidden>
-       <iframe title="OpenStreetMapで見る京都競馬場の実際の地図" loading="lazy"
-         referrerpolicy="strict-origin-when-cross-origin"
-         src="https://www.openstreetmap.org/export/embed.html?bbox=135.719%2C34.9008%2C135.732%2C34.9111&amp;layer=mapnik"></iframe>
-       <p class="real-map-credit">地図データ：<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors（ODbL）</a>／<a href="https://www.openstreetmap.org/#map=16/34.9067/135.7250" target="_blank" rel="noopener noreferrer">地図を開く</a></p>
+       <img id="kyotoCourseImage"
+         src="https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg"
+         width="620" height="430" loading="lazy" decoding="async" referrerpolicy="no-referrer"
+         alt="うまぽっと公開の京都競馬場・主要コース図。芝内回りと外回り、および芝1400m外回りのスタート位置を含む図。">
+       <p class="real-map-credit">コース図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと「京都競馬場コース素材」</a>。フリー素材を図として表示しています。</p>
      </div>
-     <p class="small-muted">この実コース図は現実の走路形状を確認するための参照表示です。<strong>馬番は正確に位置合わせしていません。</strong>馬番の移動は上の実況ビュー、または「仮想走行位置」で確認できます。</p>
+     <p class="small-muted">うまぽっとの公開画像を直接表示しています。<strong>馬番はこの素材画像にまだ位置合わせしていません。</strong>馬番の走行は上の実況ビュー、または「仮想走行位置」で確認できます。</p>
    </div>
    <canvas id="courseCanvas" width="580" height="270" role="img" hidden aria-label="仮説の走行位置と高低差を示す旧シミュレーション用俯瞰図。実コース図とは別表示です。"></canvas>
-   <p id="courseMapWarning" class="small-muted" hidden>実コース図を読み込めない場合は、上の切替で仮想走行位置を表示してください。</p>
+   <p id="courseMapWarning" class="small-muted" hidden>配布サイトの画像に接続できませんでした。素材の元ページをご確認いただくか「仮想走行位置」に切り替えてください。</p>
    <p class="small-muted" id="courseFeatures">JRA公式の競馬場資料に基づきコースを確認しています。</p>
    <p class="small-muted" id="courseMeasurements">コース寸法を読み込み中…</p>
-   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRA公式のコース図を別ページで確認</a> ／ JRAの画像は無断転載せず、東京はCC0公開の既存コース図、京都はOSM実地図を使用。旧シミュレーション俯瞰図の曲線・進路・高低差の途中地点は近似で、実地図や測量図に位置合わせしていません。</p>
+   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRAのコース公式数値と説明を確認</a> ／ 図素材は<a href="https://umapot.com/?page_id=116" target="_blank" rel="noopener noreferrer">うまぽっと（無料素材・再配布禁止）</a>を使用。既存の走行計算・仮想俯瞰図の曲線は測量図ではない近似で、素材画像とはまだ位置合わせしていません。</p>
   </section>
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
@@ -104,12 +107,12 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.11 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.12 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-11"></script>
 <script src="race-lane-ai-v1.js?v=20261012-8"></script>
 <script src="race-runner-style-v1.js?v=20261012-8"></script>
 <script src="race-sim-engine.js?v=20261012-8"></script>
-<script src="race-simulator.js?v=20261012-11"></script>
+<script src="race-simulator.js?v=20261012-12"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>
