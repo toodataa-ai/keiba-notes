@@ -68,7 +68,7 @@ def html_report(p,source):
  if not ranked:
   raise ValueError('JRA_FORMAL_V315_BLOCKER: source STEP1 per-horse ranking missing')
  bodies=[render_horse(x,p['step1_fixed_at'],p['source_prediction_proof']) for x in ranked]
- return f'<!doctype html><html lang="ja"><head><meta charset="utf-8">{STYLE}{HORSE_STYLE}</head><body>{front}{"".join(bodies)}</body></html>',1+len(bodies)
+ return f'<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">{STYLE}{HORSE_STYLE}</head><body>{front}{"".join(bodies)}</body></html>',1+len(bodies)
 
 def main():
  ap=argparse.ArgumentParser()
