@@ -32,11 +32,11 @@
     "publisher": ".github/scripts/jra-promote-formal-3action-v315.py",
     "publisher_git_blob_sha": "8eb076698a30ba38f2548cc88f8cc121fc194e74",
     "renderer": ".github/scripts/jra-render-formal-3action-v315.py",
-    "renderer_git_blob_sha": "363c2942e4a0ae2f0fdfaae9203c20b0c21d3a22",
+    "renderer_git_blob_sha": "206ab2d326700078773fe4b5513e1cc7517563e3",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
     "workflow_git_blob_sha": "6da41d15760039f13d105908ccce0f51db1dfff5",
     "horse_renderer_helper": ".github/scripts/jra_v315_horse_layout.py",
-    "horse_renderer_helper_git_blob_sha": "ac3bfe9a50134be72588c2597b2d9c1297ff8f7c"
+    "horse_renderer_helper_git_blob_sha": "101d361d8623dee1a83ca21cb23b5580e114e61f"
   },
   "currently_unautomated": "The standard v3.13 intake workflow does not itself chain v3.15. The JRA one-shot executor (human or assistant) MUST launch the second v3.15 request; no user approval is needed for a validated data-only publication. This is an execution-orchestration item, not permission to publish 60-point v3.13 as completed.",
   "immutable_prior_predictions": true,
@@ -52,9 +52,10 @@
       "block rather than publish when page count or content fail",
       "A+/A/B+/B/B-/C grade-chip colors must render in extracted PDF spans",
       "Grade colors (A+/A/B+/B/B-/C): exact #RGB values of approved v3.13 CSS, validated both in generated HTML and PDF colored rectangle fills",
-      "Mobile responsive meta viewport is identical in staged and future formal production renderer"
+      "Mobile responsive meta viewport is identical in staged and future formal production renderer",
+      "All horse report pages in HTML/PDF strictly ordered ◎→○→▲→△→× using only frozen source mark; keep original source order within each mark"
     ],
-    "approval_note": "Historical predictions, market snapshots, bets and PDFs may not be rewritten merely to stage the renderer.",
+    "approval_note": "This stage-only proposed UI/layout change requires explicit approval before updating main; original v3.15 results, STEP1, purchase instructions and historical reports remain immutable.",
     "approved_grade_palette_source": "docs/reports/2026-10-12-october-stakes-v3.13-rerun38185599767-attempt2-v313.html"
   }
 }
