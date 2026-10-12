@@ -1,4 +1,4 @@
-/* Staging race simulator v0.9. JRA official bracket colors on running numbers. */
+/* Staging race simulator v0.9. JRA bracket colors and licensed actual course reference. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -7,7 +7,7 @@ const ui={
  speed:$('speedSelect'),start:$('startBtn'),pause:$('pauseBtn'),
  restart:$('restartBtn'),newSeed:$('newSeedBtn'),path:$('pathToggle'),
  focus:$('focusSelect'),change:$('changeNotice'),
- canvas:$('raceCanvas'),map:$('courseCanvas'),remaining:$('remaining'),meta:$('raceMeta'),
+ canvas:$('raceCanvas'),map:$('courseCanvas'),courseMapMode:$('courseMapMode'),remaining:$('remaining'),meta:$('raceMeta'),
  caption:$('stageCaption'),elapsed:$('elapsed'),moment:$('moment'),lap:$('lap'),bar:$('meterFill'),
  stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo')
 };
@@ -100,6 +100,7 @@ async function loadRace(id){
   if(version!==scenarioVersion)return;
   race={...entry,horses};
   reset(false);
+  updateCourseReference();
   ui.start.disabled=false;
   ui.meta.textContent=entry.date+' '+entry.venue+entry.number+'R '+entry.surface+entry.distance_m+'m（'+entry.turn+'回り）';
   ui.course.textContent=profile.layout+' / 直線'+profile.straight_m+'m / 高低差'+profile.elevation_range_m+'m';
@@ -130,6 +131,30 @@ async function loadRace(id){
   drawIdle(e.message);
  }
 }
+
+/* Licensed reference map and hypothetical simulation must remain distinct:
+   no number overlays on real imagery until independently georeferenced. */
+function updateCourseReference(){
+ const mode=ui.courseMapMode?.value||'reference';
+ const figure=$('referenceMapFigure'),tokyo=$('tokyoRealCourseMap'),kyoto=$('kyotoRealCourseMap');
+ const region=race?.course_id==='tokyo_turf_2000'?'tokyo':
+    race?.course_id==='kyoto_turf_outer_1400'?'kyoto':null;
+ if(figure)figure.hidden=mode!=='reference'||!region;
+ if(tokyo)tokyo.hidden=mode!=='reference'||region!=='tokyo';
+ if(kyoto)kyoto.hidden=mode!=='reference'||region!=='kyoto';
+ if(ui.map)ui.map.hidden=mode!=='sim';
+ if(mode==='sim'&&sim)drawCourse();
+}
+function setupReferenceMapErrorHandling(){
+ const img=$('tokyoCourseImage');
+ if(!img)return;
+ img.addEventListener('error',()=>{
+   const warn=$('courseMapWarning');
+   if(warn){warn.hidden=false;warn.textContent='外部公開のCC0コース図を取得できませんでした。出典リンクから原図を確認するか、表示を「仮想走行位置」に切り替えてください。';}
+   img.hidden=true;
+ });
+}
+
 function reset(startNow){
  if(!race)return;
  cancelAnimationFrame(frameId);
@@ -641,6 +666,8 @@ async function initialize(){
   await loadRace(ui.race.value);
  }catch(e){ui.stands.innerHTML='<p class="error">'+esc(e.message)+'</p>';ui.moment.textContent='原本データを確認できません'}
 }
+setupReferenceMapErrorHandling();
+if(ui.courseMapMode)ui.courseMapMode.addEventListener('change',updateCourseReference);
 ui.race.addEventListener('change',()=>loadRace(ui.race.value));
 for(const input of [ui.pace,ui.bias,ui.seed])input.addEventListener('change',markDirty);
 ui.start.addEventListener('click',()=>{
