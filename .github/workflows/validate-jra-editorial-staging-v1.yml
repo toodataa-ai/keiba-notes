@@ -1,0 +1,107 @@
+name: Validate JRA editorial staging against current formal policies
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/index.html'
+      - 'docs/staging/methodology.html'
+      - 'docs/staging/roadmap.html'
+      - '.github/workflows/validate-jra-editorial-staging-v1.yml'
+permissions: {contents: read}
+concurrency:
+  group: jra-editorial-stage-check
+  cancel-in-progress: true
+jobs:
+  audit-editorial-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Verify production unchanged, 2026-10-12 policies, staging layout and every internal anchor
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import json,subprocess
+          root=Path('docs')
+          policy=json.loads((root/'data/jra_purchase_command_policy_v315.json').read_text())
+          prompt=json.loads((root/'data/latest_prompt.json').read_text())
+          assert prompt['version']=='v3.13'
+          assert prompt['purchase_command_formal_v315']['version']=='v3.15'
+          assert policy['policy_version']=='v3.15'
+          assert policy['max_regular_commands']==3 and policy['medium_command_max']==1 and policy['large_command_max']==1
+          assert policy['budget_yen']==6000 and policy['unit_yen']==100
+          assert policy['max_quote_age_before_purchase_seal_seconds']==600
+          assert policy['maximum_capture_span_seconds']==180
+          # The approved production editorial remains byte-identical to its baseline throughout this staging change.
+          for p,sha in {
+             'docs/methodology.html':'35e48d417ab0cf36407f2c6140086a12c7ee7c15',
+             'docs/roadmap.html':'787ba3ee629e930c7c9716c5921e93a0581be6fa'
+          }.items():
+            got=subprocess.check_output(['git','hash-object',p],text=True).strip()
+            assert got==sha,('PRODUCTION_EDITORIAL_MUTATED',p,got)
+          class Audit(HTMLParser):
+            def __init__(self):
+              super().__init__()
+              self.ids=set();self.fragments=[];self.styles=[];self.scripts=[];self.invalid=[]
+            def handle_starttag(self,tag,attrs):
+              attrs=dict(attrs)
+              if 'id' in attrs:
+                if attrs['id'] in self.ids:self.invalid.append(attrs['id'])
+                self.ids.add(attrs['id'])
+              h=attrs.get('href','')
+              if h.startswith('#'):self.fragments.append(h[1:])
+              if tag=='link' and attrs.get('rel')=='stylesheet':self.styles.append(h)
+              if tag=='script' and attrs.get('src'):self.scripts.append(attrs['src'])
+          for name,new_id_list in [
+              ('methodology.html',['new-purchase','new-execution']),
+              ('roadmap.html',['recent-formal','release-boundary'])
+          ]:
+            original=(root/name).read_text()
+            stage=(root/'staging'/name).read_text()
+            op,sp=Audit(),Audit()
+            op.feed(original);sp.feed(stage)
+            assert not sp.invalid,('DUPLICATE_HTML_ID',name,sp.invalid)
+            assert not (set(sp.fragments)-sp.ids),('INVALID_FRAGMENT',name,set(sp.fragments)-sp.ids)
+            assert set(op.ids).issubset(sp.ids),('ORIGINAL_SECTION_DELETED',name)
+            assert all(x in sp.ids for x in new_id_list)
+            assert [x.replace('assets/','') for x in op.styles]==[x.replace('../assets/','') for x in sp.styles]
+            assert [x.replace('assets/','') for x in op.scripts]==[x.replace('../assets/','') for x in sp.scripts]
+            assert 'name="robots" content="noindex,nofollow"' in stage
+            assert '<base href=' not in stage,('TOC_MUST_LINK_WITHIN_STAGING_PAGE',name)
+            assert "デザイン" not in stage or 'assets/methodology.css' in stage
+            assert 'v3.13' in stage and 'v3.15' in stage
+            assert "印" in stage and '6,000' in stage
+            assert '../data/latest_prompt.json' in stage
+            assert 'href="index.html"' in stage
+          home=(root/'staging/index.html').read_text()
+          assert '<base href="../">' in home
+          assert 'href="staging/methodology.html"' in home
+          assert 'href="staging/roadmap.html"' in home
+          mainhome=(root/'index.html').read_text()
+          assert 'href="staging/methodology.html"' not in mainhome
+          assert 'href="staging/roadmap.html"' not in mainhome
+          print('PASS_JRA_EDITORIAL_STAGE_CONTENT_POLICY_LAYOUT_AND_PROD_IMMUTABLE')
+          PY
+      - name: Verify public GitHub Pages bytes, including staging homepage
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 35);do
+            ok=1
+            for file in docs/staging/index.html docs/staging/methodology.html docs/staging/roadmap.html;do
+              url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
+              if ! curl --retry 1 --max-time 20 -LfsS "$url?audit=$GITHUB_RUN_ID" -o /tmp/jra-stage-editorial-http ||
+                 ! cmp -s "$file" /tmp/jra-stage-editorial-http;then
+                ok=0;break
+              fi
+            done
+            if [ "$ok" = 1 ];then
+              echo 'PASS_JRA_EDITORIAL_STAGE_3_PUBLIC_HTTP_BYTE_MATCH'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Staging editorial files not yet verified on public GitHub Pages'
+          exit 1
