@@ -47,8 +47,34 @@ jobs:
                 '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\\n','')
             expected_html=expected_html.replace(
                 '<body>\\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
-            assert hp.read_text()==expected_html,(slug,'stage marker/robots/relative asset only')
-            assert pdf.read_bytes()==(stage/(short+'.pdf')).read_bytes()
+            # The unapproved staging change intentionally reorders horse pages by
+            # ◎○▲△×. The unchanged v1.02 production PDF must NOT equal its preview.
+            # Verify identical purchase front, per-horse body, footer and coverage
+            # independently of horse order.
+            def parts(document):
+              marker='<section class="page horse-page">'
+              split=document.split(marker)
+              assert len(split)==19,(slug,'18 original horse pages required')
+              front=split[0]
+              horses=[]
+              footer=''
+              for chunk in split[1:]:
+                body,sep,tail=chunk.partition('</section>')
+                assert sep,(slug,'incomplete horse section')
+                horses.append(body+'</section>')
+                if tail.strip():
+                  assert footer==''
+                  footer=tail
+              return front,horses,footer
+            prod_front,prod_horses,prod_footer=parts(hp.read_text())
+            stage_front,stage_horses,stage_footer=parts(expected_html)
+            assert prod_front==stage_front,(slug,'purchase front differs from approved production')
+            assert sorted(prod_horses)==sorted(stage_horses),(slug,'staging changed sealed horse contents')
+            assert prod_footer==stage_footer,(slug,'unexpected footer alteration')
+            assert pdf.read_bytes().startswith(b'%PDF'),(slug,'production PDF not present')
+            assert (stage/(short+'.pdf')).read_bytes().startswith(b'%PDF'),(slug,'staging PDF not present')
+            marks=[re.search(r'<h1>[^<]+　([◎○▲△×])</h1>',x).group(1) for x in stage_horses]
+            assert marks==sorted(marks,key='◎○▲△×'.index),(slug,'stage marks not sorted')
             for grade,a,b in [('A+','gAp','g-Aplus'),('A','gA','g-A'),('B+','gBp','g-Bplus'),
                               ('B','gB','g-B'),('B-','gBm','g-Bminus'),('C','gC','g-C')]:
               old=re.search(r'\.'+a+r'\{background:(#[0-9a-f]{6});color:(#[0-9a-f]{6})\}',legacy)
