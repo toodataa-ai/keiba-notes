@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "scope": "historical_known_prerace_e012_shadow_gaps",
+  "recorded_on": "2026-10-12",
+  "entries": [
+    {
+      "case": "e2e_validation/cases/2026-10-10-mimuro-stakes/case.json",
+      "sha": "f833d33b480e1f845d80a0160e60fb8ad194788a",
+      "race_id": "2026-10-10-mimuro-stakes",
+      "version": "v3.2",
+      "grade": "prospective_strict",
+      "error": "experience_required_after_start_date: grade=prospective_strict date=2026-10-10 required_from=2026-10-10"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-11-ireland-trophy/case.json",
+      "sha": "efe7fdbe425c2ce326ac4ec6760a4585b279743f",
+      "race_id": "2026-10-11-ireland-trophy",
+      "version": "v3.12",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-11-uzumasa-stakes/case.json",
+      "sha": "4f059bc437cbd00a5ec80ee55d0b4906d891bd4e",
+      "race_id": "2026-10-11-uzumasa-stakes",
+      "version": "v3.12",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-12-october-stakes/case.json",
+      "sha": "41ba3b62ad401b0544aa558616238a47102531c0",
+      "race_id": "2026-10-12-october-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-12-swan-stakes/case.json",
+      "sha": "d4077e558b73132c81e67e4afe5d676066d0ad14",
+      "race_id": "2026-10-12-swan-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    }
+  ],
+  "policy": {
+    "exact_case_blob_sha_required": true,
+    "exact_error_set_required": true,
+    "unknown_error_blocks_ci": true,
+    "historical_source_reconstruction_forbidden": true,
+    "graded_studies_must_exclude_gaps": true,
+    "formal_grade_a_independent": true,
+    "shadow_promotion_blocked_while_gaps_exist": true,
+    "appending_new_exceptions_requires_explicit_review": true,
+    "production_model_and_bets_unchanged": true
+  },
+  "note": "Records irrecoverable missing prestart E0/E1/E2 research fields. This is a transparent CI baseline and is NOT a remediation of missing data."
+}

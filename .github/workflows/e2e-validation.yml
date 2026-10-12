@@ -43,6 +43,8 @@ jobs:
           python -m unittest e2e_validation.test_evaluate -v
           python -m unittest experience_regime_v1.test_model -v
           python -m unittest experience_regime_v1.test_sampling -v
+          python -m unittest e2e_validation.test_experience_history_gate -v
+          python -m unittest e2e_validation.test_stabilize_public_reports -v
 
       - name: Smoke E2E evaluator
         run: |
@@ -74,6 +76,9 @@ jobs:
 
       - name: Build public JRA E2E Shadow data
         run: python e2e_validation/build_public_data.py
+
+      - name: Prevent timestamp-only derived data commits
+        run: python e2e_validation/stabilize_public_reports.py
 
       - name: Upload validation reports
         uses: actions/upload-artifact@v4

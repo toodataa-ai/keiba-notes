@@ -13,6 +13,7 @@ on:
       - 'e2e_validation/test_formal_schema_adapter_v313.py'
       - 'experience_regime_v1/prestart_collection_audit_v1.py'
       - 'e2e_validation/build_public_data.py'
+      - 'e2e_validation/stabilize_public_reports.py'
   workflow_dispatch:
 permissions:
   contents: write
@@ -72,8 +73,11 @@ jobs:
           assert all(x['status']=='reviewed' for x in e['races'] if x['race_id'] in ('2026-10-11-ireland-trophy','2026-10-11-uzumasa-stakes'))
           assert e['totals']['prospective_strict_races']>=4
           assert e['review_completion']['meetings'][0]['weekly_improvement_decision']=='not_evaluated' or e['review_completion']['meetings'][0]['formal_grade_a_review_state']=='complete'
-          print('E2E_PUBLIC_FOUR_CASES_VERIFIED')
+          assert all(x['status']=='reviewed' and x['predictions'][0]['marks'] and x['predictions'][0]['bets'] for x in e['races'] if x['race_id'] in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'))
+          print('E2E_PUBLIC_SIX_CASES_VERIFIED')
           PY
+      - name: Prevent timestamp-only derived public commits
+        run: python e2e_validation/stabilize_public_reports.py
       - name: Commit only derived public reports
         run: |
           set -euo pipefail
@@ -99,7 +103,7 @@ jobs:
           import json
           from pathlib import Path
           reg=json.loads(Path('docs/data/races.json').read_text())
-          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json']
+          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json']
           for r in reg['races']:
               if r['date'] in ('2026-10-10','2026-10-11','2026-10-12') and r['scope']=='jra-main' and r['status']=='reviewed':
                   paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json'])
@@ -107,7 +111,7 @@ jobs:
               assert Path(p).is_file(),p
               print(p)
           PY
-          for attempt in $(seq 1 24); do
+          for attempt in $(seq 1 72); do
             ok=1
             while IFS= read -r FILE; do
               mkdir -p "/tmp/jra-public/$(dirname "${FILE#docs/}")"
