@@ -1,4 +1,4 @@
-/* Racing-lab scenario engine v0.1. Illustration ONLY: no predicted finish odds. */
+/* Racing-lab scenario engine v0.2. Course-informed hypotheses, NOT calibrated odds. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -19,6 +19,10 @@ function validData(data){
 }
 function create(data,options={}){
  validData(data);
+ const geo=global.RaceCourseGeometry;
+ const profile=geo&&geo.get(data.course_id);
+ if(!profile || profile.distance_m!==data.distance_m || profile.venue!==data.venue || profile.turn!==data.turn)
+   throw Error('COURSE_PROFILE_MISMATCH: このコースの測定値・条件を確認できません');
  const seed=clamp(Math.floor(Number(options.seed)||1),1,999999);
  const pace=['S','M','H'].includes(options.pace)?options.pace:'M';
  const bias=['inner','neutral','outer'].includes(options.bias)?options.bias:'neutral';
@@ -35,14 +39,16 @@ function create(data,options={}){
    surge:(rng()-.5)*.46,tempo:(rng()-.5)*.28,ability:skill*.035,
    paceFit:((paceGrade-2)*.085)+(pace==='H'?(rng()-.5)*.14:0),
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
-   trail:[],events:0,phase:rng()*6,lateKick:(rng()-.5)*.4+clamp(skill,-7,9)*.018 };
+   trail:[],events:0,phase:rng()*6,lateKick:(rng()-.5)*.4+clamp(skill,-7,9)*.018,
+   fatigue:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
  const events=[];
+ const loggedLandmarks=new Set();
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
-    tick:0,firstFinishTime:null};
+    tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
- log('start','ゲートイン完了。展開は設定に応じた仮説です');
+ log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
  const base=length/54;
  function step(delta){
   if(state.finished)return state;
@@ -50,7 +56,6 @@ function create(data,options={}){
   if(!dt)return state;
   state.t+=dt;
   const fraction=clamp(state.leader/length,0,1);
-  const atTurn=(fraction>.18&&fraction<.43)||(fraction>.58&&fraction<.76);
   const paceEffect=pace==='H'? (fraction<.48?1.22:-.92):pace==='S'?(fraction<.55?-.82:1.06):0;
   const sorted=horses.slice().sort((a,b)=>b.d-a.d);
   for(const h of sorted){
@@ -58,7 +63,10 @@ function create(data,options={}){
    let nearby=horses.filter(x=>x!==h && !x.finished && x.d>=h.d-.35 && x.d<=h.d+7.2 && Math.abs(x.lane-h.lane)<.79);
    h.blocked=nearby.length>0 && fraction>.05 && fraction<.94;
    // Within the same race, check for a safe adjacent lane before overtaking.
-   if(h.blocked && state.t-h.lastChange>2.0){
+   const m=geo.metrics(profile,h.d,h.lane);
+   const atTurn=m.kind==='turn';
+   h.gradeNow=m.grade;h.turnNow=m.bend;h.lastCourseSegment=m.segment;
+   if(h.blocked && state.t-h.lastChange>(atTurn?2.3:1.4)){
     const targets=[h.lane-1,h.lane+1].filter(l=>l>=0&&l<=7);
     targets.sort((a,b)=>{
       const aw=bias==='inner'?a:bias==='outer'?7-a:Math.abs(a-h.desiredLane);
@@ -82,14 +90,25 @@ function create(data,options={}){
    const move=h.desiredLane-h.lane;
    h.lane+=clamp(move,-dt*.72,dt*.72);
    const groundBias=(bias==='inner'?(3.6-h.lane):bias==='outer'?(h.lane-3.6):0)*.045;
-   const bendPenalty=atTurn?Math.max(0,h.lane-2)*.018:0;
+   // Separate geometry losses: turns cost extra metres for outer lanes, uphill
+   // reduces instantaneous speed and drains a little energy, downhill can restore pace.
+   // Coefficients are explicitly provisional; curvature/altitude breakpoints are estimates.
+   const bendPenalty=m.bend*(.10+Math.max(0,h.lane-1)*.025);
+   const hillEffect=m.grade>0? -26*m.grade:-Math.min(.32,Math.abs(m.grade)*16);
+   const downhillBoost=m.grade<0? Math.min(.25,Math.abs(m.grade)*12):0;
+   h.fatigue+=Math.max(0,m.grade)*dt*6;
+   h.fatigue=clamp(h.fatigue,0,.22);
    const staminaLoss=pace==='H'? Math.pow(fraction,1.9)*h.stamina*.28:Math.pow(fraction,2)*h.stamina*.16;
-   const finishing=(fraction>.72)?h.lateKick*((fraction-.72)/.28):0;
-   let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing;
+   const remaining=length-h.d;
+   const finalStretch=m.isFinalStraight?clamp(1-remaining/profile.straight_m,0,1):0;
+   const finishing=finalStretch*h.lateKick;
+   let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue;
    if(h.blocked)speed-=clamp(1.2-(nearby[0]?.d-h.d||0)*.065,.30,1.2);
    speed=Math.max(base*.84,speed);
    const before=h.d;
-   h.d+=speed*dt;
+   const physical=speed*dt;
+   h.distancePenaltyM+=physical*(1-1/m.pathStretch);
+   h.d+=physical/m.pathStretch;
    if(h.d>=length){
      h.finishTime=state.t-dt+dt*clamp((length-before)/(h.d-before),0,1);
      h.d=length;
@@ -103,7 +122,20 @@ function create(data,options={}){
    if(h.trail.length>100)h.trail.shift();
   }
   const leaders=horses.slice().sort((a,b)=>b.d-a.d||a.finishTime-b.finishTime||a.number-b.number);
+  const previousLead=state.leader;
   state.leader=leaders[0].d;
+  state.courseMetrics=geo.metrics(profile,state.leader,leaders[0].lane);
+  for(const marker of profile.landmarks){
+    if(marker.d<=0 || marker.d>=length || loggedLandmarks.has(marker.d))continue;
+    if(previousLead<marker.d && state.leader>=marker.d){
+      loggedLandmarks.add(marker.d);
+      const label=marker.label;
+      const m=geo.metrics(profile,marker.d,leaders[0].lane);
+      const note= m.grade>.001?'（上り坂でスタミナ消耗）':m.grade<-.001?'（下りで加速しやすい）':
+                  m.kind==='turn'?'（外側の距離ロスに注意）':'';
+      log('course',label+note+'／'+profile.venue+'芝コース');
+    }
+  }
   state.leadingNo=leaders[0].number;
   state.progress=clamp(state.leader/length,0,1);
   state.tick++;
@@ -117,7 +149,7 @@ function create(data,options={}){
  }
  function standings(){return horses.slice().sort((a,b)=>Number(b.finished)-Number(a.finished)||
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
- return {state,step,standings,rand:rng};
+ return {state,step,standings,rand:rng,course:profile};
 }
 global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS});
 })(typeof window!=='undefined'?window:globalThis);
