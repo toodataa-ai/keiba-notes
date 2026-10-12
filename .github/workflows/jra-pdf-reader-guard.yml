@@ -69,6 +69,26 @@ jobs:
                       '--html',str(source),'--pdf',str(pdf),'--prediction',str(prediction)],check=True)
                   checked+=1
                   continue
+              # v3.15 uses its own sealed, source-pinned renderer and full A4 validator.
+              # Re-running a reader-v1 validator on it rejects legitimate technical
+              # references and would rewrite historical evidence after the off.
+              if race.get('purchase_strategy_version')=='v3.15':
+                  import fitz
+                  pdf=Path('docs') / race['pdf']
+                  prediction=Path(race['e2e_prediction'])
+                  if not pdf.is_file() or not prediction.is_file() or not race.get('proof_commit'):
+                      raise SystemExit('Missing sealed formal v3.15 PDF/prediction/proof: '+race['id'])
+                  with fitz.open(pdf) as document:
+                      expected=1+race['field_size']
+                      if len(document)!=expected or race.get('full_report_pages')!=expected:
+                          raise SystemExit('Sealed v3.15 A4 horse-page mismatch: '+race['id'])
+                      text=' '.join(page.get_text() for page in document)
+                      if 'v3.15' not in document[0].get_text() or not all(
+                          mark in text for mark in ('◎','○','▲','△','×')):
+                          raise SystemExit('Sealed v3.15 report content incomplete: '+race['id'])
+                  print('PASS_SEALED_FORMAL_V315_A4_PDF',race['id'])
+                  checked+=1
+                  continue
               dest=out / (race['id']+'.pdf')
               subprocess.run([sys.executable,'-m','weasyprint',str(source),str(dest)],check=True)
               subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-layout.py',
