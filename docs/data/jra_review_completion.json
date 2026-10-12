@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T22:15:52.652097+00:00",
+  "generated_at": "2026-10-12T10:40:35.570876+00:00",
   "policy": {
     "formal_grade_a_independent_of_research": true,
     "never_reconstruct_missing_prerace_experience": true,
@@ -11,12 +11,12 @@
   "latest_formal_prompt_version": "v3.13",
   "formal_grade_a": {
     "passed": true,
-    "validated_case_count": 4,
+    "validated_case_count": 6,
     "errors": []
   },
   "shadow_research": {
     "state": "evidence_incomplete",
-    "prerace_evidence_gap_count": 3,
+    "prerace_evidence_gap_count": 5,
     "evidence_gaps": [
       {
         "race_id": "2026-10-10-mimuro-stakes",
@@ -35,6 +35,18 @@
         "version": "v3.12",
         "cause": "race_context.race_category is required",
         "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-12-october-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-12-swan-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
       }
     ],
     "covered_prediction_entries": 1,
@@ -51,7 +63,7 @@
       ],
       "registered_races": 6,
       "expected_races": 6,
-      "formal_grade_a_review_state": "pending",
+      "formal_grade_a_review_state": "complete",
       "races": [
         {
           "race_id": "2026-10-10-saudi-arabia-royal-cup",
@@ -80,22 +92,18 @@
         {
           "race_id": "2026-10-12-october-stakes",
           "date": "2026-10-12",
-          "formal_state": "pending",
-          "reasons": [
-            "awaiting_official_result_and_review"
-          ]
+          "formal_state": "complete",
+          "reasons": []
         },
         {
           "race_id": "2026-10-12-swan-stakes",
           "date": "2026-10-12",
-          "formal_state": "pending",
-          "reasons": [
-            "awaiting_official_result_and_review"
-          ]
+          "formal_state": "complete",
+          "reasons": []
         }
       ],
-      "weekly_improvement_decision": "not_evaluated",
-      "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
+      "weekly_improvement_decision": "no_change",
+      "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
     }
   ]
 }

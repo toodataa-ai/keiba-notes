@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T22:15:52+00:00",
+  "generated_at": "2026-10-12T10:40:34+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 4,
+    "strict": 6,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 4
+    "prediction_entries": 6
   },
   "versions": {
     "v3.12": {
@@ -48,6 +48,52 @@
         "stake_yen": 1900,
         "payout_yen": 0,
         "roi_pct": 0.0,
+        "bet_cases": 2,
+        "probability_cases": {
+          "win": 0,
+          "top3": 0
+        }
+      }
+    },
+    "v3.13": {
+      "all_non_synthetic": {
+        "cases": 2,
+        "honmei_win_rate": 0.0,
+        "honmei_top3_rate": 0.5,
+        "top3_marks_capture_rate": 0.5,
+        "winner_in_top3_marks_rate": 1.0,
+        "winner_mean_rank": null,
+        "winner_mrr": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "stake_yen": 4200,
+        "payout_yen": 9380,
+        "roi_pct": 223.333,
+        "bet_cases": 2,
+        "probability_cases": {
+          "win": 0,
+          "top3": 0
+        }
+      },
+      "strict": {
+        "cases": 2,
+        "honmei_win_rate": 0.0,
+        "honmei_top3_rate": 0.5,
+        "top3_marks_capture_rate": 0.5,
+        "winner_in_top3_marks_rate": 1.0,
+        "winner_mean_rank": null,
+        "winner_mrr": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "stake_yen": 4200,
+        "payout_yen": 9380,
+        "roi_pct": 223.333,
         "bet_cases": 2,
         "probability_cases": {
           "win": 0,
@@ -123,7 +169,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 4
+    "strict_bet_cases": 6
   },
   "errors": [],
   "entries": [
@@ -278,6 +324,86 @@
         "stake_yen": 500,
         "payout_yen": 0,
         "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-12-october-stakes",
+      "date": "2026-10-12",
+      "venue": "東京",
+      "surface": "turf",
+      "race": "オクトーバーステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-12-october-stakes/v3.15-run38189408717-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "459a92146a178b6812c92a2575bb726f324fabcf",
+        "proof_commit_at": "2026-10-12T00:50:28+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 1800,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-12-swan-stakes",
+      "date": "2026-10-12",
+      "venue": "京都",
+      "surface": "turf",
+      "race": "スワンステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-12-swan-stakes/v3.15-run38189073744-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "5c174b4ff4c1884d67965e714fc6a1b189a20dc3",
+        "proof_commit_at": "2026-10-12T00:44:01+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 2400,
+        "payout_yen": 9380,
+        "roi_pct": 390.833,
         "going_log_loss": null,
         "pace_log_loss": null,
         "win_brier": null,

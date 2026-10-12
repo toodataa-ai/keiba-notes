@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T22:15:52.771429+00:00",
+  "generated_at": "2026-10-12T10:40:35.699602+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-10-11T22:15:52.652097+00:00",
+    "generated_at": "2026-10-12T10:40:35.570876+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -40,12 +40,12 @@
     "latest_formal_prompt_version": "v3.13",
     "formal_grade_a": {
       "passed": true,
-      "validated_case_count": 4,
+      "validated_case_count": 6,
       "errors": []
     },
     "shadow_research": {
       "state": "evidence_incomplete",
-      "prerace_evidence_gap_count": 3,
+      "prerace_evidence_gap_count": 5,
       "evidence_gaps": [
         {
           "race_id": "2026-10-10-mimuro-stakes",
@@ -64,6 +64,18 @@
           "version": "v3.12",
           "cause": "race_context.race_category is required",
           "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-12-october-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-12-swan-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
         }
       ],
       "covered_prediction_entries": 1,
@@ -80,7 +92,7 @@
         ],
         "registered_races": 6,
         "expected_races": 6,
-        "formal_grade_a_review_state": "pending",
+        "formal_grade_a_review_state": "complete",
         "races": [
           {
             "race_id": "2026-10-10-saudi-arabia-royal-cup",
@@ -109,32 +121,136 @@
           {
             "race_id": "2026-10-12-october-stakes",
             "date": "2026-10-12",
-            "formal_state": "pending",
-            "reasons": [
-              "awaiting_official_result_and_review"
-            ]
+            "formal_state": "complete",
+            "reasons": []
           },
           {
             "race_id": "2026-10-12-swan-stakes",
             "date": "2026-10-12",
-            "formal_state": "pending",
-            "reasons": [
-              "awaiting_official_result_and_review"
-            ]
+            "formal_state": "complete",
+            "reasons": []
           }
         ],
-        "weekly_improvement_decision": "not_evaluated",
-        "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
+        "weekly_improvement_decision": "no_change",
+        "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
       }
     ]
   },
   "totals": {
-    "prospective_strict_races": 4,
+    "prospective_strict_races": 6,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 4,
-    "prospective_results_joined": 4
+    "prospective_prediction_entries": 6,
+    "prospective_results_joined": 6
   },
   "races": [
+    {
+      "race_id": "2026-10-12-swan-stakes",
+      "date": "2026-10-12",
+      "venue": "京都",
+      "surface": "turf",
+      "race_name": "スワンステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-12T15:45:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-12-swan-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-12-swan-stakes.json",
+      "official_result_at": "2026-10-12T10:35:01.309Z",
+      "official_going": "良",
+      "finish_order": [
+        1,
+        4,
+        9,
+        8,
+        15,
+        13,
+        5,
+        18,
+        16,
+        11,
+        17,
+        14,
+        6,
+        10,
+        3,
+        12,
+        2,
+        7
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": null,
+          "information_cutoff_at": null,
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "スワンステークス",
+          "marks": {},
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [],
+          "proof_commit": "5c174b4ff4c1884d67965e714fc6a1b189a20dc3",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-12-swan-stakes/v3.15-run38189073744-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-12-swan-stakes/v3.15-run38189073744-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-10-12-october-stakes",
+      "date": "2026-10-12",
+      "venue": "東京",
+      "surface": "turf",
+      "race_name": "オクトーバーステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-12T15:30:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-12-october-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-12-october-stakes.json",
+      "official_result_at": "2026-10-12T10:35:01.309Z",
+      "official_going": "良",
+      "finish_order": [
+        2,
+        16,
+        10,
+        1,
+        9,
+        15,
+        6,
+        17,
+        5,
+        7,
+        3,
+        8,
+        13,
+        18,
+        4,
+        14,
+        12,
+        11
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": null,
+          "information_cutoff_at": null,
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "オクトーバーステークス",
+          "marks": {},
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [],
+          "proof_commit": "459a92146a178b6812c92a2575bb726f324fabcf",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-12-october-stakes/v3.15-run38189408717-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-12-october-stakes/v3.15-run38189408717-attempt1-sealed.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-10-11-uzumasa-stakes",
       "date": "2026-10-11",
