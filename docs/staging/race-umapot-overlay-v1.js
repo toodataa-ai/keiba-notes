@@ -26,6 +26,13 @@ function sampleAt(p,f){
 }
 function point(course,d,lane=0){
  const parts=path[course?.id];if(!parts)throw Error('UMAPOT_UNSUPPORTED_COURSE');
+ if(d>course.distance_m){
+  const finish=point(course,course.distance_m,lane),tail=parts.at(-1);
+  const tangent=sampleAt(tail,1);
+  const scale=lookup.get(tail).at(-1).len/(course.segments.at(-1).to-course.segments.at(-1).from);
+  const offset=Math.min(40,d-course.distance_m)*scale;
+  return {x:finish.x+tangent.tx*offset,y:finish.y+tangent.ty*offset};
+ }
  const distance=clamp(Number(d)||0,0,course.distance_m);
  const part=course.segments.find(x=>distance<=x.to+1e-8)||course.segments.at(-1);
  const controls=parts[course.segments.indexOf(part)];if(!controls)throw Error('UMAPOT_SEGMENT_MISMATCH');
@@ -55,7 +62,7 @@ function draw(state,race,focus,pathOn,paintNumber){
   for(const t of horse.trail){const p=point(course,t.d,t.lane);if(first){ctx.moveTo(p.x,p.y);first=false}else ctx.lineTo(p.x,p.y)}
   if(!first){ctx.strokeStyle=horse.number===selected?'rgba(25,50,68,.90)':'rgba(48,65,58,.7)';ctx.lineWidth=horse.number===selected?2.8:1.8;ctx.stroke()}
  }
- const markers=state.horses.map(h=>({number:h.number,...point(course,h.d,h.lane),
+ const markers=state.horses.map(h=>({number:h.number,...point(course,h.displayD??h.d,h.lane),
   selected:h.number===selected,leading:h.number===state.leadingNo}))
  .sort((a,b)=>Number(a.selected)-Number(b.selected)||Number(a.leading)-Number(b.leading)||a.number-b.number);
  for(const h of markers)paintNumber(ctx,h.number,h.x,h.y,h.selected?.78:.64,h.selected,h.leading,race.field_size);
