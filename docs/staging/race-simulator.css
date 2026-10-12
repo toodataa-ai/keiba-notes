@@ -43,3 +43,6 @@
 .reference-scale-switch{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:10px;font-weight:700;color:#535e6d;margin:-6px 0 8px}
 .reference-scale-switch select{border:1px solid #c8d0d9;border-radius:7px;background:#fff;padding:6px 8px;font-size:11px}
 @media(max-width:500px){.reference-scale-switch{justify-content:flex-start}}
+
+/* No floating labels when the externally hosted image fails to load. */
+.real-course-track canvas.real-course-overlay[hidden]{display:none!important}
