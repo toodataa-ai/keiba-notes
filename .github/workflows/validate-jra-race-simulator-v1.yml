@@ -20,6 +20,7 @@ jobs:
       - name: JavaScript syntax, existing source immutability
         run: |
           set -euo pipefail
+          node --check docs/staging/race-course-geometry-v1.js
           node --check docs/staging/race-sim-engine.js
           node --check docs/staging/race-simulator.js
           node --check docs/staging/stage-week-preview.js
@@ -40,6 +41,8 @@ jobs:
             assert r['proof_commit'] and r['step1_fixed_at']
             assert Path('docs',item['report']).exists()
             assert item['field_size']==18
+            assert item['course_variant']=='A'
+            assert item['course_id'] in ('tokyo_turf_2000','kyoto_turf_outer_1400')
           for path,sha in {
             'docs/this-week.html':'c59b56117b0f46ff4cb2a756a51baf4b62b5c689',
             'docs/assets/week.js':'ad22854774a5a10626436bd938a661ba8261611d',
@@ -88,6 +91,24 @@ jobs:
               else throw Error('Unapproved request '+p);
               return {ok:true,status:200,json:async()=>data,text:async()=>data};
             };
+            w.eval(read('docs/staging/race-course-geometry-v1.js'));
+            const course=w.RaceCourseGeometry.get(entry.course_id);
+            assert.ok(course,'official layout required');
+            assert.equal(course.distance_m,entry.distance_m);
+            assert.equal(course.turn,entry.turn);
+            assert.equal(course.segments.at(-1).to-course.segments.at(-1).from,course.straight_m);
+            const p0=w.RaceCourseGeometry.point(course,0,0);
+            const p1=w.RaceCourseGeometry.point(course,course.distance_m,0);
+            assert.ok(Math.hypot(p0.x-p1.x,p0.y-p1.y)>20);
+            const heights=course.profile.map(q=>q[1]);
+            assert.ok(Math.abs(Math.max(...heights)-Math.min(...heights)-course.elevation_range_m)<1e-6);
+            const stages=course.segments.map(x=>x.kind);
+            assert.ok(stages.includes('turn')&&stages.includes('straight'));
+            const straightPos=course.distance_m-course.straight_m+3;
+            assert.equal(w.RaceCourseGeometry.metrics(course,straightPos,0).isFinalStraight,true);
+            const bendPos=course.segments.find(x=>x.kind==='turn').from+2;
+            assert.ok(w.RaceCourseGeometry.metrics(course,bendPos,7).pathStretch>
+              w.RaceCourseGeometry.metrics(course,bendPos,0).pathStretch);
             w.eval(read('docs/staging/race-sim-engine.js'));
             w.eval(read('docs/staging/race-simulator.js'));
             await new Promise(resolve=>setTimeout(resolve,80));
@@ -123,6 +144,8 @@ jobs:
               return {number,name,mark:x.querySelector('.standing-mark').textContent,win_pct:6,pace_grade:'B'};
             });
             const source={...entry,horses};
+            assert.equal(w.document.getElementById('courseMeasurements').textContent.includes(String(course.straight_m)),true);
+            assert.equal(w.document.getElementById('courseMeasurements').textContent.includes(String(course.elevation_range_m)),true);
             engine.validData(source);
             const a=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
             const b=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
@@ -148,6 +171,7 @@ jobs:
             docs/staging/race-simulator.css
             docs/staging/race-simulator.js
             docs/staging/race-sim-engine.js
+            docs/staging/race-course-geometry-v1.js
             docs/staging/race-sim-manifest-v1.json
             docs/staging/stage-week-preview.js
             docs/staging/index.html
@@ -162,7 +186,7 @@ jobs:
               fi
             done
             if [[ "$ok" == 1 ]];then
-              echo "PASS_SIM_SEVEN_PUBLIC_STAGE_ASSET_BYTE_MATCH"
+              echo "PASS_SIM_EIGHT_PUBLIC_STAGE_ASSET_BYTE_MATCH"
               exit 0
             fi
             sleep 10
