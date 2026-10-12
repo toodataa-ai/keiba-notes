@@ -27,13 +27,19 @@ jobs:
           ! grep -q '購入操作は最大3行' docs/index.html
           ! grep -q 'special-2026-10-11-tokyo12' docs/index.html
           ! grep -q 'special-2026-10-11-tokyo12' docs/this-week.html
+          grep -q '"current_public_version": "1.01"' docs/data/production-releases.json
+          grep -q '"public_version": "1.00"' docs/data/production-releases.json
+          grep -q '"public_version": "1.01"' docs/data/production-releases.json
+          cmp -s .github/production-releases.json docs/data/production-releases.json
+          grep -q "data/production-releases.json" docs/release-history.html
+          echo PASS_JRA_PRODUCTION_RELEASE_HISTORY_V100_V101
           echo PASS_JRA_APPROVED_RELEASE_V101_DIFF_AND_UI_SCOPE
       - name: Match actual public Pages files byte by byte, independently
         run: |
           set -euo pipefail
           for attempt in $(seq 1 25); do
             ok=1
-            for path in docs/index.html docs/this-week.html; do
+            for path in docs/index.html docs/this-week.html docs/release-history.html docs/data/production-releases.json; do
               url="https://toodataa-ai.github.io/keiba-notes/${path#docs/}"
               if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra-actual-page ||
                  ! cmp -s "$path" /tmp/jra-actual-page; then
@@ -41,7 +47,7 @@ jobs:
               fi
             done
             if [[ "$ok" -eq 1 ]]; then
-              echo PASS_JRA_APPROVED_RELEASE_V101_PUBLIC_HTTP_BINARY_MATCH
+              echo PASS_JRA_APPROVED_RELEASE_V101_AND_HISTORY_PUBLIC_HTTP_BINARY_MATCH
               exit 0
             fi
             sleep 12
