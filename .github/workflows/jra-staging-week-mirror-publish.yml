@@ -1,0 +1,82 @@
+name: Maintain JRA this-week staging as production-appearance mirror
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/jra-build-staging-week-mirror-v1.py'
+      - '.github/workflows/jra-staging-week-mirror-publish.yml'
+      - 'docs/this-week.html'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jra-stage-week-mirror-sync
+  cancel-in-progress: false
+jobs:
+  sync-staging-presentation-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - name: Generate stage only from exact live page
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-build-staging-week-mirror-v1.py
+          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          prod=Path('docs/this-week.html').read_text()
+          stage=Path('docs/staging/this-week.html').read_text()
+          assert prod.count('id="weekPredictions"') == stage.count('id="weekPredictions"') == 1
+          assert prod.count('id="weekSchedule"') == stage.count('id="weekSchedule"') == 1
+          assert prod.count('class="race-list"') == stage.count('class="race-list"')
+          assert 'id="stagingJraReports"' not in stage, 'Ad-hoc staging-only cards are forbidden'
+          assert 'jra-staging-report-link-override' not in prod
+          for short in ('tokyo11','kyoto11'):
+            for ext in ('html','pdf'):
+              p=Path('docs/staging/jra-v315-20261012')/(short+'.'+ext)
+              assert p.is_file(),p
+          print('PASS_JRA_STAGE_ONE_TO_ONE_BODY_AND_COMPONENT_STRUCTURE')
+          PY
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          s=Path('docs/staging/this-week.html').read_text()
+          m=re.search(r'<script id="jra-staging-report-link-override">(.*?)</script>',s,re.S)
+          assert m,'Missing stage link override'
+          Path('/tmp/jra-stage-mirror.js').write_text(m.group(1))
+          PY
+          node --check /tmp/jra-stage-mirror.js
+      - name: Commit only stage URL; preserve production report, bets and every source
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- docs/staging/this-week.html
+          test "$(git diff --cached --name-only)" = "docs/staging/this-week.html" || {
+            echo "::error::Staging sync may change only docs/staging/this-week.html";exit 1;
+          }
+          git commit -m "Mirror current JRA this-week production UI on staging, preview URLs only"
+          for try in 1 2 3 4 5;do
+            if git push origin HEAD:main;then break;fi
+            test "$try" -lt 5 || exit 1
+            git fetch origin main
+            git rebase origin/main || { git rebase --abort;exit 1; }
+            python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+            sleep 3
+          done
+      - name: Verify current Pages published stage bytes
+        run: |
+          set -euo pipefail
+          url='https://toodataa-ai.github.io/keiba-notes/staging/this-week.html'
+          for try in $(seq 1 35);do
+            if curl -LfsS --max-time 20 "$url?stage-mirror=$GITHUB_RUN_ID" -o /tmp/jra-stage-week-mirror &&
+               cmp -s docs/staging/this-week.html /tmp/jra-stage-week-mirror;then
+              echo "PASS_JRA_THIS_WEEK_EXACT_PROD_APPEARANCE_STAGING_HTTP $url"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Staging mirror saved but not verifiably deployed over public HTTP";exit 1
