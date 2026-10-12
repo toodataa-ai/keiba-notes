@@ -41,6 +41,17 @@ function create(data,options={}){
  const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
  const length=data.distance_m;
+ // Distinct slots by previous running style preserve legal side-by-side
+ // order while the whole pack converges safely toward the inner third.
+ const styleSlots=new Map();
+ for(const style of ['nige','senko','sashi','oikomi','unknown']){
+   const group=data.horses.filter(h=>(h.style||'unknown')===style)
+     .slice().sort((a,b)=>a.number-b.number);
+   const range=Math.min(6,Math.max(1,group.length-1)*.92);
+   group.forEach((h,i)=>{
+     styleSlots.set(h.number,group.length===1?0:range*i/(group.length-1));
+   });
+ }
  const horses=data.horses.map((h,i)=>{
   const skill=clamp((Number(h.win_pct)||mean)-mean,-12,15);
   const paceGrade=GRADE[h.pace_grade]??2;
@@ -48,7 +59,10 @@ function create(data,options={}){
   return { number:no,name:h.name,mark:h.mark,grade:h.grade,win_pct:h.win_pct,
    pace_grade:h.pace_grade,color:i,style:h.style||'unknown',styleMeta:h.styleMeta||null,
    d:0,lane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
+   initialLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
+   launchTargetLane:styleSlots.get(no)??2,
    desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
+   launchMergeMoves:0,
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
    stamina:0.9+rng()*.2,
    launchVariation:(rng()-.5)*1.6,
@@ -85,31 +99,47 @@ function create(data,options={}){
    // an outside passing route; faster finishers find inside gaps gradually.
    const m=geo.metrics(profile,h.d,h.lane);
    h.gradeNow=m.grade;h.turnNow=m.bend;h.lastCourseSegment=m.segment;
-   const choice=laneAI.plan(h,horses,laneCfg,m,bias,state.t);
+   const forming=state.leader<101;
+   const choice=forming?null:laneAI.plan(h,horses,laneCfg,m,bias,state.t);
    if(choice){
      h.desiredLane=choice.lane;h.lastChange=state.t;
      h.laneChanges++;state.totalLaneChanges++;
      if(choice.mode==='inward'){h.inwardMoves++;state.totalInsideMoves++}
      else {h.outwardMoves++;state.totalOutsidePasses++}
      if(h.events<5){
-        log('lane',h.number+'番 '+h.name+(choice.mode==='inward'?'が内の空いた進路へ':'が外の進路で前をかわす'),h);
-        h.events++;
+       log('lane',h.number+'番 '+h.name+(choice.mode==='inward'?'が内の空いた進路へ':'が外の進路で前をかわす'),h);
+       h.events++;
      }
    }
-   // A planned crossing must remain safe throughout, including after other
-   // horses advance. Abort rather than cutting across a horse next to it.
-   if(Math.abs(h.desiredLane-h.lane)>.05 &&
-      !laneAI.laneSafe(h,horses,h.desiredLane,laneCfg)){
+   let movement;
+   if(forming){
+     // The pack gently contracts during the opening 100m. Each style
+     // has distinct inner-side "slots" so runners are not all assigned
+     // to the identical rail coordinate. No lateral teleporting.
+     const ratio=smoothstep(state.leader/100);
+     const desired=h.initialLane+(h.launchTargetLane-h.initialLane)*ratio;
+     const speed=lateralSpeedAt(state.leader);
+     const amount=clamp(desired-h.lane,-dt*speed,dt*speed);
+     const proposed=clamp(h.lane+amount,0,laneCfg.maxLane);
+     const safe=laneAI.launchStepSafe(h,horses,proposed,laneCfg);
+     movement=safe?proposed-h.lane:0;
+     h.desiredLane=h.lane+movement;
+     if(movement<-.00001 && h.launchMergeMoves===0){
+       h.launchMergeMoves++;h.laneChanges++;h.inwardMoves++;
+       state.totalLaneChanges++;state.totalInsideMoves++;
+     }
+   }else{
+     // Apply the usual safe lane-change logic once gate formation ends.
+     if(Math.abs(h.desiredLane-h.lane)>.05 &&
+        !laneAI.laneSafe(h,horses,h.desiredLane,laneCfg)){
        h.desiredLane=h.lane;
+     }
+     const move=h.desiredLane-h.lane;
+     const limit=dt*lateralSpeedAt(h.d);
+     movement=clamp(move,-limit,limit);
    }
-   const move=h.desiredLane-h.lane;
-   // Allow an early, progressively accelerating lane convergence (gate
-   // release -> ~100m). The move never jumps: it is limited per tick and
-   // every proposed crossing must pass the safety corridor checks above.
-   const lateralSpeed=lateralSpeedAt(h.d);
-   const laneAdvance=clamp(move,-dt*lateralSpeed,dt*lateralSpeed);
-   h.laneVelocity=laneAdvance/(dt||1);
-   h.lane=clamp(h.lane+laneAdvance,0,laneCfg.maxLane);
+   h.laneVelocity=movement/(dt||1);
+   h.lane=clamp(h.lane+movement,0,laneCfg.maxLane);
    const groundBias=(bias==='inner'?(laneCfg.maxLane/2-h.lane):bias==='outer'?(h.lane-laneCfg.maxLane/2):0)*.026;
    // Separate geometry losses: turns cost extra metres for outer lanes, uphill
    // reduces instantaneous speed and drains a little energy, downhill can restore pace.
