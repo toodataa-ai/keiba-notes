@@ -24,6 +24,28 @@ function ticketKey(type,selection){
   return kind+':'+ids.join('-');
 }
 function textTicketKey(s){const b=splitBet(s);return ticketKey(b.type,b.selection);}
+// Approved v1.03 presentation aliases; v1.02 files stay immutable. Immutable historical prediction and bets are NOT altered.
+const JRA_V102_READABLE_REPORT_ALIASES={
+  "2026-10-12-october-stakes": {
+    "sourceReport": "reports/2026-10-12-october-stakes-v3.15-run38189408717-attempt1-v315.html",
+    "sourcePdf": "pdfs/2026-10-12-october-stakes-v3.15-run38189408717-attempt1-v315.pdf",
+    "report": "reports/2026-10-12-october-stakes-v315-readable-v103.html",
+    "pdf": "pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf"
+  },
+  "2026-10-12-swan-stakes": {
+    "sourceReport": "reports/2026-10-12-swan-stakes-v3.15-run38189073744-attempt1-v315.html",
+    "sourcePdf": "pdfs/2026-10-12-swan-stakes-v3.15-run38189073744-attempt1-v315.pdf",
+    "report": "reports/2026-10-12-swan-stakes-v315-readable-v103.html",
+    "pdf": "pdfs/2026-10-12-swan-stakes-v315-readable-v103.pdf"
+  }
+};
+function jraReadableLinks(r){
+ const approved=JRA_V102_READABLE_REPORT_ALIASES[r.id];
+ if(!approved || r.purchase_strategy_version!=='v3.15' || !['predicted','reviewed'].includes(r.status) ||
+    r.report!==approved.sourceReport || r.pdf!==approved.sourcePdf)
+   return {report:r.report,pdf:r.pdf};
+ return {report:approved.report,pdf:approved.pdf};
+}
 function betPanel(r){
   const p=r.performance||{};
   const structured=Array.isArray(r.final_bets)&&r.final_bets.length?r.final_bets:null;
@@ -111,8 +133,9 @@ function betPanel(r){
       const p=r.performance;const reviewText=typeof r.review==='string'?r.review:(r.review?.summary||'');
       const marks=r.marks?`<div class="marks"><span class="mark"><b>◎</b>${esc(r.marks.win||'—')}</span><span class="mark"><b>○</b>${esc(r.marks.second||'—')}</span><span class="mark"><b>▲</b>${esc(r.marks.third||'—')}</span></div>`:'';
       const outcome=p.ticket_hit?'<span class="status reviewed">的中あり</span>':'<span class="status">全買い目ハズレ</span>';
+      const display=jraReadableLinks(r);
       const spoiler=`<details class="race-spoiler"><summary>結果・馬券成績を見る<span class="spoiler-warning">着順・的中／ハズレ・払戻・収支を表示します</span></summary><div class="race-spoiler-body"><div class="result-outcome">${outcome}</div><div class="result-box result-summary"><b>レース結果</b><br>${esc(r.result?.summary||'成績確定')}</div>${betPanel(r)}</div></details>`;
-      return `<article class="race-card"><div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race||'')}</h3></div><span class="status reviewed">回顧済み</span></div>${marks}${spoiler}<details class="review-disclosure"><summary>反省会を見る</summary><div class="review-box">${esc(reviewText)}</div></details>${r.report?`<div class="actions"><a class="btn" href="${encodeURI(r.report)}">予想詳細を見る</a>${r.pdf?`<a class="btn secondary" href="${encodeURI(r.pdf)}">PDF</a>`:''}</div>`:''}</article>`;
+      return `<article class="race-card"><div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race||'')}</h3></div><span class="status reviewed">回顧済み</span></div>${marks}${spoiler}<details class="review-disclosure"><summary>反省会を見る</summary><div class="review-box">${esc(reviewText)}</div></details>${display.report?`<div class="actions"><a class="btn" href="${encodeURI(display.report)}">予想詳細を見る</a>${display.pdf?`<a class="btn secondary" href="${encodeURI(display.pdf)}">PDF</a>`:''}</div>`:''}</article>`;
     }).join(''):'<p class="muted">該当する成績はありません。</p>';
   }
   mode.addEventListener('change',()=>{fill();render();});value.addEventListener('change',render);fill();render();
