@@ -116,6 +116,16 @@ jobs:
               assert.ok(Math.hypot(p.x-p2.x,p.y-p2.y)<=Math.min(...course.track_width_m),'all mapped lanes lie on published turf width');
             }
             assert.equal(w.document.getElementById('cameraSelect').value,'follow');
+            const stages=course.segments.map(x=>x.kind);
+            assert.ok(stages.includes('turn')&&stages.includes('straight'));
+            const straightPos=course.distance_m-course.straight_m+3;
+            assert.equal(w.RaceCourseGeometry.metrics(course,straightPos,0).isFinalStraight,true);
+            const bendPos=course.segments.find(x=>x.kind==='turn').from+2;
+            assert.ok(w.RaceCourseGeometry.metrics(course,bendPos,7).pathStretch>
+              w.RaceCourseGeometry.metrics(course,bendPos,0).pathStretch);
+            w.eval(read('docs/staging/race-sim-engine.js'));
+            w.eval(read('docs/staging/race-simulator.js'));
+            await new Promise(resolve=>setTimeout(resolve,80));
             const closeCamera=w.RaceSimCamera.viewCamera('follow',1000,1000);
             const wideCamera=w.RaceSimCamera.viewCamera('followWide',1000,1000);
             const fullCamera=w.RaceSimCamera.viewCamera('overview',1000,1000);
@@ -135,16 +145,6 @@ jobs:
             w.innerWidth=mobileOriginal;
             w.dispatchEvent(new w.Event('resize'));
             assert.equal(w.document.getElementById('raceCanvas').height,470);
-            const stages=course.segments.map(x=>x.kind);
-            assert.ok(stages.includes('turn')&&stages.includes('straight'));
-            const straightPos=course.distance_m-course.straight_m+3;
-            assert.equal(w.RaceCourseGeometry.metrics(course,straightPos,0).isFinalStraight,true);
-            const bendPos=course.segments.find(x=>x.kind==='turn').from+2;
-            assert.ok(w.RaceCourseGeometry.metrics(course,bendPos,7).pathStretch>
-              w.RaceCourseGeometry.metrics(course,bendPos,0).pathStretch);
-            w.eval(read('docs/staging/race-sim-engine.js'));
-            w.eval(read('docs/staging/race-simulator.js'));
-            await new Promise(resolve=>setTimeout(resolve,80));
             const race=w.document.getElementById('raceSelect');
             const start=w.document.getElementById('startBtn');
             const ranks=w.document.querySelectorAll('.standing-row');
