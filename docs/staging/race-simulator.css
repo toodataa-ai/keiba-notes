@@ -135,3 +135,9 @@ body.map-expanded{overflow:hidden}
  .live-display-grid .reference-scale-switch select{max-width:240px}
  .live-display-grid .reference-map-figure>.small-muted{font-size:9px}
 }
+
+/* v0.17: explain endogenous pace next to both live displays. */
+.pace-ticker{padding:6px 13px;background:#edf4f6;color:#243b4d;border-bottom:1px solid #cbd9e2;
+ font-size:11px;line-height:1.45;font-weight:700;min-height:28px;font-variant-numeric:tabular-nums}
+.pace-ticker[data-pace="H"]{color:#a12f23;background:#fff0e9}
+.pace-ticker[data-pace="S"]{color:#2f5670;background:#edf5fb}

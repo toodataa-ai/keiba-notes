@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#13161f">
 <title>レースシミュレータ（検証版）｜競馬予想精度向上AI</title>
 <link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="race-simulator.css?v=20261012-16">
+<link rel="stylesheet" href="race-simulator.css?v=20261012-17">
 </head>
 <body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
@@ -25,7 +25,7 @@
  <section class="toolbar panel" aria-label="シミュレーションの条件">
   <div class="control-grid">
    <label>対象レース<select id="raceSelect" aria-label="対象レースを選ぶ"><option>読み込み中…</option></select></label>
-   <label>想定ペース<select id="paceSelect"><option value="S">スロー（S）</option><option value="M" selected>平均（M）</option><option value="H">ハイ（H）</option></select></label>
+   <label>ペースの想定<select id="paceSelect"><option value="auto" selected>自動（先行争いから判定）</option><option value="S">スロー寄り（S）</option><option value="M">平均寄り（M）</option><option value="H">ハイ寄り（H）</option></select></label>
    <label>進路バイアス<select id="biasSelect"><option value="inner">内有利</option><option value="neutral" selected>フラット</option><option value="outer">外有利</option></select></label>
    <label>再現番号（乱数シード）<input id="seedInput" type="number" min="1" max="999999" step="1" value="2026" inputmode="numeric"></label>
   </div>
@@ -44,6 +44,7 @@
   <div class="broadcast-top"><div><span class="live-indicator">LIVE SIMULATION</span><h2 id="liveTitle">実況ビュー ＋ 全体図</h2></div>
    <div class="race-distance"><span id="raceMeta">レースを準備中…</span><strong id="remaining">— m</strong></div>
   </div>
+  <div class="pace-ticker" id="paceDynamics" role="status" aria-live="off">隊列からペースを判定します</div>
   <div class="live-display-grid" aria-label="実況と全体図の同時表示">
    <div class="live-picture">
   <div class="track-stage">
@@ -107,6 +108,7 @@
   <p>脚質は保存済みの発走前レポートの「前走通過順」を出走頭数で補正して暫定分類します。逃げ馬は先頭を取りに行き、先行馬は前方、差し馬は中団、追込馬は後方を目指します。前走が確認できない馬は脚質不明として扱います。いずれも単一の前走からの推定で、実際の走法を保証するものではありません。</p>
   <p>発走直後は速度とカメラの追従を滑らかにし、最初の100mで各馬が安全な内側の進路へ寄るよう優先します。全馬が同時に内ラチの最短線を通れるわけではないため、前後の間隔を保ちながら内寄りの馬群を形成します。</p>
   <p>進路の基本方針はコーナーでは内ラチ優先です。最後の直線では前が詰まる前から外側に空いた進路を探し、追い越しを試みます。無理な割り込みや馬体の交錯はしません。</p>
+  <p>ペースは標準で自動判定します。先頭付近にいる逃げ・先行馬が多いほど競り合い負荷が増え、前へ行った馬はエネルギーを消費します。前半の負荷は直線まで蓄積し、後方待機組は展開次第で差を詰めます。スロー／平均／ハイの手動設定は展開仮説の補正であり、実際の隊列による負荷を無効化しません。モデルは仮説であり実測ラップや騎手の判断を再現するものではありません。</p>
   <p>直線の末脚は発走前の脚質分類、個体ごとに固定したスタミナ・加速特性、ペースと位置取りに応じて徐々に変わります。直線に入った時点の着順を固定せず、差し・追込の加速と先行勢の消耗を仮定します。必ず順位が変わるように決め打ちする演出ではありません。</p>
   <p>走る番号の丸いマーカーはJRAの公式枠色です（1枠白・2枠黒・3枠赤・4枠青・5枠黄・6枠緑・7枠橙・8枠桃）。18頭立ては1〜6枠が各2頭、7〜8枠が各3頭となり、馬番ごとに正しい枠色を付けます。</p>
   <p>実況ビューは馬の絵を使わず、数字そのものが走路上を走ります。番号の中心が馬の位置で、引き出し線や移動したラベルはありません。注目馬は元の枠色の外側を金色の輪で強調します。密集時は正確な位置を優先するため、数字が一部重なる場合があります。</p>
@@ -116,13 +118,13 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.16 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.17 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-11"></script>
 <script src="race-lane-ai-v1.js?v=20261012-14"></script>
 <script src="race-runner-style-v1.js?v=20261012-8"></script>
 <script src="race-umapot-overlay-v1.js?v=20261012-15"></script>
-<script src="race-sim-engine.js?v=20261012-14"></script>
-<script src="race-simulator.js?v=20261012-13"></script>
+<script src="race-sim-engine.js?v=20261012-17"></script>
+<script src="race-simulator.js?v=20261012-17"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>

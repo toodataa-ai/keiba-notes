@@ -56,7 +56,7 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.16' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.17' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.js?v=20261012-13' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
@@ -71,7 +71,11 @@ jobs:
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-1' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261012-16' in html
+          assert 'race-simulator.css?v=20261012-17' in html
+          assert 'race-sim-engine.js?v=20261012-17' in html
+          assert 'race-simulator.js?v=20261012-17' in html
+          assert 'value="auto" selected' in html
+          assert 'id="paceDynamics"' in html
           assert 'race-umapot-overlay-v1.js?v=20261012-15' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
@@ -446,6 +450,8 @@ jobs:
             assert.equal(w.document.getElementById('kyotoCourseImage')
               .getAttribute('src'),'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg');
             assert.equal(start.disabled,false,'Start enabled after sealed source parsed');
+            assert.equal(w.document.getElementById('paceSelect').value,'auto');
+            assert.match(w.document.getElementById('paceDynamics').textContent,/実効ペース/);
             assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
             assert.match(w.document.getElementById('raceMeta').textContent,new RegExp(entry.distance_m));
             assert.equal(w.document.getElementById('meterFill').style.width,'0%');
@@ -522,6 +528,27 @@ jobs:
               };
             }
             assert.ok(firstHundredSnapshot,'100m position snapshot is recorded');
+            // Verify tactical competition changes pace, not just selected dropdown.
+            const clone=(n,mode)=>{
+              const h=source.horses.map((x,i)=>({...x,
+                style:i<n?'nige':i<n+3?'senko':i>=13?'oikomi':'sashi'}));
+              const sample=engine.create({...source,horses:h},{seed:18,pace:mode,bias:'neutral'});
+              while(sample.state.leader<310&&!sample.state.finished)sample.step(.05);
+              return sample;
+            };
+            const solo=clone(1,'auto'),crowded=clone(4,'auto');
+            assert.ok(crowded.state.pacePeak>solo.state.pacePeak+.24,
+              'four leaders MUST generate more pace pressure than an unopposed escape');
+            assert.equal(crowded.state.peakPaceBand,'H');
+            assert.ok(['S','M'].includes(solo.state.peakPaceBand));
+            const debt=x=>x.state.horses.filter(h=>h.style==='nige')
+              .reduce((s,h)=>s+h.effortDebt,0)/x.state.horses.filter(h=>h.style==='nige').length;
+            assert.ok(debt(crowded)>debt(solo)+.08,
+              'leader contest must charge extra cumulative physical effort');
+            const forced=clone(4,'S');
+            assert.ok(forced.state.pacePeak>.40,
+              'S scenario modifier must NOT suppress actual leader competition');
+            assert.ok(Number.isInteger(a.state.finalStraightPasses) && a.state.finalStraightPasses>=0);
             assert.ok(Number.isInteger(a.state.finalStraightPasses) && a.state.finalStraightPasses>=0);
             assert.equal(typeof engine.finishDrive,'function');
             const closeRunner=a.state.horses.find(x=>x.style==='oikomi');

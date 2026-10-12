@@ -8,7 +8,7 @@ const ui={
  restart:$('restartBtn'),newSeed:$('newSeedBtn'),path:$('pathToggle'),
  focus:$('focusSelect'),change:$('changeNotice'),
  canvas:$('raceCanvas'),map:$('courseCanvas'),courseMapMode:$('courseMapMode'),remaining:$('remaining'),meta:$('raceMeta'),
- caption:$('stageCaption'),elapsed:$('elapsed'),moment:$('moment'),lap:$('lap'),bar:$('meterFill'),
+ caption:$('stageCaption'),elapsed:$('elapsed'),moment:$('moment'),lap:$('lap'),bar:$('meterFill'),paceDynamics:$('paceDynamics'),
  stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo')
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
@@ -218,6 +218,14 @@ function render(full=false){
 function renderData(){
  if(!sim)return;
  const state=sim.state;
+ if(ui.paceDynamics){
+   const k={S:'スロー',M:'平均',H:'ハイ'}[state.paceBand]||'判定中';
+   const peak={S:'スロー',M:'平均',H:'ハイ'}[state.peakPaceBand]||'判定中';
+   ui.paceDynamics.textContent='実効ペース '+k+' ／ 先頭争い '+state.paceContestants+
+     '頭（逃'+state.paceEscapers+'・先'+state.paceStalkers+
+     '） ／ 前半最大 '+peak+' ／ 競り合い負荷 '+Math.round(state.pacePressure*100)+'%';
+   ui.paceDynamics.setAttribute('data-pace',state.paceBand);
+ }
  ui.remaining.textContent=Math.max(0,Math.round(state.distance-state.leader))+' m';
  const current=state.courseMetrics;
  ui.caption.textContent=state.finished?'ゴール':(current ? current.segment : 'スタート');

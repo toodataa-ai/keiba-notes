@@ -1,4 +1,4 @@
-/* Racing-lab scenario engine v0.14. Start safety retained; staged, stochastic finish drive. NOT calibrated odds. */
+/* Racing-lab scenario engine v0.17. Contested pace, effort debt and dynamic late effects; NOT calibrated odds. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -13,6 +13,21 @@ function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
 // Stamina, prior running style and scenario pace yield a gradual—not
 // scripted—late-race speed difference. Every horse is determined at gate load.
 const LATE_STYLE_DRIVE=Object.freeze({nige:-.22,senko:.08,sashi:.61,oikomi:1.08,unknown:.27});
+/* Pace is created by the runners, rather than inferred from their finishing
+   ranks or from popularity. Manual S/M/H is a +/- scenario modifier, not a
+   frozen outcome. Near-front escape and stalker candidates raise pressure.
+   These thresholds are transparent hypotheses, not learned coefficients. */
+function contestedPace(horses,leader,mode){
+ const active=horses.filter(h=>!h.finished&&leader-h.d<15);
+ const escape=active.filter(h=>h.style==='nige'&&leader-h.d<=14);
+ const stalk=active.filter(h=>h.style==='senko'&&leader-h.d<=9);
+ const escapeCount=escape.length;
+ const totalFighters=escapeCount+stalk.length;
+ const offset=mode==='S'?-.19:mode==='H'?.23:0;
+ const pressure=clamp(.13+Math.max(0,escapeCount-1)*.31+stalk.length*.105+offset,.025,1);
+ return {pressure,escapeCount,stalkCount:stalk.length,totalFighters};
+}
+function band(pressure){return pressure>=.67?'H':pressure>=.35?'M':'S'}
 function finishDrive(h,remaining,profile,pace){
  const stretch=profile.straight_m;
  // Begin wind-up on the final bend, reach full drive in the home straight.
@@ -42,7 +57,7 @@ function create(data,options={}){
  if(!profile || profile.distance_m!==data.distance_m || profile.venue!==data.venue || profile.turn!==data.turn)
    throw Error('COURSE_PROFILE_MISMATCH: このコースの測定値・条件を確認できません');
  const seed=clamp(Math.floor(Number(options.seed)||1),1,999999);
- const pace=['S','M','H'].includes(options.pace)?options.pace:'M';
+ const pace=['auto','S','M','H'].includes(options.pace)?options.pace:'auto';
  const bias=['inner','neutral','outer'].includes(options.bias)?options.bias:'neutral';
  const rng=mulberry32(hash(data.id+'|'+seed));
  const laneAI=global.RaceLaneAI;
@@ -82,7 +97,7 @@ function create(data,options={}){
    paceFit:((paceGrade-2)*.085)+(pace==='H'?(rng()-.5)*.14:0),
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
    trail:[],events:0,phase:rng()*6,lateKick:(rng()-.5)*.4+clamp(skill,-7,9)*.018,
-   fatigue:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
+   fatigue:0,effortDebt:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
  const events=[];
  const loggedLandmarks=new Set();
@@ -91,7 +106,9 @@ function create(data,options={}){
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
     laneModel:'v0.6-style-early-inside',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
-    finalStraightPasses:0,lastOvertakeLog:-100};
+    finalStraightPasses:0,lastOvertakeLog:-100,
+    pacePressure:.13,pacePeak:.13,paceBand:'S',peakPaceBand:'S',
+    paceContestants:0,paceEscapers:0,paceStalkers:0,paceHistory:[],lastPaceLog:'S'};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
  log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
  // A representative 17 m/s illustrates realistic race-duration scale
@@ -103,7 +120,27 @@ function create(data,options={}){
   if(!dt)return state;
   state.t+=dt;
   const fraction=clamp(state.leader/length,0,1);
-  const paceEffect=pace==='H'? (fraction<.48?1.22:-.92):pace==='S'?(fraction<.55?-.82:1.06):0;
+  // Take one snapshot BEFORE any horse is advanced. Without this,
+  // processing order changes the tactical contest and breaks determinism.
+  const liveLeader=Math.max(...horses.map(h=>h.d));
+  const contest=contestedPace(horses,liveLeader,pace);
+  const paceAlpha=clamp(dt*1.8,0,1);
+  state.pacePressure+=(contest.pressure-state.pacePressure)*paceAlpha;
+  state.paceBand=band(state.pacePressure);
+  state.paceContestants=contest.totalFighters;
+  state.paceEscapers=contest.escapeCount;
+  state.paceStalkers=contest.stalkCount;
+  if(fraction<=.60){
+    state.pacePeak=Math.max(state.pacePeak,state.pacePressure);
+    state.peakPaceBand=band(state.pacePeak);
+  }
+  if(state.paceBand!==state.lastPaceLog&&state.leader>=80&&fraction<.65){
+    log('pace',state.paceBand+'ペースへ変化：先頭争い'+contest.totalFighters+'頭・競り合い負荷'+Math.round(state.pacePressure*100)+'%');
+    state.lastPaceLog=state.paceBand;
+  }
+  // Manual presets shift overall scenario slightly, while the field's
+  // actual fight still determines the local acceleration and energy cost.
+  const paceEffect=(pace==='H'?.33:pace==='S'?-.32:0)*(fraction<.5?1:-.16);
   const sorted=horses.slice().sort((a,b)=>b.d-a.d);
   const prior=horses.map(h=>({number:h.number,d:h.d,finished:h.finished}));
   for(const h of sorted){
@@ -163,10 +200,27 @@ function create(data,options={}){
    const downhillBoost=m.grade<0? Math.min(.25,Math.abs(m.grade)*12):0;
    h.fatigue+=Math.max(0,m.grade)*dt*6;
    h.fatigue=clamp(h.fatigue,0,.22);
-   const staminaLoss=pace==='H'? Math.pow(fraction,1.9)*h.stamina*.28:Math.pow(fraction,2)*h.stamina*.16;
+   const leaderGap=Math.max(0,liveLeader-h.d);
+   const onFront=h.style==='nige'&&leaderGap<=16 ||
+                 h.style==='senko'&&leaderGap<=12;
+   const earlyDemand=(1-smoothstep((fraction-.38)/.25));
+   // Sprinting to secure the lead has a real cost. It is charged ONLY to
+   // horses actually contesting the front and persists into the straight.
+   // A lone, uncontested leader can therefore conserve much more energy.
+   if(onFront){
+     const effortStyle=h.style==='nige'?1:.58;
+     h.effortDebt=clamp(h.effortDebt+dt*earlyDemand*
+       (state.pacePressure**1.30)*.039*effortStyle,0,2.8);
+   }
+   const lateExhaustion=h.effortDebt*smoothstep((fraction-.44)/.43);
+   const sprintDemand=onFront?state.pacePressure*earlyDemand*
+       (h.style==='nige'?1.02:.56):0;
+   const staminaLoss=Math.pow(fraction,1.9)*h.stamina*
+      (pace==='H'?.22:.15);
    const remaining=length-h.d;
    const finishing=finishDrive(h,remaining,profile,pace);
-   let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue;
+   let speed=base+paceEffect+sprintDemand+h.ability+h.surge+h.tempo*.35+h.paceFit+
+     groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue-lateExhaustion;
    // A runner self-selects a fore-aft position from its PREVIOUS race's
    // corner passage. No STEP1 marks, popularity, odds or target result.
    const leaderD=Math.max(...horses.map(o=>o.d));
@@ -249,6 +303,11 @@ function create(data,options={}){
   state.leadingNo=leaders[0].number;
   state.progress=clamp(state.leader/length,0,1);
   state.tick++;
+  if(state.tick%150===0){
+    state.paceHistory.push({d:Math.round(state.leader),pressure:Number(state.pacePressure.toFixed(3)),
+      grade:state.paceBand,contenders:state.paceContestants});
+    if(state.paceHistory.length>60)state.paceHistory.shift();
+  }
   if(state.tick%110===0&&!state.firstFinishTime)log('pace',Math.round(state.progress*100)+'%地点。先頭は'+state.leadingNo+'番');
   if(horses.every(h=>h.finished) || (state.firstFinishTime!==null&&state.t>state.firstFinishTime+15)){
     state.finished=true;
@@ -261,5 +320,5 @@ function create(data,options={}){
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
  return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
 }
-global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive});
+global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive,contestedPace,band});
 })(typeof window!=='undefined'?window:globalThis);
