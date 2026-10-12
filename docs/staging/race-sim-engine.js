@@ -129,7 +129,7 @@ function create(data,options={}){
        h.events++;
      }
    }else if(!choice){h.blocked=false}
-   h.distancePenaltyM+=physical*(1-1/m.pathStretch);
+   h.distancePenaltyM+=safe.distance*(m.pathStretch-1);
    h.d+=safe.distance;
    if(h.d>=length){
      h.finishTime=state.t-dt+dt*clamp((length-before)/(h.d-before),0,1);

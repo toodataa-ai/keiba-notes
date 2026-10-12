@@ -2,3 +2,9 @@
 @media(max-width:800px){.control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom-grid{grid-template-columns:1fr}.standings{max-height:230px}}
 @media(max-width:500px){.shell{padding-left:10px;padding-right:10px}.toolbar{padding:11px}.header-line{padding-top:22px}.heading{padding:12px 10px 22px}.demo-stamp{display:none}.control-grid{gap:9px}.toolbar label{font-size:10px}.controls button{font-size:11px;padding:10px}.controls .speed-label{margin-left:0}.track-tools{font-size:10px;align-items:flex-start}.stage-top,.stage-bottom{font-size:10px;padding:7px}.course-panel,.standings-panel,.race-events,.notes{padding:12px}.broadcast-top{padding:10px}.broadcast-top h2{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.meter div{transition:none}}
+
+/* v0.3 lane-decision telemetry beside the race commentary. */
+.track-tools{flex-wrap:wrap;justify-content:flex-start}
+#laneStatus{color:#344c38;font-weight:700;font-variant-numeric:tabular-nums}
+.track-tools>label{margin-left:auto}
+@media(max-width:550px){#laneStatus{width:100%}.track-tools>label{margin-left:0}}

@@ -163,6 +163,14 @@ function renderData(){
      (z>.0007?' ／ 上り':z<-.0007?' ／ 下り':' ／ 平坦')+
      (current?.kind==='turn'?' ／ コーナー':'');
  }
+ const laneText=$('laneStatus');
+ if(laneText){
+   const watched=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
+     state.horses.find(x=>String(x.number)===ui.focus.value);
+   if(watched)laneText.textContent=watched.number+'番｜内ラチから約'+
+      (1.8+watched.lane*1.65).toFixed(1)+'m　内へ '+watched.inwardMoves+
+      '回／外へ '+watched.outwardMoves+'回　詰まり '+watched.trafficHoldSeconds.toFixed(1)+'秒';
+ }
  ui.elapsed.textContent=dur(state.t);
  ui.moment.textContent=state.finished?'仮想着順が確定しました（予想や結果ではありません）':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
