@@ -60,6 +60,14 @@ jobs:
           assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
+          html=Path('docs/staging/race-simulator.html').read_text()
+          assert 'https://upload.wikimedia.org/wikipedia/commons/8/8d/Tokyo2000c.svg' in html
+          assert 'https://commons.wikimedia.org/wiki/File:Tokyo2000c.svg' in html
+          assert 'https://www.openstreetmap.org/export/embed.html?' in html
+          assert 'https://www.openstreetmap.org/copyright' in html
+          assert 'race-simulator.css?v=20261012-9' in html
+          assert 'JRAの画像は無断転載せず' in html
+          assert '実際のコース図（標準）' in html
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
           PY
       - name: Run deterministic engine and real-report DOM interaction tests
@@ -352,6 +360,26 @@ jobs:
             const ranks=w.document.querySelectorAll('.standing-row');
             assert.equal(race.value,entry.id);
             assert.equal(ranks.length,entry.field_size);
+            const realFigure=w.document.getElementById('referenceMapFigure');
+            const realTokyo=w.document.getElementById('tokyoRealCourseMap');
+            const realKyoto=w.document.getElementById('kyotoRealCourseMap');
+            const simMap=w.document.getElementById('courseCanvas');
+            const mapMode=w.document.getElementById('courseMapMode');
+            assert.equal(mapMode.value,'reference');
+            assert.equal(realFigure.hidden,false);
+            assert.equal(simMap.hidden,true,'default course plan must NOT be our approximate curve');
+            assert.equal(realTokyo.hidden,entry.venue!=='東京');
+            assert.equal(realKyoto.hidden,entry.venue!=='京都');
+            mapMode.value='sim';
+            mapMode.dispatchEvent(new w.Event('change',{bubbles:true}));
+            assert.equal(simMap.hidden,false,'manual switch exposes simulator positions');
+            assert.equal(realFigure.hidden,true,'do not overlay unmapped runner dots on the real map');
+            mapMode.value='reference';
+            mapMode.dispatchEvent(new w.Event('change',{bubbles:true}));
+            assert.equal(simMap.hidden,true);
+            assert.equal(realFigure.hidden,false);
+            assert.equal(w.document.getElementById('tokyoCourseImage')
+              .getAttribute('src'),'https://upload.wikimedia.org/wikipedia/commons/8/8d/Tokyo2000c.svg');
             assert.equal(start.disabled,false,'Start enabled after sealed source parsed');
             assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
             assert.match(w.document.getElementById('raceMeta').textContent,new RegExp(entry.distance_m));
