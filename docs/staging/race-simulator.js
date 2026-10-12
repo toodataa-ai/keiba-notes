@@ -1,4 +1,4 @@
-/* Staging retro racing simulator v0.4. Horse-scale aware camera; course physics unchanged. */
+/* Staging retro racing simulator v0.5. Camera, all-runner number badges; course physics unchanged. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -300,13 +300,85 @@ function drawTopHorse(ctx,horse,world,angle,spriteScale,simTime,selected){
  ctx.fillStyle='#202c38';ctx.beginPath();ctx.arc(3,0,2.7,0,Math.PI*2);ctx.fill();
  ctx.restore();
 }
+/* Readable saddle numbers are SCREEN-SPACE badges rather than tiny words
+   rotated with the horse. They remain upright and the same readable size
+   on desktop and phones, at every camera zoom. */
+function numberBadgeLayout(points,width,height,radius,topInset=83,bottomInset=42){
+ const occupied=[];
+ const output=[];
+ const priority=points.slice().sort((a,b)=>Number(b.focused)-Number(a.focused)||
+   Number(b.leading)-Number(a.leading)||a.number-b.number);
+ for(const p of priority){
+   if(p.x<-10 || p.x>width+10 || p.y<-10 || p.y>height+10)continue;
+   const offsets=[];
+   const base=radius+17;
+   for(const reach of [base,base+radius*1.7,base+radius*3.6,base+radius*5.8,base+radius*8]){
+     // Above and alongside horses first; fall back to more distant callouts
+     // when the starting 18-runner pack is closely bunched.
+     for(const a of [-Math.PI/2,-Math.PI/4,-3*Math.PI/4,0,Math.PI,Math.PI/4,
+       3*Math.PI/4,Math.PI/2,Math.PI/6,5*Math.PI/6,-Math.PI/6,-5*Math.PI/6]){
+       offsets.push([Math.cos(a)*reach,Math.sin(a)*reach]);
+     }
+   }
+   let best=null;
+   for(const [ox,oy] of offsets){
+     const x=p.x+ox,y=p.y+oy;
+     if(x-radius<5||x+radius>width-5||
+       y-radius<topInset||y+radius>height-bottomInset)continue;
+     if(occupied.some(o=>Math.hypot(o.x-x,o.y-y)<radius*2+5))continue;
+     best={x,y};break;
+   }
+   if(!best){
+     // Dense pack or small viewport: search a deterministic no-overlap grid.
+     const step=radius*2+6,rows=Math.floor((height-topInset-bottomInset)/step),
+       cols=Math.floor((width-10)/step);
+     let value=Infinity;
+     for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){
+       const x=5+radius+j*step,y=topInset+radius+i*step;
+       if(occupied.some(o=>Math.hypot(o.x-x,o.y-y)<radius*2+5))continue;
+       const dist=(p.x-x)**2+(p.y-y)**2;
+       if(dist<value){value=dist;best={x,y}}
+     }
+   }
+   if(best){occupied.push(best);output.push({...p,...best,anchorX:p.x,anchorY:p.y})}
+ }
+ return output;
+}
+function drawRaceNumbers(ctx,visible,canvasWidth,canvasHeight,renderedWidth){
+ const toCanvas=canvasWidth/Math.max(1,renderedWidth);
+ const radius=(renderedWidth<640?14.5:15)*toCanvas;
+ const positions=numberBadgeLayout(visible,canvasWidth,canvasHeight,radius,
+   80,40);
+ // Connector lines first; horse and label can still be linked visually
+ // even when labels have been moved to avoid covering another number.
+ ctx.save();
+ for(const p of positions){
+   ctx.strokeStyle='rgba(5,17,24,.86)';ctx.lineWidth=2*toCanvas;
+   ctx.beginPath();ctx.moveTo(p.anchorX,p.anchorY);ctx.lineTo(p.x,p.y);ctx.stroke();
+ }
+ for(const p of positions){
+   ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+   ctx.fillStyle='#111f34';ctx.fill();
+   ctx.lineWidth=(p.focused?4:3)*toCanvas;
+   ctx.strokeStyle=p.focused?'#ffda69':p.leading?'#fbeab9':'#ffffff';
+   ctx.stroke();
+   ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.font='900 '+(renderedWidth<640?16:17)*toCanvas+'px Arial, sans-serif';
+   ctx.fillStyle='#fff';
+   ctx.fillText(String(p.number),p.x,p.y+0.5*toCanvas);
+ }
+ ctx.restore();
+ return positions;
+}
+window.RaceSimNumbers=Object.freeze({layout:numberBadgeLayout,draw:drawRaceNumbers});
 function drawRace(){
  if(!sim||!race){drawIdle('出走馬の原本を確認中…');return}
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
  const w=ui.canvas.width,h=ui.canvas.height,state=sim.state,profile=RaceCourseGeometry.get(race.course_id);
  if(!profile)return;
  const mode=ui.camera?.value||'follow';
- const renderedWidth=ui.canvas.getBoundingClientRect?.().width||w;
+ const renderedWidth=ui.canvas.getBoundingClientRect?.().width||
+     ui.canvas.clientWidth||Math.min(w,Math.max(1,window.innerWidth-20));
  const camera=viewCamera(mode,renderedWidth,w);
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
@@ -376,21 +448,28 @@ function drawRace(){
    const angle=RaceCourseGeometry.heading(profile,horse.d,horse.lane,horse.laneVelocity);
    drawTopHorse(ctx,horse,pos,angle,camera.spriteScale*(horse===target?1.07:1),state.t,horse===target);
  }
- // Label leader & focus without rotating the Japanese names with horse bodies.
- for(const horse of [state.horses.find(x=>x.number===state.leadingNo),target]){
-   if(!horse)continue;
-   const p=RaceCourseGeometry.point(profile,horse.d,horse.lane);
-   ctx.save();
-   ctx.translate(p.x,p.y);
-   // Font is screen-pixel sized; at 7x zoom old world-space text
-   // became giant and covered multiple runners.
-   ctx.scale(1/zoom,1/zoom);
-   ctx.font='bold 14px Meiryo';ctx.textAlign='left';ctx.lineWidth=3;
-   const label=horse.mark+' '+horse.number+' '+horse.name;
-   ctx.strokeStyle='rgba(12,27,19,.9)';ctx.strokeText(label,34,-32);
-   ctx.fillStyle='#fff7d8';ctx.fillText(label,34,-32);
-   ctx.restore();
- }
+ ctx.restore();
+ // Screen-anchored horse-number layer: draw LAST, unrotated, with readable
+ // upright numbers for EVERY horse visible in the camera (not just ◎/leader).
+ const numberPoints=state.horses.map(horse=>{
+    const pos=RaceCourseGeometry.point(profile,horse.d,horse.lane);
+    return {number:horse.number,
+      x:w*.50+zoom*(pos.x-origin.x),
+      y:h*.52+zoom*(pos.y-origin.y),
+      focused:horse===target,
+      leading:horse.number===state.leadingNo};
+ });
+ drawRaceNumbers(ctx,numberPoints,w,h,renderedWidth);
+ // Only one larger horse name for the tracked runner, away from number badges.
+ // Other runners remain identifiable via their independent number badges.
+ ctx.save();
+ ctx.font='bold 15px Meiryo';ctx.textAlign='left';ctx.textBaseline='middle';
+ const focusedName=target.mark+' '+target.number+'番 '+target.name;
+ const barWidth=Math.min(w-24,Math.max(130,focusedName.length*16+25));
+ ctx.fillStyle='rgba(12,27,19,.88)';
+ ctx.fillRect(12,h-80,barWidth,28);
+ ctx.fillStyle='#fff7d8';
+ ctx.fillText(focusedName,22,h-65);
  ctx.restore();
  // Television overlays are static on screen, not rotated with the course.
  rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
