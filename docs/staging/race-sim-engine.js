@@ -35,6 +35,8 @@ function create(data,options={}){
  const rng=mulberry32(hash(data.id+'|'+seed));
  const laneAI=global.RaceLaneAI;
  if(!laneAI)throw Error('LANE_AI_MISSING');
+ const tactic=global.RaceRunnerStyle;
+ if(!tactic)throw Error('RUNNER_STYLE_ENGINE_MISSING');
  const laneCfg=laneAI.config(profile);
  const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
@@ -44,7 +46,7 @@ function create(data,options={}){
   const paceGrade=GRADE[h.pace_grade]??2;
   const no=h.number;
   return { number:no,name:h.name,mark:h.mark,grade:h.grade,win_pct:h.win_pct,
-   pace_grade:h.pace_grade,color:i,
+   pace_grade:h.pace_grade,color:i,style:h.style||'unknown',styleMeta:h.styleMeta||null,
    d:0,lane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
@@ -61,7 +63,7 @@ function create(data,options={}){
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
-    laneModel:'v0.5-early-inside',laneCount:laneCfg.maxLane+1,
+    laneModel:'v0.6-style-early-inside',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0};
  function log(kind,message,h){events.unshift({t:Math.round(state.t),kind,message,horse:h?.number??null});if(events.length>20)events.pop()}
  log('start','ゲートイン完了。'+profile.venue+' '+profile.course+'のコース形状を反映した仮説です');
@@ -122,6 +124,10 @@ function create(data,options={}){
    const finalStretch=m.isFinalStraight?clamp(1-remaining/profile.straight_m,0,1):0;
    const finishing=finalStretch*h.lateKick;
    let speed=base+paceEffect+h.ability+h.surge+h.tempo*.35+h.paceFit+groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue;
+   // A runner self-selects a fore-aft position from its PREVIOUS race's
+   // corner passage. No STEP1 marks, popularity, odds or target result.
+   const leaderD=Math.max(...horses.map(o=>o.d));
+   speed+=tactic.positionAdjustment(h.style,Math.max(0,leaderD-h.d),h.d,state.t);
    // Standing starts must build speed, not jump from 0 to ~17m/s.
    // Rider/runner launch variations allow the 18-horse field to stagger
    // naturally before safely merging towards the inner racing line.

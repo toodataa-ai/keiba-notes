@@ -110,7 +110,13 @@ async function loadRace(id){
   if(feat)feat.textContent='芝Aコース 1周'+profile.lap_m+'m　直線'+profile.straight_m+
     'm　総高低差'+profile.elevation_range_m+'m。コース曲線・高さの途中地点は近似。';
   ui.source.textContent='原本：'+entry.report+' ／ 発走前 STEP1 proof '+entry.proof_commit.slice(0,12)+'… ／ 馬場「'+entry.going+'」観測 '+entry.going_observed_at+' ／ この画面は仮説シミュレーションです。';
-  ui.focus.innerHTML='<option value="leader">先頭を追跡</option>'+horses.slice().sort((a,b)=>a.number-b.number).map(h=>'<option value="'+h.number+'">'+h.number+' '+esc(h.name)+'（'+h.mark+'）</option>').join('');
+  ui.focus.innerHTML='<option value="leader">先頭を追跡</option>'+horses.slice().sort((a,b)=>a.number-b.number).map(h=>'<option value="'+h.number+'">'+h.number+' '+esc(h.name)+'（'+h.mark+'・'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'不明'}[h.style]||'不明')+'）</option>').join('');
+  const styles=$('runnerStyleInfo');
+  if(styles){
+    const names={nige:'逃げ',senko:'先行',sashi:'差し',oikomi:'追込',unknown:'不明'};
+    styles.textContent='脚質の暫定推定：'+Object.entries(names).map(([key,name])=>name+' '+horses.filter(h=>h.style===key).length+'頭').join('／')+
+      '。発走前レポートの前走通過順から推定（1走分のため確定ではありません）。';
+  }
   const queryId=new URLSearchParams(location.search).get('focus');
   if(queryId&&horses.some(h=>String(h.number)===queryId))ui.focus.value=queryId;
  }catch(e){
@@ -204,7 +210,7 @@ function renderData(){
   const lead=state.leader-h.d;
   const gap=state.finished?Number(h.finishTime||0).toFixed(1)+'秒':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
   const focus=ui.focus.value===String(h.number);
-  return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+'</span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
+  return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+' <span class="small-muted">'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'？'}[h.style]||'？')+'</span></span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
  }).join('');
  ui.events.innerHTML=state.events.slice(0,7).map(e=>'<li><strong>'+dur(e.t)+'</strong>　'+esc(e.message)+'</li>').join('');
 }
