@@ -32,10 +32,25 @@
     "publisher": ".github/scripts/jra-promote-formal-3action-v315.py",
     "publisher_git_blob_sha": "8eb076698a30ba38f2548cc88f8cc121fc194e74",
     "renderer": ".github/scripts/jra-render-formal-3action-v315.py",
-    "renderer_git_blob_sha": "b63b6ffba663f18b9ff04e4a4103b751795ca6af",
+    "renderer_git_blob_sha": "2cd8c269cf614aea383caa9c0856c146e7489946",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
-    "workflow_git_blob_sha": "6da41d15760039f13d105908ccce0f51db1dfff5"
+    "workflow_git_blob_sha": "6da41d15760039f13d105908ccce0f51db1dfff5",
+    "horse_renderer_helper": ".github/scripts/jra_v315_horse_layout.py",
+    "horse_renderer_helper_git_blob_sha": "da58a9b6e00e969de8df2cc1ed43286dd92390c1"
   },
   "currently_unautomated": "The standard v3.13 intake workflow does not itself chain v3.15. The JRA one-shot executor (human or assistant) MUST launch the second v3.15 request; no user approval is needed for a validated data-only publication. This is an execution-orchestration item, not permission to publish 60-point v3.13 as completed.",
-  "immutable_prior_predictions": true
+  "immutable_prior_predictions": true,
+  "presentation_quality_gate": {
+    "mode": "staging_approval_required",
+    "scope": "human-readable report HTML/PDF and one A4 page per horse only; do not alter v3.13 STEP1, marks, prices or tickets",
+    "regression_test": ".github/scripts/test-jra-v315-report-readability.py",
+    "guards": [
+      "all 9 named factors and grade palette",
+      "show source-supported evidence and readable prior results",
+      "no serialized internals",
+      "one A4 page per horse",
+      "block rather than publish when page count or content fail"
+    ],
+    "approval_note": "Historical predictions, market snapshots, bets and PDFs may not be rewritten merely to stage the renderer."
+  }
 }
