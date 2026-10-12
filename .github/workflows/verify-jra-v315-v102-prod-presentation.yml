@@ -11,7 +11,7 @@ on:
       - 'docs/assets/jra-inline-report.css'
       - 'docs/methodology.html'
       - 'docs/roadmap.html'
-      - '.github/workflows/verify-jra-v315-v103-prod-presentation.yml'
+      - '.github/workflows/verify-jra-v315-v102-prod-presentation.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -94,7 +94,7 @@ jobs:
           assert 'stagingJraReports' not in Path('docs/staging/this-week.html').read_text()
           print('PASS_RELEASED_JRA_V103_STAGE_TO_PRODUCTION_IDENTICAL_AND_IMMUTABLE')
           PY
-      - name: Verify six public HTTP assets exact byte equality
+      - name: Verify eleven public HTML PDF JavaScript and CSS assets exact byte equality
         run: |
           set -euo pipefail
           files=(
@@ -118,9 +118,9 @@ jobs:
                  ! cmp -s "$f" /tmp/jra-v103-prod-http;then ok=0;break;fi
             done
             if [[ $ok == 1 ]];then
-              echo 'PASS_JRA_V103_SEVEN_PUBLIC_FILES_BYTE_MATCH'
+              echo 'PASS_JRA_V103_ELEVEN_PUBLIC_FILES_BYTE_MATCH'
               exit 0
             fi
             sleep 10
           done
-          echo '::error::JRA v1.02 source commit does not match public HTML/PDF';exit 1
+          echo '::error::JRA v1.03 generated source does not match public HTML/PDF';exit 1
