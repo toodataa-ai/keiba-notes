@@ -97,6 +97,9 @@ jobs:
             assert.ok(panel && panel.hidden);
             assert.equal(a.getAttribute('href'),'staging/jra-v315-20261012/tokyo11.html');
             assert.equal(host.querySelector('a.secondary').getAttribute('href'),'staging/jra-v315-20261012/tokyo11.pdf');
+            assert.equal(host.querySelectorAll('a[href*="race-simulator.html"]').length,1);
+            assert.equal(host.querySelector('a[href*="race-simulator.html"]').getAttribute('href'),
+              'staging/race-simulator.html?race=2026-10-12-october-stakes');
             let e=new window.MouseEvent('click',{bubbles:true,cancelable:true,button:0});
             a.dispatchEvent(e);
             assert.ok(e.defaultPrevented && !panel.hidden,'click must open inline, not navigate');
@@ -108,6 +111,9 @@ jobs:
             host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="reports/2026-10-12-swan-stakes-v315-readable-v103.html">AI予想詳細を見る</a></div></article>';
             await Promise.resolve();
             assert.equal(host.querySelector('a.btn').getAttribute('href'),'staging/jra-v315-20261012/kyoto11.html');
+            assert.equal(host.querySelectorAll('a[href*="race-simulator.html"]').length,1);
+            assert.equal(host.querySelector('a[href*="race-simulator.html"]').getAttribute('href'),
+              'staging/race-simulator.html?race=2026-10-12-swan-stakes');
             assert.ok(host.querySelector('.stage-inline-report'));
             console.log('PASS_STAGE_INPAGE_OPEN_CLOSE_LAZY_LOAD_PDF_AND_DYNAMIC_RACE_CARD');
           })().catch(e=>{console.error(e);process.exit(1)});
