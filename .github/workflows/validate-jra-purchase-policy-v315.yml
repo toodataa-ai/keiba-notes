@@ -1,0 +1,50 @@
+name: Validate mandatory JRA v3.15 actual three-purchase formal policy
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/data/latest_prompt.json'
+      - 'docs/data/jra_purchase_command_policy_v315.json'
+      - '.github/workflows/jra-prerace-formal-3action-v315.yml'
+      - '.github/workflows/validate-jra-purchase-policy-v315.yml'
+permissions: {contents: read}
+jobs:
+  purchase-source-of-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Preserve unchanged v3.13 historical manifest and enforce active formal v3.15 purchase format
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+          node .github/scripts/test-jra-ticket-notation-v1.mjs
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          latest=json.loads(Path('docs/data/latest_prompt.json').read_text())
+          policy=json.loads(Path('docs/data/jra_purchase_command_policy_v315.json').read_text())
+          assert latest['version']=='v3.13'
+          p=latest['purchase_command_formal_v315']
+          assert p['version']=='v3.15' and p['required_on_every_future_formal_jra_main_publication']
+          assert p['max_regular_commands']==3 and p['medium_rows']==1 and p['large_rows']==1
+          assert p['workflow']==policy['implementation']['workflow']
+          assert not p['no_user_approval_for_data_only'] is False
+          for kind in ['pipeline','publisher','renderer','workflow']:
+            path=policy['implementation'][kind]
+            expect=policy['implementation'][kind+'_git_blob_sha']
+            actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+            assert actual==expect,('SHA pin changed',kind)
+          assert policy['currently_unautomated'],'Cannot hide multi-stage orchestration limitation'
+          regs=json.loads(Path('docs/data/races.json').read_text())['races']
+          for slug in ['2026-10-12-october-stakes','2026-10-12-swan-stakes']:
+            race=next(x for x in regs if x['id']==slug)
+            assert race['purchase_strategy_version']=='v3.15'
+            assert len(race['purchase_commands'])<=3
+            assert sum(x['stake_yen'] for x in race['final_bets'])<=6000
+          print('PASS_JRA_FORMAL_V315_POLICY_PINS_AND_TODAY_LIVE_CANONICAL')
+          PY
