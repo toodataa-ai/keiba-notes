@@ -1,0 +1,95 @@
+name: Audit complete JRA staging visual identity and in-page predictions
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/**'
+      - '.github/scripts/jra-build-staging-week-mirror-v1.py'
+      - '.github/workflows/validate-jra-staging-identity-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: jra-staging-identity, cancel-in-progress: true}
+jobs:
+  identity-and-live-byte-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check markup, source invariants, staging navigation and JavaScript parse
+        run: |
+          set -euo pipefail
+          node --check docs/staging/stage-week-preview.js
+          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          import subprocess
+          root=Path('docs/staging')
+          stage=list(root.rglob('*.html'))
+          assert len(stage)>=15,('staging HTML expected',len(stage))
+          class HTML(HTMLParser):
+            def __init__(self):
+              super().__init__();self.css=[];self.links=[]
+            def handle_starttag(self,tag,attrs):
+              d=dict(attrs)
+              if tag=='link' and d.get('rel')=='stylesheet':
+                self.css.append(d.get('href',''))
+              if tag=='a':self.links.append(d.get('href',''))
+          for p in stage:
+            s=p.read_text()
+            assert s.count('data-stage="preview"')==1,(p,'html stage attribute')
+            assert s.count('class="staging-shell-marker"')==1,(p,'missing stage badge')
+            assert 'noindex,nofollow' in s,(p,'search-index suppression')
+            h=HTML();h.feed(s)
+            assert any('stage-indicator.css' in x for x in h.css),(p,'missing stripe')
+            # The common four-pixel top stripe is part of the visual identity on every page.
+            assert 'STAGING' in s
+          css=(root/'stage-indicator.css').read_text()
+          assert 'height:4px' in css and 'safe-area-inset-top' in css
+          home=(root/'index.html').read_text()
+          for name in ('this-week.html','schedule.html','results.html',
+                       'methodology.html','roadmap.html','baba-models.html','e2e.html',
+                       'experience-regime.html','local-racing-shadow.html'):
+            assert 'href="staging/'+name+'"' in home,name
+            assert (root/name).exists(),name
+          week=(root/'this-week.html').read_text()
+          assert week.count('stage-week-preview.js')==1
+          assert week.count('stage-week-preview.css')==1
+          assert 'stage-week-preview.js' not in Path('docs/this-week.html').read_text()
+          js=(root/'stage-week-preview.js').read_text()
+          assert "panel.hidden=true" in js and "panel.hidden=false" in js
+          assert 'new MutationObserver' in js
+          assert "e.preventDefault()" in js
+          assert 'stage-race-inline-' in js
+          assert 'iframe' in js and 'pdfOverrides' in js
+          assert 'docs/data/races.json' not in js
+          # No active models, final tickets, historical PDF, or production shared assets changed.
+          for p,sha in {
+            'docs/assets/week.js':'0241cc0a545153286df3f9bf04c32fc5a0c1b0fb',
+            'docs/this-week.html':'a9309f1f02d5b87b8700a2a850c593b1d488837c'
+          }.items():
+            actual=subprocess.check_output(['git','hash-object',p],text=True).strip()
+            assert actual==sha,('PROD_CONTENT_CHANGED',p,actual)
+          print('PASS_JRA_STAGE_ALL_PAGES_MARKED_INPAGE_DIAGNOSIS_AND_IMMUTABLE_PRODUCTION')
+          PY
+      - name: Verify every staging HTML and preview CSS/JS against public GitHub Pages
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find docs/staging -type f \( -name '*.html' -o -name 'stage-indicator.css' -o -name 'stage-week-preview.css' -o -name 'stage-week-preview.js' \) | sort)
+          for attempt in $(seq 1 35);do
+            ok=1
+            for f in "${files[@]}";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url?identity=$GITHUB_SHA" -o /tmp/stage-page-http ||
+                  ! cmp -s "$f" /tmp/stage-page-http;then
+                ok=0;break
+              fi
+            done
+            if [[ $ok == 1 ]];then
+              echo "PASS_JRA_STAGING_ALL_PUBLIC_HTML_ASSET_BYTES files=${#files[@]}"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Some staging HTML or stage assets are not identical to public Pages output'
+          exit 1
