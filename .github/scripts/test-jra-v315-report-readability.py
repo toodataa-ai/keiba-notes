@@ -45,7 +45,7 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
         assert [x['horse_number'] for x in expected if x['mark']==mark]==[
             x['horse_number'] for x in source['step1_ranking'] if x['mark']==mark], (rid,mark,'unstable within same mark')
     htmltext,count=mod.html_report(plan,source)
-    actual_headings=re.findall(r'<section class="page horse-page">[\\s\\S]*?<h1>(.*?)</h1>',htmltext)
+    actual_headings=re.findall(r'<section class="page horse-page">.*?<h1>(.*?)</h1>',htmltext,re.S)
     assert len(actual_headings)==len(expected)
     for i,(heading,x) in enumerate(zip(actual_headings,expected)):
         assert heading==f"{x['horse_number']}番　{x['horse_name']}　{x['mark']}",(rid,i,heading)
