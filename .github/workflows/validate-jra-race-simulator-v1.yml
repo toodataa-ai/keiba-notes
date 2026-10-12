@@ -1,0 +1,171 @@
+name: Validate stage JRA visual race simulator
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/race-sim-*'
+      - 'docs/staging/race-simulator.*'
+      - 'docs/staging/stage-week-preview.js'
+      - 'docs/staging/index.html'
+      - '.github/workflows/validate-jra-race-simulator-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: jra-race-simulator-stage, cancel-in-progress: true}
+jobs:
+  source-simulation-and-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: JavaScript syntax, existing source immutability
+        run: |
+          set -euo pipefail
+          node --check docs/staging/race-sim-engine.js
+          node --check docs/staging/race-simulator.js
+          node --check docs/staging/stage-week-preview.js
+          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import subprocess
+          data=json.loads(Path('docs/staging/race-sim-manifest-v1.json').read_text())
+          assert data['schema_version']==1 and data['status']=='STAGING_RESEARCH_ONLY'
+          assert len(data['races'])==2
+          registry=json.loads(Path('docs/data/races.json').read_text())
+          rows={r['id']:r for r in registry['races']}
+          for item in data['races']:
+            r=rows[item['id']]
+            assert r['scope']=='jra-main' and r['date']==item['date']
+            assert r['venue']==item['venue'] and r['field_size']==item['field_size']
+            assert r['proof_commit'] and r['step1_fixed_at']
+            assert Path('docs',item['report']).exists()
+            assert item['field_size']==18
+          for path,sha in {
+            'docs/this-week.html':'c59b56117b0f46ff4cb2a756a51baf4b62b5c689',
+            'docs/assets/week.js':'ad22854774a5a10626436bd938a661ba8261611d',
+          }.items():
+            actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+            assert actual==sha,(path,'production modified',actual)
+          assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
+          assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
+          print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
+          PY
+      - name: Run deterministic engine and real-report DOM interaction tests
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts jsdom@26 >/dev/null
+          node <<'JS'
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs');
+          const {JSDOM}=require('jsdom');
+          const read=p=>fs.readFileSync(p,'utf8');
+          const manifest=JSON.parse(read('docs/staging/race-sim-manifest-v1.json'));
+          const db=JSON.parse(read('docs/data/races.json'));
+          function mockCanvas(){
+            const obj={};
+            return new Proxy(obj,{get(target,key){
+              if(key in target)return target[key];
+              if(key==='canvas')return null;
+              return (...args)=>{};
+            },set(target,key,value){target[key]=value;return true;}});
+          }
+          async function testRace(entry){
+            const html=read('docs/staging/race-simulator.html');
+            const dom=new JSDOM(html,{url:'https://toodataa-ai.github.io/keiba-notes/staging/race-simulator.html?race='+entry.id,runScripts:'outside-only'});
+            const w=dom.window;
+            let tick=null;
+            w.requestAnimationFrame=fn=>{tick=fn;return 1};
+            w.cancelAnimationFrame=()=>{tick=null};
+            w.HTMLCanvasElement.prototype.getContext=mockCanvas;
+            w.HTMLElement.prototype.scrollIntoView=function(){};
+            w.fetch=async path=>{
+              const p=String(path);
+              let data;
+              if(p==='race-sim-manifest-v1.json')data=manifest;
+              else if(p==='../data/races.json')data=db;
+              else if(p==='../'+entry.report)data=read('docs/'+entry.report);
+              else throw Error('Unapproved request '+p);
+              return {ok:true,status:200,json:async()=>data,text:async()=>data};
+            };
+            w.eval(read('docs/staging/race-sim-engine.js'));
+            w.eval(read('docs/staging/race-simulator.js'));
+            await new Promise(resolve=>setTimeout(resolve,80));
+            const race=w.document.getElementById('raceSelect');
+            const start=w.document.getElementById('startBtn');
+            const ranks=w.document.querySelectorAll('.standing-row');
+            assert.equal(race.value,entry.id);
+            assert.equal(ranks.length,entry.field_size);
+            assert.equal(start.disabled,false,'Start enabled after sealed source parsed');
+            assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
+            assert.match(w.document.getElementById('raceMeta').textContent,new RegExp(entry.distance_m));
+            assert.equal(w.document.getElementById('meterFill').style.width,'0%');
+            start.click();
+            assert.equal(start.disabled,true);
+            assert.equal(typeof tick,'function');
+            // Trigger browser animation frames; track progress must move.
+            let t=1000;
+            for(let k=0;k<175;k++){const f=tick;assert.equal(typeof f,'function');f(t);t+=34}
+            assert.ok(Number.parseFloat(w.document.getElementById('meterFill').style.width)>2);
+            const pause=w.document.getElementById('pauseBtn');
+            pause.click();assert.equal(pause.textContent,'▶ 再開');
+            const still=w.document.getElementById('meterFill').style.width;
+            assert.equal(tick,null);
+            assert.equal(w.document.getElementById('meterFill').style.width,still);
+            pause.click();assert.equal(pause.textContent,'一時停止');
+            const restart=w.document.getElementById('restartBtn');restart.click();
+            assert.equal(start.disabled,true);
+            assert.equal(Number.parseFloat(w.document.getElementById('meterFill').style.width),0);
+            const engine=w.RaceSimEngine;
+            const horses=[...ranks].map(x=>{
+              const number=Number(x.querySelector('.saddle').textContent);
+              const name=x.querySelector('.standing-name').textContent;
+              return {number,name,mark:x.querySelector('.standing-mark').textContent,win_pct:6,pace_grade:'B'};
+            });
+            const source={...entry,horses};
+            engine.validData(source);
+            const a=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
+            const b=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
+            const c=engine.create(source,{seed:56,pace:'H',bias:'outer'});
+            for(let n=0;n<1300;n++){a.step(.05);b.step(.05);c.step(.05)}
+            assert(a.state.finished&&b.state.finished&&c.state.finished);
+            assert.deepEqual(a.standings().map(x=>[x.number,x.finishTime]),b.standings().map(x=>[x.number,x.finishTime]));
+            assert.notDeepEqual(a.state.horses.map(x=>x.lane),c.state.horses.map(x=>x.lane));
+            assert.equal(new Set(a.state.horses.map(x=>x.number)).size,entry.field_size);
+            assert.ok(a.state.events.length>0);
+            w.close();
+            console.log('PASS_SIM_' +entry.id+' _18_HORSES_PLAY_PAUSE_RESET_SEEDED_PHYSICS');
+          }
+          (async()=>{
+            for(const item of manifest.races)await testRace(item);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+      - name: Verify all simulator assets publicly match GitHub source bytes
+        run: |
+          set -euo pipefail
+          files=(
+            docs/staging/race-simulator.html
+            docs/staging/race-simulator.css
+            docs/staging/race-simulator.js
+            docs/staging/race-sim-engine.js
+            docs/staging/race-sim-manifest-v1.json
+            docs/staging/stage-week-preview.js
+            docs/staging/index.html
+          )
+          for attempt in $(seq 1 45);do
+            ok=1
+            for f in "${files[@]}";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url?sim=$GITHUB_RUN_ID" -o /tmp/jra-sim-stage-byte ||
+                 ! cmp -s "$f" /tmp/jra-sim-stage-byte;then
+                ok=0;break
+              fi
+            done
+            if [[ "$ok" == 1 ]];then
+              echo "PASS_SIM_SEVEN_PUBLIC_STAGE_ASSET_BYTE_MATCH"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Simulation UI is not byte-verified on public Pages'
+          exit 1
