@@ -5,6 +5,12 @@ import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 
 const source=readFileSync('docs/staging/assets/results.js','utf8');
+const previewHtml=readFileSync('docs/staging/results.html','utf8');
+const productionHtml=readFileSync('docs/results.html','utf8');
+assert(previewHtml.includes('src="staging/assets/results.js?v=20261013-settlement1"'),
+  'staging must load its dedicated new renderer');
+assert(productionHtml.includes('src="assets/results.js?v='),
+  'production HTML must continue using the untouched production renderer');
 const db=JSON.parse(readFileSync('docs/data/races.json','utf8'));
 const element={innerHTML:''};
 const context={
@@ -17,7 +23,7 @@ const context={
 runInNewContext(source+'\n;globalThis.__test={betPanel,ticketKey};',context,{timeout:5000});
 const {betPanel,ticketKey}=context.__test;
 const statuses=html=>[...html.matchAll(/class="bet-status[^"]*">([^<]+)<\/span>/g)].map(x=>x[1]);
-const checked=db.races.filter(r=>r.date>='2026-10-10'
+const checked=db.races.filter(r=>r.date>='2026-10-10'&&r.date<='2026-10-12'
   && r.status==='reviewed'
   && Array.isArray(r.final_bets)&&r.final_bets.length
   && Array.isArray(r.settlements)&&r.settlements.length);
