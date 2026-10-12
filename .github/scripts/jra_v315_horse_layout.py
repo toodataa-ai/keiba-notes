@@ -13,13 +13,15 @@ HORSE_STYLE = '''<style>
 .horse-page h2{font-size:10pt;margin:10px 0 5px;border-left:3px solid #74869d;padding-left:7px}
 .horse-facts{display:flex;gap:15px;flex-wrap:wrap;border-bottom:1px solid #d6dde6;padding:4px 0 7px;font-size:9pt}
 .horse-score{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-.horse-page .grade{display:inline-block;font-weight:750;border:1px solid #c7cdd6;border-radius:4px;padding:1px 8px;color:#314052;background:#f3f5f7}
-.horse-page .g-Aplus{background:#f6e6b1;border-color:#ddb76e;color:#72500f}
-.horse-page .g-A{background:#e7edf8;border-color:#a7bddd;color:#254c83}
-.horse-page .g-Bplus{background:#e2f0ea;border-color:#9bbfae;color:#285b45}
-.horse-page .g-B{background:#eef1f5;border-color:#b9c2cc;color:#45505d}
-.horse-page .g-Bminus{background:#f9eee0;border-color:#dfc4a8;color:#80562b}
-.horse-page .g-C{background:#f5e7e7;border-color:#d9b3b3;color:#8b4747}
+/* Color values copied without reinterpretation from the approved v3.13 report CSS:
+   .gAp, .gA, .gBp, .gB, .gBm, .gC. Preserve these historical grade semantics. */
+.horse-page .grade{display:inline-block;box-sizing:border-box;border:0;border-radius:3px;font-weight:700;font-size:9pt;min-width:23px;text-align:center;padding:2px 4px}
+.horse-page .g-Aplus{background:#f29fa9;color:#701622}
+.horse-page .g-A{background:#f7b8b5;color:#6e201c}
+.horse-page .g-Bplus{background:#f9c896;color:#734a10}
+.horse-page .g-B{background:#ffdf9d;color:#725518}
+.horse-page .g-Bminus{background:#d8e7ba;color:#4c6129}
+.horse-page .g-C{background:#d1e7f0;color:#2a5570}
 .horse-page table.factor-grid{table-layout:fixed;border-collapse:separate;border-spacing:5px 4px;font-size:9pt}
 .horse-page .factor-grid td{border:1px solid #dbe1e9;border-radius:4px;padding:5px 7px;vertical-align:middle;background:#fafbfc}
 .horse-page .factor-label{display:block;color:#47566c;font-size:8pt;margin-bottom:3px}
