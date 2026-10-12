@@ -59,7 +59,7 @@ function parseHorseReport(markup,entry){
   if(grades.length!==9)throw Error('STEP1の評価9項目が不足: '+m[1]+'番');
   const recentRuns=[...section.querySelectorAll('.run-table tbody tr')].slice(0,4).map(tr=>{
     const td=[...tr.querySelectorAll('td')].map(x=>x.textContent.trim());
-    const distance=td[2]?.match(/^芝(\\d{3,4})m$/),finish=td[3]?.match(/^(\\d{1,2})着$/);
+    const distance=td[2]?.match(/^芝([0-9]{3,4})m$/),finish=td[3]?.match(/^([0-9]{1,2})着$/);
     return {date:td[0],venue:td[1],distance_m:distance?Number(distance[1]):null,
       finish:finish?Number(finish[1]):null};
   }).filter(x=>x.date<entry.date);
