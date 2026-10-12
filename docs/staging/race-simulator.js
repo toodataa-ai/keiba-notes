@@ -283,6 +283,23 @@ function drawRaceNumbers(ctx,points,width,height,renderedWidth){
 window.RaceSimNumbers=Object.freeze({
  marker:raceNumberMarker,project:projectRaceNumbers,draw:drawRaceNumbers
 });
+// Shared course rendering primitives, retained when replacing sprite display.
+function traceCommands(ctx,parts){
+ ctx.beginPath();
+ for(const op of parts){
+  if(op[0]==='M')ctx.moveTo(op[1],op[2]);
+  else if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
+ }
+}
+function traceRace(ctx,course){
+ ctx.beginPath();ctx.moveTo(...course.segments[0].p0);
+ for(const section of course.segments)
+  ctx.bezierCurveTo(...section.p1,...section.p2,...section.p3);
+}
+function strokePath(ctx,width,color){
+ ctx.strokeStyle=color;ctx.lineWidth=width;
+ ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+}
 function drawRace(){
  if(!sim||!race){drawIdle('出走馬の原本を確認中…');return}
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
