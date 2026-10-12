@@ -11,6 +11,12 @@
     ['pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf','staging/jra-v315-20261012/tokyo11.pdf'],
     ['pdfs/2026-10-12-swan-stakes-v315-readable-v103.pdf','staging/jra-v315-20261012/kyoto11.pdf']
   ]);
+  const simByReport=new Map([
+    ['reports/2026-10-12-october-stakes-v315-readable-v103.html','2026-10-12-october-stakes'],
+    ['reports/2026-10-12-swan-stakes-v315-readable-v103.html','2026-10-12-swan-stakes'],
+    ['staging/jra-v315-20261012/tokyo11.html','2026-10-12-october-stakes'],
+    ['staging/jra-v315-20261012/kyoto11.html','2026-10-12-swan-stakes']
+  ]);
   const iconText='全頭診断をページ内で開く';
   let sequence=0;
 
@@ -27,6 +33,19 @@
         const dest=reportOverrides.get(href)||href;
         if(href!==dest)a.setAttribute('href',dest);
         reportLink=a;
+      }
+      if(reportLink){
+        // Preview integration: keep both the established in-card report and original PDF link.
+        const simRace=simByReport.get(reportLink.getAttribute('href')||'');
+        if(simRace && actions.dataset.simulatorAdded!=='1'){
+          const link=document.createElement('a');
+          link.className='btn secondary';
+          link.href='staging/race-simulator.html?race='+encodeURIComponent(simRace);
+          link.textContent='レースシミュレーション';
+          link.setAttribute('aria-label','仮想の位置取りと進路をレースアニメーションで確認');
+          actions.append(link);
+          actions.dataset.simulatorAdded='1';
+        }
       }
       if(!reportLink || reportLink.dataset.inlinePreview==='1')continue;
       const id='stage-race-inline-'+(++sequence);
