@@ -130,7 +130,7 @@ def normalize_formal_v312_for_e2e(prediction: dict) -> dict:
     return projected
 
 
-def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, prediction: dict) -> dict:
+def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, source_publication_commit: str, prediction: dict) -> dict:
     """Read-only Grade A bridge: pinned v3.13 STEP1 and v3.15 purchased bets."""
     if prediction.get("purchase_strategy_version") != "v3.15":
         return prediction
@@ -140,7 +140,12 @@ def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, prediction:
     if not all(isinstance(x, str) and x for x in (source_path, source_commit, source_sha256)):
         raise ValidationError("v3.15 missing pinned STEP1 provenance")
     original_bytes = git_text(repo_root, publication_commit, source_path)
-    earlier_bytes = git_text(repo_root, source_commit, source_path)
+    # source_prediction_proof in the frozen v3.15 record is an earlier input/odds
+    # snapshot, not the commit that publishes the completed v3.13 source JSON.
+    # Independently prove the completed v3.13 JSON was also published prestart.
+    if not source_publication_commit:
+        raise ValidationError("missing distinct prestart v3.13 prediction publication proof")
+    earlier_bytes = git_text(repo_root, source_publication_commit, source_path)
     if original_bytes != earlier_bytes or hashlib.sha256(original_bytes.encode("utf-8")).hexdigest() != source_sha256:
         raise ValidationError("v3.15 source STEP1 differs from prestart SHA-pinned proof")
     source = json.loads(original_bytes)
@@ -215,7 +220,10 @@ def load_prediction(
         prediction = read_json(repo_root / path)
 
     if grade == "prospective_strict" and prediction.get("purchase_strategy_version") == "v3.15":
-        prediction = normalize_v315_for_e2e(repo_root, spec["proof_commit"], prediction)
+            source_commit = spec.get("source_publication_proof_commit")
+        if not source_commit or git_commit_time(repo_root, source_commit) > cutoff:
+            raise ValidationError("v3.15 source prediction publication proof is missing or after cutoff")
+        prediction = normalize_v315_for_e2e(repo_root, spec["proof_commit"], source_commit, prediction)
 
     if prediction.get("prompt_version") != version:
         raise ValidationError(

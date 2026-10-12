@@ -11,10 +11,11 @@
     {
       "version": "v3.13",
       "path": "e2e_validation/predictions/2026-10-12-october-stakes/v3.15-run38189408717-attempt1-sealed.json",
-      "proof_commit": "459a92146a178b6812c92a2575bb726f324fabcf"
+      "proof_commit": "459a92146a178b6812c92a2575bb726f324fabcf",
+      "source_publication_proof_commit": "150787b15dfff60294c31b1f79ab4fd631c37fbd"
     }
   ],
   "result_path": "e2e_validation/results/2026-10-12-october-stakes.json",
   "completed_at": "2026-10-12T10:35:01.309Z",
-  "proof_note": "The v3.15 prestart publication commit contains exact immutable final_bets and SHA-pinned v3.13 STEP1; Grade A evaluation uses read-only adapter. Registry proof_commit is earlier input proof."
+  "proof_note": "Grade A reads the immutable v3.15 publication commit and separately proves the exact same SHA256-pinned v3.13 source was published before start. Original source_prediction_proof is an earlier input/odds proof; no historic files altered."
 }
