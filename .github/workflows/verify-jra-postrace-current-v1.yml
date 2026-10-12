@@ -1,0 +1,101 @@
+name: Verify live JRA postrace public bytes after Pages deployment
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-jra-postrace-current-v1.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+
+permissions:
+  contents: read
+concurrency:
+  group: verify-jra-postrace-current-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Enforce preserved historic SHA manifests
+        run: python e2e_validation/validate_manifests.py
+      - name: Verify reviewed six-race registry, public Grade A and immutable source
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('.')
+          registry=json.loads(Path('docs/data/races.json').read_text())
+          grade=json.loads(Path('docs/data/e2e_status.json').read_text())
+          review=json.loads(Path('docs/data/jra_review_completion.json').read_text())
+          public=json.loads(Path('docs/data/e2e_public.json').read_text())
+          meeting=review['meetings'][0]
+          assert meeting['meeting_id']=='2026-10-10-to-2026-10-12'
+          assert meeting['formal_grade_a_review_state']=='complete'
+          assert meeting['weekly_improvement_decision']=='no_change'
+          assert review['formal_grade_a']['passed'] and review['formal_grade_a']['validated_case_count']==6
+          assert grade['case_counts']['strict']==6 and not grade['errors']
+          assert public['totals']['prospective_strict_races']==6
+          expected={x['race_id'] for x in meeting['races']}
+          assert len(expected)==6
+          by_id={r['id']:r for r in registry['races']}
+          display={r['race_id']:r for r in public['races']}
+          paths={'docs/data/races.json','docs/data/e2e_status.json',
+                 'docs/data/experience_regime_status.json','docs/data/e2e_public.json',
+                 'docs/data/jra_review_completion.json',
+                 'docs/data/jra_postrace_audit_2026-10-11.json',
+                 'docs/data/jra_postrace_audit_2026-10-12.json'}
+          for rid in sorted(expected):
+              r=by_id[rid]
+              assert r['status']=='reviewed' and r.get('settlements') and r.get('review')
+              assert r.get('e2e_case') and r.get('result') and r.get('performance')
+              assert display[rid]['status']=='reviewed'
+              for p in ('docs/'+r['report'],'docs/'+r['pdf'],
+                        'docs/data/e2e-shadow/cases/'+rid+'/case.json',
+                        'docs/data/e2e-shadow/results/'+rid+'.json'):
+                  assert (root/p).is_file(),p
+                  paths.add(p)
+          for rid,count in [('2026-10-12-october-stakes',18),('2026-10-12-swan-stakes',24)]:
+              x=display[rid]['predictions'][0]
+              assert len(x['bets'])==count
+              assert {'win','second','third'}<=set(x['marks'])
+              assert (root/'docs'/x['prediction_path']).is_file()
+              paths.add('docs/'+x['prediction_path'])
+          Path('/tmp/jra-live-parity-files.txt').write_text(''.join(p+'\n' for p in sorted(paths)))
+          print('JRA_GRADE_A_SIX_CASES_COMPLETE; exact public artifacts:',len(paths))
+          PY
+      - name: Verify actual HTTP bytes equal approved Git files
+        run: |
+          set -euo pipefail
+          BASE=https://toodataa-ai.github.io/keiba-notes
+          for attempt in $(seq 1 60); do
+            ok=1
+            while IFS= read -r FILE; do
+              OUT="/tmp/jra-parity/${FILE#docs/}"
+              mkdir -p "$(dirname "$OUT")"
+              if ! curl -LfsS --connect-timeout 10 --max-time 35 \
+                 -H 'Cache-Control: no-cache' \
+                 "$BASE/${FILE#docs/}?strict=${GITHUB_RUN_ID}-${attempt}" -o "$OUT" ||
+                 ! cmp -s "$FILE" "$OUT"; then
+                ok=0
+                echo "NOT_YET_PUBLISHED: $FILE at attempt $attempt"
+                break
+              fi
+            done < /tmp/jra-live-parity-files.txt
+            if [ "$ok" = 1 ]; then
+              echo "JRA_LIVE_PUBLIC_ALL_BYTES_MATCH_GIT: Grade A registry, proofs, six immutable HTML/PDF and public reports"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Latest source and public Pages artifacts differ; do not declare publication complete'
+          exit 1
