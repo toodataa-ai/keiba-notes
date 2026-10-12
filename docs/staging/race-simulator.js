@@ -66,6 +66,9 @@ async function loadRace(id){
   if(!dbRes.ok||!reportRes.ok)throw Error('原本取得に失敗しました（HTTP '+dbRes.status+'/'+reportRes.status+'）');
   const db=await dbRes.json();
   isValidEntry(entry,db);
+  const profile=RaceCourseGeometry.get(entry.course_id);
+  if(!profile||profile.distance_m!==entry.distance_m||profile.venue!==entry.venue||profile.turn!==entry.turn)
+    throw Error('公式コース条件とレース定義が一致しません');
   const report=await reportRes.text();
   const horses=parseHorseReport(report,entry);
   if(version!==scenarioVersion)return;
@@ -73,7 +76,14 @@ async function loadRace(id){
   reset(false);
   ui.start.disabled=false;
   ui.meta.textContent=entry.date+' '+entry.venue+entry.number+'R '+entry.surface+entry.distance_m+'m（'+entry.turn+'回り）';
-  ui.course.textContent=entry.venue+'／'+entry.surface+entry.distance_m+'m　'+entry.turn+'回り';
+  ui.course.textContent=profile.layout+' / 直線'+profile.straight_m+'m / 高低差'+profile.elevation_range_m+'m';
+  const details=$('courseFeatures');
+  if(details)details.textContent=profile.info;
+  const mapsource=$('mapSourceLink');
+  if(mapsource){mapsource.href=profile.official;mapsource.textContent=profile.venue+'・JRA公式コース図と数値';}
+  const feat=$('courseMeasurements');
+  if(feat)feat.textContent='芝Aコース 1周'+profile.lap_m+'m　直線'+profile.straight_m+
+    'm　総高低差'+profile.elevation_range_m+'m。コース曲線・高さの途中地点は近似。';
   ui.source.textContent='原本：'+entry.report+' ／ 発走前 STEP1 proof '+entry.proof_commit.slice(0,12)+'… ／ 馬場「'+entry.going+'」観測 '+entry.going_observed_at+' ／ この画面は仮説シミュレーションです。';
   ui.focus.innerHTML='<option value="leader">先頭を追跡</option>'+horses.slice().sort((a,b)=>a.number-b.number).map(h=>'<option value="'+h.number+'">'+h.number+' '+esc(h.name)+'（'+h.mark+'）</option>').join('');
   const queryId=new URLSearchParams(location.search).get('focus');
@@ -144,7 +154,15 @@ function renderData(){
  if(!sim)return;
  const state=sim.state;
  ui.remaining.textContent=Math.max(0,Math.round(state.distance-state.leader))+' m';
- ui.caption.textContent=state.finished?'ゴール':'仮想レース・'+(state.progress>.73?'最後の直線':state.progress>.32?'向正面・コーナー':'スタート・先行争い');
+ const current=state.courseMetrics;
+ ui.caption.textContent=state.finished?'ゴール':(current ? current.segment : 'スタート');
+ const slopeInfo=$('courseSegment');
+ if(slopeInfo){
+   const z=current?.grade||0;
+   slopeInfo.textContent=state.finished?'ゴール':(current?.segment||'発走前')+
+     (z>.0007?' ／ 上り':z<-.0007?' ／ 下り':' ／ 平坦')+
+     (current?.kind==='turn'?' ／ コーナー':'');
+ }
  ui.elapsed.textContent=dur(state.t);
  ui.moment.textContent=state.finished?'仮想着順が確定しました（予想や結果ではありません）':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
@@ -264,43 +282,109 @@ function drawRace(){
 function drawCourse(){
  if(!sim||!race)return;
  const ctx=ui.map.getContext('2d');if(!ctx)return;
- ctx.clearRect(0,0,580,186);
- rect(ctx,0,0,580,186,'#315c39');
- // Track geometry is generic schematic only (not the official racing course).
- ctx.beginPath();ctx.ellipse(290,93,243,70,0,0,Math.PI*2);
- ctx.strokeStyle='#9d825e';ctx.lineWidth=44;ctx.stroke();
- ctx.beginPath();ctx.ellipse(290,93,243,70,0,0,Math.PI*2);
- ctx.strokeStyle='#c2ad81';ctx.lineWidth=34;ctx.stroke();
- ctx.beginPath();ctx.ellipse(290,93,243,70,0,0,Math.PI*2);
- ctx.strokeStyle='#7eaf79';ctx.lineWidth=13;ctx.stroke();
- ctx.strokeStyle='#f5eac1';ctx.lineWidth=2;ctx.stroke();
- const direction=race.turn==='右'?-1:1;
- function mapP(d,lane){
-   const a=direction*2*Math.PI*(d/race.distance_m) - Math.PI/2;
-   const r=lane*1.6-5;
-   return [290+(231+r)*Math.cos(a),93+(63+r*.28)*Math.sin(a)];
+ const prof=RaceCourseGeometry.get(race.course_id);if(!prof)return;
+ ctx.clearRect(0,0,580,270);
+ rect(ctx,0,0,580,270,'#1b3a2c');
+ for(let k=0;k<70;k++){
+   const x=(k*83)%580,y=(k*47)%206;
+   rect(ctx,x,y,18,2,k%4===0?'#295039':'#234432');
  }
- for(const horse of sim.state.horses){
-   if(ui.path.checked && (horse.mark==='◎'||ui.focus.value===String(horse.number))){
-    ctx.beginPath();
-    horse.trail.forEach((pt,i)=>{const pos=mapP(pt.d,pt.lane);if(i===0)ctx.moveTo(...pos);else ctx.lineTo(...pos)});
-    ctx.strokeStyle='rgba(255,250,190,.8)';ctx.lineWidth=2;ctx.stroke();
+ // Full course and any additional Kyoto inner track are traced as separate
+ // cubic outlines (topologically matched to official descriptions, not GPS).
+ function path(commands){
+   ctx.beginPath();
+   for(const op of commands){
+     if(op[0]==='M')ctx.moveTo(op[1],op[2]);
+     if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
    }
  }
- const group=sim.state.horses.slice().sort((a,b)=>a.d-b.d);
- for(const horse of group){
-    const [x,y]=mapP(horse.d,horse.lane);
-    ctx.fillStyle=baseColor[(horse.number-1)%baseColor.length];
-    ctx.beginPath();ctx.arc(x,y,horse.number===sim.state.leadingNo?6.8:5.4,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=horse.number===sim.state.leadingNo?'#ffefab':'#152824';ctx.lineWidth=2;ctx.stroke();
-    if(horse.number===sim.state.leadingNo || ui.focus.value===String(horse.number)){
-      ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.fillText(horse.number,x+8,y-8);
-    }
+ function stroke(commands,width,color){
+   path(commands);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
  }
- ctx.fillStyle='rgba(14,37,24,.81)';ctx.fillRect(202,61,180,67);
- ctx.textAlign='center';ctx.fillStyle='#efffea';ctx.font='bold 18px Meiryo';ctx.fillText(race.venue+' '+race.distance_m+'m',292,86);
- ctx.font='11px Meiryo';ctx.fillStyle='#cbe6cd';ctx.fillText(race.turn+'回り（概略）',292,107);
- ctx.textAlign='left';
+ stroke(prof.background,36,'#354b39');
+ stroke(prof.background,32,'#789a69');
+ stroke(prof.background,26,'#a4bf80');
+ stroke(prof.background,23,'#73a96b');
+ if(prof.inner_turn){
+   stroke(prof.inner_turn,26,'#38503c');
+   stroke(prof.inner_turn,18,'#6d9f64');
+   stroke(prof.inner_turn,1,'rgba(239,243,215,.65)');
+   ctx.fillStyle='#ecf6ce';ctx.font='bold 10px Meiryo';ctx.fillText('内回り',446,124);
+ }
+ if(prof.branch){stroke(prof.branch,27,'#34523d');stroke(prof.branch,23,'#91b87b');}
+ const raceCmd=[['M',...prof.segments[0].p0]];
+ for(const sg of prof.segments)raceCmd.push(['C',...sg.p1,...sg.p2,...sg.p3]);
+ stroke(raceCmd,29,'#30523a');
+ stroke(raceCmd,25,'#a9c58d');
+ stroke(raceCmd,23,'#8cb574');
+ stroke(raceCmd,1.3,'rgba(249,255,222,.55)');
+ // All landmark locations use EXACTLY the same d-axis as the engine.
+ for(const land of prof.landmarks){
+   if(land.label==='2角'||land.label==='3角'||land.label==='4角'||land.label==='直線入口')continue;
+   const p=RaceCourseGeometry.point(prof,land.d,0);
+   if(land.label==='START'||land.label==='GOAL'){
+      ctx.strokeStyle=land.label==='START'?'#fff6b1':'#fff';
+      ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(p.x-7,p.y-11);ctx.lineTo(p.x+7,p.y+11);ctx.stroke();
+      ctx.font='bold 10px monospace';ctx.fillStyle=land.label==='START'?'#fbe7a1':'#fff';
+      const shift=land.label==='START'?-36:12;
+      ctx.fillText(land.label,p.x+shift,p.y+22);
+   }else if(land.label.includes('坂')){
+      ctx.fillStyle='#ebd67b';ctx.beginPath();ctx.arc(p.x,p.y,3.7,0,Math.PI*2);ctx.fill();
+   }
+ }
+ const route=prof.landmarks;
+ const first=RaceCourseGeometry.point(prof,0,0);
+ const finish=RaceCourseGeometry.point(prof,prof.distance_m,0);
+ ctx.fillStyle='#eff1e6';ctx.font='bold 11px Meiryo';
+ ctx.fillText(prof.layout,16,19);
+ ctx.fillStyle='#b8d1bd';ctx.font='10px Meiryo';
+ ctx.fillText('黄色線：実走路（仮想レーン）  ·  座標は近似',16,34);
+ // The 18 runners share a continuous, monotone race-only path;
+ // no horse is drawn on the non-racing inner/outer circuit.
+ for(const h of sim.state.horses){
+   if(!ui.path.checked)continue;
+   const selected=ui.focus.value===String(h.number)||ui.focus.value==='leader'&&h.number===sim.state.leadingNo;
+   if(!selected&&h.mark!=='◎')continue;
+   ctx.beginPath();let started=false;
+   // Subsample the full route every 6m in addition to the most recent trail;
+   // all pixels and physics consult RaceCourseGeometry.point().
+   for(const pt of h.trail){
+     const pos=RaceCourseGeometry.point(prof,pt.d,pt.lane);
+     if(!started){ctx.moveTo(pos.x,pos.y);started=true}
+     else ctx.lineTo(pos.x,pos.y);
+   }
+   ctx.strokeStyle=selected?'#f8ea9d':'#e2d1a1';ctx.lineWidth=selected?2.4:1.6;ctx.stroke();
+ }
+ const horses=sim.state.horses.slice().sort((x,y)=>x.d-y.d);
+ for(const h of horses){
+   const p=RaceCourseGeometry.point(prof,h.d,h.lane);
+   ctx.fillStyle=baseColor[(h.number-1)%baseColor.length];
+   ctx.beginPath();ctx.arc(p.x,p.y,h.number===sim.state.leadingNo?6.3:5.1,0,Math.PI*2);ctx.fill();
+   ctx.lineWidth=h.number===sim.state.leadingNo?2.5:1.5;
+   ctx.strokeStyle=h.number===sim.state.leadingNo?'#ffe694':'#1d3025';ctx.stroke();
+   if(h.number===sim.state.leadingNo || ui.focus.value===String(h.number)){
+     ctx.font='bold 10px monospace';ctx.fillStyle='#fff';ctx.fillText(String(h.number),p.x+8,p.y-8);
+   }
+ }
+ // Elevation chart shares the exact profile breakpoints consumed by physics.
+ const chartTop=217,chartBottom=260,left=65,right=552;
+ rect(ctx,0,211,580,59,'#152e25');
+ ctx.fillStyle='#bfd0c4';ctx.font='bold 10px Meiryo';ctx.fillText('標高差',8,226);
+ ctx.font='10px monospace';ctx.fillText('m',29,241);
+ const zvals=prof.profile.map(p=>p[1]);const zlo=Math.min(...zvals),zhi=Math.max(...zvals);
+ const zToY=v=>chartBottom-7-(v-zlo)/(zhi-zlo||1)*32;
+ const dToX=d=>left+(right-left)*d/prof.distance_m;
+ ctx.strokeStyle='#688872';ctx.lineWidth=1;ctx.beginPath();
+ ctx.moveTo(left,zToY(0));ctx.lineTo(right,zToY(0));ctx.stroke();
+ ctx.beginPath();
+ prof.profile.forEach((p,i)=>{if(i===0)ctx.moveTo(dToX(p[0]),zToY(p[1]));else ctx.lineTo(dToX(p[0]),zToY(p[1]));});
+ ctx.strokeStyle='#f2d491';ctx.lineWidth=2.4;ctx.stroke();
+ const pin=dToX(sim.state.leader),z=zToY(RaceCourseGeometry.height(prof,sim.state.leader));
+ ctx.fillStyle='#fef7dc';ctx.beginPath();ctx.arc(pin,z,4,0,Math.PI*2);ctx.fill();
+ ctx.font='10px monospace';ctx.fillStyle='#b6c5bb';
+ ctx.fillText('START',left,269);ctx.fillText('GOAL',right-28,269);
+ ctx.font='bold 10px Meiryo';ctx.fillStyle='#e6ebdf';
+ ctx.fillText('▲ '+prof.elevation_range_m.toFixed(1)+'m',470,222);
 }
 function markDirty(){if(running){notify('条件変更は次の再スタートから反映されます。')}else{notify('変更した条件はスタート時に使用します。')}}
 async function initialize(){
