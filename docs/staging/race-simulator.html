@@ -49,14 +49,16 @@
    <div class="stage-bottom"><span id="moment">スタートを押すとレースが始まります</span><span id="lap">0%</span></div>
   </div>
   <div class="meter"><div id="meterFill"></div></div>
-  <div class="track-tools"><span>馬群の位置・左右の進路は仮説に基づく演出です。</span><label><input id="pathToggle" type="checkbox" checked> 進路の軌跡を表示</label></div>
+  <div class="track-tools"><span id="courseSegment">コース区間を読み込み中…</span><label><input id="pathToggle" type="checkbox" checked> 進路の軌跡を表示</label></div>
  </section>
 
  <div class="bottom-grid">
   <section class="panel course-panel" aria-label="コース俯瞰図">
-   <div class="panel-head"><h2>コース俯瞰図</h2><span id="courseLabel">芝・距離</span></div>
-   <canvas id="courseCanvas" width="580" height="186" role="img" aria-label="仮想周回路上の全出走馬の位置"></canvas>
-   <p class="small-muted">芝コースの概略図です。実際のコース形状・高低差・走行軌跡を再現した地図ではありません。</p>
+   <div class="panel-head"><h2>コース俯瞰図・高低差</h2><span id="courseLabel">芝・距離</span></div>
+   <canvas id="courseCanvas" width="580" height="270" role="img" aria-label="東京芝2000mと京都芝1400m外回りそれぞれのコースの特徴に沿った俯瞰図、仮想進路、発走・ゴール・高低差"></canvas>
+   <p class="small-muted" id="courseFeatures">JRA公式の競馬場資料に基づきコースを確認しています。</p>
+   <p class="small-muted" id="courseMeasurements">コース寸法を読み込み中…</p>
+   <p class="small-muted"><a id="mapSourceLink" href="https://www.jra.go.jp/" target="_blank" rel="noopener noreferrer">JRA公式コース図を確認</a> ／ 図形のカーブと勾配区間は実測座標ではない近似です。</p>
   </section>
   <section class="panel standings-panel" aria-labelledby="rankTitle">
    <div class="panel-head"><h2 id="rankTitle">実況順位（仮想）</h2><label class="focus-label">追跡する馬<select id="focusSelect"><option value="leader">先頭を追跡</option></select></label></div>
@@ -70,13 +72,14 @@
  <section class="notes panel">
   <h2>このシミュレーションで分かること・分からないこと</h2>
   <p>出走馬名・馬番・印・STEP1の評価（未校正の勝率を含む）は、既に保存済みの予想レポートから読み取ります。仮想エンジンが馬群の位置取り、進路変更、前が詰まる状況、ペースの変化、直線の追い上げを計算します。</p>
-  <p><strong>ここでの到達順は公式予想やレース結果ではありません。</strong>過去の実際の通過順、騎手の指示、実測ラップ、進路の映像データは使っていません。脚質・初期位置やコース形状は演出用の仮定です。同じシード・設定なら再現可能ですが、現段階で統計的な勝率評価や買い目の変更には利用しません。</p>
+  <p><strong>ここでの到達順は公式予想やレース結果ではありません。</strong>JRAが公表する直線距離・一周距離・高低差・内外のコース構造を区別して参照し、コースごとのスタート位置と走路を描いています。一方、カーブのベジェ座標、勾配の途中区間、騎手の進路判断・馬ごとの実測ラップは公開された測量原本から復元していない近似・仮定です。同じシード・設定なら再現可能ですが、統計的な勝率評価や正式買い目の変更には使いません。</p>
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.1 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
-<script src="race-sim-engine.js?v=20261012-1"></script>
-<script src="race-simulator.js?v=20261012-1"></script>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.2 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<script src="race-course-geometry-v1.js?v=20261012-2"></script>
+<script src="race-sim-engine.js?v=20261012-2"></script>
+<script src="race-simulator.js?v=20261012-2"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>
