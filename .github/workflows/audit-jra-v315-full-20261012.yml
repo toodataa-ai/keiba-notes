@@ -1,0 +1,79 @@
+name: FINAL JRA 2026-10-12 actual v3.15 3-operations publication integrity
+on:
+  push:
+    branches: [audit/jra-ui-v101-live-20261012]
+    paths: ['.github/workflows/audit-jra-v315-full-20261012.yml']
+permissions: {contents: read}
+jobs:
+  current-real:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Attest both official real 3-command purchase models and archives
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          regs=json.loads(Path('docs/data/races.json').read_text())['races']
+          journal=json.loads(Path('docs/data/jra_publication_revision_log.json').read_text())['revisions']
+          targets=['2026-10-12-october-stakes','2026-10-12-swan-stakes']
+          for rid in targets:
+            rows=[r for r in regs if r['id']==rid and r['scope']=='jra-main']
+            assert len(rows)==1
+            r=rows[0]
+            assert r['status']=='predicted' and r['purchase_strategy_version']=='v3.15'
+            assert 'v3.15' in r['report'] and 'v3.15' in r['pdf']
+            assert len(r['purchase_commands'])<=3 and len(r['purchase_commands'])>0
+            assert r['medium_command']['row']==4 and r['large_command']['row']==5
+            plan=json.loads(Path(r['e2e_prediction']).read_text())
+            assert plan['purchase_strategy_version']=='v3.15'
+            assert plan['proof_commit']==r['proof_commit']
+            assert len(r['final_bets'])==plan['ticket_count']
+            assert r['final_bets']==plan['formal_bets']
+            assert sum(b['stake_yen'] for b in r['final_bets'])==plan['total_stake_yen']==r['total_stake_yen']
+            assert 0<r['total_stake_yen']<=6000
+            assert plan['quote_age_max_seconds']<=600
+            assert plan['quote_capture_span_seconds']<=180
+            assert Path(plan['source_prediction_path']).exists()
+            assert plan['source_prediction_path']!=r['e2e_prediction']
+            assert all(b['quote_verified'] is True for b in r['final_bets'])
+            assert sum(x['points'] for x in r['purchase_commands'])+r['medium_command']['points']+r['large_command']['points']==len(r['final_bets'])
+            assert sum(x['stake_yen'] for x in r['purchase_commands'])+r['medium_command']['stake_yen']+r['large_command']['stake_yen']==r['total_stake_yen']
+            assert any(j['race_id']==rid and j['new_canonical']['proof_commit']==r['proof_commit'] for j in journal)
+            for sha in [plan['proof_commit'],plan['source_prediction_proof']]:
+              subprocess.run(['git','cat-file','-e',sha+'^{commit}'],check=True)
+            for p in [r['e2e_prediction'],'docs/'+r['report'],'docs/'+r['pdf']]:
+              assert Path(p).is_file(),p
+            print('PASS_ACTUAL_JRA_V315_3_REGULAR_PLUS_MED_LARGE',rid,'tickets',len(r['final_bets']),'regular',len(r['purchase_commands']),'spend',r['total_stake_yen'])
+          hist=json.loads(Path('docs/data/production-releases.json').read_text())
+          assert hist['current_public_version']=='1.01'
+          assert hist['policy']['ui_release_requires_explicit_user_approval']
+          assert hist['policy']['data_release_requires_user_approval'] is False
+          print('PASS_USER_APPROVED_SITE_V101_WITH_AUTONOMOUS_FORMAL_JRA_DATA')
+          PY
+      - name: Check full immutable public HTML PDF and canonical registry bytes
+        run: |
+          set -euo pipefail
+          mapfile -t RACEFILES < <(python3 - <<'PY'
+          import json
+          data=json.load(open('docs/data/races.json'))['races']
+          for x in data:
+            if x['id'] in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
+              print('docs/'+x['report']);print('docs/'+x['pdf'])
+          PY
+          )
+          test "${#RACEFILES[@]}" -eq 4
+          for i in $(seq 1 36);do
+            ok=1
+            for f in docs/data/races.json docs/data/jra_publication_revision_log.json docs/index.html docs/this-week.html docs/data/production-releases.json "${RACEFILES[@]}";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra-formal-live || ! cmp -s "$f" /tmp/jra-formal-live;then ok=0;break;fi
+            done
+            if [[ "$ok" -eq 1 ]];then echo PASS_BOTH_JRA_V315_FORMAL_THREE_ACTIONS_PUBLIC_BYTE_EQUALITY;exit 0;fi
+            sleep 12
+          done
+          echo '::error::Public bytes did not match official 3-action model and records'
+          exit 1
