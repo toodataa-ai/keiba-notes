@@ -247,11 +247,11 @@ function renderData(){
  }
  ui.remaining.textContent=Math.max(0,Math.round(state.distance-state.leader))+' m';
  const current=state.courseMetrics;
- ui.caption.textContent=state.finished?'ゴール':(current ? current.segment : 'スタート');
+ ui.caption.textContent=state.finished?'全馬ゴール・余走完了':state.firstFinishTime!==null?'ゴール通過中':(current ? current.segment : 'スタート');
  const slopeInfo=$('courseSegment');
  if(slopeInfo){
    const z=current?.grade||0;
-   slopeInfo.textContent=state.finished?'ゴール':(current?.segment||'発走前')+
+   slopeInfo.textContent=state.finished?'全馬ゴール':state.firstFinishTime!==null?'直線・ゴール板通過中':(current?.segment||'発走前')+
      (z>.0007?' ／ 上り':z<-.0007?' ／ 下り':' ／ 平坦')+
      (current?.kind==='turn'?' ／ コーナー':'');
  }
@@ -264,7 +264,7 @@ function renderData(){
       '回／外へ '+watched.outwardMoves+'回　詰まり '+watched.trafficHoldSeconds.toFixed(1)+'秒';
  }
  ui.elapsed.textContent=dur(state.t);
- ui.moment.textContent=state.finished?'仮想着順が確定しました（予想や結果ではありません）':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
+ ui.moment.textContent=state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
  ui.bar.style.width=(state.progress*100).toFixed(1)+'%';
  ui.stands.innerHTML=sim.standings().map((h,i)=>{
@@ -371,7 +371,7 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo,anchor={x:width*.5,y:height*.52}){
  if(!Array.isArray(horses))throw Error('SIM_HORSES_MISSING');
  return horses.map(h=>{
-  const p=RaceCourseGeometry.point(profile,h.d,h.lane);
+  const p=RaceCourseGeometry.point(profile,h.displayD??h.d,h.lane);
   return {number:h.number,x:anchor.x+zoom*(p.x-origin.x),
     y:anchor.y+zoom*(p.y-origin.y),
     focused:h.number===focusedNo,leading:h.number===leadingNo};
@@ -397,7 +397,7 @@ window.RaceSimNumbers=Object.freeze({
    for number circles and mobile HUD. No label displacement. */
 function frameEntireField(horses,profile,mode,width,height,renderedWidth){
  if(!Array.isArray(horses)||!horses.length)throw Error('SIM_AUTOFRAME_EMPTY_FIELD');
- const points=horses.map(h=>RaceCourseGeometry.point(profile,h.d,h.lane));
+ const points=horses.map(h=>RaceCourseGeometry.point(profile,h.displayD??h.d,h.lane));
  const left=Math.min(...points.map(p=>p.x)),right=Math.max(...points.map(p=>p.x));
  const top=Math.min(...points.map(p=>p.y)),bottom=Math.max(...points.map(p=>p.y));
  const pixelRatio=width/Math.max(1,renderedWidth);
@@ -461,6 +461,55 @@ function strokePath(ctx,width,color){
  ctx.strokeStyle=color;ctx.lineWidth=width;
  ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
 }
+
+/* STAGE v0.19: goal camera always shows the FINAL STRAIGHT horizontally.
+ * Finish-line timing is independent of post-goal visual distance. */
+function goalScreenPosition(distance,lane,finish,width,height,maxLane){
+ const center=height*.52,step=Math.min(30,height/16);
+ return {x:width*.70+(distance-finish)*width/175,
+         y:center+(lane-maxLane/2)*step};
+}
+function drawGoalPost(ctx,x,top,bottom){
+ ctx.fillStyle='#26332d';ctx.fillRect(x-5,top-20,10,bottom-top+25);
+ for(let y=top;y<bottom;y+=12){
+   ctx.fillStyle=Math.floor((y-top)/12)%2?'#293532':'#faf8ed';
+   ctx.fillRect(x-4,y,8,Math.min(12,bottom-y));
+ }
+ ctx.fillStyle='#f9f9ef';ctx.fillRect(x-38,top-48,76,26);
+ ctx.lineWidth=2;ctx.strokeStyle='#243438';ctx.strokeRect(x-38,top-48,76,26);
+ ctx.font='bold 16px Meiryo';ctx.fillStyle='#15282d';ctx.textAlign='center';
+ ctx.fillText('GOAL',x,top-29);ctx.textAlign='left';
+}
+function drawGoalCamera(ctx,state,profile,width,height,renderedWidth,target){
+ const maxLane=sim.laneConfig.maxLane,center=height*.52;
+ const span=(maxLane/2+1.6)*Math.min(30,height/16);
+ const top=Math.max(94,center-span),bottom=Math.min(height-48,center+span);
+ ctx.clearRect(0,0,width,height);
+ rect(ctx,0,0,width,height,'#244736');
+ rect(ctx,0,top,width,bottom-top,'#e3dfbe');
+ rect(ctx,0,top+13,width,bottom-top-26,'#79a65d');
+ ctx.lineWidth=3;ctx.strokeStyle='#f8f5e3';
+ for(const y of [top+13,bottom-13]){
+   ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(width,y);ctx.stroke();
+ }
+ drawGoalPost(ctx,width*.70,top+13,bottom-13);
+ const scale=width/Math.max(1,renderedWidth);
+ for(const runner of state.horses.slice().sort((a,b)=>a.number-b.number)){
+   const q=goalScreenPosition(runner.displayD??runner.d,runner.lane,profile.distance_m,width,height,maxLane);
+   if(q.x<-35||q.x>width+35)continue;
+   raceNumberMarker(ctx,runner.number,q.x,q.y,scale,
+     runner.number===target.number,runner.number===state.leadingNo,race.field_size);
+ }
+ rect(ctx,12,34,478,35,'rgba(13,27,28,.84)');
+ ctx.fillStyle='#fdf6e9';ctx.font='bold 16px Meiryo';
+ ctx.fillText(profile.venue+' 最後の直線・ゴール板固定カメラ',22,57);
+ rect(ctx,700,34,286,35,'rgba(13,27,28,.84)');
+ ctx.fillStyle='#fff4ca';ctx.font='bold 14px Meiryo';
+ ctx.fillText(state.finished?'全馬通過・余走完了':
+   state.firstFinishTime!==null?'ゴール通過・余走中':'ゴール前直線',713,57);
+}
+window.RaceSimGoalView=Object.freeze({position:goalScreenPosition,drawPost:drawGoalPost});
+
 function drawRace(){
  if(!sim||!race){drawIdle('出走馬の原本を確認中…');return}
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
@@ -473,6 +522,13 @@ function drawRace(){
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
  const target=focus||state.horses[0];
+ if(state.goalCamera){
+   drawGoalCamera(ctx,state,profile,w,h,renderedWidth,target);
+   drawCourse();
+   if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,
+      ui.path.checked,RaceSimNumbers.marker);
+   return;
+ }
  const requested=mode==='overview'
    ?{zoom:camera.zoom,origin:{x:306,y:119},anchor:{x:w*.5,y:h*.52}}
    :frameEntireField(state.horses,profile,mode,w,h,renderedWidth);
@@ -654,9 +710,9 @@ function drawCourse(){
    }
    ctx.strokeStyle=selected?'#f8ea9d':'#e2d1a1';ctx.lineWidth=selected?2.4:1.6;ctx.stroke();
  }
- const horses=sim.state.horses.slice().sort((x,y)=>x.d-y.d);
+ const horses=sim.state.horses.slice().sort((x,y)=>(x.displayD??x.d)-(y.displayD??y.d));
  for(const h of horses){
-   const p=planPoint(prof,RaceCourseGeometry.point(prof,h.d,h.lane));
+   const p=planPoint(prof,RaceCourseGeometry.point(prof,h.displayD??h.d,h.lane));
    const waku=jraWaku(h.number,race.field_size);
    ctx.fillStyle=waku.fill;
    ctx.beginPath();ctx.arc(p.x,p.y,h.number===sim.state.leadingNo?6.3:5.1,0,Math.PI*2);ctx.fill();
