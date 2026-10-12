@@ -42,6 +42,15 @@ jobs:
           sudo apt-get install -y -qq fonts-noto-cjk
           python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
       - name: Recreate Tokyo and Kyoto v3.15 documents without writing to docs
+        env:
+          JRA_V315_PREVIEW_DIR: /tmp/jra-v315-stage-preview
         run: |
           python3 -m py_compile .github/scripts/jra_v315_horse_layout.py .github/scripts/jra-render-formal-3action-v315.py
           python3 .github/scripts/test-jra-v315-report-readability.py
+      - name: Attach non-publication PDF and HTML previews for human approval
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-v315-readable-stage-preview-tokyo-kyoto
+          path: /tmp/jra-v315-stage-preview/
+          retention-days: 10
+          if-no-files-found: error
