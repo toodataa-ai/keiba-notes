@@ -115,6 +115,26 @@ function validateFullReport(race) {
   if (!fs.existsSync(reportPath)) throw new Error(`${race.id}: authored report missing: ${race.report}`);
 
   const html = fs.readFileSync(reportPath, 'utf8');
+  // Formal v3.15 predictions are generated and validated in their isolated
+  // prereace pipeline, not by the legacy authored-report/reader-v1 renderer.
+  // Requiring the old marker on their sealed source would wrongly fail every
+  // site-only publication. Never recreate or overwrite those official PDFs.
+  if (race.purchase_strategy_version === 'v3.15' && race.proof_commit &&
+      Array.isArray(race.final_bets) && race.final_bets.length > 0 &&
+      race.date >= '2026-10-12') {
+    const sealedPdf = path.resolve('docs', race.pdf);
+    if (!fs.existsSync(sealedPdf)) {
+      throw new Error(`${race.id}: sealed formal v3.15 PDF missing; legacy renderer must not invent it`);
+    }
+    if (!fs.readFileSync(sealedPdf).subarray(0, 5).equals(Buffer.from('%PDF-'))) {
+      throw new Error(`${race.id}: existing sealed formal v3.15 PDF is invalid`);
+    }
+    if (!html.includes('JRA') || !html.includes('v3.15')) {
+      throw new Error(`${race.id}: sealed formal v3.15 source header missing`);
+    }
+    console.log(`PASS_PRESERVED_SEALED_FORMAL_V315_PDF ${race.id}`);
+    return;
+  }
   if (!html.includes('data-full-report="true"')) {
     throw new Error(`${race.id}: official PDF source is not marked as a complete report`);
   }
