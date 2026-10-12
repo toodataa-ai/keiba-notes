@@ -21,6 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check docs/staging/race-course-geometry-v1.js
+          node --check docs/staging/race-lane-ai-v1.js
           node --check docs/staging/race-sim-engine.js
           node --check docs/staging/race-simulator.js
           node --check docs/staging/stage-week-preview.js
@@ -102,6 +103,14 @@ jobs:
             assert.ok(Math.hypot(p0.x-p1.x,p0.y-p1.y)>20);
             const heights=course.profile.map(q=>q[1]);
             assert.ok(Math.abs(Math.max(...heights)-Math.min(...heights)-course.elevation_range_m)<1e-6);
+            const sampledHeadings=[0,.26,.54,.73,.92,1].map(frac=>w.RaceCourseGeometry.heading(course,frac*course.distance_m,0));
+            assert.ok(sampledHeadings.some(x=>Math.abs(x-sampledHeadings[0])>1.1),'The sprite must rotate on bends');
+            for(const d of [0,.22*course.distance_m,.66*course.distance_m,course.distance_m]){
+              const p=w.RaceCourseGeometry.point(course,d,0);
+              const p2=w.RaceCourseGeometry.point(course,d,w.RaceLaneAI.config(course).maxLane);
+              assert.ok(Math.hypot(p.x-p2.x,p.y-p2.y)<=Math.min(...course.track_width_m),'all mapped lanes lie on published turf width');
+            }
+            assert.equal(w.document.getElementById('cameraSelect').value,'follow');
             const stages=course.segments.map(x=>x.kind);
             assert.ok(stages.includes('turn')&&stages.includes('straight'));
             const straightPos=course.distance_m-course.straight_m+3;
@@ -109,6 +118,7 @@ jobs:
             const bendPos=course.segments.find(x=>x.kind==='turn').from+2;
             assert.ok(w.RaceCourseGeometry.metrics(course,bendPos,7).pathStretch>
               w.RaceCourseGeometry.metrics(course,bendPos,0).pathStretch);
+            w.eval(read('docs/staging/race-lane-ai-v1.js'));
             w.eval(read('docs/staging/race-sim-engine.js'));
             w.eval(read('docs/staging/race-simulator.js'));
             await new Promise(resolve=>setTimeout(resolve,80));
@@ -123,6 +133,11 @@ jobs:
             assert.equal(w.document.getElementById('meterFill').style.width,'0%');
             start.click();
             assert.equal(start.disabled,true);
+            const camera=w.document.getElementById('cameraSelect');
+            camera.value='overview';
+            camera.dispatchEvent(new w.Event('change',{bubbles:true}));
+            camera.value='follow';
+            camera.dispatchEvent(new w.Event('change',{bubbles:true}));
             assert.equal(typeof tick,'function');
             // Trigger browser animation frames; track progress must move.
             let t=1000;
@@ -161,6 +176,23 @@ jobs:
             assert.notDeepEqual(a.state.horses.map(x=>x.lane),c.state.horses.map(x=>x.lane));
             assert.equal(new Set(a.state.horses.map(x=>x.number)).size,entry.field_size);
             assert.ok(a.state.events.length>0);
+            const lc=w.RaceLaneAI.config(course);
+            for(const h of a.state.horses){
+              assert.ok(h.lane>=-1e-6&&h.lane<=lc.maxLane+1e-6,'horse must stay between inside rail and outside limit');
+              assert.ok(Number.isFinite(h.laneVelocity),'lane direction remains continuous');
+            }
+            assert.ok(a.state.totalInsideMoves>0,'at least one horse must find an inside racing line');
+            assert.ok(a.state.totalLaneChanges>=a.state.totalInsideMoves,'lane changes counted');
+            assert.ok(a.state.trafficHolds>=0);
+            const dummies=[
+              {number:1,d:250,lane:3,finished:false},
+              {number:2,d:251,lane:2.1,finished:false},
+              {number:3,d:242,lane:1.5,finished:false}
+            ];
+            assert.equal(w.RaceLaneAI.laneSafe(dummies[0],dummies,2,lc),false,'cannot cut across occupied adjacent lane');
+            assert.equal(w.RaceLaneAI.laneSafe(dummies[0],dummies,4,lc),true,'can move into clear outside space');
+            assert.ok(w.RaceLaneAI.throttle({d:250,lane:3},[{d:252,lane:3,finished:false}],1,.05,lc).held,
+              'following runner must brake rather than pass through leader');
             w.close();
             console.log('PASS_SIM_' +entry.id+' _18_HORSES_PLAY_PAUSE_RESET_SEEDED_PHYSICS');
           }
@@ -177,6 +209,7 @@ jobs:
             docs/staging/race-simulator.js
             docs/staging/race-sim-engine.js
             docs/staging/race-course-geometry-v1.js
+            docs/staging/race-lane-ai-v1.js
             docs/staging/race-sim-manifest-v1.json
             docs/staging/stage-week-preview.js
             docs/staging/index.html
@@ -191,7 +224,7 @@ jobs:
               fi
             done
             if [[ "$ok" == 1 ]];then
-              echo "PASS_SIM_EIGHT_PUBLIC_STAGE_ASSET_BYTE_MATCH"
+              echo "PASS_SIM_NINE_PUBLIC_STAGE_ASSET_BYTE_MATCH"
               exit 0
             fi
             sleep 10
