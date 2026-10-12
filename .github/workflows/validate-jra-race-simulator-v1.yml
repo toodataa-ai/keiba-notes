@@ -254,11 +254,26 @@ jobs:
             const a=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
             const b=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
             const c=engine.create(source,{seed:56,pace:'H',bias:'outer'});
+            const meanLane=sim=>sim.state.horses.reduce((sum,h)=>sum+h.lane,0)/sim.state.horses.length;
+            const initialMeanLane=meanLane(a);
+            let turnOneSnapshot=null;
             for(let n=0;n<5000;n++){
               if(!a.state.finished)a.step(.05);
               if(!b.state.finished)b.step(.05);
               if(!c.state.finished)c.step(.05);
+              if(n===800)turnOneSnapshot={
+                meanLane:meanLane(a),
+                inwardCount:a.state.horses.filter(h=>h.inwardMoves>0).length,
+                initialMeanLane,
+                leading:a.state.leader,
+                moveCount:a.state.totalInsideMoves
+              };
             }
+            assert.ok(turnOneSnapshot&&turnOneSnapshot.leading>100);
+            console.log('PASS_SIM_RAIL_TENDENCY '+entry.id+' '+JSON.stringify(turnOneSnapshot));
+            assert.ok(turnOneSnapshot.meanLane<initialMeanLane,
+              'the live 18-runner field should converge inward after its opening phase');
+            assert.ok(turnOneSnapshot.inwardCount>=2,'several horses should choose an inside route');
             assert.ok(a.state.firstFinishTime>70 && a.state.firstFinishTime<175,'race duration physical plausibility');
             assert(a.state.finished&&b.state.finished&&c.state.finished);
             assert.deepEqual(a.standings().map(x=>[x.number,x.finishTime]),b.standings().map(x=>[x.number,x.finishTime]));
