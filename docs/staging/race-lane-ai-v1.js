@@ -86,6 +86,22 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  }
  return null;
 }
+/* The first 100m are a coordinated inward merge, rather than
+   isolated adjacent-lane decisions. A convoy can shift laterally
+   together, while immediate physical occupancy is still checked.
+   No runner may jump an occupied lane or overtake through the other. */
+function launchStepSafe(h,horses,nextLane,cfg){
+ if(nextLane<0||nextLane>cfg.maxLane)return false;
+ for(const other of horses){
+   if(other===h||other.finished)continue;
+   const gap=Math.abs(other.d-h.d);
+   // Use next-frame (sub-step) clearance, not the entire multi-lane
+   // corridor from gate to target: the latter prevented all outside
+   // horses from joining an inward-moving pack.
+   if(gap<2.45 && Math.abs(other.lane-nextLane)<.67)return false;
+ }
+ return true;
+}
 function throttle(h,horses,requestedTravel,dt,cfg){
  const front=nearestAhead(h,horses,h.lane);
  if(!front)return {distance:requestedTravel,held:false};
@@ -97,5 +113,5 @@ function throttle(h,horses,requestedTravel,dt,cfg){
  const accepted=clamp(Math.min(requestedTravel,Math.max(0,maxTravel)),0,requestedTravel);
  return {distance:accepted,held:accepted+1e-6<requestedTravel};
 }
-global.RaceLaneAI=Object.freeze({config,distances,nearAt,laneSafe,nearestAhead,plan,throttle});
+global.RaceLaneAI=Object.freeze({config,distances,nearAt,laneSafe,nearestAhead,plan,launchStepSafe,throttle});
 })(typeof window!=='undefined'?window:globalThis);
