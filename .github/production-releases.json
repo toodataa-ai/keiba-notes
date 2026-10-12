@@ -3,38 +3,37 @@
   "current_public_release": "release/jra-site-v1.01-20261012",
   "current_public_version": "1.01",
   "policy": {
-    "snapshot_scope": "successfully_deployed_production_only",
-    "rollback_scope": "entries_in_this_registry_only",
+    "snapshot_scope": "successful_production_UI_deploys_only",
+    "rollback_scope": "only_verified_release_branches",
     "staging_commits_are_rollback_targets": false,
     "ui_release_requires_explicit_user_approval": true,
+    "data_release_requires_user_approval": false,
+    "data_auto_publish_requires": "official_pre_or_post_race_evidence, CI, immutable_proof_and_HTTP_verification",
     "never_rollback_prediction_result_or_proof": true,
     "staging_and_production_ui_separate": true,
     "data_release_separate": true,
-    "deployment_switch_status": "legacy_main_docs_active; separate production/data branches preserved pending later composite cutover"
+    "deployment_switch_status": "legacy_main_docs_active; compose-branch cutover pending"
   },
   "releases": [
     {
-      "release_id": "release/2026-10-12-baseline",
-      "branch": "release/2026-10-12-baseline",
-      "commit_sha": "1baf39bd3944350eea94cf28681966a18fdd239b",
+      "release_id": "release/jra-ui-v100-pre-v101-20261012",
+      "branch": "release/jra-ui-v100-pre-v101-20261012",
+      "commit_sha": "3b78f9c73968405f15c747b43177fe21a527acd4",
       "deployed_at": null,
       "workflow_run_id": null,
       "public_version": "1.00",
-      "note": "既存公開済み競馬サイトの基準HTML断面。公開日時は未確証のため記録しない。リリース履歴は正式本番公開が確認された断面だけを追加。",
-      "user_approved_baseline": true,
-      "rollback_branch": "release/jra-ui-v100-pre-v101-20261012"
+      "note": "旧正式画面。公開日時の根拠は未確認のため記入せず、復元用原本として保管。",
+      "user_approved_baseline": true
     },
     {
       "release_id": "release/jra-site-v1.01-20261012",
       "branch": "release/jra-site-v1.01-20261012",
-      "rollback_branch": "release/jra-site-v1.01-20261012",
       "commit_sha": "632146ccb581847ae5d4cb9535fb868b8b4517d8",
       "deployed_at": "2026-10-12T08:49:24+09:00",
       "workflow_run_id": 38185706485,
       "public_version": "1.01",
-      "note": "競馬場背景写真・タイトル中央配置・検証版購入入口の撤去・東京12R臨時予想の導線撤去。予想・結果の原本は不変。",
-      "user_approved": true,
-      "http_byte_verified": true
+      "note": "ユーザー承認済み。タイトル中央寄せ・芝コース写真・試験版購入リンクと東京12R臨時導線削除・公開履歴表示。公開HTMLバイナリ一致確認済み。",
+      "user_approved": true
     }
   ]
 }
