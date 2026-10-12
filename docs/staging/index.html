@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" data-stage="preview">
 <head>
 <meta name="robots" content="noindex,nofollow"><base href="../">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
@@ -38,14 +38,10 @@
 }
 
 </style>
-<style id="staging-visual-marker">
-html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8);pointer-events:none;z-index:2147483646}
-.staging-visual-marker{position:fixed;right:6px;bottom:6px;display:flex;align-items:center;gap:5px;background:rgba(138,75,8,.92);color:#fff7ed;border-radius:999px;padding:4px 7px;font-family:"Meiryo UI",Meiryo,sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.02em;z-index:2147483647;box-shadow:0 1px 3px rgba(0,0,0,.18);pointer-events:none}
-.staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
-</style>
+<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body>
-<div class="staging-visual-marker" role="status">STAGING <small>80275b9</small></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
 <header class="hero"><div class="wrap">
 <div class="lab-signature" aria-label="AI Racing Prediction Research Lab / Predict, Validate, Improve"><span class="lab-signature-name">AI Racing Prediction Research Lab</span><span class="lab-signature-cycle">Predict <b>→</b> Validate <b>→</b> Improve</span></div>
 <h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja brand-lab-seal" aria-hidden="true"><span>研</span><span>究</span><span>所</span><span class="brand-lab-mark"></span></span></span></h1>
@@ -55,8 +51,8 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 <section class="portal-section" aria-labelledby="mainTitle"><div class="portal-head"><span class="portal-kicker">このサイトの中心</span><h2 id="mainTitle">JRAメインレース予想</h2><p>今週の予想、これからの予定、過去の成績をここから確認できます。</p></div>
 <div class="portal-grid main-grid">
 <a class="portal-card main-card" href="staging/this-week.html"><span><span class="portal-title">今週のAI予想</span><span class="portal-desc">今週の対象レースと公開済みのAI予想</span></span><span class="portal-arrow">→</span></a>
-<a class="portal-card main-card" href="schedule.html"><span><span class="portal-title">今後のAI予想スケジュール</span><span class="portal-desc">次回以降の対象レースと予想・回顧予定</span></span><span class="portal-arrow">→</span></a>
-<a class="portal-card main-card" href="results.html"><span><span class="portal-title">過去の成績</span><span class="portal-desc">結果・反省会・的中率・回収率</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card main-card" href="staging/schedule.html"><span><span class="portal-title">今後のAI予想スケジュール</span><span class="portal-desc">次回以降の対象レースと予想・回顧予定</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card main-card" href="staging/results.html"><span><span class="portal-title">過去の成績</span><span class="portal-desc">結果・反省会・的中率・回収率</span></span><span class="portal-arrow">→</span></a>
 </div>
 <div class="submain-block"><p class="submain-label">予想のしくみと改善</p><div class="portal-grid submain-grid">
 <a class="portal-card submain-card" href="staging/methodology.html"><span><span class="portal-title">AI予想ロジックと検証思想</span><span class="portal-desc">予想をどう組み立て、どう検証するか</span></span><span class="portal-arrow">→</span></a>
@@ -64,10 +60,10 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 </div></div></section>
 <section class="portal-section" aria-labelledby="researchTitle"><div class="portal-head"><span class="portal-kicker">精度向上のための研究</span><h2 id="researchTitle">予想を強くするための研究・検証</h2><p>本番予想とは切り分けながら、精度向上につながる要素を検証しています。</p></div>
 <div class="portal-grid research-grid">
-<a class="portal-card research-card" href="baba-models.html"><span><span class="portal-title">馬場状態予測の研究</span><span class="portal-desc">10競馬場×芝・ダートを個別に検証</span></span><span class="portal-arrow">→</span></a>
-<a class="portal-card research-card" href="e2e.html"><span><span class="portal-title">プロンプト改良前後の比較検証</span><span class="portal-desc">同じレースを改良前・改良後のプロンプトで予想し、結果で比較</span></span><span class="portal-arrow">→</span></a>
-<a class="portal-card research-card" href="experience-regime.html"><span><span class="portal-title">新馬・戦歴の少ない馬の予想研究</span><span class="portal-desc">実戦経験の少なさがAI予想の精度にどう影響するかを検証</span></span><span class="portal-arrow">→</span></a>
-<a class="portal-card research-card" href="local-racing-shadow.html"><span><span class="portal-title">地方競馬でのAI予想研究</span><span class="portal-desc">地方競馬でも予想と結果を蓄積して研究</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="staging/baba-models.html"><span><span class="portal-title">馬場状態予測の研究</span><span class="portal-desc">10競馬場×芝・ダートを個別に検証</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="staging/e2e.html"><span><span class="portal-title">プロンプト改良前後の比較検証</span><span class="portal-desc">同じレースを改良前・改良後のプロンプトで予想し、結果で比較</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="staging/experience-regime.html"><span><span class="portal-title">新馬・戦歴の少ない馬の予想研究</span><span class="portal-desc">実戦経験の少なさがAI予想の精度にどう影響するかを検証</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card research-card" href="staging/local-racing-shadow.html"><span><span class="portal-title">地方競馬でのAI予想研究</span><span class="portal-desc">地方競馬でも予想と結果を蓄積して研究</span></span><span class="portal-arrow">→</span></a>
 </div></section>
 <section class="portal-section" aria-labelledby="releaseHistoryTitle" style="margin-top:34px">
 <div class="portal-head"><span class="portal-kicker">PUBLIC RELEASES</span><h2 id="releaseHistoryTitle">公開バージョン履歴</h2><p>実際に本番へ公開成功した版だけを記録します。ステージング途中の改修は含みません。</p></div>

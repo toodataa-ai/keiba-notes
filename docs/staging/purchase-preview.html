@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head>
+<html lang="ja" data-stage="preview"><head>
 <meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <base href="../"><title>購入操作の見やすさ検証｜ステージング</title>
 <link rel="stylesheet" href="assets/style.css">
@@ -19,7 +19,9 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 .staging-visual-marker{position:fixed;right:6px;bottom:6px;display:flex;align-items:center;gap:5px;background:rgba(138,75,8,.92);color:#fff7ed;border-radius:999px;padding:4px 7px;font-family:"Meiryo UI",Meiryo,sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.02em;z-index:2147483647;box-shadow:0 1px 3px rgba(0,0,0,.18);pointer-events:none}
 .staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
 </style>
+<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head><body>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
 <div class="staging-visual-marker" role="status">STAGING <small>80275b9</small></div>
 <main class="audit-wrap"><div class="nav"><a href="staging/index.html">← ステージングトップ</a><a href="staging/release-history.html">公開履歴・復元方式</a></div>
 <h1>買いやすい購入方法：最大3操作＋中穴1行＋大穴1行</h1>

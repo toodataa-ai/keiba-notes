@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head>
+<!doctype html><html lang="ja" data-stage="preview"><head>
 <meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../">
 <title>サイト公開履歴とロールバック・ステージング</title><link rel="stylesheet" href="assets/style.css">
 <style>body{font:13px/1.75 Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;background:#f5f6f8;color:#232834}.wrap{max-width:860px;margin:0 auto;padding:25px 16px}h1{font-size:22px}h2{font-size:17px}.card{padding:16px;background:#fff;border:1px solid #e0e3e7;border-radius:9px;margin:12px 0}.small{color:#5c6674;font-size:12px}.warning{border-left:3px solid #a34b24;padding:10px;background:#fffbf4}code{overflow-wrap:anywhere}.pill{display:inline-block;background:#eee;padding:2px 7px;border-radius:6px}</style><style id="staging-visual-marker">
@@ -6,7 +6,9 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 .staging-visual-marker{position:fixed;right:6px;bottom:6px;display:flex;align-items:center;gap:5px;background:rgba(138,75,8,.92);color:#fff7ed;border-radius:999px;padding:4px 7px;font-family:"Meiryo UI",Meiryo,sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.02em;z-index:2147483647;box-shadow:0 1px 3px rgba(0,0,0,.18);pointer-events:none}
 .staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
 </style>
+<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head><body>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
 <div class="staging-visual-marker" role="status">STAGING <small>80275b9</small></div>
 <main class="wrap"><a href="staging/index.html">← ステージングトップ</a><h1>サイト公開履歴・旧版復元</h1><p class="small">表示改修の公開版と、予想・結果などのデータ更新を別々に管理します。画面はステージング検証→承認→正式リリース、データ更新は従来の本番更新を継続します。</p>
 <section class="card"><h2>v1.00 <span class="pill">正式版（現行）</span></h2><p>10月12日改修前のサイト画面。復元対象はHTML/CSS/JSなど画面ファイルのみ。すでに固定された予想原本・結果・払戻・最新データの巻き戻しは禁止です。</p><p>復元スナップショットは次のリリース時にGitの不変タグとして固定します。</p></section>
