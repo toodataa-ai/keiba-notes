@@ -93,6 +93,7 @@ jobs:
               return {ok:true,status:200,json:async()=>data,text:async()=>data};
             };
             w.eval(read('docs/staging/race-course-geometry-v1.js'));
+            w.eval(read('docs/staging/race-lane-ai-v1.js'));
             const course=w.RaceCourseGeometry.get(entry.course_id);
             assert.ok(course,'official layout required');
             assert.equal(course.distance_m,entry.distance_m);
@@ -118,7 +119,6 @@ jobs:
             const bendPos=course.segments.find(x=>x.kind==='turn').from+2;
             assert.ok(w.RaceCourseGeometry.metrics(course,bendPos,7).pathStretch>
               w.RaceCourseGeometry.metrics(course,bendPos,0).pathStretch);
-            w.eval(read('docs/staging/race-lane-ai-v1.js'));
             w.eval(read('docs/staging/race-sim-engine.js'));
             w.eval(read('docs/staging/race-simulator.js'));
             await new Promise(resolve=>setTimeout(resolve,80));
