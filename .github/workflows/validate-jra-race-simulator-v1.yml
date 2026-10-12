@@ -150,7 +150,12 @@ jobs:
             const a=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
             const b=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
             const c=engine.create(source,{seed:56,pace:'H',bias:'outer'});
-            for(let n=0;n<1300;n++){a.step(.05);b.step(.05);c.step(.05)}
+            for(let n=0;n<5000;n++){
+              if(!a.state.finished)a.step(.05);
+              if(!b.state.finished)b.step(.05);
+              if(!c.state.finished)c.step(.05);
+            }
+            assert.ok(a.state.firstFinishTime>70 && a.state.firstFinishTime<175,'race duration physical plausibility');
             assert(a.state.finished&&b.state.finished&&c.state.finished);
             assert.deepEqual(a.standings().map(x=>[x.number,x.finishTime]),b.standings().map(x=>[x.number,x.finishTime]));
             assert.notDeepEqual(a.state.horses.map(x=>x.lane),c.state.horses.map(x=>x.lane));
