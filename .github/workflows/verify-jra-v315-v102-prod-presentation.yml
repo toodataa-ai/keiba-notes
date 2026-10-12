@@ -49,9 +49,9 @@ jobs:
                 'src="../../assets/visitor-counter.js','src="../assets/visitor-counter.js')
             expected_html=expected_html.replace('<html lang="ja" data-stage="preview">','<html lang="ja">')
             expected_html=expected_html.replace(
-                '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\n','')
+                '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\\n','')
             expected_html=expected_html.replace(
-                '<body>\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
+                '<body>\\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
             # The approved v1.03 staging and production both order horse pages by
             # ◎○▲△×. The approved v1.03 production PDF must exactly match the proven stage PDF.
             # Verify identical purchase front, per-horse body, footer and coverage
