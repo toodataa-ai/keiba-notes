@@ -80,7 +80,7 @@
       <article class="phase done"><span class="phase-label">正式STEP1本線 / v3.13</span><h3>能力評価は印を固定したまま</h3><p>①〜⑨・印・推定確率をオッズから分離。v3.13では条件つきの単勝金額調整も正式化。ただし購入方式の後続版がその全機能を無条件に併用するわけではありません。</p></article>
       <article class="phase done"><span class="phase-label">実行補助 / v3.14</span><h3>公式情報と発売状態の監査</h3><p>開催有無、JRA出走情報、発売前の券種、ネットワーク・原本不足を区別する実行補助。根拠が欠ける場合は価格や出走馬情報を捏造せず未完了とします。</p></article>
       <article class="phase done"><span class="phase-label">現在の正式購入方式 / v3.15</span><h3>通常最大3操作＋中穴・大穴</h3><p>v3.13のSTEP1評価を保持し、STEP2購入を通常最大3操作、中穴・大穴はそれぞれ別枠で最大1操作に整理。合計予算上限6,000円。オッズ鮮度・全組み合わせ・金額・証跡を確認。</p></article>
-      <article class="phase now"><span class="phase-label">ステージング / 承認前</span><h3>全頭診断を印の順へ並べ替え</h3><p>印・評価・馬券を変えず、HTML・PDFの全頭診断を◎→○→▲→△→×順へ変更する候補。1頭1ページと評価色は維持。本番適用には別途承認が必要。</p></article>
+      <article class="phase now"><span class="phase-label">正式採用 / v1.03</span><h3>全頭診断を印の順へ並べ替え</h3><p>印・評価・馬券を変えず、HTML・PDFの全頭診断を◎→○→▲→△→×順へ変更する候補。1頭1ページと評価色は維持。v1.03で本番採用済み。</p></article>
     </div>
     <div class="callout"><b>最新方式の読み方：</b><strong>評価の本線v3.13／実行補助v3.14／正式購入v3.15</strong>はそれぞれ担当範囲が異なります。版番号が大きいものへ評価軸まで置換されたわけではありません。<a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/data/jra_purchase_command_policy_v315.json">現行の購入ポリシー</a>を正本として区別します。</div>
   </section>
@@ -229,7 +229,7 @@
 
   <section class="chapter anchor" id="output">
     <div class="chapter-head"><div class="chapter-no">13</div><div><h2>分析が正しくても、読めなければ品質不足</h2><p class="chapter-lead">HTML/PDFの可読性・完全性・検品も、予想プロセスの一部として固定します。</p></div></div>
-    <p>現行の正式レポートではA4縦・1頭1ページ、①〜⑨の日本語評価と根拠、A+〜Cの従来色を維持します。印順の全頭診断は現在ステージング検証中で、承認前の本番ページ順とは区別します。馬場確率・隊列は取得できた根拠と未取得事項を混同しません。要約版への意図しない縮退、文字の過度な縮小、PDF化による崩れを防ぎ、全ページ画像検品まで含めて「成果物が完成した」とみなします。</p>
+    <p>現行の正式レポートではA4縦・1頭1ページ、①〜⑨の日本語評価と根拠、A+〜Cの従来色を維持します。印順の全頭診断はv1.03で本番にも採用し、ステージングと同じ並び順を維持します。馬場確率・隊列は取得できた根拠と未取得事項を混同しません。要約版への意図しない縮退、文字の過度な縮小、PDF化による崩れを防ぎ、全ページ画像検品まで含めて「成果物が完成した」とみなします。</p>
     <div class="callout"><b>今後の可視化：</b>予想PDFだけでなく、サイト側でも「どのモデルを使ったか」「そのモデルはValidatedかPilotか」「どのデータが不足しているか」「どの改善が採用／棄却されたか」を追える状態を広げます。</div>
   </section>
 
