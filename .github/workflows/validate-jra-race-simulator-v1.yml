@@ -58,9 +58,9 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.18' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-18' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.19' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261013-19' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-course-geometry-v1.js?v=20261013-19' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           html=Path('docs/staging/race-simulator.html').read_text()
@@ -74,12 +74,13 @@ jobs:
           assert 'race-umapot-overlay-v1.js?v=20261012-1' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261012-18' in html
-          assert 'race-sim-engine.js?v=20261012-18' in html
-          assert 'race-simulator.js?v=20261012-18' in html
+          assert 'race-sim-engine.js?v=20261013-19' in html
+          assert 'race-simulator.js?v=20261013-19' in html
           assert 'value="auto" selected' in html
           assert 'id="paceDynamics"' in html
           assert 'race-ability-model-v1.js?v=20261012-18' in html and 'id="abilityInfo"' in html
-          assert 'race-umapot-overlay-v1.js?v=20261012-15' in html
+          assert 'ゴール前125mから実況はゴール板固定カメラ' in html
+          assert 'race-umapot-overlay-v1.js?v=20261013-19' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
           assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html
@@ -88,7 +89,7 @@ jobs:
           assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
-          assert 'race-sim-engine.js?v=20261012-18' in html
+          assert 'race-sim-engine.js?v=20261013-19' in html
           assert 'race-lane-ai-v1.js?v=20261012-14' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
@@ -594,6 +595,32 @@ jobs:
             assert.ok(turnOneSnapshot.inwardCount>=2,'several horses should choose an inside route');
             assert.ok(a.state.firstFinishTime>70 && a.state.firstFinishTime<175,'race duration physical plausibility');
             assert(a.state.finished&&b.state.finished&&c.state.finished);
+            for(const sample of [a,b,c]){
+              assert.equal(sample.state.displayFinished,true);
+              assert.ok(sample.state.allCrossedAt!==null,'every horse must actually finish');
+              assert.ok(sample.state.horses.every(h=>h.finished&&h.finishTime!==null&&
+                h.d===entry.distance_m&&h.displayD>=entry.distance_m+31.999),
+                'all runners complete 32m visual runoff');
+            }
+            const proof=engine.create(source,{seed:18,pace:'M',bias:'neutral'});
+            while(proof.state.firstFinishTime===null&&!proof.state.finished)proof.step(.05);
+            assert.equal(proof.state.goalCamera,true);
+            assert.equal(proof.state.finished,false,'not complete at first finish');
+            const firstCrossed=proof.state.horses.find(h=>h.finished);
+            assert.ok(firstCrossed);
+            const fixed=firstCrossed.finishTime;
+            for(let i=0;i<70;i++)proof.step(.05);
+            assert.equal(firstCrossed.finishTime,fixed,'finish time immutable');
+            assert.ok(firstCrossed.displayD>entry.distance_m);
+            assert.equal(typeof w.RaceSimGoalView.drawPost,'function');
+            const before=w.RaceSimGoalView.position(entry.distance_m-1,2,entry.distance_m,1000,470,8);
+            const after=w.RaceSimGoalView.position(entry.distance_m+1,2,entry.distance_m,1000,470,8);
+            assert.ok(before.x<700&&after.x>700&&before.y===after.y,
+              'straight horizontal finish and actual line crossing');
+            assert.notEqual(w.RaceCourseGeometry.point(course,entry.distance_m+32,2).x,
+              w.RaceCourseGeometry.point(course,entry.distance_m,2).x);
+            assert.notEqual(w.RaceUmapotOverlay.point(course,entry.distance_m+32,2).x,
+              w.RaceUmapotOverlay.point(course,entry.distance_m,2).x);
             assert.deepEqual(a.standings().map(x=>[x.number,x.finishTime]),b.standings().map(x=>[x.number,x.finishTime]));
             assert.notDeepEqual(a.state.horses.map(x=>x.lane),c.state.horses.map(x=>x.lane));
             assert.equal(new Set(a.state.horses.map(x=>x.number)).size,entry.field_size);
@@ -633,6 +660,8 @@ jobs:
             docs/staging/race-course-geometry-v1.js
             docs/staging/race-lane-ai-v1.js
             docs/staging/race-runner-style-v1.js
+            docs/staging/race-ability-model-v1.js
+            docs/staging/race-umapot-overlay-v1.js
             docs/staging/race-sim-manifest-v1.json
             docs/staging/stage-week-preview.js
             docs/staging/index.html
@@ -647,7 +676,7 @@ jobs:
               fi
             done
             if [[ "$ok" == 1 ]];then
-              echo "PASS_SIM_TEN_PUBLIC_STAGE_ASSET_BYTE_MATCH"
+              echo "PASS_SIM_TWELVE_PUBLIC_STAGE_ASSET_BYTE_MATCH"
               exit 0
             fi
             sleep 10
