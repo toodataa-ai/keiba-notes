@@ -72,6 +72,45 @@ jobs:
             assert actual==sha,('PROD_CONTENT_CHANGED',p,actual)
           print('PASS_JRA_STAGE_ALL_PAGES_MARKED_INPAGE_DIAGNOSIS_AND_IMMUTABLE_PRODUCTION')
           PY
+      - name: Browser-DOM smoke test for stage card open, close, PDF and dynamically inserted cards
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --ignore-scripts jsdom@26 >/dev/null
+          node <<'JS'
+          const assert=require('node:assert/strict');
+          const fs=require('node:fs');
+          const {JSDOM}=require('jsdom');
+          (async()=>{
+            const html='<html><body><div id="weekPredictions"></div></body></html>';
+            const dom=new JSDOM(html,{url:'https://toodataa-ai.github.io/keiba-notes/staging/this-week.html',runScripts:'outside-only'});
+            const {window}=dom;
+            window.HTMLElement.prototype.scrollIntoView=function(){};
+            window.eval(fs.readFileSync('docs/staging/stage-week-preview.js','utf8'));
+            const host=window.document.getElementById('weekPredictions');
+            const tokyo='reports/2026-10-12-october-stakes-v315-readable-v102.html';
+            const pdf='pdfs/2026-10-12-october-stakes-v315-readable-v102.pdf';
+            host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="'+tokyo+'">AI予想詳細を見る</a><a class="btn secondary" href="'+pdf+'">PDF</a></div></article>';
+            await Promise.resolve();
+            let a=host.querySelector('a.btn');
+            let panel=host.querySelector('.stage-inline-report');
+            assert.ok(panel && panel.hidden);
+            assert.equal(a.getAttribute('href'),'staging/jra-v315-20261012/tokyo11.html');
+            assert.equal(host.querySelector('a.secondary').getAttribute('href'),'staging/jra-v315-20261012/tokyo11.pdf');
+            let e=new window.MouseEvent('click',{bubbles:true,cancelable:true,button:0});
+            a.dispatchEvent(e);
+            assert.ok(e.defaultPrevented && !panel.hidden,'click must open inline, not navigate');
+            assert.equal(panel.querySelector('iframe').getAttribute('src'),'staging/jra-v315-20261012/tokyo11.html');
+            assert.equal(a.getAttribute('aria-expanded'),'true');
+            a.dispatchEvent(new window.MouseEvent('click',{bubbles:true,cancelable:true,button:0}));
+            assert.equal(panel.hidden,true,'repeat click closes in-place report');
+            // Dynamically updated cards must be enhanced without a page reload.
+            host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="reports/2026-10-12-swan-stakes-v315-readable-v102.html">AI予想詳細を見る</a></div></article>';
+            await Promise.resolve();
+            assert.equal(host.querySelector('a.btn').getAttribute('href'),'staging/jra-v315-20261012/kyoto11.html');
+            assert.ok(host.querySelector('.stage-inline-report'));
+            console.log('PASS_STAGE_INPAGE_OPEN_CLOSE_LAZY_LOAD_PDF_AND_DYNAMIC_RACE_CARD');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
       - name: Verify every staging HTML and preview CSS/JS against public GitHub Pages
         run: |
           set -euo pipefail
