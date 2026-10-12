@@ -45,7 +45,7 @@
    <div class="race-distance"><span id="raceMeta">レースを準備中…</span><strong id="remaining">— m</strong></div>
   </div>
   <div class="track-stage">
-   <canvas id="raceCanvas" width="1000" height="470" role="img" aria-label="東京または京都の走路を上空から見たレース実況。馬がコースのカーブ方向に体を向け、空いている内側の進路を選ぶアニメーション"></canvas>
+   <canvas id="raceCanvas" width="1000" height="470" role="img" aria-label="馬番の数字そのものが東京または京都の走路に沿って移動する実況。番号の中心が出走馬のシミュレーション位置を表します"></canvas>
    <div class="stage-top"><span id="stageCaption">発走前</span><span id="elapsed">00:00</span></div>
    <div class="stage-bottom"><span id="moment">スタートを押すとレースが始まります</span><span id="lap">0%</span></div>
   </div>
@@ -72,18 +72,18 @@
  </section>
  <section class="notes panel">
   <h2>このシミュレーションで分かること・分からないこと</h2>
-  <p>実況ビューでは画面内のすべての馬に、白文字の馬番バッジを常時表示します。馬群が密集するときはバッジをずらし、線でそれぞれの馬と結びます。先頭馬と注目馬は枠線で区別できます。</p>
-  <p>実況カメラは馬群を大きく映す近距離表示が標準です。広く見たいときは「馬群を広く」「コース全体」に切り替えられます。スマートフォンでは縦長の実況画面で馬を見やすく表示します。</p>
+  <p>実況ビューは馬の絵を使わず、数字そのものが走路上を走ります。番号の中心が馬の位置で、引き出し線や移動したラベルはありません。注目馬は金色で表示します。密集時は正確な位置を優先するため、数字が一部重なる場合があります。</p>
+  <p>実況カメラは番号の走る様子を近距離で追います。「馬群を広く」「コース全体」にも切り替えられます。スマートフォンでは番号の間隔を見やすくするため追走の倍率を上げています。</p>
   <p>出走馬名・馬番・印・STEP1の評価（未校正の勝率を含む）は、既に保存済みの予想レポートから読み取ります。馬の向きは走路の接線と横移動から計算します。通常は内側の短い進路を優先し、前後の安全間隔が足りなければ進路変更せず、状況によっては外からかわす動きを表現します。</p>
   <p><strong>ここでの到達順や騎乗判断は公式予想やレース結果ではありません。</strong>内寄りの進路選択、馬同士の間隔・進路の譲り合いも仮定した簡易モデルです。接触や落馬を扱う実際の競走シミュレータではありません。JRAが公表する直線距離・一周距離・高低差・内外のコース構造を区別して参照し、コースごとのスタート位置と走路を描いています。一方、カーブのベジェ座標、勾配の途中区間、騎手の進路判断・馬ごとの実測ラップは公開された測量原本から復元していない近似・仮定です。同じシード・設定なら再現可能ですが、統計的な勝率評価や正式買い目の変更には使いません。</p>
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.5 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.6 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261012-3"></script>
 <script src="race-lane-ai-v1.js?v=20261012-3"></script>
 <script src="race-sim-engine.js?v=20261012-3"></script>
-<script src="race-simulator.js?v=20261012-5"></script>
+<script src="race-simulator.js?v=20261012-6"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>

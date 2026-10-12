@@ -1,4 +1,4 @@
-/* Staging retro racing simulator v0.5. Camera, all-runner number badges; course physics unchanged. */
+/* Staging race simulator v0.6. Moving horse numbers ARE the runner positions; physics unchanged. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -15,7 +15,7 @@ let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0
 // A race-view preset changes how much of the track is visible. The horse sprite
 // also gets its OWN pixel target: previously /zoom cancelled magnification,
 // leaving horses roughly 40px across even with a closer track camera.
-const CAMERA_ZOOM=Object.freeze({follow:7.1,followWide:4.15,overview:1.72});
+const CAMERA_ZOOM=Object.freeze({follow:13.8,followWide:6.2,overview:1.72});
 function viewCamera(mode,screenWidth,canvasWidth){
  const chosen=Object.prototype.hasOwnProperty.call(CAMERA_ZOOM,mode)?mode:'follow';
  const width=Math.max(1,Number(screenWidth)||Number(canvasWidth)||1000);
@@ -23,7 +23,7 @@ function viewCamera(mode,screenWidth,canvasWidth){
  const narrow=width<640;
  const horsePx=chosen==='overview'?(narrow?22:35):
                chosen==='followWide'?(narrow?38:62):(narrow?51:88);
- const zoom=CAMERA_ZOOM[chosen];
+ const zoom=CAMERA_ZOOM[chosen]*(narrow&&chosen==='follow'?2.5:1);
  // The source sprite measures ~45 local x pixels nose to tail.
  const spriteScale=horsePx*backing/(width*45*zoom);
  return Object.freeze({mode:chosen,zoom,spriteScale,horsePx});
@@ -241,136 +241,48 @@ function horseSprite(ctx,x,y,h,time,selected){
  }
  ctx.restore();
 }
-/* v0.3: north-up course camera. Every runner points along the actual
-   Bezier tangent, plus small yaw when changing lanes. Former fixed right-
-   facing side sprite is retained only for historical v0.2 compatibility. */
-function traceCommands(ctx,parts){
- ctx.beginPath();
- for(const op of parts){
-  if(op[0]==='M')ctx.moveTo(op[1],op[2]);
-  else if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
- }
-}
-function traceRace(ctx,course){
- ctx.beginPath();ctx.moveTo(...course.segments[0].p0);
- for(const segment of course.segments){
-  ctx.bezierCurveTo(...segment.p1,...segment.p2,...segment.p3);
- }
-}
-function strokePath(ctx,width,color){
- ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';
- ctx.lineJoin='round';ctx.stroke();
-}
-function drawTopHorse(ctx,horse,world,angle,spriteScale,simTime,selected){
- // The draw scale is calculated from the ACTUAL visible CSS canvas width.
- // A nearby horse now occupies ~88px desktop / 51px mobile (nose to tail)
- // rather than staying an unreadable ~40px / ~15px at every zoom setting.
- // Keep course tangent rotation and movement unchanged.
- const scale=spriteScale;
+/* A number marker IS the runner; its centre never leaves simulated track
+   coordinates. No horse sprite, floating label, offset, leader line or tether. */
+function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false){
+ if(!Number.isInteger(number)||number<1||!Number.isFinite(x)||!Number.isFinite(y))
+  throw Error('SIM_NUMBER_POSITION_INVALID');
+ const radius=(focused?15.5:13.5)*scale;
  ctx.save();
- ctx.translate(world.x,world.y);
- ctx.rotate(angle);
- ctx.scale(scale,scale);
- const gait=Math.sin(simTime*15+horse.phase);
- const coat=baseColor[(horse.number-1)%baseColor.length];
- ctx.fillStyle='rgba(6,18,10,.26)';
- ctx.beginPath();ctx.ellipse(0,4,17,9,0,0,2*Math.PI);ctx.fill();
- if(selected){ctx.strokeStyle='#fcecb8';ctx.lineWidth=2.2;
-   ctx.strokeRect(-23,-16,49,33);}
- // Four galloping legs, changing silhouette with the replay clock.
- const wig=gait*4;
- rect(ctx,-9,-9+wig*.32,5,6,'#503b32');
- rect(ctx,-9,4-wig*.32,5,6,'#503b32');
- rect(ctx,7,-11-wig*.32,5,7,'#594538');
- rect(ctx,7,4+wig*.32,5,7,'#594538');
- // Body, tail, neck, muzzle and ears form a readable top-down horse.
- rect(ctx,-14,-6,25,12,'#806047');
- rect(ctx,-18,-4,8,7,'#4a3228');
- rect(ctx,7,-4,11,9,'#8e7057');
- rect(ctx,16,-4,10,8,'#a58a67');
- rect(ctx,23,-3,4,2,'#302a27');
- rect(ctx,16,-9,3,6,'#51392f');
- rect(ctx,16,5,3,5,'#51392f');
- // Saddle cloth is the same identifying color as the standings.
- rect(ctx,-8,-7,13,14,coat);
- rect(ctx,-4,-6,7,12,'#f7f4e9');
- // Rider and helmet; horse heads towards +x before course rotation.
- ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(-2,0,5.4,5,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#f4d8b2';ctx.beginPath();ctx.arc(2,0,2.4,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#202c38';ctx.beginPath();ctx.arc(3,0,2.7,0,Math.PI*2);ctx.fill();
+ ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
+ ctx.fillStyle=focused?'#f1cf64':leading?'#f0ead7':'#172334';ctx.fill();
+ ctx.lineWidth=(focused?3.4:2.4)*scale;
+ ctx.strokeStyle=focused?'#fff9d6':'#ffffff';ctx.stroke();
+ ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.fillStyle=focused||leading?'#152339':'#ffffff';
+ ctx.font='900 '+(number>9?16:18)*scale+'px Arial, sans-serif';
+ ctx.fillText(String(number),x,y+.4*scale);
  ctx.restore();
+ return {number,x,y};
 }
-/* Readable saddle numbers are SCREEN-SPACE badges rather than tiny words
-   rotated with the horse. They remain upright and the same readable size
-   on desktop and phones, at every camera zoom. */
-function numberBadgeLayout(points,width,height,radius,topInset=83,bottomInset=42){
- const occupied=[];
- const output=[];
- const priority=points.slice().sort((a,b)=>Number(b.focused)-Number(a.focused)||
-   Number(b.leading)-Number(a.leading)||a.number-b.number);
- for(const p of priority){
-   if(p.x<-10 || p.x>width+10 || p.y<-10 || p.y>height+10)continue;
-   const offsets=[];
-   const base=radius+17;
-   for(const reach of [base,base+radius*1.7,base+radius*3.6,base+radius*5.8,base+radius*8]){
-     // Above and alongside horses first; fall back to more distant callouts
-     // when the starting 18-runner pack is closely bunched.
-     for(const a of [-Math.PI/2,-Math.PI/4,-3*Math.PI/4,0,Math.PI,Math.PI/4,
-       3*Math.PI/4,Math.PI/2,Math.PI/6,5*Math.PI/6,-Math.PI/6,-5*Math.PI/6]){
-       offsets.push([Math.cos(a)*reach,Math.sin(a)*reach]);
-     }
-   }
-   let best=null;
-   for(const [ox,oy] of offsets){
-     const x=p.x+ox,y=p.y+oy;
-     if(x-radius<5||x+radius>width-5||
-       y-radius<topInset||y+radius>height-bottomInset)continue;
-     if(occupied.some(o=>Math.hypot(o.x-x,o.y-y)<radius*2+5))continue;
-     best={x,y};break;
-   }
-   if(!best){
-     // Dense pack or small viewport: search a deterministic no-overlap grid.
-     const step=radius*2+6,rows=Math.floor((height-topInset-bottomInset)/step),
-       cols=Math.floor((width-10)/step);
-     let value=Infinity;
-     for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){
-       const x=5+radius+j*step,y=topInset+radius+i*step;
-       if(occupied.some(o=>Math.hypot(o.x-x,o.y-y)<radius*2+5))continue;
-       const dist=(p.x-x)**2+(p.y-y)**2;
-       if(dist<value){value=dist;best={x,y}}
-     }
-   }
-   if(best){occupied.push(best);output.push({...p,...best,anchorX:p.x,anchorY:p.y})}
- }
- return output;
+function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo){
+ if(!Array.isArray(horses))throw Error('SIM_HORSES_MISSING');
+ return horses.map(h=>{
+  const p=RaceCourseGeometry.point(profile,h.d,h.lane);
+  return {number:h.number,x:width*.5+zoom*(p.x-origin.x),
+    y:height*.52+zoom*(p.y-origin.y),
+    focused:h.number===focusedNo,leading:h.number===leadingNo};
+ }).sort((x,y)=>Number(x.focused)-Number(y.focused)||
+  Number(x.leading)-Number(y.leading)||x.number-y.number);
 }
-function drawRaceNumbers(ctx,visible,canvasWidth,canvasHeight,renderedWidth){
- const toCanvas=canvasWidth/Math.max(1,renderedWidth);
- const radius=(renderedWidth<640?14.5:15)*toCanvas;
- const positions=numberBadgeLayout(visible,canvasWidth,canvasHeight,radius,
-   80,40);
- // Connector lines first; horse and label can still be linked visually
- // even when labels have been moved to avoid covering another number.
- ctx.save();
- for(const p of positions){
-   ctx.strokeStyle='rgba(5,17,24,.86)';ctx.lineWidth=2*toCanvas;
-   ctx.beginPath();ctx.moveTo(p.anchorX,p.anchorY);ctx.lineTo(p.x,p.y);ctx.stroke();
+function drawRaceNumbers(ctx,points,width,height,renderedWidth){
+ const scale=width/Math.max(1,renderedWidth),visible=[];
+ for(const p of points){
+  const radius=(p.focused?15.5:13.5)*scale;
+  // A number that is out of view stays out of view: never detach it
+  // from the actual moving horse coordinates.
+  if(p.x+radius<0||p.x-radius>width||p.y+radius<0||p.y-radius>height)continue;
+  visible.push(raceNumberMarker(ctx,p.number,p.x,p.y,scale,p.focused,p.leading));
  }
- for(const p of positions){
-   ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);
-   ctx.fillStyle='#111f34';ctx.fill();
-   ctx.lineWidth=(p.focused?4:3)*toCanvas;
-   ctx.strokeStyle=p.focused?'#ffda69':p.leading?'#fbeab9':'#ffffff';
-   ctx.stroke();
-   ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.font='900 '+(renderedWidth<640?16:17)*toCanvas+'px Arial, sans-serif';
-   ctx.fillStyle='#fff';
-   ctx.fillText(String(p.number),p.x,p.y+0.5*toCanvas);
- }
- ctx.restore();
- return positions;
+ return visible;
 }
-window.RaceSimNumbers=Object.freeze({layout:numberBadgeLayout,draw:drawRaceNumbers});
+window.RaceSimNumbers=Object.freeze({
+ marker:raceNumberMarker,project:projectRaceNumbers,draw:drawRaceNumbers
+});
 function drawRace(){
  if(!sim||!race){drawIdle('出走馬の原本を確認中…');return}
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
@@ -439,45 +351,17 @@ function drawRace(){
      strokePath(ctx,horse===target?1.75:1.2,horse===target?'#fff0ad':'#f0e6c3');
    }
  }
- // Correct overlap ordering is part of the broadcast effect: a selected
- // horse renders last, over the back marker of other horses when clustered.
- const group=state.horses.slice().sort((a,b)=>a.d-b.d||a.lane-b.lane);
- group.sort((a,b)=>(a===target?1:0)-(b===target?1:0)||a.d-b.d||a.number-b.number);
- for(const horse of group){
-   const pos=RaceCourseGeometry.point(profile,horse.d,horse.lane);
-   const angle=RaceCourseGeometry.heading(profile,horse.d,horse.lane,horse.laneVelocity);
-   drawTopHorse(ctx,horse,pos,angle,camera.spriteScale*(horse===target?1.07:1),state.t,horse===target);
- }
  ctx.restore();
- // Screen-anchored horse-number layer: draw LAST, unrotated, with readable
- // upright numbers for EVERY horse visible in the camera (not just ◎/leader).
- const numberPoints=state.horses.map(horse=>{
-    const pos=RaceCourseGeometry.point(profile,horse.d,horse.lane);
-    return {number:horse.number,
-      x:w*.50+zoom*(pos.x-origin.x),
-      y:h*.52+zoom*(pos.y-origin.y),
-      focused:horse===target,
-      leading:horse.number===state.leadingNo};
- });
- drawRaceNumbers(ctx,numberPoints,w,h,renderedWidth);
- // Only one larger horse name for the tracked runner, away from number badges.
- // Other runners remain identifiable via their independent number badges.
- ctx.save();
- ctx.font='bold 15px Meiryo';ctx.textAlign='left';ctx.textBaseline='middle';
- const focusedName=target.mark+' '+target.number+'番 '+target.name;
- const barWidth=Math.min(w-24,Math.max(130,focusedName.length*16+25));
- ctx.fillStyle='rgba(12,27,19,.88)';
- ctx.fillRect(12,h-80,barWidth,28);
- ctx.fillStyle='#fff7d8';
- ctx.fillText(focusedName,22,h-65);
- ctx.restore();
+ const points=projectRaceNumbers(state.horses,profile,origin,zoom,w,h,
+   target.number,state.leadingNo);
+ drawRaceNumbers(ctx,points,w,h,renderedWidth);
  // Television overlays are static on screen, not rotated with the course.
  rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
  ctx.font='bold 17px Meiryo';ctx.textAlign='left';ctx.fillStyle='#f7f6ee';
- ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':mode==='followWide'?'馬群を広く':'馬群に接近'),23,56);
+ ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':mode==='followWide'?'馬群を広く':'馬番を追走'),23,56);
  rect(ctx,773,34,213,33,'rgba(13,27,28,.84)');
  ctx.font='bold 13px Meiryo';ctx.fillStyle='#f1e3b0';
- ctx.fillText(state.finished?'PHOTO FINISH':'実際の走路方向に旋回',788,55);
+ ctx.fillText(state.finished?'PHOTO FINISH':'馬番＝走行位置',788,55);
  ctx.textAlign='start';
  drawCourse();
 }
