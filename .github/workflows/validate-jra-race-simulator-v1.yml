@@ -55,8 +55,9 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.10' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-10' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.11' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-course-geometry-v1.js?v=20261012-11' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -106,6 +107,30 @@ jobs:
             assert.equal(course.distance_m,entry.distance_m);
             assert.equal(course.turn,entry.turn);
             assert.ok(Math.abs(course.segments.at(-1).to-course.segments.at(-1).from-course.straight_m)<1e-7);
+            // Kyoto geometry is now re-traced against the JRA plane map:
+            // uphill-tilted backstretch, asymmetric outer right-hand bend,
+            // and a separate 3rd/4th inner bypass joined at the fourth exit.
+            if(entry.venue==='京都'){
+              assert.equal(course.segments.length,5);
+              const start=course.segments[0],last=course.segments.at(-1);
+              assert.ok(start.p3[1]+15<start.p0[1],
+                'Kyoto backstretch must slope upward to the third corner');
+              assert.ok(course.inner_turn?.length===3,
+                'Kyoto inner 3rd/4th path must branch and merge');
+              assert.deepEqual(Array.from(course.inner_turn[0].slice(1)),Array.from(start.p3),
+                'inner course branches at same upper third-corner location');
+              assert.deepEqual(Array.from(course.inner_turn.at(-1).slice(-2)),Array.from(last.p0),
+                'inner course merges before home straight');
+              const outerX=Math.max(...course.segments.slice(1,4)
+                .flatMap(s=>[s.p0[0],s.p1[0],s.p2[0],s.p3[0]]));
+              const insideX=Math.max(...course.inner_turn
+                .flatMap(seg=>seg.slice(1).filter((_,idx)=>idx%2===0)));
+              assert.ok(outerX-insideX>25,
+                'outside 3rd-4th corners must run noticeably wider than inner course');
+              assert.ok(last.p3[0]<last.p0[0] && Math.abs(last.p3[1]-last.p0[1])<1e-7,
+                'Kyoto finish is on the flat lower home straight');
+              console.log('PASS_KYOTO_COURSE_PLANE_RIGHT_OUTER_INNER_SPLIT');
+            }
             const p0=w.RaceCourseGeometry.point(course,0,0);
             const p1=w.RaceCourseGeometry.point(course,course.distance_m,0);
             assert.ok(Math.hypot(p0.x-p1.x,p0.y-p1.y)>20);
