@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "release": "v3.13",
+  "scope": "current_e2e_orchestration_supersession_only",
+  "historical_anchor_commit": "34a4d82683e2e7115538d70d463b46f22f68277e",
+  "ledger_path": "e2e_validation/experience_archived_gaps_v1.json",
+  "ledger_blob_sha": "7573c679c32f1d02ed944580c13d08fb75d3a8dc",
+  "superseded_components": [
+    {
+      "path": ".github/workflows/e2e-validation.yml",
+      "original_blob_sha": "072a4e8e8965954ba3ad259694326a7739ec3398",
+      "current_blob_sha": "e6e1286b3043db1931dcdbf5a9bbc12eb4210c8d"
+    },
+    {
+      "path": "e2e_validation/validate_experience_history_v312.py",
+      "original_blob_sha": "a53d4e602ed70e697530e8970bb35efeeccaa80a",
+      "current_blob_sha": "bf6c58cb92658042ffaf3f72ebaf10409ea952a4"
+    }
+  ],
+  "safeguards": {
+    "no_legacy_manifest_mutation": true,
+    "old_blob_sha_retention": true,
+    "old_workflow_sources_preserved_in_git": true,
+    "formal_grade_a_unchanged": true,
+    "shadow_promotion_blocked": true,
+    "only_current_ci_behavior_changed": true,
+    "unknown_shadow_errors_fail": true
+  }
+}
