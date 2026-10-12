@@ -1,0 +1,77 @@
+name: Independently verify JRA 2026-10-12 latest two races and v1.01 release history
+on:
+  push:
+    branches: [audit/jra-ui-v101-live-20261012]
+    paths: ['.github/workflows/audit-jra-today-published-v101.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - name: Verify exactly one current entry per JRA main race, new prereace proof, and separate UI history
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          races=json.loads(Path('docs/data/races.json').read_text())['races']
+          j=json.loads(Path('docs/data/jra_publication_revision_log.json').read_text())
+          released=json.loads(Path('docs/data/production-releases.json').read_text())
+          assert released['current_public_version']=='1.01'
+          assert released['policy']['ui_release_requires_explicit_user_approval']
+          assert not released['policy']['data_release_requires_user_approval']
+          expected={
+            '2026-10-12-october-stakes':('d5f9d75334d0b8612d5a37e2f2710fc38d76bcff','38185599767-attempt2'),
+            '2026-10-12-swan-stakes':('5ce56b3fbd2480cb21727a0a28a877d54a9cb536','38185612987-attempt1')}
+          for rid,(proof,run) in expected.items():
+            entry=[x for x in races if x['id']==rid]
+            assert len(entry)==1 and entry[0]['scope']=='jra-main' and entry[0]['status']=='predicted'
+            assert entry[0]['proof_commit']==proof
+            assert run in entry[0]['report'] and run in entry[0]['pdf']
+            assert entry[0]['total_stake_yen']<=6000
+            assert len(entry[0]['final_bets'])>0
+            assert any(x['race_id']==rid and x['new_canonical']['proof_commit']==proof for x in j['revisions'])
+            for x in ('e2e_prediction','report','pdf'):
+              p=entry[0][x] if x=='e2e_prediction' else 'docs/'+entry[0][x]
+              assert Path(p).exists(),(rid,p)
+            subprocess.run(['git','cat-file','-e',proof+'^{commit}'],check=True)
+          for old in [
+            'e2e_validation/predictions/2026-10-12-october-stakes/v3.13-run38177939515-attempt2.json',
+            'e2e_validation/predictions/2026-10-12-swan-stakes/v3.13-run38177942081-attempt2.json']:
+            assert Path(old).is_file(),'old sealed prediction missing '+old
+          assert Path('.github/production-releases.json').read_bytes()==Path('docs/data/production-releases.json').read_bytes()
+          print('PASS_BOTH_JRA_CURRENT_PREDICTIONS_PROOF_ARCHIVES_AND_UI_HISTORY')
+          PY
+      - name: Verify actual Pages response bytes equal exact currently committed data UI HTML and PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t RACE_ARTIFACTS < <(python3 - <<'PY'
+          import json
+          entries=json.load(open('docs/data/races.json'))['races']
+          for r in entries:
+            if r['id'] in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
+              print('docs/'+r['report']);print('docs/'+r['pdf'])
+          PY
+          )
+          [[ ${#RACE_ARTIFACTS[@]} -eq 4 ]]
+          for attempt in $(seq 1 36); do
+            ok=1
+            for path in docs/index.html docs/this-week.html docs/release-history.html docs/data/production-releases.json docs/data/races.json "${RACE_ARTIFACTS[@]}"; do
+              url="https://toodataa-ai.github.io/keiba-notes/${path#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra-audit-published-asset ||
+                 ! cmp -s "$path" /tmp/jra-audit-published-asset;then ok=0;break;fi
+            done
+            if [[ "$ok" -eq 1 ]];then
+              echo 'PASS_CURRENT_PRODUCTION_SITE_RELEASE_HISTORY_AND_BOTH_JRA_HTML_PDF_HTTP_EXACT'
+              exit 0
+            fi
+            sleep 12
+          done
+          echo '::error::One or more real HTTP responses differ from GitHub current canonical files'
+          exit 1
