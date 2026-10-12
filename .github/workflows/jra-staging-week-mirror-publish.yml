@@ -32,7 +32,8 @@ jobs:
           assert 'stagingJraReports' not in stage
           assert stage.count('class="staging-shell-marker"')==1
           assert stage.count('stage-week-preview.js')==1
-          assert stage.count('stage-week-preview.css')==1
+          assert stage.count('jra-inline-report.css')==1
+          assert 'jra-inline-report.js' not in stage
           assert 'data-stage="preview"' in stage
           assert 'stage-week-preview.js' not in prod
           assert 'noindex' not in prod

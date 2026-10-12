@@ -27,6 +27,8 @@ jobs:
           assert stage.count('class="staging-shell-marker"')==1
           assert stage.count('stage-week-preview.js')==1
           assert 'stage-week-preview.js' not in prod
+          assert 'jra-inline-report.js' in prod
+          assert 'jra-inline-report.js' not in stage
           assert 'id="weekPredictions"' in prod and 'id="weekPredictions"' in stage
           print('PASS_NO_STAGE_ONLY_UI_CONTROLS')
           PY
