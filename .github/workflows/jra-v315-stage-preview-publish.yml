@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          STAGE_SHA=49577948cac8951fa05e9a8bdc72c530260b34e4
+          STAGE_SHA=84819b91d0cb10133b6175c509dfca190ff19a87
           git fetch origin staging/jra-v315-report-readability-20261012
           test "$(git rev-parse FETCH_HEAD)" = "$STAGE_SHA" || { echo "::error::Unreviewed stage branch change";exit 1; }
           mkdir -p /tmp/jra-v315-readability-render
@@ -82,25 +82,18 @@ jobs:
             subprocess.run(['python3','/tmp/jra-v315-readability-render/jra-render-formal-3action-v315.py',
                 '--plan',str(planpath),'--source',str(sourcepath),
                 '--html',str(hp),'--pdf',str(pdf)],check=True)
-            # The preview alone gets an explicit unapproved/staging banner.
+            # Future formal production and staging use the exact same renderer/layout.
+            # The only HTML-only difference is an invisible noindex robots directive.
             h=hp.read_text()
             assert h.startswith('<!doctype html>') and 'overall_grade</strong>' not in h
-            h=h.replace('<head>','<head><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'
-                '<style>.stage-banner{position:sticky;top:0;z-index:100;background:#704119;color:#fff;padding:7px 10px;'
-                'font-size:11px;font-weight:700;text-align:center}@media print{.stage-banner{display:none}}</style>',1)
-            h=h.replace('<body>','<body><div class="stage-banner">STAGING ｜ 未承認・本番未反映 ｜ 原本と買い目は変更なし</div>',1)
-            hp.write_text(h)
-            # Label the preview PDF without regenerating or changing the source forecast.
+            assert 'name="viewport"' in h
+            hp.write_text(h.replace('<head>','<head><meta name="robots" content="noindex,nofollow">',1))
             with fitz.open(pdf) as document:
               expected=1+entry['field_size']
               assert len(document)==expected
-              for page in document:
-                page.insert_text((390,16),'STAGING - NOT LIVE',fontsize=8,fontname='helv',color=(.48,.24,.09))
-              document.save(str(pdf)+'.tmp',garbage=3,deflate=True)
-            Path(str(pdf)+'.tmp').replace(pdf)
-            with fitz.open(pdf) as document:
-              assert len(document)==expected
-              assert all('STAGING - NOT LIVE' in page.get_text() for page in document)
+              assert all('STAGING - NOT LIVE' not in page.get_text() for page in document)
+            assert 'stage-banner' not in hp.read_text()
+            # PDF remains byte-identical to future formal production renderer output.
             links.append((short,label,expected))
           page=['<!doctype html><html lang="ja"><head><meta charset="utf-8">',
             '<meta name="viewport" content="width=device-width, initial-scale=1">',
