@@ -53,8 +53,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.4' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-4' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.5' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-5' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -126,7 +126,30 @@ jobs:
             w.eval(read('docs/staging/race-sim-engine.js'));
             w.eval(read('docs/staging/race-simulator.js'));
             await new Promise(resolve=>setTimeout(resolve,80));
-            const closeCamera=w.RaceSimCamera.viewCamera('follow',1000,1000);
+            assert.ok(w.RaceSimNumbers,'number label rendering must be exported for independent QA');
+            const dense=Array.from({length:entry.field_size},(_,i)=>({
+              number:i+1,x:475+(i%6)*9,y:310+Math.floor(i/6)*13,
+              focused:i===2,leading:i===0
+            }));
+            const mobileRadius=14.5*1000/355;
+            const laidOut=w.RaceSimNumbers.layout(dense,1000,730,mobileRadius,80,40);
+            assert.equal(laidOut.length,entry.field_size,'all 18 dense runners must have a visible label');
+            for(let i=0;i<laidOut.length;i++){
+              const a=laidOut[i];
+              assert.ok(a.x>=mobileRadius+4&&a.x<=1000-mobileRadius-4,'label inside horizontal viewport');
+              assert.ok(a.y>=80+mobileRadius&&a.y<=730-40-mobileRadius,'label clear of HUD');
+              for(let j=0;j<i;j++)assert.ok(Math.hypot(a.x-laidOut[j].x,a.y-laidOut[j].y)>=mobileRadius*2+4.9,
+                'no overlapping number labels in dense horse pack');
+            }
+            const renderedNumbers=[];
+            const ctx=mockCanvas();
+            ctx.fillText=(value)=>{renderedNumbers.push(String(value))};
+            const badges=w.RaceSimNumbers.draw(ctx,dense,1000,730,355);
+            assert.equal(badges.length,entry.field_size);
+            assert.deepEqual(renderedNumbers.sort((a,b)=>+a- +b),dense.map(x=>String(x.number)));
+            assert.ok(w.RaceSimNumbers.layout(dense,1000,470,15,80,40).length===entry.field_size,
+              'desktop badges remain readable without overlap');
+                        const closeCamera=w.RaceSimCamera.viewCamera('follow',1000,1000);
             const wideCamera=w.RaceSimCamera.viewCamera('followWide',1000,1000);
             const fullCamera=w.RaceSimCamera.viewCamera('overview',1000,1000);
             assert.ok(closeCamera.zoom>wideCamera.zoom && wideCamera.zoom>fullCamera.zoom,
