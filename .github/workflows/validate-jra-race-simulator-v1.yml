@@ -53,8 +53,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.6' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261012-6' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.7' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261012-7' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
@@ -160,6 +160,36 @@ jobs:
               1000,470,355).length,0,'never relocate offscreen horse numbers');
             const center=w.RaceSimNumbers.marker(ctx,12,275,225,1,true,false);
             assert.equal(center.x,275);assert.equal(center.y,225);
+            // Regression for the specific user-observed problem: the leading
+            // horse fit while trailing horses vanished outside a mobile frame.
+            const spread=raw.map((h,i)=>({...h,d:540+i*24,lane:i%10}));
+            for(const simulatedWidth of [355,390,1000]){
+              const frame=w.RaceSimCamera.frameEntireField(spread,course,'follow',
+                1000,730,simulatedWidth);
+              const points=w.RaceSimNumbers.project(spread,course,frame.origin,
+                frame.zoom,1000,730,5,1,frame.anchor);
+              assert.equal(points.length,entry.field_size);
+              const radius=15.5*1000/simulatedWidth;
+              for(const p of points){
+                assert.ok(p.x>=radius&&p.x<=1000-radius,
+                  'last-place and leading number must be visible horizontally');
+                assert.ok(p.y>=radius+46&&p.y<=730-radius-58,
+                  'the entire horse pack must fit vertically clear of mobile HUD');
+              }
+              assert.ok(frame.zoom>0 && frame.zoom<=frame.maxZoom);
+            }
+            const laneConfig=w.RaceLaneAI.config(course);
+            const runner={number:99,d:500,lane:8,desiredLane:8,lastChange:-100,finished:false,blocked:false};
+            const metric=w.RaceCourseGeometry.metrics(course,500,runner.lane);
+            const inside=w.RaceLaneAI.plan(runner,[runner],laneConfig,metric,'neutral',35);
+            assert.equal(inside.mode,'inward','horse should prefer the clear shorter inside rail');
+            assert.equal(inside.lane,7);
+            const front={number:100,d:504,lane:3,finished:false};
+            const blocker={number:101,d:501,lane:2.1,finished:false};
+            const needingPass={number:99,d:500,lane:3,desiredLane:3,lastChange:-100,finished:false};
+            const outside=w.RaceLaneAI.plan(needingPass,[needingPass,front,blocker],
+              laneConfig,metric,'neutral',35);
+            assert.equal(outside?.mode,'outward','outside route only when inner is blocked');
             const closeCamera=w.RaceSimCamera.viewCamera('follow',1000,1000);
             const wideCamera=w.RaceSimCamera.viewCamera('followWide',1000,1000);
             const fullCamera=w.RaceSimCamera.viewCamera('overview',1000,1000);
