@@ -1,0 +1,8 @@
+/* Staging-only in-page report. Does not alter production layout outside expanded section. */
+.stage-inline-report{margin:12px 0 2px;border:1px solid #d9dfe8;border-radius:8px;overflow:hidden;background:#fff}
+.stage-inline-report[hidden]{display:none!important}
+.stage-inline-report-head{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;background:#f5f6f8;border-bottom:1px solid #d9dfe8;color:#3f4858;font:700 12px/1.35 "Meiryo UI",Meiryo,sans-serif}
+.stage-inline-close{flex:0 0 auto;border:1px solid #bac2cc;border-radius:6px;background:#fff;padding:5px 11px;color:#374151;font:600 11px "Meiryo UI",Meiryo,sans-serif;cursor:pointer}
+.stage-inline-close:focus-visible{outline:2px solid #b5172a;outline-offset:2px}
+.stage-inline-report iframe{display:block;width:100%;height:min(75vh,850px);min-height:450px;border:0;background:#fff;-webkit-overflow-scrolling:touch}
+@media(max-width:640px){.stage-inline-report iframe{height:72vh;min-height:440px}.stage-inline-report-head{padding:8px}}
