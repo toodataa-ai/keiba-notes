@@ -128,6 +128,12 @@ function segmentAt(profile,d){
  return profile.segments.find(s=>x<=s.to+1e-8)||profile.segments.at(-1);
 }
 function point(profile,d,lane=0){
+ if(d>profile.distance_m){
+   const end=point(profile,profile.distance_m,lane),last=profile.segments.at(-1);
+   const pxPerMeter=arcTable(last).total/(last.to-last.from);
+   const extra=clamp(d-profile.distance_m,0,40)*pxPerMeter;
+   return {...end,x:end.x+end.tx*extra,y:end.y+end.ty*extra,segment:last,t:1};
+ }
  const s=segmentAt(profile,d);
  const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
  const t=tByLength(s,ratio);
