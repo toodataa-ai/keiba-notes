@@ -21,7 +21,7 @@ legacy_classes={'A+':'gAp','A':'gA','B+':'gBp','B':'gB','B-':'gBm','C':'gC'}
 new_classes={'A+':'g-Aplus','A':'g-A','B+':'g-Bplus','B':'g-B','B-':'g-Bminus','C':'g-C'}
 palette={}
 for grade,klass in legacy_classes.items():
-    m=re.search(r'\\.'+klass+r'\\{background:(#[0-9a-fA-F]{6});color:(#[0-9a-fA-F]{6})\\}',legacy)
+    m=re.search(r'\.'+klass+r'\{background:(#[0-9a-fA-F]{6});color:(#[0-9a-fA-F]{6})\}',legacy)
     assert m is not None,('approved v3.13 grade source not found',grade)
     palette[grade]=(m.group(1).lower(),m.group(2).lower())
 assert list(palette)==['A+','A','B+','B','B-','C']
@@ -41,7 +41,7 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
     assert htmltext.count('class="page horse-page"')==registry['field_size']
     # Grade colors must match the original approved HTML byte-for-byte.
     for grade,(bg,fg) in palette.items():
-        match=re.search(r'\\.horse-page \\.'+new_classes[grade]+r'\\{([^}]*)\\}',htmltext)
+        match=re.search(r'\.horse-page \.'+new_classes[grade]+r'\{([^}]*)\}',htmltext)
         assert match is not None,(rid,grade,'grade CSS rule missing')
         assert 'background:'+bg in match.group(1),(rid,grade,'background color regression')
         assert 'color:'+fg in match.group(1),(rid,grade,'foreground color regression')
