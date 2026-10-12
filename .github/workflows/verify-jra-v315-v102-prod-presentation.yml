@@ -46,7 +46,7 @@ jobs:
             expected_html=expected_html.replace(
                 '<link rel="stylesheet" href="../stage-indicator.css?v=20261012-1">\\n','')
             expected_html=expected_html.replace(
-                '<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>\\n','')
+                '<body>\\n<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>','<body>')
             assert hp.read_text()==expected_html,(slug,'stage marker/robots/relative asset only')
             assert pdf.read_bytes()==(stage/(short+'.pdf')).read_bytes()
             for grade,a,b in [('A+','gAp','g-Aplus'),('A','gA','g-A'),('B+','gBp','g-Bplus'),
