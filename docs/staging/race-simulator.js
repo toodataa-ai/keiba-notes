@@ -1,4 +1,4 @@
-/* Staging race simulator v0.8. Stable full-field camera and pre-race running-style source. */
+/* Staging race simulator v0.8. Camera easing and pre-race running-style tactics. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -12,6 +12,7 @@ const ui={
  stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo')
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
+let cameraMotion=null;
 // A race-view preset changes how much of the track is visible. The horse sprite
 // also gets its OWN pixel target: previously /zoom cancelled magnification,
 // leaving horses roughly 40px across even with a closer track camera.
@@ -134,6 +135,7 @@ function reset(startNow){
  cancelAnimationFrame(frameId);
  const seed=seedValue();ui.seed.value=String(seed);
  sim=RaceSimEngine.create(race,{seed,pace:ui.pace.value,bias:ui.bias.value});
+ cameraMotion=null;
  running=false;lastFrame=0;renderAt=0;notify('');
  ui.pause.disabled=true;ui.pause.textContent='一時停止';ui.start.disabled=false;
  ui.start.textContent='▶ レーススタート';
@@ -312,7 +314,37 @@ function frameEntireField(horses,profile,mode,width,height,renderedWidth){
    anchor:{x:width/2,y:(marginTop+height-marginBottom)/2},
    bounds:{left,right,top,bottom},count:horses.length,maxZoom};
 }
-window.RaceSimCamera=Object.freeze({viewCamera,frameEntireField});
+/* Interpolate camera travel without teleporting at gate release.
+   Limit zoom from the CURRENT bbox, not only the target bbox: keeping all
+   real horse coordinates visible takes precedence over smoothing. */
+function stableCameraFrame(target,previous,simTime,width,height,renderedWidth){
+ if(!previous||simTime<previous.time||simTime===0){
+   return {...target,time:simTime};
+ }
+ const dt=Math.max(0,Math.min(.25,simTime-previous.time));
+ const alpha=1-Math.exp(-dt/.26);
+ const center={
+   x:previous.origin.x+(target.origin.x-previous.origin.x)*alpha,
+   y:previous.origin.y+(target.origin.y-previous.origin.y)*alpha
+ };
+ const candidateZoom=previous.zoom+(target.zoom-previous.zoom)*alpha;
+ const pixelRatio=width/Math.max(1,renderedWidth);
+ const mx=Math.min(width*.24,Math.max(48,22*pixelRatio));
+ const mt=Math.min(height*.30,Math.max(110,82+19*pixelRatio));
+ const mb=Math.min(height*.30,Math.max(86,64+19*pixelRatio));
+ const safeLeft=target.anchor.x-mx,safeRight=width-mx-target.anchor.x;
+ const safeTop=target.anchor.y-mt,safeBottom=height-mb-target.anchor.y;
+ const b=target.bounds;
+ const maxZoom=Math.min(
+   safeLeft/Math.max(.01,center.x-b.left),
+   safeRight/Math.max(.01,b.right-center.x),
+   safeTop/Math.max(.01,center.y-b.top),
+   safeBottom/Math.max(.01,b.bottom-center.y)
+ );
+ const zoom=Math.max(.1,Math.min(candidateZoom,maxZoom));
+ return {...target,origin:center,zoom,time:simTime};
+}
+window.RaceSimCamera=Object.freeze({viewCamera,frameEntireField,stableCameraFrame});
 // Shared course rendering primitives, retained when replacing sprite display.
 function traceCommands(ctx,parts){
  ctx.beginPath();
@@ -342,9 +374,13 @@ function drawRace(){
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
  const target=focus||state.horses[0];
- const frame=mode==='overview'
+ const requested=mode==='overview'
    ?{zoom:camera.zoom,origin:{x:306,y:119},anchor:{x:w*.5,y:h*.52}}
    :frameEntireField(state.horses,profile,mode,w,h,renderedWidth);
+ // Only track a live chase camera; manual overview is an explicit hard cut.
+ const frame=mode==='overview'?requested:
+    stableCameraFrame(requested,cameraMotion,state.t,w,h,renderedWidth);
+ cameraMotion=mode==='overview'?null:frame;
  const {zoom,origin,anchor}=frame;
  ctx.clearRect(0,0,w,h);
  // World camera stays north-up. As horses travel the curved course,
@@ -550,10 +586,10 @@ ui.newSeed.addEventListener('click',()=>{
  reset(true);
 });
 ui.focus.addEventListener('change',render);
-if(ui.camera)ui.camera.addEventListener('change',render);
+if(ui.camera)ui.camera.addEventListener('change',()=>{cameraMotion=null;render()});
 ui.path.addEventListener('change',render);
 ui.speed.addEventListener('change',render);
-window.addEventListener('resize',()=>{resizeRaceCanvas();render()});
+window.addEventListener('resize',()=>{cameraMotion=null;resizeRaceCanvas();render()});
 resizeRaceCanvas();
 window.addEventListener('pagehide',()=>{running=false;cancelAnimationFrame(frameId)});
 initialize();
