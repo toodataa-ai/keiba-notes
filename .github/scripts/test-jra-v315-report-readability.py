@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from weasyprint import HTML
@@ -14,6 +15,16 @@ sys.path.insert(0,str(ROOT/'.github/scripts'))
 spec=importlib.util.spec_from_file_location('jra_v315_report',ROOT/'.github/scripts/jra-render-formal-3action-v315.py')
 mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
+# Snapshot of the approved v3.13 grade palette, not a newly invented palette.
+legacy=(ROOT/'docs/reports/2026-10-12-october-stakes-v3.13-rerun38185599767-attempt2-v313.html').read_text()
+legacy_classes={'A+':'gAp','A':'gA','B+':'gBp','B':'gB','B-':'gBm','C':'gC'}
+new_classes={'A+':'g-Aplus','A':'g-A','B+':'g-Bplus','B':'g-B','B-':'g-Bminus','C':'g-C'}
+palette={}
+for grade,klass in legacy_classes.items():
+    m=re.search(r'\\.'+klass+r'\\{background:(#[0-9a-fA-F]{6});color:(#[0-9a-fA-F]{6})\\}',legacy)
+    assert m is not None,('approved v3.13 grade source not found',grade)
+    palette[grade]=(m.group(1).lower(),m.group(2).lower())
+assert list(palette)==['A+','A','B+','B','B-','C']
 races=json.loads((ROOT/'docs/data/races.json').read_text())['races']
 for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
     registry=next(x for x in races if x['id']==rid)
@@ -28,6 +39,12 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
     assert count==1+len(source['step1_ranking'])
     assert count==1+registry['field_size']
     assert htmltext.count('class="page horse-page"')==registry['field_size']
+    # Grade colors must match the original approved HTML byte-for-byte.
+    for grade,(bg,fg) in palette.items():
+        match=re.search(r'\\.horse-page \\.'+new_classes[grade]+r'\\{([^}]*)\\}',htmltext)
+        assert match is not None,(rid,grade,'grade CSS rule missing')
+        assert 'background:'+bg in match.group(1),(rid,grade,'background color regression')
+        assert 'color:'+fg in match.group(1),(rid,grade,'foreground color regression')
     for internal in ('<strong>overall_grade</strong>','<strong>factor_grades</strong>',
                      '<strong>past_performances</strong>','<strong>source_url</strong>'):
         assert internal not in htmltext,(rid,internal)
@@ -50,6 +67,20 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
                     assert section in content,(rid,i,section)
                 for internal in ('overall_grade','factor_grades','past_performances','source_url'):
                     assert internal not in content,(rid,i,internal)
+            if i>0:
+                # Verify not just CSS: grade foreground and background survive into the real PDF.
+                grades=set(source['step1_ranking'][i-1]['factor_grades']) | {source['step1_ranking'][i-1]['overall_grade']}
+                spans=[(span['text'].strip(),span['color'])
+                       for b in page.get_text('dict')['blocks']
+                       for line in b.get('lines',[]) for span in line['spans']]
+                fills=[d['fill'] for d in page.get_drawings() if d.get('fill') is not None]
+                for grade in grades:
+                    bg,fg=palette[grade]
+                    expected_fg=int(fg[1:],16)
+                    expected_bg=tuple(int(bg[k:k+2],16)/255 for k in (1,3,5))
+                    assert (grade,expected_fg) in spans,(rid,i,grade,'PDF foreground regression')
+                    assert any(len(fill)>=3 and max(abs(fill[k]-expected_bg[k]) for k in range(3))<0.013 for fill in fills),(
+                        rid,i,grade,'PDF background regression')
             for b in page.get_text('dict')['blocks']:
                 for line in b.get('lines',[]):
                     for span in line['spans']:
