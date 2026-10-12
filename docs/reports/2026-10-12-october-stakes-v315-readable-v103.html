@@ -1,0 +1,297 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+@page { size:A4 portrait; margin:14mm 13mm 14mm; }
+body{font-family:"Noto Sans CJK JP","Meiryo",sans-serif;color:#263143;font-size:9.5pt;line-height:1.58}
+h1{font-size:19pt;margin:5px 0 10px}h2{font-size:14pt;margin:6px 0}h3{font-size:11pt}
+small,.meta{color:#59687b;font-size:8pt}
+.kicker{font-weight:700;color:#a62a41;font-size:9pt}
+.page{break-after:page} .page:last-child{break-after:auto}
+h1,h2,h3{break-after:avoid}
+table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:9pt}
+th{background:#eef0f4;text-align:left;color:#455063;border-bottom:1px solid #bdc6d1}
+th,td{padding:8px 6px;vertical-align:top;border-bottom:1px solid #d9dee6;overflow-wrap:anywhere}
+table col:nth-child(1){width:22%}table col:nth-child(2){width:46%}table col:nth-child(3){width:32%}
+.method{color:#617184;font-size:8pt}.numbers{font-weight:600;font-variant-numeric:tabular-nums}
+h3.hole{color:#93502d;font-size:10pt;margin:16px 0 5px}
+div.totals{background:#f2f4f7;margin-top:12px;padding:10px}
+.disclosure{background:#fff8ef;border-left:3px solid #bd8d5f;padding:9px;font-size:9pt}
+.rider{margin-top:16px;font-size:8.6pt;color:#475366}
+.fact{border:1px solid #e0e4e9;padding:10px;margin:9px 0}
+</style><style>
+/* v3.15 per-horse human-readable print layout, one A4 page per horse */
+.horse-page h1{font-size:16pt;margin:4px 0 6px}
+.horse-page h2{font-size:10pt;margin:10px 0 5px;border-left:3px solid #74869d;padding-left:7px}
+.horse-facts{display:flex;gap:15px;flex-wrap:wrap;border-bottom:1px solid #d6dde6;padding:4px 0 7px;font-size:9pt}
+.horse-score{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+/* Color values copied without reinterpretation from the approved v3.13 report CSS:
+   .gAp, .gA, .gBp, .gB, .gBm, .gC. Preserve these historical grade semantics. */
+.horse-page .grade{display:inline-block;box-sizing:border-box;border:0;border-radius:3px;font-weight:700;font-size:9pt;min-width:23px;text-align:center;padding:2px 4px}
+.horse-page .g-Aplus{background:#f29fa9;color:#701622}
+.horse-page .g-A{background:#f7b8b5;color:#6e201c}
+.horse-page .g-Bplus{background:#f9c896;color:#734a10}
+.horse-page .g-B{background:#ffdf9d;color:#725518}
+.horse-page .g-Bminus{background:#d8e7ba;color:#4c6129}
+.horse-page .g-C{background:#d1e7f0;color:#2a5570}
+.horse-page table.factor-grid{table-layout:fixed;border-collapse:separate;border-spacing:5px 4px;font-size:9pt}
+.horse-page .factor-grid td{border:1px solid #dbe1e9;border-radius:4px;padding:5px 7px;vertical-align:middle;background:#fafbfc}
+.horse-page .factor-label{display:block;color:#47566c;font-size:8pt;margin-bottom:3px}
+.horse-page .assessment{font-size:9pt;line-height:1.48;margin:4px 0 7px;white-space:normal;overflow-wrap:anywhere}
+.horse-page table.run-table{font-size:8.3pt;table-layout:fixed}
+.horse-page .run-table th,.horse-page .run-table td{padding:5px 4px;overflow-wrap:normal}
+.horse-page .run-table th:nth-child(1){width:20%}
+.horse-page .run-table th:nth-child(2){width:17%}
+.horse-page .run-table th:nth-child(3){width:24%}
+.horse-page .run-table th:nth-child(4){width:17%}
+.horse-page .run-table th:nth-child(5){width:22%}
+.horse-page .supplement{font-size:8.5pt;color:#4c5c70;line-height:1.5;margin:7px 0}
+.horse-page .technical-ref{font-size:8pt;color:#59687b;margin-top:8px}
+.horse-page .technical-ref a{color:#3c5b7e;text-decoration:none}
+</style></head><body><section class="page"><div class="kicker">JRA 正式購入セット v3.15 ／ 能力・適性評価 v3.13</div>
+<h1>2026-10-12　東京11R　オクトーバーステークス</h1>
+<p class="meta">2026年10月12日の発走前情報だけで確定。馬番・券種・点数・購入額を1行ずつ照合済み。
+通常の購入操作は最大3行、中穴・大穴は別枠で最大1行ずつです。</p>
+<h2>通常の購入操作（最大3行）</h2><table><colgroup><col/><col/><col/></colgroup><thead><tr><th>券種・買い方</th><th>馬番／購入操作</th><th>点数 × 単価＝金額</th></tr></thead><tbody><tr><td><b>馬連</b><div class='method'>BOX</div></td><td class='numbers'>1・2・3・7・18 BOX</td><td>10点 × 100円 ＝ <b>1,000円</b></td></tr><tr><td><b>馬単</b><div class='method'>2着固定流し</div></td><td class='numbers'>（2・3・7・9・18）→1</td><td>5点 × 100円 ＝ <b>500円</b></td></tr><tr><td><b>馬単</b><div class='method'>個別指定</div></td><td class='numbers'>7→3</td><td>1点 × 100円 ＝ <b>100円</b></td></tr></tbody></table>
+<h3 class='hole'>中穴（実測20倍以上100倍未満）</h3><table><colgroup><col/><col/><col/></colgroup><tbody><tr><td><b>枠連</b><div class='method'>個別指定</div></td><td class='numbers'>2－4</td><td>1点 × 100円 ＝ <b>100円</b></td></tr></tbody></table>
+<h3 class='hole'>大穴（100円で的中時払戻1万円以上）</h3><table><colgroup><col/><col/><col/></colgroup><tbody><tr><td><b>馬単</b><div class='method'>個別指定</div></td><td class='numbers'>3→18</td><td>1点 × 100円 ＝ <b>100円</b></td></tr></tbody></table>
+<div class='totals'><b>総投資額：1,800円</b>　／　購入操作 5 回
+<p>モデル期待純利益：412円、
+推定的中確率：25.57%、
+推定損失確率：76.47%</p></div>
+<p class='disclosure'>発走前オッズは取得時点の価格であり、最終オッズではありません。過去v3.13の60点方式とは
+実際の購入点数・期待利益・的中率が異なります。推定モデルは未校正で、的中・利益は保証されません。</p>
+<p class='meta'>固定済み発走前原本：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6<br>
+新方式の発走前証跡：5dc0f82bb39e59a52e0e46e040e91e2baa4ee3db／研究対象の旧買い目は履歴に保存</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>1番　メイショウハチコウ　◎</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-A">A</span></span>
+<span>斤量 <strong>54kg</strong></span><span>馬プロフィール・騎手 <strong>牡3/黒鹿 54.0 kg 丹内 祐次</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-Aplus">A+</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-A">A</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年5月の東京・プリンシパルS（芝2000m、L）で1着。同場同距離の重賞級メンバー相手の勝利を優先する。一方ダービー2400mは13着で、相手強化の不安は残る。。JRA前走：2026年5月31日 東京 東京優駿 13 着 18 頭 7 番 13 番人気 M.ディー 57.0 kg 2400芝 2:23.7 良 108 512 kg 1 1 2 2 3F 34.9 ロブチェン (1.0)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-05-31</td><td>東京</td><td>芝2400m</td><td>13着</td><td>2:23.7 </td></tr><tr><td>2026-05-03</td><td>東京</td><td>芝2000m</td><td>1着</td><td>1:58.5 同場・同距離</td></tr><tr><td>2026-03-28</td><td>中山</td><td>芝1800m</td><td>1着</td><td>1:50.3 </td></tr><tr><td>2026-03-01</td><td>中山</td><td>芝1600m</td><td>4着</td><td>1:33.3 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：13.6%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>2番　アスクセクシーモア　○</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-A">A</span></span>
+<span>斤量 <strong>55kg</strong></span><span>馬プロフィール・騎手 <strong>牡4/青鹿 55.0 kg 岩田 康誠</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-Aplus">A+</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-A">A</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年5月の東京・府中S（芝2000m、3勝クラス）1着、時計1分57秒1。同場同距離の直近勝利を評価。目黒記念2500mは6着で距離適性に幅がある。。JRA前走：2026年5月31日 東京 目黒記念 6 着 14 頭 7 番 9 番人気 北村 友一 55.0 kg 2500芝 2:30.1 良 104 480 kg 2 2 2 2 3F 34.2 ファイアンクランツ (0.3)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-05-31</td><td>東京</td><td>芝2500m</td><td>6着</td><td>2:30.1 </td></tr><tr><td>2026-05-03</td><td>東京</td><td>芝2000m</td><td>1着</td><td>1:57.1 同場・同距離</td></tr><tr><td>2026-02-22</td><td>東京</td><td>芝2000m</td><td>3着</td><td>1:58.8 同場・同距離</td></tr><tr><td>2025-11-23</td><td>東京</td><td>芝1600m</td><td>9着</td><td>1:32.5 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：12.9%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>18番　トーセンリョウ　▲</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bplus">B+</span></span>
+<span>斤量 <strong>56kg</strong></span><span>馬プロフィール・騎手 <strong>牡7/鹿 56.0 kg 浜中 俊</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-Aplus">A+</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bplus">B+</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2025年東京オクトーバーS（芝2000m、L）2着の同場同距離好走馬。2026年新潟大賞典2000m6着など近走も中距離オープンで経験豊富。。JRA前走：2026年6月13日 東京 ジューンS OP 8 着 13 頭 11 番 7 番人気 F.ゴンサルベ 57.0 kg 1800芝 1:46.6 良 100 460 kg 11 10 10 3F 33.6 カネラフィーナ (0.6)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-06-13</td><td>東京</td><td>芝1800m</td><td>8着</td><td>1:46.6 </td></tr><tr><td>2026-05-16</td><td>新潟</td><td>芝2000m</td><td>6着</td><td>1:59.3 </td></tr><tr><td>2026-03-08</td><td>阪神</td><td>芝1800m</td><td>7着</td><td>1:44.9 </td></tr><tr><td>2025-10-13</td><td>東京</td><td>芝2000m</td><td>2着</td><td>1:57.8 同場・同距離</td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：8.6%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>3番　ニシノレヴナント　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bplus">B+</span></span>
+<span>斤量 <strong>56.5kg</strong></span><span>馬プロフィール・騎手 <strong>せん6/栗 56.5 kg 内田 博幸</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-Aplus">A+</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bplus">B+</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2025年東京オクトーバーS（芝2000m、L）を勝っている同条件実績馬。一方2026年の金鯱賞2000mは12着で、近走の復調確認が必要。。JRA前走：2026年3月15日 中京 金鯱賞 12 着 14 頭 7 番 13 番人気 野中 悠太郎 57.0 kg 2000芝 1:59.1 良 102 482 kg 12 12 12 13 3F 34.2 シェイクユアハート (1.0)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-03-15</td><td>中京</td><td>芝2000m</td><td>12着</td><td>1:59.1 </td></tr><tr><td>2026-01-25</td><td>中山</td><td>芝2200m</td><td>9着</td><td>2:11.6 </td></tr><tr><td>2025-11-09</td><td>東京</td><td>芝2500m</td><td>9着</td><td>2:30.5 </td></tr><tr><td>2025-10-13</td><td>東京</td><td>芝2000m</td><td>1着</td><td>1:57.5 同場・同距離</td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：8.0%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>4番　テリオスララ　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-B">B</span></span>
+<span>斤量 <strong>53kg</strong></span><span>馬プロフィール・騎手 <strong>牝4/黒鹿 53.0 kg 松岡 正海</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-B">B</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年2月の東京・初音S芝1800mを1着。東京コース適性と軽斤量を評価するが、6月の府中牝馬Sでは16着でオープン級の安定感に課題。。JRA前走：2026年6月21日 東京 府中牝馬S 16 着 16 頭 9 番 7 番人気 F.ゴンサルベ 54.0 kg 1800芝 1:50.9 稍重 47 508 kg 2 2 2 3F 39.7 セキトバイースト (5.4)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-06-21</td><td>東京</td><td>芝1800m</td><td>16着</td><td>1:50.9 </td></tr><tr><td>2026-03-08</td><td>阪神</td><td>芝1800m</td><td>10着</td><td>1:45.4 </td></tr><tr><td>2026-02-10</td><td>東京</td><td>芝1800m</td><td>1着</td><td>1:45.7 </td></tr><tr><td>2025-10-19</td><td>東京</td><td>芝1800m</td><td>10着</td><td>1:46.4 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：5.2%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>5番　ボーンディスウェイ　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-B">B</span></span>
+<span>斤量 <strong>56kg</strong></span><span>馬プロフィール・騎手 <strong>牡7/黒鹿 56.0 kg 木幡 巧也</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-B">B</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年夏の七夕賞2000m5着、新潟記念2000m7着と中距離重賞を続戦。今回も2000mだが、東京同条件での直近勝利は確認できず上位には置かない。。JRA前走：2026年8月30日 新潟 新潟記念 7 着 11 頭 1 番 11 番人気 丸山 元気 57.0 kg 2000芝 2:00.0 稍重 108 490 kg 2 2 3F 34.5 ゾロアストロ (0.4)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-08-30</td><td>新潟</td><td>芝2000m</td><td>7着</td><td>2:00.0 </td></tr><tr><td>2026-07-12</td><td>福島</td><td>芝2000m</td><td>5着</td><td>1:58.7 </td></tr><tr><td>2026-05-31</td><td>東京</td><td>芝2500m</td><td>11着</td><td>2:30.4 </td></tr><tr><td>2026-04-11</td><td>阪神</td><td>芝2600m</td><td>6着</td><td>2:37.8 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：5.2%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>7番　シルトホルン　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bplus">B+</span></span>
+<span>斤量 <strong>57kg</strong></span><span>馬プロフィール・騎手 <strong>牡6/黒鹿 57.0 kg 石田 拓郎</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-A">A</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bplus">B+</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年4月福島民報杯2000m3着、7月巴賞1800m3着。芝中距離オープンで複数好走があり条件適性を評価、ただし57kgの負担は考慮。。JRA前走：2026年7月12日 函館 巴賞 OP 3 着 14 頭 4 番 1 番人気 丹内 祐次 58.0 kg 1800芝 1:48.0 重 99 480 kg 6 6 6 6 3F 35.4 ヴーレヴー (0.9)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-07-12</td><td>函館</td><td>芝1800m</td><td>3着</td><td>1:48.0 </td></tr><tr><td>2026-05-09</td><td>東京</td><td>芝1800m</td><td>7着</td><td>1:45.7 </td></tr><tr><td>2026-04-12</td><td>福島</td><td>芝2000m</td><td>3着</td><td>1:58.8 </td></tr><tr><td>2026-02-22</td><td>小倉</td><td>芝1800m</td><td>5着</td><td>1:45.8 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：8.0%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>9番　ディマイザキッド　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bplus">B+</span></span>
+<span>斤量 <strong>56kg</strong></span><span>馬プロフィール・騎手 <strong>牡5/鹿 56.0 kg 菊沢 一樹</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bplus">B+</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年金鯱賞2000m7着と関越S1800m7着はいずれも僅差。着順ほど能力差が大きくない可能性はあるが、今回の同条件勝利実績は確認できない。。JRA前走：2026年8月8日 新潟 関越S OP 7 着 16 頭 8 番 5 番人気 菊沢 一樹 56.0 kg 1800芝 1:45.3 良 101 468 kg 12 12 3F 32.2 エストゥペンダ (0.3)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-08-08</td><td>新潟</td><td>芝1800m</td><td>7着</td><td>1:45.3 </td></tr><tr><td>2026-06-13</td><td>東京</td><td>芝1800m</td><td>13着</td><td>1:47.3 </td></tr><tr><td>2026-03-15</td><td>中京</td><td>芝2000m</td><td>7着</td><td>1:58.4 </td></tr><tr><td>2026-01-25</td><td>中山</td><td>芝2200m</td><td>6着</td><td>2:11.4 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：8.0%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>12番　ジュタ　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-B">B</span></span>
+<span>斤量 <strong>56kg</strong></span><span>馬プロフィール・騎手 <strong>牡4/鹿 56.0 kg 荻野 極</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-A">A</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-B">B</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年中山・美浦S芝2000m3勝クラス1着。一方函館記念2000m14着、関屋記念1600m7着と重賞で未証明の面があり中位評価。。JRA前走：2026年7月26日 新潟 関屋記念 7 着 14 頭 2 番 13 番人気 吉田 豊 56.0 kg 1600芝 1:34.7 不良 87 516 kg 7 7 3F 36.3 アンパドゥ (2.3)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-07-26</td><td>新潟</td><td>芝1600m</td><td>7着</td><td>1:34.7 </td></tr><tr><td>2026-06-28</td><td>函館</td><td>芝2000m</td><td>14着</td><td>1:59.1 </td></tr><tr><td>2026-05-09</td><td>東京</td><td>芝1800m</td><td>8着</td><td>1:45.8 </td></tr><tr><td>2026-04-05</td><td>中山</td><td>芝2000m</td><td>1着</td><td>2:01.5 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：5.2%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>13番　ナムラエイハブ　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-B">B</span></span>
+<span>斤量 <strong>56kg</strong></span><span>馬プロフィール・騎手 <strong>牡5/鹿 56.0 kg 横山 和生</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-B">B</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年小倉記念2000m5着、東京ジューンS1800m9着。芝中距離の重賞経験はあるが東京2000mでの最近の上位入線を確認できない。。JRA前走：2026年7月19日 小倉 小倉記念 5 着 18 頭 3 番 12 番人気 田山 旺佑 56.0 kg 2000芝 1:58.4 良 104 510 kg 3 3 3 3 3F 35.7 ゼンダンハヤブサ (0.4)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-07-19</td><td>小倉</td><td>芝2000m</td><td>5着</td><td>1:58.4 </td></tr><tr><td>2026-06-13</td><td>東京</td><td>芝1800m</td><td>9着</td><td>1:46.6 </td></tr><tr><td>2026-05-24</td><td>京都</td><td>芝1800m</td><td>7着</td><td>1:44.2 </td></tr><tr><td>2026-03-08</td><td>阪神</td><td>芝1800m</td><td>8着</td><td>1:45.1 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：5.2%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>16番　ミッキーゴールド　△</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-B">B</span></span>
+<span>斤量 <strong>55kg</strong></span><span>馬プロフィール・騎手 <strong>せん4/鹿 55.0 kg 三浦 皇成</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-B">B</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年中京関ケ原S2200m3勝クラス1着。チャレンジC2000m8着と重賞で壁も見せたが中距離での勝ち上がりを評価。。JRA前走：2026年9月12日 阪神 チャレンジC 8 着 16 頭 14 番 10 番人気 西村 淳也 55.0 kg 2000芝 1:58.5 良 98 488 kg 10 9 10 8 3F 35.0 ジョバンニ (0.9)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-09-12</td><td>阪神</td><td>芝2000m</td><td>8着</td><td>1:58.5 </td></tr><tr><td>2026-07-25</td><td>中京</td><td>芝2200m</td><td>1着</td><td>2:10.5 </td></tr><tr><td>2026-05-03</td><td>東京</td><td>芝2000m</td><td>10着</td><td>1:58.1 同場・同距離</td></tr><tr><td>2026-03-29</td><td>阪神</td><td>芝2400m</td><td>10着</td><td>2:24.2 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：5.2%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>6番　ブレイヴロッカー　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-C">C</span></span>
+<span>斤量 <strong>56kg</strong></span><span>馬プロフィール・騎手 <strong>せん6/芦 56.0 kg 長浜 鴻緒</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-C">C</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年9月丹頂S2600m13着、7月札幌日経賞は競走中止。長距離寄りの近走から東京芝2000mへの距離短縮に大きな不確実性。。JRA前走：2026年9月6日 札幌 丹頂S OP 13 着 14 頭 11 番 13 番人気 斎藤 新 56.0 kg 2600芝 2:44.8 良 72 456 kg 2 2 2 6 3F 40.1 コーチェラバレー (4.1)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-09-06</td><td>札幌</td><td>芝2600m</td><td>13着</td><td>2:44.8 </td></tr><tr><td>2026-07-26</td><td>札幌</td><td>芝2600m</td><td>None着</td><td>None </td></tr><tr><td>2026-03-28</td><td>中山</td><td>芝2500m</td><td>12着</td><td>2:32.9 </td></tr><tr><td>2026-02-21</td><td>東京</td><td>芝3400m</td><td>3着</td><td>3:32.5 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：1.7%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>8番　シルブロン　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-C">C</span></span>
+<span>斤量 <strong>55kg</strong></span><span>馬プロフィール・騎手 <strong>せん8/鹿 55.0 kg 武藤 雅</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-C">C</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年東京ダイヤモンドS3400m11着、前年ステイヤーズS3600m9着。近走は長距離中心で東京芝2000mに必要な速度面の一次根拠が弱い。。JRA前走：2026年2月21日 東京 ダイヤモンド 11 着 15 頭 9 番 13 番人気 三浦 皇成 56.0 kg 3400芝 3:33.4 良 101 512 kg 13 14 14 12 3F 35.2 スティンガーグラス (1.4)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-02-21</td><td>東京</td><td>芝3400m</td><td>11着</td><td>3:33.4 </td></tr><tr><td>2025-12-06</td><td>中山</td><td>芝3600m</td><td>9着</td><td>3:47.7 </td></tr><tr><td>2025-10-13</td><td>東京</td><td>芝2000m</td><td>15着</td><td>1:58.7 同場・同距離</td></tr><tr><td>2025-08-09</td><td>新潟</td><td>芝1800m</td><td>8着</td><td>1:46.9 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：1.7%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>10番　ジュンブロッサム　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bminus">B-</span></span>
+<span>斤量 <strong>57.5kg</strong></span><span>馬プロフィール・騎手 <strong>牡7/黒鹿 57.5 kg 杉原 誠人</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-B">B</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bminus">B-</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年新潟記念2000m9着、関越S1800m9着、エプソムC9着。近走連続の掲示板外に加え57.5kgで巻き返し材料が限定的。。JRA前走：2026年8月30日 新潟 新潟記念 9 着 11 頭 7 番 10 番人気 杉原 誠人 58.0 kg 2000芝 2:00.1 稍重 109 472 kg 11 11 3F 33.9 ゾロアストロ (0.5)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-08-30</td><td>新潟</td><td>芝2000m</td><td>9着</td><td>2:00.1 </td></tr><tr><td>2026-08-08</td><td>新潟</td><td>芝1800m</td><td>9着</td><td>1:45.4 </td></tr><tr><td>2026-05-09</td><td>東京</td><td>芝1800m</td><td>9着</td><td>1:45.8 </td></tr><tr><td>2026-04-04</td><td>中山</td><td>芝1600m</td><td>11着</td><td>1:34.5 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：2.8%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>11番　セイウンプラチナ　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-C">C</span></span>
+<span>斤量 <strong>53kg</strong></span><span>馬プロフィール・騎手 <strong>牡7/鹿 53.0 kg 野中 悠太郎</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-C">C</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年9月オールカマー2200m13着で大きく離され、2025年中山金杯2000mも11着。53kgの軽斤量は魅力だが近走の基礎能力根拠に乏しい。。JRA前走：2026年9月20日 中山 オールカマー 13 着 13 頭 11 番 12 番人気 内田 博幸 57.0 kg 2200芝 2:23.3 重 53 500 kg 3 3 3 13 3F 43.3 メイショウゲキリン (6.4)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-09-20</td><td>中山</td><td>芝2200m</td><td>13着</td><td>2:23.3 </td></tr><tr><td>2025-02-22</td><td>東京</td><td>芝3400m</td><td>8着</td><td>3:34.3 </td></tr><tr><td>2025-01-05</td><td>中山</td><td>芝2000m</td><td>11着</td><td>1:58.9 </td></tr><tr><td>2024-09-01</td><td>札幌</td><td>芝2600m</td><td>10着</td><td>2:43.8 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：1.7%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>14番　グランドカリナン　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bminus">B-</span></span>
+<span>斤量 <strong>54kg</strong></span><span>馬プロフィール・騎手 <strong>牡6/鹿 54.0 kg 吉田 豊</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-A">A</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bminus">B-</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年9月丹頂S2600m3着は評価できるが、春の新潟大賞典2000m9着。2000mへの短縮と東京コース適性が課題。。JRA前走：2026年9月6日 札幌 丹頂S OP 3 着 14 頭 8 番 14 番人気 小林 美駒 54.0 kg 2600芝 2:42.1 良 92 460 kg 7 11 13 14 3F 36.1 コーチェラバレー (1.4)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-09-06</td><td>札幌</td><td>芝2600m</td><td>3着</td><td>2:42.1 </td></tr><tr><td>2026-05-16</td><td>新潟</td><td>芝2000m</td><td>9着</td><td>1:59.6 </td></tr><tr><td>2026-05-10</td><td>東京</td><td>芝2400m</td><td>10着</td><td>2:24.9 </td></tr><tr><td>2026-04-11</td><td>阪神</td><td>芝2600m</td><td>5着</td><td>2:37.7 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：2.8%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>15番　メリオーレム　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-Bminus">B-</span></span>
+<span>斤量 <strong>55kg</strong></span><span>馬プロフィール・騎手 <strong>牡5/鹿 55.0 kg 石橋 脩</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-Bminus">B-</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年京都都大路S1800m4着に対して七夕賞2000m16着。2000m直近の大敗を重く見て同条件への再適応が必要。。JRA前走：2026年7月12日 福島 七夕賞 16 着 16 頭 7 番 9 番人気 M.デムーロ 55.0 kg 2000芝 2:09.5 稍重 498 kg 14 15 16 16 3F 45.3 アスクナイスショー (11.6)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-07-12</td><td>福島</td><td>芝2000m</td><td>16着</td><td>2:09.5 </td></tr><tr><td>2026-06-13</td><td>東京</td><td>芝1800m</td><td>10着</td><td>1:46.7 </td></tr><tr><td>2026-05-24</td><td>京都</td><td>芝1800m</td><td>4着</td><td>1:44.0 </td></tr><tr><td>2025-12-13</td><td>中京</td><td>芝2000m</td><td>5着</td><td>1:58.1 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：2.8%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section><section class="page horse-page">
+<div class="kicker">STEP1 発走前評価（能力・適性評価 v3.13／原本は変更なし）</div>
+<h1>17番　コスモブッドレア　×</h1>
+<div class="horse-facts"><span class="horse-score">総合評価 <span class="grade g-C">C</span></span>
+<span>斤量 <strong>53kg</strong></span><span>馬プロフィール・騎手 <strong>牡5/芦 53.0 kg 柴田 大知</strong></span></div>
+<h2>①〜⑨ 評価内訳</h2><table class="factor-grid"><tbody><tr><td><span class="factor-label">① 斤量</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">② 展開</span><span class="grade g-B">B</span></td><td><span class="factor-label">③ 馬場・トラックバイアス</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">④ ローテーション</span><span class="grade g-Bplus">B+</span></td><td><span class="factor-label">⑤ コース適性</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑥ 血統</span><span class="grade g-B">B</span></td></tr><tr><td><span class="factor-label">⑦ 調教</span><span class="grade g-Bminus">B-</span></td><td><span class="factor-label">⑧ 騎手</span><span class="grade g-B">B</span></td><td><span class="factor-label">⑨ 基礎能力</span><span class="grade g-C">C</span></td></tr></tbody></table>
+<h2>能力・適性の判断根拠</h2><p class="assessment">2026年オールカマー2200m8着、関越S1800m16着。軽斤量53kgを加味しても近走の安定性に乏しい。。JRA前走：2026年9月20日 中山 オールカマー 8 着 13 頭 10 番 13 番人気 津村 明秀 57.0 kg 2200芝 2:19.4 重 87 486 kg 11 11 12 10 3F 38.6 メイショウゲキリン (2.5)</p>
+<h2>公式近走成績</h2>
+<table class="run-table"><thead><tr><th>日付</th><th>競馬場</th><th>距離</th><th>着順</th><th>時計・同条件</th></tr></thead><tbody><tr><td>2026-09-20</td><td>中山</td><td>芝2200m</td><td>8着</td><td>2:19.4 </td></tr><tr><td>2026-08-08</td><td>新潟</td><td>芝1800m</td><td>16着</td><td>1:46.8 </td></tr><tr><td>2026-02-08</td><td>小倉</td><td>芝2000m</td><td>11着</td><td>2:01.3 </td></tr><tr><td>2025-12-21</td><td>中山</td><td>芝1800m</td><td>14着</td><td>1:49.3 </td></tr></tbody></table>
+<p class="supplement">調教データ：未取得 ／ 騎手のコース別データ：未取得<br>
+モデル単勝確率：1.7%（未校正の推定値。市場オッズをSTEP1に反映していません）</p>
+<p class="technical-ref">STEP1固定：2026-10-12T06:52:59.468+09:00 ／ 原本証跡：74bf876420ce7b3ceaf1fb3ef34d82790e7be0b6・<a href="https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604051120261012%2FFE">JRA公式根拠を開く</a><br>
+詳細な公式原文・原票は固定済み発走前JSONに保存。ここでは原本の評価や馬券を変更していません。</p>
+</section></body></html>

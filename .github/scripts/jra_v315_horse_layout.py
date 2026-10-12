@@ -47,6 +47,23 @@ def chip(grade):
              'B-':'g-Bminus','C':'g-C'}.get(grade,'')
     return f'<span class="grade {klass}">{esc(grade)}</span>'
 
+# Presentation order only. 'STEP1 ranking' source can be stored by horse number;
+# never infer a fresh prediction from its array position.
+MARK_ORDER = {'◎':0, '○':1, '▲':2, '△':3, '×':4}
+
+def order_horses_by_mark(source_ranking):
+    if not isinstance(source_ranking,list) or not source_ranking:
+        raise ValueError('JRA_V315_MARK_ORDER_BLOCKER: empty sealed STEP1 ranking')
+    marks=[x.get('mark') if isinstance(x,dict) else None for x in source_ranking]
+    unknown={m for m in marks if m not in MARK_ORDER}
+    if unknown:
+        raise ValueError('JRA_V315_MARK_ORDER_BLOCKER: unknown sealed marks '+repr(unknown))
+    numbers=[str(x.get('horse_number')) for x in source_ranking]
+    if len(numbers)!=len(set(numbers)):
+        raise ValueError('JRA_V315_MARK_ORDER_BLOCKER: duplicate sealed horse number')
+    # Python sorting is stable; horses with the same mark keep their exact source order.
+    return sorted(source_ranking,key=lambda x:MARK_ORDER[x['mark']])
+
 def render_horse(x,fixed_at,source_proof):
     n = x.get('horse_number')
     horse = x.get('horse_name')
