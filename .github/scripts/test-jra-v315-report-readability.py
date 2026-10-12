@@ -35,7 +35,21 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
     source=json.loads(raw)
     assert plan['source_prediction_sha256']==hashlib.sha256(raw).hexdigest()
     assert source['step1_ranking']
+    # Stable visual sorting: mark priority, then the original sealed source order.
+    expected=mod.order_horses_by_mark(source['step1_ranking'])
+    expected_marks=[x['mark'] for x in expected]
+    assert expected_marks==sorted(expected_marks,key=mod.order_horses_by_mark.__globals__['MARK_ORDER'].__getitem__)
+    assert sorted(x['horse_number'] for x in expected)==sorted(x['horse_number'] for x in source['step1_ranking'])
+    assert expected is not source['step1_ranking']
+    for mark in ('◎','○','▲','△','×'):
+        assert [x['horse_number'] for x in expected if x['mark']==mark]==[
+            x['horse_number'] for x in source['step1_ranking'] if x['mark']==mark], (rid,mark,'unstable within same mark')
     htmltext,count=mod.html_report(plan,source)
+    actual_headings=re.findall(r'<section class="page horse-page">[\\s\\S]*?<h1>(.*?)</h1>',htmltext)
+    assert len(actual_headings)==len(expected)
+    for i,(heading,x) in enumerate(zip(actual_headings,expected)):
+        assert heading==f"{x['horse_number']}番　{x['horse_name']}　{x['mark']}",(rid,i,heading)
+
     assert count==1+len(source['step1_ranking'])
     assert count==1+registry['field_size']
     assert htmltext.count('class="page horse-page"')==registry['field_size']
@@ -63,13 +77,16 @@ for rid in ('2026-10-12-october-stakes','2026-10-12-swan-stakes'):
             content=page.get_text()
             assert len(content)>100
             if i>0:
+                x=expected[i-1]
+                header=f"{x['horse_number']}番　{x['horse_name']}　{x['mark']}"
+                assert header in content,(rid,i,'PDF page horse order mismatch',header)
                 for section in ('①〜⑨ 評価内訳','判断根拠','近走成績','モデル単勝確率'):
                     assert section in content,(rid,i,section)
                 for internal in ('overall_grade','factor_grades','past_performances','source_url'):
                     assert internal not in content,(rid,i,internal)
             if i>0:
                 # Verify not just CSS: grade foreground and background survive into the real PDF.
-                grades=set(source['step1_ranking'][i-1]['factor_grades']) | {source['step1_ranking'][i-1]['overall_grade']}
+                grades=set(expected[i-1]['factor_grades']) | {expected[i-1]['overall_grade']}
                 spans=[(span['text'].strip(),span['color'])
                        for b in page.get_text('dict')['blocks']
                        for line in b.get('lines',[]) for span in line['spans']]
