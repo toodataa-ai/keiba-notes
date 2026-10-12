@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/2026-10-12-baseline",
-  "current_public_version": "1.00",
+  "current_public_release": "release/jra-site-v1.01-20261012",
+  "current_public_version": "1.01",
   "policy": {
     "snapshot_scope": "successfully_deployed_production_only",
     "rollback_scope": "entries_in_this_registry_only",
@@ -10,7 +10,7 @@
     "never_rollback_prediction_result_or_proof": true,
     "staging_and_production_ui_separate": true,
     "data_release_separate": true,
-    "deployment_switch_status": "legacy_main_docs_active; branch-composition activation pending"
+    "deployment_switch_status": "legacy_main_docs_active; separate production/data branches preserved pending later composite cutover"
   },
   "releases": [
     {
@@ -21,7 +21,20 @@
       "workflow_run_id": null,
       "public_version": "1.00",
       "note": "既存公開済み競馬サイトの基準HTML断面。公開日時は未確証のため記録しない。リリース履歴は正式本番公開が確認された断面だけを追加。",
-      "user_approved_baseline": true
+      "user_approved_baseline": true,
+      "rollback_branch": "release/jra-ui-v100-pre-v101-20261012"
+    },
+    {
+      "release_id": "release/jra-site-v1.01-20261012",
+      "branch": "release/jra-site-v1.01-20261012",
+      "rollback_branch": "release/jra-site-v1.01-20261012",
+      "commit_sha": "632146ccb581847ae5d4cb9535fb868b8b4517d8",
+      "deployed_at": "2026-10-12T08:49:24+09:00",
+      "workflow_run_id": 38185706485,
+      "public_version": "1.01",
+      "note": "競馬場背景写真・タイトル中央配置・検証版購入入口の撤去・東京12R臨時予想の導線撤去。予想・結果の原本は不変。",
+      "user_approved": true,
+      "http_byte_verified": true
     }
   ]
 }
