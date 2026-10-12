@@ -11,8 +11,10 @@ assert data["final_bets"]==[] and data["total_stake_yen"]==0
 assert "正式監査未了" in page and "見送り" in page and "未完了" in page
 assert page.count('class="special-card"')==1
 assert "京都12R" not in page and "2026-10-11-kyoto-12" not in page
-for name in ["index.html","this-week.html"]:
-    assert "special-2026-10-11-tokyo12.html" in (root/name).read_text()
+# v1.01 approved production release removed the temporary Tokyo12 entrance.
+# Keep the archived reference page but do not put its ad-hoc link back into normal navigation.
+for name in ["index.html","this-week.html","staging/index.html","staging/this-week.html"]:
+    assert "special-2026-10-11-tokyo12.html" not in (root/name).read_text(), name
 assert data["full_odds_8_types_verified"] is False and data["full_outcome_distribution_computed"] is False
 assert data["historical_jra_predictions_mutated"] is False
 changed=subprocess.check_output(["git","diff","--name-only","origin/main...HEAD"],text=True).splitlines()
