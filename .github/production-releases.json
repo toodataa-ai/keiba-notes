@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.02-20261012",
-  "current_public_version": "1.02",
+  "current_public_release": "release/jra-site-v1.03-20261012",
+  "current_public_version": "1.03",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -47,6 +47,20 @@
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true
+    },
+    {
+      "release_id": "release/jra-site-v1.03-20261012",
+      "branch": "release/jra-site-v1.03-20261012",
+      "commit_sha": "f5bf39b0285a231734b4616d942d0ba4ea33dcab",
+      "deployed_at": "2026-10-12T12:30:16+09:00",
+      "workflow_run_id": 38199964440,
+      "validation_workflow_run_id": 38199964480,
+      "public_version": "1.03",
+      "note": "ユーザー承認済み。本番で全頭診断をページ内開閉し、HTML/PDFを◎→○→▲→△→×順で表示。予想の思想と今後のブラッシュアップ思想をv3.15購入方式まで更新。STAGING識別横棒・ラベルは検証環境のみ表示。旧v1.02レポート・発走前予想・印・買い目・proofは不変。11ファイルの公開HTTP一致、ステージング全画面検査、v3.15 PDF検査を完了。",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true
     }
   ]
 }
