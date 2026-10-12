@@ -42,8 +42,8 @@ jobs:
             assert pdf.read_bytes()==(stage/(short+'.pdf')).read_bytes()
             for grade,a,b in [('A+','gAp','g-Aplus'),('A','gA','g-A'),('B+','gBp','g-Bplus'),
                               ('B','gB','g-B'),('B-','gBm','g-Bminus'),('C','gC','g-C')]:
-              old=re.search(r'\\.'+a+r'\\{background:(#[0-9a-f]{6});color:(#[0-9a-f]{6})\\}',legacy)
-              new=re.search(r'\\.horse-page \\.'+b+r'\\{([^}]+)\\}',hp.read_text())
+              old=re.search(r'\.'+a+r'\{background:(#[0-9a-f]{6});color:(#[0-9a-f]{6})\}',legacy)
+              new=re.search(r'\.horse-page \.'+b+r'\{([^}]+)\}',hp.read_text())
               assert old is not None and new is not None,(slug,grade,'grade css')
               assert 'background:'+old.group(1) in new.group(1)
               assert 'color:'+old.group(2) in new.group(1)
