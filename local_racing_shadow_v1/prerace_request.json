@@ -1,16 +1,15 @@
 {
   "schema_version": 1,
   "scope": "PRE-RACE",
-  "date": "2026-10-11",
-  "request_seq": 2,
+  "date": "2026-10-14",
+  "request_seq": 3,
   "production_effect": false,
   "official_calendar_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TodayRaceInfoTop",
   "expected_races_by_venue": {
-    "obihiro": 12,
-    "morioka": 12,
-    "kanazawa": 10,
-    "kochi": 11,
-    "saga": 11
+    "monbetsu": 12,
+    "kawasaki": 12,
+    "nagoya": 12,
+    "sonoda": 12
   },
-  "reason": "Idempotent re-audit of 56 official races and six pre-start frozen predictions; verify manifest and actual GitHub Pages live files. Never modify original predictions."
+  "reason": "Manual 2026-10-14 JST all four NAR active venues, 48 official races. Freeze predictions only before start; audit proof commits, coverage gaps, public manifest and live Pages. Do not change JRA files or immutable predictions."
 }
