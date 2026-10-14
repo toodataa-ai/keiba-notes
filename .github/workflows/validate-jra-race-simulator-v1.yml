@@ -16,6 +16,7 @@ on:
       - 'tools/test_race_sim_stage_v023.cjs'
       - 'tools/test_race_sim_stage_v024.cjs'
       - 'tools/test_race_sim_stage_v025.cjs'
+      - 'tools/test_race_sim_stage_v027.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -50,6 +51,8 @@ jobs:
           node tools/test_race_sim_stage_v024.cjs
           node --check tools/test_race_sim_stage_v025.cjs
           node tools/test_race_sim_stage_v025.cjs
+          node --check tools/test_race_sim_stage_v027.cjs
+          node tools/test_race_sim_stage_v027.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
@@ -76,9 +79,9 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.26' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261015-26' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-course-geometry-v1.js?v=20261015-24' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.27' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261015-27' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-course-geometry-v1.js?v=20261015-27' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           html=Path('docs/staging/race-simulator.html').read_text()
@@ -93,8 +96,10 @@ jobs:
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261015-22' in html
           assert 'race-sim-engine.js?v=20261015-26' in html
-          assert 'race-simulator.js?v=20261015-26' in html
-          assert 'value="auto" selected' in html
+          assert 'race-simulator.js?v=20261015-27' in html
+          assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
+          assert 'value="sim" selected' in html
+          assert 'width="580" height="410"' in html
           assert 'id="paceDynamics"' in html
           assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
           assert 'ゴール前80mから実況は後続も見えるゴール板固定カメラ' in html
@@ -116,7 +121,7 @@ jobs:
           assert '.live-display-grid{display:grid;grid-template-columns:' in style
           assert '@media(max-width:999px)' in style
           assert 'ranking-grid' in html
-          assert '実際のコース図（標準）' in html
+          assert 'JRA公式平面図に近づけた走路' in html
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
           PY
       - name: Run deterministic engine and real-report DOM interaction tests
@@ -287,25 +292,21 @@ jobs:
             w.RaceSimNumbers.marker(paintCtx,1,130,180,1,false,true,18);
             assert.equal(paintColors[1],wc.forHorse(1,18).fill,
               'race leader must keep its actual white frame, not leader tint');
-            // Tokyo course-plan aspect ratio: the old drawing was squashed
-            // north-south. ONLY the 580x270 overhead schematic is corrected;
-            // simulation physics coordinates and Kyoto geometry stay identical.
+            // JRA source-traced coordinates are drawn 1:1 in both axes.
+            // The old Tokyo 1.16 vertical-only scale must not be revived.
             const map=w.RaceSimMapView;
-            assert.ok(map&&typeof map.point==='function','overhead map projection exists');
-            const baseSpline=course.segments.flatMap(segment=>[segment.p0,segment.p1,segment.p2,segment.p3]);
+            assert.ok(map&&typeof map.point==='function');
+            assert.ok(course.sourcePlan&&course.mapUnitsPerMeter>.35&&course.mapUnitsPerMeter<1);
+            const baseSpline=course.segments.flatMap(s=>[s.p0,s.p1,s.p2,s.p3]);
             const coord=baseSpline.map(p=>({x:p[0],y:p[1]}));
             const projectedMap=coord.map(p=>map.point(course,p));
             const span=(v,k)=>Math.max(...v.map(q=>q[k]))-Math.min(...v.map(q=>q[k]));
-            const expectedRatio=entry.venue==='東京'?1.16:1;
-            assert.ok(Math.abs(span(projectedMap,'y')/span(coord,'y')-expectedRatio)<1e-8,
-              'Tokyo overhead shape must be ~16 percent taller, Kyoto unchanged');
-            assert.ok(Math.abs(span(projectedMap,'x')/span(coord,'x')-1)<1e-8,
-              'overhead ratio correction does not modify the east-west dimension');
+            assert.equal(span(projectedMap,'y'),span(coord,'y'));
+            assert.equal(span(projectedMap,'x'),span(coord,'x'));
             for(let i=0;i<coord.length;i++){
               assert.equal(projectedMap[i].x,coord[i].x);
-              if(entry.venue!=='東京')assert.equal(projectedMap[i].y,coord[i].y);
-              assert.ok(projectedMap[i].y>15&&projectedMap[i].y<211,
-                'corrected turf drawing fits above the altitude strip');
+              assert.equal(projectedMap[i].y,coord[i].y);
+              assert.ok(projectedMap[i].y>10&&projectedMap[i].y<310);
             }
             const commands=[['M',...course.segments[0].p0],
               ...course.segments.map(s=>['C',...s.p1,...s.p2,...s.p3])];
@@ -325,7 +326,7 @@ jobs:
               const physical=w.RaceCourseGeometry.point(course,d,1);
               const visual=map.point(course,physical);
               assert.equal(visual.x,physical.x,'never change course distance/horse x');
-              assert.ok(Math.abs(visual.y-(112+(physical.y-112)*expectedRatio))<1e-7,
+              assert.equal(visual.y,physical.y,
                 'horse markers, landmarks and course lines must align');
             }
             assert.ok(w.RaceSimNumbers,'runner positions must be rendered as moving numbers');
@@ -428,7 +429,13 @@ jobs:
             const realKyoto=w.document.getElementById('kyotoRealCourseMap');
             const simMap=w.document.getElementById('courseCanvas');
             const mapMode=w.document.getElementById('courseMapMode');
-            assert.equal(mapMode.value,'reference');
+            assert.equal(mapMode.value,'sim','source traced geometry is standard');
+            assert.equal(realFigure.hidden,true);
+            assert.equal(simMap.hidden,false);
+            assert.equal(simMap.width,580);
+            assert.equal(simMap.height,410);
+            mapMode.value='reference';
+            mapMode.dispatchEvent(new w.Event('change',{bubbles:true}));
             assert.equal(realFigure.hidden,false);
             assert.equal(w.document.querySelectorAll('.real-course-viewport').length,2);
             for(const prefix of ['tokyo','kyoto']){
@@ -453,7 +460,7 @@ jobs:
             assert.ok(w.document.querySelector('.course-panel-wide').classList.contains('is-expanded'));
             expand.click();assert.equal(expand.getAttribute('aria-expanded'),'false');
             assert.ok(!w.document.body.classList.contains('map-expanded'));
-            assert.equal(simMap.hidden,true,'default course plan must NOT be our approximate curve');
+            assert.equal(simMap.hidden,true,'reference view is an optional switch');
             const broadcast=w.document.querySelector('.broadcast.dual-view');
             const split=broadcast.querySelector('.live-display-grid');
             const livePicture=split.querySelector('.live-picture');
