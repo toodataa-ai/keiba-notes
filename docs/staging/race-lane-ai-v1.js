@@ -1,4 +1,4 @@
-/* Race Lane Decision v0.5 — safe inward convergence, deterministic hypothesis, not horse tracking data.
+/* Race Lane Decision v0.6 — safe inward convergence, deterministic hypothesis, not horse tracking data.
    Lane 0 is the inside rail on both turn directions.
    Model minimum observed JRA course width, leave safety buffers and score
    inward distance savings against traffic and safe overtaking room. */
@@ -47,12 +47,15 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  // Straight runners plan a pass before they are fully boxed in. A blocked
  // finisher needs an alternative LINE, not a position teleport or speed cheat.
  const finalStraight=Boolean(m.isFinalStraight);
- const obstructed=Boolean(front && front.d-h.d<(finalStraight?18:12));
+ const nearHomeTurn=!finalStraight&&m.toFinalStraight<=145;
+ const tactical=finalStraight||nearHomeTurn;
+ const gap=front?front.d-h.d:Infinity;
+ const obstructed=Boolean(front&&gap<(tactical?16:6));
  h.blocked=obstructed;
  if(Math.abs(h.lane-h.desiredLane)>.07)return null;
  // Each move is gradual (engine clamps lateral velocity); check the whole
  // crossing corridor and the space ahead before choosing a route.
- const cooldown=finalStraight?.65:m.bend>.5?1.50:1.0;
+ const cooldown=finalStraight?.65:nearHomeTurn?1.0:m.bend>.5?2.0:1.5;
  if(t-h.lastChange<cooldown || h.d<8)return null;
  const old=h.lane;
  function freeForward(lane,buffer){
@@ -67,8 +70,8 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  // A fast finisher in the home straight must consider free outside lines
  // BEFORE continuing its automatic inward drift into a boxed-in lane.
  // Test more than one outside target: the adjacent lane may be occupied.
- if(obstructed){
-   for(const spread of [1,2,3]){
+ if(tactical&&obstructed){
+   for(const spread of (finalStraight?[1,2,3]:[1,2])){
      const outside=route(Math.min(cfg.maxLane,old+spread),'outward','home-straight-pass');
      if(outside)return outside;
    }
@@ -77,21 +80,21 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  // In the straight, a clear inside lane is still a valid passing route.
  // "外有利" can keep a useful wider line on the final straight, but
  // cannot push a free runner out arbitrarily at every tick.
- const preferInside=!obstructed&&m.bend>.25&&old>1&&(bias!=='outer'||old>5);
+ const preferInside=(!obstructed||!tactical&&gap>4.3)&&m.bend>.25&&old>1&&(bias!=='outer'||old>5);
  if(preferInside&&old>.38){
    const inside=route(Math.max(0,old-1),'inward','clear-inner');
    if(inside)return inside;
  }
  // A blocked horse sometimes has to peel to the outside to pass;
  // avoid inventing large outward moves when no traffic needs passing.
- if(obstructed&&old<cfg.maxLane-.35){
+ if(obstructed&&gap<=4.3&&old<cfg.maxLane-.35){
    const outside=route(Math.min(cfg.maxLane,old+1),'outward','outside-pass');
    if(outside)return outside;
  }
  // In an outer-biased straight, allow moves toward the rail only
  // when the lane remains conspicuously wide (left of the default
  // target in clock-face terms). This never overrides safety.
- if(bias==='outer'&&old>4.5){
+ if(tactical&&bias==='outer'&&old>4.5){
    const inside=route(Math.max(0,old-1),'inward','reduce-excess-width');
    if(inside)return inside;
  }

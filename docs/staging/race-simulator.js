@@ -9,7 +9,7 @@ const ui={
  focus:$('focusSelect'),change:$('changeNotice'),
  canvas:$('raceCanvas'),map:$('courseCanvas'),courseMapMode:$('courseMapMode'),remaining:$('remaining'),meta:$('raceMeta'),
  caption:$('stageCaption'),elapsed:$('elapsed'),moment:$('moment'),lap:$('lap'),bar:$('meterFill'),paceDynamics:$('paceDynamics'),
- stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo'),abilityInfo:$('abilityInfo')
+ stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo'),abilityInfo:$('abilityInfo'),sixTraits:$('runnerSixTraits')
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
 let cameraMotion=null;
@@ -235,6 +235,12 @@ function renderData(){
     '｜速度補正 '+(selected.ability+selected.paceFit).toFixed(2)+'m/秒（仮説）｜'+
     a.evidence.join(' ／ ')+(a.missing.length?' ／ 不足:'+a.missing.join('、'):'')+
     ' ／ 比較除外：'+a.excluded;
+    if(ui.sixTraits){
+      const labels={early:'先行力',cruise:'巡航速度',burst:'瞬発力',sustain:'持続力',stamina:'スタミナ',acceleration:'加速性能'};
+      ui.sixTraits.innerHTML=Object.entries(labels).map(([key,label])=>
+        '<div class="runner-trait"><span>'+label+'</span><strong>'+a.six[key]+'</strong><div class="trait-bar"><i style="width:'+a.six[key]+'%"></i></div></div>'
+      ).join('');
+    }
   }
  }
  if(ui.paceDynamics){

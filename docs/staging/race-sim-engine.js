@@ -1,4 +1,4 @@
-/* Stage engine v0.21: contested pace, tactical pack pursuit and realistic late fatigue. */
+/* Stage engine v0.22: six pre-race attributes, live fatigue and stage-only race dynamics. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -34,8 +34,15 @@ function finishDrive(h,remaining,profile,pace){
  // Begin wind-up on the final bend, reach full drive in the home straight.
  const ramp=smoothstep((stretch+130-remaining)/(stretch*.85+130));
  const reserve=(h.stamina-1)*.90+h.lateKick*1.25;
+ const six=h.six;
+ const burstPhase=smoothstep((stretch*.85-remaining)/(stretch*.68));
+ const sustainPhase=smoothstep((stretch+115-remaining)/(stretch*.9+115));
+ const accelerationPhase=smoothstep((stretch+65-remaining)/(stretch*.50+65));
  const highPaceTax=pace==='H'?(h.style==='nige'?.13:h.style==='senko'?.05:0):0;
- return ramp*(LATE_STYLE_DRIVE[h.style]??.27)+ramp*reserve-ramp*highPaceTax;
+ return ramp*(LATE_STYLE_DRIVE[h.style]??.27)+ramp*reserve-ramp*highPaceTax+
+   (six.burst-50)*.008*burstPhase+
+   (six.sustain-50)*.006*sustainPhase+
+   (six.acceleration-50)*.004*accelerationPhase;
 }
 function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -94,10 +101,10 @@ function create(data,options={}){
    desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    launchMergeMoves:0,
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
-   stamina:traits.stamina,
-   launchVariation:traits.earlySpeed+(rng()-.5)*.30,
+   stamina:clamp(.90+traits.six.stamina*.002,.90,1.10),six:traits.six,
+   launchVariation:traits.earlySpeed+(traits.six.early-50)*.007+(rng()-.5)*.30,
    surge:(rng()-.5)*.30,tempo:(rng()-.5)*.12,
-   ability:traits.baseSpeed+traits.courseSpeed,paceFit:traits.paceSpeed,
+   ability:traits.baseSpeed+traits.courseSpeed+(traits.six.cruise-50)*.004,paceFit:traits.paceSpeed,
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
    displayD:0,runoffSpeed:0,
    trail:[],events:0,phase:rng()*6,lateKick:traits.kick+(rng()-.5)*.16,
@@ -109,7 +116,7 @@ function create(data,options={}){
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
-    laneModel:'v0.7-tactical-overtake',laneCount:laneCfg.maxLane+1,
+    laneModel:'v0.8-staged-tactical-overtake',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
     finalStraightPasses:0,lastOvertakeLog:-100,straightEntryOrder:null,
     runoffMeters:RUNOFF_M,allCrossedAt:null,displayFinished:false,goalCamera:false,

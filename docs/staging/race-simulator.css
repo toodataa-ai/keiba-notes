@@ -143,3 +143,12 @@ body.map-expanded{overflow:hidden}
 .pace-ticker[data-pace="S"]{color:#2f5670;background:#edf5fb}
 
 .ability-info{font-size:10px;line-height:1.65;color:#43586b;background:#f0f5f7;padding:8px 10px;border-left:3px solid #54768a;border-radius:4px;overflow-wrap:anywhere;margin:6px 0 10px}
+
+/* Stage 0.22: restrained six-trait values, mobile two-column layout. */
+.runner-six-traits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0}
+.runner-trait{min-width:0;padding:7px 9px;background:rgba(135,170,137,.08);border:1px solid rgba(137,170,140,.2);border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 7px;font-size:12px}
+.runner-trait span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.runner-trait strong{font-size:15px;font-variant-numeric:tabular-nums}
+.trait-bar{grid-column:1/-1;height:4px;background:rgba(156,176,159,.20);border-radius:4px;overflow:hidden}
+.trait-bar i{display:block;height:100%;background:#84ac7b;border-radius:4px}
+@media(max-width:550px){.runner-six-traits{grid-template-columns:repeat(2,minmax(0,1fr))}}
