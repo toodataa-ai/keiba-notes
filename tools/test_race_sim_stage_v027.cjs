@@ -43,8 +43,8 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
   minStep:+minMove.toFixed(3),maxStep:+maxMove.toFixed(3),maxTurn:+maxDirection.toFixed(5)}));
 }
 const html=fs.readFileSync('docs/staging/race-simulator.html','utf8');
-assert.match(html,/value="sim" selected/);
-assert.match(html,/Stage v0\.27/);
-assert.match(html,/width="580" height="410"/);
+assert.ok(!html.includes('id="courseMapMode"')&&!html.includes('id="courseCanvas"'));
+assert.match(html,/Stage v0\.\d+/);
+assert.ok(html.includes('id="referenceMapFigure"'));
 assert.ok(!html.includes('id="paceSelect"')&&!html.includes('id="cameraSelect"'));
 console.log('PASS_V027_STAGE_SHAPE_REGISTRATION_AND_DEFAULT');

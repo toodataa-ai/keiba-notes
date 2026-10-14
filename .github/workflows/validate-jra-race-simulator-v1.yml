@@ -17,6 +17,7 @@ on:
       - 'tools/test_race_sim_stage_v024.cjs'
       - 'tools/test_race_sim_stage_v025.cjs'
       - 'tools/test_race_sim_stage_v027.cjs'
+      - 'tools/test_race_sim_stage_v028.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -53,6 +54,8 @@ jobs:
           node tools/test_race_sim_stage_v025.cjs
           node --check tools/test_race_sim_stage_v027.cjs
           node tools/test_race_sim_stage_v027.cjs
+          node --check tools/test_race_sim_stage_v028.cjs
+          node tools/test_race_sim_stage_v028.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
@@ -79,9 +82,9 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.27' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261015-27' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-course-geometry-v1.js?v=20261015-27' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.28' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261015-28' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-course-geometry-v1.js?v=20261015-28' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           html=Path('docs/staging/race-simulator.html').read_text()
@@ -92,18 +95,19 @@ jobs:
           assert 'https://umapot.com/?page_id=116' in html
           assert '馬番の位置はコース図への手動の近似位置合わせ' in html
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-23' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-28' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261015-22' in html
           assert 'race-sim-engine.js?v=20261015-26' in html
-          assert 'race-simulator.js?v=20261015-27' in html
+          assert 'race-simulator.js?v=20261015-28' in html
           assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
-          assert 'value="sim" selected' in html
-          assert 'width="580" height="410"' in html
+          assert 'id="courseMapMode"' not in html and 'id="courseCanvas"' not in html
+          assert 'id="pathToggle"' not in html
+          assert 'class="reference-map-figure"' in html
           assert 'id="paceDynamics"' in html
           assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
           assert 'ゴール前80mから実況は後続も見えるゴール板固定カメラ' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-23' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-28' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
           assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html
@@ -427,15 +431,10 @@ jobs:
             const realFigure=w.document.getElementById('referenceMapFigure');
             const realTokyo=w.document.getElementById('tokyoRealCourseMap');
             const realKyoto=w.document.getElementById('kyotoRealCourseMap');
-            const simMap=w.document.getElementById('courseCanvas');
-            const mapMode=w.document.getElementById('courseMapMode');
-            assert.equal(mapMode.value,'sim','source traced geometry is standard');
-            assert.equal(realFigure.hidden,true);
-            assert.equal(simMap.hidden,false);
-            assert.equal(simMap.width,580);
-            assert.equal(simMap.height,410);
-            mapMode.value='reference';
-            mapMode.dispatchEvent(new w.Event('change',{bubbles:true}));
+            // Only the Umapot illustration appears below the race footage.
+            assert.equal(w.document.getElementById('courseCanvas'),null);
+            assert.equal(w.document.getElementById('courseMapMode'),null);
+            assert.equal(w.document.getElementById('pathToggle'),null);
             assert.equal(realFigure.hidden,false);
             assert.equal(w.document.querySelectorAll('.real-course-viewport').length,2);
             for(const prefix of ['tokyo','kyoto']){
@@ -460,7 +459,7 @@ jobs:
             assert.ok(w.document.querySelector('.course-panel-wide').classList.contains('is-expanded'));
             expand.click();assert.equal(expand.getAttribute('aria-expanded'),'false');
             assert.ok(!w.document.body.classList.contains('map-expanded'));
-            assert.equal(simMap.hidden,true,'reference view is an optional switch');
+            assert.equal(realFigure.hidden,false,'Umapot is the single persistent map');
             const broadcast=w.document.querySelector('.broadcast.dual-view');
             const split=broadcast.querySelector('.live-display-grid');
             const livePicture=split.querySelector('.live-picture');
@@ -474,14 +473,9 @@ jobs:
               'details must stay collapsed for simultaneous viewing');
             assert.equal(realTokyo.hidden,entry.venue!=='東京');
             assert.equal(realKyoto.hidden,entry.venue!=='京都');
-            mapMode.value='sim';
-            mapMode.dispatchEvent(new w.Event('change',{bubbles:true}));
-            assert.equal(simMap.hidden,false,'manual switch exposes simulator positions');
-            assert.equal(realFigure.hidden,true,'do not overlay unmapped runner dots on the real map');
-            mapMode.value='reference';
-            mapMode.dispatchEvent(new w.Event('change',{bubbles:true}));
-            assert.equal(simMap.hidden,true);
             assert.equal(realFigure.hidden,false);
+            assert.equal(realTokyo.hidden,entry.venue!=='東京');
+            assert.equal(realKyoto.hidden,entry.venue!=='京都');
             assert.equal(w.document.getElementById('tokyoCourseImage')
               .getAttribute('src'),'https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse_1.jpg');
             assert.equal(w.document.getElementById('kyotoCourseImage')
