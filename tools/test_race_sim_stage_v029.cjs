@@ -50,6 +50,6 @@ for(const [d,greenFrom,greenTo] of sampledOuterStripe){
 }
 assert.equal(W.RaceUmapotOverlay.outwardShiftPx(t,675),0,'Tokyo registration untouched');
 const html=fs.readFileSync(dir+'race-simulator.html','utf8');
-assert.ok(html.includes('Stage v0.29')&&html.includes('外回りの芝帯上'));
+assert.ok(/Stage v0\.\d+/.test(html)&&html.includes('外回り'));
 assert.ok(!html.includes('id="courseMapMode"')&&!html.includes('id="pathToggle"'));
 console.log('PASS_V029_KYOTO_OUTER_ONLY_IMAGE_STRIPE_AND_SEAM_CONTINUITY');

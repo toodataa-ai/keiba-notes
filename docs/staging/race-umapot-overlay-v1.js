@@ -58,11 +58,15 @@ function railEdgePx(course,d){
 // not physical track metres; no changes to race simulation physics.
 const outerRailCorrection=Object.freeze({
  kyoto_turf_outer_1400:[
-  [0,0],[225,1],[365,3],[445,4],[500,5],[540,7],
-  [570,10],[600,15],[650,21],[675,22],[700,24],
-  [725,26],[750,28],[775,28],[805,26],[830,24],
-  [860,19],[890,14],[920,9],[950,8],[970,8],
-  [996.3,8],[1100,7],[1250,6],[1400,6]
+  // Source-image white split is only 5–10px wide. Place the NUMBER center
+  // outside that split with positive margin through 3→4C (not on its edge).
+  // In the bend's last half the two green fields merge; preserve the outer
+  // continuation instead of cutting back toward the inside horse track.
+  [0,0],[225,1],[365,3],[445,6],[500,10],[540,14],
+  [570,18],[600,24],[650,29],[675,31],[700,33],
+  [725,35],[750,39],[775,42],[805,44],[830,42],
+  [860,39],[890,34],[920,23],[950,16],[970,13],
+  [996.3,10],[1100,7],[1250,6],[1400,6]
  ]
 });
 function outwardShiftPx(course,d){
