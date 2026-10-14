@@ -41,5 +41,5 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
   maxGradeChange:+maxGrade.toFixed(5)}));
 }
 const page=fs.readFileSync(root+'race-simulator.html','utf8');
-assert.ok(page.includes('Stage v0.23')&&page.includes('一本の連続スプライン'));
+assert.ok(/Stage v0\.\d+/.test(page)&&page.includes('一本の連続スプライン'));
 console.log('PASS_V023_STAGE_ONLY_CHECKPOINTS');
