@@ -428,7 +428,7 @@ jobs:
             const start=w.document.getElementById('startBtn');
             const ranks=w.document.querySelectorAll('.standing-row');
             assert.equal(race.value,entry.id);
-            assert.equal(ranks.length,entry.field_size);
+            assert.equal(ranks.length,entry.field_size,'ui load result: '+w.document.getElementById('standings').textContent);
             const realFigure=w.document.getElementById('referenceMapFigure');
             const realTokyo=w.document.getElementById('tokyoRealCourseMap');
             const realKyoto=w.document.getElementById('kyotoRealCourseMap');
