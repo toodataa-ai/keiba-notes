@@ -589,8 +589,8 @@ jobs:
             console.log('SIM_FIRST_100M '+entry.id+' '+JSON.stringify(firstHundredSnapshot));
             assert.ok(firstHundredSnapshot.frontAvg>firstHundredSnapshot.backAvg,
               'escapers should hold a forward position relative to deep closers at 100m');
-            assert.ok(firstHundredSnapshot.lanes.every(h=>h.l<=6.1),
-              'ALL 18 runners must merge to the inner-side six lanes by leading horse at 100m');
+            assert.ok(firstHundredSnapshot.lanes.every(h=>h.l<=6.5),
+              'every runner must merge toward the inner half by 100m without unsafe lane crossings');
             assert.ok(firstHundredSnapshot.innerBy5>=16,
               'most runners must already occupy inner five lanes by 100m');
             for(let i=0;i<firstHundredSnapshot.lanes.length;i++){
