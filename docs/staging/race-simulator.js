@@ -5,9 +5,9 @@ const $=id=>document.getElementById(id);
 const ui={
  race:$('raceSelect'),bias:$('biasSelect'),seed:$('seedInput'),
  speed:$('speedSelect'),start:$('startBtn'),pause:$('pauseBtn'),
- restart:$('restartBtn'),newSeed:$('newSeedBtn'),path:$('pathToggle'),
+ restart:$('restartBtn'),newSeed:$('newSeedBtn'),
  focus:$('focusSelect'),change:$('changeNotice'),
- canvas:$('raceCanvas'),map:$('courseCanvas'),courseMapMode:$('courseMapMode'),remaining:$('remaining'),meta:$('raceMeta'),
+ canvas:$('raceCanvas'),map:null,remaining:$('remaining'),meta:$('raceMeta'),
  caption:$('stageCaption'),elapsed:$('elapsed'),moment:$('moment'),lap:$('lap'),bar:$('meterFill'),paceDynamics:$('paceDynamics'),
  stands:$('standings'),events:$('raceEvents'),course:$('courseLabel'),source:$('sourceInfo'),abilityInfo:$('abilityInfo'),sixTraits:$('runnerSixTraits')
 };
@@ -143,15 +143,11 @@ async function loadRace(id){
 /* Licensed reference map and hypothetical simulation must remain distinct:
    no number overlays on real imagery until independently georeferenced. */
 function updateCourseReference(){
- const mode=ui.courseMapMode?.value||'reference';
  const figure=$('referenceMapFigure'),tokyo=$('tokyoRealCourseMap'),kyoto=$('kyotoRealCourseMap');
- const region=race?.course_id==='tokyo_turf_2000'?'tokyo':
-    race?.course_id==='kyoto_turf_outer_1400'?'kyoto':null;
- if(figure)figure.hidden=mode!=='reference'||!region;
- if(tokyo)tokyo.hidden=mode!=='reference'||region!=='tokyo';
- if(kyoto)kyoto.hidden=mode!=='reference'||region!=='kyoto';
- if(ui.map)ui.map.hidden=mode!=='sim';
- if(mode==='sim'&&sim)drawCourse();
+ const region=race?.course_id==='tokyo_turf_2000'?'tokyo':race?.course_id==='kyoto_turf_outer_1400'?'kyoto':null;
+ if(figure)figure.hidden=!region;
+ if(tokyo)tokyo.hidden=region!=='tokyo';
+ if(kyoto)kyoto.hidden=region!=='kyoto';
 }
 function setupReferenceMapErrorHandling(){
  for(const id of ['tokyoCourseImage','kyotoCourseImage']){
@@ -160,7 +156,7 @@ function setupReferenceMapErrorHandling(){
    img.addEventListener('error',()=>{
      const warn=$('courseMapWarning');
      if(warn){warn.hidden=false;
-       warn.textContent='うまぽっとのコース図を表示できませんでした。出典リンクから素材ページを開くか「仮想走行位置」に切り替えてください。';}
+       warn.textContent='うまぽっとの画像を読み込めませんでした。素材の出典リンクをご確認ください。';}
      img.hidden=true;
    });
    img.addEventListener('load',()=>{
@@ -535,7 +531,7 @@ function drawRace(){
    drawGoalCamera(ctx,state,profile,w,h,renderedWidth,target);
    drawCourse();
    if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,
-      ui.path.checked,RaceSimNumbers.marker);
+      false,RaceSimNumbers.marker);
    return;
  }
  const requested=mode==='overview'
@@ -573,10 +569,9 @@ function drawRace(){
  }
  // Race-specific running route with clear inner and outer rails.
  traceRace(ctx,profile);strokePath(ctx,41,'#274832');
- traceRace(ctx,profile);strokePath(ctx,35,'#d9d7b7');
+ traceRace(ctx,profile);strokePath(ctx,35,'#7a9e61');
  traceRace(ctx,profile);strokePath(ctx,31,'#87af65');
  traceRace(ctx,profile);strokePath(ctx,27,'#75a85f');
- traceRace(ctx,profile);strokePath(ctx,1.2,'rgba(234,249,208,.5)');
  // Distance markings use the shared physical race d-axis.
  const marks=[0,profile.distance_m-profile.straight_m,profile.distance_m-400,profile.distance_m-200,profile.distance_m];
  for(const d of marks){
@@ -584,20 +579,6 @@ function drawRace(){
    const q=RaceCourseGeometry.point(profile,d,0);
    ctx.fillStyle=d===profile.distance_m?'#faf2b8':'#e8f5d4';
    ctx.beginPath();ctx.arc(q.x,q.y,2.8,0,Math.PI*2);ctx.fill();
- }
- if(ui.path.checked){
-   for(const horse of state.horses){
-     const important=horse.number===state.leadingNo||horse===target||horse.mark==='◎';
-     if(!important)continue;
-     const pts=horse.trail;
-     if(!pts.length)continue;
-     ctx.beginPath();
-     pts.forEach((q,i)=>{
-       const p=RaceCourseGeometry.point(profile,q.d,q.lane);
-       if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
-     });
-     strokePath(ctx,horse===target?1.75:1.2,horse===target?'#fff0ad':'#f0e6c3');
-   }
  }
  ctx.restore();
  const points=projectRaceNumbers(state.horses,profile,origin,zoom,w,h,
@@ -613,7 +594,7 @@ function drawRace(){
    String(visibleNumbers.length)+' / '+String(state.horses.length)+'頭 表示中',788,55);
  ctx.textAlign='start';
  drawCourse();
- if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,ui.path.checked,RaceSimNumbers.marker);
+ if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,false,RaceSimNumbers.marker);
 }
 /* Source-relative x/y after tracing JRA official planar course diagrams.
  * No additional anisotropic rendering correction is permitted. */
@@ -699,20 +680,6 @@ function drawCourse(){
  ctx.fillText('JRA公式平面図ベース・測量座標ではありません',16,34);
  // The 18 runners share a continuous, monotone race-only path;
  // no horse is drawn on the non-racing inner/outer circuit.
- for(const h of sim.state.horses){
-   if(!ui.path.checked)continue;
-   const selected=ui.focus.value===String(h.number)||ui.focus.value==='leader'&&h.number===sim.state.leadingNo;
-   if(!selected&&h.mark!=='◎')continue;
-   ctx.beginPath();let started=false;
-   // Subsample the full route every 6m in addition to the most recent trail;
-   // all pixels and physics consult RaceCourseGeometry.point().
-   for(const pt of h.trail){
-     const pos=planPoint(prof,RaceCourseGeometry.point(prof,pt.d,pt.lane));
-     if(!started){ctx.moveTo(pos.x,pos.y);started=true}
-     else ctx.lineTo(pos.x,pos.y);
-   }
-   ctx.strokeStyle=selected?'#f8ea9d':'#e2d1a1';ctx.lineWidth=selected?2.4:1.6;ctx.stroke();
- }
  const horses=sim.state.horses.slice().sort((x,y)=>(x.displayD??x.d)-(y.displayD??y.d));
  for(const h of horses){
    const p=planPoint(prof,RaceCourseGeometry.point(prof,h.displayD??h.d,h.lane));
@@ -761,7 +728,6 @@ async function initialize(){
  }catch(e){ui.stands.innerHTML='<p class="error">'+esc(e.message)+'</p>';ui.moment.textContent='原本データを確認できません'}
 }
 setupReferenceMapErrorHandling();
-if(ui.courseMapMode)ui.courseMapMode.addEventListener('change',updateCourseReference);
 ui.race.addEventListener('change',()=>loadRace(ui.race.value));
 for(const input of [ui.bias,ui.seed])input.addEventListener('change',markDirty);
 ui.start.addEventListener('click',()=>{
@@ -776,7 +742,6 @@ ui.newSeed.addEventListener('click',()=>{
  reset(true);
 });
 ui.focus.addEventListener('change',render);
-ui.path.addEventListener('change',render);
 ui.speed.addEventListener('change',render);
 window.addEventListener('resize',()=>{cameraMotion=null;resizeRaceCanvas();render()});
 resizeRaceCanvas();

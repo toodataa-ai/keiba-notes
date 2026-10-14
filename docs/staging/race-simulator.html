@@ -54,11 +54,7 @@
    </div>
  <section class="panel course-panel course-panel-wide" aria-label="コース俯瞰図">
    <div class="panel-head"><h2>全体図 <span class="map-sync-status">● 実況と同期</span></h2><span id="courseLabel">芝・距離</span></div>
-   <div class="map-control-row"><label class="reference-map-switch">表示<select id="courseMapMode" aria-label="実コース図または仮想走行位置">
-     <option value="reference">うまぽっとのコース図</option>
-     <option value="sim" selected>JRA公式平面図に近づけた走路・高低差（標準）</option>
-   </select></label>
-   <div class="map-view-toolbar"><button id="mapExpandBtn" type="button" aria-expanded="false" aria-label="全体コース図を全画面に拡大">⛶ 全画面で見る</button><span class="map-view-hint">余白を省いてコース部分を拡大表示。さらに拡大すると横スクロールできます。</span></div>
+   <div class="map-control-row"><div class="map-view-toolbar"><button id="mapExpandBtn" type="button" aria-expanded="false" aria-label="全体コース図を全画面に拡大">⛶ 全画面で見る</button><span class="map-view-hint">余白を省いてコース部分を拡大表示。さらに拡大すると横スクロールできます。</span></div>
    <label class="reference-scale-switch">図の大きさ<select id="referenceScale"><option value="fit" selected>コースを大きく表示（標準）</option><option value="zoom150">さらに拡大（1.5倍）</option><option value="zoom200">最大拡大（2倍）</option><option value="native">等倍表示（横スクロール）</option><option value="uncropped">元画像（余白も表示）</option></select></label></div>
    <div class="reference-map-figure" id="referenceMapFigure">
      <div id="tokyoRealCourseMap" hidden>
@@ -75,9 +71,8 @@
          alt="うまぽっと公開の京都競馬場・主要コース図。芝内回りと外回り、および芝1400m外回りのスタート位置を含む図。"><canvas id="kyotoCourseOverlay" class="real-course-overlay" width="620" height="430" role="img" aria-label="うまぽっとの実コース図の上を仮想馬番が移動"></canvas></div></div></div>
        <p class="real-map-credit">コース図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと「京都競馬場コース素材」</a>。フリー素材を図として表示しています。</p>
      </div>
-     <p class="small-muted">うまぽっとのコース図は比較用です。標準表示はJRA公式平面図を基準に芝走路を再トレースした図です。<strong>馬番の位置はコース図への手動の近似位置合わせ</strong>で、GPSやレース映像からの実測ではありません。</p>
+     <p class="small-muted">下の全体図はうまぽっと画像に固定。馬番の位置は画像の内ラチ側を基準に近似補正しています。<strong>馬番の位置はコース図への手動の近似位置合わせ</strong>で、GPSやレース映像からの実測ではありません。</p>
    </div>
-   <canvas id="courseCanvas" width="580" height="410" role="img" aria-label="JRA平面図の芝の走路をトレースしたコース近似図。測量座標ではないコース上を馬番が移動します。"></canvas>
    <p id="courseMapWarning" class="small-muted" hidden>配布サイトの画像に接続できませんでした。素材の元ページをご確認いただくか「仮想走行位置」に切り替えてください。</p>
    <details class="course-reference-details"><summary>コースの説明・公式寸法・素材の利用条件</summary>
    <p class="small-muted" id="courseFeatures">JRA公式の競馬場資料に基づきコースを確認しています。</p>
@@ -86,7 +81,7 @@
    </details>
   </section>
   </div>
-  <div class="track-tools"><span id="courseSegment">コース区間を読み込み中…</span><span id="laneStatus">内ラチ優先・進路選択中…</span><label><input id="pathToggle" type="checkbox" checked> 進路の軌跡を表示</label></div>
+  <div class="track-tools"><span id="courseSegment">コース区間を読み込み中…</span><span id="laneStatus">内ラチ優先・進路選択中…</span></div>
   <div id="wakuLegend" class="waku-legend" role="list" aria-label="JRA 1枠から8枠の枠色一覧"></div>
  </section>
 
@@ -121,14 +116,14 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.27 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
-<script src="race-course-geometry-v1.js?v=20261015-27"></script>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.28 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<script src="race-course-geometry-v1.js?v=20261015-28"></script>
 <script src="race-lane-ai-v1.js?v=20261015-25"></script>
 <script src="race-runner-style-v1.js?v=20261015-24"></script>
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
-<script src="race-umapot-overlay-v1.js?v=20261015-23"></script>
+<script src="race-umapot-overlay-v1.js?v=20261015-28"></script>
 <script src="race-sim-engine.js?v=20261015-26"></script>
-<script src="race-simulator.js?v=20261015-27"></script>
+<script src="race-simulator.js?v=20261015-28"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body>
 </html>
