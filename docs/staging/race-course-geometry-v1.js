@@ -64,7 +64,7 @@ const COURSE={
   ],
   // Inner course uses the shorter internal bend and rejoins near the exit.
   inner_turn:[
-    ['M',458,49],['C',488,52,509,86,500,128],
+    ['M',458,35],['C',488,47,509,86,500,128],
     ['C',496,163,480,194,462,209]
   ],
   branch:[['M',198,78],['C',143,87,80,104,20,101]],
