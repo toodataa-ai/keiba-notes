@@ -125,7 +125,8 @@ jobs:
           assert '.live-display-grid{display:grid;grid-template-columns:' in style
           assert '@media(max-width:999px)' in style
           assert 'ranking-grid' in html
-          assert 'JRA公式平面図に近づけた走路' in html
+          assert 'うまぽっとのコース図' in html
+          assert 'id="courseMapMode"' not in html
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
           PY
       - name: Run deterministic engine and real-report DOM interaction tests
