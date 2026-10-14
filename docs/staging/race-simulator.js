@@ -615,16 +615,10 @@ function drawRace(){
  drawCourse();
  if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,ui.path.checked,RaceSimNumbers.marker);
 }
-/* DISPLAY-ONLY course-plan aspect correction. Tokyo's hand-fitted
-   schematic has an overly flat north/south extent relative to the JRA
-   flat plan. Apply a slight 16% Y-axis expansion around its center.
-   This must NEVER alter RaceCourseGeometry.point() or physics metres.
-   Kyoto's map is left IDENTICAL. */
-const COURSE_PLAN_Y=Object.freeze({tokyo_turf_2000:1.16});
-function planPoint(profile,p){
- const ratio=COURSE_PLAN_Y[profile?.id]||1;
- return {x:p.x,y:112+(p.y-112)*ratio};
-}
+/* Source-relative x/y after tracing JRA official planar course diagrams.
+ * No additional anisotropic rendering correction is permitted. */
+const COURSE_PLAN_Y=Object.freeze({});
+function planPoint(profile,p){return {x:p.x,y:p.y}}
 function planCoordinates(profile,commands){
  return commands.map(op=>{
    if(op[0]==='M'){
@@ -645,10 +639,10 @@ function drawCourse(){
  if(!sim||!race)return;
  const ctx=ui.map.getContext('2d');if(!ctx)return;
  const prof=RaceCourseGeometry.get(race.course_id);if(!prof)return;
- ctx.clearRect(0,0,580,270);
- rect(ctx,0,0,580,270,'#1b3a2c');
+ ctx.clearRect(0,0,580,410);
+ rect(ctx,0,0,580,410,'#1b3a2c');
  for(let k=0;k<70;k++){
-   const x=(k*83)%580,y=(k*47)%206;
+   const x=(k*83)%580,y=(k*47)%310;
    rect(ctx,x,y,18,2,k%4===0?'#295039':'#234432');
  }
  // Full course and any additional Kyoto inner track are traced as separate
@@ -702,7 +696,7 @@ function drawCourse(){
  ctx.fillStyle='#eff1e6';ctx.font='bold 11px Meiryo';
  ctx.fillText(prof.layout,16,19);
  ctx.fillStyle='#b8d1bd';ctx.font='10px Meiryo';
- ctx.fillText('黄色線：実走路（仮想レーン）  ·  座標は近似',16,34);
+ ctx.fillText('JRA公式平面図ベース・測量座標ではありません',16,34);
  // The 18 runners share a continuous, monotone race-only path;
  // no horse is drawn on the non-racing inner/outer circuit.
  for(const h of sim.state.horses){
@@ -732,12 +726,12 @@ function drawCourse(){
    }
  }
  // Elevation chart shares the exact profile breakpoints consumed by physics.
- const chartTop=217,chartBottom=260,left=65,right=552;
- rect(ctx,0,211,580,59,'#152e25');
- ctx.fillStyle='#bfd0c4';ctx.font='bold 10px Meiryo';ctx.fillText('標高差',8,226);
- ctx.font='10px monospace';ctx.fillText('m',29,241);
+ const chartTop=334,chartBottom=395,left=65,right=552;
+ rect(ctx,0,318,580,92,'#152e25');
+ ctx.fillStyle='#bfd0c4';ctx.font='bold 10px Meiryo';ctx.fillText('標高差',8,338);
+ ctx.font='10px monospace';ctx.fillText('m',29,351);
  const zvals=prof.profile.map(p=>p[1]);const zlo=Math.min(...zvals),zhi=Math.max(...zvals);
- const zToY=v=>chartBottom-7-(v-zlo)/(zhi-zlo||1)*32;
+ const zToY=v=>chartBottom-10-(v-zlo)/(zhi-zlo||1)*43;
  const dToX=d=>left+(right-left)*d/prof.distance_m;
  ctx.strokeStyle='#688872';ctx.lineWidth=1;ctx.beginPath();
  ctx.moveTo(left,zToY(0));ctx.lineTo(right,zToY(0));ctx.stroke();
@@ -747,9 +741,9 @@ function drawCourse(){
  const pin=dToX(sim.state.leader),z=zToY(RaceCourseGeometry.height(prof,sim.state.leader));
  ctx.fillStyle='#fef7dc';ctx.beginPath();ctx.arc(pin,z,4,0,Math.PI*2);ctx.fill();
  ctx.font='10px monospace';ctx.fillStyle='#b6c5bb';
- ctx.fillText('START',left,269);ctx.fillText('GOAL',right-28,269);
+ ctx.fillText('START',left,405);ctx.fillText('GOAL',right-28,405);
  ctx.font='bold 10px Meiryo';ctx.fillStyle='#e6ebdf';
- ctx.fillText('▲ '+prof.elevation_range_m.toFixed(1)+'m',470,222);
+ ctx.fillText('▲ '+prof.elevation_range_m.toFixed(1)+'m',470,335);
 }
 function markDirty(){if(running){notify('条件変更は次の再スタートから反映されます。')}else{notify('変更した条件はスタート時に使用します。')}}
 async function initialize(){
