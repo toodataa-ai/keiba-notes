@@ -617,7 +617,8 @@ function planCoordinates(profile,commands){
 }
 window.RaceSimMapView=Object.freeze({point:planPoint,commands:planCoordinates,verticalRatio:COURSE_PLAN_Y});
 function drawCourse(){
- if(!sim||!race)return;
+ // The old schematic canvas is intentionally absent in Umapot-only mode.
+ if(!ui.map||!sim||!race)return;
  const ctx=ui.map.getContext('2d');if(!ctx)return;
  const prof=RaceCourseGeometry.get(race.course_id);if(!prof)return;
  ctx.clearRect(0,0,580,410);
