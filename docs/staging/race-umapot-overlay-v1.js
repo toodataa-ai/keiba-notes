@@ -51,11 +51,34 @@ function railEdgePx(course,d){
  const a=knots[i],b=knots[i+1],f=clamp((x-a[0])/(b[0]-a[0]||1),0,1);
  return a[1]+(b[1]-a[1])*f;
 }
+// Outer-course stripe registration on Umapot's Kyoto A-course illustration.
+// At the 3rd and 4th bends the green *inner* and *outer* circuits coexist.
+// The previous centerline followed the inner stripe; these independently
+// sampled outward-normal shifts choose the OUTER turf ribbon. Image pixels,
+// not physical track metres; no changes to race simulation physics.
+const outerRailCorrection=Object.freeze({
+ kyoto_turf_outer_1400:[
+  [0,0],[225,1],[365,3],[445,4],[500,5],[540,7],
+  [570,10],[600,15],[650,21],[675,22],[700,24],
+  [725,26],[750,28],[775,28],[805,26],[830,24],
+  [860,19],[890,14],[920,9],[950,8],[970,8],
+  [996.3,8],[1100,7],[1250,6],[1400,6]
+ ]
+});
+function outwardShiftPx(course,d){
+ const anchors=outerRailCorrection[course.id];if(!anchors)return 0;
+ const x=clamp(d,0,course.distance_m);let i=0;
+ while(i<anchors.length-2&&x>anchors[i+1][0])i++;
+ const a=anchors[i],b=anchors[i+1],z=clamp((x-a[0])/(b[0]-a[0]||1),0,1);
+ // Smooth at every anchor to prevent a kink when switching course sections.
+ const smooth=z*z*(3-2*z);
+ return a[1]+(b[1]-a[1])*smooth;
+}
 function point(course,d,lane=0){
  if(!path[course?.id])throw Error('UMAPOT_UNSUPPORTED_COURSE');
  const p=referenceLine(course).at(d);
  const towardInsidePx=railEdgePx(course,d)-(1.8+clamp(Number(lane)||0,0,18)*1.65)*1.30;
- const offset=-towardInsidePx*(course.turn==='左'?1:-1);
+ const offset=-towardInsidePx*(course.turn==='左'?1:-1)-outwardShiftPx(course,d);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset};
 }
 function validate(course){
@@ -113,5 +136,5 @@ function setup(){
  }
 }
 setup();
-global.RaceUmapotOverlay=Object.freeze({point,validate,draw,width:620,height:430});
+global.RaceUmapotOverlay=Object.freeze({point,validate,draw,outwardShiftPx,width:620,height:430});
 })(typeof window!=='undefined'?window:globalThis);

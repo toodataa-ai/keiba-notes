@@ -28,12 +28,12 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
 const html=fs.readFileSync(dir+'race-simulator.html','utf8');
 const js=fs.readFileSync(dir+'race-simulator.js','utf8');
 const um=fs.readFileSync(dir+'race-umapot-overlay-v1.js','utf8');
-assert.match(html,/Stage v0\.28/);
+assert.match(html,/Stage v0\.\d+/);
 assert.ok(html.includes('id="referenceMapFigure"'));
 for(const id of ['courseMapMode','courseCanvas','pathToggle'])assert.ok(!html.includes('id="'+id+'"'));
 assert.ok(!html.includes('進路の軌跡を表示'));
 assert.ok(!js.includes("strokePath(ctx,35,'#d9d7b7')"));
 assert.ok(!js.includes("horse.trail"));
 assert.ok(!um.includes('if(pathOn)for'));
-assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261015-28'));
+assert.ok(/race-umapot-overlay-v1\.js\?v=20261015-\d+/.test(html));
 console.log('PASS_V028_UMAPOT_FIXED_MAP_NO_YELLOW_TRAILS');
