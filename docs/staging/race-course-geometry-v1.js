@@ -129,46 +129,62 @@ function segmentAt(profile,d){
  return profile.segments.find(s=>x<=s.to+1e-8)||profile.segments.at(-1);
 }
 function rawCenter(profile,d){
- const s=segmentAt(profile,d),x=clamp(d,0,profile.distance_m);
- const ratio=clamp((x-s.from)/(s.to-s.from),0,1);
- return cubic(s,tByLength(s,ratio));
+ const x=clamp(d,0,profile.distance_m),s=segmentAt(profile,x);
+ return cubic(s,tByLength(s,clamp((x-s.from)/(s.to-s.from),0,1)));
 }
-// Use smooth world-space positions at every manually fitted cubic seam.
-// Without this, the lane normal changes suddenly at sector checkpoints.
-function centerXY(profile,d){
- const x=clamp(d,0,profile.distance_m),base=rawCenter(profile,x);
- let nearest=Infinity;
- for(const s of profile.segments.slice(1))nearest=Math.min(nearest,Math.abs(x-s.from));
- if(nearest>=18)return {x:base.x,y:base.y};
- let sx=0,sy=0;
- for(const [delta,k] of [[-12,1],[-6,4],[0,6],[6,4],[12,1]]){
-  const q=rawCenter(profile,clamp(x+delta,0,profile.distance_m));sx+=q.x*k;sy+=q.y*k;
+/* ONE globally smooth race curve in distance coordinates for position and
+ * tangent. Source Beziers are used only to prepare sampled control points.
+ * Every frame evaluates the same C1 cubic-Hermite spline, across landmarks. */
+function continuousLine(profile,source){
+ const n=Math.ceil(profile.distance_m),step=profile.distance_m/n;
+ const raw=Array.from({length:n+1},(_,i)=>source(i*step));
+ function ext(i){
+  if(i<0)return{x:raw[0].x+i*(raw[1].x-raw[0].x),y:raw[0].y+i*(raw[1].y-raw[0].y)};
+  if(i>n)return{x:raw[n].x+(i-n)*(raw[n].x-raw[n-1].x),y:raw[n].y+(i-n)*(raw[n].y-raw[n-1].y)};
+  return raw[i];
  }
- const blend=1-smoothstep(nearest/18);
- return {x:base.x*(1-blend)+(sx/16)*blend,y:base.y*(1-blend)+(sy/16)*blend};
+ const kernel=Array.from({length:41},(_,j)=>Math.exp(-.5*((j-20)/7)**2));
+ const total=kernel.reduce((a,b)=>a+b,0);
+ const pts=raw.map((_,i)=>{
+  let x=0,y=0;for(let j=0;j<41;j++){const p=ext(i+j-20),w=kernel[j];x+=p.x*w;y+=p.y*w}
+  return{x:x/total,y:y/total};
+ });
+ const v=pts.map((p,i)=>{
+  const lo=Math.max(0,i-1),hi=Math.min(n,i+1),div=(hi-lo)*step;
+  return{x:(pts[hi].x-pts[lo].x)/div,y:(pts[hi].y-pts[lo].y)/div};
+ });
+ const unit=(x,y)=>{const mag=Math.hypot(x,y)||1;return{tx:x/mag,ty:y/mag}};
+ function at(distance){
+  const d=Number.isFinite(distance)?distance:0;
+  if(d<=0)return{...pts[0],...unit(v[0].x,v[0].y)};
+  if(d>=profile.distance_m){
+   const excess=Math.min(40,d-profile.distance_m);
+   return{x:pts[n].x+excess*v[n].x,y:pts[n].y+excess*v[n].y,...unit(v[n].x,v[n].y)};
+  }
+  const i=Math.min(n-1,Math.floor(d/step)),t=(d-i*step)/step;
+  const a=pts[i],b=pts[i+1],m=v[i],q=v[i+1],t2=t*t,t3=t2*t;
+  const x=(2*t3-3*t2+1)*a.x+(t3-2*t2+t)*step*m.x+
+          (-2*t3+3*t2)*b.x+(t3-t2)*step*q.x;
+  const y=(2*t3-3*t2+1)*a.y+(t3-2*t2+t)*step*m.y+
+          (-2*t3+3*t2)*b.y+(t3-t2)*step*q.y;
+  const dx=((6*t2-6*t)*a.x+(3*t2-4*t+1)*step*m.x+
+           (-6*t2+6*t)*b.x+(3*t2-2*t)*step*q.x)/step;
+  const dy=((6*t2-6*t)*a.y+(3*t2-4*t+1)*step*m.y+
+           (-6*t2+6*t)*b.y+(3*t2-2*t)*step*q.y)/step;
+  return{x,y,...unit(dx,dy)};
+ }
+ return Object.freeze({at,sampleStep:step,length:profile.distance_m});
+}
+const raceLineCache=new WeakMap();
+function raceLine(profile){
+ if(!raceLineCache.has(profile))raceLineCache.set(profile,continuousLine(profile,d=>rawCenter(profile,d)));
+ return raceLineCache.get(profile);
 }
 function point(profile,d,lane=0){
- if(d>profile.distance_m){
-  const end=point(profile,profile.distance_m,lane);
-  const last=profile.segments.at(-1);
-  const shift=Math.min(40,d-profile.distance_m)*arcTable(last).total/(last.to-last.from);
-  return {...end,x:end.x+end.tx*shift,y:end.y+end.ty*shift,segment:last,t:1};
- }
- const x=clamp(d,0,profile.distance_m),s=segmentAt(profile,x);
- const ratio=clamp((x-s.from)/(s.to-s.from),0,1);
+ const p=raceLine(profile).at(d),s=segmentAt(profile,d);
+ const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
  const t=tByLength(s,ratio);
- const center=centerXY(profile,x);
- const before=centerXY(profile,clamp(x-1.5,0,profile.distance_m));
- const after=centerXY(profile,clamp(x+1.5,0,profile.distance_m));
- const magnitude=Math.hypot(after.x-before.x,after.y-before.y)||1;
- const p={x:center.x,y:center.y,tx:(after.x-before.x)/magnitude,ty:(after.y-before.y)/magnitude};
- // Lane zero is the inside running line. Lateral scale is illustrative,
- // but physical width in metres is applied separately in the simulator.
- // Map physical lane spacing to the JRA-reported minimum track width.
- // Leave ~1.8m per side for a safe rail buffer. This shares the lane model's
- // 1.65m spacing; outside horses must not be drawn beyond the turf rail.
- const railBuffer=1.8,minWidth=Math.min(...profile.track_width_m);
- const offset=(lane*1.65-(minWidth/2-railBuffer))*(profile.turn==='左'?1:-1);
+ const offset=(lane*1.65-(Math.min(...profile.track_width_m)/2-1.8))*(profile.turn==='左'?1:-1);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset,tx:p.tx,ty:p.ty,segment:s,t};
 }
 function heading(profile,d,lane=0,laneVelocity=0){
@@ -195,9 +211,9 @@ function height(profile,d){
  return values.at(-1)[1];
 }
 function slope(profile,d){
- // Derivative over 1m using one-sided samples at breakpoints.
- const x=clamp(d,.5,profile.distance_m-.5);
- return height(profile,x+.5)-height(profile,x-.5);
+ // Gradual grade changes prevent one-frame acceleration at elevation landmarks.
+ const x=clamp(d,0,profile.distance_m),r=9;
+ return (height(profile,clamp(x+r,0,profile.distance_m))-height(profile,clamp(x-r,0,profile.distance_m)))/(2*r);
 }
 function metrics(profile,d,lane=0){
  const s=segmentAt(profile,d);
@@ -226,5 +242,5 @@ function metrics(profile,d,lane=0){
 }
 for(const c of Object.values(COURSE))validate(c);
 function get(id){return COURSE[id]||null}
-global.RaceCourseGeometry=Object.freeze({get,validate,point,heading,segmentAt,height,slope,metrics,COURSE});
+global.RaceCourseGeometry=Object.freeze({get,validate,point,heading,segmentAt,height,slope,metrics,continuousLine,COURSE});
 })(typeof window!=='undefined'?window:globalThis);
