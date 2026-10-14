@@ -92,7 +92,7 @@ jobs:
           assert 'id="paceDynamics"' in html
           assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
           assert 'ゴール前80mから実況は後続も見えるゴール板固定カメラ' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-22' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-23' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
           assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html
