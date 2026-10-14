@@ -1,7 +1,7 @@
-/* JRA course geometry experiment v0.2.
+/* JRA course geometry experiment v0.27.
  * Official numbers: Tokyo turf A lap 2083.1m, final straight 525.9m, elevation range 2.7m;
  * Kyoto turf outer A lap 1894.3m, final straight 403.7m, elevation range 4.3m.
- * Bezier waypoints are hand-fit TOPOLOGICAL approximations, not surveyed GPS coordinates.
+ * Waypoints are traced from JRA official planar diagrams, not surveyed GPS coordinates.
  * The racing line respects each race's START, bends and finish; its d-axis is in race metres.
  * Keep all experimental geometry separate from the immutable JRA betting/prediction model.
  */
@@ -12,28 +12,33 @@ const COURSE={
   id:'tokyo_turf_2000',venue:'東京',course:'芝2000m',layout:'Aコース・左回り',
   turn:'左',distance_m:2000,lap_m:2083.1,straight_m:525.9,
   track_width_m:[31,41],elevation_range_m:2.7,
-  info:'1・2コーナー奥の引き込み線発走／ゆったりした3つのコーナー／最後の525.9mと残り460〜300mの上り坂',
+  mapUnitsPerMeter:.55,
+  sourcePlan:{provider:'JRA official course plane diagram',sourceWidth:568,sourceHeight:386,
+    sourceUrl:'https://www.jra.go.jp/facilities/race/tokyo/course/',
+    shapeMethod:'manual tracing of turf centreline on official 568×386 plane illustration; not surveyed GPS'},
+  info:'JRA公式平面図から走路輪郭を再トレース。1・2コーナー奥の引き込み線発走／525.9mの直線／最後の上り坂',
   official:'https://jra.jp/facilities/race/tokyo/course/',
   feature_source:'https://www.jra.go.jp/keiba/thisweek/2025/1102_1/race.html',
-  // Outer circuit continues beyond the race-only start; turn 1 is passed on the chute.
+  // Shape traced against JRA's publicly displayed planar course diagram.
+  // Never redistribute the source bitmap. All coordinates are original
+  // approximate route waypoints, not GIS positions or surveyed measurements.
   background:[
-    ['M',138,181],['C',215,182,375,181,452,181],
-    ['C',511,181,532,149,523,103],['C',518,63,499,47,452,42],
-    ['C',368,39,250,43,164,47],['C',107,49,74,72,68,111],
-    ['C',62,152,91,179,138,181]
+    ['M',134,269],['C',79,269,43,236,42,181],
+    ['C',39,107,73,68,143,61],['C',239,57,335,56,422,61],
+    ['C',483,63,527,98,527,161],['C',530,220,480,269,423,271],
+    ['C',327,273,231,270,134,269]
   ],
-  branch:[['M',518,131],['C',519,111,519,92,507,76]],
-  // All segment lengths sum to 2000.0, last one exactly 525.9.
+  branch:[['M',529,213],['C',535,177,533,146,526,131]],
+  // JRA 2,000m turf route: 2nd bend chute, upper backstretch, 3rd and 4th,
+  // 525.9m lower grandstand straight. d metres remain official race metres.
   segments:[
-   {from:0,to:130,name:'引き込み線・スタート',kind:'chute',bend:.15,p0:[518,131],p1:[520,112],p2:[516,90],p3:[507,76]},
-   {from:130,to:300,name:'2コーナー',kind:'turn',bend:.85,p0:[507,76],p1:[497,50],p2:[478,43],p3:[452,42]},
-   {from:300,to:900,name:'向正面',kind:'straight',bend:.03,p0:[452,42],p1:[357,37],p2:[257,43],p3:[164,47]},
-   {from:900,to:1145,name:'3コーナー',kind:'turn',bend:.67,p0:[164,47],p1:[113,49],p2:[74,73],p3:[68,111]},
-   {from:1145,to:1474.1,name:'4コーナー',kind:'turn',bend:.82,p0:[68,111],p1:[62,154],p2:[94,182],p3:[150,181]},
-   {from:1474.1,to:2000,name:'最後の直線 525.9m',kind:'straight',bend:0,p0:[150,181],p1:[245,182],p2:[357,181],p3:[452,181]}
+   {from:0,to:130,name:'引き込み線・スタート',kind:'chute',bend:.15,p0:[529,211],p1:[532,185],p2:[532,154],p3:[526,131]},
+   {from:130,to:300,name:'2コーナー',kind:'turn',bend:.85,p0:[526,131],p1:[520,91],p2:[492,60],p3:[435,62]},
+   {from:300,to:900,name:'向正面',kind:'straight',bend:.03,p0:[435,62],p1:[341,57],p2:[241,60],p3:[143,65]},
+   {from:900,to:1145,name:'3コーナー',kind:'turn',bend:.67,p0:[143,65],p1:[91,63],p2:[45,98],p3:[44,157]},
+   {from:1145,to:1474.1,name:'4コーナー',kind:'turn',bend:.82,p0:[44,157],p1:[42,229],p2:[84,269],p3:[135,270]},
+   {from:1474.1,to:2000,name:'最後の直線 525.9m',kind:'straight',bend:0,p0:[135,270],p1:[231,271],p2:[328,270],p3:[423,270]}
   ],
-  // High/low location estimated; absolute height origin arbitrary. Change across
-  // final ramp is official ~2.0m, 1540m to 1700m (remaining 460m to 300m).
   profile:[[0,0],[510,-1.6],[760,-1.6],[900,-.1],[1170,-1.35],
     [1420,-.9],[1540,-.9],[1700,1.1],[2000,1.1]],
   landmarks:[{d:0,label:'START'},{d:130,label:'2角'},{d:900,label:'3角'},
@@ -44,35 +49,34 @@ const COURSE={
   id:'kyoto_turf_outer_1400',venue:'京都',course:'芝1400m外回り',layout:'Aコース・右外回り',
   turn:'右',distance_m:1400,lap_m:1894.3,straight_m:403.7,
   track_width_m:[24,38],elevation_range_m:4.3,
-  info:'2角を回り切った向正面から発走／3コーナーの坂を上って残り800m付近から下る／平坦な403.7m直線',
+  mapUnitsPerMeter:.70,
+  sourcePlan:{provider:'JRA official course plane diagram',sourceWidth:571,sourceHeight:306,
+    sourceUrl:'https://www.jra.go.jp/facilities/race/kyoto/course/',
+    shapeMethod:'manual tracing of outer turf centreline on official 571×306 plane illustration; not surveyed GPS'},
+  info:'JRA公式平面図の芝外回り走路を再トレース。上側に長い引き込み線／3コーナーの坂／外回り3〜4コーナー／403.7mの直線',
   official:'https://www.jra.go.jp/facilities/race/kyoto/course/',
   feature_source:'https://www.jra.go.jp/keiba/thisweek/2025/1013_1/race.html',
-  // Kyoto: the backstretch gently inclines upward toward the right on
-  // the published plan; the LEFT 1st/2nd bend is broad and rounded.
-  // The outer 3rd/4th bend on the RIGHT opens wider than the inner bend.
-  // This drawing is an original schematic fitted to JRA's plane map,
-  // NOT a set of geographical/surveyed GPS measurements.
-  // Both 3rd/4th courses share the upper branch and 4th exit.
   background:[
-    ['M',190,183],['C',116,184,77,166,71,123],
-    ['C',67,89,99,54,166,59],['C',268,52,372,31,446,35],
-    ['C',501,31,534,52,548,80],['C',563,124,550,153,521,168],
-    ['C',508,180,484,183,462,183],
-    ['C',377,183,272,183,190,183]
+    ['M',173,209],['C',146,208,147,154,164,116],
+    ['C',181,79,214,71,262,60],['C',329,42,403,33,459,35],
+    ['C',507,34,536,74,538,129],['C',541,176,508,210,462,209],
+    ['C',379,210,267,210,173,209]
   ],
+  // Inner course uses the shorter internal bend and rejoins near the exit.
   inner_turn:[
-    ['M',446,35],['C',488,39,508,62,512,99],
-    ['C',517,136,496,169,462,183]
+    ['M',458,49],['C',488,52,509,86,500,128],
+    ['C',496,163,480,194,462,209]
   ],
+  branch:[['M',198,78],['C',143,87,80,104,20,101]],
+  // Outer-course turf 1,400m starts at the left backstretch and continues
+  // into the broad right-hand outer 3rd/4th bend; 403.7m lower straight.
   segments:[
-   {from:0,to:365,name:'向正面・先行争い',kind:'straight',bend:0,p0:[195,56],p1:[282,52],p2:[381,33],p3:[446,35]},
-   {from:365,to:570,name:'3コーナー・上り',kind:'turn',bend:.62,p0:[446,35],p1:[502,31],p2:[531,49],p3:[548,80]},
-   {from:570,to:805,name:'3〜4コーナー・急な下り',kind:'turn',bend:.83,p0:[548,80],p1:[561,112],p2:[548,149],p3:[521,168]},
-   {from:805,to:996.3,name:'4コーナー・直線へ',kind:'turn',bend:.66,p0:[521,168],p1:[509,179],p2:[487,183],p3:[462,183]},
-   {from:996.3,to:1400,name:'平坦な直線 403.7m',kind:'straight',bend:0,p0:[462,183],p1:[377,183],p2:[277,183],p3:[195,183]}
+   {from:0,to:365,name:'向正面・先行争い',kind:'straight',bend:0,p0:[195,78],p1:[286,58],p2:[371,36],p3:[458,35]},
+   {from:365,to:570,name:'3コーナー・上り',kind:'turn',bend:.62,p0:[458,35],p1:[502,32],p2:[530,62],p3:[539,99]},
+   {from:570,to:805,name:'3〜4コーナー・急な下り',kind:'turn',bend:.83,p0:[539,99],p1:[553,146],p2:[532,177],p3:[509,189]},
+   {from:805,to:996.3,name:'4コーナー・直線へ',kind:'turn',bend:.66,p0:[509,189],p1:[497,201],p2:[479,209],p3:[462,209]},
+   {from:996.3,to:1400,name:'平坦な直線 403.7m',kind:'straight',bend:0,p0:[462,209],p1:[367,209],p2:[270,209],p3:[179,209]}
   ],
-  // Crest at approximately 800m remaining, then a sharp descent; external
-  // source confirms total relief of 4.3m, while profile breakpoints are estimates.
   profile:[[0,0],[210,.25],[575,4.3],[610,4.3],[850,.4],[996.3,0],[1400,0]],
   landmarks:[{d:0,label:'START'},{d:365,label:'3角'},{d:600,label:'坂頂上'},
     {d:805,label:'4角'},{d:996.3,label:'直線入口'},{d:1400,label:'GOAL'}]
@@ -217,7 +221,8 @@ function point(profile,d,lane=0){
  const p=raceLine(profile).at(d),s=segmentAt(profile,d);
  const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
  const t=tByLength(s,ratio);
- const offset=(lane*1.65-(Math.min(...profile.track_width_m)/2-1.8))*(profile.turn==='左'?1:-1);
+ const metersToMap=profile.mapUnitsPerMeter||1;
+ const offset=(lane*1.65-(Math.min(...profile.track_width_m)/2-1.8))*metersToMap*(profile.turn==='左'?1:-1);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset,tx:p.tx,ty:p.ty,segment:s,t};
 }
 function heading(profile,d,lane=0,laneVelocity=0){
