@@ -1,4 +1,4 @@
-/* Stage engine v0.20: immutable finish time, independent visual runoff. */
+/* Stage engine v0.21: contested pace, tactical pack pursuit and realistic late fatigue. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -33,7 +33,7 @@ function finishDrive(h,remaining,profile,pace){
  const stretch=profile.straight_m;
  // Begin wind-up on the final bend, reach full drive in the home straight.
  const ramp=smoothstep((stretch+130-remaining)/(stretch*.85+130));
- const reserve=(h.stamina-1)*.90+h.lateKick*.90;
+ const reserve=(h.stamina-1)*.90+h.lateKick*1.25;
  const highPaceTax=pace==='H'?(h.style==='nige'?.13:h.style==='senko'?.05:0):0;
  return ramp*(LATE_STYLE_DRIVE[h.style]??.27)+ramp*reserve-ramp*highPaceTax;
 }
@@ -100,7 +100,7 @@ function create(data,options={}){
    ability:traits.baseSpeed+traits.courseSpeed,paceFit:traits.paceSpeed,
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
    displayD:0,runoffSpeed:0,
-   trail:[],events:0,phase:rng()*6,lateKick:traits.kick+(rng()-.5)*.08,
+   trail:[],events:0,phase:rng()*6,lateKick:traits.kick+(rng()-.5)*.16,
    fatigue:0,effortDebt:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
  const RUNOFF_M=32;
@@ -109,9 +109,9 @@ function create(data,options={}){
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
-    laneModel:'v0.6-style-early-inside',laneCount:laneCfg.maxLane+1,
+    laneModel:'v0.7-tactical-overtake',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
-    finalStraightPasses:0,lastOvertakeLog:-100,
+    finalStraightPasses:0,lastOvertakeLog:-100,straightEntryOrder:null,
     runoffMeters:RUNOFF_M,allCrossedAt:null,displayFinished:false,goalCamera:false,
     pacePressure:.13,pacePeak:.13,paceBand:'S',peakPaceBand:'S',
     paceContestants:0,paceEscapers:0,paceStalkers:0,paceHistory:[],lastPaceLog:'S'};
@@ -213,27 +213,27 @@ function create(data,options={}){
    // Separate geometry losses: turns cost extra metres for outer lanes, uphill
    // reduces instantaneous speed and drains a little energy, downhill can restore pace.
    // Coefficients are explicitly provisional; curvature/altitude breakpoints are estimates.
-   const bendPenalty=m.bend*(.10+Math.max(0,h.lane-1)*.025);
+   const bendPenalty=m.bend*.10; // outer distance is already charged by pathStretch
    const hillEffect=m.grade>0? -26*m.grade:0;
    const downhillBoost=m.grade<0? Math.min(.25,Math.abs(m.grade)*12):0;
    h.fatigue+=Math.max(0,m.grade)*dt*6;
    h.fatigue=clamp(h.fatigue,0,.22);
    const leaderGap=Math.max(0,liveLeader-h.d);
-   const onFront=h.style==='nige'&&leaderGap<=16 ||
-                 h.style==='senko'&&leaderGap<=12;
+   const onFront=(h.style==='nige'&&leaderGap<=16) ||
+                 (h.style==='senko'&&leaderGap<=12) || leaderGap<=3;
    const earlyDemand=(1-smoothstep((fraction-.38)/.25));
    // Sprinting to secure the lead has a real cost. It is charged ONLY to
    // horses actually contesting the front and persists into the straight.
    // A lone, uncontested leader can therefore conserve much more energy.
    if(onFront){
-     const effortStyle=h.style==='nige'?1:.58;
+     const effortStyle=h.style==='nige'?1:h.style==='senko'?.58:.78;
      h.effortDebt=clamp(h.effortDebt+dt*earlyDemand*
        (state.pacePressure**1.30)*.039*effortStyle,0,2.8);
    }
-   const lateExhaustion=h.effortDebt*smoothstep((fraction-.44)/.43)/h.stamina;
+   const lateExhaustion=1.55*h.effortDebt*smoothstep((fraction-.44)/.43)/h.stamina;
    const sprintDemand=onFront?state.pacePressure*earlyDemand*
        (h.style==='nige'?.78:.40):0;
-   const staminaLoss=Math.pow(fraction,1.9)*h.stamina*
+   const staminaLoss=Math.pow(fraction,1.9)/h.stamina*
       (.13+.14*state.pacePeak);
    const remaining=length-h.d;
    // AUTO is a mode, not a pace grade. The observed high-pace pressure must
@@ -243,12 +243,21 @@ function create(data,options={}){
    const hasCover=!onFront&&horses.some(o=>o!==h&&!o.finished&&
      o.d-h.d>=3&&o.d-h.d<=11&&Math.abs(o.lane-h.lane)<1.35);
    const shelter=hasCover?.045:0;
-   let speed=base+paceEffect+sprintDemand+shelter+h.ability+h.surge+h.tempo*.35+h.paceFit+
+   // Early cruising compresses speed variance; the late sprint reveals ability.
+   const abilityRelease=.70+.30*smoothstep((fraction-.56)/.27);
+   let speed=base+paceEffect+sprintDemand+shelter+h.ability*abilityRelease+h.surge+h.tempo*.35+h.paceFit+
      groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue-lateExhaustion;
    // A runner self-selects a fore-aft position from its PREVIOUS race's
    // corner passage. No STEP1 marks, popularity, odds or target result.
    const leaderD=Math.max(...horses.map(o=>o.d));
    speed+=tactic.positionAdjustment(h.style,Math.max(0,leaderD-h.d),h.d,state.t,h.styleMeta);
+   // Jockey keeps contact with a departing pack before the final sprint.
+   // Chase costs effort, does not teleport or force a particular finish.
+   const intendedGap=({nige:1,senko:9,sashi:19,oikomi:29,unknown:19})[h.style]??19;
+   const packWindow=smoothstep((fraction-.15)/.20)*(1-smoothstep((fraction-.61)/.16));
+   const catchUp=clamp((leaderD-h.d-intendedGap)*.012,0,.30)*packWindow;
+   speed+=catchUp;
+   h.effortDebt=clamp(h.effortDebt+dt*catchUp*.006,0,2.8);
    // Standing starts must build speed, not jump from 0 to ~17m/s.
    // Rider/runner launch variations allow the 18-horse field to stagger
    // naturally before safely merging towards the inner racing line.
@@ -292,6 +301,10 @@ function create(data,options={}){
    h.trail.push({d:h.d,lane:h.lane});
    if(h.trail.length>100)h.trail.shift();
   }
+  // Snapshot modeled ranks on entering the straight; never assign a target result.
+  if(!state.straightEntryOrder && state.leader>=length-profile.straight_m){
+    state.straightEntryOrder=horses.slice().sort((a,b)=>b.d-a.d||a.number-b.number).map(h=>h.number);
+  }
   // Count actual longitudinal position crossings, not "cinematic" fake
   // passes. Do not count finish-line ties or movement between lanes alone.
   if(state.leader>=length-profile.straight_m){
@@ -328,7 +341,7 @@ function create(data,options={}){
   }
   state.leadingNo=leaders[0].number;
   state.progress=clamp(state.leader/length,0,1);
-  state.goalCamera=state.leader>=length-125;
+  state.goalCamera=state.leader>=length-80;
   state.tick++;
   if(state.tick%150===0){
     state.paceHistory.push({d:Math.round(state.leader),pressure:Number(state.pacePressure.toFixed(3)),

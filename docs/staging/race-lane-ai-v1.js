@@ -1,4 +1,4 @@
-/* Race Lane Decision v0.4 — safe inward convergence, deterministic hypothesis, not horse tracking data.
+/* Race Lane Decision v0.5 — safe inward convergence, deterministic hypothesis, not horse tracking data.
    Lane 0 is the inside rail on both turn directions.
    Model minimum observed JRA course width, leave safety buffers and score
    inward distance savings against traffic and safe overtaking room. */
@@ -47,7 +47,7 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  // Straight runners plan a pass before they are fully boxed in. A blocked
  // finisher needs an alternative LINE, not a position teleport or speed cheat.
  const finalStraight=Boolean(m.isFinalStraight);
- const obstructed=Boolean(front && front.d-h.d<(finalStraight?12.5:7.5));
+ const obstructed=Boolean(front && front.d-h.d<(finalStraight?18:12));
  h.blocked=obstructed;
  if(Math.abs(h.lane-h.desiredLane)>.07)return null;
  // Each move is gradual (engine clamps lateral velocity); check the whole
@@ -61,13 +61,13 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  }
  function route(lane,mode,reason){
    if(Math.abs(lane-old)<.35||!laneSafe(h,horses,lane,cfg))return null;
-   if(!freeForward(lane,8.5))return null;
+   if(!freeForward(lane,15))return null;
    return {lane,mode,avoids:obstructed,scoreGain:1,reason};
  }
  // A fast finisher in the home straight must consider free outside lines
  // BEFORE continuing its automatic inward drift into a boxed-in lane.
  // Test more than one outside target: the adjacent lane may be occupied.
- if(finalStraight&&obstructed){
+ if(obstructed){
    for(const spread of [1,2,3]){
      const outside=route(Math.min(cfg.maxLane,old+spread),'outward','home-straight-pass');
      if(outside)return outside;
@@ -77,7 +77,7 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  // In the straight, a clear inside lane is still a valid passing route.
  // "外有利" can keep a useful wider line on the final straight, but
  // cannot push a free runner out arbitrarily at every tick.
- const preferInside=bias!=='outer'||m.bend>.22||old>4;
+ const preferInside=!obstructed&&m.bend>.25&&old>1&&(bias!=='outer'||old>5);
  if(preferInside&&old>.38){
    const inside=route(Math.max(0,old-1),'inward','clear-inner');
    if(inside)return inside;

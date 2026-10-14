@@ -242,7 +242,9 @@ function renderData(){
    const peak={S:'スロー',M:'平均',H:'ハイ'}[state.peakPaceBand]||'判定中';
    ui.paceDynamics.textContent='実効ペース '+k+' ／ 先頭争い '+state.paceContestants+
      '頭（逃'+state.paceEscapers+'・先'+state.paceStalkers+
-     '） ／ 前半最大 '+peak+' ／ 競り合い負荷 '+Math.round(state.pacePressure*100)+'%';
+     '） ／ 前半最大 '+peak+' ／ 競り合い負荷 '+Math.round(state.pacePressure*100)+'%'+
+     (state.straightEntryOrder?' ／ 直線順位変動 '+state.straightEntryOrder.filter(
+       (no,i)=>sim.standings().findIndex(h=>h.number===no)!==i).length+'頭':'');
    ui.paceDynamics.setAttribute('data-pace',state.paceBand);
  }
  ui.remaining.textContent=Math.max(0,Math.round(state.distance-state.leader))+' m';
@@ -462,12 +464,12 @@ function strokePath(ctx,width,color){
  ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
 }
 
-/* STAGE v0.20: preserve travel direction across the final camera cut.
+/* STAGE v0.21: goal camera keeps the trailing runners in view.
  * Tokyo goes screen-left to right; Kyoto's home straight goes right to left. */
 function goalScreenPosition(distance,lane,finish,width,height,maxLane,turn='左'){
  const center=height*.52,step=Math.min(30,height/16);
  const direction=turn==='右'?-1:1,finishX=turn==='右'?width*.30:width*.70;
- return {x:finishX+direction*(distance-finish)*width/175,
+ return {x:finishX+direction*(distance-finish)*width/290,
          y:center+(lane-maxLane/2)*step};
 }
 function drawGoalPost(ctx,x,top,bottom){

@@ -187,7 +187,7 @@ function metrics(profile,d,lane=0){
  // Approximate effective radius for lane-dependent path penalties:
  // absolute values are hypotheses because JRA does not publish all bend radii.
  const bend=turn?s.bend:0;
- const laneOffsetM=Math.max(0,lane)*2.9;
+ const laneOffsetM=Math.max(0,lane)*1.65; // same units as lane decisions
  const pathStretch=turn?1+laneOffsetM/(130/Math.max(bend,.2)):1;
  const groundBonus=slope(profile,d);
  return {segment:s.name,kind:s.kind,bend,grade:groundBonus,

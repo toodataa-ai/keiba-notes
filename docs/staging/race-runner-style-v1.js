@@ -23,7 +23,7 @@ function inferFromLastRace(text){
  else style='sashi';
  return {style,confidence:'single_previous_race',first,last:end,field:runners,positions,source:'pre_race_report_last_run'};
 }
-const styleGap={nige:0,senko:4.0,sashi:10.0,oikomi:19.0,unknown:10.0};
+const styleGap={nige:0,senko:3.0,sashi:7.0,oikomi:13.0,unknown:7.0};
 function positionAdjustment(style,gap,d,t,prior){
  const category=TYPES.includes(style)?style:'unknown';
  // Prior-race early passage gives each runner a DIFFERENT desired pack gap.
@@ -33,11 +33,11 @@ function positionAdjustment(style,gap,d,t,prior){
     (prior.first-1)/(prior.field-1):.5;
  const target=styleGap[category]+Math.max(-5,Math.min(5,(priorPct-.5)*12));
  const progress=Math.max(0,Number(d)||0);
- const early=progress<100?1:progress<350?.52*(350-progress)/250:0;
- const requested=Math.max(-2.4,Math.min(2.4,(gap-target)*.18));
+ const early=progress<100?1:progress<420?.47*(420-progress)/320:0;
+ const requested=Math.max(-1.15,Math.min(1.15,(gap-target)*.11));
  // Initially offer extra acceleration for leading runners and hold back
  // deep closers. Later allow racing ability and tactics to decide order.
- const launch={nige:1.40,senko:.60,sashi:-.35,oikomi:-1.2,unknown:-.15}[category];
+ const launch={nige:.92,senko:.35,sashi:-.15,oikomi:-.65,unknown:-.15}[category];
  const startBlend=Math.min(1,Math.max(0,(Number(t)||0)/2.2));
  return (requested+launch)*early*startBlend;
 }
