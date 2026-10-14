@@ -370,7 +370,9 @@ jobs:
             }
             const laneConfig=w.RaceLaneAI.config(course);
             const runner={number:99,d:500,lane:8,desiredLane:8,lastChange:-100,finished:false,blocked:false};
-            const openStraight=w.RaceCourseGeometry.metrics(course,500,runner.lane);
+            const freeStraight=course.segments.find(seg=>seg.kind==='straight'&&seg.to-seg.from>100);
+            runner.d=(freeStraight.from+freeStraight.to)/2;
+            const openStraight=w.RaceCourseGeometry.metrics(course,runner.d,runner.lane);
             assert.equal(w.RaceLaneAI.plan(runner,[runner],laneConfig,openStraight,'neutral',35),null,
               'a clear straight should not trigger pointless lane weaving');
             const corner=course.segments.find(seg=>seg.kind==='turn');
