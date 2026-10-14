@@ -1,0 +1,34 @@
+name: Validate staged JRA course blueprint registry
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/race-course-catalog-v1.json'
+      - 'docs/staging/race-course-catalog-v1.js'
+      - 'docs/staging/race-course-catalog.html'
+      - 'docs/staging/race-course-catalog-ui-v1.js'
+      - 'tools/test_race_course_catalog_v1.cjs'
+      - '.github/workflows/validate-jra-course-catalog-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-course-registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check
+        run: |
+          node --check docs/staging/race-course-catalog-v1.js
+          node --check docs/staging/race-course-catalog-ui-v1.js
+          node --check tools/test_race_course_catalog_v1.cjs
+      - name: Verify route identities, JRA values, source and fail-closed adapter
+        run: node tools/test_race_course_catalog_v1.cjs
+      - name: No production/JRA prediction artifacts touched
+        run: |
+          test -f docs/staging/race-course-catalog-v1.json
+          test -f docs/staging/race-course-catalog.html
+          git diff-tree --no-commit-id --name-only -r HEAD > /tmp/changed.txt
+          ! grep -E '^docs/data/|^docs/reports/|^local_racing_shadow_v1/|^prompts/' /tmp/changed.txt
+          echo PASS_STAGE_ONLY_CATALOG_NO_JRA_PRODUCTION_MUTATIONS
