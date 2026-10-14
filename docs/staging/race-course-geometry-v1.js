@@ -173,7 +173,40 @@ function continuousLine(profile,source){
            (-6*t2+6*t)*b.y+(3*t2-2*t)*step*q.y)/step;
   return{x,y,...unit(dx,dy)};
  }
- return Object.freeze({at,sampleStep:step,length:profile.distance_m});
+ // Globally smooth, monotone visual-arc-length reparameterization.
+ // Preserve exact landmark d->position knots while making the apparent
+ // speed continuous even when adjoining source pieces have different scale.
+ const arcLength=[0];let last=at(0),arc=0;
+ for(let i=1;i<=n;i++){const p=at(i*step);arc+=Math.hypot(p.x-last.x,p.y-last.y);arcLength.push(arc);last=p}
+ function measure(d){
+  const index=Math.min(n-1,Math.max(0,Math.floor(d/step))),f=clamp(d/step-index,0,1);
+  return arcLength[index]*(1-f)+arcLength[index+1]*f;
+ }
+ const boundaries=[0,...profile.segments.slice(1).map(s=>s.from),profile.distance_m];
+ const knots=boundaries.map(measure);
+ const meanSpeed=boundaries.slice(1).map((d,i)=>(knots[i+1]-knots[i])/(d-boundaries[i]));
+ const slope=boundaries.map((_,i)=>i===0?meanSpeed[0]:i===boundaries.length-1?meanSpeed.at(-1):
+  2*meanSpeed[i-1]*meanSpeed[i]/(meanSpeed[i-1]+meanSpeed[i]));
+ function smoothArc(d){
+  let i=0;while(i<boundaries.length-2&&d>=boundaries[i+1])i++;
+  const L=boundaries[i+1]-boundaries[i],t=clamp((d-boundaries[i])/L,0,1),t2=t*t,t3=t2*t;
+  return (2*t3-3*t2+1)*knots[i]+(t3-2*t2+t)*L*slope[i]+
+   (-2*t3+3*t2)*knots[i+1]+(t3-t2)*L*slope[i+1];
+ }
+ function uniformAt(d){
+  if(d<=0)return at(0);
+  if(d>=profile.distance_m){
+   const p=at(profile.distance_m),extra=Math.min(40,d-profile.distance_m),speed=slope.at(-1);
+   return{x:p.x+p.tx*speed*extra,y:p.y+p.ty*speed*extra,tx:p.tx,ty:p.ty};
+  }
+  const target=clamp(smoothArc(d),0,arc);
+  let low=0,high=n;
+  while(low<high){const mid=(low+high)>>1;if(arcLength[mid]<target)low=mid+1;else high=mid}
+  const i=Math.max(0,Math.min(n-1,low-1));
+  const f=(target-arcLength[i])/(arcLength[i+1]-arcLength[i]||1);
+  return at((i+f)*step);
+ }
+ return Object.freeze({at:uniformAt,sampleStep:step,length:profile.distance_m});
 }
 const raceLineCache=new WeakMap();
 function raceLine(profile){
