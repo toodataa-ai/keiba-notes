@@ -66,7 +66,7 @@ function create(data,options={}){
  if(!profile || profile.distance_m!==data.distance_m || profile.venue!==data.venue || profile.turn!==data.turn)
    throw Error('COURSE_PROFILE_MISMATCH: このコースの測定値・条件を確認できません');
  const seed=clamp(Math.floor(Number(options.seed)||1),1,999999);
- const pace=['auto','S','M','H'].includes(options.pace)?options.pace:'auto';
+ const pace='auto'; // The field itself always determines the pace.
  const bias=['inner','neutral','outer'].includes(options.bias)?options.bias:'neutral';
  const rng=mulberry32(hash(data.id+'|'+seed));
  const laneAI=global.RaceLaneAI;
@@ -158,7 +158,7 @@ function create(data,options={}){
   }
   // Manual presets shift overall scenario slightly, while the field's
   // actual fight still determines the local acceleration and energy cost.
-  const paceEffect=(pace==='H'?.33:pace==='S'?-.32:0)*(fraction<.5?1:-.16);
+  const paceEffect=0; // No manual pace multiplier.
   const sorted=horses.slice().sort((a,b)=>b.d-a.d);
   const prior=horses.map(h=>({number:h.number,d:h.d,finished:h.finished}));
   for(const h of sorted){

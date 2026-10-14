@@ -3,7 +3,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const ui={
- camera:$('cameraSelect'),race:$('raceSelect'),pace:$('paceSelect'),bias:$('biasSelect'),seed:$('seedInput'),
+ race:$('raceSelect'),bias:$('biasSelect'),seed:$('seedInput'),
  speed:$('speedSelect'),start:$('startBtn'),pause:$('pauseBtn'),
  restart:$('restartBtn'),newSeed:$('newSeedBtn'),path:$('pathToggle'),
  focus:$('focusSelect'),change:$('changeNotice'),
@@ -174,7 +174,7 @@ function reset(startNow){
  if(!race)return;
  cancelAnimationFrame(frameId);
  const seed=seedValue();ui.seed.value=String(seed);
- sim=RaceSimEngine.create(race,{seed,pace:ui.pace.value,bias:ui.bias.value});
+ sim=RaceSimEngine.create(race,{seed,pace:'auto',bias:ui.bias.value});
  cameraMotion=null;
  running=false;lastFrame=0;renderAt=0;notify('');
  ui.pause.disabled=true;ui.pause.textContent='一時停止';ui.start.disabled=false;
@@ -524,7 +524,7 @@ function drawRace(){
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;
  const w=ui.canvas.width,h=ui.canvas.height,state=sim.state,profile=RaceCourseGeometry.get(race.course_id);
  if(!profile)return;
- const mode=ui.camera?.value||'follow';
+ const mode='follow';
  const renderedWidth=ui.canvas.getBoundingClientRect?.().width||
      ui.canvas.clientWidth||Math.min(w,Math.max(1,window.innerWidth-20));
  const camera=viewCamera(mode,renderedWidth,w);
@@ -769,7 +769,7 @@ async function initialize(){
 setupReferenceMapErrorHandling();
 if(ui.courseMapMode)ui.courseMapMode.addEventListener('change',updateCourseReference);
 ui.race.addEventListener('change',()=>loadRace(ui.race.value));
-for(const input of [ui.pace,ui.bias,ui.seed])input.addEventListener('change',markDirty);
+for(const input of [ui.bias,ui.seed])input.addEventListener('change',markDirty);
 ui.start.addEventListener('click',()=>{
  if(!sim)return;
  if(sim.state.finished || sim.state.t===0 && !running){reset(false);start()}
@@ -782,7 +782,6 @@ ui.newSeed.addEventListener('click',()=>{
  reset(true);
 });
 ui.focus.addEventListener('change',render);
-if(ui.camera)ui.camera.addEventListener('change',()=>{cameraMotion=null;render()});
 ui.path.addEventListener('change',render);
 ui.speed.addEventListener('change',render);
 window.addEventListener('resize',()=>{cameraMotion=null;resizeRaceCanvas();render()});
