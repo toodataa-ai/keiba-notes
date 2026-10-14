@@ -29,11 +29,12 @@ for(const [progress,separatorEnd,outerEdge] of bands){
   'OUTSIDE_TURF_IMAGE_EDGE d='+progress+' x='+out4.x);
  assert.ok(out4.x>inside.x+4,'outerward lane orientation at d='+progress);
 }
-// The white split fades out after ~750m; continue on the OUTER edge,
-// never jump back to the orange/brown inner circuit.
+// The white separator fades after ~750m; at 890m+ the tangent swings
+// towards the bottom straight so x itself decreases on the correct outer
+// green stripe. Bounds use the image's lower straight, not the bend x-values.
 for(const [progress,minimumX] of [
  [700,558],[725,556],[750,555],[775,550],[805,540],
- [830,533],[860,514],[890,503],[920,490]
+ [830,533],[860,514],[890,500],[920,483]
 ]){
  assert.ok(W.RaceUmapotOverlay.point(k,progress,0).x>=minimumX,
   'LATE_TURN_CUTS_INSIDE d='+progress);
