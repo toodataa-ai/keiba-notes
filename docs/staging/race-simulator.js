@@ -1,4 +1,4 @@
-/* Staging race simulator v0.9. JRA bracket colors and licensed actual course reference. */
+/* Staging race simulator v0.20. JRA bracket colors and licensed actual course reference. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -462,11 +462,12 @@ function strokePath(ctx,width,color){
  ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
 }
 
-/* STAGE v0.19: goal camera always shows the FINAL STRAIGHT horizontally.
- * Finish-line timing is independent of post-goal visual distance. */
-function goalScreenPosition(distance,lane,finish,width,height,maxLane){
+/* STAGE v0.20: preserve travel direction across the final camera cut.
+ * Tokyo goes screen-left to right; Kyoto's home straight goes right to left. */
+function goalScreenPosition(distance,lane,finish,width,height,maxLane,turn='左'){
  const center=height*.52,step=Math.min(30,height/16);
- return {x:width*.70+(distance-finish)*width/175,
+ const direction=turn==='右'?-1:1,finishX=turn==='右'?width*.30:width*.70;
+ return {x:finishX+direction*(distance-finish)*width/175,
          y:center+(lane-maxLane/2)*step};
 }
 function drawGoalPost(ctx,x,top,bottom){
@@ -492,17 +493,17 @@ function drawGoalCamera(ctx,state,profile,width,height,renderedWidth,target){
  for(const y of [top+13,bottom-13]){
    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(width,y);ctx.stroke();
  }
- drawGoalPost(ctx,width*.70,top+13,bottom-13);
+ drawGoalPost(ctx,profile.turn==='右'?width*.30:width*.70,top+13,bottom-13);
  const scale=width/Math.max(1,renderedWidth);
  for(const runner of state.horses.slice().sort((a,b)=>a.number-b.number)){
-   const q=goalScreenPosition(runner.displayD??runner.d,runner.lane,profile.distance_m,width,height,maxLane);
+   const q=goalScreenPosition(runner.displayD??runner.d,runner.lane,profile.distance_m,width,height,maxLane,profile.turn);
    if(q.x<-35||q.x>width+35)continue;
    raceNumberMarker(ctx,runner.number,q.x,q.y,scale,
      runner.number===target.number,runner.number===state.leadingNo,race.field_size);
  }
  rect(ctx,12,34,478,35,'rgba(13,27,28,.84)');
  ctx.fillStyle='#fdf6e9';ctx.font='bold 16px Meiryo';
- ctx.fillText(profile.venue+' 最後の直線・ゴール板固定カメラ',22,57);
+ ctx.fillText(profile.venue+' 最後の直線・ゴール板固定カメラ '+(profile.turn==='右'?'←':'→'),22,57);
  rect(ctx,700,34,286,35,'rgba(13,27,28,.84)');
  ctx.fillStyle='#fff4ca';ctx.font='bold 14px Meiryo';
  ctx.fillText(state.finished?'全馬通過・余走完了':

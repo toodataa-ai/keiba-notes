@@ -37,7 +37,9 @@ function point(course,d,lane=0){
  const part=course.segments.find(x=>distance<=x.to+1e-8)||course.segments.at(-1);
  const controls=parts[course.segments.indexOf(part)];if(!controls)throw Error('UMAPOT_SEGMENT_MISMATCH');
  const p=sampleAt(controls,(distance-part.from)/(part.to-part.from));
- const outside=(clamp(Number(lane)||0,0,9)-4)*1.45*(course.turn==='左'?1:-1);
+ // Do not stack outer runners at lane 9: share physics' complete rail range.
+ const maxLane=clamp(Math.floor((Math.min(...course.track_width_m)-3.6)/1.65),7,18);
+ const outside=(clamp(Number(lane)||0,0,maxLane)-maxLane/2)*1.30*(course.turn==='左'?1:-1);
  return {x:p.x-p.ty*outside,y:p.y+p.tx*outside};
 }
 function validate(course){

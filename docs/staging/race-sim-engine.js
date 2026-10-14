@@ -1,4 +1,4 @@
-/* Stage engine v0.19: immutable finish time, independent visual runoff. */
+/* Stage engine v0.20: immutable finish time, independent visual runoff. */
 (function(global){
 'use strict';
 const MARKS=['◎','○','▲','△','×'];
@@ -12,7 +12,8 @@ function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
 }
 // Stamina, prior running style and scenario pace yield a gradual—not
 // scripted—late-race speed difference. Every horse is determined at gate load.
-const LATE_STYLE_DRIVE=Object.freeze({nige:.12,senko:.13,sashi:.15,oikomi:.17,unknown:.14});
+// Gradual finish drives vary by style, but never dictate finishing rank.
+const LATE_STYLE_DRIVE=Object.freeze({nige:.12,senko:.13,sashi:.19,oikomi:.22,unknown:.15});
 /* Pace is created by the runners, rather than inferred from their finishing
    ranks or from popularity. Manual S/M/H is a +/- scenario modifier, not a
    frozen outcome. Near-front escape and stalker candidates raise pressure.
@@ -197,8 +198,14 @@ function create(data,options={}){
        h.desiredLane=h.lane;
      }
      const move=h.desiredLane-h.lane;
-     const limit=dt*lateralSpeedAt(h.d);
-     movement=clamp(move,-limit,limit);
+     // Tight turns discourage sudden sideways movement. Recheck occupancy
+     // each frame because the corridor may have changed after route planning.
+     const limit=dt*lateralSpeedAt(h.d)*(m.bend>.6?.86:1);
+     const tentative=clamp(move,-limit,limit);
+     const nextLane=clamp(h.lane+tentative,0,laneCfg.maxLane);
+     const clear=laneAI.launchStepSafe(h,horses,nextLane,laneCfg);
+     movement=clear?tentative:0;
+     if(!clear)h.desiredLane=h.lane;
    }
    h.laneVelocity=movement/(dt||1);
    h.lane=clamp(h.lane+movement,0,laneCfg.maxLane);
@@ -225,12 +232,18 @@ function create(data,options={}){
    }
    const lateExhaustion=h.effortDebt*smoothstep((fraction-.44)/.43)/h.stamina;
    const sprintDemand=onFront?state.pacePressure*earlyDemand*
-       (h.style==='nige'?1.02:.56):0;
+       (h.style==='nige'?.78:.40):0;
    const staminaLoss=Math.pow(fraction,1.9)*h.stamina*
-      (pace==='H'?.22:.15);
+      (.13+.14*state.pacePeak);
    const remaining=length-h.d;
-   const finishing=finishDrive(h,remaining,profile,pace);
-   let speed=base+paceEffect+sprintDemand+h.ability+h.surge+h.tempo*.35+h.paceFit+
+   // AUTO is a mode, not a pace grade. The observed high-pace pressure must
+   // contribute to late fatigue even with the default automatic scenario.
+   const finishing=finishDrive(h,remaining,profile,state.peakPaceBand);
+   // Small slipstream benefit when tracking another runner (no artificial pass).
+   const hasCover=!onFront&&horses.some(o=>o!==h&&!o.finished&&
+     o.d-h.d>=3&&o.d-h.d<=11&&Math.abs(o.lane-h.lane)<1.35);
+   const shelter=hasCover?.045:0;
+   let speed=base+paceEffect+sprintDemand+shelter+h.ability+h.surge+h.tempo*.35+h.paceFit+
      groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue-lateExhaustion;
    // A runner self-selects a fore-aft position from its PREVIOUS race's
    // corner passage. No STEP1 marks, popularity, odds or target result.
