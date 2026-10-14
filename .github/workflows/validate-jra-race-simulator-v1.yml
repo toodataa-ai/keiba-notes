@@ -12,6 +12,7 @@ on:
       - 'docs/staging/stage-week-preview.js'
       - 'tools/test_race_sim_stage_v020.cjs'
       - 'tools/test_race_sim_stage_v021.cjs'
+      - 'tools/test_race_sim_stage_v022.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -38,6 +39,8 @@ jobs:
           node tools/test_race_sim_stage_v020.cjs
           node --check tools/test_race_sim_stage_v021.cjs
           node tools/test_race_sim_stage_v021.cjs
+          node --check tools/test_race_sim_stage_v022.cjs
+          node tools/test_race_sim_stage_v022.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
@@ -64,9 +67,9 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.21' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261015-21' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-course-geometry-v1.js?v=20261015-21' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.22' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261015-22' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-course-geometry-v1.js?v=20261015-22' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           html=Path('docs/staging/race-simulator.html').read_text()
@@ -77,16 +80,16 @@ jobs:
           assert 'https://umapot.com/?page_id=116' in html
           assert '馬番の位置はコース図への手動の近似位置合わせ' in html
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
-          assert 'race-umapot-overlay-v1.js?v=20261014-20' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-22' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261012-18' in html
-          assert 'race-sim-engine.js?v=20261015-21a' in html
-          assert 'race-simulator.js?v=20261015-21' in html
+          assert 'race-simulator.css?v=20261015-22' in html
+          assert 'race-sim-engine.js?v=20261015-22' in html
+          assert 'race-simulator.js?v=20261015-22' in html
           assert 'value="auto" selected' in html
           assert 'id="paceDynamics"' in html
-          assert 'race-ability-model-v1.js?v=20261012-18' in html and 'id="abilityInfo"' in html
+          assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
           assert 'ゴール前80mから実況は後続も見えるゴール板固定カメラ' in html
-          assert 'race-umapot-overlay-v1.js?v=20261014-20' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-22' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
           assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html
@@ -95,8 +98,8 @@ jobs:
           assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
-          assert 'race-sim-engine.js?v=20261015-21a' in html
-          assert 'race-lane-ai-v1.js?v=20261015-21' in html
+          assert 'race-sim-engine.js?v=20261015-22' in html
+          assert 'race-lane-ai-v1.js?v=20261015-22' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
           assert 'broadcast panel dual-view' in html

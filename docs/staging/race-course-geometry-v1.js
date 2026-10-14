@@ -216,7 +216,7 @@ function metrics(profile,d,lane=0){
   break;
  }
  const laneOffsetM=Math.max(0,lane)*1.65; // same units as lane decisions
- const pathStretch=turn?1+laneOffsetM/(130/Math.max(bend,.2)):1;
+ const pathStretch=bend>.001?1+laneOffsetM/(130/Math.max(bend,.2)):1;
  const groundBonus=slope(profile,d);
  return {segment:s.name,kind:s.kind,bend,grade:groundBonus,
          height:height(profile,d),pathStretch,
