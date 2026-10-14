@@ -125,7 +125,7 @@ jobs:
           assert '.live-display-grid{display:grid;grid-template-columns:' in style
           assert '@media(max-width:999px)' in style
           assert 'ranking-grid' in html
-          assert 'うまぽっとのコース図' in html
+          assert 'うまぽっと画像に固定' in html
           assert 'id="courseMapMode"' not in html
           print('PASS_SIM_STAGE_ONLY_TWO_SOURCE_VERIFIED_RACES_PROD_FROZEN')
           PY
