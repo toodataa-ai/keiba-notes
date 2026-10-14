@@ -77,11 +77,12 @@ function create(data,options={}){
  const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
  const length=data.distance_m;
- // Four distinct lines with fore-aft depth instead of 18 independent
- // horizontal positions or multiple style groups all pulling to rail zero.
+ // Four distinct lines with fore-aft depth and stable gate-order grouping.
+ // Preserve lateral order on the gate-to-pack merge: alternating targets
+ // forced horses to cut across the full field and stall in outer lanes.
  const styleSlots=new Map();
  data.horses.slice().sort((a,b)=>a.number-b.number).forEach((h,i)=>{
-   styleSlots.set(h.number,(i%4)*1.10);
+   styleSlots.set(h.number,Math.min(3,Math.floor(i*4/data.horses.length))*1.10);
  });
  const horses=data.horses.map((h,i)=>{
   const skill=clamp((Number(h.win_pct)||mean)-mean,-12,15);
