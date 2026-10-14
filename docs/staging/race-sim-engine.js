@@ -13,7 +13,9 @@ function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
 // Stamina, prior running style and scenario pace yield a gradual—not
 // scripted—late-race speed difference. Every horse is determined at gate load.
 // Gradual finish drives vary by style, but never dictate finishing rank.
-const LATE_STYLE_DRIVE=Object.freeze({nige:.12,senko:.13,sashi:.19,oikomi:.22,unknown:.15});
+// Provisional stage-only pace balance: leaders conserve energy under modest
+// pressure, while closers can respond late. Race-day fluctuation is seeded.
+const LATE_STYLE_DRIVE=Object.freeze({nige:.36,senko:.35,sashi:.17,oikomi:.44,unknown:.32});
 /* Pace is created by the runners, rather than inferred from their finishing
    ranks or from popularity. Manual S/M/H is a +/- scenario modifier, not a
    frozen outcome. Near-front escape and stalker candidates raise pressure.
@@ -100,7 +102,7 @@ function create(data,options={}){
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
    stamina:clamp(.90+traits.six.stamina*.002,.90,1.10),six:traits.six,
    launchVariation:traits.earlySpeed+(traits.six.early-50)*.007+(rng()-.5)*.30,
-   surge:(rng()-.5)*.30,tempo:(rng()-.5)*.12,
+   surge:(rng()-.5)*.70,tempo:(rng()-.5)*.12,
    ability:traits.baseSpeed+traits.courseSpeed+(traits.six.cruise-50)*.004,paceFit:traits.paceSpeed,
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
    displayD:0,runoffSpeed:0,
@@ -234,7 +236,7 @@ function create(data,options={}){
      h.effortDebt=clamp(h.effortDebt+dt*earlyDemand*
        (state.pacePressure**1.30)*.039*effortStyle,0,2.8);
    }
-   const lateExhaustion=1.55*h.effortDebt*smoothstep((fraction-.44)/.43)/h.stamina;
+   const lateExhaustion=1.0*h.effortDebt*smoothstep((fraction-.44)/.43)/h.stamina;
    const sprintDemand=onFront?state.pacePressure*earlyDemand*
        (h.style==='nige'?.78:.40):0;
    const staminaLoss=Math.pow(fraction,1.9)/h.stamina*
