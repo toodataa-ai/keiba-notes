@@ -22,19 +22,25 @@ for(const date of chosen){
       const position=new Map(actual.map(h=>[h.horse_no,h.finish_position]));
       const baseline=pred.ability_order[0]?.horse_no, challenger=scoreRace(pred).top_pick.horse_no;
       if (!position.has(baseline)||!position.has(challenger)) throw new Error("Top pick lacks official rank");
-      rows.push({race_id:rid,date,venue:pred.venue,baseline_rank:position.get(baseline),challenger_rank:position.get(challenger)});
+      rows.push({race_id:rid,date,venue:pred.venue,baseline_rank:position.get(baseline),challenger_rank:position.get(challenger),field_size:actual.length});
     }catch(e){excluded.push({race_id:rid,reason:String(e.message||e)});}
   }
 }
+const average=(a)=>a.length?Number((a.reduce((s,x)=>s+x,0)/a.length).toFixed(4)):null;
 const aggregate=ar=>({n:ar.length,baseline_wins:ar.filter(x=>x.baseline_rank===1).length,
  challenger_wins:ar.filter(x=>x.challenger_rank===1).length,
  baseline_top3:ar.filter(x=>x.baseline_rank<=3).length,challenger_top3:ar.filter(x=>x.challenger_rank<=3).length,
  better_rank:ar.filter(x=>x.challenger_rank<x.baseline_rank).length,
  worse_rank:ar.filter(x=>x.challenger_rank>x.baseline_rank).length,
- equal_rank:ar.filter(x=>x.challenger_rank===x.baseline_rank).length});
-const groups={};
-for(const row of rows)(groups[row.venue]??=[]).push(row);
+ equal_rank:ar.filter(x=>x.challenger_rank===x.baseline_rank).length,
+ baseline_mean_rank_error:average(ar.map(x=>x.baseline_rank-1)),
+ challenger_mean_rank_error:average(ar.map(x=>x.challenger_rank-1)),
+ baseline_mean_normalized_rank_error:average(ar.map(x=>(x.baseline_rank-1)/Math.max(1,x.field_size-1))),
+ challenger_mean_normalized_rank_error:average(ar.map(x=>(x.challenger_rank-1)/Math.max(1,x.field_size-1))) });
+const groups={},groupsByDate={};
+for(const row of rows){(groups[row.venue]??=[]).push(row);(groupsByDate[row.date]??=[]).push(row);}
 console.log(JSON.stringify({study:"RETROSPECTIVE_EXPLORATORY_NOT_FORWARD",model:"local-challenger-v0.2.0-candidate",
  cutoff_rule:"Only original frozen pre-race data are scored; no learned tuning on these outcomes",
  dates:chosen,overall:aggregate(rows),by_venue:Object.fromEntries(Object.entries(groups).map(([k,v])=>[k,aggregate(v)])),
+ by_date:Object.fromEntries(Object.entries(groupsByDate).map(([k,v])=>[k,aggregate(v)])),
  excluded,limitations:["No pre-race odds so no ROI or EV","No unbiased future holdout yet","Do not compare Banei until separate model"]},null,2));
