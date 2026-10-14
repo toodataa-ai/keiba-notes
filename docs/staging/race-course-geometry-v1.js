@@ -79,6 +79,7 @@ const COURSE={
  }
 };
 function clamp(v,a,b){return Math.min(b,Math.max(a,v));}
+function smoothstep(v){const x=clamp(v,0,1);return x*x*(3-2*x)}
 function validate(profile){
  if(!profile||!Array.isArray(profile.segments)||profile.segments.length<2)throw Error('COURSE_PROFILE_MISSING');
  if(profile.segments[0].from!==0 || Math.abs(profile.segments[profile.segments.length-1].to-profile.distance_m)>1e-6)throw Error('COURSE_DISTANCE_INVALID');
@@ -127,6 +128,25 @@ function segmentAt(profile,d){
  const x=clamp(d,0,profile.distance_m);
  return profile.segments.find(s=>x<=s.to+1e-8)||profile.segments.at(-1);
 }
+function rawCenter(profile,d){
+ const s=segmentAt(profile,d),x=clamp(d,0,profile.distance_m);
+ const ratio=clamp((x-s.from)/(s.to-s.from),0,1);
+ return cubic(s,tByLength(s,ratio));
+}
+// Use smooth world-space positions at every manually fitted cubic seam.
+// Without this, the lane normal changes suddenly at sector checkpoints.
+function centerXY(profile,d){
+ const x=clamp(d,0,profile.distance_m),base=rawCenter(profile,x);
+ let nearest=Infinity;
+ for(const s of profile.segments.slice(1))nearest=Math.min(nearest,Math.abs(x-s.from));
+ if(nearest>=18)return {x:base.x,y:base.y};
+ let sx=0,sy=0;
+ for(const [delta,k] of [[-12,1],[-6,4],[0,6],[6,4],[12,1]]){
+  const q=rawCenter(profile,clamp(x+delta,0,profile.distance_m));sx+=q.x*k;sy+=q.y*k;
+ }
+ const blend=1-smoothstep(nearest/18);
+ return {x:base.x*(1-blend)+(sx/16)*blend,y:base.y*(1-blend)+(sy/16)*blend};
+}
 function point(profile,d,lane=0){
  if(d>profile.distance_m){
   const end=point(profile,profile.distance_m,lane);
@@ -134,16 +154,14 @@ function point(profile,d,lane=0){
   const shift=Math.min(40,d-profile.distance_m)*arcTable(last).total/(last.to-last.from);
   return {...end,x:end.x+end.tx*shift,y:end.y+end.ty*shift,segment:last,t:1};
  }
- if(d>profile.distance_m){
-   const end=point(profile,profile.distance_m,lane),last=profile.segments.at(-1);
-   const pxPerMeter=arcTable(last).total/(last.to-last.from);
-   const extra=clamp(d-profile.distance_m,0,40)*pxPerMeter;
-   return {...end,x:end.x+end.tx*extra,y:end.y+end.ty*extra,segment:last,t:1};
- }
- const s=segmentAt(profile,d);
- const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
+ const x=clamp(d,0,profile.distance_m),s=segmentAt(profile,x);
+ const ratio=clamp((x-s.from)/(s.to-s.from),0,1);
  const t=tByLength(s,ratio);
- const p=cubic(s,t);
+ const center=centerXY(profile,x);
+ const before=centerXY(profile,clamp(x-1.5,0,profile.distance_m));
+ const after=centerXY(profile,clamp(x+1.5,0,profile.distance_m));
+ const magnitude=Math.hypot(after.x-before.x,after.y-before.y)||1;
+ const p={x:center.x,y:center.y,tx:(after.x-before.x)/magnitude,ty:(after.y-before.y)/magnitude};
  // Lane zero is the inside running line. Lateral scale is illustrative,
  // but physical width in metres is applied separately in the simulator.
  // Map physical lane spacing to the JRA-reported minimum track width.
@@ -186,13 +204,24 @@ function metrics(profile,d,lane=0){
  const turn=s.kind==='turn';
  // Approximate effective radius for lane-dependent path penalties:
  // absolute values are hypotheses because JRA does not publish all bend radii.
- const bend=turn?s.bend:0;
+ let bend=turn?s.bend:0;
+ // Blend estimated bend resistance over sector boundaries; segment labels
+ // change exactly at landmarks but a horse cannot change drag instantly.
+ for(let i=1;i<profile.segments.length;i++){
+  const b=profile.segments[i].from;
+  if(Math.abs(d-b)>20)continue;
+  const prev=profile.segments[i-1],next=profile.segments[i];
+  const left=prev.kind==='turn'?prev.bend:0,right=next.kind==='turn'?next.bend:0;
+  bend=left+(right-left)*smoothstep((d-b+20)/40);
+  break;
+ }
  const laneOffsetM=Math.max(0,lane)*1.65; // same units as lane decisions
  const pathStretch=turn?1+laneOffsetM/(130/Math.max(bend,.2)):1;
  const groundBonus=slope(profile,d);
  return {segment:s.name,kind:s.kind,bend,grade:groundBonus,
          height:height(profile,d),pathStretch,
          straightLeft:Math.min(profile.straight_m,profile.distance_m-d),
+         toFinalStraight:Math.max(0,profile.distance_m-profile.straight_m-d),
          isFinalStraight:d>=profile.distance_m-profile.straight_m};
 }
 for(const c of Object.values(COURSE))validate(c);

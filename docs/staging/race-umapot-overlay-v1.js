@@ -24,6 +24,25 @@ function sampleAt(p,f){
  const a=arr[Math.max(0,lo-1)],b=arr[lo];
  return cubic(p,a.t+(b.t-a.t)*(distance-a.len)/(b.len-a.len||1));
 }
+function rawCenter(course,d){
+ const parts=path[course?.id];if(!parts)throw Error('UMAPOT_UNSUPPORTED_COURSE');
+ const x=clamp(d,0,course.distance_m);
+ const segment=course.segments.find(s=>x<=s.to+1e-8)||course.segments.at(-1);
+ const part=parts[course.segments.indexOf(segment)];
+ return sampleAt(part,(x-segment.from)/(segment.to-segment.from));
+}
+function smoothedCenter(course,d){
+ const x=clamp(d,0,course.distance_m),p=rawCenter(course,x);
+ let gap=Infinity;
+ for(const s of course.segments.slice(1))gap=Math.min(gap,Math.abs(x-s.from));
+ if(gap>=18)return {x:p.x,y:p.y};
+ let ax=0,ay=0;
+ for(const [step,k] of [[-12,1],[-6,4],[0,6],[6,4],[12,1]]){
+  const q=rawCenter(course,clamp(x+step,0,course.distance_m));ax+=q.x*k;ay+=q.y*k;
+ }
+ const t=clamp(gap/18,0,1),fade=1-t*t*(3-2*t);
+ return {x:p.x*(1-fade)+ax*fade/16,y:p.y*(1-fade)+ay*fade/16};
+}
 function point(course,d,lane=0){
  const parts=path[course?.id];if(!parts)throw Error('UMAPOT_UNSUPPORTED_COURSE');
  if(d>course.distance_m){
@@ -34,13 +53,15 @@ function point(course,d,lane=0){
   return {x:finish.x+tangent.tx*offset,y:finish.y+tangent.ty*offset};
  }
  const distance=clamp(Number(d)||0,0,course.distance_m);
- const part=course.segments.find(x=>distance<=x.to+1e-8)||course.segments.at(-1);
- const controls=parts[course.segments.indexOf(part)];if(!controls)throw Error('UMAPOT_SEGMENT_MISMATCH');
- const p=sampleAt(controls,(distance-part.from)/(part.to-part.from));
+ const p=smoothedCenter(course,distance);
+ const back=smoothedCenter(course,clamp(distance-1.5,0,course.distance_m));
+ const next=smoothedCenter(course,clamp(distance+1.5,0,course.distance_m));
+ const magnitude=Math.hypot(next.x-back.x,next.y-back.y)||1;
+ const tx=(next.x-back.x)/magnitude,ty=(next.y-back.y)/magnitude;
  // Do not stack outer runners at lane 9: share physics' complete rail range.
  const maxLane=clamp(Math.floor((Math.min(...course.track_width_m)-3.6)/1.65),7,18);
  const outside=(clamp(Number(lane)||0,0,maxLane)-maxLane/2)*1.30*(course.turn==='左'?1:-1);
- return {x:p.x-p.ty*outside,y:p.y+p.tx*outside};
+ return {x:p.x-ty*outside,y:p.y+tx*outside};
 }
 function validate(course){
  const parts=path[course.id];if(!parts||parts.length!==course.segments.length)throw Error('UMAPOT_UNREGISTERED');
