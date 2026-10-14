@@ -62,7 +62,7 @@ function plan(h,horses,cfg,m,bias,t){
    // Leave several running files, rather than filling only the inner rail.
    const crowded=horses.filter(o=>o!==h&&!o.finished&&Math.abs(o.d-h.d)<28&&
      Math.abs(o.lane-target)<.72).length;
-   const capacity=target<.7?5:target<1.7?6:7;
+   const capacity=target<.7?4:target<1.7?5:6;
    if(crowded>=capacity)return null;
   }
   return {lane:target,mode,reason,avoids:blocked,scoreGain:1};
