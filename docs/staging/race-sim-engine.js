@@ -96,7 +96,7 @@ function create(data,options={}){
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
    stamina:traits.stamina,
    launchVariation:traits.earlySpeed+(rng()-.5)*.30,
-   surge:(rng()-.5)*.10,tempo:(rng()-.5)*.12,
+   surge:(rng()-.5)*.30,tempo:(rng()-.5)*.12,
    ability:traits.baseSpeed+traits.courseSpeed,paceFit:traits.paceSpeed,
    lastChange:-20,blocked:false,lastBlocked:false,finished:false,finishTime:null,
    displayD:0,runoffSpeed:0,
@@ -220,7 +220,7 @@ function create(data,options={}){
    h.fatigue=clamp(h.fatigue,0,.22);
    const leaderGap=Math.max(0,liveLeader-h.d);
    const onFront=(h.style==='nige'&&leaderGap<=16) ||
-                 (h.style==='senko'&&leaderGap<=12) || leaderGap<=3;
+                 (h.style==='senko'&&leaderGap<=12) || (state.leader>60&&leaderGap<=3);
    const earlyDemand=(1-smoothstep((fraction-.38)/.25));
    // Sprinting to secure the lead has a real cost. It is charged ONLY to
    // horses actually contesting the front and persists into the straight.

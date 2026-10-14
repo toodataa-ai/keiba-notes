@@ -80,7 +80,7 @@ jobs:
           assert 'race-umapot-overlay-v1.js?v=20261014-20' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261012-18' in html
-          assert 'race-sim-engine.js?v=20261015-21' in html
+          assert 'race-sim-engine.js?v=20261015-21a' in html
           assert 'race-simulator.js?v=20261015-21' in html
           assert 'value="auto" selected' in html
           assert 'id="paceDynamics"' in html
@@ -95,7 +95,7 @@ jobs:
           assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
-          assert 'race-sim-engine.js?v=20261015-21' in html
+          assert 'race-sim-engine.js?v=20261015-21a' in html
           assert 'race-lane-ai-v1.js?v=20261015-21' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
@@ -370,7 +370,12 @@ jobs:
             }
             const laneConfig=w.RaceLaneAI.config(course);
             const runner={number:99,d:500,lane:8,desiredLane:8,lastChange:-100,finished:false,blocked:false};
-            const metric=w.RaceCourseGeometry.metrics(course,500,runner.lane);
+            const openStraight=w.RaceCourseGeometry.metrics(course,500,runner.lane);
+            assert.equal(w.RaceLaneAI.plan(runner,[runner],laneConfig,openStraight,'neutral',35),null,
+              'a clear straight should not trigger pointless lane weaving');
+            const corner=course.segments.find(seg=>seg.kind==='turn');
+            runner.d=(corner.from+corner.to)/2;
+            const metric=w.RaceCourseGeometry.metrics(course,runner.d,runner.lane);
             const inside=w.RaceLaneAI.plan(runner,[runner],laneConfig,metric,'neutral',35);
             assert.equal(inside.mode,'inward','horse should prefer the clear shorter inside rail');
             assert.equal(inside.lane,7);
