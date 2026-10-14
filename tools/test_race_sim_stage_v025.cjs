@@ -89,5 +89,5 @@ const selected=W.RaceLaneAI.plan(collision,[collision,innerBlocker],cfg,segment,
 if(selected)assert.ok(W.RaceLaneAI.laneSafe(collision,[collision,innerBlocker],selected.lane,cfg),
  'never pass through the blocking runner');
 const html=fs.readFileSync(dir+'race-simulator.html','utf8');
-assert.ok(html.includes('Stage v0.25')&&html.includes('安全な内側の進路'));
+assert.ok(/Stage v0\.\d+/.test(html)&&html.includes('安全な内側の進路'));
 console.log('PASS_V025_KYOTO_18_OUTER_ISOLATION_REGRESSION',{insideBy589});

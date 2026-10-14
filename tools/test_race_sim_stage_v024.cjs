@@ -58,5 +58,5 @@ for(const [id,file] of [
  console.log('PASS_V024_COMPACT_MULTI_FILE_PACK_AND_SEAM_SPEED',id,JSON.stringify(snapshots));
 }
 const html=fs.readFileSync(dir+'race-simulator.html','utf8');
-assert.ok(html.includes('Stage v0.24')&&html.includes('内側3〜4列'));
+assert.ok(/Stage v0\.\d+/.test(html)&&html.includes('内側3〜4列'));
 console.log('PASS_V024_STAGE_ONLY_RACING_PACK');
