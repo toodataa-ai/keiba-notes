@@ -39,7 +39,16 @@ function resizeRaceCanvas(){
 const baseColor=['#e13c58','#2b67b8','#e9b939','#299e72','#a064bf','#e57824','#4e7891','#c74997','#7d9840','#57a4b6','#e26262','#827bb8','#339b9a','#ba833c','#b64d63','#678551','#928e83','#385cab'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function notify(s){ui.change.hidden=!s;ui.change.textContent=s||''}
-function dur(t){let n=Math.floor(t);return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
+function dur(t){
+ const tenths=Math.floor(Math.max(0,Number(t)||0)*10+1e-7);
+ const min=Math.floor(tenths/600),sec=Math.floor((tenths%600)/10),frac=tenths%10;
+ return min?min+'.'+String(sec).padStart(2,'0')+'.'+frac:sec+'.'+frac;
+}
+function firstThree(state){
+ return state.horses.filter(h=>h.finished&&Number.isFinite(h.finishTime))
+  .sort((a,b)=>a.finishTime-b.finishTime||a.number-b.number).slice(0,3);
+}
+window.RaceSimTiming=Object.freeze({format:dur,firstThree});
 function seedValue(){return Math.max(1,Math.min(999999,parseInt(ui.seed.value,10)||1))}
 function chooseRace(id){return catalog.find(r=>r.id===id)||null}
 function readerUrl(report){
@@ -245,6 +254,7 @@ function renderData(){
    ui.paceDynamics.textContent='実効ペース '+k+' ／ 先頭争い '+state.paceContestants+
      '頭（逃'+state.paceEscapers+'・先'+state.paceStalkers+
      '） ／ 前半最大 '+peak+' ／ 競り合い負荷 '+Math.round(state.pacePressure*100)+'%'+
+     (state.splitTime!==null?' ／ 前半'+state.splitDistanceM+'m '+dur(state.splitTime):'')+
      (state.straightEntryOrder?' ／ 直線順位変動 '+state.straightEntryOrder.filter(
        (no,i)=>sim.standings().findIndex(h=>h.number===no)!==i).length+'頭':'');
    ui.paceDynamics.setAttribute('data-pace',state.paceBand);
@@ -267,19 +277,36 @@ function renderData(){
       (1.8+watched.lane*1.65).toFixed(1)+'m　内へ '+watched.inwardMoves+
       '回／外へ '+watched.outwardMoves+'回　詰まり '+watched.trafficHoldSeconds.toFixed(1)+'秒';
  }
- ui.elapsed.textContent=dur(state.t);
+ // Stop the visible race clock at the winner's actual line-crossing time.
+ ui.elapsed.textContent=dur(state.firstFinishTime??state.t);
+ const splitEl=$('splitTime');
+ if(splitEl){
+  splitEl.hidden=state.splitTime===null||state.t-state.splitTime>8;
+  splitEl.textContent=state.splitTime===null?'':'前半'+state.splitDistanceM+'m '+dur(state.splitTime);
+ }
+ const podium=$('podium');
+ if(podium){
+  const finishers=firstThree(state);
+  podium.hidden=finishers.length===0;
+  podium.innerHTML=finishers.map((h,i)=>
+    '<div class="podium-row"><span class="podium-rank">'+(i+1)+'着</span>'+
+    '<span class="podium-name">'+esc(h.number+'番 '+h.name)+'</span>'+
+    '<span class="podium-time">'+dur(h.finishTime)+'</span></div>').join('');
+ }
  ui.moment.textContent=state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
  ui.bar.style.width=(state.progress*100).toFixed(1)+'%';
  ui.stands.innerHTML=sim.standings().map((h,i)=>{
   const lead=state.leader-h.d;
-  const gap=state.finished?Number(h.finishTime||0).toFixed(1)+'秒':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
+  const gap=state.finished?dur(h.finishTime):i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
   const focus=ui.focus.value===String(h.number);
   return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle" style="background:'+jraWaku(h.number,race.field_size).fill+
      ';color:'+jraWaku(h.number,race.field_size).text+';border:1px solid '+
      jraWaku(h.number,race.field_size).border+'">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+' <span class="small-muted">'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'？'}[h.style]||'？')+'</span></span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
  }).join('');
- ui.events.innerHTML=state.events.slice(0,7).map(e=>'<li><strong>'+dur(e.t)+'</strong>　'+esc(e.message)+'</li>').join('');
+ ui.events.innerHTML=state.events.slice(0,7).map(e=>
+ '<li><strong>'+dur(e.t)+'</strong>　'+esc(e.message)+
+ (e.kind==='split'&&state.splitTime!==null?' '+dur(state.splitTime):'')+'</li>').join('');
 }
 function drawIdle(message){
  const ctx=ui.canvas.getContext('2d');if(!ctx)return;

@@ -152,3 +152,24 @@ body.map-expanded{overflow:hidden}
 .trait-bar{grid-column:1/-1;height:4px;background:rgba(156,176,159,.20);border-radius:4px;overflow:hidden}
 .trait-bar i{display:block;height:100%;background:#84ac7b;border-radius:4px}
 @media(max-width:550px){.runner-six-traits{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Stage v0.31 broadcast race clock and at-the-line race results */
+#elapsed{font-size:clamp(21px,3.5vw,30px);font-weight:900;line-height:1.15;
+ font-variant-numeric:tabular-nums;letter-spacing:.6px;padding:5px 9px;border-radius:5px;
+ background:rgba(12,24,32,.87)}
+.stage-split{pointer-events:none;position:absolute;top:48px;left:12px;z-index:5;
+ color:#fff;background:rgba(16,29,42,.88);border-radius:5px;padding:5px 9px;
+ font:800 clamp(12px,2.5vw,18px) "Meiryo UI",Meiryo,sans-serif;
+ font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000}
+.finish-podium{pointer-events:none;position:absolute;left:10px;bottom:36px;
+ max-width:min(93%,460px);min-width:min(64%,235px);display:grid;gap:3px;z-index:6}
+.finish-podium[hidden],.stage-split[hidden]{display:none!important}
+.podium-row{display:flex;align-items:center;gap:7px;min-width:0;background:rgba(13,24,37,.9);
+ box-shadow:0 1px 4px #1118;color:#fff;border-radius:5px;padding:5px 8px;
+ font-size:clamp(11px,2.2vw,16px);font-weight:800}
+.podium-rank{flex:none;color:#ffda73}.podium-name{flex:1;min-width:0;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}.podium-time{flex:none;font-variant-numeric:tabular-nums}
+@media(max-width:500px){#elapsed{font-size:23px;padding:4px 7px}
+ .stage-split{top:37px;left:7px}
+ .finish-podium{left:7px;bottom:25px;max-width:96%}
+ .podium-row{padding:4px 6px;gap:5px}}
