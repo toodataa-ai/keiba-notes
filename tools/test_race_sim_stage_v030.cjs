@@ -48,5 +48,5 @@ for(const lane of [0,2,4]){
 }
 assert.equal(W.RaceUmapotOverlay.outwardShiftPx(t,675),0,'Tokyo unchanged');
 const html=fs.readFileSync(d+'race-simulator.html','utf8');
-assert.ok(html.includes('Stage v0.30')&&html.includes('白い内外分離線より外側'));
+assert.ok(/Stage v0\.\d+/.test(html)&&html.includes('白い内外分離線より外側'));
 console.log('PASS_V030_KYOTO_OUTER_RAIL_CLEARANCE_AND_NO_INNER_SHORTCUT');

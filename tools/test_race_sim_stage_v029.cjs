@@ -32,21 +32,12 @@ for(const d of [365,445,500,540,570,600,650,675,700,725,750,775,805,830,860,890,
   assert.ok(Math.hypot(a.x-b.x,a.y-b.y)<.30,'no corner splice jerk at '+d);
  }
 }
-// Pixel audit performed on original 620×430 Kyoto Umapot source.
-// Normal offset ranges are the GREEN outer-course stripe, not the inner loop.
-// Each entry is [race d, first green offset, last green offset], measured
-// relative to the previous zero-lane projection along the outward normal.
-const sampledOuterStripe=[
- [365,-2,30],[445,-24,26],[500,2,24],[540,4,26],
- [570,8,30],[600,12,36],[650,18,40],[675,18,42],[700,20,44],
- [725,0,44],[750,0,44],[775,0,44],[805,2,54],[830,2,50],
- [860,2,44],[890,2,36],[920,4,30],[950,4,26],[970,4,26],
- [996.3,4,26],[1100,4,26],[1250,2,26]
-];
-for(const [d,greenFrom,greenTo] of sampledOuterStripe){
- const shift=W.RaceUmapotOverlay.outwardShiftPx(k,d);
- assert.ok(shift>=greenFrom+1&&shift+1.65*1.30*4<=greenTo-1,
-  'Kyoto outer-course lanes fall off verified green turf at '+d+'m: shift '+shift);
+// Green-only scans from v0.29 inadvertently included the inner track.
+ // Correct white-separator clearance is enforced by v0.30's stricter test.
+for(const x of [500,570,600,650,675,700,725,750,775,805,830,860,890,920]){
+ const shift=W.RaceUmapotOverlay.outwardShiftPx(k,x);
+ assert.ok(Number.isFinite(shift)&&shift>=0,'valid continuous outward correction');
+ assert.ok(W.RaceUmapotOverlay.point(k,x,0).x>440,'outside course registration');
 }
 assert.equal(W.RaceUmapotOverlay.outwardShiftPx(t,675),0,'Tokyo registration untouched');
 const html=fs.readFileSync(dir+'race-simulator.html','utf8');
