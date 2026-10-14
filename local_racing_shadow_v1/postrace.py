@@ -154,7 +154,17 @@ def parse_official(soup, p):
         # by official results. Ignore only this exact leading qualifier.
         normalized = re.sub(r"^J指", "", normalized)
         abbreviated = re.sub(r"^J指", "", abbreviated)
-        if len(abbreviated) < 6 or abbreviated not in normalized:
+        # NAR result titles may add the edition (第N回), an optional 賞 before
+        # the class label, or omit the 2歳 qualifier before オープン.
+        # Allow only these known official-vs-card differences; race date,
+        # course, race number, horse numbers and names are still joined strictly.
+        def title_key(name):
+            name = re.sub(r"^第[0-9]+回", "", name)
+            name = re.sub(r"賞(?=[ABC][0-9])", "", name)
+            name = re.sub(r"】2歳(?=オープン)", "】", name)
+            return name
+        standard_name, card_name = title_key(normalized), title_key(abbreviated)
+        if standard_name != card_name and (len(card_name) < 6 or card_name not in standard_name):
             raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
     body = soup.get_text(" ", strip=True)
     dist_match = re.search(r"ダート\s*(\d{3,4})\s*[ｍm]", body)
@@ -197,6 +207,13 @@ def parse_official(soup, p):
         rank = int(raw_rank) if re.fullmatch(r"\d{1,2}", raw_rank) else None
         special = next((code for code in ("出走取消", "競走除外", "競走中止", "失格", "降着", "取消", "除外", "中止")
                         if code in raw_rank), None)
+        # For a horse that stopped mid-race, NAR may leave the finish-rank
+        # cell blank and put the explicit "中止" in the 着差 column instead.
+        if rank is None and special is None and raw_rank == "" and len(cells) > 11:
+            margin = clean(cells[11].get_text(" ", strip=True))
+            if margin in ("中止", "競走中止"):
+                special = "競走中止"
+                raw_rank = f"競走中止（着差欄:{margin}）"
         if rank is None and special is None:
             raise Blocked("BLOCKED_PARSE", f"Unrecognized finish status: {raw_rank}")
         rows.append({"horse_no": int(horse_number), "horse_name": name, "finish_position": rank,
