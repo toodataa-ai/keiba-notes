@@ -76,8 +76,8 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.25' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261015-22' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.26' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261015-26' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261015-24' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
@@ -92,8 +92,8 @@ jobs:
           assert 'race-umapot-overlay-v1.js?v=20261015-23' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261015-22' in html
-          assert 'race-sim-engine.js?v=20261015-24' in html
-          assert 'race-simulator.js?v=20261015-22' in html
+          assert 'race-sim-engine.js?v=20261015-26' in html
+          assert 'race-simulator.js?v=20261015-26' in html
           assert 'value="auto" selected' in html
           assert 'id="paceDynamics"' in html
           assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
@@ -107,7 +107,7 @@ jobs:
           assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
-          assert 'race-sim-engine.js?v=20261015-24' in html
+          assert 'race-sim-engine.js?v=20261015-26' in html
           assert 'race-lane-ai-v1.js?v=20261015-25' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
@@ -207,7 +207,7 @@ jobs:
               const p2=w.RaceCourseGeometry.point(course,d,w.RaceLaneAI.config(course).maxLane);
               assert.ok(Math.hypot(p.x-p2.x,p.y-p2.y)<=Math.min(...course.track_width_m),'all mapped lanes lie on published turf width');
             }
-            assert.equal(w.document.getElementById('cameraSelect').value,'follow');
+            assert.equal(w.document.getElementById('cameraSelect'),null);
             const stages=course.segments.map(x=>x.kind);
             assert.ok(stages.includes('turn')&&stages.includes('straight'));
             const straightPos=course.distance_m-course.straight_m+3;
@@ -487,20 +487,13 @@ jobs:
             const low=w.RaceSimAbility.profile({factorGrades:['B','B','B','B','C','B','B','B','C'],win_pct:1},entry,6);
             assert.ok(high.baseSpeed+high.courseSpeed>low.baseSpeed+low.courseSpeed+.75);
             assert.equal(high.kick,0,'unknown previous passage must remain neutral');
-            assert.equal(w.document.getElementById('paceSelect').value,'auto');
+            assert.equal(w.document.getElementById('paceSelect'),null);
             assert.match(w.document.getElementById('paceDynamics').textContent,/実効ペース/);
             assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
             assert.match(w.document.getElementById('raceMeta').textContent,new RegExp(entry.distance_m));
             assert.equal(w.document.getElementById('meterFill').style.width,'0%');
             start.click();
             assert.equal(start.disabled,true);
-            const camera=w.document.getElementById('cameraSelect');
-            camera.value='overview';
-            camera.dispatchEvent(new w.Event('change',{bubbles:true}));
-            camera.value='followWide';
-            camera.dispatchEvent(new w.Event('change',{bubbles:true}));
-            camera.value='follow';
-            camera.dispatchEvent(new w.Event('change',{bubbles:true}));
             assert.equal(typeof tick,'function');
             // Trigger browser animation frames; track progress must move.
             let t=1000;
@@ -583,6 +576,7 @@ jobs:
             assert.ok(debt(crowded)>debt(solo)+.08,
               'leader contest must charge extra cumulative physical effort');
             const forced=clone(4,'S');
+            assert.equal(forced.state.pace,'auto');
             assert.ok(forced.state.pacePeak>.40,
               'S scenario modifier must NOT suppress actual leader competition');
             assert.ok(Number.isInteger(a.state.finalStraightPasses) && a.state.finalStraightPasses>=0);
