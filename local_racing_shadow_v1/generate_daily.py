@@ -146,8 +146,8 @@ def fetch_runners(code, race_no):
         raise ValueError(f"Duplicate horse numbers: {url}")
     if len(result)<5 or len(result)>18:
         raise ValueError(f"Invalid horse count {len(result)}: {url}")
-    if not any(r["recent_races"] for r in result):
-        raise ValueError(f"No verified historical pre-race evidence: {url}")
+    # A genuine debut-only field may have no prior starts. Keep the official runners,
+    # but do not invent an ability advantage or a top pick for that cold-start race.
     return result,url,seen
 
 def build(venue,code,program):
@@ -157,16 +157,19 @@ def build(venue,code,program):
     active=[r for r in runners if not r["non_runner"]]
     if not active:
         raise ValueError(f"No active runners: {url}")
+    cold_start=not any(r["recent_races"] for r in active)
     ranked=sorted(active,key=lambda r:(-r["evidence_score"],-r["evidence_density"],r["horse_no"]))
     # Weight is retained as evidence; no popularity/odds or post-race performance is used.
+    # Cold-start debutants must not be spuriously differentiated by horse number.
     for rank,r in enumerate(ranked,1):
-        r["ability_rank"]=rank
+        r["ability_rank"]=None if cold_start else rank
     for r in runners:
         if r["non_runner"]:
             r["ability_rank"]=None
     front=sum(r["running_style_hypothesis"]=="先行" for r in active)
-    pace="H（速い）" if front>=5 else "M（平均）" if front>=3 else "S（遅い）" if front<=1 else "M（仮説）"
-    top=ranked[0]
+    pace=("不明（過去走実績なしの初出走）" if cold_start else
+          "H（速い）" if front>=5 else "M（平均）" if front>=3 else "S（遅い）" if front<=1 else "M（仮説）")
+    top=None if cold_start else ranked[0]
     now=dt.datetime.now(JST)
     if now >= program["scheduled_start_at"] - dt.timedelta(minutes=2):
         raise ValueError(f"Pre-race cutoff cannot be proven: {venue} {program['race_no']}R")
@@ -178,10 +181,13 @@ def build(venue,code,program):
             "generated_at":now.isoformat(timespec="seconds"),
             "information_cutoff_at":now.isoformat(timespec="seconds"),
             "model_version":"local-daily-shadow-v0.1","production_effect":False,
-            "method":"公式出馬表の直近5走着順と当距離実績に基づく、オッズ非参照の再現可能なcompact STEP1基準",
-            "method_limitations":["過去レースの格差・馬場差・タイム指数は未補正", "騎手・斤量は記録対象だが能力スコアには未投入", "レース当日馬場・バイアスが公表前の場合は未確認"],
+            "method":("公式初出走の過去走データなし：能力序列と本命を保留する中立的cold-start観測" if cold_start else
+                      "公式出馬表の直近5走着順と当距離実績に基づく、オッズ非参照の再現可能なcompact STEP1基準"),
+            "method_limitations":["過去レースの格差・馬場差・タイム指数は未補正", "騎手・斤量は記録対象だが能力スコアには未投入", "レース当日馬場・バイアスが公表前の場合は未確認"] +
+                                 (["全頭の公式過去走実績なし。能力順位・本命・展開を推定できないため留保する"] if cold_start else []),
+            "cold_start_no_form":cold_start,
             "going":"未確認（予想固定時点の公式出馬表で未取得）",
-            "track_bias_evidence":None,"pace":pace,"top_pick":{"horse_no":top["horse_no"],"horse_name":top["horse_name"]},
+            "track_bias_evidence":None,"pace":pace,"top_pick":({"horse_no":top["horse_no"],"horse_name":top["horse_name"]} if top is not None else None),
             "ability_order":[{"horse_no":r["horse_no"],"horse_name":r["horse_name"],"ability_rank":r["ability_rank"],"evidence_score":r["evidence_score"]} for r in ranked],
             "runners":runners,
             "sources":[{"name":"NAR公式・当日出馬表（過去5走を含む）","url":url,"observed_at":seen.isoformat(timespec="seconds")},
