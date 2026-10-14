@@ -2,8 +2,8 @@
   "schema_version": 1,
   "date": "2026-10-15",
   "scope": "PRE-RACE_ALL_OFFICIAL_VENUES",
-  "status": "PARTIAL_WITH_COVERAGE_GAPS",
-  "generated_at": "2026-10-15T08:21:28+09:00",
+  "status": "COMPLETE",
+  "generated_at": "2026-10-15T08:23:01+09:00",
   "official_total_races": 48,
   "official_races_by_venue": {
     "kawasaki": 12,
@@ -56,6 +56,7 @@
     "20261015-nagoya-12",
     "20261015-sonoda-01",
     "20261015-sonoda-02",
+    "20261015-sonoda-03",
     "20261015-sonoda-04",
     "20261015-sonoda-05",
     "20261015-sonoda-06",
@@ -66,8 +67,12 @@
     "20261015-sonoda-11",
     "20261015-sonoda-12"
   ],
-  "created_count": 47,
+  "created_count": 48,
   "newly_created_race_ids": [
+    "20261015-sonoda-03"
+  ],
+  "newly_created_count": 1,
+  "already_frozen_race_ids": [
     "20261015-kawasaki-01",
     "20261015-kawasaki-02",
     "20261015-kawasaki-03",
@@ -116,18 +121,9 @@
     "20261015-monbetsu-11",
     "20261015-monbetsu-12"
   ],
-  "newly_created_count": 47,
-  "already_frozen_race_ids": [],
-  "already_frozen_count": 0,
-  "coverage_gaps": [
-    {
-      "venue": "sonoda",
-      "race_id": "20261015-sonoda-03",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "ValueError: No verified historical pre-race evidence: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=27&k_raceDate=2026%2F10%2F15&k_raceNo=3"
-    }
-  ],
-  "gap_count": 1,
+  "already_frozen_count": 47,
+  "coverage_gaps": [],
+  "gap_count": 0,
   "minimum_precommit_lead_minutes": 12,
   "prediction_commit_sha": "Must be resolved independently from Git history AFTER push; this diagnostic file is not temporal proof.",
   "production_effect": false,
