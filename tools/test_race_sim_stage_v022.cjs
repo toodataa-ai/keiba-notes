@@ -54,5 +54,6 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
  console.log('PASS_V022_SIX_TRAITS_CONTINUOUS_COURSE_TACTICAL_LANES',profile.venue);
 }
 const html=fs.readFileSync(root+'race-simulator.html','utf8');
-assert.ok(html.includes('Stage v0.22')&&html.includes('id="runnerSixTraits"'));
+assert.ok(/Stage v0\.\d+/.test(html)&&html.includes('id="runnerSixTraits"'),
+  'stage revision may advance while six-trait UI remains supported');
 console.log('PASS_V022_STAGE_UI_NON_PRODUCTION');
