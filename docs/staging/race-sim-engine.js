@@ -112,9 +112,11 @@ function create(data,options={}){
  const RUNOFF_M=32;
  const events=[];
  const loggedLandmarks=new Set();
+ // Record 1000m for races at least 1600m; opening 3F (600m) for shorter.
+ const splitDistanceM=length>=1600?1000:600;
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
-    tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
+    tick:0,firstFinishTime:null,splitTime:null,splitDistanceM,courseId:profile.id,courseMetrics:null,
     laneModel:'v0.9-four-wide-fore-aft-pack',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
     finalStraightPasses:0,lastOvertakeLog:-100,straightEntryOrder:null,
@@ -333,6 +335,11 @@ function create(data,options={}){
   const leaders=horses.slice().sort((a,b)=>b.d-a.d||a.finishTime-b.finishTime||a.number-b.number);
   const previousLead=state.leader;
   state.leader=leaders[0].d;
+  if(state.splitTime===null&&previousLead<splitDistanceM&&state.leader>=splitDistanceM){
+    const fraction=clamp((splitDistanceM-previousLead)/(state.leader-previousLead||1),0,1);
+    state.splitTime=state.t-dt+dt*fraction;
+    log('split','前半'+splitDistanceM+'m通過');
+  }
   state.courseMetrics=geo.metrics(profile,state.leader,leaders[0].lane);
   for(const marker of profile.landmarks){
     if(marker.d<=0 || marker.d>=length || loggedLandmarks.has(marker.d))continue;
