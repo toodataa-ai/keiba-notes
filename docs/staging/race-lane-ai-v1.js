@@ -6,11 +6,12 @@
 'use strict';
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
 const LANE_METRES=1.65, HORSE_LENGTH_M=2.55;
+const PACK_MAX_LANE=3.45, PASS_MAX_LANE=5.35;
 function config(profile){
  if(!profile||!Array.isArray(profile.track_width_m))throw Error('LANE_WIDTH_SOURCE_MISSING');
  const minWidth=Math.min(...profile.track_width_m);
  const maxLane=clamp(Math.floor((minWidth-3.6)/LANE_METRES),7,18);
- return Object.freeze({minWidth,maxLane,laneWidthM:LANE_METRES,minimumLongitudinalM:HORSE_LENGTH_M});
+ return Object.freeze({minWidth,maxLane,packMaxLane:Math.min(PACK_MAX_LANE,maxLane),passMaxLane:Math.min(PASS_MAX_LANE,maxLane),laneWidthM:LANE_METRES,minimumLongitudinalM:HORSE_LENGTH_M});
 }
 function distances(a,b){
  return {fore:a.d-b.d,side:Math.abs(a.lane-b.lane)};
@@ -42,61 +43,56 @@ function nearestAhead(h,horses,atLane=h.lane){
    Math.abs(o.lane-atLane)<.62).sort((a,b)=>a.d-b.d||a.number-b.number)[0]||null;
 }
 function plan(h,horses,cfg,courseMetrics,bias,t){
- const m=courseMetrics;
- const front=nearestAhead(h,horses);
- // Straight runners plan a pass before they are fully boxed in. A blocked
- // finisher needs an alternative LINE, not a position teleport or speed cheat.
- const finalStraight=Boolean(m.isFinalStraight);
- const nearHomeTurn=!finalStraight&&m.toFinalStraight<=145;
- const tactical=finalStraight||nearHomeTurn;
+ const m=courseMetrics,front=nearestAhead(h,horses);
  const gap=front?front.d-h.d:Infinity;
- const obstructed=Boolean(front&&gap<(tactical?16:6));
- h.blocked=obstructed;
+ const inStraight=Boolean(m.isFinalStraight);
+ const toHome=Number.isFinite(m.toFinalStraight)?m.toFinalStraight:Infinity;
+ const tactical=inStraight||toHome<=145;
+ const blocked=Boolean(front&&gap<(tactical?12:5.2));
+ h.blocked=blocked;
  if(Math.abs(h.lane-h.desiredLane)>.07)return null;
- // Each move is gradual (engine clamps lateral velocity); check the whole
- // crossing corridor and the space ahead before choosing a route.
- const cooldown=finalStraight?.65:nearHomeTurn?1.0:m.bend>.5?2.0:1.5;
- if(t-h.lastChange<cooldown || h.d<8)return null;
+ const cooldown=inStraight?.75:tactical?1.25:m.bend>.5?2.1:1.4;
+ if(t-h.lastChange<cooldown||h.d<8)return null;
  const old=h.lane;
- function freeForward(lane,buffer){
-   const other=nearestAhead(h,horses,lane);
-   return !other || other.d-h.d>=buffer;
+ const preferred=Number.isFinite(h.preferredLane)?h.preferredLane:null;
+ function route(target,mode,reason,buffer=3.5){
+  if(Math.abs(target-old)<.26||!laneSafe(h,horses,target,cfg))return null;
+  const next=nearestAhead(h,horses,target);
+  if(next&&next.d-h.d<buffer)return null;
+  return {lane:target,mode,reason,avoids:blocked,scoreGain:1};
  }
- function route(lane,mode,reason){
-   if(Math.abs(lane-old)<.35||!laneSafe(h,horses,lane,cfg))return null;
-   if(!freeForward(lane,15))return null;
-   return {lane,mode,avoids:obstructed,scoreGain:1,reason};
+ // PRE-RACE horses hold one of four individual pack lanes. Crowded bends
+ // must not funnel all runners into a literal single-file rail procession.
+ if(preferred!==null&&old>preferred+.36){
+  const target=route(Math.max(preferred,old-1),'inward','return-to-pack');
+  if(target)return target;
  }
- // A fast finisher in the home straight must consider free outside lines
- // BEFORE continuing its automatic inward drift into a boxed-in lane.
- // Test more than one outside target: the adjacent lane may be occupied.
- if(tactical&&obstructed){
-   for(const spread of (finalStraight?[1,2,3]:[1,2])){
-     const outside=route(Math.min(cfg.maxLane,old+spread),'outward','home-straight-pass');
-     if(outside)return outside;
-   }
+ // Preserve existing standalone lane tests without preferredLane metadata.
+ if(m.bend>.25&&old>cfg.packMaxLane+.4&&(bias!=='outer'||old>cfg.passMaxLane)){
+  const inner=route(Math.max(cfg.packMaxLane,old-1),'inward','outer-turn-saving');
+  if(inner)return inner;
  }
- // Before the final straight: shorter inside arcs remain the default.
- // In the straight, a clear inside lane is still a valid passing route.
- // "外有利" can keep a useful wider line on the final straight, but
- // cannot push a free runner out arbitrarily at every tick.
- const preferInside=(!obstructed||!tactical&&gap>4.3)&&m.bend>.25&&old>1&&(bias!=='outer'||old>5);
- if(preferInside&&old>.38){
-   const inside=route(Math.max(0,old-1),'inward','clear-inner');
-   if(inside)return inside;
+ if(preferred===null&&m.bend>.25&&old>1&&!blocked){
+  const inner=route(Math.max(0,old-1),'inward','clear-inside-turn');
+  if(inner)return inner;
  }
- // A blocked horse sometimes has to peel to the outside to pass;
- // avoid inventing large outward moves when no traffic needs passing.
- if(obstructed&&gap<=4.3&&old<cfg.maxLane-.35){
-   const outside=route(Math.min(cfg.maxLane,old+1),'outward','outside-pass');
+ // For a standalone scenario keep the historic outside-pass option. In the
+ // real 18-runner pack an available adjacent inner line is considered first.
+ if(blocked&&(tactical||gap<=4.25)){
+  const options=preferred===null?[Math.min(cfg.packMaxLane,old+1),Math.max(0,old-1)]:
+    [Math.max(0,old-1),Math.min(cfg.packMaxLane,old+1)];
+  for(const target of options){
+   const action=route(target,target>old?'outward':'inward','packed-passing-lane',7);
+   if(action)return action;
+  }
+  if(tactical&&gap<=5.2&&old<cfg.passMaxLane-.35){
+   const outside=route(Math.min(cfg.passMaxLane,old+1),'outward','late-outside-shoulder',7);
    if(outside)return outside;
+  }
  }
- // In an outer-biased straight, allow moves toward the rail only
- // when the lane remains conspicuously wide (left of the default
- // target in clock-face terms). This never overrides safety.
- if(tactical&&bias==='outer'&&old>4.5){
-   const inside=route(Math.max(0,old-1),'inward','reduce-excess-width');
-   if(inside)return inside;
+ if(preferred!==null&&old>cfg.packMaxLane+.28&&!blocked){
+  const rejoin=route(Math.max(cfg.packMaxLane,old-1),'inward','rejoin-pack');
+  if(rejoin)return rejoin;
  }
  return null;
 }

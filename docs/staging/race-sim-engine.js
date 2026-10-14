@@ -77,17 +77,12 @@ function create(data,options={}){
  const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
  const length=data.distance_m;
- // Distinct slots by previous running style preserve legal side-by-side
- // order while the whole pack converges safely toward the inner third.
+ // Four distinct lines with fore-aft depth instead of 18 independent
+ // horizontal positions or multiple style groups all pulling to rail zero.
  const styleSlots=new Map();
- for(const style of ['nige','senko','sashi','oikomi','unknown']){
-   const group=data.horses.filter(h=>(h.style||'unknown')===style)
-     .slice().sort((a,b)=>a.number-b.number);
-   const range=Math.min(6,Math.max(1,group.length-1)*.92);
-   group.forEach((h,i)=>{
-     styleSlots.set(h.number,group.length===1?0:range*i/(group.length-1));
-   });
- }
+ data.horses.slice().sort((a,b)=>a.number-b.number).forEach((h,i)=>{
+   styleSlots.set(h.number,(i%4)*1.10);
+ });
  const horses=data.horses.map((h,i)=>{
   const skill=clamp((Number(h.win_pct)||mean)-mean,-12,15);
   const traits=abilityModel.profile(h,data,mean);
@@ -98,6 +93,7 @@ function create(data,options={}){
    d:0,lane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    initialLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    launchTargetLane:styleSlots.get(no)??2,
+   preferredLane:styleSlots.get(no)??2,
    desiredLane:(no-1)*laneCfg.maxLane/Math.max(1,maxNumber-1),
    launchMergeMoves:0,
    laneVelocity:0,laneChanges:0,inwardMoves:0,outwardMoves:0,trafficHoldSeconds:0,
@@ -116,7 +112,7 @@ function create(data,options={}){
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
     tick:0,firstFinishTime:null,courseId:profile.id,courseMetrics:null,
-    laneModel:'v0.8-staged-tactical-overtake',laneCount:laneCfg.maxLane+1,
+    laneModel:'v0.9-four-wide-fore-aft-pack',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
     finalStraightPasses:0,lastOvertakeLog:-100,straightEntryOrder:null,
     runoffMeters:RUNOFF_M,allCrossedAt:null,displayFinished:false,goalCamera:false,
@@ -169,7 +165,7 @@ function create(data,options={}){
    // an outside passing route; faster finishers find inside gaps gradually.
    const m=geo.metrics(profile,h.d,h.lane);
    h.gradeNow=m.grade;h.turnNow=m.bend;h.lastCourseSegment=m.segment;
-   const forming=state.leader<101;
+   const forming=state.leader<220;
    const choice=forming?null:laneAI.plan(h,horses,laneCfg,m,bias,state.t);
    if(choice){
      h.desiredLane=choice.lane;h.lastChange=state.t;
@@ -186,7 +182,7 @@ function create(data,options={}){
      // The pack gently contracts during the opening 100m. Each style
      // has distinct inner-side "slots" so runners are not all assigned
      // to the identical rail coordinate. No lateral teleporting.
-     const ratio=smoothstep(state.leader/60);
+     const ratio=smoothstep(state.leader/90);
      const desired=h.initialLane+(h.launchTargetLane-h.initialLane)*ratio;
      const speed=lateralSpeedAt(state.leader);
      const amount=clamp(desired-h.lane,-dt*speed,dt*speed);
@@ -260,9 +256,9 @@ function create(data,options={}){
    speed+=tactic.positionAdjustment(h.style,Math.max(0,leaderD-h.d),h.d,state.t,h.styleMeta);
    // Jockey keeps contact with a departing pack before the final sprint.
    // Chase costs effort, does not teleport or force a particular finish.
-   const intendedGap=({nige:1,senko:9,sashi:19,oikomi:29,unknown:19})[h.style]??19;
-   const packWindow=smoothstep((fraction-.15)/.20)*(1-smoothstep((fraction-.61)/.16));
-   const catchUp=clamp((leaderD-h.d-intendedGap)*.012,0,.30)*packWindow;
+   const intendedGap=({nige:0,senko:5,sashi:12,oikomi:20,unknown:12})[h.style]??12;
+   const packWindow=smoothstep((fraction-.05)/.10)*(1-smoothstep((fraction-.76)/.12));
+   const catchUp=clamp((leaderD-h.d-intendedGap)*.042,0,1.20)*packWindow;
    speed+=catchUp;
    h.effortDebt=clamp(h.effortDebt+dt*catchUp*.006,0,2.8);
    // Standing starts must build speed, not jump from 0 to ~17m/s.
