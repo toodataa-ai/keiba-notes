@@ -386,8 +386,8 @@ jobs:
             const freeStraight=course.segments.find(seg=>seg.kind==='straight'&&seg.to-seg.from>100);
             runner.d=(freeStraight.from+freeStraight.to)/2;
             const openStraight=w.RaceCourseGeometry.metrics(course,runner.d,runner.lane);
-            assert.equal(w.RaceLaneAI.plan(runner,[runner],laneConfig,openStraight,'neutral',35),null,
-              'a clear straight should not trigger pointless lane weaving');
+            assert.equal(w.RaceLaneAI.plan(runner,[runner],laneConfig,openStraight,'neutral',35)?.mode,'inward',
+              'a clear inner path is preferred until turning into the home straight');
             const corner=course.segments.find(seg=>seg.kind==='turn');
             runner.d=(corner.from+corner.to)/2;
             const metric=w.RaceCourseGeometry.metrics(course,runner.d,runner.lane);
