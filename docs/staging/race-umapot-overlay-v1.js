@@ -38,11 +38,24 @@ function referenceLine(course){
   global.RaceCourseGeometry.continuousLine(course,d=>rawCenter(course,d)));
  return referenceLines.get(course);
 }
+// Measured-image guide offsets approximate the inside turf edge
+// of Umapot's JPG. Display-only, NOT surveyed/georeferenced positions.
+const railGuide=Object.freeze({
+ tokyo_turf_2000:[[0,19],[130,17],[300,19],[900,19],[1145,13],[1474.1,18],[2000,18]],
+ kyoto_turf_outer_1400:[[0,20],[365,19],[570,18],[805,17],[996.3,15],[1400,15]]
+});
+function railEdgePx(course,d){
+ const knots=railGuide[course.id];if(!knots)throw Error('UMAPOT_RAIL_MISSING');
+ const x=clamp(d,0,course.distance_m);let i=0;
+ while(i<knots.length-2&&x>knots[i+1][0])i++;
+ const a=knots[i],b=knots[i+1],f=clamp((x-a[0])/(b[0]-a[0]||1),0,1);
+ return a[1]+(b[1]-a[1])*f;
+}
 function point(course,d,lane=0){
  if(!path[course?.id])throw Error('UMAPOT_UNSUPPORTED_COURSE');
  const p=referenceLine(course).at(d);
- const maxLane=clamp(Math.floor((Math.min(...course.track_width_m)-3.6)/1.65),7,18);
- const offset=(clamp(Number(lane)||0,0,maxLane)-maxLane/2)*1.30*(course.turn==='左'?1:-1);
+ const towardInsidePx=railEdgePx(course,d)-(1.8+clamp(Number(lane)||0,0,18)*1.65)*1.30;
+ const offset=-towardInsidePx*(course.turn==='左'?1:-1);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset};
 }
 function validate(course){
@@ -61,12 +74,6 @@ function draw(state,race,focus,pathOn,paintNumber){
  const course=global.RaceCourseGeometry.get(race.course_id);
  ctx.clearRect(0,0,620,430);
  const selected=focus==='leader'?state.leadingNo:Number(focus);
- if(pathOn)for(const horse of state.horses){
-  if(horse.number!==selected&&horse.mark!=='◎')continue;
-  ctx.beginPath();let first=true;
-  for(const t of horse.trail){const p=point(course,t.d,t.lane);if(first){ctx.moveTo(p.x,p.y);first=false}else ctx.lineTo(p.x,p.y)}
-  if(!first){ctx.strokeStyle=horse.number===selected?'rgba(25,50,68,.90)':'rgba(48,65,58,.7)';ctx.lineWidth=horse.number===selected?2.8:1.8;ctx.stroke()}
- }
  const markers=state.horses.map(h=>({number:h.number,...point(course,h.displayD??h.d,h.lane),
   selected:h.number===selected,leading:h.number===state.leadingNo}))
  .sort((a,b)=>Number(a.selected)-Number(b.selected)||Number(a.leading)-Number(b.leading)||a.number-b.number);

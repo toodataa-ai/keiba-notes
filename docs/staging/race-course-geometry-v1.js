@@ -222,7 +222,9 @@ function point(profile,d,lane=0){
  const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
  const t=tByLength(s,ratio);
  const metersToMap=profile.mapUnitsPerMeter||1;
- const offset=(lane*1.65-(Math.min(...profile.track_width_m)/2-1.8))*metersToMap*(profile.turn==='左'?1:-1);
+ // Visual course is 27 units across; lane-zero is 1.8m from the inner edge.
+ const innerM=1.8+Math.max(0,Number(lane)||0)*1.65;
+ const offset=-(13.5-innerM*metersToMap)*(profile.turn==='左'?1:-1);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset,tx:p.tx,ty:p.ty,segment:s,t};
 }
 function heading(profile,d,lane=0,laneVelocity=0){
