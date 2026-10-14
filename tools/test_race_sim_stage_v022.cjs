@@ -28,8 +28,8 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
  const h={number:99,d:startD,lane:3,desiredLane:3,lastChange:-100,finished:false};
  const ahead={number:100,d:startD+9,lane:3,finished:false};
  assert.equal(W.RaceLaneAI.plan(h,[h,ahead],cfg,
-   W.RaceCourseGeometry.metrics(profile,startD,3),'neutral',50),null,
-   'do not go 3 lanes outside 9m behind a horse in the first half');
+   W.RaceCourseGeometry.metrics(profile,startD,3),'neutral',50)?.mode,'inward',
+   'when an inside lane is clear in the first half, move inward instead of outward');
  const lastD=profile.distance_m-55;
  const closer={...h,d:lastD,blocked:false},leader={...ahead,d:lastD+6};
  assert.equal(W.RaceLaneAI.plan(closer,[closer,leader],cfg,

@@ -1,4 +1,4 @@
-/* Race Lane Decision v0.6 — safe inward convergence, deterministic hypothesis, not horse tracking data.
+/* Race Lane Decision v0.7 — safe inward convergence, deterministic hypothesis, not horse tracking data.
    Lane 0 is the inside rail on both turn directions.
    Model minimum observed JRA course width, leave safety buffers and score
    inward distance savings against traffic and safe overtaking room. */
@@ -42,57 +42,61 @@ function nearestAhead(h,horses,atLane=h.lane){
  return horses.filter(o=>o!==h&&!o.finished&&o.d>=h.d-.01&&
    Math.abs(o.lane-atLane)<.62).sort((a,b)=>a.d-b.d||a.number-b.number)[0]||null;
 }
-function plan(h,horses,cfg,courseMetrics,bias,t){
- const m=courseMetrics,front=nearestAhead(h,horses);
- const gap=front?front.d-h.d:Infinity;
- const inStraight=Boolean(m.isFinalStraight);
- const toHome=Number.isFinite(m.toFinalStraight)?m.toFinalStraight:Infinity;
- const tactical=inStraight||toHome<=145;
- const blocked=Boolean(front&&gap<(tactical?12:5.2));
+function plan(h,horses,cfg,m,bias,t){
+ const front=nearestAhead(h,horses),gap=front?front.d-h.d:Infinity;
+ const straight=Boolean(m.isFinalStraight);
+ const blocked=Boolean(front&&gap<(straight?13:5.2));
  h.blocked=blocked;
  if(Math.abs(h.lane-h.desiredLane)>.07)return null;
- const cooldown=inStraight?.75:tactical?1.25:m.bend>.5?2.1:1.4;
+ const cooldown=straight?.75:m.bend>.5?1.25:1.35;
  if(t-h.lastChange<cooldown||h.d<8)return null;
- const old=h.lane;
- const preferred=Number.isFinite(h.preferredLane)?h.preferredLane:null;
- function route(target,mode,reason,buffer=3.5){
-  if(Math.abs(target-old)<.26||!laneSafe(h,horses,target,cfg))return null;
-  const next=nearestAhead(h,horses,target);
-  if(next&&next.d-h.d<buffer)return null;
+ const old=h.lane,packMax=cfg.packMaxLane??3.45;
+ function route(target,mode,reason,frontBuffer=6,backBuffer=4.5){
+  if(Math.abs(target-old)<.29||target<0||target>cfg.maxLane||
+     !laneSafe(h,horses,target,cfg))return null;
+  const ahead=nearestAhead(h,horses,target);
+  if(ahead&&ahead.d-h.d<frontBuffer)return null;
+  if(horses.some(o=>o!==h&&!o.finished&&o.d<h.d&&h.d-o.d<backBuffer&&
+    Math.abs(o.lane-target)<.77))return null;
+  if(mode==='inward'&&old<=packMax+.25){
+   // Leave several running files, rather than filling only the inner rail.
+   const crowded=horses.filter(o=>o!==h&&!o.finished&&Math.abs(o.d-h.d)<28&&
+     Math.abs(o.lane-target)<.72).length;
+   const capacity=target<.7?5:target<1.7?6:7;
+   if(crowded>=capacity)return null;
+  }
   return {lane:target,mode,reason,avoids:blocked,scoreGain:1};
  }
- // PRE-RACE horses hold one of four individual pack lanes. Crowded bends
- // must not funnel all runners into a literal single-file rail procession.
- if(preferred!==null&&old>preferred+.36){
-  const target=route(Math.max(preferred,old-1),'inward','return-to-pack');
-  if(target)return target;
- }
- // Preserve existing standalone lane tests without preferredLane metadata.
- if(m.bend>.25&&old>cfg.packMaxLane+.4&&(bias!=='outer'||old>cfg.passMaxLane)){
-  const inner=route(Math.max(cfg.packMaxLane,old-1),'inward','outer-turn-saving');
-  if(inner)return inner;
- }
- if(preferred===null&&m.bend>.25&&old>1&&!blocked){
-  const inner=route(Math.max(0,old-1),'inward','clear-inside-turn');
-  if(inner)return inner;
- }
- // For a standalone scenario keep the historic outside-pass option. In the
- // real 18-runner pack an available adjacent inner line is considered first.
- if(blocked&&(tactical||gap<=4.25)){
-  const options=preferred===null?[Math.min(cfg.passMaxLane,old+1),Math.max(0,old-1)]:
-    [Math.max(0,old-1),Math.min(cfg.packMaxLane,old+1)];
-  for(const target of options){
-   const action=route(target,target>old?'outward':'inward','packed-passing-lane',7);
-   if(action)return action;
+ if(!straight){
+  // Always pursue a SAFE open inner line before turning into the straight.
+  // The starting gate's preferredLane is NOT a lower bound.
+  for(const distance of [1,.70,.45,1.30]){
+   const inside=route(Math.max(0,old-distance),'inward',
+     'inner-first-before-straight',7.5,4.8);
+   if(inside)return inside;
   }
-  if(tactical&&gap<=5.2&&old<cfg.passMaxLane-.35){
-   const outside=route(Math.min(cfg.passMaxLane,old+1),'outward','late-outside-shoulder',7);
+  // Pre-straight outside movement is an emergency exception only: directly
+  // blocked and the inside corridor is unavailable. Maximum fifth line.
+  if(blocked&&gap<5.1&&old<packMax+.15){
+   const shoulder=Math.min(cfg.passMaxLane??cfg.maxLane,packMax+.75);
+   const outside=route(Math.min(shoulder,old+1),'outward',
+     'blocked-no-inner-route',6.5,4.5);
    if(outside)return outside;
   }
+  return null;
  }
- if(preferred!==null&&old>cfg.packMaxLane+.28&&!blocked){
-  const rejoin=route(Math.max(cfg.packMaxLane,old-1),'inward','rejoin-pack');
-  if(rejoin)return rejoin;
+ // Upon entering the home straight, overtaking lines can widen.
+ if(!blocked&&old>.35){
+  const inside=route(Math.max(0,old-1),'inward','straight-inner-clear');
+  if(inside)return inside;
+ }
+ if(blocked){
+  for(const spread of [1,1.7]){
+   const outside=route(Math.min(cfg.passMaxLane??cfg.maxLane,old+spread),
+     'outward','straight-outside-pass',7,4.5);
+   if(outside)return outside;
+  }
+  if(old>.35)return route(Math.max(0,old-1),'inward','straight-inner-pass',7,4.5);
  }
  return null;
 }

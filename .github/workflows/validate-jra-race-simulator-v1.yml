@@ -15,6 +15,7 @@ on:
       - 'tools/test_race_sim_stage_v022.cjs'
       - 'tools/test_race_sim_stage_v023.cjs'
       - 'tools/test_race_sim_stage_v024.cjs'
+      - 'tools/test_race_sim_stage_v025.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -47,6 +48,8 @@ jobs:
           node tools/test_race_sim_stage_v023.cjs
           node --check tools/test_race_sim_stage_v024.cjs
           node tools/test_race_sim_stage_v024.cjs
+          node --check tools/test_race_sim_stage_v025.cjs
+          node tools/test_race_sim_stage_v025.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
@@ -73,7 +76,7 @@ jobs:
             actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'Stage v0.24' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'Stage v0.25' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.js?v=20261015-22' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261015-24' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
@@ -105,7 +108,7 @@ jobs:
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
           assert 'race-sim-engine.js?v=20261015-24' in html
-          assert 'race-lane-ai-v1.js?v=20261015-24' in html
+          assert 'race-lane-ai-v1.js?v=20261015-25' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
           assert 'broadcast panel dual-view' in html
