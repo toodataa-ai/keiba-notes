@@ -1,0 +1,52 @@
+name: Inspect projected Kyoto outer path on original image
+on:
+  push:
+    paths:
+      - '.github/workflows/staging-kyoto-outer-visual-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make annotated reference image and print sample colors
+        shell: bash
+        run: |
+          set -eu
+          python3 -m pip install -q Pillow
+          node - <<'JS' > /tmp/coursepoints.json
+          const fs=require('fs'),vm=require('vm'),w={};
+          for(const file of ['race-course-geometry-v1.js','race-umapot-overlay-v1.js'])vm.runInNewContext(fs.readFileSync('docs/staging/'+file,'utf8').replace('setup();',''),{window:w,globalThis:w,document:{getElementById:()=>null,querySelector:()=>null}});
+          const c=w.RaceCourseGeometry.get('kyoto_turf_outer_1400');
+          const obj={};
+          for(let d=0;d<=1400;d+=5)obj[d]=[0,4].map(l=>w.RaceUmapotOverlay.point(c,d,l));
+          process.stdout.write(JSON.stringify(obj));
+          JS
+          python3 - <<'PY'
+          import io,json,urllib.request,base64,math
+          from PIL import Image,ImageDraw,ImageFont
+          url='https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg'
+          data=urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=20).read()
+          im=Image.open(io.BytesIO(data)).convert('RGB')
+          points=json.load(open('/tmp/coursepoints.json'));im=im.resize((1240,860))
+          dr=ImageDraw.Draw(im)
+          for k,x in points.items():
+            d=int(k)
+            for lane,clr in [(0,(235,0,255)),(1,(0,0,250))]:
+              p=x[lane];px=p['x']*2;py=p['y']*2
+              dr.ellipse((px-3,py-3,px+3,py+3),fill=clr)
+              if d%100==0:
+                dr.text((px+4,py+3),str(d),fill=clr,stroke_width=1,stroke_fill='white')
+          # Mark screenshot's leader distance: 1400-664=736
+          for d in [675,700,725,750,775,800,850,950]:
+            x=points[str((d//5)*5)]
+            p=x[0];px=p['x']*2;py=p['y']*2
+            dr.ellipse((px-8,py-8,px+8,py+8),outline=(255,0,0),width=4)
+          o=io.BytesIO();im.save(o,'PNG',optimize=True)
+          print('ANNOTATED_START',flush=True)
+          print(base64.b64encode(o.getvalue()).decode(),flush=True)
+          print('ANNOTATED_END',flush=True)
+          PY
