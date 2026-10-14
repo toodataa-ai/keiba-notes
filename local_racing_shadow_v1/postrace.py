@@ -24,7 +24,7 @@ from bs4 import BeautifulSoup
 ROOT = Path("local_racing_shadow_v1")
 JST = dt.timezone(dt.timedelta(hours=9))
 ENDPOINT = "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/"
-CODES = {"大井": 20, "園田": 27, "川崎": 21, "船橋": 19, "浦和": 18, "名古屋": 24}
+CODES = {v["label"]: int(v["nar_baba_code"]) for v in json.loads((Path(__file__).parent / "config.json").read_text(encoding="utf-8"))["venues"].values() if v.get("enabled")}
 HTTP = requests.Session()
 HTTP.headers.update({"User-Agent": "Mozilla/5.0 (compatible; LocalShadowPostRace/0.2; +official-sources)",
                      "Accept-Language": "ja-JP,ja;q=0.9"})
