@@ -79,7 +79,7 @@ function plan(h,horses,cfg,courseMetrics,bias,t){
  // For a standalone scenario keep the historic outside-pass option. In the
  // real 18-runner pack an available adjacent inner line is considered first.
  if(blocked&&(tactical||gap<=4.25)){
-  const options=preferred===null?[Math.min(cfg.packMaxLane,old+1),Math.max(0,old-1)]:
+  const options=preferred===null?[Math.min(cfg.passMaxLane,old+1),Math.max(0,old-1)]:
     [Math.max(0,old-1),Math.min(cfg.packMaxLane,old+1)];
   for(const target of options){
    const action=route(target,target>old?'outward':'inward','packed-passing-lane',7);
