@@ -10,7 +10,7 @@
   const catalog=JraCourseCatalog.create(data),stats=catalog.stats,totals=by('totals');
   totals.replaceChildren();
   for(const [name,value] of [['競馬場',stats.venues],['基本走路',stats.families],
-    ['芝A/B/C/D・ダートの設定',stats.rail_variants],['距離別テンプレート',stats.templates],
+    ['代表走路（芝A相当・ダート）',stats.rail_variants],['距離別テンプレート',stats.templates],
     ['座標検品・承認済み',stats.geometry_approved]]){
    const c=el('div',name);c.className='metric';const strong=el('strong',value);
    c.prepend(strong);totals.appendChild(c);
@@ -19,7 +19,7 @@
    by('venueFilter').appendChild(option)}
   const grouped=[];
   for(const v of data.venues)for(const r of v.routes)for(const rail of Object.keys(r.variants)){
-   const items=catalog.list({venue:v.code,surface:r.surface,layout:r.layout,rail:rail==='dirt'?null:rail})
+   const items=catalog.list({venue:v.code,surface:r.surface,layout:r.layout})
     .filter(t=>t.rail===rail);
    grouped.push({venue:v,route:r,rail,items,details:r.variants[rail]});
   }
@@ -37,7 +37,7 @@
     const statuses=g.items.filter(i=>i.stage_experiment_id).map(i=>i.distance_m+'m（既存試作）');
     for(const value of [
      g.venue.name+' '+(r.surface==='turf'?'芝':'ダート')+' '+human(r.layout),
-     g.rail==='dirt'?'—':g.rail,
+     g.rail==='dirt'?'ダート固有':'A相当（B/C/D共用）',
      r.distances_m.join('・'),
      (t.lap_m??'—')+' / '+(t.straight_m??'—'),
      (statuses.length?statuses.join('、')+'。':'')+escStatus(statuses.length?'stage_experiment':'geometry_untraced')

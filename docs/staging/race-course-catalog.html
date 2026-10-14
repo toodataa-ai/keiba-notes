@@ -28,13 +28,13 @@ ul{padding-left:21px;font-size:13px;line-height:1.9}.bottom{margin-top:20px;font
 </style></head><body>
 <div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
 <main class="wrap">
-<h1>JRA全10競馬場 コース型台帳 <small>v1.0</small></h1>
+<h1>JRA全10競馬場 コース型台帳 <small>v1.1</small></h1>
 <p>レースの前に登録する<strong>コースの公式諸元・内外回り・距離別の走路型</strong>です。
 出走馬が確定したら対応する型に馬番・能力値等を結びつける設計ですが、現時点では走行座標が未検品の型は再生できません。</p>
 <div id="totals" class="meta" aria-live="polite"><span>台帳を読み込み中…</span></div>
 <div class="notice">
 <strong>登録済み ≠ 実コース座標完成。</strong>
-一周距離・直線距離・芝A/B/C/D・公表施行距離はJRAの諸元です。
+一周距離・直線距離は芝A相当の代表値とダート固有値です。芝B/C/Dの開催でもA相当の同じ形状を使う近似モデルです。
 内ラチ位置、発走地点、コーナー内外分岐、実画像との一致はコース・距離ごとに別途監査が必要です。
 東京2000mと京都外1400mは既存の<strong>ステージング試作</strong>であり、全型完成の証明には含めません。
 </div>
@@ -47,21 +47,21 @@ ul{padding-left:21px;font-size:13px;line-height:1.9}.bottom{margin-top:20px;font
 <option value="outer_to_inner">外→内</option><option value="straight">直線</option></select></label>
 </div>
 <p id="filterSummary" aria-live="polite"></p>
-<div class="scroll"><table><thead><tr><th>競馬場・種類</th><th>A/B/C/D</th>
+<div class="scroll"><table><thead><tr><th>競馬場・種類</th><th>代表モデル</th>
 <th>施行距離 (m)</th><th>1周 / 直線 (m)</th><th>形状・発走位置</th></tr></thead>
 <tbody id="courseRows"><tr><td colspan="5">台帳を読み込み中…</td></tr></tbody></table></div>
 </section>
 <section class="panel">
 <h2>実レースへの適用条件</h2>
-<ul><li>競馬場・芝／ダート・距離・芝コース区分を一致させます。内回りと外回りを勝手に推測しません。</li>
+<ul><li>競馬場・芝／ダート・距離・内回り／外回りの区別を維持します。芝A/B/C/Dの指定は走行コース型の選択には使わず、A相当を代表として使います。</li>
 <li>新潟直線1000m、阪神・中山の外→内併用、芝スタートのダートなどを別ルートで識別します。</li>
 <li>スタートゲート、内外ラチ、接続点、ゴール、高低差を実画像と照合し、承認済みになって初めて馬の走行を許可します。</li>
-<li>当日の出走馬、馬番、脚質、能力、馬場、展開はコースとは別のデータとして後から接続します。</li></ul>
+<li>当日の出走馬、馬番、脚質、能力、馬場、展開はコースとは別のデータとして後から接続します。B/C/Dによる実際のラチ移動や距離ロスの微差は再現しません。</li></ul>
 <p><a href="race-simulator.html">既存の東京・京都シミュレータ（ステージング試作）</a> ／
 <a href="https://www.jra.go.jp/facilities/race/">JRA公式競馬場案内</a></p>
 </section>
 <p class="bottom">出典：JRA公式各競馬場「コース紹介」。競馬場・コース条件の公表値であり、GPS実測値ではありません。障害コースは今回の対象外。</p>
 </main>
-<script src="race-course-catalog-v1.js?v=1" defer></script>
-<script src="race-course-catalog-ui-v1.js?v=1" defer></script>  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
+<script src="race-course-catalog-v1.js?v=2" defer></script>
+<script src="race-course-catalog-ui-v1.js?v=2" defer></script>  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

@@ -1,23 +1,25 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "catalog_id": "jra-flat-course-templates",
   "source_checked_on": "2026-10-15",
   "source_authority": "JRA official racecourse course data and plan diagrams",
   "scope": "JRA flat turf/dirt. Jump racing is out of scope.",
   "status_definition": {
-    "official_spec_registered": "Lap, straight, width, height, lane-letter and advertised start-distance facts stored; no image geometry implied.",
+    "official_spec_registered": "Official JRA representative A-rail course specs for turf and fixed dirt specs; identical representative route for B/C/D.",
     "geometry_untraced": "No approved physical centreline or gate XY. Must not animate as the requested route.",
-    "stage_experiment": "Current live staging approximation only; exact route & rail validation not yet approved.",
+    "stage_experiment": "Existing stage A-representative simulation only, not GPS-validated or automatically approved for other distances.",
     "geometry_approved": "Only after path, starts, turns, transitions, rail sides and source-image regression are signed off."
   },
   "safety_contract": {
     "no_inferred_inner_outer": true,
     "no_substitute_nearby_distance": true,
     "no_reuse_other_course_geometry": true,
-    "require_explicit_turf_rail": true,
+    "require_explicit_turf_rail": false,
     "no_live_simulation_until_geometry_approved": true,
     "stage_preexisting_legacy_sim_untouched": true,
-    "source_is_illustration_not_survey": true
+    "source_is_illustration_not_survey": true,
+    "turf_rail_variants_collapsed_to_A": true,
+    "inner_outer_dirt_and_special_routes_remain_distinct": true
   },
   "venues": [
     {
@@ -46,24 +48,9 @@
                 25,
                 27
               ]
-            },
-            "B": {
-              "lap_m": 1650.4,
-              "straight_m": 267.6,
-              "width_m": [
-                22,
-                25.5
-              ]
-            },
-            "C": {
-              "lap_m": 1659.8,
-              "straight_m": 269.1,
-              "width_m": [
-                19,
-                25
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -83,7 +70,8 @@
                 20
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -113,24 +101,9 @@
                 29,
                 29
               ]
-            },
-            "B": {
-              "lap_m": 1651.8,
-              "straight_m": 262.1,
-              "width_m": [
-                25,
-                25
-              ]
-            },
-            "C": {
-              "lap_m": 1675.8,
-              "straight_m": 264.5,
-              "width_m": [
-                21,
-                22
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -150,7 +123,8 @@
                 20
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -180,24 +154,9 @@
                 25,
                 27
               ]
-            },
-            "B": {
-              "lap_m": 1614.1,
-              "straight_m": 297.5,
-              "width_m": [
-                22.5,
-                25
-              ]
-            },
-            "C": {
-              "lap_m": 1628.1,
-              "straight_m": 299.7,
-              "width_m": [
-                20,
-                23
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -218,7 +177,8 @@
                 25
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -243,17 +203,10 @@
                 25,
                 25
               ]
-            },
-            "B": {
-              "lap_m": null,
-              "straight_m": 1000,
-              "width_m": [
-                21,
-                21
-              ]
             }
           },
-          "special": "separate_1000m_straight_chute"
+          "special": "separate_1000m_straight_chute",
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -274,16 +227,9 @@
                 25,
                 25
               ]
-            },
-            "B": {
-              "lap_m": 1648.1,
-              "straight_m": 358.7,
-              "width_m": [
-                21,
-                21
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -305,16 +251,9 @@
                 25,
                 25
               ]
-            },
-            "B": {
-              "lap_m": 2248.1,
-              "straight_m": 658.7,
-              "width_m": [
-                21,
-                21
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -339,7 +278,8 @@
           },
           "special_starts": {
             "1200": "turf_to_dirt"
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -372,35 +312,12 @@
                 31,
                 41
               ]
-            },
-            "B": {
-              "lap_m": 2101.9,
-              "straight_m": 525.9,
-              "width_m": [
-                28,
-                38
-              ]
-            },
-            "C": {
-              "lap_m": 2120.8,
-              "straight_m": 525.9,
-              "width_m": [
-                25,
-                35
-              ]
-            },
-            "D": {
-              "lap_m": 2139.6,
-              "straight_m": 525.9,
-              "width_m": [
-                22,
-                32
-              ]
             }
           },
           "stage_experiments": {
             "A:2000": "tokyo_turf_2000"
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -426,7 +343,8 @@
           },
           "special_starts": {
             "1600": "turf_to_dirt"
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -454,24 +372,9 @@
                 20,
                 32
               ]
-            },
-            "B": {
-              "lap_m": 1686,
-              "straight_m": 310,
-              "width_m": [
-                17,
-                29
-              ]
-            },
-            "C": {
-              "lap_m": 1704.8,
-              "straight_m": 310,
-              "width_m": [
-                14,
-                26
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -492,24 +395,9 @@
                 24,
                 32
               ]
-            },
-            "B": {
-              "lap_m": 1858.5,
-              "straight_m": 310,
-              "width_m": [
-                21,
-                29
-              ]
-            },
-            "C": {
-              "lap_m": 1877.3,
-              "straight_m": 310,
-              "width_m": [
-                18,
-                26
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -523,23 +411,14 @@
               "lap_m": null,
               "straight_m": 310,
               "width_m": null
-            },
-            "B": {
-              "lap_m": null,
-              "straight_m": 310,
-              "width_m": null
-            },
-            "C": {
-              "lap_m": null,
-              "straight_m": 310,
-              "width_m": null
             }
           },
           "route_sections": [
             "outer",
             "inner"
           ],
-          "requires_exact_branch_join": true
+          "requires_exact_branch_join": true,
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -562,7 +441,8 @@
                 25
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -593,16 +473,9 @@
                 28,
                 30
               ]
-            },
-            "B": {
-              "lap_m": 1724.8,
-              "straight_m": 412.5,
-              "width_m": [
-                25,
-                27
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -624,7 +497,8 @@
                 25
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -653,32 +527,9 @@
                 27,
                 38
               ]
-            },
-            "B": {
-              "lap_m": 1802.2,
-              "straight_m": 323.4,
-              "width_m": [
-                24,
-                35
-              ]
-            },
-            "C": {
-              "lap_m": 1821.1,
-              "straight_m": 323.4,
-              "width_m": [
-                21,
-                32
-              ]
-            },
-            "D": {
-              "lap_m": 1839.9,
-              "straight_m": 323.4,
-              "width_m": [
-                18,
-                29
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -702,35 +553,12 @@
                 24,
                 38
               ]
-            },
-            "B": {
-              "lap_m": 1913.6,
-              "straight_m": 398.7,
-              "width_m": [
-                21,
-                35
-              ]
-            },
-            "C": {
-              "lap_m": 1932.4,
-              "straight_m": 398.7,
-              "width_m": [
-                18,
-                32
-              ]
-            },
-            "D": {
-              "lap_m": 1951.3,
-              "straight_m": 398.7,
-              "width_m": [
-                15,
-                29
-              ]
             }
           },
           "stage_experiments": {
             "A:1400": "kyoto_turf_outer_1400"
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -754,7 +582,8 @@
                 25
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -783,16 +612,9 @@
                 24,
                 28
               ]
-            },
-            "B": {
-              "lap_m": 1713.2,
-              "straight_m": 359.1,
-              "width_m": [
-                20,
-                25
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -813,16 +635,9 @@
                 24,
                 29
               ]
-            },
-            "B": {
-              "lap_m": 2113.2,
-              "straight_m": 476.3,
-              "width_m": [
-                20,
-                25
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "turf",
@@ -836,18 +651,14 @@
               "lap_m": null,
               "straight_m": null,
               "width_m": null
-            },
-            "B": {
-              "lap_m": null,
-              "straight_m": null,
-              "width_m": null
             }
           },
           "route_sections": [
             "outer",
             "inner"
           ],
-          "requires_exact_branch_join": true
+          "requires_exact_branch_join": true,
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -869,7 +680,8 @@
                 25
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     },
@@ -899,24 +711,9 @@
                 30,
                 30
               ]
-            },
-            "B": {
-              "lap_m": 1633.9,
-              "straight_m": 293,
-              "width_m": [
-                27,
-                27
-              ]
-            },
-            "C": {
-              "lap_m": 1652.8,
-              "straight_m": 293,
-              "width_m": [
-                24,
-                24
-              ]
             }
-          }
+          },
+          "rail_model": "representative_A"
         },
         {
           "surface": "dirt",
@@ -936,9 +733,22 @@
                 24
               ]
             }
-          }
+          },
+          "rail_model": "dirt_native"
         }
       ]
     }
-  ]
+  ],
+  "representative_policy": {
+    "turf_model": "A-equivalent route for all A/B/C/D race inputs. Inputs with B/C/D are approximations, not physically exact rails.",
+    "primary_rail": "A",
+    "accepts_actual_rails": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "does_not_change_horse_ability_or_physics": true,
+    "no_uncertified_geometry_reuse": true
+  }
 }
