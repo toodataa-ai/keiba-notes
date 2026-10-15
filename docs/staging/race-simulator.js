@@ -537,13 +537,8 @@ function drawGoalCamera(ctx,state,profile,width,height,renderedWidth,target){
    raceNumberMarker(ctx,runner.number,q.x,q.y,scale,
      runner.number===target.number,runner.number===state.leadingNo,race.field_size);
  }
- rect(ctx,12,34,478,35,'rgba(13,27,28,.84)');
- ctx.fillStyle='#fdf6e9';ctx.font='bold 16px Meiryo';
- ctx.fillText(profile.venue+' 最後の直線・ゴール板固定カメラ '+(profile.turn==='右'?'←':'→'),22,57);
- rect(ctx,700,34,286,35,'rgba(13,27,28,.84)');
- ctx.fillStyle='#fff4ca';ctx.font='bold 14px Meiryo';
- ctx.fillText(state.finished?'全馬通過・余走完了':
-   state.firstFinishTime!==null?'ゴール通過・余走中':'ゴール前直線',713,57);
+ // HUD lives exclusively in HTML stageCaption / elapsed / splitTime.
+ // Do not draw extra television banners behind translucent labels.
 }
 window.RaceSimGoalView=Object.freeze({position:goalScreenPosition,drawPost:drawGoalPost});
 
@@ -615,16 +610,9 @@ function drawRace(){
  ctx.restore();
  const points=projectRaceNumbers(state.horses,profile,origin,zoom,w,h,
    target.number,state.leadingNo,anchor);
- const visibleNumbers=drawRaceNumbers(ctx,points,w,h,renderedWidth,race.field_size);
- // Television overlays are static on screen, not rotated with the course.
- rect(ctx,12,34,336,33,'rgba(13,27,28,.84)');
- ctx.font='bold 17px Meiryo';ctx.textAlign='left';ctx.fillStyle='#f7f6ee';
- ctx.fillText(profile.venue+' '+profile.course+'  '+(mode==='overview'?'コース全体':mode==='followWide'?'馬群を広く':'馬番を追走'),23,56);
- rect(ctx,773,34,213,33,'rgba(13,27,28,.84)');
- ctx.font='bold 13px Meiryo';ctx.fillStyle='#f1e3b0';
- ctx.fillText(state.finished?'PHOTO FINISH':
-   String(visibleNumbers.length)+' / '+String(state.horses.length)+'頭 表示中',788,55);
- ctx.textAlign='start';
+ drawRaceNumbers(ctx,points,w,h,renderedWidth,race.field_size);
+ // The HTML course-section and timing badges are the only HUD in this view.
+ // The canvas renders the course and moving numbers, never duplicate titles.
  drawCourse();
  if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,false,RaceSimNumbers.marker);
 }
