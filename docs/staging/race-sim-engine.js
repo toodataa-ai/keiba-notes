@@ -157,8 +157,11 @@ function create(data,options={}){
   for(const h of horses){
    if(!h.finished)continue;
    const fatigued=clamp((h.displayD-length)/RUNOFF_M,0,1);
-   h.displayD=Math.min(length+RUNOFF_M,h.displayD+
-      dt*Math.max(11,h.runoffSpeed)*(.94-.16*fatigued));
+   // Keep the elapsed post-line head start: capping every finisher at the
+   // same +32m location visually turns a multi-length finish into a tie.
+   // All runners continue forward; the race stops once the last finisher
+   // has travelled the required 32m past the winning line.
+   h.displayD+=dt*Math.max(11,h.runoffSpeed)*(.94-.16*fatigued);
   }
   const fraction=clamp(state.leader/length,0,1);
   // Take one snapshot BEFORE any horse is advanced. Without this,
@@ -283,7 +286,11 @@ function create(data,options={}){
    // Jockey keeps contact with a departing pack before the final sprint.
    // Chase costs effort, does not teleport or force a particular finish.
    const intendedGap=({nige:0,senko:5,sashi:12,oikomi:20,unknown:12})[h.style]??12;
-   const packWindow=smoothstep((fraction-.05)/.10)*(1-smoothstep((fraction-.76)/.12));
+   // Continue tactical pursuit farther through the home straight rather than
+   // switching it off around 1750m and letting an implausible 30m+ leader
+   // gap open on routine competitive stakes. This changes real travel speed,
+   // not recorded finish times or ranks after the fact.
+   const packWindow=smoothstep((fraction-.05)/.10)*(1-smoothstep((fraction-.90)/.12));
    const catchUp=clamp((leaderD-h.d-intendedGap)*.042,0,1.20)*packWindow;
    speed+=catchUp;
    h.effortDebt=clamp(h.effortDebt+dt*catchUp*.006,0,2.8);
@@ -323,7 +330,7 @@ function create(data,options={}){
      h.d=length;
      h.finished=true;
      log('finish',h.number+'番 '+h.name+'がゴール板を通過',h);
-     if(state.firstFinishTime===null)state.firstFinishTime=h.finishTime;
+     if(state.firstFinishTime===null||h.finishTime<state.firstFinishTime)state.firstFinishTime=h.finishTime;
    }
    // Path and separation events are emitted above; do not duplicate every tick.
    h.lastBlocked=h.blocked;
