@@ -121,11 +121,19 @@ def validate_prediction(path, p, date, enabled):
     if len(nums) < 5 or len(nums) != len(set(nums)):
         raise Blocked("BLOCKED_JOIN", "Prediction horse numbers invalid")
     order = p.get("ability_order", [])
-    ranks = [x["ability_rank"] for x in order]
-    if sorted(ranks) != list(range(1, len(ranks) + 1)):
-        raise Blocked("BLOCKED_JOIN", "Prediction ability ranks invalid")
-    if order[0]["horse_no"] != p["top_pick"]["horse_no"]:
-        raise Blocked("BLOCKED_JOIN", "Top-pick not ability rank 1")
+    if p.get("cold_start_no_form") is True:
+        # All-debut entrants: preserve explicitly withheld ranks/top pick.
+        # A result may be archived but is NOT an evaluable prediction.
+        if p.get("top_pick") is not None or any(x.get("ability_rank") is not None for x in order):
+            raise Blocked("BLOCKED_JOIN", "Cold-start abstention has unexpected ranking")
+        if sorted(int(x["horse_no"]) for x in order) != sorted(nums):
+            raise Blocked("BLOCKED_JOIN", "Cold-start horse set differs from runner list")
+    else:
+        ranks = [x["ability_rank"] for x in order]
+        if sorted(ranks) != list(range(1, len(ranks) + 1)):
+            raise Blocked("BLOCKED_JOIN", "Prediction ability ranks invalid")
+        if order[0]["horse_no"] != p["top_pick"]["horse_no"]:
+            raise Blocked("BLOCKED_JOIN", "Top-pick not ability rank 1")
     return nums
 
 def parse_official(soup, p):
@@ -159,9 +167,18 @@ def parse_official(soup, p):
         # Allow only these known official-vs-card differences; race date,
         # course, race number, horse numbers and names are still joined strictly.
         def title_key(name):
+            # NAR RaceList uses official shortened labels (J認/J交),
+            # while RaceMarkTable spells out the same designation.
+            # The surrounding date, venue, number, distance and runners
+            # must still independently match before accepting a result.
+            name = re.sub(r"^(?:JRA認定|J認|J交)", "", name)
+            name = re.sub(r"JRA選定馬$", "", name)
             name = re.sub(r"^第[0-9]+回", "", name)
             name = re.sub(r"賞(?=[ABC][0-9])", "", name)
             name = re.sub(r"】2歳(?=オープン)", "】", name)
+            # Verified 2026-10-15 Sonoda 5R official vs card abbreviation.
+            name = name.replace("セレクションハンデ", "セレクショ")
+            name = re.sub(r"3歳以上特別$", "", name)
             return name
         standard_name, card_name = title_key(normalized), title_key(abbreviated)
         if standard_name != card_name and (len(card_name) < 6 or card_name not in standard_name):
@@ -249,8 +266,7 @@ def joined(p, official):
 def make_review(p, result):
     actual = joined(p, result)
     top = p["top_pick"]
-    first = actual[int(top["horse_no"])]
-    top_finish = first["finish_position"]
+    top_finish = actual[int(top["horse_no"])]["finish_position"] if top is not None else None
     rank_cmp = []
     for x in p["ability_order"]:
         no = int(x["horse_no"])
