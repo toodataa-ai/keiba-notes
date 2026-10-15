@@ -1,0 +1,78 @@
+name: Backtest Tokyo Kyoto Stage B labels
+
+on:
+  pull_request:
+    paths:
+      - 'baba_models_v2/jra_result_labels.py'
+      - 'baba_models_v2/test_jra_result_labels.py'
+      - '.github/workflows/backtest-tokyo-kyoto-stage-b-labels.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect-labels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check pytest requests beautifulsoup4 pypdf
+      - name: Test result label parsers
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_jra_result_labels.py test_jra_observations.py
+      - name: Collect exact-timestamp JRA morning observations
+        run: |
+          python baba_models_v2/jra_observations.py --track tokyo --from-year 2025 --to-year 2026 --output tmp/stage_b/tokyo_observations.csv
+          python baba_models_v2/jra_observations.py --track kyoto --from-year 2025 --to-year 2026 --output tmp/stage_b/kyoto_observations.csv
+      - name: Collect official race-time condition labels
+        run: |
+          python baba_models_v2/jra_result_labels.py --track tokyo --observations tmp/stage_b/tokyo_observations.csv --output tmp/stage_b/tokyo_labels.csv
+          python baba_models_v2/jra_result_labels.py --track kyoto --observations tmp/stage_b/kyoto_observations.csv --output tmp/stage_b/kyoto_labels.csv
+      - name: Audit label coverage
+        run: |
+          python - <<'PY'
+          import csv,json
+          from collections import Counter
+          from pathlib import Path
+          root=Path('tmp/stage_b')
+          manifest={'schema_version':1,'datasets':{}}
+          for track in ('tokyo','kyoto'):
+              obs=list(csv.DictReader((root/f'{track}_observations.csv').open(encoding='utf-8')))
+              exact=[r for r in obs if r['race_day'].lower() in {'true','1'} and r['moisture_time']]
+              labels=list(csv.DictReader((root/f'{track}_labels.csv').open(encoding='utf-8')))
+              surfaces=Counter(r['surface'] for r in labels)
+              conditions=Counter((r['surface'],r['condition']) for r in labels)
+              days=sorted(set(r['race_date'] for r in labels))
+              exact_days=sorted(set(r['observed_date'] for r in exact))
+              if not set(days).issubset(set(exact_days)):
+                  raise SystemExit(f'{track}: label date without exact morning anchor')
+              if len(labels) != len(set((r['race_date'],r['race_number']) for r in labels)):
+                  raise SystemExit(f'{track}: duplicate race labels')
+              manifest['datasets'][track]={
+                  'exact_anchor_days':len(exact_days),
+                  'label_days':len(days),
+                  'labels':len(labels),
+                  'surface_counts':dict(surfaces),
+                  'condition_counts':{f'{s}:{c}':n for (s,c),n in sorted(conditions.items())},
+                  'date_from':min(days) if days else None,
+                  'date_to':max(days) if days else None,
+              }
+              if len(days) < 12:
+                  raise SystemExit(f'{track}: fewer than 12 independent label days')
+              for surface in ('turf','dirt'):
+                  if surfaces[surface] < 80:
+                      raise SystemExit(f'{track}/{surface}: fewer than 80 labels ({surfaces[surface]})')
+          (root/'label_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(manifest,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokyo-kyoto-stage-b-labels
+          path: tmp/stage_b
+          if-no-files-found: error
+          retention-days: 30
