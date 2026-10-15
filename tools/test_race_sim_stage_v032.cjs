@@ -17,10 +17,10 @@ assert.ok(overlay.validate(t)&&overlay.validate(k));
 // pocket. They intentionally reject the previous inward rail displacement
 // at 60–100m, while allowing a safety margin for Bézier interpolation.
 const outerPocketCorridor=[
- [0,505,521,273,282],[20,510,526,250,265],
+ [0,505,525,273,282],[20,510,526,250,265],
  [40,513,530,231,241],[60,515,533,208,216],
  [80,505,523,185,198],[100,495,511,169,182],
- [120,482,496,159,173],[130,476,492,154,169],
+ [120,482,497,159,173],[130,476,494,154,169],
  [150,469,485,147,161],[170,460,477,140,157]
 ];
 for(const [d,xmin,xmax,ymin,ymax] of outerPocketCorridor){
