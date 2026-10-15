@@ -91,7 +91,8 @@ function point(course,d,lane=0){
  // The Tokyo 2000m pocket is narrower in the illustration than the main
  // course. Compress DISPLAY-ONLY lane spacing until the chute rejoins the
  // common turf route (120-170m); physics and actual lane decisions are intact.
- const tokyoPocket=course.id==='tokyo_turf_2000'?1-clamp((d-120)/50,0,1):0;
+ const smooth=x=>{const q=clamp(x,0,1);return q*q*(3-2*q)};
+ const tokyoPocket=course.id==='tokyo_turf_2000'?smooth(d/30)*(1-smooth((d-110)/20)):0;
  const visualLaneScale=1.30-0.35*tokyoPocket;
  const towardInsidePx=railEdgePx(course,d)-(1.8+clamp(Number(lane)||0,0,18)*1.65)*visualLaneScale;
  const offset=-towardInsidePx*(course.turn==='左'?1:-1)-outwardShiftPx(course,d);
