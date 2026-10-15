@@ -24,6 +24,7 @@ on:
       - 'tools/test_race_sim_stage_v031.cjs'
       - 'tools/test_race_sim_stage_v032.cjs'
       - 'tools/test_race_sim_stage_v033.cjs'
+      - 'tools/test_race_sim_stage_v034.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -72,6 +73,8 @@ jobs:
           node tools/test_race_sim_stage_v032.cjs
           node --check tools/test_race_sim_stage_v033.cjs
           node tools/test_race_sim_stage_v033.cjs
+          node --check tools/test_race_sim_stage_v034.cjs
+          node tools/test_race_sim_stage_v034.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
@@ -99,7 +102,7 @@ jobs:
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
           assert 'Stage v0.31' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261016-33' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261016-34' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261015-28' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
@@ -113,9 +116,9 @@ jobs:
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
           assert 'race-umapot-overlay-v1.js?v=20261015-32' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
-          assert 'race-simulator.css?v=20261016-33' in html
+          assert 'race-simulator.css?v=20261016-34' in html
           assert 'race-sim-engine.js?v=20261016-33' in html
-          assert 'race-simulator.js?v=20261016-33' in html
+          assert 'race-simulator.js?v=20261016-34' in html
           assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
           assert 'id="courseMapMode"' not in html and 'id="courseCanvas"' not in html
           assert 'id="pathToggle"' not in html
