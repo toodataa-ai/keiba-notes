@@ -4,10 +4,10 @@
   "scope": "predictions_with_valid_proof_only",
   "expected_predictions": 48,
   "eligible_predictions": 48,
-  "completed_reviews": 44,
+  "completed_reviews": 4,
   "pending": 0,
-  "blocked": 4,
-  "skipped_existing": 0,
+  "blocked": 0,
+  "skipped_existing": 44,
   "by_venue": {
     "名古屋": {
       "reviewed": 12,
@@ -20,33 +20,33 @@
       "small_sample_warning": true
     },
     "園田": {
-      "reviewed": 10,
-      "evaluable": 10,
+      "reviewed": 12,
+      "evaluable": 11,
       "top_pick_wins": 2,
-      "top_pick_top3": 5,
-      "win_rate": 0.2,
-      "top3_rate": 0.5,
-      "mean_absolute_top_pick_rank_error": 2.7,
+      "top_pick_top3": 6,
+      "win_rate": 0.181818,
+      "top3_rate": 0.545455,
+      "mean_absolute_top_pick_rank_error": 2.545455,
       "small_sample_warning": true
     },
     "川崎": {
-      "reviewed": 11,
-      "evaluable": 11,
+      "reviewed": 12,
+      "evaluable": 12,
       "top_pick_wins": 7,
-      "top_pick_top3": 9,
-      "win_rate": 0.636364,
-      "top3_rate": 0.818182,
-      "mean_absolute_top_pick_rank_error": 1.272727,
+      "top_pick_top3": 10,
+      "win_rate": 0.583333,
+      "top3_rate": 0.833333,
+      "mean_absolute_top_pick_rank_error": 1.25,
       "small_sample_warning": true
     },
     "門別": {
-      "reviewed": 11,
-      "evaluable": 11,
+      "reviewed": 12,
+      "evaluable": 12,
       "top_pick_wins": 4,
       "top_pick_top3": 9,
-      "win_rate": 0.363636,
-      "top3_rate": 0.818182,
-      "mean_absolute_top_pick_rank_error": 1.909091,
+      "win_rate": 0.333333,
+      "top3_rate": 0.75,
+      "mean_absolute_top_pick_rank_error": 2.083333,
       "small_sample_warning": true
     }
   },
@@ -62,23 +62,23 @@
       "small_sample_warning": true
     },
     "1200": {
-      "reviewed": 3,
-      "evaluable": 3,
+      "reviewed": 4,
+      "evaluable": 4,
       "top_pick_wins": 0,
       "top_pick_top3": 2,
       "win_rate": 0.0,
-      "top3_rate": 0.666667,
-      "mean_absolute_top_pick_rank_error": 4.333333,
+      "top3_rate": 0.5,
+      "mean_absolute_top_pick_rank_error": 4.25,
       "small_sample_warning": true
     },
     "1230": {
-      "reviewed": 3,
-      "evaluable": 3,
+      "reviewed": 4,
+      "evaluable": 4,
       "top_pick_wins": 1,
-      "top_pick_top3": 1,
-      "win_rate": 0.333333,
-      "top3_rate": 0.333333,
-      "mean_absolute_top_pick_rank_error": 2.666667,
+      "top_pick_top3": 2,
+      "win_rate": 0.25,
+      "top3_rate": 0.5,
+      "mean_absolute_top_pick_rank_error": 2.25,
       "small_sample_warning": true
     },
     "1400": {
@@ -102,13 +102,13 @@
       "small_sample_warning": true
     },
     "1600": {
-      "reviewed": 2,
-      "evaluable": 2,
+      "reviewed": 3,
+      "evaluable": 3,
       "top_pick_wins": 2,
-      "top_pick_top3": 2,
-      "win_rate": 1.0,
+      "top_pick_top3": 3,
+      "win_rate": 0.666667,
       "top3_rate": 1.0,
-      "mean_absolute_top_pick_rank_error": 0.0,
+      "mean_absolute_top_pick_rank_error": 0.333333,
       "small_sample_warning": true
     },
     "1700": {
@@ -142,7 +142,7 @@
       "small_sample_warning": true
     },
     "820": {
-      "reviewed": 1,
+      "reviewed": 2,
       "evaluable": 1,
       "top_pick_wins": 0,
       "top_pick_top3": 1,
@@ -172,21 +172,21 @@
       "small_sample_warning": true
     }
   },
-  "top_pick_win_rate": 0.340909,
-  "top_pick_top3_rate": 0.636364,
+  "top_pick_win_rate": 0.319149,
+  "top_pick_top3_rate": 0.638298,
   "ranking_error_summary": {
-    "top_pick_mean_absolute_rank_error": 2.477273,
-    "evaluable_n": 44
+    "top_pick_mean_absolute_rank_error": 2.446809,
+    "evaluable_n": 47
   },
-  "reviewed_races": 44,
+  "reviewed_races": 48,
   "summary": {
-    "reviewed": 44,
-    "evaluable": 44,
+    "reviewed": 48,
+    "evaluable": 47,
     "top_pick_wins": 15,
-    "top_pick_top3": 28,
-    "win_rate": 0.340909,
-    "top3_rate": 0.636364,
-    "mean_absolute_top_pick_rank_error": 2.477273,
+    "top_pick_top3": 30,
+    "win_rate": 0.319149,
+    "top3_rate": 0.638298,
+    "mean_absolute_top_pick_rank_error": 2.446809,
     "small_sample_warning": false
   },
   "evidence_based_findings": [
@@ -209,6 +209,7 @@
       "20261015-kawasaki-07",
       "20261015-kawasaki-08",
       "20261015-kawasaki-09",
+      "20261015-kawasaki-10",
       "20261015-kawasaki-11",
       "20261015-kawasaki-12",
       "20261015-monbetsu-01",
@@ -218,6 +219,7 @@
       "20261015-monbetsu-05",
       "20261015-monbetsu-06",
       "20261015-monbetsu-07",
+      "20261015-monbetsu-08",
       "20261015-monbetsu-09",
       "20261015-monbetsu-10",
       "20261015-monbetsu-11",
@@ -236,7 +238,9 @@
       "20261015-nagoya-12",
       "20261015-sonoda-01",
       "20261015-sonoda-02",
+      "20261015-sonoda-03",
       "20261015-sonoda-04",
+      "20261015-sonoda-05",
       "20261015-sonoda-06",
       "20261015-sonoda-07",
       "20261015-sonoda-08",
@@ -245,12 +249,7 @@
       "20261015-sonoda-11",
       "20261015-sonoda-12"
     ],
-    "unresolved_ids": [
-      "20261015-kawasaki-10",
-      "20261015-monbetsu-08",
-      "20261015-sonoda-03",
-      "20261015-sonoda-05"
-    ],
+    "unresolved_ids": [],
     "ineligible_proof_ids": []
   }
 }
