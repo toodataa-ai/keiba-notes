@@ -28,5 +28,5 @@ assert.match(html,/<div class="stage-top">[\s\S]*?id="stageCaption"[\s\S]*?class
 assert.match(css,/#elapsed\{font-size:/);
 assert.match(css,/\.stage-split-value\{font:900/);
 assert.match(html,/race-simulator\.js\?v=20261016-35/);
-assert.match(html,/HUD fix v0\.35/);
+assert.match(html,/Finish spacing v0\.36/);
 console.log('PASS_V035_NO_GHOST_CANVAS_HUD_BOTH_VIEWS_HTML_TIMER_AND_GOAL_PRESERVED');

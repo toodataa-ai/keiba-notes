@@ -114,7 +114,11 @@ function draw(state,race,focus,pathOn,paintNumber){
  const course=global.RaceCourseGeometry.get(race.course_id);
  ctx.clearRect(0,0,620,430);
  const selected=focus==='leader'?state.leadingNo:Number(focus);
- const markers=state.horses.map(h=>({number:h.number,...point(course,h.displayD??h.d,h.lane),
+ // The course bitmap ends at the finishing straight. Once a horse runs
+ // past the 40m reference-map extrapolation, let its marker EXIT the map;
+ // do not clamp every finisher onto the same pixel and fake a photo tie.
+ const markers=state.horses.filter(h=>!h.finished||(h.displayD??h.d)<=state.distance+40)
+ .map(h=>({number:h.number,...point(course,h.displayD??h.d,h.lane),
   selected:h.number===selected,leading:h.number===state.leadingNo}))
  .sort((a,b)=>Number(a.selected)-Number(b.selected)||Number(a.leading)-Number(b.leading)||a.number-b.number);
  for(const h of markers)paintNumber(ctx,h.number,h.x,h.y,h.selected?.78:.64,h.selected,h.leading,race.field_size);

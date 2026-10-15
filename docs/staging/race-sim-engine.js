@@ -131,6 +131,14 @@ function create(data,options={}){
    fatigue:0,effortDebt:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
  const RUNOFF_M=32;
+ // All horses ease down after the wire on the SAME monotone runoff curve.
+ // Their screen order then remains tied to the real fractional crossing
+ // times instead of changing due to arbitrary post-race acceleration, and
+ // the early finishers keep their elapsed head start at the final frame.
+ function postFinishTravel(seconds){
+  const t=Math.max(0,Number(seconds)||0);
+  return (14.2/.12)*(1-Math.exp(-.12*t));
+ }
  const events=[];
  const loggedLandmarks=new Set();
  // Record 1000m for races at least 1600m; opening 3F (600m) for shorter.
@@ -156,9 +164,10 @@ function create(data,options={}){
   state.t+=dt;
   for(const h of horses){
    if(!h.finished)continue;
-   const fatigued=clamp((h.displayD-length)/RUNOFF_M,0,1);
-   h.displayD=Math.min(length+RUNOFF_M,h.displayD+
-      dt*Math.max(11,h.runoffSpeed)*(.94-.16*fatigued));
+   // Continuous extrapolation from the INTERPOLATED wire-crossing instant:
+   // same after-race easing for all runners, no 32m clamp, and no phantom
+   // overtake after the official virtual finish order has been established.
+   h.displayD=length+postFinishTravel(state.t-h.finishTime);
   }
   const fraction=clamp(state.leader/length,0,1);
   // Take one snapshot BEFORE any horse is advanced. Without this,
@@ -283,7 +292,11 @@ function create(data,options={}){
    // Jockey keeps contact with a departing pack before the final sprint.
    // Chase costs effort, does not teleport or force a particular finish.
    const intendedGap=({nige:0,senko:5,sashi:12,oikomi:20,unknown:12})[h.style]??12;
-   const packWindow=smoothstep((fraction-.05)/.10)*(1-smoothstep((fraction-.76)/.12));
+   // Continue tactical pursuit farther through the home straight rather than
+   // switching it off around 1750m and letting an implausible 30m+ leader
+   // gap open on routine competitive stakes. This changes real travel speed,
+   // not recorded finish times or ranks after the fact.
+   const packWindow=smoothstep((fraction-.05)/.10)*(1-smoothstep((fraction-.90)/.12));
    const catchUp=clamp((leaderD-h.d-intendedGap)*.042,0,1.20)*packWindow;
    speed+=catchUp;
    h.effortDebt=clamp(h.effortDebt+dt*catchUp*.006,0,2.8);
@@ -321,9 +334,10 @@ function create(data,options={}){
      h.finishTime=state.t-dt+dt*clamp((length-before)/(h.d-before),0,1);
      h.runoffSpeed=Math.max(11,speed/m.pathStretch);
      h.d=length;
+     h.displayD=length+postFinishTravel(state.t-h.finishTime);
      h.finished=true;
      log('finish',h.number+'番 '+h.name+'がゴール板を通過',h);
-     if(state.firstFinishTime===null)state.firstFinishTime=h.finishTime;
+     if(state.firstFinishTime===null||h.finishTime<state.firstFinishTime)state.firstFinishTime=h.finishTime;
    }
    // Path and separation events are emitted above; do not duplicate every tick.
    h.lastBlocked=h.blocked;
