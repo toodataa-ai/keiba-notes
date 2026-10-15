@@ -281,8 +281,13 @@ function renderData(){
  ui.elapsed.textContent=dur(state.firstFinishTime??state.t);
  const splitEl=$('splitTime');
  if(splitEl){
-  splitEl.hidden=state.splitTime===null||state.t-state.splitTime>8;
-  splitEl.textContent=state.splitTime===null?'':'前半'+state.splitDistanceM+'m '+dur(state.splitTime);
+  // Keep the sectional beneath the main timer once the line is crossed.
+  // Do not expire after eight seconds: the two clocks remain comparable at
+  // the finish and throughout the remainder of the simulation.
+  splitEl.hidden=state.splitTime===null;
+  const label=$('splitLabel'),value=$('splitValue');
+  if(label)label.textContent='前半'+state.splitDistanceM+'m';
+  if(value)value.textContent=state.splitTime===null?'—':dur(state.splitTime);
  }
  const podium=$('podium');
  if(podium){
