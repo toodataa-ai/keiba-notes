@@ -22,6 +22,7 @@ on:
       - 'tools/test_race_sim_stage_v029.cjs'
       - 'tools/test_race_sim_stage_v030.cjs'
       - 'tools/test_race_sim_stage_v031.cjs'
+      - 'tools/test_race_sim_stage_v032.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -66,6 +67,8 @@ jobs:
           node tools/test_race_sim_stage_v030.cjs
           node --check tools/test_race_sim_stage_v031.cjs
           node tools/test_race_sim_stage_v031.cjs
+          node --check tools/test_race_sim_stage_v032.cjs
+          node tools/test_race_sim_stage_v032.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
@@ -105,7 +108,7 @@ jobs:
           assert 'https://umapot.com/?page_id=116' in html
           assert '馬番の位置はコース図への手動の近似位置合わせ' in html
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-30' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-32' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261015-31' in html
           assert 'race-sim-engine.js?v=20261015-31' in html
@@ -118,7 +121,7 @@ jobs:
           assert 'id="podium"' in html and 'id="splitTime"' in html
           assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
           assert 'ゴール前80mから実況は後続も見えるゴール板固定カメラ' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-30' in html
+          assert 'race-umapot-overlay-v1.js?v=20261015-32' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
           assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html

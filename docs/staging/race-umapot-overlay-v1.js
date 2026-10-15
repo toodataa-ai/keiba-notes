@@ -41,7 +41,14 @@ function referenceLine(course){
 // Measured-image guide offsets approximate the inside turf edge
 // of Umapot's JPG. Display-only, NOT surveyed/georeferenced positions.
 const railGuide=Object.freeze({
- tokyo_turf_2000:[[0,19],[130,17],[300,19],[900,19],[1145,13],[1474.1,18],[2000,18]],
+ // Tokyo 2000m has a separate outer turf pocket, divided from the inside
+ // course by a white cutout. The ordinary inner-rail guide incorrectly drew
+ // the first 60-100m of horse numbers across this separator. Signed pixel
+ // anchors below are illustration registrations, NOT surveyed turf rails.
+ // At 170-300m the guide returns to the pre-existing main-course values.
+ tokyo_turf_2000:[[0,14],[20,10],[40,5],[60,-3],[80,0],[100,3],
+  [120,9],[130,11],[150,13],[170,17],[300,19],
+  [900,19],[1145,13],[1474.1,18],[2000,18]],
  kyoto_turf_outer_1400:[[0,20],[365,19],[570,18],[805,17],[996.3,15],[1400,15]]
 });
 function railEdgePx(course,d){
@@ -81,7 +88,13 @@ function outwardShiftPx(course,d){
 function point(course,d,lane=0){
  if(!path[course?.id])throw Error('UMAPOT_UNSUPPORTED_COURSE');
  const p=referenceLine(course).at(d);
- const towardInsidePx=railEdgePx(course,d)-(1.8+clamp(Number(lane)||0,0,18)*1.65)*1.30;
+ // The Tokyo 2000m pocket is narrower in the illustration than the main
+ // course. Compress DISPLAY-ONLY lane spacing until the chute rejoins the
+ // common turf route (120-170m); physics and actual lane decisions are intact.
+ const smooth=x=>{const q=clamp(x,0,1);return q*q*(3-2*q)};
+ const tokyoPocket=course.id==='tokyo_turf_2000'?smooth(d/30)*(1-smooth((d-110)/20)):0;
+ const visualLaneScale=1.30-0.35*tokyoPocket;
+ const towardInsidePx=railEdgePx(course,d)-(1.8+clamp(Number(lane)||0,0,18)*1.65)*visualLaneScale;
  const offset=-towardInsidePx*(course.turn==='左'?1:-1)-outwardShiftPx(course,d);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset};
 }
