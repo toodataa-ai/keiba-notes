@@ -157,10 +157,16 @@ body.map-expanded{overflow:hidden}
 #elapsed{font-size:clamp(18px,2.8vw,25px);font-weight:900;line-height:1.15;
  font-variant-numeric:tabular-nums;letter-spacing:.6px;padding:5px 9px;border-radius:5px;
  background:rgba(12,24,32,.87)}
-.stage-split{pointer-events:none;position:absolute;top:48px;left:12px;z-index:5;
- color:#fff;background:rgba(16,29,42,.88);border-radius:5px;padding:5px 9px;
- font:800 clamp(12px,2.5vw,18px) "Meiryo UI",Meiryo,sans-serif;
- font-variant-numeric:tabular-nums;text-shadow:0 1px 2px #000}
+/* The sectional number shares the EXACT clock size, immediately beneath
+   the current time, aligned to the same right edge on desktop and mobile. */
+.stage-clock-stack{display:grid;justify-items:end;align-content:start;gap:3px;flex:none}
+.stage-split{pointer-events:none;position:static;display:flex;align-items:baseline;
+ justify-content:flex-end;gap:7px;color:#fff;background:rgba(16,29,42,.88);
+ border-radius:5px;padding:3px 9px;font-variant-numeric:tabular-nums;
+ text-shadow:0 1px 2px #000;white-space:nowrap}
+.stage-split-label{font:700 10px "Meiryo UI",Meiryo,sans-serif;opacity:.9}
+.stage-split-value{font:900 clamp(18px,2.8vw,25px) "Meiryo UI",Meiryo,sans-serif;
+ line-height:1.15;letter-spacing:.6px;font-variant-numeric:tabular-nums}
 .finish-podium{pointer-events:none;position:absolute;left:10px;bottom:36px;
  max-width:min(93%,460px);min-width:min(64%,235px);display:grid;gap:3px;z-index:6}
 .finish-podium[hidden],.stage-split[hidden]{display:none!important}
@@ -170,6 +176,8 @@ body.map-expanded{overflow:hidden}
 .podium-rank{flex:none;color:#ffda73}.podium-name{flex:1;min-width:0;white-space:nowrap;
  overflow:hidden;text-overflow:ellipsis}.podium-time{flex:none;font-variant-numeric:tabular-nums}
 @media(max-width:500px){#elapsed{font-size:18px;padding:3px 6px}
- .stage-split{top:37px;left:7px}
+ .stage-split{padding:3px 6px;gap:5px}
+ .stage-split-value{font-size:18px}
+ .stage-split-label{font-size:9px}
  .finish-podium{left:7px;bottom:25px;max-width:96%}
  .podium-row{padding:4px 6px;gap:5px}}
