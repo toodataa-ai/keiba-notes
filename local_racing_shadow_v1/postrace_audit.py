@@ -68,9 +68,16 @@ def audit(date, published):
         for no,name in pred_horses.items():
             assert_equal(name,official_horses[no],"Horse name JOIN")
         by_no = {h["horse_no"]: h for h in result["finish_order"]}
-        top_no = p["top_pick"]["horse_no"]
-        assert_equal(review["top_pick"], p["top_pick"], "Frozen top pick")
-        assert_equal(review["actual_top_pick_finish"], by_no[top_no]["finish_position"], "Top-pick finish")
+        top = p["top_pick"]
+        top_no = top["horse_no"] if top is not None else None
+        assert_equal(review["top_pick"], top, "Frozen top pick")
+        if top_no is None:
+            assert p.get("cold_start_no_form") is True, f"{rid}: missing top pick without cold-start proof"
+            assert all(x["ability_rank"] is None for x in p["ability_order"]), f"{rid}: cold-start ranks must remain null"
+        assert_equal(review["actual_top_pick_finish"],
+                     by_no[top_no]["finish_position"] if top_no is not None else None, "Top-pick finish")
+        assert_equal(review["hit_metrics"]["evaluable"],
+                     top_no is not None and by_no[top_no]["finish_position"] is not None, "Eligibility denominator")
         assert_equal(len(review["rank_comparison"]),len(p["ability_order"]),"Ranking compare count")
         for a, b in zip(p["ability_order"], review["rank_comparison"]):
             assert_equal(a["horse_no"], b["horse_no"], "Ability horse number")
