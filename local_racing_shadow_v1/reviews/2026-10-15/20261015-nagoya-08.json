@@ -1,0 +1,108 @@
+{
+  "race_id": "20261015-nagoya-08",
+  "date": "2026-10-15",
+  "venue": "名古屋",
+  "prediction_path": "local_racing_shadow_v1/predictions/2026-10-15/20261015-nagoya-08.json",
+  "result_path": "local_racing_shadow_v1/results/2026-10-15/20261015-nagoya-08.json",
+  "prediction_sha256": "975efafb1dfacd5c9a670cf3e84fb760a74ea02824e711e68d690b088981e8fb",
+  "proof_commit": "43b1b38721261b2705da131a5c5348cb23d00926",
+  "top_pick": {
+    "horse_no": 9,
+    "horse_name": "セイスイミリオン"
+  },
+  "actual_top_pick_finish": 3,
+  "rank_comparison": [
+    {
+      "horse_no": 9,
+      "horse_name": "セイスイミリオン",
+      "predicted_rank": 1,
+      "actual_finish": 3,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 5,
+      "horse_name": "アフロビート",
+      "predicted_rank": 2,
+      "actual_finish": 9,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 6,
+      "horse_name": "アカツキロットリー",
+      "predicted_rank": 3,
+      "actual_finish": 1,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 7,
+      "horse_name": "アットザホップ",
+      "predicted_rank": 4,
+      "actual_finish": 8,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 4,
+      "horse_name": "ハルノウミ",
+      "predicted_rank": 5,
+      "actual_finish": 7,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 3,
+      "horse_name": "レアリーゼ",
+      "predicted_rank": 6,
+      "actual_finish": 4,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 2,
+      "horse_name": "ビナハイフォン",
+      "predicted_rank": 7,
+      "actual_finish": 5,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 8,
+      "horse_name": "イノセンス",
+      "predicted_rank": 8,
+      "actual_finish": 2,
+      "official_disposition": null
+    },
+    {
+      "horse_no": 1,
+      "horse_name": "スカイレックス",
+      "predicted_rank": 9,
+      "actual_finish": 6,
+      "official_disposition": null
+    }
+  ],
+  "hit_metrics": {
+    "evaluable": true,
+    "top_pick_win": 0,
+    "top_pick_top3": 1,
+    "top_pick_rank_error": 2
+  },
+  "diagnostics": [
+    {
+      "classification": "evidence",
+      "finding": "Official finishing position compared against frozen pre-race ranking"
+    },
+    {
+      "classification": "unknown",
+      "finding": "Pre-race pace cannot be validated from finish order alone"
+    }
+  ],
+  "known_limitations": [
+    "No post-race hindsight adjustment to the pre-race ranking",
+    "Single-day sample cannot establish transferable effects",
+    "Official incident narratives and bias not independently verified",
+    "Official splits are not interpreted unless separately verified"
+  ],
+  "predicted_pace": "M（仮説）",
+  "official_pace_evidence": null,
+  "source_urls": [
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=24&k_raceDate=2026%2F10%2F15&k_raceNo=8",
+    "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=24&k_raceDate=2026%2F10%2F15"
+  ],
+  "review_status": "VERIFIED"
+}
