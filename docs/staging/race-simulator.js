@@ -249,15 +249,15 @@ function renderData(){
   }
  }
  if(ui.paceDynamics){
-   const k={S:'スロー',M:'平均',H:'ハイ'}[state.paceBand]||'判定中';
-   const peak={S:'スロー',M:'平均',H:'ハイ'}[state.peakPaceBand]||'判定中';
-   ui.paceDynamics.textContent='実効ペース '+k+' ／ 先頭争い '+state.paceContestants+
+   const k={S:'スロー',M:'平均',H:'ハイ'}[state.splitPaceBand]||'計測中';
+   const peak={S:'低',M:'中',H:'高'}[state.peakPaceBand]||'不明';
+   ui.paceDynamics.textContent='通過時計ペース '+k+' ／ 先頭争い '+state.paceContestants+
      '頭（逃'+state.paceEscapers+'・先'+state.paceStalkers+
-     '） ／ 前半最大 '+peak+' ／ 競り合い負荷 '+Math.round(state.pacePressure*100)+'%'+
+     '） ／ 序盤の競り合い最大 '+peak+' ／ 現在の競り合い負荷 '+Math.round(state.pacePressure*100)+'%'+
      (state.splitTime!==null?' ／ 前半'+state.splitDistanceM+'m '+dur(state.splitTime):'')+
      (state.straightEntryOrder?' ／ 直線順位変動 '+state.straightEntryOrder.filter(
        (no,i)=>sim.standings().findIndex(h=>h.number===no)!==i).length+'頭':'');
-   ui.paceDynamics.setAttribute('data-pace',state.paceBand);
+   ui.paceDynamics.setAttribute('data-pace',state.splitPaceBand||'M');
  }
  ui.remaining.textContent=Math.max(0,Math.round(state.distance-state.leader))+' m';
  const current=state.courseMetrics;

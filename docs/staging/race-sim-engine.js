@@ -5,6 +5,27 @@ const MARKS=['◎','○','▲','△','×'];
 const GRADE={ 'A+':5,'A':4,'B+':3,'B':2,'B-':1,'C':0 };
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 function smoothstep(v){const x=clamp(v,0,1);return x*x*(3-2*x)}
+// Stage-only physical speed calibration, not a replay of race results.
+// Tokyo turf 2000m starts from a pocket with a measured slow first furlong;
+// the earlier common 17m/s baseline plus multiple ability increments made
+// even a low-contest 1000m split implausibly fast. Reduce opening cruise and
+// let a gradual late-race drive recover speed. No target result or fixed time.
+// Kyoto and all other course physics retain their original speed baseline.
+function sectionalSpeedAdjustment(profile,d){
+ if(profile.id!=='tokyo_turf_2000')return 0;
+ const f=clamp(d/profile.distance_m,0,1);
+ return -1.20+1.50*smoothstep((f-.42)/.17);
+}
+// Display classification based on a simulated LINE-CROSSING split, not on
+// the number of rivals attempting the lead. Provisional course-specific
+// thresholds (not official JRA pace determination). Contest pressure is a
+// separate physiological model and must not overwrite these labels.
+function classifySplitPace(profile,seconds){
+ if(!Number.isFinite(seconds)||seconds<=0)return null;
+ const limits=profile.id==='tokyo_turf_2000'?[57.2,58.8]:
+  profile.id==='kyoto_turf_outer_1400'?[34.2,35.3]:null;
+ return limits?(seconds<limits[0]?'H':seconds<limits[1]?'M':'S'):null;
+}
 function startSpeedFactor(t){return .12+.88*smoothstep(t/2.9)}
 function lateralSpeedAt(d){const leadIn=smoothstep(d/16);
  const taper=1-smoothstep((d-85)/35);
@@ -116,7 +137,7 @@ function create(data,options={}){
  const splitDistanceM=length>=1600?1000:600;
  const state={id:data.id,seed,pace,bias,distance:length,venue:data.venue,race:data.race,
     t:0,progress:0,leader:0,finished:false,leaderFinished:false,horses,events,leadingNo:horses[0].number,
-    tick:0,firstFinishTime:null,splitTime:null,splitDistanceM,courseId:profile.id,courseMetrics:null,
+    tick:0,firstFinishTime:null,splitTime:null,splitPaceBand:null,splitDistanceM,courseId:profile.id,courseMetrics:null,
     laneModel:'v0.9-four-wide-fore-aft-pack',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
     finalStraightPasses:0,lastOvertakeLog:-100,straightEntryOrder:null,
@@ -253,7 +274,7 @@ function create(data,options={}){
    const shelter=hasCover?.045:0;
    // Early cruising compresses speed variance; the late sprint reveals ability.
    const abilityRelease=.70+.30*smoothstep((fraction-.56)/.27);
-   let speed=base+paceEffect+sprintDemand+shelter+h.ability*abilityRelease+h.surge+h.tempo*.35+h.paceFit+
+   let speed=base+sectionalSpeedAdjustment(profile,h.d)+paceEffect+sprintDemand+shelter+h.ability*abilityRelease+h.surge+h.tempo*.35+h.paceFit+
      groundBias-bendPenalty-staminaLoss+finishing+hillEffect+downhillBoost-h.fatigue-lateExhaustion;
    // A runner self-selects a fore-aft position from its PREVIOUS race's
    // corner passage. No STEP1 marks, popularity, odds or target result.
@@ -338,6 +359,7 @@ function create(data,options={}){
   if(state.splitTime===null&&previousLead<splitDistanceM&&state.leader>=splitDistanceM){
     const fraction=clamp((splitDistanceM-previousLead)/(state.leader-previousLead||1),0,1);
     state.splitTime=state.t-dt+dt*fraction;
+    state.splitPaceBand=classifySplitPace(profile,state.splitTime);
     log('split','前半'+splitDistanceM+'m通過');
   }
   state.courseMetrics=geo.metrics(profile,state.leader,leaders[0].lane);
@@ -375,5 +397,5 @@ function create(data,options={}){
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
  return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
 }
-global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive,contestedPace,band});
+global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive,contestedPace,band,sectionalSpeedAdjustment,classifySplitPace});
 })(typeof window!=='undefined'?window:globalThis);
