@@ -29,6 +29,7 @@ on:
       - 'tools/test_race_sim_stage_v036.cjs'
       - 'tools/test_race_sim_stage_v037.cjs'
       - 'tools/test_race_sim_stage_v038.cjs'
+      - 'tools/test_race_sim_stage_v039.cjs'
       - 'docs/staging/index.html'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
@@ -87,6 +88,8 @@ jobs:
           node tools/test_race_sim_stage_v037.cjs
           node --check tools/test_race_sim_stage_v038.cjs
           node tools/test_race_sim_stage_v038.cjs
+          node --check tools/test_race_sim_stage_v039.cjs
+          node tools/test_race_sim_stage_v039.cjs
           python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
           python3 - <<'PY'
           import json
