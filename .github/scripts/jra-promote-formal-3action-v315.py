@@ -49,11 +49,26 @@ def main():
  need(plan['source_prediction_path']==sourcepath.as_posix(),'source path mismatch')
  need(Path(html).is_file() and Path(pdf).is_file(),'report missing')
  need(str(html).startswith('docs/reports/') and str(pdf).startswith('docs/pdfs/'),'unsafe public filenames')
+ # Strict canonical reader-v1 contract: 5 front pages, all horse pages,
+ # substantive dynamic-tail pages, no spill, no blank page or internal identifiers.
+ # Execute on the actual PDF, not merely generated HTML or Actions green status.
+ import importlib.util,re
+ lpath=Path('.github/scripts/validate-jra-pdf-layout.py')
+ spec=importlib.util.spec_from_file_location('approved_jra_reader_v1_validator',lpath)
+ validator=importlib.util.module_from_spec(spec);spec.loader.exec_module(validator)
+ errors=validator.validate(html,pdf,Path('docs/data/jra_pdf_layout_policy_v1.json'))
+ need(not errors,'reader-v1 PDF acceptance failed: '+'; '.join(errors[:6]))
+ authored=html.read_text(encoding='utf8')
+ horse_count=len(re.findall(r'<section class="horse">',authored))
+ front_and_tail=len(re.findall(r'<section class="page">',authored))
+ need(horse_count==plan['race_context']['sale_field_size'],'one reader page per horse')
+ need(front_and_tail>=8,'reader-v1 missing front or complete tail pages')
+ need('購入操作とJRA入力馬番' in authored and '採用買い目｜' in authored,
+      'v3.15 full purchase report sections missing')
  with fitz.open(pdf) as doc:
   pagecount=len(doc)
-  need(pagecount==1+plan['race_context']['sale_field_size'],'A4 report must have cover and exactly 1 per horse')
-  need('総投資額' in doc[0].get_text(),'PDF purchase headline absent')
- need('通常の購入操作' in html.read_text(encoding='utf8'),'HTML actual three action table missing')
+  need(pagecount==horse_count+front_and_tail,'A4 report has overflow or missing page')
+  need('最終購入予定' in doc[0].get_text(),'PDF purchase headline absent')
  master=get(REG)
  entries=[x for x in master['races'] if x.get('id')==raceid and x.get('scope')=='jra-main']
  need(len(entries)==1,'missing unique published canonical record')

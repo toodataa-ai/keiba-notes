@@ -30,13 +30,15 @@
     "pipeline": ".github/scripts/jra-build-formal-3action-v315.mjs",
     "pipeline_git_blob_sha": "4a10dda63fe2078e3a64c681412829b9b70efde1",
     "publisher": ".github/scripts/jra-promote-formal-3action-v315.py",
-    "publisher_git_blob_sha": "8eb076698a30ba38f2548cc88f8cc121fc194e74",
-    "renderer": ".github/scripts/jra-render-formal-3action-v315.py",
-    "renderer_git_blob_sha": "206ab2d326700078773fe4b5513e1cc7517563e3",
+    "publisher_git_blob_sha": "ab3e8cf8d3c3d47a751cfb25cce621952e9b82be",
+    "renderer": ".github/scripts/jra-render-formal-reader-v315.py",
+    "renderer_git_blob_sha": "f66b9b4973542b3d64f50238015eb4bfc2aa222d",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
-    "workflow_git_blob_sha": "6da41d15760039f13d105908ccce0f51db1dfff5",
+    "workflow_git_blob_sha": "6d8002302ffa9a046602939b8588238872bb7485",
     "horse_renderer_helper": ".github/scripts/jra_v315_horse_layout.py",
-    "horse_renderer_helper_git_blob_sha": "101d361d8623dee1a83ca21cb23b5580e114e61f"
+    "horse_renderer_helper_git_blob_sha": "101d361d8623dee1a83ca21cb23b5580e114e61f",
+    "historical_renderer": ".github/scripts/jra-render-formal-3action-v315.py",
+    "historical_renderer_git_blob_sha": "206ab2d326700078773fe4b5513e1cc7517563e3"
   },
   "currently_unautomated": "The standard v3.13 intake workflow does not itself chain v3.15. The JRA one-shot executor (human or assistant) MUST launch the second v3.15 request; no user approval is needed for a validated data-only publication. This is an execution-orchestration item, not permission to publish 60-point v3.13 as completed.",
   "immutable_prior_predictions": true,
@@ -56,6 +58,17 @@
       "All horse report pages in HTML/PDF strictly ordered ◎→○→▲→△→× using only frozen source mark; keep original source order within each mark"
     ],
     "approval_note": "This stage-only proposed UI/layout change requires explicit approval before updating main; original v3.15 results, STEP1, purchase instructions and historical reports remain immutable.",
-    "approved_grade_palette_source": "docs/reports/2026-10-12-october-stakes-v3.13-rerun38185599767-attempt2-v313.html"
+    "approved_grade_palette_source": "docs/reports/2026-10-12-october-stakes-v3.13-rerun38185599767-attempt2-v313.html",
+    "reader_v1_compatibility": {
+      "status": "staging_ci_passed_historical_replay",
+      "tested_workflow_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/38981469028",
+      "historical_reference": "2026-10-12-swan-stakes",
+      "reference_pages": 52,
+      "full_horse_count": 18,
+      "strict_validator": ".github/scripts/validate-jra-pdf-layout.py",
+      "policy": "docs/data/jra_pdf_layout_policy_v1.json",
+      "css": "docs/assets/jra-pdf-reader-v1.css",
+      "constraints": "No historical files rewritten, no CSS or model changes; reader-visible SHA prohibited. Future live prestart publication requires fresh PDF validation and public HTTP matching."
+    }
   }
 }
