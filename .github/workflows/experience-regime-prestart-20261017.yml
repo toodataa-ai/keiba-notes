@@ -1,0 +1,116 @@
+name: E0 E1 E2 JRA official prestart shadow collection and proof audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experience_regime_v1/requests/2026-10-17.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: experience-regime-prestart-2026-10-17
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate local extraction guardrails and classifier
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m unittest experience_regime_v1.test_sampling experience_regime_v1.test_model experience_regime_v1.test_prestart_collection_audit_v1
+          python -m py_compile experience_regime_v1/collect_prestart_v1.py experience_regime_v1/publish_progress_v1.py
+          python - <<'PY'
+          from experience_regime_v1.collect_prestart_v1 import official_card_url
+          def sample(v,n):return {"date":"2026-10-17","venue":v,"race_no":n}
+          assert official_card_url(sample("東京",1)).endswith("%2FD0")
+          assert official_card_url(sample("東京",8)).endswith("%2FC3")
+          assert official_card_url(sample("東京",12)).endswith("%2FD7")
+          assert official_card_url(sample("京都",6)).endswith("%2F37")
+          assert official_card_url(sample("新潟",12)).endswith("%2F4E")
+          PY
+      - name: Freeze reproducible weekly stratified sample plan before any selected start
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          PLAN=experience_regime_v1/collection/2026-10-17/sample_plan.json
+          if [[ ! -e "$PLAN" ]];then
+            python experience_regime_v1/sampling.py \
+              --pool experience_regime_v1/collection/2026-10-17/race_pool.json \
+              --output "$PLAN" > /tmp/e012-selected-plan.log
+            python - <<'PY'
+          import json
+          from datetime import datetime
+          p=json.load(open("experience_regime_v1/collection/2026-10-17/sample_plan.json"))
+          assert p["population_races"]==72
+          assert p["selected_race_count"]>=6
+          for r in p["selected_races"]:
+              assert datetime.now().astimezone()<datetime.fromisoformat(r["start_at"]),"sample plan must precede all selected starts"
+          print("E012_FIXED_WEEKLY_PLAN",p["selected_race_count"],p["category_summary"])
+          PY
+            git add -- "$PLAN"
+            git commit -m 'Freeze deterministic 2026-10-17 JRA E012 weekly 72-race selection'
+            git push origin HEAD:main
+          else
+            echo 'E012_REUSE_PRIOR_IMMUTABLE_WEEKLY_SELECTION'
+          fi
+      - name: Fetch source-verifiable lifetime career totals for every selected race
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.collect_prestart_v1 collect --week-id 2026-10-17 --date 2026-10-17
+          python -m experience_regime_v1.collect_prestart_v1 precommit_gate --week-id 2026-10-17 --date 2026-10-17
+      - name: Commit research source snapshots and coverage gaps before racing
+        run: |
+          set -euo pipefail
+          git add -- experience_regime_v1/collection/2026-10-17
+          if ! git diff --cached --quiet;then
+            git commit -m 'Freeze independently sourced JRA prestart E012 race snapshots, audit and gaps'
+            git push origin HEAD:main
+          fi
+          echo "E012_PROOF_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "E012_PROOF_AT=$(git show -s --format=%cI HEAD)" >> "$GITHUB_ENV"
+      - name: Audit first Git commit timestamp, then publish proof-backed aggregate progress
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.collect_prestart_v1 proof_audit \
+            --week-id 2026-10-17 --date 2026-10-17 \
+            --proof-sha "$E012_PROOF_SHA" --commit-at "$E012_PROOF_AT"
+          python experience_regime_v1/publish_progress_v1.py 2026-10-17 2026-10-17
+          git add -- experience_regime_v1/collection/2026-10-17/proof_commit_2026-10-17.json docs/data/experience_regime_status.json
+          git commit -m 'Publish JRA E012 prestart Git proof and category-regime totals with no formal effects'
+          git push origin HEAD:main
+      - name: Verify public Pages bytes and audit data not just Actions result
+        run: |
+          set -euo pipefail
+          STATUS=docs/data/experience_regime_status.json
+          for attempt in $(seq 1 20);do
+            if curl -fsSL --max-time 20 \
+                https://toodataa-ai.github.io/keiba-notes/data/experience_regime_status.json -o /tmp/e012-public.json &&
+                cmp -s "$STATUS" /tmp/e012-public.json &&
+                curl -fsSL --max-time 20 \
+                https://toodataa-ai.github.io/keiba-notes/experience-regime.html -o /tmp/e012-page.html &&
+                grep -q 'e012-live-collection' /tmp/e012-page.html;then
+              echo 'E012_REAL_PUBLIC_RESEARCH_HTTP_MATCH';break
+            fi
+            if [[ "$attempt" == 20 ]];then echo '::error::E012 public Pages mismatch';exit 1;fi
+            sleep 12
+          done
+          python - <<'PY'
+          import json
+          d=json.load(open('docs/data/experience_regime_status.json'))
+          r=d['collection_runs']['2026-10-17']
+          print('E012_AUDITED_REAL_HORSES',r['regimes'])
+          print('E012_GAPS',r['collection_gaps'],r['collection_errors'])
+          if not r['prerace_proof_valid_races']:
+              raise SystemExit('BLOCKER: no real official JRA prestart snapshot; Actions success is not collection')
+          PY
