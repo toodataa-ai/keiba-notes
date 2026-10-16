@@ -38,7 +38,7 @@ for(let d=800;d<=970;d++){
  totalTurn+=curvature;
  // Explicitly retain inside/outside lane width and track alignment.
  const a=over.point(k,d,0),b=over.point(k,d,4);
- assert.ok(a.x>=440 && b.x>a.x+1,'Kyoto outside turn/lanes at '+d);
+ assert.ok(a.x>=440 && Math.hypot(b.x-a.x,b.y-a.y)>8, 'Kyoto outside turf and lane clearance at '+d);
 }
 assert.ok(maxCurvature<6.7,'4C course heading still jerks by '+maxCurvature+' degrees/m');
 assert.ok(maxWobble<4.9,'4C artificial up-down twist '+maxWobble);
