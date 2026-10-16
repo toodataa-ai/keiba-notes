@@ -1,0 +1,92 @@
+name: Validate JRA v3.15 evidence-backed zero-ticket PASS and reader-v1
+on:
+  push:
+    branches: [fix/jra-v315-audited-pass-20261017]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pass-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert current pinned v3.13 histories, prompt, purchase code
+        run: |
+          set -euo pipefail
+          python3 e2e_validation/validate_manifests.py
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          python3 - <<'PY'
+          import json,subprocess
+          impl=json.load(open('docs/data/jra_purchase_command_policy_v315.json'))['implementation']
+          for key in ('pipeline','publisher','renderer','workflow'):
+              actual=subprocess.check_output(['git','hash-object',impl[key]],text=True).strip()
+              assert actual==impl[key+'_git_blob_sha'],('unpinned v3.15 implementation',key,actual)
+          print('PASS V315 all four exact release SHA pins')
+          PY
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+      - name: Generate PASS from historical source plus fixed prestart replay clock
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {buildFormalThreeCommandPlan} from './.github/scripts/jra-build-formal-3action-v315.mjs';
+          const sourcePath='e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-run38982649242-attempt1.json';
+          const b=fs.readFileSync(sourcePath);
+          const src=JSON.parse(b);
+          src.__source_path=sourcePath;
+          const now_iso=new Date(Date.parse(src.final_bets_fixed_at)+90000).toISOString();
+          const plan=buildFormalThreeCommandPlan(src,b,{now_iso});
+          assert.equal(plan.purchase_decision,'pass');
+          assert.equal(plan.pass_reason_code,'no_qualifying_regular_positive_ev_3action');
+          assert.equal(plan.formal_bets.length,0);
+          assert.equal(plan.total_stake_yen,0);
+          assert.equal(plan.command_count,0);
+          assert.equal(plan.regular_commands.length,0);
+          assert.equal(plan.pass_evidence.comparison_status,'no_qualifying_regular_command');
+          assert.equal(plan.medium_command.method,'pass');
+          assert.equal(plan.large_command.method,'pass');
+          plan.status='formal_prestart';
+          plan.proof_commit='a'.repeat(40); // IN-MEMORY TEST PLACEHOLDER, NOT A REAL GIT PROOF
+          fs.writeFileSync('/tmp/jra-v315-pass-staged.json',JSON.stringify(plan,null,2));
+          console.log('PASS NONPUBLIC STAGING ONLY',plan.source_race_id,plan.purchase_decision,
+            plan.ticket_count,'historical source proof preserved');
+          JS
+      - name: Render complete immutable STEP1 + newly proposed no-buy A4 report and strict PDF
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 .github/scripts/jra-render-formal-reader-v315.py \
+            --plan /tmp/jra-v315-pass-staged.json \
+            --source e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-run38982649242-attempt1.json \
+            --html /tmp/jra-v315-pass-staged.html --pdf /tmp/jra-v315-pass-staged.pdf
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html /tmp/jra-v315-pass-staged.html \
+            --pdf /tmp/jra-v315-pass-staged.pdf \
+            --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 - <<'PY'
+          from pathlib import Path
+          a=Path('/tmp/jra-v315-pass-staged.html').read_text()
+          assert '購入見送り' in a and '0円' in a
+          assert 'no_qualifying_regular_positive_ev_3action' not in a
+          assert '通常購入セットの採算条件を満たさず全券種見送り' in a
+          print('PASS reader-v1 full no-bet PDF without leaked internal audit codes')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jra-v315-pass-reader-staging-audit
+          path: |
+            /tmp/jra-v315-pass-staged.html
+            /tmp/jra-v315-pass-staged.pdf
+          if-no-files-found: error
