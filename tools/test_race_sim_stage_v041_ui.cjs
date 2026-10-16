@@ -38,8 +38,20 @@ async function main(){
  assert.equal(calls.length,1,'fixture must not retrieve a real pre-race report');
  assert.ok(el('singleDemoNotice')&&!el('singleDemoNotice').hidden);
  assert.equal(el('raceSelect').value,'stage-shuka-inner-one-runner-demo-v1');
- assert.equal(el('genericCourseMap').hidden,false,'reused generic map must be shown');
- assert.equal(el('kyotoRealCourseMap').hidden,true,'outer-only bitmap must be hidden');
+ assert.equal(el('genericCourseMap').hidden,true,
+  'Shuka must no longer display its hand-drawn approximate map');
+ assert.equal(el('kyotoRealCourseMap').hidden,false,
+  'Shuka shares the real original Kyoto map with outer 1400m');
+ assert.equal(el('kyotoCourseImage').getAttribute('src'),
+  'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg');
+ assert.equal(el('kyotoCourseOverlay').hidden,false);
+ const kyoto=w.RaceCourseGeometry.get('kyoto_turf_inner_2000');
+ assert.equal(w.RaceUmapotOverlay.validate(kyoto),true);
+ for(const distance of [0,100,308.7,530,720,1000,1435,1671.6,2000]){
+  const p=w.RaceUmapotOverlay.point(kyoto,distance,0);
+  assert.ok(p.x>28&&p.x<590&&p.y>86&&p.y<351,
+   'runner remains registered on actual Kyoto bitmap '+distance);
+ }
  assert.equal(el('tokyoRealCourseMap').hidden,true);
  assert.equal(el('startBtn').disabled,false);
  assert.equal(w.document.querySelectorAll('.standing-row').length,1);
@@ -62,6 +74,8 @@ async function main(){
  assert.ok(n>400&&n<1500,'existing playback should finish promptly');
  assert.ok(mid>15,'horse advanced through second half');
  assert.equal(highest,100,'race should reach finish');
+ assert.equal(el('kyotoRealCourseMap').hidden,false,'original map stays on for entire run');
+ assert.equal(el('genericCourseMap').hidden,true,'generic map stays off');
  assert.equal(el('remaining').textContent,'0 m');
  assert.ok(el('splitTime').hidden===false,'1000m split should persist after finish');
  assert.match(el('podium').textContent,/試走完了/);

@@ -52,7 +52,7 @@ for(const d of [0,60,130,570,675,830,970,1500,2000]){
  assert.equal(over.outwardShiftPx(t,d),0,'Tokyo untouched');
 }
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
-assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261015-37'));
+assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261016-43'));
 assert.ok(html.includes('Kyoto curve v0.37'));
 console.log('PASS_V037_KYOTO_4C_SMOOTH_OUTER_BEND',
  'mean heading change', (totalTurn/171).toFixed(2), 'maximum wobble',maxWobble.toFixed(2));

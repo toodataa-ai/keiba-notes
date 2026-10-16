@@ -37,7 +37,7 @@ for(const seed of [1,18,2026]){
  assert.ok(sim.standings()[0].displayD>2032);
 }
 assert.ok(html.includes('id="singleDemoNotice"'));
-assert.ok(html.includes('race-simulator.js?v=20261016-41'));
+assert.ok(html.includes('race-simulator.js?v=20261016-43'));
 assert.ok(html.includes('race-sim-engine.js?v=20261016-41'));
 assert.ok(src.includes("params.get('demo')==='shuka-one'?DEMO_ID"));
 assert.ok(src.includes("catalog=[...(registry.races||[]),demoEntry()]"));

@@ -27,6 +27,6 @@ assert.match(finish,/raceNumberMarker\(ctx,/,'runner numbers at finish preserved
 assert.match(html,/<div class="stage-top">[\s\S]*?id="stageCaption"[\s\S]*?class="stage-clock-stack"[\s\S]*?id="elapsed"[\s\S]*?id="splitTime"/);
 assert.match(css,/#elapsed\{font-size:/);
 assert.match(css,/\.stage-split-value\{font:900/);
-assert.match(html,/race-simulator\.js\?v=20261016-41/);
+assert.match(html,/race-simulator\.js\?v=20261016-43/);
 assert.match(html,/Finish spacing v0\.36/);
 console.log('PASS_V035_NO_GHOST_CANVAS_HUD_BOTH_VIEWS_HTML_TIMER_AND_GOAL_PRESERVED');
