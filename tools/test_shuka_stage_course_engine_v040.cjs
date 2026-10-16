@@ -57,6 +57,15 @@ assert.match(js,/user_approved_illustration/);
 assert.match(js,/sharedSplineSvg/);
 assert.match(js,/setProbeDistance/);
 assert.doesNotMatch(js,/RaceSimEngine\.create|parseHorseReport/);
+const simulator=fs.readFileSync(dir+'race-simulator.js','utf8');
+const simHTML=fs.readFileSync(dir+'race-simulator.html','utf8');
+assert.ok(simHTML.includes('id="genericCourseCanvas"'));
+assert.ok(simHTML.includes('race-course-geometry-v1.js?v=20261016-40'));
+assert.ok(simHTML.includes('race-simulator.js?v=20261016-40'));
+assert.ok(simulator.includes("ui.map=canUseGeneric?$('genericCourseCanvas'):null;"));
+assert.ok(simulator.includes("if(!['tokyo_turf_2000','kyoto_turf_outer_1400'].includes(race.course_id))return;"));
+assert.ok(simulator.includes('drawLicensedOverlay(state);'));
+assert.ok(simulator.includes('drawCourse();'));
 // Physics smoke test, test-only generated field, no report writes.
 const styles=['nige','nige','senko','senko','senko','senko',
  'sashi','sashi','sashi','sashi','sashi','sashi',
