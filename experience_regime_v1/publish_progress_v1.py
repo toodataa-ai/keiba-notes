@@ -48,6 +48,9 @@ def main(week,date):
             verified[regime+"_horse_observations"]+=1
             per_category.setdefault(cat,Counter())[regime]+=1
     planned_today=[x for x in plan["selected_races"] if x["date"]==date]
+    gap_reasons=Counter(x["reason"] for x in summary["coverage_gaps"])
+    planned_exclusions=gap_reasons.get("not_selected_by_fixed_weekly_plan",0)
+    collection_failures=sum(v for k,v in gap_reasons.items() if k!="not_selected_by_fixed_weekly_plan")
     types={c:dict(r) for c,r in per_category.items()}
     run={"week_id":week,"date":date,"population_today":summary["population_today_count"],
          "population_week":len(pool["races"]),"target_stratified_week":sum(
@@ -66,6 +69,9 @@ def main(week,date):
                      for k in ("E0","E1","E2")},
          "category_regime_verified_horses":types,
          "collection_gaps":len(summary["coverage_gaps"]),
+         "planned_exclusions":planned_exclusions,
+         "collection_failures":collection_failures,
+         "gap_reasons":dict(gap_reasons),
          "collection_errors":audit_errors,
          "step1_prediction_scope":"only preserved official control if a verified immutable source exists; otherwise unavailable",
          "models_automatically_promoted":False,"production_effect":False}
