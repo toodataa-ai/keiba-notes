@@ -60,7 +60,7 @@ def read_make(p,source,source_bytes):
  command_rows=[]
  for c in commands:
   if c['method']=='pass':
-   command_rows.append((c['category'],'見送り','購入なし','0点','0円'))
+   command_rows.append((c['category'],'見送り',c.get('jra_input','購入なし'),'0点','0円'))
   else:
    command_rows.append((c['category'],c['type']+' '+METHOD.get(c['method'],c['method']),
                         c['jra_input'],str(c['points'])+'点',f"{c['stake_yen']:,}円"))
