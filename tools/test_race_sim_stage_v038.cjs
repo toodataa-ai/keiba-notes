@@ -32,7 +32,7 @@ const fixtures=[
 let totalSignals=0;
 for(const [id,seed,winner,winningTime,topSix] of fixtures){
  const p=W.RaceCourseGeometry.get(id);
- const sim=W.RaceSimEngine.create({id:'v038-'+id,course_id:id,
+ const sim=W.RaceSimEngine.create({id:'visual-test-'+id,course_id:id,
   venue:p.venue,turn:p.turn,distance_m:p.distance_m,horses},{seed});
  assert.equal(sim.state.lastVisualPass,null);
  let checks=0,steps=0;
