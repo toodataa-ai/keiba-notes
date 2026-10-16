@@ -63,7 +63,9 @@ assert.ok(simHTML.includes('id="genericCourseCanvas"'));
 assert.ok(simHTML.includes('race-course-geometry-v1.js?v=20261016-40'));
 assert.ok(simHTML.includes('race-simulator.js?v=20261016-43'));
 assert.ok(simulator.includes("ui.map=canUseGeneric?$('genericCourseCanvas'):null;"));
-assert.ok(simulator.includes("if(!['tokyo_turf_2000','kyoto_turf_outer_1400'].includes(race.course_id))return;"));
+// The v0.43 licensed-image overlay now correctly supports the stage-only inner 2000m.
+assert.ok(simulator.includes("['tokyo_turf_2000','kyoto_turf_outer_1400',"));
+assert.ok(simulator.includes("'kyoto_turf_inner_2000'].includes(race.course_id)"));
 assert.ok(simulator.includes('drawLicensedOverlay(state);'));
 assert.ok(simulator.includes('drawCourse();'));
 // Physics smoke test, test-only generated field, no report writes.
