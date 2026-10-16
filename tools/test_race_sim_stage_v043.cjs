@@ -3,8 +3,11 @@
  */
 'use strict';
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const root='docs/staging/',W={},document={
- getElementById:()=>null,querySelector:()=>null
+const root='docs/staging/',W={};
+const mapCanvas={hidden:false,getContext:()=>({clearRect(){}})};
+const document={
+ getElementById:id=>id==='kyotoCourseOverlay'?mapCanvas:null,
+ querySelector:()=>null
 };
 for(const p of ['race-course-geometry-v1.js'])
  vm.runInNewContext(fs.readFileSync(root+p,'utf8'),{window:W,globalThis:W});
@@ -20,25 +23,96 @@ assert.ok(W.RaceUmapotOverlay.validate(kyoto));
 assert.ok(W.RaceUmapotOverlay.validate(oldKyoto));
 assert.ok(W.RaceUmapotOverlay.validate(tokyo));
 assert.equal(kyoto.segments.length,7);
+// Nine requested stations: centres of the *inner* green ribbon, lane 0
+// (the single-runner demo starts in lane 0).
 const expected=[
- [0,349.5,312],[100,291.2,310],[310,170.6,301.7],
- [530,157.7,203.3],[720,187.1,156.3],[1000,318.4,141.7],
- [1270,462.2,137],[1435,510.1,196],
- [1670,500.7,314.7],[2000,294.4,310.9]
+ [0,350,316],[100,293.37,314.93],[308.7,179.26,300.93],
+ [530,162.71,204.34],[900,281.77,147.34],
+ [1270,463.08,135.01],[1435,507.04,197.10],
+ [1671.6,488.78,316.72],[2000,294,317]
 ];
 for(const [d,x,y] of expected){
- const p=W.RaceUmapotOverlay.point(kyoto,d,3);
+ const p=W.RaceUmapotOverlay.point(kyoto,d,0);
  assert.ok(Math.hypot(p.x-x,p.y-y)<3,'registered Kyoto inner image anchor: '+d);
 }
 let last=null,maxPxPer5m=0;
 for(let d=0;d<=2000;d+=5){
- const p=W.RaceUmapotOverlay.point(kyoto,d,3);
+ const p=W.RaceUmapotOverlay.point(kyoto,d,0);
  assert.ok(p.x>28&&p.x<590&&p.y>86&&p.y<351,
   'inner 2000m marker must stay on the Kyoto original image '+d);
  if(last)maxPxPer5m=Math.max(maxPxPer5m,Math.hypot(last.x-p.x,last.y-p.y));
  last=p;
 }
 assert.ok(maxPxPer5m<5,'smooth 4th-corner→straight and start/finish joins');
+
+/* Independent manually sampled centre ribbon on the source 620x430 Umapot
+ * JPEG, NOT the Bezier control points. The permissive 12px tolerance reflects
+ * source illustration width, anti-aliasing and 1 px map sampling. Checking
+ * against this separate trace detects green-band escape (the old image-BOUNDS
+ * check only guaranteed that markers stayed somewhere inside the JPEG).
+ */
+const innerTurfGuide=[
+ [0,350,317],[100,294,316],[210,229,310],[308.7,178,301],
+ [360,163,284],[420,159,253],[475,159,225],[530,165,204],
+ [600,171,181],[650,181,169],[720,207,161],[820,251,153],
+ [900,286,147],[1000,331,142],[1100,380,138],[1200,430,134],
+ [1270,463,136],[1350,496,159],[1400,508,180],[1435,510,197],
+ [1490,510,225],[1550,510,259],[1600,507,286],[1650,500,309],
+ [1671.6,490,317],[1760,435,318],[1860,378,318],[2000,294,317]
+];
+function tracedTurfAt(d){
+ let i=0;
+ while(i<innerTurfGuide.length-2&&d>innerTurfGuide[i+1][0])i++;
+ const [d0,x0,y0]=innerTurfGuide[i], [d1,x1,y1]=innerTurfGuide[i+1];
+ const f=(d-d0)/(d1-d0);
+ return {x:x0+(x1-x0)*f,y:y0+(y1-y0)*f};
+}
+const distanceToTurf=(p,d)=>{
+ const g=tracedTurfAt(d);return Math.hypot(p.x-g.x,p.y-g.y);
+};
+const TURF_CENTRE_TOLERANCE_PX=12;
+let worstCentreDeviation=0;
+for(let d=0;d<=2000;d+=5){
+ const actual=W.RaceUmapotOverlay.point(kyoto,d,0);
+ const delta=distanceToTurf(actual,d);
+ worstCentreDeviation=Math.max(worstCentreDeviation,delta);
+ assert.ok(delta<TURF_CENTRE_TOLERANCE_PX,
+   '5m turf ribbon escape (not merely image bounds) at '+d+'m: '+delta.toFixed(2)+'px');
+}
+assert.ok(distanceToTurf({x:200,y:253},420)>TURF_CENTRE_TOLERANCE_PX,
+ 'negative control: 44px outside first bend must be rejected');
+assert.ok(distanceToTurf({x:545,y:258},1550)>TURF_CENTRE_TOLERANCE_PX,
+ 'negative control: outer loop at fourth bend must be rejected');
+assert.equal(W.RaceUmapotOverlay.outwardShiftPx(kyoto,1435),0);
+const immutableLegacySamples={
+ tokyo_turf_2000:[[0,507.3069,277.143],[120,484.3591,169.4188],
+  [900,159.8892,144.7502],[1474.1,171.1475,299.3172],[2000,370.9976,299.34]],
+ kyoto_turf_outer_1400:[[0,226.9792,168.2066],[365,455.3475,124.4614],
+  [570,552.0981,166.4973],[805,542.3273,308.3],
+  [996.3,453.9117,314.3303],[1400,290.0029,310.34]]
+};
+for(const [id,checkpoints] of Object.entries(immutableLegacySamples)){
+ const course=W.RaceCourseGeometry.get(id);
+ for(const [d,x,y] of checkpoints){
+  const p=W.RaceUmapotOverlay.point(course,d,0);
+  assert.ok(Math.hypot(p.x-x,p.y-y)<0.015,
+   'other courses must be bitwise-stable to 0.01px: '+id+' '+d+'m');
+ }
+}
+const painted=[];
+const demoRace={course_id:'kyoto_turf_inner_2000',venue:'京都',field_size:1};
+for(const d of [0,100,308.7,530,900,1270,1435,1671.6,2000]){
+ painted.length=0;
+ W.RaceUmapotOverlay.draw({leadingNo:1,distance:2000,
+   horses:[{number:1,d,lane:0,finished:false}]},
+   demoRace,'leader',false,(_ctx,number,x,y)=>painted.push({number,x,y}));
+ assert.equal(painted.length,1,'one demo number must be painted at '+d);
+ assert.equal(painted[0].number,1);
+ const pt=W.RaceUmapotOverlay.point(kyoto,d,0);
+ assert.ok(Math.hypot(painted[0].x-pt.x,painted[0].y-pt.y)<1e-7,
+  'one-runner overlay render must follow the calibrated centre at '+d);
+}
+
 // Check original image registrations were not rewritten as stand-ins.
 const oldOuter=W.RaceUmapotOverlay.point(oldKyoto,805,3);
 assert.ok(Math.abs(oldOuter.x-559)<15 && oldOuter.y>270);
@@ -54,4 +128,4 @@ assert.ok(js.includes("'kyoto_turf_inner_2000'].includes(race.course_id)"));
 const official=JSON.parse(fs.readFileSync(root+'race-sim-manifest-v1.json','utf8'));
 assert.equal(official.races.length,2,'official field must remain two sealed races');
 assert.ok(!official.races.some(x=>x.course_id==='kyoto_turf_inner_2000'));
-console.log('PASS_V043_ACTUAL_UMAPOT_KYOTO_IMAGE_INNER_2000_AND_LEGACY_TRACKS',maxPxPer5m.toFixed(2));
+console.log('PASS_V044_KYOTO_INNER_TURF_BAND_EVERY_5M_AND_LEGACY_TRACKS',maxPxPer5m.toFixed(2),'ribbon deviation',worstCentreDeviation.toFixed(2));
