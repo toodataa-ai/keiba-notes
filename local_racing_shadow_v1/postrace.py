@@ -178,7 +178,7 @@ def parse_official(soup, p):
             name = re.sub(r"】2歳(?=オープン)", "】", name)
             # Verified 2026-10-15 Sonoda 5R official vs card abbreviation.
             name = name.replace("セレクションハンデ", "セレクショ")
-            name = re.sub(r"3歳以上特別$", "", name)
+            name = re.sub(r"3歳以上特(?:別)?$", "", name)
             return name
         standard_name, card_name = title_key(normalized), title_key(abbreviated)
         def verified_short_title(full, shortened):
