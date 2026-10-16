@@ -6,8 +6,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const root='docs/staging/',W={},document={
  getElementById:()=>null,querySelector:()=>null
 };
-for(const p of ['race-course-geometry-v1.js','race-lane-ai-v1.js',
- 'race-runner-style-v1.js','race-ability-model-v1.js','race-sim-engine.js'])
+for(const p of ['race-course-geometry-v1.js'])
  vm.runInNewContext(fs.readFileSync(root+p,'utf8'),{window:W,globalThis:W});
 vm.runInNewContext(fs.readFileSync(root+'race-umapot-overlay-v1.js','utf8'),
  {window:W,globalThis:W,document});
