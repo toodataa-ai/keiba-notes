@@ -1,6 +1,6 @@
 /* Stage v0.38: highlight genuine straight overtakes WITHOUT changing
  * horse coordinates, physics, race times or number-driven map positions.
- * Golden results were pinned from v0.37 with the same fixed synthetic field.
+ * Golden results were updated for the explicitly versioned v0.40 shared physics model.
  */
 'use strict';
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
@@ -23,11 +23,11 @@ const horses=styles.map((style,i)=>({number:i+1,name:'H'+(i+1),style,
  mark:'△',grade:'B',win_pct:5.5,pace_grade:'B',
  factorGrades:Array(9).fill('B'),recentRuns:[]}));
 const fixtures=[
- // course, seed, winning horse, winning time, top six numbers in v0.37
+ // course, seed, winning horse, winning time, top six numbers in v0.40
  ['tokyo_turf_2000',1,11,121.42463920558448,[11,9,4,5,7,2]],
  ['tokyo_turf_2000',2026,18,121.80322331941704,[18,11,14,9,5,6]],
- ['kyoto_turf_outer_1400',1,6,83.84356987806018,[6,9,8,2,12,10]],
- ['kyoto_turf_outer_1400',2026,8,83.68984850385156,[8,1,3,6,2,9]]
+ ['kyoto_turf_outer_1400',1,6,83.84356987806018,[6,9,8,12,2,10]],
+ ['kyoto_turf_outer_1400',2026,8,83.61277934372269,[8,1,3,6,12,2]]
 ];
 let totalSignals=0;
 for(const [id,seed,winner,winningTime,topSix] of fixtures){
@@ -89,7 +89,7 @@ assert.ok(ui.includes('const passingNo=recentOvertake(state)?.attackerNo??null;'
  'final 80m goal camera must preserve the real-pass highlight');
 assert.ok(ui.includes('race.field_size,runner.number===passingNo);'));
 assert.ok(ui.includes('target.number,state.leadingNo,anchor,activePass?.attackerNo??null'));
-assert.ok(page.includes('race-sim-engine.js?v=20261016-38'));
+assert.ok(page.includes('race-sim-engine.js?v=20261016-40'));
 assert.ok(page.includes('race-simulator.js?v=20261016-39'));
 assert.ok(page.includes('Overtake view v0.38'));
 console.log('PASS_V038_REAL_OVERTAKES_NO_FAKE_POSITIONS_GOLDEN_RESULTS',totalSignals);
