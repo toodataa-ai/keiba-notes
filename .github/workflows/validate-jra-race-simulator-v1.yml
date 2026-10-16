@@ -17,6 +17,8 @@ on:
       - 'tools/test_weekend_main_course_blueprints_20261017.cjs'
       - 'tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs'
       - 'tools/test_shuka_stage_course_engine_v040.cjs'
+      - 'tools/test_race_sim_stage_v041.cjs'
+      - 'tools/test_race_sim_stage_v041_ui.cjs'
       - 'tools/test_race_sim_stage_v020.cjs'
       - 'tools/test_race_sim_stage_v021.cjs'
       - 'tools/test_race_sim_stage_v022.cjs'
@@ -66,6 +68,9 @@ jobs:
           node tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs
           node --check tools/test_shuka_stage_course_engine_v040.cjs
           node tools/test_shuka_stage_course_engine_v040.cjs
+          node --check tools/test_race_sim_stage_v041.cjs
+          node tools/test_race_sim_stage_v041.cjs
+          node --check tools/test_race_sim_stage_v041_ui.cjs
           node --check tools/test_race_sim_stage_v020.cjs
           node tools/test_race_sim_stage_v020.cjs
           node --check tools/test_race_sim_stage_v021.cjs
@@ -133,7 +138,7 @@ jobs:
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
           assert 'Stage v0.31' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261016-41' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
@@ -148,8 +153,8 @@ jobs:
           assert 'race-umapot-overlay-v1.js?v=20261015-37' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261016-34' in html
-          assert 'race-sim-engine.js?v=20261016-40' in html
-          assert 'race-simulator.js?v=20261016-40' in html
+          assert 'race-sim-engine.js?v=20261016-41' in html
+          assert 'race-simulator.js?v=20261016-41' in html
           assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
           assert 'id="courseMapMode"' not in html and 'id="courseCanvas"' not in html
           assert 'id="pathToggle"' not in html
@@ -167,7 +172,7 @@ jobs:
           assert '#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}' in style
           assert '#tokyoRealCourseMap .real-course-track{width:121.568627%' in style
           assert '#kyotoRealCourseMap .real-course-track{width:108.771930%' in style
-          assert 'race-sim-engine.js?v=20261016-40' in html
+          assert 'race-sim-engine.js?v=20261016-41' in html
           assert 'race-lane-ai-v1.js?v=20261015-25' in html
           assert html.index('course-panel course-panel-wide') < html.index('standings-panel')
           assert html.index('live-display-grid') < html.index('course-panel course-panel-wide') < html.index('track-tools')
@@ -722,6 +727,10 @@ jobs:
             for(const item of manifest.races)await testRace(item);
           })().catch(e=>{console.error(e);process.exit(1)});
           JS
+      - name: Test one-runner Shuka demo in existing stage UI
+        run: |
+          set -euo pipefail
+          node tools/test_race_sim_stage_v041_ui.cjs
       - name: Verify all simulator assets publicly match GitHub source bytes
         run: |
           set -euo pipefail
