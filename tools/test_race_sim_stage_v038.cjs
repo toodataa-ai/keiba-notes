@@ -85,6 +85,9 @@ for(const [id,seed,winner,winningTime,topSix] of fixtures){
 assert.ok(totalSignals>=25,'visibility signals should be frequent enough to matter');
 assert.ok(ui.includes("const latestPass=recentOvertake(state,2.2);"));
 assert.ok(ui.includes('ctx.arc(x,y,radius+7*scale'));
+assert.ok(ui.includes('const passingNo=recentOvertake(state)?.attackerNo??null;'),
+ 'final 80m goal camera must preserve the real-pass highlight');
+assert.ok(ui.includes('race.field_size,runner.number===passingNo);'));
 assert.ok(ui.includes('target.number,state.leadingNo,anchor,activePass?.attackerNo??null'));
 assert.ok(page.includes('race-sim-engine.js?v=20261016-38'));
 assert.ok(page.includes('race-simulator.js?v=20261016-38'));
