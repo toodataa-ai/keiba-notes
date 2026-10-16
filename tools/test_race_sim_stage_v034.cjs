@@ -31,6 +31,6 @@ assert.ok(js.includes("if(label)label.textContent='前半'+state.splitDistanceM+
 assert.ok(js.includes("if(value)value.textContent=state.splitTime===null?'—':dur(state.splitTime);"));
 assert.ok(js.includes('state.firstFinishTime??state.t'));
 assert.ok(html.includes('race-simulator.css?v=20261016-34'));
-assert.ok(html.includes('race-simulator.js?v=20261016-39'));
+assert.ok(html.includes('race-simulator.js?v=20261016-40'));
 assert.ok(html.includes('race-sim-engine.js?v=20261016-40'));
 console.log('PASS_V034_RIGHT_STACK_EQUAL_FONT_600M_1000M_PERSISTENT_SPLIT');
