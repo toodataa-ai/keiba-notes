@@ -11,6 +11,10 @@ on:
       - 'docs/staging/race-umapot-overlay-v1.js'
       - 'docs/staging/race-simulator.*'
       - 'docs/staging/stage-week-preview.js'
+      - 'docs/staging/weekend-main-course-blueprints-20261017.json'
+      - 'docs/staging/weekend-main-course-review.html'
+      - 'docs/staging/weekend-main-course-review-v1.js'
+      - 'tools/test_weekend_main_course_blueprints_20261017.cjs'
       - 'tools/test_race_sim_stage_v020.cjs'
       - 'tools/test_race_sim_stage_v021.cjs'
       - 'tools/test_race_sim_stage_v022.cjs'
@@ -52,6 +56,9 @@ jobs:
           node --check docs/staging/race-sim-engine.js
           node --check docs/staging/race-simulator.js
           node --check docs/staging/stage-week-preview.js
+          node --check docs/staging/weekend-main-course-review-v1.js
+          node --check tools/test_weekend_main_course_blueprints_20261017.cjs
+          node tools/test_weekend_main_course_blueprints_20261017.cjs
           node --check tools/test_race_sim_stage_v020.cjs
           node tools/test_race_sim_stage_v020.cjs
           node --check tools/test_race_sim_stage_v021.cjs
