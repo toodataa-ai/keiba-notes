@@ -181,7 +181,25 @@ def parse_official(soup, p):
             name = re.sub(r"3歳以上特別$", "", name)
             return name
         standard_name, card_name = title_key(normalized), title_key(abbreviated)
-        if standard_name != card_name and (len(card_name) < 6 or card_name not in standard_name):
+        def verified_short_title(full, shortened):
+            # NAR RaceList sometimes truncates a long title (including at the
+            # class boundary). Permit only a short *suffix* omission on each
+            # side of an identical grade token, never arbitrary fuzzy matching.
+            # Date/venue/R number/distance/horse numbers+names remain strict.
+            grade = re.compile(r"[ABC][1-9]")
+            f, s = grade.search(full), grade.search(shortened)
+            if not f or not s or f.group() != s.group():
+                return False
+            before_f, before_s = full[:f.start()], shortened[:s.start()]
+            after_f, after_s = full[f.start():], shortened[s.start():]
+            return (len(before_s) >= 7
+                    and before_f.startswith(before_s)
+                    and 0 <= len(before_f) - len(before_s) <= 3
+                    and after_f.startswith(after_s)
+                    and 0 <= len(after_f) - len(after_s) <= 4)
+        if (standard_name != card_name and
+                (len(card_name) < 6 or card_name not in standard_name) and
+                not verified_short_title(standard_name, card_name)):
             raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
     body = soup.get_text(" ", strip=True)
     dist_match = re.search(r"ダート\s*(\d{3,4})\s*[ｍm]", body)
