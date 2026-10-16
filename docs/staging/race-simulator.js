@@ -122,8 +122,8 @@ async function loadRace(id){
   const horses=parseHorseReport(report,entry);
   if(version!==scenarioVersion)return;
   race={...entry,horses};
-  reset(false);
   updateCourseReference();
+  reset(false);
   ui.start.disabled=false;
   ui.meta.textContent=entry.date+' '+entry.venue+entry.number+'R '+entry.surface+entry.distance_m+'m（'+entry.turn+'回り）';
   ui.course.textContent=profile.layout+' / 直線'+profile.straight_m+'m / 高低差'+profile.elevation_range_m+'m';
@@ -159,10 +159,20 @@ async function loadRace(id){
    no number overlays on real imagery until independently georeferenced. */
 function updateCourseReference(){
  const figure=$('referenceMapFigure'),tokyo=$('tokyoRealCourseMap'),kyoto=$('kyotoRealCourseMap');
+ const generic=$('genericCourseMap');
  const region=race?.course_id==='tokyo_turf_2000'?'tokyo':race?.course_id==='kyoto_turf_outer_1400'?'kyoto':null;
- if(figure)figure.hidden=!region;
+ const geometry=race?RaceCourseGeometry.get(race.course_id):null;
+ const canUseGeneric=Boolean(geometry?.user_approved_stage_geometry)&&!region;
+ if(figure)figure.hidden=!region&&!canUseGeneric;
  if(tokyo)tokyo.hidden=region!=='tokyo';
  if(kyoto)kyoto.hidden=region!=='kyoto';
+ if(generic)generic.hidden=!canUseGeneric;
+ ui.map=canUseGeneric?$('genericCourseCanvas'):null;
+}
+function drawLicensedOverlay(state){
+ if(!window.RaceUmapotOverlay||!race)return;
+ if(!['tokyo_turf_2000','kyoto_turf_outer_1400'].includes(race.course_id))return;
+ RaceUmapotOverlay.draw(state,race,ui.focus.value,false,RaceSimNumbers.marker);
 }
 function setupReferenceMapErrorHandling(){
  for(const id of ['tokyoCourseImage','kyotoCourseImage']){
@@ -609,8 +619,7 @@ function drawRace(){
  if(state.goalCamera){
    drawGoalCamera(ctx,state,profile,w,h,renderedWidth,target);
    drawCourse();
-   if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,
-      false,RaceSimNumbers.marker);
+   drawLicensedOverlay(state);
    return;
  }
  const requested=mode==='overview'
@@ -668,7 +677,7 @@ function drawRace(){
  // The HTML course-section and timing badges are the only HUD in this view.
  // The canvas renders the course and moving numbers, never duplicate titles.
  drawCourse();
- if(window.RaceUmapotOverlay)RaceUmapotOverlay.draw(state,race,ui.focus.value,false,RaceSimNumbers.marker);
+ drawLicensedOverlay(state);
 }
 /* Source-relative x/y after tracing JRA official planar course diagrams.
  * No additional anisotropic rendering correction is permitted. */
