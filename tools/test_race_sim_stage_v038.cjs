@@ -52,8 +52,10 @@ for(const [id,seed,winner,winningTime,topSix] of fixtures){
   assert.ok(recent(sim.state)?.attackerNo===pass.attackerNo,'caption is real crossing');
   assert.equal(recent({...sim.state,t:pass.t+2.3},2.2),null,
    'overtake caption expires');
-  assert.equal(recent({...sim.state,goalCamera:true}),null,
-   'do not overlay after goal camera switch');
+  if(sim.state.firstFinishTime===null)
+   assert.ok(recent({...sim.state,goalCamera:true}),
+    'keep genuine passing highlight in last 80m goal camera');
+  else assert.equal(recent(sim.state),null,'hide pass after winner finishes');
   const focus=sim.state.leadingNo,anchor={x:500,y:370};
   const args=[sim.state.horses,p,{x:300,y:150},5,1000,730,
    focus,sim.state.leadingNo,anchor];
