@@ -99,7 +99,15 @@ function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^(t>>>
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function validData(data){
  if(!data || !Number.isFinite(data.distance_m)||data.distance_m<600||data.distance_m>4000)throw Error('距離データが不正です');
- if(!Array.isArray(data.horses)||data.horses.length<2||data.horses.length>24)throw Error('出走頭数が不正です');
+ // One runner is allowed ONLY as an explicitly labelled Shuka stage DEMO.
+ // Normal JRA races continue to require a full, previously sealed field.
+ const singleDemo=data?.demo_mode==='shuka_single_horse_v1'&&
+  data.course_id==='kyoto_turf_inner_2000'&&data.distance_m===2000&&
+  data.venue==='京都'&&data.turn==='右'&&data.field_size===1&&
+  data.horses?.length===1&&data.horses[0].number===1&&
+  data.horses[0].name==='仮の1頭（デモ）';
+ if(!Array.isArray(data.horses)||(data.horses.length<2&&!singleDemo)||
+   data.horses.length>24)throw Error('出走頭数が不正です');
  const nos=new Set();
  for(const h of data.horses){
   if(!Number.isInteger(h.number)||h.number<1||h.number>30||nos.has(h.number))throw Error('馬番が重複または不正です');
