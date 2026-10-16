@@ -10,14 +10,12 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 def read(p):return json.loads(p.read_text(encoding="utf-8"))
-def main(week,date):
+def build_run(week,date):
     folder=ROOT/"experience_regime_v1"/"collection"/week
     pool=read(folder/"race_pool.json")
     plan=read(folder/"sample_plan.json")
     proof=read(folder/("proof_commit_"+date+".json"))
     summary=read(folder/("coverage_gap_"+date+".json"))
-    out=ROOT/"docs/data/experience_regime_status.json"
-    existing=read(out)
     verified=Counter()
     per_category={}
     captured_ids=[]
@@ -75,9 +73,17 @@ def main(week,date):
          "collection_errors":audit_errors,
          "step1_prediction_scope":"only preserved official control if a verified immutable source exists; otherwise unavailable",
          "models_automatically_promoted":False,"production_effect":False}
+    return run
+
+def main(week,date):
+    out=ROOT/"docs/data/experience_regime_status.json"
+    existing=read(out)
+    run=build_run(week,date)
     existing.setdefault("collection_runs",{})[date]=run
-    existing["last_collection_audit_at"]=datetime.now(timezone.utc).isoformat()
+    # Proof-derived stable timestamp avoids repeated E2E-generated no-op commits.
+    proof=read(ROOT/"experience_regime_v1"/"collection"/week/("proof_commit_"+date+".json"))
+    existing["last_collection_audit_at"]=proof["generated_at"]
     out.write_text(json.dumps(existing,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    print("E012_PUBLIC_STATUS_UPDATED",date,len(captured_ids),len(complete_ids),dict(verified),flush=True)
+    print("E012_PUBLIC_STATUS_UPDATED",date,run["prerace_proof_valid_races"],run["complete_evidence_races"],run["regimes"],flush=True)
 if __name__=="__main__":
     main(*sys.argv[1:])
