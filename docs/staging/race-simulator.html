@@ -80,7 +80,7 @@
          alt="うまぽっと公開の京都競馬場・主要コース図。芝内回りと外回り、および芝1400m外回りのスタート位置を含む図。"><canvas id="kyotoCourseOverlay" class="real-course-overlay" width="620" height="430" role="img" aria-label="うまぽっとの実コース図の上を仮想馬番が移動"></canvas></div></div></div>
        <p class="real-map-credit">コース図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと「京都競馬場コース素材」</a>。フリー素材を図として表示しています。</p>
      </div>
-     <p class="small-muted">下の全体図はうまぽっと画像に固定。東京芝2000mの引き込み線は、白い分離帯を横切らず2000m専用の外側の芝ポケットを進むよう馬番の表示座標を補正しました。京都外回り1400mは、3〜4コーナーで画像の白い内外分離線より外側の芝帯に馬番を配置します。走行計算は変更していません。<strong>馬番の位置はコース図への手動の近似位置合わせ</strong>で、GPSやレース映像からの実測ではありません。</p>
+     <p class="small-muted">下の全体図はうまぽっと画像に固定。東京芝2000mの引き込み線は、白い分離帯を横切らず2000m専用の外側の芝ポケットを進むよう馬番の表示座標を補正しました。京都外回り1400mは、3〜4コーナーで画像の白い内外分離線より外側の芝帯に馬番を配置し、4コーナー付近の不自然な上下の折れを補間曲線で抑えています。走行計算は変更していません。<strong>馬番の位置はコース図への手動の近似位置合わせ</strong>で、GPSやレース映像からの実測ではありません。</p>
    </div>
    <p id="courseMapWarning" class="small-muted" hidden>うまぽっとの画像を読み込めませんでした。素材の元ページをご確認ください。</p>
    <details class="course-reference-details"><summary>コースの説明・公式寸法・素材の利用条件</summary>
@@ -125,12 +125,12 @@
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.31 / Finish spacing v0.36 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ Stage v0.31 / Finish spacing v0.36 / Kyoto curve v0.37 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
 <script src="race-course-geometry-v1.js?v=20261015-28"></script>
 <script src="race-lane-ai-v1.js?v=20261015-25"></script>
 <script src="race-runner-style-v1.js?v=20261015-24"></script>
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
-<script src="race-umapot-overlay-v1.js?v=20261015-36"></script>
+<script src="race-umapot-overlay-v1.js?v=20261015-37"></script>
 <script src="race-sim-engine.js?v=20261016-36"></script>
 <script src="race-simulator.js?v=20261016-35"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
