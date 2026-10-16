@@ -20,6 +20,21 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
           python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Validate immutable SHA pins for reader-v1 v3.15 publication
+        run: |
+          set -euo pipefail
+          python3 -m py_compile .github/scripts/jra-render-formal-reader-v315.py .github/scripts/jra-promote-formal-3action-v315.py
+          python3 - <<'PY'
+          import json,subprocess
+          p=json.load(open('docs/data/jra_purchase_command_policy_v315.json'))['implementation']
+          for key in ('renderer','publisher','workflow'):
+              path=p[key]
+              actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+              expected=p[key+'_git_blob_sha']
+              assert actual==expected,(key,path,expected,actual)
+          assert p['historical_renderer_git_blob_sha']=='206ab2d326700078773fe4b5513e1cc7517563e3'
+          print('PASS all forward-only v3.15 publication SHA pins')
+          PY
       - name: Replay an immutable historical sealed v3.15 source without publishing
         run: |
           set -euo pipefail
