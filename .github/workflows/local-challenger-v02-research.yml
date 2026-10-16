@@ -1,0 +1,37 @@
+name: NAR Challenger v0.2 Research-Only CI
+on:
+  push:
+    branches:
+      - 'research/local-challenger-v0.2-*'
+    paths:
+      - 'local_racing_shadow_v1/challenger_v0_2/**'
+      - '.github/workflows/local-challenger-v02-research.yml'
+  pull_request:
+    paths:
+      - 'local_racing_shadow_v1/challenger_v0_2/**'
+      - '.github/workflows/local-challenger-v02-research.yml'
+permissions:
+  contents: read
+jobs:
+  candidate-safety-and-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Unit tests (read only)
+        run: node --test local_racing_shadow_v1/challenger_v0_2/test.mjs
+      - name: Retrospective replay research report (not forward E2E)
+        run: node local_racing_shadow_v1/challenger_v0_2/evaluate.mjs > local_challenger_v02_research_report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: local-challenger-v02-research-replay
+          path: local_challenger_v02_research_report.json
+      - name: Assert original data untouched
+        run: |
+          git diff --exit-code HEAD -- local_racing_shadow_v1/predictions local_racing_shadow_v1/results local_racing_shadow_v1/reviews docs/data
+          test -z "$(git status --porcelain --untracked-files=all | grep -v '^?? local_challenger_v02_research_report.json$')"
