@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Forward-only v3.15 publisher using the exact approved reader-v1 A4 CSS.
 Historical v3.13 STEP1 and its original purchased lines remain unchanged.
+The locked layout CSS is copied verbatim from docs/assets; proof SHAs stay in audit JSON.
 """
 import argparse,hashlib,html,importlib.util,json,re
 from pathlib import Path
