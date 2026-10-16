@@ -80,10 +80,25 @@ function outwardShiftPx(course,d){
  const anchors=outerRailCorrection[course.id];if(!anchors)return 0;
  const x=clamp(d,0,course.distance_m);let i=0;
  while(i<anchors.length-2&&x>anchors[i+1][0])i++;
- const a=anchors[i],b=anchors[i+1],z=clamp((x-a[0])/(b[0]-a[0]||1),0,1);
- // Smooth at every anchor to prevent a kink when switching course sections.
- const smooth=z*z*(3-2*z);
- return a[1]+(b[1]-a[1])*smooth;
+ const a=anchors[i],b=anchors[i+1],h=b[0]-a[0],z=clamp((x-a[0])/h,0,1);
+ // Shape-preserving monotone Hermite curve. Former per-anchor smoothstep
+ // forced the offset velocity to ZERO at each 4C registration waypoint:
+ // this produced a repeated up/down wobble (a false "hill") on the image.
+ // Keep the original outer-turf coordinates and WHITE-divider clearance.
+ function tangent(j){
+  if(j===0)return (anchors[1][1]-anchors[0][1])/(anchors[1][0]-anchors[0][0]);
+  if(j===anchors.length-1)return (anchors[j][1]-anchors[j-1][1])/
+    (anchors[j][0]-anchors[j-1][0]);
+  const left=(anchors[j][1]-anchors[j-1][1])/(anchors[j][0]-anchors[j-1][0]);
+  const right=(anchors[j+1][1]-anchors[j][1])/(anchors[j+1][0]-anchors[j][0]);
+  if(!left||!right||Math.sign(left)!==Math.sign(right))return 0;
+  const h0=anchors[j][0]-anchors[j-1][0],h1=anchors[j+1][0]-anchors[j][0];
+  const w0=2*h1+h0,w1=h1+2*h0;
+  return (w0+w1)/(w0/left+w1/right);
+ }
+ const m0=tangent(i),m1=tangent(i+1),z2=z*z,z3=z2*z;
+ return (2*z3-3*z2+1)*a[1]+(z3-2*z2+z)*h*m0+
+   (-2*z3+3*z2)*b[1]+(z3-z2)*h*m1;
 }
 function point(course,d,lane=0){
  if(!path[course?.id])throw Error('UMAPOT_UNSUPPORTED_COURSE');
