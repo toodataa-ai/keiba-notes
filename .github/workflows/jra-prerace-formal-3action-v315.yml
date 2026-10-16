@@ -121,6 +121,11 @@ jobs:
           PY
           python3 .github/scripts/jra-render-formal-3action-v315.py \
             --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          # Approved reader-v1 is the publication gate. Never promote a custom CSS, SHA-leaking,
+          # shortened or overflowed v3.15 PDF, even if its own loose assertions pass.
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html "$REPORT" --pdf "$PDF" \
+            --policy docs/data/jra_pdf_layout_policy_v1.json
           python3 .github/scripts/jra-promote-formal-3action-v315.py \
             "$PREDICTION" "$SOURCE" "$REPORT" "$PDF" "$MANIFEST"
       - name: Commit only approved data artifacts, current pointer and immutable audit journal
