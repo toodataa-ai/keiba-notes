@@ -468,14 +468,25 @@ function frameEntireField(horses,profile,mode,width,height,renderedWidth){
    real horse coordinates visible takes precedence over smoothing. */
 function stableCameraFrame(target,previous,simTime,width,height,renderedWidth){
  if(!previous||simTime<previous.time||simTime===0){
-   return {...target,time:simTime};
+   return {...target,time:simTime,panVelocity:{x:0,y:0}};
  }
  const dt=Math.max(0,Math.min(.25,simTime-previous.time));
  const alpha=1-Math.exp(-dt/.26);
- const center={
-   x:previous.origin.x+(target.origin.x-previous.origin.x)*alpha,
-   y:previous.origin.y+(target.origin.y-previous.origin.y)*alpha
+ // Generic acceleration-limited CAMERA follow: physically moving horse
+ // centres remain unchanged. Smooth the moving viewport's pan velocity at
+ // every course bend-to-straight transition rather than course-by-course hacks.
+ const desiredVelocity={
+  x:(target.origin.x-previous.origin.x)*alpha/Math.max(.001,dt),
+  y:(target.origin.y-previous.origin.y)*alpha/Math.max(.001,dt)
  };
+ const oldVelocity=previous.panVelocity||{x:0,y:0};
+ const change={x:desiredVelocity.x-oldVelocity.x,y:desiredVelocity.y-oldVelocity.y};
+ const accelLimit=8; // map-space units/s² shared by all geometries
+ const changeNorm=Math.hypot(change.x,change.y);
+ const factor=changeNorm>accelLimit*dt?accelLimit*dt/changeNorm:1;
+ const panVelocity={x:oldVelocity.x+factor*change.x,y:oldVelocity.y+factor*change.y};
+ const center={x:previous.origin.x+panVelocity.x*dt,
+               y:previous.origin.y+panVelocity.y*dt};
  const candidateZoom=previous.zoom+(target.zoom-previous.zoom)*alpha;
  const pixelRatio=width/Math.max(1,renderedWidth);
  const mx=Math.min(width*.24,Math.max(48,22*pixelRatio));
@@ -491,7 +502,7 @@ function stableCameraFrame(target,previous,simTime,width,height,renderedWidth){
    safeBottom/Math.max(.01,b.bottom-center.y)
  );
  const zoom=Math.max(.1,Math.min(candidateZoom,maxZoom));
- return {...target,origin:center,zoom,time:simTime};
+ return {...target,origin:center,zoom,time:simTime,panVelocity};
 }
 window.RaceSimCamera=Object.freeze({viewCamera,frameEntireField,stableCameraFrame});
 // Shared course rendering primitives, retained when replacing sprite display.
