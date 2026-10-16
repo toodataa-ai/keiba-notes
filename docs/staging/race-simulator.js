@@ -502,10 +502,26 @@ function traceCommands(ctx,parts){
   else if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
  }
 }
+// Active track and horse markers share ONE spline on ALL courses.
+// The raw source Bézier pieces remain for the muted background illustration,
+// but must not define a second, differently curved racing surface.
+const raceTrackTraceCache=new WeakMap();
+function traceRacePoints(course){
+ if(!raceTrackTraceCache.has(course)){
+  const sampleCount=Math.ceil(course.distance_m/1.0),points=[];
+  for(let i=0;i<=sampleCount;i++){
+   const d=course.distance_m*i/sampleCount;
+   const p=RaceCourseGeometry.center(course,d);
+   points.push({x:p.x,y:p.y});
+  }
+  raceTrackTraceCache.set(course,points);
+ }
+ return raceTrackTraceCache.get(course);
+}
 function traceRace(ctx,course){
- ctx.beginPath();ctx.moveTo(...course.segments[0].p0);
- for(const section of course.segments)
-  ctx.bezierCurveTo(...section.p1,...section.p2,...section.p3);
+ const pts=traceRacePoints(course);
+ ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+ for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
 }
 function strokePath(ctx,width,color){
  ctx.strokeStyle=color;ctx.lineWidth=width;
