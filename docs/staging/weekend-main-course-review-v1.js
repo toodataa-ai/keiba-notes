@@ -132,8 +132,8 @@ function render(blueprint){
  }
  get('courseNotes').textContent=blueprint.notes;
  get('courseStatus').textContent='コース専用型 '+blueprint.course_id+
-  (approved?' ／ 走行線の形状承認済み・コース試走可':' ／ 走行線設計案（未承認）')+
-  ' ／ 実際の出走馬の再生は発走前原本の固定待ち';
+  (approved?' ／ 形状承認済み・距離マーカーで試走可 ／ 出走馬の発走前原本待ち':
+   ' ／ コース形状未承認・試走不可 ／ 出走馬の再生も不可');
  get('officialCourse').href=blueprint.official_course;
  get('officialEntries').href=blueprint.official_entries;
  const officialDetail=get('officialRaceReference');
