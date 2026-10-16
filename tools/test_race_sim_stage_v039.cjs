@@ -59,7 +59,8 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
    const acceleration=Math.hypot(current.panVelocity.x-frame.panVelocity.x,
      current.panVelocity.y-frame.panVelocity.y)/dt;
    peak=Math.max(peak,acceleration);
-   assert.ok(acceleration<=8.0001,'camera must not B-dash at any track boundary');
+   assert.ok(acceleration<=12*profile.mapUnitsPerMeter+.0001,
+    'scale-normalized camera must not B-dash at any track boundary');
   }
   for(const h of sim.state.horses){
    const p=G.point(profile,h.displayD??h.d,h.lane);
