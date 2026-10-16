@@ -64,8 +64,8 @@
         "required_entries": 2,
         "required_entries_with_experience": 0,
         "required_missing_experience": 0,
-        "coverage_rate": 0.0,
-        "required_coverage_rate": 0.0
+        "coverage_rate": 0,
+        "required_coverage_rate": 0
       },
       "regimes": {
         "E0": {
@@ -425,8 +425,8 @@
         "required_entries": 2,
         "required_entries_with_experience": 0,
         "required_missing_experience": 0,
-        "coverage_rate": 0.0,
-        "required_coverage_rate": 0.0
+        "coverage_rate": 0,
+        "required_coverage_rate": 0
       },
       "regimes": {
         "E0": {
@@ -811,7 +811,7 @@
           "mean_predicted_top3": null,
           "win_brier": null,
           "top3_brier": null,
-          "mean_step1_rank": 6.0,
+          "mean_step1_rank": 6,
           "mark_top3_rate": 0.272727
         },
         "E2": {
@@ -1119,7 +1119,7 @@
               "mean_predicted_top3": null,
               "win_brier": null,
               "top3_brier": null,
-              "mean_step1_rank": 6.0,
+              "mean_step1_rank": 6,
               "mark_top3_rate": 0.272727
             },
             "E2": {
@@ -1163,7 +1163,7 @@
               "mean_predicted_top3": null,
               "win_brier": null,
               "top3_brier": null,
-              "mean_step1_rank": 6.0,
+              "mean_step1_rank": 6,
               "mark_top3_rate": 0.272727
             },
             "E2": {
@@ -1229,5 +1229,207 @@
     "no_ranking_or_mark_change": true,
     "no_automatic_promotion": true,
     "next_step": "Accumulate category x regime coverage, then estimate uncertainty/shrinkage as a separate challenger."
-  }
+  },
+  "collection_runs": {
+    "2026-10-17": {
+      "week_id": "2026-10-17",
+      "date": "2026-10-17",
+      "population_today": 36,
+      "population_week": 72,
+      "target_stratified_week": 16,
+      "selected_week": 21,
+      "selected_today": 9,
+      "selected_today_races": [
+        {
+          "race_id": "2026-10-17-kyoto-06",
+          "venue": "京都",
+          "race_no": 6,
+          "race_category": "debut",
+          "sample_origin": "stratified_sample"
+        },
+        {
+          "race_id": "2026-10-17-kyoto-09",
+          "venue": "京都",
+          "race_no": 9,
+          "race_category": "open_listed",
+          "sample_origin": "stratified_sample"
+        },
+        {
+          "race_id": "2026-10-17-kyoto-11",
+          "venue": "京都",
+          "race_no": 11,
+          "race_category": "class_3",
+          "sample_origin": "official_prediction"
+        },
+        {
+          "race_id": "2026-10-17-niigata-11",
+          "venue": "新潟",
+          "race_no": 11,
+          "race_category": "class_3",
+          "sample_origin": "official_prediction"
+        },
+        {
+          "race_id": "2026-10-17-niigata-12",
+          "venue": "新潟",
+          "race_no": 12,
+          "race_category": "class_1",
+          "sample_origin": "stratified_sample"
+        },
+        {
+          "race_id": "2026-10-17-tokyo-09",
+          "venue": "東京",
+          "race_no": 9,
+          "race_category": "open_listed",
+          "sample_origin": "stratified_sample"
+        },
+        {
+          "race_id": "2026-10-17-tokyo-10",
+          "venue": "東京",
+          "race_no": 10,
+          "race_category": "class_3",
+          "sample_origin": "stratified_sample"
+        },
+        {
+          "race_id": "2026-10-17-tokyo-11",
+          "venue": "東京",
+          "race_no": 11,
+          "race_category": "graded",
+          "sample_origin": "official_prediction"
+        },
+        {
+          "race_id": "2026-10-17-tokyo-12",
+          "venue": "東京",
+          "race_no": 12,
+          "race_category": "class_2",
+          "sample_origin": "stratified_sample"
+        }
+      ],
+      "category_plan_summary": {
+        "debut": {
+          "label": "新馬",
+          "population_races": 10,
+          "official_prediction_races": 0,
+          "eligible_non_official_races": 10,
+          "target_stratified_races": 3,
+          "selected_stratified_races": 3,
+          "shortfall": 0
+        },
+        "maiden": {
+          "label": "未勝利",
+          "population_races": 18,
+          "official_prediction_races": 0,
+          "eligible_non_official_races": 18,
+          "target_stratified_races": 3,
+          "selected_stratified_races": 3,
+          "shortfall": 0
+        },
+        "class_1": {
+          "label": "1勝クラス",
+          "population_races": 23,
+          "official_prediction_races": 0,
+          "eligible_non_official_races": 23,
+          "target_stratified_races": 2,
+          "selected_stratified_races": 2,
+          "shortfall": 0
+        },
+        "class_2": {
+          "label": "2勝クラス",
+          "population_races": 9,
+          "official_prediction_races": 0,
+          "eligible_non_official_races": 9,
+          "target_stratified_races": 2,
+          "selected_stratified_races": 2,
+          "shortfall": 0
+        },
+        "class_3": {
+          "label": "3勝クラス",
+          "population_races": 5,
+          "official_prediction_races": 2,
+          "eligible_non_official_races": 3,
+          "target_stratified_races": 2,
+          "selected_stratified_races": 2,
+          "shortfall": 0
+        },
+        "open_listed": {
+          "label": "OP・L",
+          "population_races": 4,
+          "official_prediction_races": 2,
+          "eligible_non_official_races": 2,
+          "target_stratified_races": 2,
+          "selected_stratified_races": 2,
+          "shortfall": 0
+        },
+        "graded": {
+          "label": "GIII・GII・GI",
+          "population_races": 3,
+          "official_prediction_races": 2,
+          "eligible_non_official_races": 1,
+          "target_stratified_races": 2,
+          "selected_stratified_races": 1,
+          "shortfall": 1
+        }
+      },
+      "proof_commit": "fe5ffc5c64be9e68387a49642b7cf02c1727a8be",
+      "proof_commit_at": "2026-10-16T23:18:12Z",
+      "prerace_proof_valid_races": 9,
+      "complete_evidence_races": 9,
+      "complete_evidence_race_ids": [
+        "2026-10-17-kyoto-06",
+        "2026-10-17-kyoto-09",
+        "2026-10-17-kyoto-11",
+        "2026-10-17-niigata-11",
+        "2026-10-17-niigata-12",
+        "2026-10-17-tokyo-09",
+        "2026-10-17-tokyo-10",
+        "2026-10-17-tokyo-11",
+        "2026-10-17-tokyo-12"
+      ],
+      "regimes": {
+        "E0": {
+          "horse_observations": 16,
+          "races": 1
+        },
+        "E1": {
+          "horse_observations": 12,
+          "races": 1
+        },
+        "E2": {
+          "horse_observations": 109,
+          "races": 7
+        }
+      },
+      "category_regime_verified_horses": {
+        "debut": {
+          "E0": 16
+        },
+        "open_listed": {
+          "E2": 16,
+          "E1": 12
+        },
+        "class_3": {
+          "E2": 47
+        },
+        "class_1": {
+          "E2": 18
+        },
+        "graded": {
+          "E2": 14
+        },
+        "class_2": {
+          "E2": 14
+        }
+      },
+      "collection_gaps": 27,
+      "collection_errors": [],
+      "step1_prediction_scope": "only preserved official control if a verified immutable source exists; otherwise unavailable",
+      "models_automatically_promoted": false,
+      "production_effect": false,
+      "planned_exclusions": 27,
+      "collection_failures": 0,
+      "gap_reasons": {
+        "not_selected_by_fixed_weekly_plan": 27
+      }
+    }
+  },
+  "last_collection_audit_at": "2026-10-17T08:18:13.787312+09:00"
 }
