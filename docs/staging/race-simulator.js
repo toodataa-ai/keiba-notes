@@ -461,7 +461,8 @@ function frameEntireField(horses,profile,mode,width,height,renderedWidth){
      availableH/Math.max(.01,bottom-top));
  return {zoom,origin:{x:(left+right)/2,y:(top+bottom)/2},
    anchor:{x:width/2,y:(marginTop+height-marginBottom)/2},
-   bounds:{left,right,top,bottom},count:horses.length,maxZoom};
+   bounds:{left,right,top,bottom},count:horses.length,maxZoom,
+   mapUnitsPerMeter:profile.mapUnitsPerMeter||.65};
 }
 /* Interpolate camera travel without teleporting at gate release.
    Limit zoom from the CURRENT bbox, not only the target bbox: keeping all
@@ -481,7 +482,9 @@ function stableCameraFrame(target,previous,simTime,width,height,renderedWidth){
  };
  const oldVelocity=previous.panVelocity||{x:0,y:0};
  const change={x:desiredVelocity.x-oldVelocity.x,y:desiredVelocity.y-oldVelocity.y};
- const accelLimit=8; // map-space units/s² shared by all geometries
+ // Convert the same metre-normalized camera acceleration to each course's
+ // diagram coordinate scale; no Tokyo/Kyoto-specific branch or tuning.
+ const accelLimit=12*(target.mapUnitsPerMeter||.65);
  const changeNorm=Math.hypot(change.x,change.y);
  const factor=changeNorm>accelLimit*dt?accelLimit*dt/changeNorm:1;
  const panVelocity={x:oldVelocity.x+factor*change.x,y:oldVelocity.y+factor*change.y};
