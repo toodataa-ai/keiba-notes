@@ -217,8 +217,12 @@ function raceLine(profile){
  if(!raceLineCache.has(profile))raceLineCache.set(profile,continuousLine(profile,d=>rawCenter(profile,d)));
  return raceLineCache.get(profile);
 }
+// Common display-time centerline for EVERY course. Draw track rails from
+// exactly the same globally smoothed spline as moving horse numbers, rather
+// than re-tracing the unsmoothed source Bézier segments separately.
+function center(profile,d){return raceLine(profile).at(d)}
 function point(profile,d,lane=0){
- const p=raceLine(profile).at(d),s=segmentAt(profile,d);
+ const p=center(profile,d),s=segmentAt(profile,d);
  const ratio=clamp((clamp(d,0,profile.distance_m)-s.from)/(s.to-s.from),0,1);
  const t=tByLength(s,ratio);
  const metersToMap=profile.mapUnitsPerMeter||1;
@@ -282,5 +286,5 @@ function metrics(profile,d,lane=0){
 }
 for(const c of Object.values(COURSE))validate(c);
 function get(id){return COURSE[id]||null}
-global.RaceCourseGeometry=Object.freeze({get,validate,point,heading,segmentAt,height,slope,metrics,continuousLine,COURSE});
+global.RaceCourseGeometry=Object.freeze({get,validate,center,point,heading,segmentAt,height,slope,metrics,continuousLine,COURSE});
 })(typeof window!=='undefined'?window:globalThis);
