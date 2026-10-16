@@ -28,9 +28,9 @@
   ],
   "implementation": {
     "pipeline": ".github/scripts/jra-build-formal-3action-v315.mjs",
-    "pipeline_git_blob_sha": "4a10dda63fe2078e3a64c681412829b9b70efde1",
+    "pipeline_git_blob_sha": "c6c4672a2f835af98d95f7cd6fef79771232a5be",
     "publisher": ".github/scripts/jra-promote-formal-3action-v315.py",
-    "publisher_git_blob_sha": "ab3e8cf8d3c3d47a751cfb25cce621952e9b82be",
+    "publisher_git_blob_sha": "d8a556affbdf521a0d8c329dba31ca3425510080",
     "renderer": ".github/scripts/jra-render-formal-reader-v315.py",
     "renderer_git_blob_sha": "f66b9b4973542b3d64f50238015eb4bfc2aa222d",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
@@ -71,5 +71,18 @@
       "css": "docs/assets/jra-pdf-reader-v1.css",
       "constraints": "No historical files rewritten, no CSS or model changes; reader-visible SHA prohibited. Future live prestart publication requires fresh PDF validation and public HTTP matching."
     }
+  },
+  "audited_pass_extension_v1": {
+    "version": "v1",
+    "scope": "New future JRA main race formal purchase-only v3.15 phase; no changes to v3.13 STEP1 or prior bets",
+    "when": "No qualifying positive EV regular JRA executable purchase-command portfolio can be assembled from complete fresh validated eight-type market evidence",
+    "formal_purchase_decision": "pass",
+    "mandatory_zero_bets": true,
+    "mandatory_zero_stake": true,
+    "require_immutable_source_proof": true,
+    "require_passing_reader_v1_complete_pdf": true,
+    "require_public_http_byte_identity": true,
+    "prohibit_side_ticket_only": "Speculative medium/large selections do not override failure of regular-purchase gate",
+    "past_results_immutable": true
   }
 }
