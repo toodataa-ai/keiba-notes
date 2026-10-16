@@ -40,7 +40,17 @@ def main():
  need(want==plan,'post-proof modification detected')
  need(parse(g('show','-s','--format=%cI',proof))<start,'proof commit after race start')
  tickets=plan['formal_bets']
- need(isinstance(tickets,list) and tickets and len(tickets)==plan['ticket_count'],'ticket count mismatch')
+ need(isinstance(tickets,list) and len(tickets)==plan['ticket_count'],'ticket count mismatch')
+ if plan['purchase_decision']=='pass':
+  need(not tickets and plan['total_stake_yen']==0 and plan['command_count']==0,
+       'PASS must have exactly zero bought tickets and zero stake')
+  need(not plan['regular_commands'] and plan['medium_command']['method']=='pass'
+       and plan['large_command']['method']=='pass','PASS with executable purchase rows')
+  need(plan.get('pass_reason_code')=='no_qualifying_regular_positive_ev_3action'
+       and plan.get('pass_evidence',{}).get('comparison_status')=='no_qualifying_regular_command',
+       'PASS requires exact audited source comparison evidence')
+ else:
+  need(plan['purchase_decision']=='buy' and len(tickets)>0,'BUY must have real adopted tickets')
  need(len({key(t) for t in tickets})==len(tickets),'duplicate purchase ticket')
  need(sum(t['stake_yen'] for t in tickets)==plan['total_stake_yen']<=6000,'purchase budget mismatch')
  need(plan['command_count']<=5 and len(plan['regular_commands'])<=3,'too many purchase operations')
@@ -91,7 +101,7 @@ def main():
   bets=[x['type']+' '+'-'.join(map(str,x['selection'])) for x in tickets],
   total_stake_yen=plan['total_stake_yen'],
   purchase_decision=plan['purchase_decision'],
-  purchase_reason_code='v315_grouped_verified_positive_edge',
+  purchase_reason_code=('v315_no_qualifying_regular_positive_ev_pass' if plan['purchase_decision']=='pass' else 'v315_grouped_verified_positive_edge'),
   final_bets_fixed_at=plan['final_bets_fixed_at'],
   e2e_prediction=planpath.as_posix(),proof_commit=proof)
  before=copy.deepcopy(old)
