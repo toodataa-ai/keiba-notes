@@ -15,6 +15,7 @@ on:
       - 'docs/staging/weekend-main-course-review.html'
       - 'docs/staging/weekend-main-course-review-v1.js'
       - 'tools/test_weekend_main_course_blueprints_20261017.cjs'
+      - 'tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs'
       - 'tools/test_race_sim_stage_v020.cjs'
       - 'tools/test_race_sim_stage_v021.cjs'
       - 'tools/test_race_sim_stage_v022.cjs'
@@ -60,6 +61,8 @@ jobs:
           node --check docs/staging/weekend-main-course-review-v1.js
           node --check tools/test_weekend_main_course_blueprints_20261017.cjs
           node tools/test_weekend_main_course_blueprints_20261017.cjs
+          node --check tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs
+          node tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs
           node --check tools/test_race_sim_stage_v020.cjs
           node tools/test_race_sim_stage_v020.cjs
           node --check tools/test_race_sim_stage_v021.cjs

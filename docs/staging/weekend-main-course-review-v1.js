@@ -45,6 +45,17 @@ function render(blueprint){
  }
  flag(blueprint.segments[0][0],'#358965','START',-10);
  flag(blueprint.segments.at(-1)[3],'#ca5555','GOAL',-9);
+ // Show the actual corner-entry locations from each independently authored
+ // route, so a malformed first-corner/gate/goal position is easy to spot.
+ for(let i=1;i<blueprint.segments.length-1;i++){
+  const match=blueprint.segment_names[i].match(/^([1-4])コーナー/);
+  if(!match)continue;
+  const p=blueprint.segments[i][0],text=svg('text',{
+   x:p[0]+8,y:p[1]-10,'class':'point-tag',fill:'#493d8a'});
+  text.textContent=match[1]+'C';
+  view.appendChild(svg('circle',{cx:p[0],cy:p[1],r:4.2,fill:'#7764a9',stroke:'#fff','stroke-width':1.2}));
+  view.appendChild(text);
+ }
  box.appendChild(view);
  const grid=get('courseMetrics');grid.replaceChildren();
  for(const [label,value] of [
@@ -60,6 +71,11 @@ function render(blueprint){
    ' ／ 走行線設計案（未承認）／ 実レース再生不可';
  get('officialCourse').href=blueprint.official_course;
  get('officialEntries').href=blueprint.official_entries;
+ const officialDetail=get('officialRaceReference');
+ if(officialDetail){
+  officialDetail.hidden=!blueprint.reference?.official_race;
+  if(blueprint.reference?.official_race)officialDetail.href=blueprint.reference.official_race;
+ }
  const tbody=get('sectorTable');tbody.replaceChildren();
  for(let i=0;i<blueprint.segments.length;i++){
   const tr=make('tr',''),th=make('th','区間'+(i+1));th.scope='row';
