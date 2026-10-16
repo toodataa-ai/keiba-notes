@@ -133,7 +133,7 @@ jobs:
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
           assert 'Stage v0.31' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261016-39' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
@@ -149,7 +149,7 @@ jobs:
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261016-34' in html
           assert 'race-sim-engine.js?v=20261016-40' in html
-          assert 'race-simulator.js?v=20261016-39' in html
+          assert 'race-simulator.js?v=20261016-40' in html
           assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
           assert 'id="courseMapMode"' not in html and 'id="courseCanvas"' not in html
           assert 'id="pathToggle"' not in html
