@@ -52,6 +52,33 @@ function contestedPace(horses,leader,mode){
  return {pressure,escapeCount,stalkCount:stalk.length,totalFighters};
 }
 function band(pressure){return pressure>=.67?'H':pressure>=.35?'M':'S'}
+// Shared downhill-to-straight closing opportunity, computed from registered
+// geometry (not a special case for Kyoto). A horse must have pre-race evidence
+// of late acceleration/sustained speed AND remain in a rear-running style.
+// This is a *small* physically integrated speed term, not a changed finish
+// rank or a target race result. The fixed coefficient is provisional pending
+// multi-race historical out-of-sample validation.
+const closingOpportunityCache=new WeakMap();
+function closingTurnOpportunity(profile){
+ if(closingOpportunityCache.has(profile))return closingOpportunityCache.get(profile);
+ const geometry=global.RaceCourseGeometry;
+ const straightEntry=profile.distance_m-profile.straight_m;
+ const high=geometry.height(profile,Math.max(0,straightEntry-380));
+ const exit=geometry.height(profile,straightEntry);
+ const opportunity=clamp((high-exit)/4,0,1);
+ closingOpportunityCache.set(profile,opportunity);
+ return opportunity;
+}
+function closingTurnResponse(h,remaining,profile,pace){
+ const downhill=closingTurnOpportunity(profile);
+ if(downhill<=0)return 0;
+ const role=h.style==='sashi'?.82:h.style==='oikomi'?1:0;
+ if(!role)return 0;
+ const traits=clamp((h.six.burst+h.six.sustain+h.six.acceleration-140)/35,.25,1);
+ const strain=pace==='H'?1:pace==='M'?.72:.42;
+ const ramp=smoothstep((profile.straight_m+100-remaining)/(profile.straight_m*.78+100));
+ return .32*downhill*role*traits*strain*ramp;
+}
 function finishDrive(h,remaining,profile,pace){
  const stretch=profile.straight_m;
  // Begin wind-up on the final bend, reach full drive in the home straight.
@@ -65,7 +92,8 @@ function finishDrive(h,remaining,profile,pace){
  return ramp*(LATE_STYLE_DRIVE[h.style]??.27)+ramp*reserve-ramp*highPaceTax+
    (six.burst-50)*.008*burstPhase+
    (six.sustain-50)*.006*sustainPhase+
-   (six.acceleration-50)*.004*accelerationPhase;
+   (six.acceleration-50)*.004*accelerationPhase+
+   closingTurnResponse(h,remaining,profile,pace);
 }
 function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
@@ -415,5 +443,5 @@ function create(data,options={}){
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
  return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
 }
-global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive,contestedPace,band,sectionalSpeedAdjustment,classifySplitPace});
+global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive,closingTurnOpportunity,closingTurnResponse,contestedPace,band,sectionalSpeedAdjustment,classifySplitPace});
 })(typeof window!=='undefined'?window:globalThis);
