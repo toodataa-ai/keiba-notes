@@ -1,0 +1,245 @@
+{
+  "race_id": "2026-10-17-fuji-stakes",
+  "status": "shadow_comparison_only",
+  "formal_prompt_version": "v3.13",
+  "formal_purchase_decision_unchanged": true,
+  "formal_bets_selection_unchanged": true,
+  "formal_proof_commit": "8c578c46d9b5c7bbbff865d2d1f80cbeef17b3c2",
+  "formal_prediction_file": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-run38982649242-attempt1.json",
+  "formal_prediction_sha256": "8e83c4ef476e0a7cc2c2e7c198f6d709a20095ce6ef8f7fcff11216789af8fc4",
+  "models_compared": "v3.12 100-yen selected-line baseline vs grouped complete-strategy counterfactual; not v3.13 WIN-stake-sized final",
+  "comparison": {
+    "algorithm": "set_preference_bounded_neighbourhood_v1",
+    "activated": false,
+    "status": "keep_formal_baseline",
+    "formal_prediction_unchanged": true,
+    "not_global_optimum": true,
+    "baseline": {
+      "total_stake_yen": 600,
+      "ticket_count": 6,
+      "command_count": 6,
+      "hit_probability": 0.040536159039307816,
+      "net_loss_probability": 0.9594638409606879,
+      "expected_net_profit_yen": 61.84476620182534,
+      "expected_net_profit_low_yen": 100.02378564330502
+    },
+    "proposed": {
+      "total_stake_yen": 600,
+      "ticket_count": 6,
+      "command_count": 6,
+      "hit_probability": 0.040536159039307816,
+      "net_loss_probability": 0.9594638409606879,
+      "expected_net_profit_yen": 61.84476620182534,
+      "expected_net_profit_low_yen": 100.02378564330502
+    },
+    "proposed_lines": [
+      {
+        "type": "三連単",
+        "selection": [
+          1,
+          10,
+          14
+        ],
+        "stake_yen": 100,
+        "market_odds": 668.3,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+        "observed_at": "2026-10-16T23:42:08.058+00:00",
+        "market_selection_id": "三連単:[1,10,14]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          1,
+          14,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 782.2,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+        "observed_at": "2026-10-16T23:42:08.058+00:00",
+        "market_selection_id": "三連単:[1,14,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          1,
+          14,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 1154.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+        "observed_at": "2026-10-16T23:42:08.058+00:00",
+        "market_selection_id": "三連単:[1,14,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          1,
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 656.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+        "observed_at": "2026-10-16T23:42:08.058+00:00",
+        "market_selection_id": "三連単:[1,5,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          1,
+          5,
+          14
+        ],
+        "stake_yen": 100,
+        "market_odds": 1091.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+        "observed_at": "2026-10-16T23:42:08.058+00:00",
+        "market_selection_id": "三連単:[1,5,14]"
+      },
+      {
+        "type": "枠連",
+        "selection": [
+          1,
+          6
+        ],
+        "stake_yen": 100,
+        "market_odds": 33.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040611?ninki=0",
+        "observed_at": "2026-10-16T23:42:08.557+00:00",
+        "market_selection_id": "枠連:[1,6]"
+      }
+    ],
+    "commands": [
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            1,
+            10,
+            14
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[1,10,14]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            1,
+            14,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[1,14,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            1,
+            14,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[1,14,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            1,
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[1,5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            1,
+            5,
+            14
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[1,5,14]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "枠連",
+        "definition": {
+          "selection": [
+            1,
+            6
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "枠連:[1,6]"
+        ]
+      }
+    ],
+    "preferred_strategy_ids": [],
+    "considered": 1,
+    "feasible": 0,
+    "candidate_group_count": 26,
+    "source_quote_universe_count": 171,
+    "rejected": {
+      "unpriced": 0,
+      "over_budget": 0,
+      "incomplete": 0,
+      "unsupported": 0
+    },
+    "guardrails": {
+      "minimum_central_profit_yen": 60.60787087778883,
+      "policy": {
+        "max_budget_yen": 6000,
+        "unit_yen": 100,
+        "max_group_candidates": 24,
+        "max_groups_per_portfolio": 2,
+        "min_saved_purchase_commands": 1,
+        "max_expected_profit_sacrifice_yen": 100,
+        "max_expected_profit_sacrifice_ratio": 0.02,
+        "max_union_hit_decrease": 0.005,
+        "max_net_loss_increase": 0.01,
+        "max_low_scenario_profit_sacrifice_yen": 200
+      }
+    },
+    "caveat": "Modeled win probabilities are uncalibrated; no actual-return guarantee. This sidecar never changes the official v3.13 final_bets."
+  }
+}

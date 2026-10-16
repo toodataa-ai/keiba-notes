@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-12T10:35:01.309Z",
+  "updated_at": "2026-10-17T08:43:18.038+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -3115,6 +3115,129 @@
       "review": "発走前STEP1の◎9は上位入線し、▲1も首位に到達した。一方で○13は上位に届かず、後方から速い上がりを使った4の浮上を事前にどれほど評価したかが論点。v3.15は三連複BOXに単点の複数券種を組み合わせており、単純な単一馬券の的中率ではなく購入セット全体の相関・期待利益・損失リスクを検証する。結果に合わせた事後的な買い目変更は行わず、十分な独立ペア比較が得られるまで閾値を維持する。",
       "review_at": "2026-10-12T10:35:01.309Z",
       "e2e_case": "e2e_validation/cases/2026-10-12-swan-stakes/case.json"
+    },
+    {
+      "id": "2026-10-17-fuji-stakes",
+      "date": "2026-10-17",
+      "venue": "東京",
+      "race": "富士ステークス",
+      "scope": "jra-main",
+      "prompt_version": "v3.13",
+      "status": "predicted",
+      "source": "jra-live-source-capture-prerace-fixed",
+      "eligible_for_learning": false,
+      "field_size": 14,
+      "report": "reports/2026-10-17-fuji-stakes.html",
+      "pdf": "pdfs/2026-10-17-fuji-stakes.pdf",
+      "pdf_mode": "full",
+      "full_report_pages": 39,
+      "marks": {
+        "win": "4 トロヴァトーレ",
+        "second": "10 アンパドゥ",
+        "third": "5 アドマイヤズーム"
+      },
+      "bets": [
+        "三連単 1-10-14",
+        "三連単 1-14-10",
+        "三連単 1-14-5",
+        "三連単 1-5-10",
+        "三連単 1-5-14",
+        "枠連 1-6"
+      ],
+      "purchase_decision": "buy",
+      "purchase_reason_code": "bought",
+      "total_stake_yen": 600,
+      "final_bets": [
+        {
+          "id": "B01",
+          "type": "三連単",
+          "selection": [
+            1,
+            10,
+            14
+          ],
+          "stake_yen": 100,
+          "market_odds": 668.3,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+          "observed_at": "2026-10-16T23:42:08.058+00:00",
+          "market_selection_id": "三連単:[1,10,14]"
+        },
+        {
+          "id": "B02",
+          "type": "三連単",
+          "selection": [
+            1,
+            14,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 782.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+          "observed_at": "2026-10-16T23:42:08.058+00:00",
+          "market_selection_id": "三連単:[1,14,10]"
+        },
+        {
+          "id": "B03",
+          "type": "三連単",
+          "selection": [
+            1,
+            14,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": 1154.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+          "observed_at": "2026-10-16T23:42:08.058+00:00",
+          "market_selection_id": "三連単:[1,14,5]"
+        },
+        {
+          "id": "B04",
+          "type": "三連単",
+          "selection": [
+            1,
+            5,
+            10
+          ],
+          "stake_yen": 100,
+          "market_odds": 656.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+          "observed_at": "2026-10-16T23:42:08.058+00:00",
+          "market_selection_id": "三連単:[1,5,10]"
+        },
+        {
+          "id": "B05",
+          "type": "三連単",
+          "selection": [
+            1,
+            5,
+            14
+          ],
+          "stake_yen": 100,
+          "market_odds": 1091.7,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+          "observed_at": "2026-10-16T23:42:08.058+00:00",
+          "market_selection_id": "三連単:[1,5,14]"
+        },
+        {
+          "id": "B06",
+          "type": "枠連",
+          "selection": [
+            1,
+            6
+          ],
+          "stake_yen": 100,
+          "market_odds": 33.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040611?ninki=0",
+          "observed_at": "2026-10-16T23:42:08.557+00:00",
+          "market_selection_id": "枠連:[1,6]"
+        }
+      ],
+      "final_bets_fixed_at": "2026-10-16T23:42:43.585Z",
+      "step1_fixed_at": "2026-10-17T08:41:32.691+09:00",
+      "e2e_prediction": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-run38982649242-attempt1.json",
+      "proof_commit": "8c578c46d9b5c7bbbff865d2d1f80cbeef17b3c2",
+      "purchase_budget_yen": 6000,
+      "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
     }
   ]
 }
