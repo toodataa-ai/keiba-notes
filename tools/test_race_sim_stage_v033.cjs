@@ -74,8 +74,8 @@ assert.ok(kyotoState.firstFinishTime>=79&&kyotoState.firstFinishTime<84,
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
 const css=fs.readFileSync(base+'race-simulator.css','utf8');
 const ui=fs.readFileSync(base+'race-simulator.js','utf8');
-assert.ok(html.includes('race-sim-engine.js?v=20261016-36'));
-assert.ok(html.includes('race-simulator.js?v=20261016-35'));
+assert.ok(html.includes('race-sim-engine.js?v=20261016-38'));
+assert.ok(html.includes('race-simulator.js?v=20261016-38'));
 assert.ok(html.includes('race-simulator.css?v=20261016-34'));
 assert.ok(css.includes('#elapsed{font-size:clamp(18px,2.8vw,25px)'));
 assert.ok(css.includes('@media(max-width:500px){#elapsed{font-size:18px'));
