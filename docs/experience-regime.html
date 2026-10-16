@@ -113,7 +113,7 @@
     <tr><td>E0: 戦歴0戦</td><td id="e012-e0">取得中</td></tr>
     <tr><td>E1: 戦歴1〜3戦</td><td id="e012-e1">取得中</td></tr>
     <tr><td>E2: 戦歴4戦以上</td><td id="e012-e2">取得中</td></tr>
-    <tr><td>coverage_gap / 要再確認</td><td id="e012-gaps">取得中</td></tr>
+    <tr><td>固定抽出による対象外 / 実際の収集失敗</td><td id="e012-gaps">取得中</td></tr>
     <tr><td>証拠 Git commit</td><td id="e012-commit">取得中</td></tr>
     </tbody>
   </table>
@@ -143,7 +143,7 @@ async function load(){
       set('e012-selected',run.population_today+'レース（本日） / '+run.selected_week+'レース（今週固定） / '+run.selected_today+'レース（本日抽出）');
       set('e012-proof',run.prerace_proof_valid_races+' / '+run.complete_evidence_races+' レース');
       for(const k of ['E0','E1','E2']){const t=run.regimes?.[k]||{};set('e012-'+k.toLowerCase(),(t.horse_observations||0)+'頭 / '+(t.races||0)+'レース');}
-      set('e012-gaps',run.collection_gaps+'件（非抽出レースを含む） / 証拠不足・確認事項 '+run.collection_errors?.length+'件');
+      set('e012-gaps',(run.planned_exclusions??'—')+'レース / '+(run.collection_failures??'—')+'レース（監査未完了 '+(run.collection_errors?.length||0)+'件）');
       set('e012-commit',run.proof_commit+'（'+run.proof_commit_at+'）');
     }else{
       const e=document.getElementById('e012-run-date');if(e)e.textContent='対象日の発走前証拠は未固定または未公開です。既存の累積観測と混同しません。';
