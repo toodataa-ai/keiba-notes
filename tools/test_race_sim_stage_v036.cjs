@@ -78,7 +78,7 @@ for(const [courseID,raceID,file] of [
  }
 }
 const html=fs.readFileSync(root+'race-simulator.html','utf8');
-assert.ok(html.includes('race-sim-engine.js?v=20261016-36'));
+assert.ok(html.includes('race-sim-engine.js?v=20261016-38'));
 assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261015-37'));
 assert.ok(html.includes('Finish spacing v0.36'));
 assert.ok(html.includes('全馬が最低32m駆け抜け'));

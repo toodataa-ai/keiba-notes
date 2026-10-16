@@ -148,7 +148,7 @@ function create(data,options={}){
     tick:0,firstFinishTime:null,splitTime:null,splitPaceBand:null,splitDistanceM,courseId:profile.id,courseMetrics:null,
     laneModel:'v0.9-four-wide-fore-aft-pack',laneCount:laneCfg.maxLane+1,
     totalLaneChanges:0,totalInsideMoves:0,totalOutsidePasses:0,trafficHolds:0,
-    finalStraightPasses:0,lastOvertakeLog:-100,straightEntryOrder:null,
+    finalStraightPasses:0,lastOvertakeLog:-100,lastVisualPass:null,straightEntryOrder:null,
     runoffMeters:RUNOFF_M,allCrossedAt:null,displayFinished:false,goalCamera:false,
     pacePressure:.13,pacePeak:.13,paceBand:'S',peakPaceBand:'S',
     paceContestants:0,paceEscapers:0,paceStalkers:0,paceHistory:[],lastPaceLog:'S'};
@@ -361,8 +361,12 @@ function create(data,options={}){
         if(!firstPass)firstPass=x.d>y.d?[x,y]:[y,x];
       }
     }
-    if(firstPass && state.t-state.lastOvertakeLog>1.5){
+    if(firstPass && state.firstFinishTime===null && state.t-state.lastOvertakeLog>1.5){
       const [attacker,victim]=firstPass;
+      // Display telemetry from a REAL longitudinal crossing only.
+      // It never shifts any runner, modifies speed, rank or settlement.
+      state.lastVisualPass={attackerNo:attacker.number,victimNo:victim.number,
+        attackerName:attacker.name,t:state.t};
       log('pass',attacker.number+'番 '+attacker.name+'が直線で'+victim.number+'番をかわす',attacker);
       state.lastOvertakeLog=state.t;
     }
