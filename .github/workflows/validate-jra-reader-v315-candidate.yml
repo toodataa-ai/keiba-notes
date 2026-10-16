@@ -1,0 +1,49 @@
+name: Validate JRA v3.15 reader-v1 compatible candidate
+on:
+  push:
+    branches:
+      - 'fix/jra-v315-reader-v1-*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exactly approved printing dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Replay an immutable historical sealed v3.15 source without publishing
+        run: |
+          set -euo pipefail
+          PLAN="e2e_validation/predictions/2026-10-12-swan-stakes/v3.15-run38189073744-attempt1-sealed.json"
+          SOURCE="e2e_validation/predictions/2026-10-12-swan-stakes/v3.13-rerun38188588325-attempt1.json"
+          python3 .github/scripts/jra-render-formal-reader-v315.py \
+            --plan "$PLAN" --source "$SOURCE" \
+            --html /tmp/jra-reader-v315.html --pdf /tmp/jra-reader-v315.pdf
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html /tmp/jra-reader-v315.html --pdf /tmp/jra-reader-v315.pdf \
+            --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 - <<'PY'
+          from pathlib import Path
+          html=Path('/tmp/jra-reader-v315.html').read_text()
+          assert '2026年10月12日の発走前情報だけで確定' not in html
+          assert 'source_prediction_proof' not in html
+          assert '正式v3.15' in html
+          print('PASS forward-only v315 reader adaptation smoke')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reader-v315-audit
+          path: |
+            /tmp/jra-reader-v315.html
+            /tmp/jra-reader-v315.pdf
+          if-no-files-found: ignore
