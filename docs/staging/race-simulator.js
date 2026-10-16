@@ -461,21 +461,35 @@ function frameEntireField(horses,profile,mode,width,height,renderedWidth){
      availableH/Math.max(.01,bottom-top));
  return {zoom,origin:{x:(left+right)/2,y:(top+bottom)/2},
    anchor:{x:width/2,y:(marginTop+height-marginBottom)/2},
-   bounds:{left,right,top,bottom},count:horses.length,maxZoom};
+   bounds:{left,right,top,bottom},count:horses.length,maxZoom,
+   mapUnitsPerMeter:profile.mapUnitsPerMeter||.65};
 }
 /* Interpolate camera travel without teleporting at gate release.
    Limit zoom from the CURRENT bbox, not only the target bbox: keeping all
    real horse coordinates visible takes precedence over smoothing. */
 function stableCameraFrame(target,previous,simTime,width,height,renderedWidth){
  if(!previous||simTime<previous.time||simTime===0){
-   return {...target,time:simTime};
+   return {...target,time:simTime,panVelocity:{x:0,y:0}};
  }
  const dt=Math.max(0,Math.min(.25,simTime-previous.time));
  const alpha=1-Math.exp(-dt/.26);
- const center={
-   x:previous.origin.x+(target.origin.x-previous.origin.x)*alpha,
-   y:previous.origin.y+(target.origin.y-previous.origin.y)*alpha
+ // Generic acceleration-limited CAMERA follow: physically moving horse
+ // centres remain unchanged. Smooth the moving viewport's pan velocity at
+ // every course bend-to-straight transition rather than course-by-course hacks.
+ const desiredVelocity={
+  x:(target.origin.x-previous.origin.x)*alpha/Math.max(.001,dt),
+  y:(target.origin.y-previous.origin.y)*alpha/Math.max(.001,dt)
  };
+ const oldVelocity=previous.panVelocity||{x:0,y:0};
+ const change={x:desiredVelocity.x-oldVelocity.x,y:desiredVelocity.y-oldVelocity.y};
+ // Convert the same metre-normalized camera acceleration to each course's
+ // diagram coordinate scale; no Tokyo/Kyoto-specific branch or tuning.
+ const accelLimit=12*(target.mapUnitsPerMeter||.65);
+ const changeNorm=Math.hypot(change.x,change.y);
+ const factor=changeNorm>accelLimit*dt?accelLimit*dt/changeNorm:1;
+ const panVelocity={x:oldVelocity.x+factor*change.x,y:oldVelocity.y+factor*change.y};
+ const center={x:previous.origin.x+panVelocity.x*dt,
+               y:previous.origin.y+panVelocity.y*dt};
  const candidateZoom=previous.zoom+(target.zoom-previous.zoom)*alpha;
  const pixelRatio=width/Math.max(1,renderedWidth);
  const mx=Math.min(width*.24,Math.max(48,22*pixelRatio));
@@ -491,7 +505,7 @@ function stableCameraFrame(target,previous,simTime,width,height,renderedWidth){
    safeBottom/Math.max(.01,b.bottom-center.y)
  );
  const zoom=Math.max(.1,Math.min(candidateZoom,maxZoom));
- return {...target,origin:center,zoom,time:simTime};
+ return {...target,origin:center,zoom,time:simTime,panVelocity};
 }
 window.RaceSimCamera=Object.freeze({viewCamera,frameEntireField,stableCameraFrame});
 // Shared course rendering primitives, retained when replacing sprite display.
@@ -502,10 +516,26 @@ function traceCommands(ctx,parts){
   else if(op[0]==='C')ctx.bezierCurveTo(...op.slice(1));
  }
 }
+// Active track and horse markers share ONE spline on ALL courses.
+// The raw source Bézier pieces remain for the muted background illustration,
+// but must not define a second, differently curved racing surface.
+const raceTrackTraceCache=new WeakMap();
+function traceRacePoints(course){
+ if(!raceTrackTraceCache.has(course)){
+  const sampleCount=Math.ceil(course.distance_m/1.0),points=[];
+  for(let i=0;i<=sampleCount;i++){
+   const d=course.distance_m*i/sampleCount;
+   const p=RaceCourseGeometry.center(course,d);
+   points.push({x:p.x,y:p.y});
+  }
+  raceTrackTraceCache.set(course,points);
+ }
+ return raceTrackTraceCache.get(course);
+}
 function traceRace(ctx,course){
- ctx.beginPath();ctx.moveTo(...course.segments[0].p0);
- for(const section of course.segments)
-  ctx.bezierCurveTo(...section.p1,...section.p2,...section.p3);
+ const pts=traceRacePoints(course);
+ ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+ for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
 }
 function strokePath(ctx,width,color){
  ctx.strokeStyle=color;ctx.lineWidth=width;
