@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#172439">
+<title>今週末6メイン｜コース走行線の設計レビュー</title>
+<link rel="stylesheet" href="stage-indicator.css?v=20261012-1">
+<style>
+:root{font-family:"Meiryo UI",Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;color:#19283e;background:#f2f5f9}
+*{box-sizing:border-box}body{margin:0}.shell{width:min(1140px,calc(100% - 28px));margin:auto}
+header{background:#17283f;color:#fff;padding:53px 0 25px}header a{color:#dae6f7}
+.kicker{color:#abc5dd;letter-spacing:.15em;font-size:11px;font-weight:800;margin:16px 0 7px}
+h1{font-size:clamp(19px,3vw,28px);margin:0 0 12px;line-height:1.4}
+header p{font-size:13px;line-height:1.8;color:#d8e3ed;max-width:860px}
+main{padding:23px 0 55px}.notice{font-size:13px;line-height:1.8;border-left:4px solid #b88b41;background:#fcf6e9;padding:11px 14px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:285px minmax(0,1fr);gap:16px;align-items:start}
+.panel{background:#fff;border:1px solid #dce4ec;border-radius:10px;padding:16px}
+h2{font-size:16px;margin:0 0 12px}.course-list{display:grid;gap:7px}
+.course-item{display:block;width:100%;text-align:left;background:#f7f9fc;border:1px solid #d8e2ed;border-radius:7px;color:#22374d;padding:11px;cursor:pointer;font:inherit;font-size:13px}
+.course-item[aria-pressed="true"]{background:#e8f1ff;border-color:#447db0;box-shadow:inset 3px 0 #386f9f}
+.course-item strong{display:block;font-size:13px;margin-top:3px}.tiny{font-size:11px;color:#65768b;line-height:1.6}
+.visual{background:#f7fbff;border:1px solid #d8e1ed;border-radius:9px;overflow:hidden}
+svg{display:block;width:100%;aspect-ratio:620/390}
+svg .outer{fill:none;stroke-width:36;stroke-linecap:round;stroke-linejoin:round}
+svg .surface{fill:none;stroke-width:28;stroke-linecap:round;stroke-linejoin:round}
+svg .center{fill:none;stroke:#f5f9ff;stroke-width:1.4;stroke-dasharray:4 6}
+svg .point-tag{font-family:Meiryo,sans-serif;font-weight:800;font-size:12px;paint-order:stroke;stroke:#fff;stroke-width:3}
+.legend{display:flex;flex-wrap:wrap;gap:15px;font-size:11px;color:#536783;padding:0 12px 13px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.metric{background:#f0f4f9;border-radius:7px;padding:9px;font-size:11px;color:#637489}
+.metric strong{display:block;font-size:16px;color:#213d5d;margin-top:3px}
+.info{line-height:1.8;font-size:13px;margin:9px 0;color:#34465d}
+.details{border-collapse:collapse;width:100%;font-size:12px;margin-top:8px}
+.details td,.details th{padding:8px 7px;border-bottom:1px solid #e1e8f0;text-align:left}
+.details th{width:115px;color:#536783;vertical-align:top}
+.links{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.links a{color:#185a88;text-decoration:underline;font-size:13px}
+.status{font-size:12px;font-weight:bold;color:#76561e;padding:9px 12px;background:#fff5df;border-radius:6px}
+footer{font-size:12px;color:#6b7a8e;padding:15px 0}
+button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2px}
+@media(max-width:740px){.grid{grid-template-columns:1fr}.course-list{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:11px}.meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.course-list{grid-template-columns:1fr}.shell{width:calc(100% - 20px)}}
+</style>
+</head>
+<body>
+<div class="staging-shell-marker" role="status">STAGING <span>コース形状の検品待ち</span></div>
+<header><div class="shell">
+<a href="race-simulator.html">← 現行レースシミュレータへ戻る</a>
+<div class="kicker">RACING LAB · WEEKEND COURSE PREPARATION</div>
+<h1>10/17–18 JRA全6メイン コース設計レビュー</h1>
+<p>秋華賞・富士Sを優先し、6レースで必要なコースの走行線をそれぞれ独立に設計しています。既存のシミュレータと同じコース共通エンジンに接続する前に、スタート位置・周回方向・内外・ゴールを確認する画面です。</p>
+</div></header>
+<main class="shell">
+<div class="notice"><strong>ここに表示するコース線は設計案です。まだ馬を走らせることはできません。</strong>
+一周距離・直線長・内外回りはJRA公表値ですが、画面上のXY座標は図面に基づく近似であり、測量済み座標ではありません。
+形状の目視検品・独立した走行線テスト・発走前の全頭予想レポート固定が済んだコースだけ、シミュレータの再生対象へ昇格させます。</div>
+<div class="grid">
+<section class="panel" aria-label="今週末の6つのメインレース"><h2>対象レース</h2><div id="courseList" class="course-list" role="group" aria-label="コースを選択"></div></section>
+<section class="panel" aria-labelledby="courseTitle">
+<h2 id="courseTitle">コース選択待ち</h2>
+<div id="diagram" class="visual" aria-label="走行線の設計プレビュー"></div>
+<div class="legend"><span><i style="background:#358965"></i>START</span><span><i style="background:#ca5555"></i>GOAL</span><span>白い点線：進行する走行線の中心</span></div>
+<div id="courseMetrics" class="meta"></div>
+<p id="courseNotes" class="info"></p>
+<div class="status" id="courseStatus" role="status">独立座標検品前・再生不可</div>
+<table class="details"><tbody id="sectorTable"></tbody></table>
+<div class="links"><a id="officialCourse" target="_blank" rel="noopener noreferrer">JRA公式コース図・諸元</a><a id="officialEntries" target="_blank" rel="noopener noreferrer">JRA出馬表・開催情報</a><a href="race-course-catalog.html">JRA全10場のコース型台帳</a></div>
+</section>
+</div>
+<footer>Stage design blueprint v0.1 — 正式予想・発走前prediction・買い目・結果データは変更しません。シミュレータは既存の2コースを引き続き利用できます。</footer>
+</main>
+<script src="weekend-main-course-review-v1.js?v=20261016-1" defer></script>
+</body></html>
