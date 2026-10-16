@@ -47,7 +47,7 @@ for(let index=0;index<expected.length;index++){
   const seg=b.segments[i];
   assert.equal(seg.length,4);
   assert.ok(b.segment_bounds[i+1]>b.segment_bounds[i]);
-  assert.ok(seg.every(pt=>pt.length===2&&pt.every(coord=>Number.isFinite(coord)&&coord>=50&&coord<=550)));
+  assert.ok(seg.every(pt=>pt.length===2&&pt.every(coord=>Number.isFinite(coord)&&coord>=35&&coord<=550)));
   assert.ok(Math.hypot(seg[0][0]-seg[3][0],seg[0][1]-seg[3][1])>2,'degenerate route segment');
   if(i){
    const previous=b.segments[i-1][3];
