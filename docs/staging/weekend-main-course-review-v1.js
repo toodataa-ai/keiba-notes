@@ -131,6 +131,7 @@ function render(blueprint){
   const item=make('div',label);item.className='metric';item.appendChild(make('strong',value));grid.appendChild(item);
  }
  get('courseNotes').textContent=blueprint.notes;
+ const demoLink=get('singleDemoLink');if(demoLink)demoLink.hidden=!approved;
  get('courseStatus').textContent='コース専用型 '+blueprint.course_id+
   (approved?' ／ 形状承認済み・距離マーカーで試走可 ／ 出走馬の発走前原本待ち':
    ' ／ コース形状未承認・試走不可 ／ 出走馬の再生も不可');

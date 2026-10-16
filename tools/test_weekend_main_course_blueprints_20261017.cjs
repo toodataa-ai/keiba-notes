@@ -61,7 +61,9 @@ for(let index=0;index<expected.length;index++){
 assert.equal(new Set(file.courses.map(x=>x.course_id)).size,6,'all six independently defined');
 assert.equal(new Set(file.courses.map(x=>JSON.stringify(x.segments))).size,6,'no reused surrogate course shape');
 assert.match(html,/STAGING/);
-assert.match(html,/まだ馬を走らせることはできません/);
+assert.match(html,/秋華賞コースのみ仮1頭デモで試走できます/);
+assert.match(html,/id="singleDemoLink"/);
+assert.match(script,/demoLink\.hidden=!approved/);
 assert.match(html,/weekend-main-course-review-v1\.js/);
 assert.match(script,/PROVISIONAL_BLUEPRINT_NO_ANIMATION/);
 assert.match(script,/safe_for_live_simulator!==false/);

@@ -70,7 +70,7 @@ assert.ok(!route.notes.includes('1コーナーまで217.2m'));
 assert.ok(route.official_course.includes('/kyoto/course/'));
 assert.ok(route.reference.official_race.includes('/keiba/g1/shuka.html'));
 assert.match(review,/id="officialRaceReference"/);
-assert.match(review,/weekend-main-course-review-v1.js\?v=20261016-3/);
+assert.match(review,/weekend-main-course-review-v1.js\?v=20261016-4/);
 assert.match(script,/segment_names\[i\]\.match\(/);
 assert.match(script,/officialRaceReference/);
 assert.doesNotMatch(script,/RaceSimEngine\\.create/);

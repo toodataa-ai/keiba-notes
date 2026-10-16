@@ -61,7 +61,7 @@ const html=fs.readFileSync(root+'race-simulator.html','utf8');
 const source=fs.readFileSync(root+'race-sim-engine.js','utf8');
 assert.ok(source.includes('closingTurnOpportunity(profile)'));
 assert.ok(source.includes('closingTurnResponse(h,remaining,profile,pace)'));
-assert.ok(html.includes('race-sim-engine.js?v=20261016-40'));
+assert.ok(html.includes('race-sim-engine.js?v=20261016-41'));
 assert.ok(html.includes('Closing balance v0.40'));
 assert.ok(html.includes('瞬発力・持続力・加速特性'));
 console.log('PASS_V040_GENERIC_TERRAIN_CLOSING_CONTEST_NO_TARGET_RANK',JSON.stringify(results));

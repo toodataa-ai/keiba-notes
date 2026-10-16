@@ -13,6 +13,17 @@ const ui={
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
 let cameraMotion=null;
+// Test fixture lives only inside staging. It cannot impersonate a JRA report.
+const DEMO_ID='stage-shuka-inner-one-runner-demo-v1';
+const DEMO_MODE='shuka_single_horse_v1';
+function isDemo(r){return r?.id===DEMO_ID&&r.demo_mode===DEMO_MODE}
+function demoEntry(){return {id:DEMO_ID,demo_mode:DEMO_MODE,date:'2026-10-18',
+ venue:'京都',number:11,race:'秋華賞コース（仮1頭）',surface:'芝',
+ turn:'右',distance_m:2000,course_id:'kyoto_turf_inner_2000',
+ field_size:1,scope:'STAGING_DEMO_ONLY',going:'デモ',going_observed_at:'—'};}
+function demoHorse(){return {number:1,name:'仮の1頭（デモ）',mark:'△',
+ grade:'B',pace_grade:'B',factorGrades:Array(9).fill('B'),style:'senko',
+ styleMeta:{source:'STAGE_SYNTHETIC_ONLY'},recentRuns:[],win_pct:NaN};}
 // A race-view preset changes how much of the track is visible. The horse sprite
 // also gets its OWN pixel target: previously /zoom cancelled magnification,
 // leaving horses roughly 40px across even with a closer track camera.
@@ -106,8 +117,29 @@ async function loadRace(id){
  ui.meta.textContent='データ検証中…';ui.remaining.textContent='— m';
  ui.stands.innerHTML='<p class="small-muted">全頭の評価原本を確認しています…</p>';
  ui.events.innerHTML='<li>固定済みの発走前レポートを読み込み中…</li>';
+ const demoLabel=$('singleDemoNotice');if(demoLabel)demoLabel.hidden=true;
  try{
   const entry=chooseRace(id);if(!entry)throw Error('このレースのシミュレーション設定はまだ作成されていません');
+  if(isDemo(entry)){
+   const profile=RaceCourseGeometry.get(entry.course_id);
+   if(!profile?.user_approved_stage_geometry||profile.distance_m!==2000)
+    throw Error('承認済みの秋華賞走行線がありません');
+   const horses=[demoHorse()];
+   RaceSimEngine.validData({...entry,horses});
+   race={...entry,horses};
+   updateCourseReference();reset(false);
+   ui.start.disabled=false;
+   ui.meta.textContent='【非公式・仮1頭】10/18 京都11R 芝2000m内回り';
+   ui.course.textContent=profile.layout+' ／ 直線'+profile.straight_m+'m ／ 高低差'+profile.elevation_range_m+'m';
+   if(demoLabel)demoLabel.hidden=false;
+   ui.source.textContent='【仮1頭デモ】馬名・能力・時計は仮の値。JRA出走馬、正式予想、買い目、結果には一切使用しません。';
+   const feat=$('courseFeatures');if(feat)feat.textContent=profile.info+'（仮1頭による走行線の確認）';
+   const measure=$('courseMeasurements');if(measure)measure.textContent='京都芝内A：1周'+profile.lap_m+'m、直線'+profile.straight_m+'m。仮1頭デモ。';
+   const official=$('mapSourceLink');if(official){official.href=profile.official;official.textContent='JRA京都競馬場・公式コース図';}
+   ui.focus.innerHTML='<option value="leader">仮の1頭を追跡</option><option value="1">1番 仮の1頭（デモ）</option>';
+   const style=$('runnerStyleInfo');if(style)style.textContent='仮1頭の走行確認専用。脚質・能力・速度・時計はデモ設定です。';
+   return;
+  }
   const [dbRes,reportRes]=await Promise.all([
    fetch('../data/races.json',{cache:'no-store'}),
    fetch(readerUrl(entry.report),{cache:'no-store'})
@@ -265,6 +297,10 @@ function renderData(){
   }
  }
  if(ui.paceDynamics){
+   if(isDemo(race)){
+    ui.paceDynamics.textContent='【非公式・仮1頭】コース動作確認／競り合いなし／時計はデモ専用'+
+     (state.splitTime!==null?' ／ 1000m '+dur(state.splitTime):'');
+   }else{
    const k={S:'スロー',M:'平均',H:'ハイ'}[state.splitPaceBand]||'計測中';
    const peak={S:'低',M:'中',H:'高'}[state.peakPaceBand]||'不明';
    ui.paceDynamics.textContent='通過時計ペース '+k+' ／ 先頭争い '+state.paceContestants+
@@ -274,6 +310,7 @@ function renderData(){
      (state.straightEntryOrder?' ／ 直線順位変動 '+state.straightEntryOrder.filter(
        (no,i)=>sim.standings().findIndex(h=>h.number===no)!==i).length+'頭':'');
    ui.paceDynamics.setAttribute('data-pace',state.splitPaceBand||'M');
+   }
  }
  ui.remaining.textContent=Math.max(0,Math.round(state.distance-state.leader))+' m';
  const current=state.courseMetrics;
@@ -310,17 +347,17 @@ function renderData(){
   const finishers=firstThree(state);
   podium.hidden=finishers.length===0;
   podium.innerHTML=finishers.map((h,i)=>
-    '<div class="podium-row"><span class="podium-rank">'+(i+1)+'着</span>'+
+    '<div class="podium-row"><span class="podium-rank">'+(isDemo(race)?'試走完了':(i+1)+'着')+'</span>'+
     '<span class="podium-name">'+esc(h.number+'番 '+h.name)+'</span>'+
     '<span class="podium-time">'+dur(h.finishTime)+'</span></div>').join('');
  }
  const latestPass=recentOvertake(state,2.2);
- ui.moment.textContent=state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':latestPass?latestPass.attackerNo+'番 '+latestPass.attackerName+'が'+latestPass.victimNo+'番をかわす':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
+ ui.moment.textContent=isDemo(race)?(state.finished?'仮1頭が完走しました（非公式）':state.firstFinishTime!==null?'仮1頭がゴールを通過・余走中':'京都芝2000m内回り・仮1頭が走行中'):state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':latestPass?latestPass.attackerNo+'番 '+latestPass.attackerName+'が'+latestPass.victimNo+'番をかわす':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
  ui.bar.style.width=(state.progress*100).toFixed(1)+'%';
  ui.stands.innerHTML=sim.standings().map((h,i)=>{
   const lead=state.leader-h.d;
-  const gap=state.finished?dur(h.finishTime):i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
+  const gap=state.finished?dur(h.finishTime):isDemo(race)?'単独走':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
   const focus=ui.focus.value===String(h.number);
   return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle" style="background:'+jraWaku(h.number,race.field_size).fill+
      ';color:'+jraWaku(h.number,race.field_size).text+';border:1px solid '+
@@ -381,6 +418,10 @@ const JRA_WAKU=Object.freeze([
  {name:'桃',fill:'#f4a1c5',text:'#171717',border:'#542e3f'}
 ]);
 function jraWaku(number,fieldSize=18){
+ // Only the separately flagged one-runner course demonstration gets a
+ // neutral white marker. Official 8–18 runner JRA waku validation is unchanged.
+ if(fieldSize===1&&number===1&&typeof race!=='undefined'&&isDemo(race))
+  return {waku:1,...JRA_WAKU[0]};
  if(!Number.isInteger(number)||!Number.isInteger(fieldSize)||
    fieldSize<8||fieldSize>18||number<1||number>fieldSize)
    throw Error('JRA_WAKU_FIELD_INVALID');
@@ -803,10 +844,11 @@ async function initialize(){
   if(!res.ok)throw Error('シミュレータのレース登録を取得できません（HTTP '+res.status+'）');
   const registry=await res.json();
   if(registry.schema_version!==1||registry.status!=='STAGING_RESEARCH_ONLY')throw Error('未承認データ形式です');
-  catalog=registry.races||[];
+  catalog=[...(registry.races||[]),demoEntry()];
   if(!catalog.length)throw Error('シミュレーション可能なレースがありません');
-  ui.race.innerHTML=catalog.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.date+' '+x.venue+x.number+'R '+x.race)+'</option>').join('');
-  const wanted=new URLSearchParams(location.search).get('race');
+  ui.race.innerHTML=catalog.map(x=>'<option value="'+esc(x.id)+'">'+esc((isDemo(x)?'【非公式・仮1頭】 ':'')+x.date+' '+x.venue+x.number+'R '+x.race)+'</option>').join('');
+  const params=new URLSearchParams(location.search);
+  const wanted=params.get('demo')==='shuka-one'?DEMO_ID:params.get('race');
   if(wanted&&chooseRace(wanted))ui.race.value=wanted;
   await loadRace(ui.race.value);
  }catch(e){ui.stands.innerHTML='<p class="error">'+esc(e.message)+'</p>';ui.moment.textContent='原本データを確認できません'}

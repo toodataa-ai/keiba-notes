@@ -62,7 +62,7 @@ button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2p
 <p>秋華賞・富士Sを優先し、6レースで必要なコースの走行線をそれぞれ独立に設計しています。既存のシミュレータと同じコース共通エンジンに接続する前に、スタート位置・周回方向・内外・ゴールを確認する画面です。</p>
 </div></header>
 <main class="shell">
-<div class="notice"><strong>ここに表示するコース線は設計案です。まだ馬を走らせることはできません。</strong>
+<div class="notice"><strong>秋華賞コースのみ仮1頭デモで試走できます。他の5コースは設計案です。</strong>
 一周距離・直線長・内外回りはJRA公表値ですが、画面上のXY座標は図面に基づく近似であり、測量済み座標ではありません。
 形状の目視検品・独立した走行線テスト・発走前の全頭予想レポート固定が済んだコースだけ、シミュレータの再生対象へ昇格させます。</div>
 <div class="grid">
@@ -80,6 +80,7 @@ button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2p
 <div id="courseMetrics" class="meta"></div>
 <p id="courseNotes" class="info"></p>
 <div class="status" id="courseStatus" role="status">独立座標検品前・再生不可</div>
+<p id="singleDemoLink" hidden><a href="race-simulator.html?demo=shuka-one" style="display:inline-block;padding:9px 13px;background:#176381;color:white;border-radius:7px;text-decoration:none;font-weight:700;font-size:13px">▶ 既存のシミュレータで秋華賞・仮1頭を走らせる</a></p>
 <table class="details"><tbody id="sectorTable"></tbody></table>
 <div class="links"><a id="officialCourse" target="_blank" rel="noopener noreferrer">JRA公式コース図・諸元</a><a id="officialRaceReference" target="_blank" rel="noopener noreferrer" hidden>JRA公式・秋華賞のコース図と解説</a><a id="officialEntries" target="_blank" rel="noopener noreferrer">JRA出馬表・開催情報</a><a href="race-course-catalog.html">JRA全10場のコース型台帳</a></div>
 </section>
@@ -87,6 +88,6 @@ button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2p
 <footer>Stage design blueprint v0.1 — 正式予想・発走前prediction・買い目・結果データは変更しません。シミュレータは既存の2コースを引き続き利用できます。</footer>
 </main>
 <script src="race-course-geometry-v1.js?v=20261016-40" defer></script>
-<script src="weekend-main-course-review-v1.js?v=20261016-3" defer></script>
+<script src="weekend-main-course-review-v1.js?v=20261016-4" defer></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
