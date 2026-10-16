@@ -102,7 +102,24 @@
     <p>正式な予想ページには追加抽出した1R〜12Rの研究用予想や個別馬のShadow診断を表示しません。このページでは研究目的、分類定義、抽出方式、カテゴリ別集計レベルの進捗、採用・棄却判断を公開します。将来、Experience Regimeが順位を変えるChallengerへ進む場合は、その予想出力の保管・公開方法を改めて分離します。</p>
   </section>
 
-  <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
+  <section class="chapter" id="e012-live-collection" aria-label="発走前固定研究進捗">
+  <div class="chapter-head"><div class="chapter-no">07</div><div><h2>発走前固定の実収集・監査</h2><p class="chapter-lead">GitHub proof_commit の実時刻と公式通算戦績を確認した、研究専用の進捗です。</p></div></div>
+  <p id="e012-run-date">対象日データを確認中…</p>
+  <table class="metric-table">
+    <thead><tr><th>指標</th><th>発走前の確認値</th></tr></thead>
+    <tbody>
+    <tr><td>母集団 / 週次固定抽出 / 当日の研究対象</td><td id="e012-selected">取得中</td></tr>
+    <tr><td>発走前 Git proof 検証済みレース / 全馬証拠揃い</td><td id="e012-proof">取得中</td></tr>
+    <tr><td>E0: 戦歴0戦</td><td id="e012-e0">取得中</td></tr>
+    <tr><td>E1: 戦歴1〜3戦</td><td id="e012-e1">取得中</td></tr>
+    <tr><td>E2: 戦歴4戦以上</td><td id="e012-e2">取得中</td></tr>
+    <tr><td>coverage_gap / 要再確認</td><td id="e012-gaps">取得中</td></tr>
+    <tr><td>証拠 Git commit</td><td id="e012-commit">取得中</td></tr>
+    </tbody>
+  </table>
+  <p>この表は研究専用であり、正式予想の順位・印・購入判断には反映しません。GitHub Actionsの成功表示だけを観測完了とみなさず、対象レース別の発走前証拠を別途検証します。収集不能は0頭扱いではなく coverage_gap として記録します。</p>
+</section>
+<div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 
 <footer class="wrap foot">E0/E1/E2 経験量研究 — シャドー観測専用。 JRA 1R–12R are the population; production ranking and betting decisions are unchanged.</footer>
@@ -119,6 +136,19 @@ async function load(){
     }
     document.querySelector('#coverage').textContent=entries?`${covered}/${entries}`:'0 cases';
     document.querySelector('#observations').textContent=String(obs||0);
+    const run=d.collection_runs?.['2026-10-17'];
+    if(run){
+      const set=(id,value)=>{const e=document.getElementById(id);if(e)e.textContent=String(value)};
+      set('e012-run-date','取得対象：'+run.date+' / 自動昇格なし');
+      set('e012-selected',run.population_today+'レース（本日） / '+run.selected_week+'レース（今週固定） / '+run.selected_today+'レース（本日抽出）');
+      set('e012-proof',run.prerace_proof_valid_races+' / '+run.complete_evidence_races+' レース');
+      for(const k of ['E0','E1','E2']){const t=run.regimes?.[k]||{};set('e012-'+k.toLowerCase(),(t.horse_observations||0)+'頭 / '+(t.races||0)+'レース');}
+      set('e012-gaps',run.collection_gaps+'件（非抽出レースを含む） / 証拠不足・確認事項 '+run.collection_errors?.length+'件');
+      set('e012-commit',run.proof_commit+'（'+run.proof_commit_at+'）');
+    }else{
+      const e=document.getElementById('e012-run-date');if(e)e.textContent='対象日の発走前証拠は未固定または未公開です。既存の累積観測と混同しません。';
+      for(const id of ['e012-selected','e012-proof','e012-e0','e012-e1','e012-e2','e012-gaps','e012-commit']){const e=document.getElementById(id);if(e)e.textContent='未検証';}
+    }
   }catch(e){document.querySelector('#coverage').textContent='取得失敗';document.querySelector('#observations').textContent='—'}
 }
 load();
