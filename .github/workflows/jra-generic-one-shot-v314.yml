@@ -66,12 +66,12 @@ jobs:
           node .github/scripts/test-jra-balanced-v311.mjs
           node .github/scripts/test-jra-purchase-audit-v312.mjs
           python3 -m py_compile .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v313.py .github/scripts/validate-jra-pdf-content-v313.py
-          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
           node .github/scripts/validate-prompt-history.mjs
           node .github/scripts/test-jra-v313-formal-real.mjs
           node .github/scripts/test-jra-portfolio-v311.mjs
           node .github/scripts/test-jra-strategy-v39.mjs
-          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
       - name: Validate path and reserve immutable snapshot names
         env:
           INPUT_PATH: ${{ env.INPUT_PATH }}
@@ -199,7 +199,7 @@ jobs:
           python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py --input "$RECOVERED_INPUT" --fresh-seconds 600 --max-spread-seconds 180
           node .github/scripts/jra-prestart-pipeline-v313.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
           node .github/scripts/validate-jra-portfolio-v313.mjs "$PREDICTION"
-          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
       - name: Audit entire purchasable sets against the unchanged sealed formal ticket portfolio
         run: |
           set -euo pipefail
