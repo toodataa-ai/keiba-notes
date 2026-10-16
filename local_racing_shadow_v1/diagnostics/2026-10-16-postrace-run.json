@@ -3,8 +3,8 @@
   "date": "2026-10-16",
   "prompt": "local_racing_shadow_v1/shadow_review_prompt_v0_2.txt",
   "expected_predictions": 36,
-  "completed_or_verified": 35,
-  "total_unresolved": 1,
+  "completed_or_verified": 36,
+  "total_unresolved": 0,
   "races": {
     "20261016-kawasaki-01": {
       "status": "SKIPPED_VERIFIED",
@@ -55,25 +55,22 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-08.json"
     },
     "20261016-kawasaki-09": {
-      "status": "COMPLETED",
+      "status": "SKIPPED_VERIFIED",
       "reason": null,
       "result_path": "local_racing_shadow_v1/results/2026-10-16/20261016-kawasaki-09.json",
-      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-09.json",
-      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=21&k_raceDate=2026%2F10%2F16&k_raceNo=9"
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-09.json"
     },
     "20261016-kawasaki-10": {
-      "status": "COMPLETED",
+      "status": "SKIPPED_VERIFIED",
       "reason": null,
       "result_path": "local_racing_shadow_v1/results/2026-10-16/20261016-kawasaki-10.json",
-      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-10.json",
-      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=21&k_raceDate=2026%2F10%2F16&k_raceNo=10"
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-10.json"
     },
     "20261016-kawasaki-11": {
-      "status": "COMPLETED",
+      "status": "SKIPPED_VERIFIED",
       "reason": null,
       "result_path": "local_racing_shadow_v1/results/2026-10-16/20261016-kawasaki-11.json",
-      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-11.json",
-      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=21&k_raceDate=2026%2F10%2F16&k_raceNo=11"
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-kawasaki-11.json"
     },
     "20261016-kawasaki-12": {
       "status": "SKIPPED_VERIFIED",
@@ -214,10 +211,11 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-sonoda-10.json"
     },
     "20261016-sonoda-11": {
-      "status": "BLOCKED_JOIN",
-      "reason": "Race name differs: ひょうごの至宝　但馬牛賞Ｂ１ ３歳以上特別 != ひょうごの至宝　但馬牛賞Ｂ１ ３歳以上特",
-      "result_path": null,
-      "review_path": null
+      "status": "COMPLETED",
+      "reason": null,
+      "result_path": "local_racing_shadow_v1/results/2026-10-16/20261016-sonoda-11.json",
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-sonoda-11.json",
+      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=27&k_raceDate=2026%2F10%2F16&k_raceNo=11"
     },
     "20261016-sonoda-12": {
       "status": "SKIPPED_VERIFIED",
@@ -226,8 +224,6 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-16/20261016-sonoda-12.json"
     }
   },
-  "retry_only_race_ids": [
-    "20261016-sonoda-11"
-  ],
-  "status": "PARTIAL"
+  "retry_only_race_ids": [],
+  "status": "SUCCESS"
 }
