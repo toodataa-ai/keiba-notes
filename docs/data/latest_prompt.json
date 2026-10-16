@@ -190,7 +190,7 @@
       },
       "workflow": {
         "path": ".github/workflows/jra-generic-one-shot-v314.yml",
-        "git_blob_sha": "de287d501515e417702955cecdc8ebf0ef4e1a36"
+        "git_blob_sha": "c56578f85473289e1b232b399d8503f55ebc7e7e"
       },
       "tests": {
         "path": ".github/scripts/test-jra-generic-v314.py",
@@ -254,5 +254,13 @@
     "no_user_approval_for_data_only": true,
     "canonical_outcome": "new actual selected tickets overwrite only current canonical final_bets; historical source records immutable",
     "orchestration": "run as second phase of each one-shot JRA instruction; do not report a 60-ticket source as completed current forecast"
+  },
+  "active_e2e_historical_sha_execution_bridge_v1": {
+    "status": "formal_executor_only",
+    "validator": {
+      "path": ".github/scripts/validate-jra-v313-current-e2e-v1.mjs",
+      "git_blob_sha": "8f4e21243e3f991de7f9cce2cd8dfbce5ad484b9"
+    },
+    "scope": "Verify all immutable v3.13 manifest blobs through approved historical Git anchors and explicitly signed current E2E supersession. Do not alter v3.13 original manifest/model nor weaken reader-v1 validation."
   }
 }
