@@ -359,9 +359,9 @@ function renderData(){
   const lead=state.leader-h.d;
   const gap=state.finished?dur(h.finishTime):isDemo(race)?'単独走':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
   const focus=ui.focus.value===String(h.number);
-  return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle" style="background:'+jraWaku(h.number,race.field_size).fill+
-     ';color:'+jraWaku(h.number,race.field_size).text+';border:1px solid '+
-     jraWaku(h.number,race.field_size).border+'">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+' <span class="small-muted">'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'？'}[h.style]||'？')+'</span></span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
+  return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle" style="background:'+runnerWaku(h.number,race.field_size).fill+
+     ';color:'+runnerWaku(h.number,race.field_size).text+';border:1px solid '+
+     runnerWaku(h.number,race.field_size).border+'">'+h.number+'</span><span class="standing-name" title="'+esc(h.name)+'">'+esc(h.name)+' <span class="small-muted">'+({nige:'逃',senko:'先',sashi:'差',oikomi:'追',unknown:'？'}[h.style]||'？')+'</span></span><span class="standing-mark">'+h.mark+'</span><span class="standing-gap">'+gap+'</span></div>';
  }).join('');
  ui.events.innerHTML=state.events.slice(0,7).map(e=>
  '<li><strong>'+dur(e.t)+'</strong>　'+esc(e.message)+
@@ -431,6 +431,11 @@ function jraWaku(number,fieldSize=18){
  throw Error('JRA_WAKU_NOT_FOUND');
 }
 window.RaceWakuColors=Object.freeze({forHorse:jraWaku,palette:JRA_WAKU});
+// JRA's 1–8 frame mapping is intentionally unchanged. Only the explicit
+// single-runner stage fixture uses the white test badge.
+function runnerWaku(number,fieldSize){
+ return fieldSize===1&&isDemo(race)?{waku:1,...JRA_WAKU[0]}:jraWaku(number,fieldSize);
+}
 function paintWakuLegend(){
  const root=$('wakuLegend');if(!root)return;
  root.innerHTML=JRA_WAKU.map((p,i)=>'<span class="waku-key" role="listitem"><span class="waku-swatch" style="background:'+
@@ -441,7 +446,7 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
  if(!Number.isInteger(number)||number<1||!Number.isFinite(x)||!Number.isFinite(y))
   throw Error('SIM_NUMBER_POSITION_INVALID');
  const radius=(focused?15.5:13.5)*scale;
- const waku=jraWaku(number,fieldSize);
+ const waku=runnerWaku(number,fieldSize);
  ctx.save();
  ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
  ctx.fillStyle=waku.fill;ctx.fill();
@@ -804,7 +809,7 @@ function drawCourse(){
  const horses=sim.state.horses.slice().sort((x,y)=>(x.displayD??x.d)-(y.displayD??y.d));
  for(const h of horses){
    const p=planPoint(prof,RaceCourseGeometry.point(prof,h.displayD??h.d,h.lane));
-   const waku=jraWaku(h.number,race.field_size);
+   const waku=runnerWaku(h.number,race.field_size);
    ctx.fillStyle=waku.fill;
    ctx.beginPath();ctx.arc(p.x,p.y,h.number===sim.state.leadingNo?6.3:5.1,0,Math.PI*2);ctx.fill();
    ctx.lineWidth=h.number===sim.state.leadingNo?2.5:1.5;
