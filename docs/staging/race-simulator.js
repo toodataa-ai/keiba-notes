@@ -424,9 +424,9 @@ function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,le
     y:anchor.y+zoom*(p.y-origin.y),
     focused:h.number===focusedNo,leading:h.number===leadingNo,
     passing:h.number===passingNo};
- }).sort((x,y)=>Number(x.focused)-Number(y.focused)||
-  Number(x.leading)-Number(y.leading)||
-  Number(x.passing)-Number(y.passing)||x.number-y.number);
+ }).sort((x,y)=>Number(x.passing)-Number(y.passing)||
+  Number(x.focused)-Number(y.focused)||
+  Number(x.leading)-Number(y.leading)||x.number-y.number);
 }
 function drawRaceNumbers(ctx,points,width,height,renderedWidth,fieldSize=18){
  const scale=width/Math.max(1,renderedWidth),visible=[];
