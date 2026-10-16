@@ -361,7 +361,7 @@ function create(data,options={}){
         if(!firstPass)firstPass=x.d>y.d?[x,y]:[y,x];
       }
     }
-    if(firstPass && state.t-state.lastOvertakeLog>1.5){
+    if(firstPass && state.firstFinishTime===null && state.t-state.lastOvertakeLog>1.5){
       const [attacker,victim]=firstPass;
       // Display telemetry from a REAL longitudinal crossing only.
       // It never shifts any runner, modifies speed, rank or settlement.
