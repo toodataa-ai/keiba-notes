@@ -90,6 +90,6 @@ assert.ok(ui.includes('const passingNo=recentOvertake(state)?.attackerNo??null;'
 assert.ok(ui.includes('race.field_size,runner.number===passingNo);'));
 assert.ok(ui.includes('target.number,state.leadingNo,anchor,activePass?.attackerNo??null'));
 assert.ok(page.includes('race-sim-engine.js?v=20261016-40'));
-assert.ok(page.includes('race-simulator.js?v=20261016-39'));
+assert.ok(page.includes('race-simulator.js?v=20261016-40'));
 assert.ok(page.includes('Overtake view v0.38'));
 console.log('PASS_V038_REAL_OVERTAKES_NO_FAKE_POSITIONS_GOLDEN_RESULTS',totalSignals);
