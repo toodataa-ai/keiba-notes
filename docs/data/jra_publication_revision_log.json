@@ -7083,6 +7083,161 @@
       "html_sha256": "db01b722180689eaa0bc6d9937478773958edfe5316e7c58d3a49b496807f22f",
       "immutable_prior_prediction": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-run38982649242-attempt1.json",
       "immutable_prior_pdf": "pdfs/2026-10-17-fuji-stakes.pdf"
+    },
+    {
+      "race_id": "2026-10-17-fuji-stakes",
+      "promoted_at_utc": "2026-10-16T23:58:16.164720+00:00",
+      "old_canonical": {
+        "id": "2026-10-17-fuji-stakes",
+        "date": "2026-10-17",
+        "venue": "東京",
+        "race": "富士ステークス",
+        "scope": "jra-main",
+        "prompt_version": "v3.13",
+        "status": "predicted",
+        "source": "jra-live-source-capture-prerace-fixed",
+        "eligible_for_learning": false,
+        "field_size": 14,
+        "report": "reports/2026-10-17-fuji-stakes-v3.13-rerun38983786715-attempt1-v313.html",
+        "pdf": "pdfs/2026-10-17-fuji-stakes-v3.13-rerun38983786715-attempt1-v313.pdf",
+        "pdf_mode": "full",
+        "full_report_pages": 39,
+        "marks": {
+          "win": "4 トロヴァトーレ",
+          "second": "10 アンパドゥ",
+          "third": "5 アドマイヤズーム"
+        },
+        "bets": [
+          "三連単 1-10-14",
+          "三連単 1-14-10",
+          "三連単 1-14-5",
+          "三連単 1-5-10",
+          "三連単 1-5-14",
+          "枠連 1-6",
+          "馬単 1-10"
+        ],
+        "purchase_decision": "buy",
+        "purchase_reason_code": "bought",
+        "total_stake_yen": 700,
+        "final_bets": [
+          {
+            "id": "B01",
+            "type": "三連単",
+            "selection": [
+              1,
+              10,
+              14
+            ],
+            "stake_yen": 100,
+            "market_odds": 667.2,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:05.365+00:00",
+            "market_selection_id": "三連単:[1,10,14]"
+          },
+          {
+            "id": "B02",
+            "type": "三連単",
+            "selection": [
+              1,
+              14,
+              10
+            ],
+            "stake_yen": 100,
+            "market_odds": 783.1,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:05.365+00:00",
+            "market_selection_id": "三連単:[1,14,10]"
+          },
+          {
+            "id": "B03",
+            "type": "三連単",
+            "selection": [
+              1,
+              14,
+              5
+            ],
+            "stake_yen": 100,
+            "market_odds": 1149.1,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:05.365+00:00",
+            "market_selection_id": "三連単:[1,14,5]"
+          },
+          {
+            "id": "B04",
+            "type": "三連単",
+            "selection": [
+              1,
+              5,
+              10
+            ],
+            "stake_yen": 100,
+            "market_odds": 652.7,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:05.365+00:00",
+            "market_selection_id": "三連単:[1,5,10]"
+          },
+          {
+            "id": "B05",
+            "type": "三連単",
+            "selection": [
+              1,
+              5,
+              14
+            ],
+            "stake_yen": 100,
+            "market_odds": 1077.3,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:05.365+00:00",
+            "market_selection_id": "三連単:[1,5,14]"
+          },
+          {
+            "id": "B06",
+            "type": "枠連",
+            "selection": [
+              1,
+              6
+            ],
+            "stake_yen": 100,
+            "market_odds": 34.4,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:06.169+00:00",
+            "market_selection_id": "枠連:[1,6]"
+          },
+          {
+            "id": "B07",
+            "type": "馬単",
+            "selection": [
+              1,
+              10
+            ],
+            "stake_yen": 100,
+            "market_odds": 83.8,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040611?ninki=0",
+            "observed_at": "2026-10-16T23:55:06.584+00:00",
+            "market_selection_id": "馬単:[1,10]"
+          }
+        ],
+        "final_bets_fixed_at": "2026-10-16T23:55:07.011Z",
+        "step1_fixed_at": "2026-10-17T08:41:32.691+09:00",
+        "e2e_prediction": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-rerun38983786715-attempt1.json",
+        "proof_commit": "b5372422c45f83b21cfa09fe078a9c2ba27e2a94",
+        "purchase_budget_yen": 6000,
+        "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers."
+      },
+      "new_canonical": {
+        "prompt_version": "v3.13",
+        "purchase_strategy_version": "v3.15",
+        "report": "reports/2026-10-17-fuji-stakes-v3.15-run38984039647-attempt1-v315.html",
+        "pdf": "pdfs/2026-10-17-fuji-stakes-v3.15-run38984039647-attempt1-v315.pdf",
+        "e2e_prediction": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.15-run38984039647-attempt1-sealed.json",
+        "proof_commit": "a535067c4f3bfc8e8dfdab185099f5b2dee328e1",
+        "final_bets_fixed_at": "2026-10-16T23:57:41.727Z"
+      },
+      "old_source_original_preserved": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.13-rerun38983786715-attempt1.json",
+      "old_pdf_preserved": "pdfs/2026-10-17-fuji-stakes-v3.13-rerun38983786715-attempt1-v313.pdf",
+      "html_sha256": "0ea08b7358b34ac58ec0a774c223bfcd425fb5efe53cf1178e3f711497d5cd03",
+      "pdf_sha256": "fcfb7ab5367a2b07393befe95a668283371208917cf4d279aca50dc5ee74bc85",
+      "user_requested_formal_three_command_policy": true
     }
   ]
 }
