@@ -1,0 +1,97 @@
+name: E0 E1 E2 independent publication and isolation verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experience_regime_v1/requests/verify-20261017.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate original immutable proof, all horses, category counts and change isolation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from datetime import datetime
+          from collections import Counter
+          import json, subprocess
+          root=Path('experience_regime_v1/collection/2026-10-17')
+          status=json.loads(Path('docs/data/experience_regime_status.json').read_text())
+          run=status['collection_runs']['2026-10-17']
+          proof=json.loads((root/'proof_commit_2026-10-17.json').read_text())
+          plan=json.loads((root/'sample_plan.json').read_text())
+          pool=json.loads((root/'race_pool.json').read_text())
+          assert pool['race_count']==72 and plan['population_races']==72
+          assert plan['selected_race_count']==21 and run['selected_today']==9
+          assert run['planned_exclusions']==27 and run['collection_failures']==0
+          assert len(run['complete_evidence_race_ids'])==9 and len(proof['races'])==9
+          assert proof['proof_commit']==run['proof_commit']
+          s=subprocess.check_output(['git','show','-s','--format=%cI',proof['proof_commit']],text=True).strip()
+          assert datetime.fromisoformat(s)==datetime.fromisoformat(proof['proof_commit_at'])
+          valid=Counter();races=Counter()
+          original_paths=set(subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r',proof['proof_commit']],text=True).splitlines())
+          for x in proof['races']:
+              rid=x['race_id']
+              sp=root/'snapshots'/(rid+'.json')
+              ap=root/'audits'/(rid+'.json')
+              assert str(sp) in original_paths
+              assert str(ap) in original_paths
+              p=json.loads(sp.read_text());a=json.loads(ap.read_text())
+              assert a['usable_for_e012_shadow'] and x['proof_prestart_valid']
+              assert datetime.fromisoformat(x['captured_at'])<datetime.fromisoformat(x['start_at'])
+              assert datetime.fromisoformat(proof['proof_commit_at'])<datetime.fromisoformat(x['start_at'])
+              assert len(p['step1']['runners'])==len(p['experience']['horses'])
+              for k,h in p['experience']['horses'].items():
+                  starts=h['starts_before_race']
+                  assert isinstance(starts,int) and starts>=0
+                  assert starts==sum(h['career_summary_wsto'])
+                  assert h['regime']==('E0' if starts==0 else 'E1' if starts<=3 else 'E2')
+                  assert h['source_url'].startswith('https://www.jra.go.jp/')
+                  assert h['observed_at']<x['start_at']
+                  valid[h['regime']]+=1
+                  races[(h['regime'],rid)]+=1
+          assert valid==Counter(E0=16,E1=12,E2=109),valid
+          for k in ('E0','E1','E2'):
+              assert run['regimes'][k]['horse_observations']==valid[k]
+              assert run['regimes'][k]['races']==len([1 for regime,rid in races if regime==k])
+          changed=subprocess.check_output(['git','diff','--name-only','684c2e9143d4b11dcfdc02bbd4dcad433de50cf9','HEAD'],text=True).splitlines()
+          assert changed and all(p.startswith(('experience_regime_v1/','docs/data/experience_regime_status.json','docs/experience-regime.html','.github/workflows/experience-regime-')) for p in changed),changed
+          print('E012_PROOF_BEFORE_START_VERIFIED',proof['proof_commit'],s)
+          print('E012_IMMUTABLE_SNAPSHOTS_VERIFIED',len(proof['races']),sum(valid.values()),dict(valid))
+          print('E012_FORMAL_JRA_NAR_E2E_PDF_ISOLATION_VERIFIED',len(changed),'research-only changes')
+          PY
+      - name: Independently fetch latest public status and research HTML and verify byte equality
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20);do
+            if curl --max-time 20 -LfsS \
+                 https://toodataa-ai.github.io/keiba-notes/data/experience_regime_status.json -o /tmp/live-status.json &&
+               cmp -s docs/data/experience_regime_status.json /tmp/live-status.json &&
+               curl --max-time 20 -LfsS \
+                 https://toodataa-ai.github.io/keiba-notes/experience-regime.html -o /tmp/live-research.html &&
+               cmp -s docs/experience-regime.html /tmp/live-research.html;then
+               python - <<'PY'
+          import json
+          d=json.load(open('/tmp/live-status.json'))['collection_runs']['2026-10-17']
+          assert d['planned_exclusions']==27 and d['collection_failures']==0
+          assert d['prerace_proof_valid_races']==9
+          assert sum(x['horse_observations'] for x in d['regimes'].values())==137
+          html=open('/tmp/live-research.html').read()
+          assert 'e012-live-collection' in html and 'run.planned_exclusions' in html
+          print('E012_LATEST_PUBLIC_PAGES_EXACT_BYTE_MATCH 2026-10-17 9 137')
+          PY
+               exit 0
+            fi
+            sleep 12
+          done
+          echo '::error::Latest public status or research HTML differs from GitHub';exit 1
