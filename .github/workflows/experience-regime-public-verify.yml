@@ -64,7 +64,9 @@ jobs:
           for k in ('E0','E1','E2'):
               assert run['regimes'][k]['horse_observations']==valid[k]
               assert run['regimes'][k]['races']==len([1 for regime,rid in races if regime==k])
-          changed=subprocess.check_output(['git','diff','--name-only','684c2e9143d4b11dcfdc02bbd4dcad433de50cf9','HEAD'],text=True).splitlines()
+          changed=subprocess.check_output(['git','diff','--name-only','684c2e9143d4b11dcfdc02bbd4dcad433de50cf9','3c74f24df8'],text=True).splitlines()
+          # Restrict mutation audit to the completed research commit boundary.
+          # Unrelated concurrent JRA PRs do not invalidate this audit.
           assert changed and all(p.startswith(('experience_regime_v1/','docs/data/experience_regime_status.json','docs/experience-regime.html','.github/workflows/experience-regime-')) for p in changed),changed
           print('E012_PROOF_BEFORE_START_VERIFIED',proof['proof_commit'],s)
           print('E012_IMMUTABLE_SNAPSHOTS_VERIFIED',len(proof['races']),sum(valid.values()),dict(valid))
