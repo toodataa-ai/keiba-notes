@@ -549,7 +549,7 @@ jobs:
             assert.ok(high.baseSpeed+high.courseSpeed>low.baseSpeed+low.courseSpeed+.75);
             assert.equal(high.kick,0,'unknown previous passage must remain neutral');
             assert.equal(w.document.getElementById('paceSelect'),null);
-            assert.match(w.document.getElementById('paceDynamics').textContent,/実効ペース/);
+            assert.match(w.document.getElementById('paceDynamics').textContent,/通過時計ペース/);
             assert.match(w.document.getElementById('sourceInfo').textContent,/proof/);
             assert.match(w.document.getElementById('raceMeta').textContent,new RegExp(entry.distance_m));
             assert.equal(w.document.getElementById('meterFill').style.width,'0%');
