@@ -32,8 +32,48 @@ export function buildFormalThreeCommandPlan(source,srcBytes,{now_iso=new Date().
   outcome_distributions:source.outcome_distributions,race_context:source.race_context,
   freeze_at:source.final_bets_fixed_at};
  const result=compareThreePlusAna(args);
+ // Price verification and scenario comparisons are mandatory even when abstaining.
+ // A regular bundle with no positive modeled edge means formal PASS, not failure
+ // and not a license to buy only speculative optional side tickets.
+ if(result.status==='no_qualifying_regular_command'){
+  need(result.regular_commands.length===0,'regular mode status inconsistent');
+  const pass=(tier,row)=>({
+   row,category:tier,method:'pass',type:'見送り',
+   jra_input:'通常購入セットの採算条件を満たさず全券種見送り',
+   points:0,unit_stake_yen:0,stake_yen:0,ticket_keys:[],
+   reason:'実オッズと共通着順確率の試算で、通常3操作の正の期待値条件を満たさなかった。'
+  });
+  return {
+   schema_version:1,purchase_strategy_version:'v3.15',model_version:'v3.13',
+   status:'pending_git_proof',source_race_id:source.race_id,
+   source_prediction_sha256:hash(srcBytes),source_prediction_proof:source.proof_commit,
+   source_prediction_path:source.__source_path || null,
+   race_context:source.race_context,step1_fixed_at:source.step1_fixed_at,
+   source_final_bets_fixed_at:source.final_bets_fixed_at,
+   final_bets_fixed_at:now_iso,proof_commit:null,
+   quote_age_max_seconds:(now-oldest)/1000,
+   quote_capture_span_seconds:(newest-oldest)/1000,
+   formal_bets:[],regular_commands:[],
+   medium_command:pass('中穴',4),large_command:pass('大穴',5),
+   total_stake_yen:0,purchase_decision:'pass',command_count:0,ticket_count:0,
+   purchase_metrics:{stake_yen:0,ticket_count:0,command_count:0,
+    modeled_expected_net_profit_yen:0,modeled_low_expected_net_profit_yen:0,
+    modeled_union_hit_probability:0,modeled_net_loss_probability:0},
+   exacta_coverage_audit:result.exacta_coverage_audit,
+   comparison_to_v313:{expected_profit_yen:null,union_hit_pp:null,net_loss_pp:null},
+   pass_reason_code:'no_qualifying_regular_positive_ev_3action',
+   pass_evidence:{comparison_status:result.status,
+    candidate_medium_count:result.candidate_medium_count,
+    candidate_large_count:result.candidate_large_count,
+    formal_baseline:result.formal_baseline,
+    regular_research:result.regular_research},
+   risk_disclosure:'No verifiable positive-edge regular purchase set in v3.15. Prior v3.13 bets remain immutable audit originals, not current recommendations.',
+   selection_method:'Audited no-bet verdict. The positive-edge gate applies to the complete priced regular set; no bet prices or tickets were invented.',
+   old_original_immutable:true
+  };
+ }
  need(result.status==='three_plus_two_holes_shadow_candidate'&&result.regular_commands.length>0,
-    'no valid positive-EV 3-action purchase set; publish a documented PASS rather than fabricate ticket');
+    'unrecognized regular purchase comparison state; no invented tickets');
  const regular=result.regular_commands,side=[result.medium_command,result.large_command];
  need(regular.length<=3&&side.length===2,'more than 3+2 commands');
  need(side[0].category==='中穴'&&side[1].category==='大穴','incorrect speculative tiers');
