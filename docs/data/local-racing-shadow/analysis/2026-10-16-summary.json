@@ -4,10 +4,10 @@
   "scope": "predictions_with_valid_proof_only",
   "expected_predictions": 36,
   "eligible_predictions": 36,
-  "completed_reviews": 32,
+  "completed_reviews": 3,
   "pending": 0,
-  "blocked": 4,
-  "skipped_existing": 0,
+  "blocked": 1,
+  "skipped_existing": 32,
   "by_venue": {
     "名古屋": {
       "reviewed": 12,
@@ -30,13 +30,13 @@
       "small_sample_warning": true
     },
     "川崎": {
-      "reviewed": 9,
-      "evaluable": 6,
+      "reviewed": 12,
+      "evaluable": 9,
       "top_pick_wins": 3,
-      "top_pick_top3": 3,
-      "win_rate": 0.5,
-      "top3_rate": 0.5,
-      "mean_absolute_top_pick_rank_error": 2.333333,
+      "top_pick_top3": 5,
+      "win_rate": 0.333333,
+      "top3_rate": 0.555556,
+      "mean_absolute_top_pick_rank_error": 3.222222,
       "small_sample_warning": true
     }
   },
@@ -71,6 +71,16 @@
       "mean_absolute_top_pick_rank_error": 3.0,
       "small_sample_warning": true
     },
+    "1600": {
+      "reviewed": 2,
+      "evaluable": 2,
+      "top_pick_wins": 0,
+      "top_pick_top3": 2,
+      "win_rate": 0.0,
+      "top3_rate": 1.0,
+      "mean_absolute_top_pick_rank_error": 2.0,
+      "small_sample_warning": true
+    },
     "1700": {
       "reviewed": 1,
       "evaluable": 1,
@@ -82,13 +92,13 @@
       "small_sample_warning": true
     },
     "2000": {
-      "reviewed": 1,
-      "evaluable": 1,
+      "reviewed": 2,
+      "evaluable": 2,
       "top_pick_wins": 1,
       "top_pick_top3": 1,
-      "win_rate": 1.0,
-      "top3_rate": 1.0,
-      "mean_absolute_top_pick_rank_error": 0.0,
+      "win_rate": 0.5,
+      "top3_rate": 0.5,
+      "mean_absolute_top_pick_rank_error": 5.5,
       "small_sample_warning": true
     },
     "820": {
@@ -112,22 +122,22 @@
       "small_sample_warning": true
     }
   },
-  "top_pick_win_rate": 0.310345,
-  "top_pick_top3_rate": 0.482759,
+  "top_pick_win_rate": 0.28125,
+  "top_pick_top3_rate": 0.5,
   "ranking_error_summary": {
-    "top_pick_mean_absolute_rank_error": 2.689655,
-    "evaluable_n": 29
+    "top_pick_mean_absolute_rank_error": 2.90625,
+    "evaluable_n": 32
   },
-  "reviewed_races": 32,
+  "reviewed_races": 35,
   "summary": {
-    "reviewed": 32,
-    "evaluable": 29,
+    "reviewed": 35,
+    "evaluable": 32,
     "top_pick_wins": 9,
-    "top_pick_top3": 14,
-    "win_rate": 0.310345,
-    "top3_rate": 0.482759,
-    "mean_absolute_top_pick_rank_error": 2.689655,
-    "small_sample_warning": true
+    "top_pick_top3": 16,
+    "win_rate": 0.28125,
+    "top3_rate": 0.5,
+    "mean_absolute_top_pick_rank_error": 2.90625,
+    "small_sample_warning": false
   },
   "evidence_based_findings": [
     "Frozen ability rank compared with NAR official result without hindsight adjustment"
@@ -148,6 +158,9 @@
       "20261016-kawasaki-06",
       "20261016-kawasaki-07",
       "20261016-kawasaki-08",
+      "20261016-kawasaki-09",
+      "20261016-kawasaki-10",
+      "20261016-kawasaki-11",
       "20261016-kawasaki-12",
       "20261016-nagoya-01",
       "20261016-nagoya-02",
@@ -174,9 +187,6 @@
       "20261016-sonoda-12"
     ],
     "unresolved_ids": [
-      "20261016-kawasaki-09",
-      "20261016-kawasaki-10",
-      "20261016-kawasaki-11",
       "20261016-sonoda-11"
     ],
     "ineligible_proof_ids": []

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "mode": "local_daily_shadow_public_view",
   "production_effect": false,
-  "updated_at": "2026-10-16T23:09:10+09:00",
+  "updated_at": "2026-10-16T23:11:39+09:00",
   "model_version": "local-daily-shadow-v0.1",
   "notice": "地方競馬Shadowは研究用です。JRA正式予想・正式成績には直接反映しません。発走前predictionは結果確定後も改変しません。",
   "venues": [
@@ -3911,13 +3911,13 @@
       "distance": 1600,
       "class": "ＢＲＩＤＧＥアーティスト市原ひかり記Ｃ１",
       "scheduled_start_at": "2026-10-16T19:05:00+09:00",
-      "status": "predicted",
+      "status": "reviewed",
       "model_version": "local-daily-shadow-v0.1",
       "information_cutoff_at": "2026-10-16T08:53:40+09:00",
       "proof_commit": "a495e556b96881ef9816fc267c1827e8f813c1fd",
       "prediction_path": "data/local-racing-shadow/predictions/2026-10-16/20261016-kawasaki-09.json",
-      "result_path": null,
-      "review_path": null,
+      "result_path": "data/local-racing-shadow/results/2026-10-16/20261016-kawasaki-09.json",
+      "review_path": "data/local-racing-shadow/reviews/2026-10-16/20261016-kawasaki-09.json",
       "preview": {
         "top_pick": {
           "horse_no": 6,
@@ -3936,13 +3936,13 @@
       "distance": 2000,
       "class": "かわさきミュートンもうすぐ２０歳Ｂ２Ｂ３",
       "scheduled_start_at": "2026-10-16T19:40:00+09:00",
-      "status": "predicted",
+      "status": "reviewed",
       "model_version": "local-daily-shadow-v0.1",
       "information_cutoff_at": "2026-10-16T08:53:40+09:00",
       "proof_commit": "a495e556b96881ef9816fc267c1827e8f813c1fd",
       "prediction_path": "data/local-racing-shadow/predictions/2026-10-16/20261016-kawasaki-10.json",
-      "result_path": null,
-      "review_path": null,
+      "result_path": "data/local-racing-shadow/results/2026-10-16/20261016-kawasaki-10.json",
+      "review_path": "data/local-racing-shadow/reviews/2026-10-16/20261016-kawasaki-10.json",
       "preview": {
         "top_pick": {
           "horse_no": 11,
@@ -3961,13 +3961,13 @@
       "distance": 1600,
       "class": "かわさきジャズ２０２６開催記Ｂ１二Ｂ２一",
       "scheduled_start_at": "2026-10-16T20:15:00+09:00",
-      "status": "predicted",
+      "status": "reviewed",
       "model_version": "local-daily-shadow-v0.1",
       "information_cutoff_at": "2026-10-16T08:53:41+09:00",
       "proof_commit": "a495e556b96881ef9816fc267c1827e8f813c1fd",
       "prediction_path": "data/local-racing-shadow/predictions/2026-10-16/20261016-kawasaki-11.json",
-      "result_path": null,
-      "review_path": null,
+      "result_path": "data/local-racing-shadow/results/2026-10-16/20261016-kawasaki-11.json",
+      "review_path": "data/local-racing-shadow/reviews/2026-10-16/20261016-kawasaki-11.json",
       "preview": {
         "top_pick": {
           "horse_no": 1,
@@ -4675,16 +4675,16 @@
     {
       "date": "2026-10-16",
       "scope": "predictions_with_valid_proof_only",
-      "reviewed_races": 32,
+      "reviewed_races": 35,
       "summary": {
-        "reviewed": 32,
-        "evaluable": 29,
+        "reviewed": 35,
+        "evaluable": 32,
         "top_pick_wins": 9,
-        "top_pick_top3": 14,
-        "win_rate": 0.310345,
-        "top3_rate": 0.482759,
-        "mean_absolute_top_pick_rank_error": 2.689655,
-        "small_sample_warning": true
+        "top_pick_top3": 16,
+        "win_rate": 0.28125,
+        "top3_rate": 0.5,
+        "mean_absolute_top_pick_rank_error": 2.90625,
+        "small_sample_warning": false
       },
       "findings": [],
       "path": "data/local-racing-shadow/analysis/2026-10-16-summary.json"
