@@ -38,6 +38,15 @@ svg .point-tag{font-family:Meiryo,sans-serif;font-weight:800;font-size:12px;pain
 .links{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
 .links a{color:#185a88;text-decoration:underline;font-size:13px}
 .status{font-size:12px;font-weight:bold;color:#76561e;padding:9px 12px;background:#fff5df;border-radius:6px}
+.rehearsal{margin:13px 0 15px;padding:12px;border:1px solid #b9d7dd;background:#f1fbfd;border-radius:8px}
+.rehearsal[hidden]{display:none}
+.rehearsal h3{font-size:13px;margin:0 0 7px}
+.rehearsal p{color:#436175;font-size:11px;line-height:1.6;margin:0 0 9px}
+.rehearsal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rehearsal-actions button{padding:9px 14px;border:1px solid #286c84;border-radius:6px;font:inherit;font-weight:700;font-size:12px;background:#1d6380;color:#fff}
+.rehearsal-actions button+button{background:#fff;color:#1d6380}
+.rehearsal input{width:100%;accent-color:#1d6c83;margin:10px 0 2px}
+.rehearsal output{font-size:12px;font-weight:700;color:#1d5773}
 footer{font-size:12px;color:#6b7a8e;padding:15px 0}
 button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2px}
 @media(max-width:740px){.grid{grid-template-columns:1fr}.course-list{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:11px}.meta{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -61,6 +70,12 @@ button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2p
 <section class="panel" aria-labelledby="courseTitle">
 <h2 id="courseTitle">コース選択待ち</h2>
 <div id="diagram" class="visual" aria-label="走行線の設計プレビュー"></div>
+<div id="courseRehearsal" class="rehearsal" hidden>
+<h3>走行線の試走（コースの位置確認のみ）</h3>
+<p>青い点はコース上の距離位置です。馬・能力・時計・着順を生成するものではありません。全頭の固定済み発走前データが揃うまで実レースの再生は無効です。</p>
+<div class="rehearsal-actions"><button type="button" id="rehearsalPlay">▶ コースを試走</button><button type="button" id="rehearsalPause">停止</button><output id="rehearsalDistance">0 / 2000 m</output></div>
+<input type="range" id="rehearsalScrub" aria-label="コース上の距離位置" min="0" max="2000" step="1" value="0">
+</div>
 <div class="legend"><span><i style="background:#358965"></i>START</span><span><i style="background:#ca5555"></i>GOAL</span><span><i style="background:#7764a9"></i>コーナー入口</span><span>白い点線：進行する走行線の中心</span></div>
 <div id="courseMetrics" class="meta"></div>
 <p id="courseNotes" class="info"></p>
@@ -71,6 +86,7 @@ button:focus-visible,a:focus-visible{outline:3px solid #68afd7;outline-offset:2p
 </div>
 <footer>Stage design blueprint v0.1 — 正式予想・発走前prediction・買い目・結果データは変更しません。シミュレータは既存の2コースを引き続き利用できます。</footer>
 </main>
-<script src="weekend-main-course-review-v1.js?v=20261016-2" defer></script>
+<script src="race-course-geometry-v1.js?v=20261016-40" defer></script>
+<script src="weekend-main-course-review-v1.js?v=20261016-3" defer></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

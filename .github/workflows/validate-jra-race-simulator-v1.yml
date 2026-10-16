@@ -16,6 +16,7 @@ on:
       - 'docs/staging/weekend-main-course-review-v1.js'
       - 'tools/test_weekend_main_course_blueprints_20261017.cjs'
       - 'tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs'
+      - 'tools/test_shuka_stage_course_engine_v040.cjs'
       - 'tools/test_race_sim_stage_v020.cjs'
       - 'tools/test_race_sim_stage_v021.cjs'
       - 'tools/test_race_sim_stage_v022.cjs'
@@ -63,6 +64,8 @@ jobs:
           node tools/test_weekend_main_course_blueprints_20261017.cjs
           node --check tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs
           node tools/test_shuka_kyoto_inner_2000_geometry_20261016.cjs
+          node --check tools/test_shuka_stage_course_engine_v040.cjs
+          node tools/test_shuka_stage_course_engine_v040.cjs
           node --check tools/test_race_sim_stage_v020.cjs
           node tools/test_race_sim_stage_v020.cjs
           node --check tools/test_race_sim_stage_v021.cjs
@@ -130,8 +133,8 @@ jobs:
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
           assert 'Stage v0.31' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261016-39' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-course-geometry-v1.js?v=20261016-39' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-course-geometry-v1.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
           html=Path('docs/staging/race-simulator.html').read_text()
@@ -146,7 +149,7 @@ jobs:
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261016-34' in html
           assert 'race-sim-engine.js?v=20261016-40' in html
-          assert 'race-simulator.js?v=20261016-39' in html
+          assert 'race-simulator.js?v=20261016-40' in html
           assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
           assert 'id="courseMapMode"' not in html and 'id="courseCanvas"' not in html
           assert 'id="pathToggle"' not in html

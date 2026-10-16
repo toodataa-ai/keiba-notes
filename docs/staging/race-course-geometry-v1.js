@@ -80,6 +80,45 @@ const COURSE={
   profile:[[0,0],[210,.25],[575,4.3],[610,4.3],[850,.4],[996.3,0],[1400,0]],
   landmarks:[{d:0,label:'START'},{d:365,label:'3角'},{d:600,label:'坂頂上'},
     {d:805,label:'4角'},{d:996.3,label:'直線入口'},{d:1400,label:'GOAL'}]
+ },
+ kyoto_turf_inner_2000:{
+  id:'kyoto_turf_inner_2000',venue:'京都',course:'芝2000m内回り',layout:'Aコース・右内回り',
+  turn:'右',distance_m:2000,lap_m:1782.8,straight_m:328.4,
+  track_width_m:[27,38],elevation_range_m:3.1,mapUnitsPerMeter:.66,
+  user_approved_stage_geometry:true,
+  sourcePlan:{provider:'JRA official course plan and Shuka Sho course guide',
+    sourceWidth:620,sourceHeight:390,
+    sourceUrl:'https://www.jra.go.jp/facilities/race/kyoto/course/',
+    shapeMethod:'approved 2026-10-16 manual illustration blueprint; not surveyed GPS'},
+  official:'https://www.jra.go.jp/facilities/race/kyoto/course/',
+  feature_source:'https://www.jra.go.jp/keiba/g1/shuka.html',
+  info:'秋華賞の芝2000m内回り。スタンド前の発走から1コーナーまで308.7m／最後の直線328.4m。測量位置・途中勾配は近似。',
+  // The closing stretch and start run-up are SUBCURVES OF THE SAME
+  // home-straight Bezier. Do not redraw independently or overlap GOAL/1C.
+  background:[
+    ['M',148,280],
+    ['C',99,277.375,90,251,88,204],
+    ['C',83,141,124,109,184,94],
+    ['C',252,77,367,69,437,78],
+    ['C',491,85,508,121,508,166],
+    ['C',508,231,493,272,452,281],
+    ['C',393,290,260,286,148,280]
+  ],
+  segments:[
+   {from:0,to:308.7,name:"スタンド前・発走〜1コーナー",kind:'straight',bend:0,p0:[351.76,286.264],p1:[289.96,286.48],p2:[215.2,283.6],p3:[148,280]},
+   {from:308.7,to:530,name:"1コーナー・内回り",kind:'turn',bend:0.76,p0:[148,280],p1:[99,277.375],p2:[90,251],p3:[88,204]},
+   {from:530,to:720,name:"2コーナー・内回り",kind:'turn',bend:0.72,p0:[88,204],p1:[83,141],p2:[124,109],p3:[184,94]},
+   {from:720,to:1270,name:"向正面・淀の坂へ",kind:'straight',bend:0.02,p0:[184,94],p1:[252,77],p2:[367,69],p3:[437,78]},
+   {from:1270,to:1435,name:"3コーナー・坂頂上",kind:'turn',bend:0.65,p0:[437,78],p1:[491,85],p2:[508,121],p3:[508,166]},
+   {from:1435,to:1671.6,name:"4コーナー・下り",kind:'turn',bend:0.8,p0:[508,166],p1:[508,231],p2:[493,272],p3:[452,281]},
+   {from:1671.6,to:2000,name:"最後の直線 328.4m",kind:'straight',bend:0,p0:[452,281],p1:[407.75,287.75],p2:[321.875,287.1875],p3:[234.45313,283.95313]}
+  ],
+  // Approximate stage-only grade, constrained to the official 3.1m relief.
+  profile:[[0,0],[308.7,0],[530,.15],[720,.25],[1060,.9],[1270,2.7],
+    [1315,3.1],[1400,2.9],[1510,.8],[1671.6,0],[2000,0]],
+  landmarks:[{d:0,label:'START'},{d:308.7,label:'1角'},{d:530,label:'2角'},
+    {d:1270,label:'3角'},{d:1315,label:'坂頂上'},{d:1435,label:'4角'},
+    {d:1671.6,label:'直線入口'},{d:2000,label:'GOAL'}]
  }
 };
 function clamp(v,a,b){return Math.min(b,Math.max(a,v));}
