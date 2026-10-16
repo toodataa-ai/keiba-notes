@@ -35,7 +35,7 @@ jobs:
           node .github/scripts/test-jra-exacta-wheel-comparison-v1.mjs
           node .github/scripts/test-jra-three-plus-ana-v1.mjs
           node --check .github/scripts/jra-build-formal-3action-v315.mjs
-          python3 -m py_compile .github/scripts/jra-render-formal-3action-v315.py .github/scripts/jra-promote-formal-3action-v315.py
+          python3 -m py_compile .github/scripts/jra-render-formal-reader-v315.py .github/scripts/jra-promote-formal-3action-v315.py
       - name: Resolve exactly one prereace purchase-only request and current verified source
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -119,7 +119,7 @@ jobs:
           Path(b).parent.mkdir(parents=True,exist_ok=True)
           Path(b).write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
           PY
-          python3 .github/scripts/jra-render-formal-3action-v315.py \
+          python3 .github/scripts/jra-render-formal-reader-v315.py \
             --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
           # Approved reader-v1 is the publication gate. Never promote a custom CSS, SHA-leaking,
           # shortened or overflowed v3.15 PDF, even if its own loose assertions pass.
