@@ -1,5 +1,5 @@
-/* Read-only course blueprint review. No animation and no access to JRA
- * predictions or race results until geometry AND pre-race reports are signed off. */
+/* Stage route design review: approved-route distance PROBE only.
+ * Never invent runners or read/alter STEP1, bets, payouts, or JRA results. */
 (()=>{'use strict';
 const NS='http://www.w3.org/2000/svg',get=id=>document.getElementById(id);
 const make=(tag,txt)=>{const n=document.createElement(tag);n.textContent=String(txt);return n};
@@ -11,7 +11,57 @@ const svg=(tag,attributes={})=>{
 const profilePath=segs=>segs.map((c,i)=>(i?'':'M '+c[0].join(' '))+
  ' C '+c[1].join(' ')+' '+c[2].join(' ')+' '+c[3].join(' ')).join(' ');
 const approxMeter=(b,i)=>Math.round((b.segment_bounds[i+1]-b.segment_bounds[i])*10)/10;
+let currentProfile=null,probe=null,playing=false,frame=0,lastTime=0;
+const approvedGeometry=b=>b.approval?.status==='user_approved_illustration'&&
+ b.approval.real_horse_replay_requires_pre_race_frozen_report===true&&
+ typeof RaceCourseGeometry!=='undefined'&&
+ RaceCourseGeometry.get(b.course_id)?.user_approved_stage_geometry===true&&
+ RaceCourseGeometry.get(b.course_id)?.distance_m===b.distance_m;
+function sharedSplineSvg(profile){
+ const commands=[];
+ for(let d=0;d<=profile.distance_m;d+=4){
+  const p=RaceCourseGeometry.center(profile,d);
+  commands.push((d===0?'M ':'L ')+p.x.toFixed(2)+' '+p.y.toFixed(2));
+ }
+ const p=RaceCourseGeometry.center(profile,profile.distance_m);
+ commands.push('L '+p.x.toFixed(2)+' '+p.y.toFixed(2));
+ return commands.join(' ');
+}
+function setProbeDistance(d){
+ if(!currentProfile||!probe)return;
+ const distance=Math.max(0,Math.min(currentProfile.distance_m,Number(d)||0));
+ const p=RaceCourseGeometry.center(currentProfile,distance);
+ probe.setAttribute('cx',p.x.toFixed(3));probe.setAttribute('cy',p.y.toFixed(3));
+ get('rehearsalScrub').value=String(Math.round(distance));
+ get('rehearsalDistance').textContent=Math.round(distance)+' / '+currentProfile.distance_m+' m';
+}
+function stopProbe(){
+ playing=false;cancelAnimationFrame(frame);frame=0;lastTime=0;
+}
+function tick(time){
+ if(!playing||!currentProfile)return;
+ if(!lastTime)lastTime=time;
+ const dt=Math.max(0,Math.min(.1,(time-lastTime)/1000));
+ lastTime=time;
+ const curr=Number(get('rehearsalScrub').value||0),next=Math.min(currentProfile.distance_m,curr+dt*115);
+ setProbeDistance(next);
+ if(next>=currentProfile.distance_m){stopProbe();return}
+ frame=requestAnimationFrame(tick);
+}
+get('rehearsalPlay').addEventListener('click',()=>{
+ if(!currentProfile)return;
+ if(Number(get('rehearsalScrub').value)>=currentProfile.distance_m)setProbeDistance(0);
+ stopProbe();playing=true;frame=requestAnimationFrame(tick);
+});
+get('rehearsalPause').addEventListener('click',stopProbe);
+get('rehearsalScrub').addEventListener('input',()=>{
+ stopProbe();setProbeDistance(get('rehearsalScrub').value);
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopProbe()});
+window.addEventListener('pagehide',stopProbe);
 function render(blueprint){
+ stopProbe();currentProfile=null;probe=null;
+ get('courseRehearsal').hidden=true;
  const title=get('courseTitle'),box=get('diagram');box.replaceChildren();
  title.textContent=blueprint.date+' '+blueprint.venue+'11R '+blueprint.race+' · '+
    (blueprint.surface==='dirt'?'ダート':'芝')+blueprint.distance_m+'m'+
@@ -22,7 +72,12 @@ function render(blueprint){
  marker.appendChild(svg('path',{d:'M 0 0 L 6 3 L 0 6 Z',fill:'#144a70'}));h.appendChild(marker);view.appendChild(h);
  for(let i=0;i<4;i++){view.appendChild(svg('path',{d:'M 24 '+(40+i*87)+' H 570',
    stroke:'#e0e9f2','stroke-dasharray':'3 6','stroke-width':'1'}));}
- const d=profilePath(blueprint.segments),dirt=blueprint.surface==='dirt';
+ // The route used by real engine physics is also the EXACT preview line.
+ // Other unapproved routes stay as static Bézier designs.
+ const approved=approvedGeometry(blueprint);
+ const d=approved?sharedSplineSvg(RaceCourseGeometry.get(blueprint.course_id)):
+   profilePath(blueprint.segments);
+ const dirt=blueprint.surface==='dirt';
  view.appendChild(svg('path',{d,class:'outer',stroke:dirt?'#bd926a':'#7caf98'}));
  view.appendChild(svg('path',{d,class:'surface',stroke:dirt?'#d6b08a':'#65b887'}));
  view.appendChild(svg('path',{d,class:'center'}));
@@ -56,6 +111,15 @@ function render(blueprint){
   view.appendChild(svg('circle',{cx:p[0],cy:p[1],r:4.2,fill:'#7764a9',stroke:'#fff','stroke-width':1.2}));
   view.appendChild(text);
  }
+ if(approved){
+  currentProfile=RaceCourseGeometry.get(blueprint.course_id);
+  probe=svg('circle',{cx:0,cy:0,r:8,fill:'#1267a7',stroke:'#fff','stroke-width':2.8,
+   'aria-label':'コース上の距離を示す青い点。馬ではありません'});
+  view.appendChild(probe);
+  const test=get('courseRehearsal');test.hidden=false;
+  get('rehearsalScrub').max=String(blueprint.distance_m);
+  setProbeDistance(0);
+ }
  box.appendChild(view);
  const grid=get('courseMetrics');grid.replaceChildren();
  for(const [label,value] of [
@@ -68,7 +132,8 @@ function render(blueprint){
  }
  get('courseNotes').textContent=blueprint.notes;
  get('courseStatus').textContent='コース専用型 '+blueprint.course_id+
-   ' ／ 走行線設計案（未承認）／ 実レース再生不可';
+  (approved?' ／ 走行線の形状承認済み・コース試走可':' ／ 走行線設計案（未承認）')+
+  ' ／ 実際の出走馬の再生は発走前原本の固定待ち';
  get('officialCourse').href=blueprint.official_course;
  get('officialEntries').href=blueprint.official_entries;
  const officialDetail=get('officialRaceReference');
