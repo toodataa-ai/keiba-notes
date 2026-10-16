@@ -48,7 +48,13 @@ function firstThree(state){
  return state.horses.filter(h=>h.finished&&Number.isFinite(h.finishTime))
   .sort((a,b)=>a.finishTime-b.finishTime||a.number-b.number).slice(0,3);
 }
-window.RaceSimTiming=Object.freeze({format:dur,firstThree});
+// Real race-engine crossing telemetry only; never manufacture a position swap.
+function recentOvertake(state,windowSeconds=1.9){
+ const pass=state?.lastVisualPass;
+ return !state?.goalCamera&&state?.firstFinishTime===null&&pass&&
+  state.t>=pass.t&&state.t-pass.t<windowSeconds?pass:null;
+}
+window.RaceSimTiming=Object.freeze({format:dur,firstThree,recentOvertake});
 function seedValue(){return Math.max(1,Math.min(999999,parseInt(ui.seed.value,10)||1))}
 function chooseRace(id){return catalog.find(r=>r.id===id)||null}
 function readerUrl(report){
@@ -298,7 +304,8 @@ function renderData(){
     '<span class="podium-name">'+esc(h.number+'番 '+h.name)+'</span>'+
     '<span class="podium-time">'+dur(h.finishTime)+'</span></div>').join('');
  }
- ui.moment.textContent=state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
+ const latestPass=recentOvertake(state,2.2);
+ ui.moment.textContent=state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':latestPass?latestPass.attackerNo+'番 '+latestPass.attackerName+'が'+latestPass.victimNo+'番をかわす':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
  ui.bar.style.width=(state.progress*100).toFixed(1)+'%';
  ui.stands.innerHTML=sim.standings().map((h,i)=>{
@@ -383,7 +390,7 @@ function paintWakuLegend(){
    p.fill+';color:'+p.text+';border-color:'+p.border+'">'+(i+1)+'</span>'+
    (i+1)+'枠 '+p.name+'</span>').join('');
 }
-function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,fieldSize=18){
+function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,fieldSize=18,passing=false){
  if(!Number.isInteger(number)||number<1||!Number.isFinite(x)||!Number.isFinite(y))
   throw Error('SIM_NUMBER_POSITION_INVALID');
  const radius=(focused?15.5:13.5)*scale;
@@ -397,6 +404,11 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
    ctx.beginPath();ctx.arc(x,y,radius+4.3*scale,0,Math.PI*2);
    ctx.lineWidth=3.2*scale;ctx.strokeStyle='#f9d46c';ctx.stroke();
  }
+ if(passing){
+   // A thin ring around the genuine crossing point; no position offset.
+   ctx.beginPath();ctx.arc(x,y,radius+7*scale,0,Math.PI*2);
+   ctx.lineWidth=2.6*scale;ctx.strokeStyle='#b6f3a0';ctx.stroke();
+ }
  ctx.textAlign='center';ctx.textBaseline='middle';
  ctx.fillStyle=waku.text;
  ctx.font='900 '+(number>9?16:18)*scale+'px Arial, sans-serif';
@@ -404,15 +416,17 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
  ctx.restore();
  return {number,x,y,waku:waku.waku};
 }
-function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo,anchor={x:width*.5,y:height*.52}){
+function projectRaceNumbers(horses,profile,origin,zoom,width,height,focusedNo,leadingNo,anchor={x:width*.5,y:height*.52},passingNo=null){
  if(!Array.isArray(horses))throw Error('SIM_HORSES_MISSING');
  return horses.map(h=>{
   const p=RaceCourseGeometry.point(profile,h.displayD??h.d,h.lane);
   return {number:h.number,x:anchor.x+zoom*(p.x-origin.x),
     y:anchor.y+zoom*(p.y-origin.y),
-    focused:h.number===focusedNo,leading:h.number===leadingNo};
+    focused:h.number===focusedNo,leading:h.number===leadingNo,
+    passing:h.number===passingNo};
  }).sort((x,y)=>Number(x.focused)-Number(y.focused)||
-  Number(x.leading)-Number(y.leading)||x.number-y.number);
+  Number(x.leading)-Number(y.leading)||
+  Number(x.passing)-Number(y.passing)||x.number-y.number);
 }
 function drawRaceNumbers(ctx,points,width,height,renderedWidth,fieldSize=18){
  const scale=width/Math.max(1,renderedWidth),visible=[];
@@ -421,7 +435,7 @@ function drawRaceNumbers(ctx,points,width,height,renderedWidth,fieldSize=18){
   // A number that is out of view stays out of view: never detach it
   // from the actual moving horse coordinates.
   if(p.x+radius<0||p.x-radius>width||p.y+radius<0||p.y-radius>height)continue;
-  visible.push(raceNumberMarker(ctx,p.number,p.x,p.y,scale,p.focused,p.leading,fieldSize));
+  visible.push(raceNumberMarker(ctx,p.number,p.x,p.y,scale,p.focused,p.leading,fieldSize,p.passing));
  }
  return visible;
 }
@@ -608,8 +622,10 @@ function drawRace(){
    ctx.beginPath();ctx.arc(q.x,q.y,2.8,0,Math.PI*2);ctx.fill();
  }
  ctx.restore();
+ // Draw the real overtaker last for 1.9s. No displacement of number centres.
+ const activePass=recentOvertake(state);
  const points=projectRaceNumbers(state.horses,profile,origin,zoom,w,h,
-   target.number,state.leadingNo,anchor);
+   target.number,state.leadingNo,anchor,activePass?.attackerNo??null);
  drawRaceNumbers(ctx,points,w,h,renderedWidth,race.field_size);
  // The HTML course-section and timing badges are the only HUD in this view.
  // The canvas renders the course and moving numbers, never duplicate titles.
