@@ -29,7 +29,7 @@ jobs:
       - name: Validate new action estimator and historical v3.13 predictor
         run: |
           set -euo pipefail
-          node .github/scripts/validate-jra-prompt-v313.mjs
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
           node .github/scripts/test-jra-three-command-v1.mjs
           node .github/scripts/test-jra-ticket-notation-v1.mjs
           node .github/scripts/test-jra-exacta-wheel-comparison-v1.mjs
