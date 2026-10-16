@@ -19,6 +19,7 @@ on:
       - 'tools/test_shuka_stage_course_engine_v040.cjs'
       - 'tools/test_race_sim_stage_v041.cjs'
       - 'tools/test_race_sim_stage_v041_ui.cjs'
+      - 'tools/test_race_sim_stage_v043.cjs'
       - 'tools/test_race_sim_stage_v020.cjs'
       - 'tools/test_race_sim_stage_v021.cjs'
       - 'tools/test_race_sim_stage_v022.cjs'
@@ -70,6 +71,8 @@ jobs:
           node tools/test_shuka_stage_course_engine_v040.cjs
           node --check tools/test_race_sim_stage_v041.cjs
           node tools/test_race_sim_stage_v041.cjs
+          node --check tools/test_race_sim_stage_v043.cjs
+          node tools/test_race_sim_stage_v043.cjs
           node --check tools/test_race_sim_stage_v041_ui.cjs
           node --check tools/test_race_sim_stage_v020.cjs
           node tools/test_race_sim_stage_v020.cjs
@@ -138,7 +141,7 @@ jobs:
             assert actual==sha,(path,'production modified',actual)
           assert 'STAGING' in Path('docs/staging/race-simulator.html').read_text()
           assert 'Stage v0.31' in Path('docs/staging/race-simulator.html').read_text()
-          assert 'race-simulator.js?v=20261016-41' in Path('docs/staging/race-simulator.html').read_text()
+          assert 'race-simulator.js?v=20261016-43' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-course-geometry-v1.js?v=20261016-40' in Path('docs/staging/race-simulator.html').read_text()
           assert 'race-simulator.html?race=' in Path('docs/staging/stage-week-preview.js').read_text()
           assert 'staging/race-simulator.html' in Path('docs/staging/index.html').read_text()
@@ -150,11 +153,11 @@ jobs:
           assert 'https://umapot.com/?page_id=116' in html
           assert '馬番の位置はコース図への手動の近似位置合わせ' in html
           assert 'tokyoCourseOverlay' in html and 'kyotoCourseOverlay' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-37' in html
+          assert 'race-umapot-overlay-v1.js?v=20261016-43' in html
           assert 'tokyoRealCourseMap' in html and 'kyotoRealCourseMap' in html
           assert 'race-simulator.css?v=20261016-34' in html
           assert 'race-sim-engine.js?v=20261016-41' in html
-          assert 'race-simulator.js?v=20261016-41' in html
+          assert 'race-simulator.js?v=20261016-43' in html
           assert 'id="paceSelect"' not in html and 'id="cameraSelect"' not in html
           assert 'id="courseMapMode"' not in html and 'id="courseCanvas"' not in html
           assert 'id="pathToggle"' not in html
@@ -163,7 +166,7 @@ jobs:
           assert 'id="podium"' in html and 'id="splitTime"' in html
           assert 'race-ability-model-v1.js?v=20261015-22' in html and 'id="abilityInfo"' in html and 'id="runnerSixTraits"' in html
           assert 'ゴール前80mから実況は後続も見えるゴール板固定カメラ' in html
-          assert 'race-umapot-overlay-v1.js?v=20261015-37' in html
+          assert 'race-umapot-overlay-v1.js?v=20261016-43' in html
           assert html.count('class="real-course-scroll"') == 2
           assert html.count('class="real-course-viewport"') == 2
           assert 'mapExpandBtn' in html and 'zoom150' in html and 'zoom200' in html
