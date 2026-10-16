@@ -56,7 +56,8 @@ for(const [d,x,y] of kyotoReference){
 }
 assert.equal(overlay.outwardShiftPx(t,675),0);
 const html=fs.readFileSync(root+'race-simulator.html','utf8');
-assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261015-37'));
+// Existing stage page already uses the Kyoto inner/outer shared image overlay.
+assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261016-43'));
 assert.ok(html.includes('東京芝2000mの引き込み線'));
 assert.ok(html.includes('Stage v0.31'));
 console.log('PASS_V032_TOKYO_2000_OUTER_TURF_CHUTE_30_MARKERS_WHITE_GAP_CLEAR');

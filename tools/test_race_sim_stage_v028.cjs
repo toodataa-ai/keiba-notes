@@ -35,5 +35,6 @@ assert.ok(!html.includes('進路の軌跡を表示'));
 assert.ok(!js.includes("strokePath(ctx,35,'#d9d7b7')"));
 assert.ok(!js.includes("horse.trail"));
 assert.ok(!um.includes('if(pathOn)for'));
-assert.ok(/race-umapot-overlay-v1\.js\?v=20261015-\d+/.test(html));
+// Existing stage page already uses the Kyoto inner/outer shared image overlay.
+assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261016-43'));
 console.log('PASS_V028_UMAPOT_FIXED_MAP_NO_YELLOW_TRAILS');
