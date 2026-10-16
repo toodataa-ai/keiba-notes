@@ -189,7 +189,24 @@ jobs:
           git add -- "$INPUT_PATH" "$SNAPSHOT" "$RECOVERED_INPUT" "e2e_validation/quote-evidence/$RACE_ID" "$SHADOW_EVIDENCE"
           if [[ -d "$RECOVERED_EVIDENCE" ]] && find "$RECOVERED_EVIDENCE" -type f -print -quit | grep -q .; then git add -- "$RECOVERED_EVIDENCE"; fi
           git commit -m "Freeze JRA v3.14 generic intake and complete v3.13 prestart market evidence"
-          git push origin HEAD:main
+          # Preserve newer main changes from independently scheduled NAR, website,
+          # and parallel JRA requests. Race-scoped commits may be rebased only if
+          # git can reconcile cleanly, never force-push or rewrite prior proofs.
+          for push_attempt in 1 2 3; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Unmergeable concurrent publication; no force push"
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [[ "$push_attempt" -eq 3 ]]; then
+              echo "::error::Concurrent write race exhausted retries; no data overwritten"
+              exit 1
+            fi
+          done
           PROOF=$(git rev-parse HEAD)
           echo "PROOF=$PROOF" >> "$GITHUB_ENV"
           echo "Recorded immutable prereace snapshot $SNAPSHOT in $PROOF"
@@ -231,7 +248,24 @@ jobs:
           if actual!=expected:raise SystemExit('BLOCKER: unexpected historical file changes: '+str(actual^expected))
           PY
           git commit -m "Publish validated v3.13 full JRA original prediction HTML PDF and public registry"
-          git push origin HEAD:main
+          # Preserve newer main changes from independently scheduled NAR, website,
+          # and parallel JRA requests. Race-scoped commits may be rebased only if
+          # git can reconcile cleanly, never force-push or rewrite prior proofs.
+          for push_attempt in 1 2 3; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Unmergeable concurrent publication; no force push"
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [[ "$push_attempt" -eq 3 ]]; then
+              echo "::error::Concurrent write race exhausted retries; no data overwritten"
+              exit 1
+            fi
+          done
           echo "JRA_V313_COMMITTED_AWAITING_PUBLIC_HTTP_VERIFICATION $RACE_ID proof=$PROOF"
       - name: Independently compare deployed website HTML PDF and public race registry
         run: |
