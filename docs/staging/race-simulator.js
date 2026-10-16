@@ -51,7 +51,7 @@ function firstThree(state){
 // Real race-engine crossing telemetry only; never manufacture a position swap.
 function recentOvertake(state,windowSeconds=1.9){
  const pass=state?.lastVisualPass;
- return !state?.goalCamera&&state?.firstFinishTime===null&&pass&&
+ return state?.firstFinishTime===null&&pass&&
   state.t>=pass.t&&state.t-pass.t<windowSeconds?pass:null;
 }
 window.RaceSimTiming=Object.freeze({format:dur,firstThree,recentOvertake});
@@ -545,11 +545,19 @@ function drawGoalCamera(ctx,state,profile,width,height,renderedWidth,target){
  }
  drawGoalPost(ctx,profile.turn==='右'?width*.30:width*.70,top+13,bottom-13);
  const scale=width/Math.max(1,renderedWidth);
- for(const runner of state.horses.slice().sort((a,b)=>a.number-b.number)){
+ const passingNo=recentOvertake(state)?.attackerNo??null;
+ // Apply the same actual-pass foreground order when the camera switches
+ // 80m before the line; do not suppress the decisive final 80m.
+ const runners=state.horses.slice().sort((a,b)=>
+   Number(a.number===passingNo)-Number(b.number===passingNo)||
+   Number(a.number===target.number)-Number(b.number===target.number)||
+   a.number-b.number);
+ for(const runner of runners){
    const q=goalScreenPosition(runner.displayD??runner.d,runner.lane,profile.distance_m,width,height,maxLane,profile.turn);
    if(q.x<-35||q.x>width+35)continue;
    raceNumberMarker(ctx,runner.number,q.x,q.y,scale,
-     runner.number===target.number,runner.number===state.leadingNo,race.field_size);
+     runner.number===target.number,runner.number===state.leadingNo,
+     race.field_size,runner.number===passingNo);
  }
  // HUD lives exclusively in HTML stageCaption / elapsed / splitTime.
  // Do not draw extra television banners behind translucent labels.
