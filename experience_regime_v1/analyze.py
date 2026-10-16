@@ -244,6 +244,22 @@ def main() -> int:
 
     status = run(REPO_ROOT, REPO_ROOT / args.cases)
     output = REPO_ROOT / args.output
+    # Rehydrate research-only prospective snapshots from their independently
+    # committed proof, rather than dropping them when the existing E2E workflow
+    # rebuilds its formal control metrics. No E2E raw inputs are modified.
+    if output.resolve() == (REPO_ROOT / "docs/data/experience_regime_status.json").resolve():
+        from experience_regime_v1.publish_progress_v1 import build_run, read as read_proof_json
+        proof_paths = sorted(
+            (REPO_ROOT / "experience_regime_v1/collection").glob("*/proof_commit_*.json")
+        )
+        for proof_path in proof_paths:
+            proof = read_proof_json(proof_path)
+            week_id = proof.get("week_id")
+            race_date = proof.get("date")
+            if not week_id or not race_date:
+                continue
+            status.setdefault("collection_runs", {})[race_date] = build_run(week_id, race_date)
+            status["last_collection_audit_at"] = proof["generated_at"]
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(status, ensure_ascii=False, indent=2))
