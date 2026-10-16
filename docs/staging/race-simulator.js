@@ -192,7 +192,8 @@ async function loadRace(id){
 function updateCourseReference(){
  const figure=$('referenceMapFigure'),tokyo=$('tokyoRealCourseMap'),kyoto=$('kyotoRealCourseMap');
  const generic=$('genericCourseMap');
- const region=race?.course_id==='tokyo_turf_2000'?'tokyo':race?.course_id==='kyoto_turf_outer_1400'?'kyoto':null;
+ const region=race?.course_id==='tokyo_turf_2000'?'tokyo':
+   ['kyoto_turf_outer_1400','kyoto_turf_inner_2000'].includes(race?.course_id)?'kyoto':null;
  const geometry=race?RaceCourseGeometry.get(race.course_id):null;
  const canUseGeneric=Boolean(geometry?.user_approved_stage_geometry)&&!region;
  if(figure)figure.hidden=!region&&!canUseGeneric;
@@ -203,7 +204,8 @@ function updateCourseReference(){
 }
 function drawLicensedOverlay(state){
  if(!window.RaceUmapotOverlay||!race)return;
- if(!['tokyo_turf_2000','kyoto_turf_outer_1400'].includes(race.course_id))return;
+ if(!['tokyo_turf_2000','kyoto_turf_outer_1400',
+   'kyoto_turf_inner_2000'].includes(race.course_id))return;
  RaceUmapotOverlay.draw(state,race,ui.focus.value,false,RaceSimNumbers.marker);
 }
 function setupReferenceMapErrorHandling(){
