@@ -77,7 +77,7 @@ for(const id of ['tokyo_turf_2000','kyoto_turf_outer_1400']){
  maximumAccel=Math.max(maximumAccel,peak);
 }
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
-assert.ok(html.includes('race-course-geometry-v1.js?v=20261016-39'));
+assert.ok(html.includes('race-course-geometry-v1.js?v=20261016-40'));
 assert.ok(html.includes('race-simulator.js?v=20261016-39'));
 assert.ok(html.includes('Shared transitions v0.39'));
 assert.ok(html.includes('全競馬場共通の連続走行スプライン'));
