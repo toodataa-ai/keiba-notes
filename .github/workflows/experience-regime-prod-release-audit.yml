@@ -128,3 +128,27 @@ jobs:
             assert x['purchase_strategy_version']=='v3.15' and x['final_bets'] and x['pdf'] and x['proof_commit']
           print('PASS_PRODUCTION_PAGES_LATEST_JRA_RACE_REGISTRY_AND_BETS')
           PY
+      - name: Verify latest public E012 research JSON exact byte parity
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 18); do
+            if curl -fsSL --max-time 18 \
+              "https://toodataa-ai.github.io/keiba-notes/data/experience_regime_status.json?verify-$GITHUB_RUN_ID-$attempt" \
+              -o /tmp/live-e012-status.json &&
+              cmp -s docs/data/experience_regime_status.json /tmp/live-e012-status.json; then
+              python3 - <<'PY'
+          import json
+          status=json.load(open('/tmp/live-e012-status.json'))
+          run=status['collection_runs']['2026-10-18']
+          assert run['population_today']==36 and run['selected_today']==12
+          assert run['prerace_proof_valid_races']==12 and run['complete_evidence_races']==12
+          assert sum(x['horse_observations'] for x in run['regimes'].values())==139
+          assert run['collection_failures']==0 and run['planned_exclusions']==24
+          print('E012_LIVE_PUBLIC_STATUS_EXACT_BYTES_AND_12_RACES_139_HORSES')
+          PY
+              exit 0
+            fi
+            sleep 8
+          done
+          echo '::error::Published E012 research status not byte-equal to committed GitHub data'
+          exit 1
