@@ -164,7 +164,7 @@ async function load(){
     }
     document.querySelector('#coverage').textContent=entries?`${covered}/${entries}`:'0 cases';
     document.querySelector('#observations').textContent=String(obs||0);
-    const run=d.collection_runs?.['2026-10-17'];
+    const run=d.collection_runs?.[Object.keys(d.collection_runs||{}).sort().slice(-1)[0]];
     if(run){
       const set=(id,value)=>{const e=document.getElementById(id);if(e)e.textContent=String(value)};
       set('e012-run-date','取得対象：'+run.date+' / 自動昇格なし');
