@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "scope": "predictions_with_valid_proof_only",
+  "expected_predictions": 34,
+  "eligible_predictions": 34,
+  "completed_reviews": 22,
+  "pending": 0,
+  "blocked": 12,
+  "skipped_existing": 0,
+  "by_venue": {
+    "佐賀": {
+      "reviewed": 11,
+      "evaluable": 10,
+      "top_pick_wins": 3,
+      "top_pick_top3": 6,
+      "win_rate": 0.3,
+      "top3_rate": 0.6,
+      "mean_absolute_top_pick_rank_error": 2.4,
+      "small_sample_warning": true
+    },
+    "高知": {
+      "reviewed": 11,
+      "evaluable": 11,
+      "top_pick_wins": 6,
+      "top_pick_top3": 10,
+      "win_rate": 0.545455,
+      "top3_rate": 0.909091,
+      "mean_absolute_top_pick_rank_error": 0.818182,
+      "small_sample_warning": true
+    }
+  },
+  "by_distance": {
+    "1300": {
+      "reviewed": 8,
+      "evaluable": 8,
+      "top_pick_wins": 4,
+      "top_pick_top3": 6,
+      "win_rate": 0.5,
+      "top3_rate": 0.75,
+      "mean_absolute_top_pick_rank_error": 1.375,
+      "small_sample_warning": true
+    },
+    "1400": {
+      "reviewed": 8,
+      "evaluable": 8,
+      "top_pick_wins": 3,
+      "top_pick_top3": 6,
+      "win_rate": 0.375,
+      "top3_rate": 0.75,
+      "mean_absolute_top_pick_rank_error": 1.625,
+      "small_sample_warning": true
+    },
+    "1600": {
+      "reviewed": 3,
+      "evaluable": 3,
+      "top_pick_wins": 2,
+      "top_pick_top3": 3,
+      "win_rate": 0.666667,
+      "top3_rate": 1.0,
+      "mean_absolute_top_pick_rank_error": 0.333333,
+      "small_sample_warning": true
+    },
+    "1750": {
+      "reviewed": 2,
+      "evaluable": 2,
+      "top_pick_wins": 0,
+      "top_pick_top3": 1,
+      "win_rate": 0.0,
+      "top3_rate": 0.5,
+      "mean_absolute_top_pick_rank_error": 4.0,
+      "small_sample_warning": true
+    },
+    "900": {
+      "reviewed": 1,
+      "evaluable": 0,
+      "top_pick_wins": 0,
+      "top_pick_top3": 0,
+      "win_rate": null,
+      "top3_rate": null,
+      "mean_absolute_top_pick_rank_error": null,
+      "small_sample_warning": true
+    }
+  },
+  "top_pick_win_rate": 0.428571,
+  "top_pick_top3_rate": 0.761905,
+  "ranking_error_summary": {
+    "top_pick_mean_absolute_rank_error": 1.571429,
+    "evaluable_n": 21
+  },
+  "reviewed_races": 22,
+  "summary": {
+    "reviewed": 22,
+    "evaluable": 21,
+    "top_pick_wins": 9,
+    "top_pick_top3": 16,
+    "win_rate": 0.428571,
+    "top3_rate": 0.761905,
+    "mean_absolute_top_pick_rank_error": 1.571429,
+    "small_sample_warning": true
+  },
+  "evidence_based_findings": [
+    "Frozen ability rank compared with NAR official result without hindsight adjustment"
+  ],
+  "uncertainties": [
+    "Small one-day sample; no JRA transfer",
+    "Pace and race incident effects not externally verified"
+  ],
+  "coverage_gaps": [],
+  "reconciliation": {
+    "eligible_equals_categories": true,
+    "review_ids": [
+      "20261017-kochi-01",
+      "20261017-kochi-02",
+      "20261017-kochi-03",
+      "20261017-kochi-04",
+      "20261017-kochi-05",
+      "20261017-kochi-06",
+      "20261017-kochi-07",
+      "20261017-kochi-08",
+      "20261017-kochi-09",
+      "20261017-kochi-10",
+      "20261017-kochi-11",
+      "20261017-saga-01",
+      "20261017-saga-02",
+      "20261017-saga-03",
+      "20261017-saga-04",
+      "20261017-saga-05",
+      "20261017-saga-06",
+      "20261017-saga-07",
+      "20261017-saga-08",
+      "20261017-saga-09",
+      "20261017-saga-10",
+      "20261017-saga-11"
+    ],
+    "unresolved_ids": [
+      "20261017-obihiro-01",
+      "20261017-obihiro-02",
+      "20261017-obihiro-03",
+      "20261017-obihiro-04",
+      "20261017-obihiro-05",
+      "20261017-obihiro-06",
+      "20261017-obihiro-07",
+      "20261017-obihiro-08",
+      "20261017-obihiro-09",
+      "20261017-obihiro-10",
+      "20261017-obihiro-11",
+      "20261017-obihiro-12"
+    ],
+    "ineligible_proof_ids": []
+  }
+}
