@@ -179,15 +179,18 @@ def precommit_gate(week_id,date):
         record=json.loads(p.read_text())
         start=datetime.fromisoformat(record["race_context"]["start_at"])
         if jst_now()>=start:
-            rejected.append(record["race_id"])
-            # ONLY a newly generated, not-yet-committed snapshot can be pruned.
+            # Reuse existing Git-tracked historical snapshots without mutation.
+            # First-introduction provenance is independently checked via git log.
             import subprocess
             tracked=subprocess.run(["git","ls-files","--error-unmatch",str(p.relative_to(ROOT))],
                  cwd=ROOT,capture_output=True).returncode==0
-            if not tracked:
-                p.unlink()
-                a=week_dir/"audits"/p.name
-                if a.exists():a.unlink()
+            if tracked:
+                continue
+            rejected.append(record["race_id"])
+            # ONLY a newly generated, not-yet-committed snapshot can be pruned.
+            p.unlink()
+            a=week_dir/"audits"/p.name
+            if a.exists():a.unlink()
     if rejected:
         path=week_dir/("precommit_blockers_"+date+".json")
         save_new(path,{"at":jst_now().isoformat(),"race_ids":rejected,
