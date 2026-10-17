@@ -31,6 +31,7 @@ jobs:
           node --check docs/lab/race-broadcast-map-v1.js
           node tools/test_kyoto_broadcast_shared_map_v047.cjs
           node tools/test_kyoto_inner_18_lane_v048.cjs
+          node --check docs/lab/race-turf-corridor-v1.js
           python3 .github/scripts/staging-baseline-v2.py --check
       - name: Enforce display-only scope and unchanged protected race artifacts
         run: |
@@ -53,6 +54,9 @@ jobs:
             'docs/lab/race-lab-18-fixture-v1.js',
             'tools/test_kyoto_inner_18_lane_v048.cjs',
             'docs/lab/KYOTO_INNER_18_RUNNER_QA_V048.md',
+            'docs/lab/KYOTO_INNER_RAIL_CORRIDOR_V049.md',
+            'docs/lab/race-turf-corridor-v1.js',
+            'docs/lab/race-turf-rails-kyoto-inner-2000-v1.json',
           }
           # Verify the geometry-only commit itself, not the entire evolving main history.
           assert files.issubset(allowed),('UNEXPECTED_UI_COMMIT_CHANGE',sorted(files-allowed))
@@ -122,14 +126,20 @@ jobs:
               }""",timeout=25000)
               samples=page.evaluate("""() => {
                 const course=window.RaceCourseGeometry.get('kyoto_turf_inner_2000');
-                return [0,100,308.7,530,900,1270,1435,1671.6,2000].map(d=>({d,...window.RaceUmapotOverlay.point(course,d,0)}));
+                return [0,100,308.7,530,900,1270,1435,1671.6,2000].map(d=>{
+                  const band=RaceTurfCorridor.rails(course,d,RaceUmapotOverlay.legacyPoint);
+                  const p=RaceUmapotOverlay.point(course,d,0);
+                  const fraction=RaceTurfCorridor.fraction(course,0);
+                  return {d,p,inner:band.inner,outer:band.outer,fraction,widthPx:band.widthPx};
+                });
               }""")
               for got,(d,x,y) in zip(samples,checkpoints):
                 assert got['d']==d,(width,got)
-                deviation=((got['x']-x)**2+(got['y']-y)**2)**.5
-                if d in (308.7,530,900):
-                  assert 2<=deviation<=9.2,(width,d,got,deviation)
-                else: assert deviation<.03,(width,d,got,deviation)
+                assert 3<got['widthPx']<70,(width,got)
+                assert 0<got['fraction']<0.15,(width,got)
+                want={k:got['inner'][k]+(got['outer'][k]-got['inner'][k])*got['fraction'] for k in ('x','y')}
+                assert ((got['p']['x']-want['x'])**2+(got['p']['y']-want['y'])**2)**.5<.001,(width,got)
+              print('PASS_LAB_KYOTO_RAIL_BOUNDARY_NOT_LEGACY_CENTERLINE',width)
               image.locator('xpath=..').screenshot(path=f'/tmp/kyoto-lab-review/kyoto-{width}-anchors.png')
               page.locator('#startBtn').click()
               page.wait_for_function("""() => {
@@ -140,6 +150,9 @@ jobs:
               assert not errors,(width,errors)
               assert not network,(width,network)
               assert page.locator('#raceCanvas').is_visible()
+              # Verify the raster-derived turf band, not an offset to a
+              # manually edited course-centre reference line, in both views.
+              assert page.evaluate("RaceTurfCorridor.has('kyoto_turf_inner_2000')")
               # Verify real bitmap was drawn into the broadcast canvas and
               # that the transformed horse point is the SAME map coordinate.
               shared=page.evaluate("""() => {
