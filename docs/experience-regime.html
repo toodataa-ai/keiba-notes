@@ -15,6 +15,31 @@
 .simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
 @media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
 </style>
+<style id="experience-regime-mobile-overflow-fix">
+/* Mobile containment for long JRA research audit labels/SHAs.
+   Display-only; the source status JSON and proof remain untouched. */
+#e012-live-collection{min-width:0;max-width:100%}
+#e012-live-collection .metric-table{width:100%;max-width:100%;table-layout:fixed}
+#e012-live-collection .metric-table th:first-child,
+#e012-live-collection .metric-table td:first-child{width:43%}
+#e012-live-collection .metric-table th,
+#e012-live-collection .metric-table td{white-space:normal!important;overflow-wrap:anywhere;word-break:break-word}
+#e012-commit{overflow-wrap:anywhere;word-break:break-all}
+@media(max-width:650px){
+ .chapter,.chapter-head,.chapter-head>div{min-width:0}
+ .metric-table{width:100%;max-width:100%;table-layout:fixed}
+ .metric-table th,.metric-table td{white-space:normal!important;overflow-wrap:anywhere}
+ #e012-live-collection .metric-table{display:block;border-collapse:separate;margin:14px 0}
+ #e012-live-collection .metric-table thead{display:none}
+ #e012-live-collection .metric-table tbody{display:grid;gap:9px;min-width:0}
+ #e012-live-collection .metric-table tr{display:block;min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fafafb}
+ #e012-live-collection .metric-table td,
+ #e012-live-collection .metric-table td:first-child{display:block;width:100%;min-width:0;max-width:100%;border:0;padding:0;white-space:normal!important}
+ #e012-live-collection .metric-table td:first-child{font-size:11.5px;line-height:1.5;color:var(--muted);font-weight:650}
+ #e012-live-collection .metric-table td:last-child{margin-top:5px;font-size:13px;line-height:1.6;font-weight:650;overflow-wrap:anywhere}
+ #e012-live-collection #e012-commit{font-size:12px;word-break:break-all}
+}
+</style>
 </head>
 <body>
 <header class="method-hero roadmap-hero">
