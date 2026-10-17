@@ -1,75 +1,65 @@
-name: Maintain JRA this-week staging as production-appearance mirror
+name: Maintain JRA staging full production-appearance baseline
 on:
   push:
     branches: [main]
     paths:
+      - '.github/scripts/staging-baseline-v2.py'
       - '.github/scripts/jra-build-staging-week-mirror-v1.py'
       - '.github/workflows/jra-staging-week-mirror-publish.yml'
+      - 'docs/index.html'
       - 'docs/this-week.html'
+      - 'docs/schedule.html'
+      - 'docs/results.html'
+      - 'docs/methodology.html'
+      - 'docs/roadmap.html'
+      - 'docs/e2e.html'
+      - 'docs/baba-models.html'
+      - 'docs/local-racing-shadow.html'
+      - 'docs/experience-regime.html'
+      - 'docs/release-history.html'
   workflow_dispatch:
 permissions: {contents: write}
-concurrency:
-  group: jra-stage-week-mirror-sync
-  cancel-in-progress: false
+concurrency: {group: jra-stage-baseline-mirror-v2, cancel-in-progress: false}
 jobs:
-  sync-staging-presentation-only:
+  mirror:
     runs-on: ubuntu-latest
-    timeout-minutes: 14
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with: {ref: main, fetch-depth: 0, persist-credentials: true}
-      - name: Validate shared production template, no staging-only controls
+      - name: Mirror only canonical UI pages with safe conflict handling
         run: |
           set -euo pipefail
-          python3 .github/scripts/jra-build-staging-week-mirror-v1.py
-          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
-          python3 - <<'PY'
-          from pathlib import Path
-          prod=Path('docs/this-week.html').read_text()
-          stage=Path('docs/staging/this-week.html').read_text()
-          for k in ('id="weekPredictions"','id="weekSchedule"','class="race-list"'):
-            assert prod.count(k)==stage.count(k),(k,prod.count(k),stage.count(k))
-          assert 'stagingJraReports' not in stage
-          assert stage.count('class="staging-shell-marker"')==1
-          assert stage.count('stage-week-preview.js')==1
-          assert stage.count('jra-inline-report.css')==1
-          assert 'jra-inline-report.js' not in stage
-          assert 'data-stage="preview"' in stage
-          assert 'stage-week-preview.js' not in prod
-          assert 'noindex' not in prod
-          assert 'noindex' in stage
-          print('PASS_JRA_STAGE_EXACT_PROD_TEMPLATES')
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 .github/scripts/staging-baseline-v2.py
+            git add -- docs/staging/index.html docs/staging/this-week.html docs/staging/schedule.html docs/staging/results.html docs/staging/methodology.html docs/staging/roadmap.html docs/staging/e2e.html docs/staging/baba-models.html docs/staging/local-racing-shadow.html docs/staging/experience-regime.html docs/staging/release-history.html
+            python3 - <<'PY'
+          import subprocess
+          files=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert all(p.startswith('docs/staging/') and p.endswith('.html') and p.count('/')==2 for p in files),files
+          print('PASS_STAGE_MIRROR_UI_ONLY',sorted(files))
           PY
-      - name: Idempotent stage-only sync if future production template changes
-        run: |
-          set -euo pipefail
-          git add -- docs/staging/this-week.html
-          if git diff --cached --quiet -- docs/staging/this-week.html;then
-            echo 'PASS_JRA_STAGE_ALREADY_SAME_AS_PRODUCTION'
-          else
-            test "$(git diff --cached --name-only)" = "docs/staging/this-week.html"
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'Synchronize exact JRA production UI template to staging'
-            for try in 1 2 3 4 5;do
-              if git push origin HEAD:main;then break;fi
-              test "$try" -lt 5 || exit 1
-              git fetch origin main
-              git rebase origin/main || { git rebase --abort;exit 1; }
-              python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
-              sleep 3
-            done
-          fi
-      - name: Verify public staging HTTP byte-match
-        run: |
-          set -euo pipefail
-          url='https://toodataa-ai.github.io/keiba-notes/staging/this-week.html'
-          for try in $(seq 1 35);do
-            if curl -LfsS --max-time 20 "$url?stage-mirror=$GITHUB_RUN_ID" -o /tmp/jra-stage-week-mirror &&
-               cmp -s docs/staging/this-week.html /tmp/jra-stage-week-mirror;then
-              echo "PASS_JRA_THIS_WEEK_EXACT_PROD_APPEARANCE_STAGING_HTTP $url"
-              exit 0
-            fi
-            sleep 10
+            if git diff --cached --quiet;then echo PASS_STAGE_ALREADY_BASELINED;break;fi
+            git commit -m "Align staging canonical pages with current production UI only"
+            if git push origin HEAD:main;then echo PASS_STAGE_MIRROR_UPDATED;break;fi
+            test "$attempt" -lt 5 || { echo "::error::Main moved during staging-only sync";exit 1; }
+            sleep 4
           done
-          echo "::error::Staging mirror saved but public bytes not verified";exit 1
+      - name: Validate exact HTML baseline and public Pages byte parity
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/staging-baseline-v2.py --check
+          for attempt in $(seq 1 25);do
+            ok=1
+            for name in index.html this-week.html results.html experience-regime.html;do
+              if ! curl -fsSL --max-time 22 "https://toodataa-ai.github.io/keiba-notes/staging/$name?mirror=$GITHUB_RUN_ID-$attempt" -o /tmp/stage-byte-check ||
+                 ! cmp -s "docs/staging/$name" /tmp/stage-byte-check;then ok=0;break;fi
+            done
+            if [[ $ok -eq 1 ]];then echo PASS_STAGING_FOUR_CANONICAL_PAGES_HTTP_BYTES;exit 0;fi
+            sleep 8
+          done
+          echo '::error::Public staging baseline byte mismatch';exit 1
