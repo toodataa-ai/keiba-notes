@@ -34,7 +34,7 @@
     "renderer": ".github/scripts/jra-render-formal-reader-v315.py",
     "renderer_git_blob_sha": "b96d6d35b668d6f3edec0034c32d8df7b7ab34ff",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
-    "workflow_git_blob_sha": "f9618054af98536314187f039a797974d13d4b37",
+    "workflow_git_blob_sha": "908ca58b7b357f6e4f43b194e9ae947e6de085b0",
     "horse_renderer_helper": ".github/scripts/jra_v315_horse_layout.py",
     "horse_renderer_helper_git_blob_sha": "101d361d8623dee1a83ca21cb23b5580e114e61f",
     "historical_renderer": ".github/scripts/jra-render-formal-3action-v315.py",
@@ -84,5 +84,12 @@
     "require_public_http_byte_identity": true,
     "prohibit_side_ticket_only": "Speculative medium/large selections do not override failure of regular-purchase gate",
     "past_results_immutable": true
+  },
+  "operational_concurrency_patch_v1": {
+    "date": "2026-10-18",
+    "scope": "only GitHub proof and publication push retry, no forecast/bets/PDF/CSS changes",
+    "historical_workflow_git_blob_sha": "f9618054af98536314187f039a797974d13d4b37",
+    "approved_current_workflow_git_blob_sha": "908ca58b7b357f6e4f43b194e9ae947e6de085b0",
+    "algorithm": "git fetch main, non-forced git rebase main, push max 5; abort on irreconcilable races.json conflict"
   }
 }

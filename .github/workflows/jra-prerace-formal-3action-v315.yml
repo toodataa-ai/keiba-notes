@@ -98,7 +98,19 @@ jobs:
           git add -- "$SNAPSHOT"
           test "$(git diff --cached --name-only)" = "$SNAPSHOT"
           git commit -m "Freeze price-audited v3.15 3+2 action purchase recommendation before JRA race"
-          git push origin HEAD:main
+          # Preserve the immutable race-scoped proof on main without force-push.
+          # Other NAR/JRA or UI commits can land while deterministic audit runs.
+          for push_attempt in 1 2 3 4 5; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Unmergeable concurrent update: no data overwritten"; exit 1
+            fi
+            if git push origin HEAD:main; then break; fi
+            if [[ "$push_attempt" -eq 5 ]]; then
+              echo "::error::Concurrent write retry limit; no force push"; exit 1
+            fi
+          done
           echo "PROOF=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
       - name: Seal against actual Git snapshot, render full per-horse A4, replace only current pointer
         shell: bash
@@ -139,7 +151,19 @@ jobs:
           assert expected==actual,('no UI changes or partial canonical replacements allowed',expected^actual)
           PY
           git commit -m "Publish official JRA v3.15 purchase-only three actions + medium/large with full A4 and immutable proof"
-          git push origin HEAD:main
+          # Preserve the immutable race-scoped proof on main without force-push.
+          # Other NAR/JRA or UI commits can land while deterministic audit runs.
+          for push_attempt in 1 2 3 4 5; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Unmergeable concurrent update: no data overwritten"; exit 1
+            fi
+            if git push origin HEAD:main; then break; fi
+            if [[ "$push_attempt" -eq 5 ]]; then
+              echo "::error::Concurrent write retry limit; no force push"; exit 1
+            fi
+          done
       - name: Verify public current record, regenerated HTML, PDF and full audit journal byte equality
         run: |
           set -euo pipefail
