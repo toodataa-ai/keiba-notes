@@ -89,7 +89,7 @@ jobs:
               page.on('response',lambda res:network.append((res.status,res.url)) if res.url.startswith('http://127.0.0.1:8765/') and res.status>=400 else None)
               # Record actual drawImage calls on live broadcast canvas and
               # inspect the 2-D transform to reject rotate/skew/stretch.
-              page.add_init_script("""() => {
+              page.add_init_script("""(() => {
                 const original=CanvasRenderingContext2D.prototype.drawImage;
                 CanvasRenderingContext2D.prototype.drawImage=function(img,...args){
                   if(this.canvas?.id==='raceCanvas'&&img?.id==='kyotoCourseImage'){
@@ -101,7 +101,7 @@ jobs:
                   }
                   return original.call(this,img,...args);
                 };
-              }""")
+              })();""")
               page.goto('http://127.0.0.1:8765/lab/race-simulator.html?demo=shuka-one&guide=1',wait_until='domcontentloaded',timeout=30000)
               page.wait_for_function("document.querySelector('#singleDemoNotice')?.hidden===false",timeout=18000)
               assert page.locator('#kyotoRealCourseMap').is_visible()
