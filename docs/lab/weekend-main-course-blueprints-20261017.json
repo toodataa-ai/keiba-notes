@@ -1,0 +1,928 @@
+{
+  "schema_version": 1,
+  "status": "PROVISIONAL_BLUEPRINT_NO_ANIMATION",
+  "as_of": "2026-10-16",
+  "safe_for_live_simulator": false,
+  "source": "JRA published course specs + manually sketched independent route topology; diagram coordinates are NOT surveyed",
+  "restrictions": {
+    "no_unverified_live_animation": true,
+    "no_change_to_step1_step2_bets": true,
+    "track_variants": "A-equivalent turf representative",
+    "require_human_visual_acceptance": true,
+    "require_frozen_pre_race_horse_report_for_live": true
+  },
+  "courses": [
+    {
+      "priority": 1,
+      "date": "2026-10-18",
+      "venue": "京都",
+      "race": "秋華賞 GⅠ",
+      "venue_id": "kyoto",
+      "surface": "turf",
+      "layout": "inner",
+      "distance_m": 2000,
+      "lap_m": 1782.8,
+      "straight_m": 328.4,
+      "turn": "right",
+      "track_width_m": [
+        27,
+        38
+      ],
+      "elevation_range_m": 3.1,
+      "official_entries": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604071120261018%2F30",
+      "official_course": "https://www.jra.go.jp/facilities/race/kyoto/course/",
+      "course_id": "kyoto_turf_inner_2000",
+      "segment_bounds": [
+        0,
+        308.7,
+        530,
+        720,
+        1270,
+        1435,
+        1671.6,
+        2000
+      ],
+      "segment_names": [
+        "スタンド前・発走〜1コーナー",
+        "1コーナー・内回り",
+        "2コーナー・内回り",
+        "向正面・淀の坂へ",
+        "3コーナー・坂頂上",
+        "4コーナー・下り",
+        "最後の直線 328.4m"
+      ],
+      "segments": [
+        [
+          [
+            351.76,
+            286.264
+          ],
+          [
+            289.96,
+            286.48
+          ],
+          [
+            215.2,
+            283.6
+          ],
+          [
+            148,
+            280
+          ]
+        ],
+        [
+          [
+            148,
+            280
+          ],
+          [
+            99,
+            277.375
+          ],
+          [
+            90,
+            251
+          ],
+          [
+            88,
+            204
+          ]
+        ],
+        [
+          [
+            88,
+            204
+          ],
+          [
+            83,
+            141
+          ],
+          [
+            124,
+            109
+          ],
+          [
+            184,
+            94
+          ]
+        ],
+        [
+          [
+            184,
+            94
+          ],
+          [
+            252,
+            77
+          ],
+          [
+            367,
+            69
+          ],
+          [
+            437,
+            78
+          ]
+        ],
+        [
+          [
+            437,
+            78
+          ],
+          [
+            491,
+            85
+          ],
+          [
+            508,
+            121
+          ],
+          [
+            508,
+            166
+          ]
+        ],
+        [
+          [
+            508,
+            166
+          ],
+          [
+            508,
+            231
+          ],
+          [
+            493,
+            272
+          ],
+          [
+            452,
+            281
+          ]
+        ],
+        [
+          [
+            452,
+            281
+          ],
+          [
+            407.75,
+            287.75
+          ],
+          [
+            321.875,
+            287.1875
+          ],
+          [
+            234.45313,
+            283.95313
+          ]
+        ]
+      ],
+      "notes": "京都芝A内2000m。スタンド前START→308.7mで1コーナー→2コーナー→向正面の上り→3コーナー頂上→4コーナー下り→328.4mの直線→GOAL。ゴールは1コーナー入口より手前、スタート後とゴール前の共通直線は同じ曲線上で完全一致。XY座標はJRAコース図に沿う設計用近似であり測量座標ではない。",
+      "start_to_first_turn_m": 308.7,
+      "reference": {
+        "official_race": "https://www.jra.go.jp/keiba/g1/shuka.html",
+        "official_plan": "https://www.jra.go.jp/facilities/race/kyoto/course/",
+        "route_kind": "right_inner_single_lap_plus_stand_start",
+        "note": "Official distances are authoritative. Cubic XY are carefully drafted display-only approximation."
+      },
+      "overlap_geometry": {
+        "home_straight_shared_cubic": [
+          [
+            452,
+            281
+          ],
+          [
+            393,
+            290
+          ],
+          [
+            260,
+            286
+          ],
+          [
+            148,
+            280
+          ]
+        ],
+        "start_fraction": 0.4,
+        "goal_fraction": 0.75,
+        "gate_on_home_straight": true,
+        "first_corner_not_at_goal": true
+      },
+      "approval": {
+        "status": "user_approved_illustration",
+        "approved_on": "2026-10-16",
+        "approved_scope": "staging route geometry and course-only progress probe",
+        "surveyed_gps": false,
+        "real_horse_replay_requires_pre_race_frozen_report": true
+      }
+    },
+    {
+      "priority": 2,
+      "date": "2026-10-17",
+      "venue": "東京",
+      "race": "富士ステークス GⅡ",
+      "venue_id": "tokyo",
+      "surface": "turf",
+      "layout": "single",
+      "distance_m": 1600,
+      "lap_m": 2083.1,
+      "straight_m": 525.9,
+      "turn": "left",
+      "track_width_m": [
+        31,
+        41
+      ],
+      "elevation_range_m": 2.7,
+      "official_entries": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604061120261017%2F22",
+      "official_course": "https://www.jra.go.jp/facilities/race/tokyo/course/",
+      "course_id": "tokyo_turf_1600",
+      "segment_bounds": [
+        0,
+        566,
+        825,
+        1074.1,
+        1600
+      ],
+      "segment_names": [
+        "向正面・芝1600m発走",
+        "3コーナー",
+        "4コーナー",
+        "最後の直線"
+      ],
+      "segments": [
+        [
+          [
+            422,
+            92
+          ],
+          [
+            332,
+            89
+          ],
+          [
+            236,
+            91
+          ],
+          [
+            147,
+            95
+          ]
+        ],
+        [
+          [
+            147,
+            95
+          ],
+          [
+            96,
+            95
+          ],
+          [
+            65,
+            127
+          ],
+          [
+            58,
+            178
+          ]
+        ],
+        [
+          [
+            58,
+            178
+          ],
+          [
+            48,
+            226
+          ],
+          [
+            78,
+            292
+          ],
+          [
+            140,
+            293
+          ]
+        ],
+        [
+          [
+            140,
+            293
+          ],
+          [
+            230,
+            293
+          ],
+          [
+            338,
+            293
+          ],
+          [
+            439,
+            293
+          ]
+        ]
+      ],
+      "notes": "向正面発走。芝2000m引き込み線とは異なる発走点。ゴール前直線525.9m。"
+    },
+    {
+      "priority": 3,
+      "date": "2026-10-17",
+      "venue": "京都",
+      "race": "トルマリンステークス",
+      "venue_id": "kyoto",
+      "surface": "dirt",
+      "layout": "single",
+      "distance_m": 1800,
+      "lap_m": 1607.6,
+      "straight_m": 329.1,
+      "turn": "right",
+      "track_width_m": [
+        25,
+        25
+      ],
+      "elevation_range_m": 3,
+      "official_entries": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202604061120261017%2F00",
+      "official_course": "https://www.jra.go.jp/facilities/race/kyoto/course/",
+      "course_id": "kyoto_dirt_1800",
+      "segment_bounds": [
+        0,
+        192.4,
+        430,
+        660,
+        1050,
+        1470.9,
+        1800
+      ],
+      "segment_names": [
+        "スタンド前・発走",
+        "1コーナー",
+        "2コーナー",
+        "向正面",
+        "3〜4コーナー・ダート",
+        "最後の直線"
+      ],
+      "segments": [
+        [
+          [
+            316,
+            256
+          ],
+          [
+            275,
+            257
+          ],
+          [
+            218,
+            259
+          ],
+          [
+            181,
+            258
+          ]
+        ],
+        [
+          [
+            181,
+            258
+          ],
+          [
+            145,
+            248
+          ],
+          [
+            135,
+            191
+          ],
+          [
+            163,
+            141
+          ]
+        ],
+        [
+          [
+            163,
+            141
+          ],
+          [
+            183,
+            113
+          ],
+          [
+            238,
+            102
+          ],
+          [
+            296,
+            102
+          ]
+        ],
+        [
+          [
+            296,
+            102
+          ],
+          [
+            353,
+            102
+          ],
+          [
+            406,
+            107
+          ],
+          [
+            438,
+            135
+          ]
+        ],
+        [
+          [
+            438,
+            135
+          ],
+          [
+            479,
+            181
+          ],
+          [
+            473,
+            233
+          ],
+          [
+            445,
+            256
+          ]
+        ],
+        [
+          [
+            445,
+            256
+          ],
+          [
+            360,
+            257
+          ],
+          [
+            263,
+            258
+          ],
+          [
+            181,
+            258
+          ]
+        ]
+      ],
+      "notes": "芝ではなくダート専用走路。1周1607.6m・最後の直線329.1m。"
+    },
+    {
+      "priority": 4,
+      "date": "2026-10-17",
+      "venue": "新潟",
+      "race": "北陸ステークス",
+      "venue_id": "niigata",
+      "surface": "turf",
+      "layout": "inner",
+      "distance_m": 1200,
+      "lap_m": 1623,
+      "straight_m": 358.7,
+      "turn": "left",
+      "track_width_m": [
+        25,
+        25
+      ],
+      "elevation_range_m": 0.8,
+      "official_entries": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0104202604011120261017%2F99",
+      "official_course": "https://www.jra.go.jp/facilities/race/niigata/course/",
+      "course_id": "niigata_turf_inner_1200",
+      "segment_bounds": [
+        0,
+        420,
+        645,
+        841.3,
+        1200
+      ],
+      "segment_names": [
+        "内回り1200m発走",
+        "3コーナー",
+        "4コーナー",
+        "最後の直線"
+      ],
+      "segments": [
+        [
+          [
+            500,
+            102
+          ],
+          [
+            408,
+            93
+          ],
+          [
+            298,
+            93
+          ],
+          [
+            180,
+            100
+          ]
+        ],
+        [
+          [
+            180,
+            100
+          ],
+          [
+            136,
+            108
+          ],
+          [
+            111,
+            139
+          ],
+          [
+            110,
+            176
+          ]
+        ],
+        [
+          [
+            110,
+            176
+          ],
+          [
+            108,
+            223
+          ],
+          [
+            137,
+            273
+          ],
+          [
+            185,
+            283
+          ]
+        ],
+        [
+          [
+            185,
+            283
+          ],
+          [
+            270,
+            293
+          ],
+          [
+            395,
+            289
+          ],
+          [
+            490,
+            288
+          ]
+        ]
+      ],
+      "notes": "内回り芝1200m。外回り直線658.7mではなく、内回り直線358.7mを使用。"
+    },
+    {
+      "priority": 5,
+      "date": "2026-10-18",
+      "venue": "東京",
+      "race": "ブラジルカップ",
+      "venue_id": "tokyo",
+      "surface": "dirt",
+      "layout": "single",
+      "distance_m": 2100,
+      "lap_m": 1899,
+      "straight_m": 501.6,
+      "turn": "left",
+      "track_width_m": [
+        25,
+        25
+      ],
+      "elevation_range_m": 2.5,
+      "official_entries": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604071120261018%2F52",
+      "official_course": "https://www.jra.go.jp/facilities/race/tokyo/course/",
+      "course_id": "tokyo_dirt_2100",
+      "segment_bounds": [
+        0,
+        201,
+        500,
+        705,
+        1260,
+        1475,
+        1598.4,
+        2100
+      ],
+      "segment_names": [
+        "スタンド前・発走",
+        "1コーナー",
+        "2コーナー",
+        "向正面",
+        "3コーナー",
+        "4コーナー",
+        "最後の直線"
+      ],
+      "segments": [
+        [
+          [
+            224,
+            303
+          ],
+          [
+            312,
+            305
+          ],
+          [
+            384,
+            303
+          ],
+          [
+            453,
+            302
+          ]
+        ],
+        [
+          [
+            453,
+            302
+          ],
+          [
+            490,
+            275
+          ],
+          [
+            518,
+            214
+          ],
+          [
+            501,
+            158
+          ]
+        ],
+        [
+          [
+            501,
+            158
+          ],
+          [
+            491,
+            108
+          ],
+          [
+            463,
+            99
+          ],
+          [
+            416,
+            98
+          ]
+        ],
+        [
+          [
+            416,
+            98
+          ],
+          [
+            320,
+            92
+          ],
+          [
+            226,
+            97
+          ],
+          [
+            149,
+            104
+          ]
+        ],
+        [
+          [
+            149,
+            104
+          ],
+          [
+            106,
+            117
+          ],
+          [
+            84,
+            157
+          ],
+          [
+            85,
+            209
+          ]
+        ],
+        [
+          [
+            85,
+            209
+          ],
+          [
+            78,
+            255
+          ],
+          [
+            105,
+            302
+          ],
+          [
+            150,
+            305
+          ]
+        ],
+        [
+          [
+            150,
+            305
+          ],
+          [
+            247,
+            306
+          ],
+          [
+            346,
+            302
+          ],
+          [
+            453,
+            302
+          ]
+        ]
+      ],
+      "notes": "芝と異なる東京ダート専用走路。ホームストレート側に発走地点を設定。"
+    },
+    {
+      "priority": 6,
+      "date": "2026-10-18",
+      "venue": "新潟",
+      "race": "新潟牝馬ステークス L",
+      "venue_id": "niigata",
+      "surface": "turf",
+      "layout": "inner",
+      "distance_m": 2200,
+      "lap_m": 1623,
+      "straight_m": 358.7,
+      "turn": "left",
+      "track_width_m": [
+        25,
+        25
+      ],
+      "elevation_range_m": 0.8,
+      "official_entries": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0104202604021120261018%2FC9",
+      "official_course": "https://www.jra.go.jp/facilities/race/niigata/course/",
+      "course_id": "niigata_turf_inner_2200",
+      "segment_bounds": [
+        0,
+        577,
+        865,
+        1100,
+        1510,
+        1670,
+        1841.3,
+        2200
+      ],
+      "segment_names": [
+        "スタンド前・発走",
+        "1コーナー",
+        "2コーナー",
+        "向正面",
+        "3コーナー",
+        "4コーナー",
+        "最後の直線"
+      ],
+      "segments": [
+        [
+          [
+            250,
+            299
+          ],
+          [
+            332,
+            299
+          ],
+          [
+            415,
+            297
+          ],
+          [
+            475,
+            292
+          ]
+        ],
+        [
+          [
+            475,
+            292
+          ],
+          [
+            515,
+            272
+          ],
+          [
+            541,
+            228
+          ],
+          [
+            527,
+            186
+          ]
+        ],
+        [
+          [
+            527,
+            186
+          ],
+          [
+            525,
+            125
+          ],
+          [
+            477,
+            102
+          ],
+          [
+            430,
+            96
+          ]
+        ],
+        [
+          [
+            430,
+            96
+          ],
+          [
+            348,
+            89
+          ],
+          [
+            254,
+            92
+          ],
+          [
+            165,
+            98
+          ]
+        ],
+        [
+          [
+            165,
+            98
+          ],
+          [
+            115,
+            109
+          ],
+          [
+            102,
+            166
+          ],
+          [
+            115,
+            214
+          ]
+        ],
+        [
+          [
+            115,
+            214
+          ],
+          [
+            124,
+            264
+          ],
+          [
+            146,
+            283
+          ],
+          [
+            190,
+            292
+          ]
+        ],
+        [
+          [
+            190,
+            292
+          ],
+          [
+            267,
+            302
+          ],
+          [
+            378,
+            297
+          ],
+          [
+            475,
+            292
+          ]
+        ]
+      ],
+      "notes": "新潟芝2200mは内回り。外回り芝2000m・直線1000mとは別の型。"
+    }
+  ]
+}

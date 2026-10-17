@@ -1,0 +1,183 @@
+:root{font-family:"Meiryo UI","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;color:#242b36;background:#eef0f4;font-size:14px}*{box-sizing:border-box}body{margin:0;min-height:100vh}button,select,input{font:inherit}.shell{max-width:1190px;margin:auto;padding-left:18px;padding-right:18px}.site-header{background:linear-gradient(130deg,#111319,#20232d 65%,#361820);color:#fff;border-bottom:3px solid #b91c32}.header-line{display:flex;align-items:center;justify-content:space-between;padding-top:22px;gap:12px}.back{color:#e5e7eb;font-size:12px;text-decoration:none}.back:hover{text-decoration:underline}.edition{font-size:10px;font-weight:800;color:#ef9ca9;letter-spacing:1.5px}.heading{display:flex;justify-content:space-between;gap:15px;align-items:center;padding-top:16px;padding-bottom:26px}.eyebrow{font-size:11px;font-weight:900;letter-spacing:2px;color:#db7484}h1{font-size:clamp(23px,4vw,34px);letter-spacing:-.5px;margin:6px 0}.subtitle{max-width:740px;font-size:12px;line-height:1.8;color:#c6cad3;margin:5px 0}.demo-stamp{border:1px solid #6b4852;background:#211d24;padding:12px;min-width:104px;text-align:center;display:grid;gap:2px;transform:skew(-5deg)}.demo-stamp span{font-size:9px;letter-spacing:1.5px}.demo-stamp strong{color:#f9c7cf;font-size:27px;line-height:1}.demo-stamp small{font-size:9px;color:#c1afb3}.panel{background:#fff;border:1px solid #dce0e7;border-radius:12px;box-shadow:0 2px 9px rgba(20,22,30,.04)}.toolbar{padding:17px 18px;margin:22px 0 16px}.control-grid{display:grid;grid-template-columns:2.1fr 1.2fr 1.1fr;gap:12px}.toolbar label{display:flex;flex-direction:column;gap:6px;font-size:11px;color:#535e6d;font-weight:800}.toolbar select,.toolbar input,.focus-label select{display:block;width:100%;min-width:0;border:1px solid #c8d0d9;background:#fff;border-radius:7px;padding:8px 10px;color:#1f2937;font-weight:600;font-size:12px}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}.controls button{border:1px solid #d6dae1;border-radius:7px;padding:10px 13px;background:#fff;color:#354051;cursor:pointer;font-size:12px;font-weight:800}.controls button:disabled{opacity:.45;cursor:default}.controls button.primary{background:#ad1831;border-color:#ad1831;color:#fff}.controls button:focus-visible,.controls select:focus-visible,.toolbar input:focus-visible,.toolbar select:focus-visible{outline:2px solid #aa263a;outline-offset:2px}.controls .speed-label{margin-left:auto;display:flex;align-items:center;flex-direction:row;gap:7px}.speed-label select{width:70px}.change-notice{font-size:12px;color:#7d4410;margin:10px 0 0}.broadcast{overflow:hidden;margin-bottom:15px}.broadcast-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 16px;background:#171b25;color:#fff}.broadcast-top h2{font-size:16px;margin:3px 0 0}.live-indicator{font-family:monospace;letter-spacing:1.5px;color:#f993a1;font-size:10px;font-weight:900}.race-distance{text-align:right}.race-distance span{display:block;font-size:10px;color:#bcc3ce}.race-distance strong{display:block;font-size:20px;font-variant-numeric:tabular-nums}.track-stage{position:relative;overflow:hidden;background:#83c8e2}.track-stage canvas{display:block;width:100%;aspect-ratio:1000/470;image-rendering:pixelated}.stage-top,.stage-bottom{pointer-events:none;position:absolute;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;gap:8px;font:700 12px "Meiryo UI",Meiryo,sans-serif;color:#fff;text-shadow:0 2px 3px #111}.stage-top{top:0}.stage-bottom{bottom:0;background:linear-gradient(0deg,rgba(0,0,0,.6),transparent)}.stage-top span:first-child{background:#1f2638c9;padding:3px 8px;border-radius:4px}.meter{height:5px;background:#d0d6d4}.meter div{height:100%;width:0;background:linear-gradient(90deg,#c21e39,#f8ba66);transition:width .15s}.track-tools{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 15px;font-size:11px;color:#5f6772}.track-tools input{vertical-align:middle}.bottom-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}.course-panel,.standings-panel,.race-events,.notes{padding:14px 16px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.panel-head h2,.notes h2{margin:0;font-size:15px}.panel-head>span,.muted-label{font-size:10px;color:#718096}.course-panel canvas{display:block;width:100%;height:auto;border-radius:6px;background:#243a25}.small-muted{font-size:10px;line-height:1.7;color:#727b86;margin:9px 0 0}.focus-label{font-size:10px;color:#637080;display:flex;align-items:center;gap:7px}.focus-label select{width:min(185px,37vw);font-size:11px;padding:6px}.standings{max-height:210px;overflow-y:auto;overscroll-behavior:contain}.standing-row{display:grid;grid-template-columns:24px 30px minmax(0,1fr) 32px 55px;gap:5px;align-items:center;min-height:28px;font-size:11px;border-top:1px solid #edf0f4}.standing-row:first-child{border:0}.standing-row.focused{background:#fff5ea}.rank-no{font-size:10px;color:#88919a;text-align:center}.saddle{display:inline-flex;justify-content:center;align-items:center;width:22px;height:21px;border-radius:4px;background:#1d2739;color:#fff;font-size:11px;font-weight:900}.standing-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}.standing-mark{text-align:center;color:#a61734;font-weight:900}.standing-gap{text-align:right;font-size:10px;font-variant-numeric:tabular-nums;color:#5b6570}.race-events{margin-top:14px}.race-events ol{display:flex;flex-wrap:wrap;gap:9px;margin:0;padding:0;list-style:none}.race-events li{background:#f3f5f8;border:1px solid #e7eaf0;border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.5;max-width:100%}.notes{margin-top:14px;border-left:3px solid #ae233d}.notes p{font-size:11px;line-height:1.95;color:#596474;margin:8px 0}.notes strong{color:#3b4353}.notes .source{word-break:break-word;color:#66758e;font-size:10px}.site-footer{font-size:10px;color:#7b8797;padding-top:20px;padding-bottom:30px}.error{padding:14px;border:1px solid #dc8891;background:#fff6f5;color:#8b1e30;border-radius:6px}.toolbar input[type=checkbox]{width:auto}
+@media(max-width:800px){.control-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom-grid{grid-template-columns:1fr}.standings{max-height:230px}}
+@media(max-width:500px){.shell{padding-left:10px;padding-right:10px}.toolbar{padding:11px}.header-line{padding-top:22px}.heading{padding:12px 10px 22px}.demo-stamp{display:none}.control-grid{gap:9px}.toolbar label{font-size:10px}.controls button{font-size:11px;padding:10px}.controls .speed-label{margin-left:0}.track-tools{font-size:10px;align-items:flex-start}.stage-top,.stage-bottom{font-size:10px;padding:7px}.course-panel,.standings-panel,.race-events,.notes{padding:12px}.broadcast-top{padding:10px}.broadcast-top h2{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.meter div{transition:none}}
+
+/* v0.3 lane-decision telemetry beside the race commentary. */
+.track-tools{flex-wrap:wrap;justify-content:flex-start}
+#laneStatus{color:#344c38;font-weight:700;font-variant-numeric:tabular-nums}
+.track-tools>label{margin-left:auto}
+@media(max-width:550px){#laneStatus{width:100%}.track-tools>label{margin-left:0}}
+
+/* v0.4: keep a usable vertical broadcast viewport on narrow phones. */
+.track-stage canvas{height:auto;aspect-ratio:auto}
+.controls .speed-label select#cameraSelect{width:min(210px,40vw)}
+@media(max-width:640px){.track-stage canvas{width:100%;height:auto}.controls .speed-label select#cameraSelect{width:min(205px,52vw)}}
+
+/* v0.9 — JRA bracket-color legend shared by the live field and standings. */
+.waku-legend{display:flex;align-items:center;flex-wrap:wrap;column-gap:11px;row-gap:7px;padding:9px 14px 12px;background:#f7f8f9;border-top:1px solid #e3e7ec}
+.waku-key{display:inline-flex;align-items:center;gap:4px;color:#465163;font-size:10px;font-weight:700;white-space:nowrap}
+.waku-swatch{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border:1px solid;border-radius:5px;font:bold 13px Arial,sans-serif}
+@media(max-width:640px){.waku-legend{column-gap:8px;row-gap:7px;padding:8px 10px}.waku-key{font-size:9px}.waku-swatch{width:20px;height:20px}}
+
+
+/* v0.9 licensed real-course reference switch. Real map must retain its
+   original aspect ratio, with no simulated number overlays. */
+#referenceMapFigure[hidden],#tokyoRealCourseMap[hidden],#kyotoRealCourseMap[hidden],#courseCanvas[hidden]{display:none!important}
+.reference-map-switch{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:8px 0 12px;font-size:11px;font-weight:800;color:#535e6d}
+.reference-map-switch select{border:1px solid #c8d0d9;border-radius:7px;background:#fff;color:#1f2937;padding:7px 9px;max-width:230px;min-width:0;font-size:12px}
+.reference-map-figure{margin:0 0 10px;border:1px solid #dce3df;background:#f9faf8;border-radius:8px;overflow:hidden;padding:8px}
+.reference-map-figure img{display:block;width:100%;height:auto;object-fit:contain;max-width:100%;background:#fff}
+.reference-map-figure iframe{display:block;width:100%;height:315px;border:0;border-radius:5px;background:#eff1ed}
+.reference-map-figure .real-map-credit{font-size:10px;line-height:1.65;margin:6px 3px 0;color:#647382;overflow-wrap:anywhere}
+.reference-map-figure .small-muted{margin:9px 3px 2px}
+.reference-map-figure a,.course-panel a{color:#356a77}
+@media(max-width:500px){.reference-map-figure iframe{height:265px}.reference-map-switch{justify-content:flex-start}.reference-map-switch select{max-width:250px}}
+
+/* Stage v0.13: original image remains untouched underneath a transparent canvas. */
+.reference-map-figure{overflow-x:auto}
+.real-course-track{position:relative;width:100%;aspect-ratio:620/430}
+.real-course-track img{display:block;width:100%;height:100%;object-fit:fill}
+.real-course-track canvas.real-course-overlay{position:absolute;inset:0;display:block;width:100%;height:100%;background:transparent;border:0;pointer-events:none}
+.reference-map-figure.native-scale .real-course-track{width:620px;min-width:620px}
+.reference-scale-switch{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:10px;font-weight:700;color:#535e6d;margin:-6px 0 8px}
+.reference-scale-switch select{border:1px solid #c8d0d9;border-radius:7px;background:#fff;padding:6px 8px;font-size:11px}
+@media(max-width:500px){.reference-scale-switch{justify-content:flex-start}}
+
+/* No floating labels when the externally hosted image fails to load. */
+.real-course-track canvas.real-course-overlay[hidden]{display:none!important}
+
+/* Stage v0.14 — full-width actual racecourse immediately after the broadcast.
+   The 620×430 image and number canvas scale together; no 2-column squeeze. */
+.course-panel-wide{margin:0 0 15px;padding:14px 16px}
+.course-panel-wide .reference-map-figure{width:100%;padding:10px 12px}
+.course-panel-wide .real-course-track{width:100%;max-width:none}
+.course-panel-wide #courseCanvas{display:block;width:100%;max-width:100%;height:auto}
+.ranking-grid{display:block}
+.ranking-grid .standings-panel{width:100%}
+.ranking-grid .standings{max-height:345px}
+@media(max-width:640px){
+ .course-panel-wide{padding:12px}
+ .course-panel-wide .reference-map-figure{padding:6px}
+ .ranking-grid .standings{max-height:300px}
+}
+
+/* Stage v0.15: SOURCE IMAGE AND RUNNER CANVAS ARE CROPPED TOGETHER.
+   Original 620×430 rasters contain huge empty top/bottom margins. In the
+   standard view show the complete COURSE rather than the surrounding paper.
+   SOURCE IMAGE IS NOT REPACKAGED OR ALTERED. */
+.course-panel-wide .reference-map-figure{width:100%;max-width:none;overflow:visible;padding:8px;border:1px solid #dae2e7}
+.course-panel-wide .real-course-scroll{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable}
+.course-panel-wide .real-course-viewport{display:block;position:relative;overflow:hidden;width:100%;min-width:0}
+#tokyoRealCourseMap .real-course-viewport{aspect-ratio:510 / 295}
+#kyotoRealCourseMap .real-course-viewport{aspect-ratio:570 / 300}
+/* Keep the transparent 620×430 overlay and the image at precisely the same
+   transform, so projected horse number centres stay attached to the drawing. */
+.course-panel-wide .real-course-track{position:absolute;inset:0 auto auto 0;height:auto;aspect-ratio:620 / 430}
+#tokyoRealCourseMap .real-course-track{width:121.568627%;transform:translate(-8.870968%,-16.279070%)}
+#kyotoRealCourseMap .real-course-track{width:108.771930%;transform:translate(-3.225806%,-15.116279%)}
+.course-panel-wide .real-course-track img,.course-panel-wide .real-course-track canvas.real-course-overlay{width:100%;height:100%;border-radius:0}
+.course-panel-wide .real-course-scroll.zoom-150 .real-course-viewport{width:150%}
+.course-panel-wide .real-course-scroll.zoom-200 .real-course-viewport{width:200%}
+.course-panel-wide .real-course-scroll.show-original .real-course-viewport{aspect-ratio:620 / 430}
+.course-panel-wide .real-course-scroll.show-original .real-course-track{width:100%;transform:none}
+.course-panel-wide .native-scale .real-course-viewport{width:620px}
+.map-view-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+.map-view-toolbar button{font:700 12px "Meiryo UI",Meiryo,sans-serif;background:#fff;color:#293e50;border:1px solid #aabaca;padding:9px 12px;border-radius:7px;cursor:pointer}
+.map-view-toolbar button:focus-visible{outline:2px solid #a3263d;outline-offset:2px}
+.map-view-hint{font-size:10px;color:#6a7582}
+body.map-expanded{overflow:hidden}
+.course-panel-wide.is-expanded{position:fixed!important;inset:0;z-index:10001;margin:0;border-radius:0;overflow-y:auto;overscroll-behavior:contain;background:#fff;padding:15px;box-shadow:0 0 0 100vmax rgba(0,0,0,.5)}
+.course-panel-wide.is-expanded .reference-map-figure{max-width:1700px;margin:auto}
+.course-panel-wide.is-expanded .real-course-scroll:not(.zoom-150):not(.zoom-200):not(.show-original) .real-course-viewport{width:150%}
+@media(max-width:640px){
+ .course-panel-wide .reference-map-figure{padding:3px}
+ .course-panel-wide.is-expanded{padding:10px}
+ .map-view-hint{flex-basis:100%}
+}
+
+/* Stage v0.16: the simulcast and full track are siblings in ONE broadcast,
+   desktop split view and tightly stacked mobile view. */
+.broadcast.dual-view{overflow:hidden}
+.live-display-grid{display:grid;grid-template-columns:minmax(0,1.07fr) minmax(0,1fr);gap:0;align-items:start;background:#f7faf8}
+.live-display-grid .live-picture{min-width:0;background:#9acbdd}
+.live-display-grid .track-stage canvas{display:block;width:100%;height:auto}
+.live-display-grid .course-panel-wide{min-width:0;width:100%;margin:0;padding:10px 11px;box-shadow:none;border:0;border-left:1px solid #bacbd0;border-radius:0;background:#fbfcfb}
+.live-display-grid .course-panel-wide .panel-head{margin-bottom:4px}
+.live-display-grid .course-panel-wide .panel-head h2{font-size:13px}
+.map-sync-status{font:700 10px "Meiryo UI",Meiryo,sans-serif;color:#247453;white-space:nowrap}
+.live-display-grid .map-control-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0}
+.live-display-grid .reference-map-switch,.live-display-grid .reference-scale-switch{display:flex;gap:5px;align-items:center;justify-content:flex-start;margin:0;font-size:10px}
+.live-display-grid .reference-map-switch select,.live-display-grid .reference-scale-switch select{max-width:min(240px,100%);font-size:11px;padding:5px 7px}
+.live-display-grid .map-view-toolbar{margin:5px 0;gap:5px}
+.live-display-grid .map-view-toolbar button{padding:5px 8px;font-size:10px}
+.live-display-grid .map-view-hint{display:none}
+.live-display-grid .reference-map-figure{margin:6px 0 0;padding:3px;border:0;background:#fff}
+.live-display-grid .reference-map-figure .real-map-credit{font-size:9px;line-height:1.35;margin:3px 2px}
+.live-display-grid .reference-map-figure>.small-muted{font-size:9px;margin:5px 3px 2px}
+.live-display-grid .course-reference-details{margin:8px 1px 0}
+.live-display-grid .course-reference-details summary{font-size:10px;cursor:pointer;color:#586779}
+.live-display-grid .course-reference-details .small-muted{font-size:10px;margin:8px 0}
+.live-display-grid .course-panel-wide #courseCanvas{width:100%}
+.live-display-grid .track-stage,.live-display-grid .meter{min-width:0}
+@media(max-width:999px){
+ .live-display-grid{grid-template-columns:minmax(0,1fr)}
+ .live-display-grid .course-panel-wide{border-left:0;border-top:3px solid #293746;padding:8px 8px 10px}
+ .live-display-grid .reference-map-figure{margin:3px 0 0}
+ .live-display-grid .map-view-toolbar{margin:3px 0}
+ .live-display-grid .course-panel-wide .panel-head h2{font-size:12px}
+ .live-display-grid .map-control-row{gap:5px}
+}
+@media(max-width:499px){
+ .live-display-grid .course-panel-wide{padding:6px}
+ .live-display-grid .map-control-row{gap:6px}
+ .live-display-grid .reference-map-switch select{max-width:180px}
+ .live-display-grid .reference-scale-switch select{max-width:240px}
+ .live-display-grid .reference-map-figure>.small-muted{font-size:9px}
+}
+
+/* v0.17: explain endogenous pace next to both live displays. */
+.pace-ticker{padding:6px 13px;background:#edf4f6;color:#243b4d;border-bottom:1px solid #cbd9e2;
+ font-size:11px;line-height:1.45;font-weight:700;min-height:28px;font-variant-numeric:tabular-nums}
+.pace-ticker[data-pace="H"]{color:#a12f23;background:#fff0e9}
+.pace-ticker[data-pace="S"]{color:#2f5670;background:#edf5fb}
+
+.ability-info{font-size:10px;line-height:1.65;color:#43586b;background:#f0f5f7;padding:8px 10px;border-left:3px solid #54768a;border-radius:4px;overflow-wrap:anywhere;margin:6px 0 10px}
+
+/* Stage 0.22: restrained six-trait values, mobile two-column layout. */
+.runner-six-traits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:9px 0}
+.runner-trait{min-width:0;padding:7px 9px;background:rgba(135,170,137,.08);border:1px solid rgba(137,170,140,.2);border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 7px;font-size:12px}
+.runner-trait span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.runner-trait strong{font-size:15px;font-variant-numeric:tabular-nums}
+.trait-bar{grid-column:1/-1;height:4px;background:rgba(156,176,159,.20);border-radius:4px;overflow:hidden}
+.trait-bar i{display:block;height:100%;background:#84ac7b;border-radius:4px}
+@media(max-width:550px){.runner-six-traits{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Stage v0.31 broadcast race clock and at-the-line race results */
+#elapsed{font-size:clamp(18px,2.8vw,25px);font-weight:900;line-height:1.15;
+ font-variant-numeric:tabular-nums;letter-spacing:.6px;padding:5px 9px;border-radius:5px;
+ background:rgba(12,24,32,.87)}
+/* The sectional number shares the EXACT clock size, immediately beneath
+   the current time, aligned to the same right edge on desktop and mobile. */
+.stage-clock-stack{display:grid;justify-items:end;align-content:start;gap:3px;flex:none}
+.stage-split{pointer-events:none;position:static;display:flex;align-items:baseline;
+ justify-content:flex-end;gap:7px;color:#fff;background:rgba(16,29,42,.88);
+ border-radius:5px;padding:3px 9px;font-variant-numeric:tabular-nums;
+ text-shadow:0 1px 2px #000;white-space:nowrap}
+.stage-split-label{font:700 10px "Meiryo UI",Meiryo,sans-serif;opacity:.9}
+.stage-split-value{font:900 clamp(18px,2.8vw,25px) "Meiryo UI",Meiryo,sans-serif;
+ line-height:1.15;letter-spacing:.6px;font-variant-numeric:tabular-nums}
+.finish-podium{pointer-events:none;position:absolute;left:10px;bottom:36px;
+ max-width:min(93%,460px);min-width:min(64%,235px);display:grid;gap:3px;z-index:6}
+.finish-podium[hidden],.stage-split[hidden]{display:none!important}
+.podium-row{display:flex;align-items:center;gap:7px;min-width:0;background:rgba(13,24,37,.9);
+ box-shadow:0 1px 4px #1118;color:#fff;border-radius:5px;padding:5px 8px;
+ font-size:clamp(11px,2.2vw,16px);font-weight:800}
+.podium-rank{flex:none;color:#ffda73}.podium-name{flex:1;min-width:0;white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis}.podium-time{flex:none;font-variant-numeric:tabular-nums}
+@media(max-width:500px){#elapsed{font-size:18px;padding:3px 6px}
+ .stage-split{padding:3px 6px;gap:5px}
+ .stage-split-value{font-size:18px}
+ .stage-split-label{font-size:9px}
+ .finish-podium{left:7px;bottom:25px;max-width:96%}
+ .podium-row{padding:4px 6px;gap:5px}}
