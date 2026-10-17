@@ -48,7 +48,8 @@ jobs:
           current=[r for r in races if r['id'].startswith('2026-10-17')]
           assert len(current)==3
           for r in current:
-            assert r['status']=='predicted' and r['purchase_strategy_version']=='v3.15'
+            # A completed postrace review must not fail prereace research UI audit.
+            assert r['status'] in ('predicted','reviewed') and r['purchase_strategy_version']=='v3.15'
             assert r['final_bets'] and r['proof_commit'] and Path('docs',r['pdf']).is_file()
             assert Path(r['e2e_prediction']).is_file()
           print('PASS_LATEST_3_JRA_V315_REGISTRATIONS_WITH_FROZEN_PDFS_AND_BETS')
