@@ -18,9 +18,11 @@ import urllib.request
 from statistics import median
 from PIL import Image
 
-IMAGE_URL = "https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg"
-COURSE_ID = "kyoto_turf_inner_2000"
-DISTANCE = 2000
+COURSE_IMAGES = {
+    "kyoto_turf_inner_2000":"https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg",
+    "kyoto_turf_outer_1400":"https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg",
+    "tokyo_turf_2000":"https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse_1.jpg",
+}
 STEP = 5
 JAVASCRIPT = r"""
 const fs=require('fs'),vm=require('vm'),w={},document={getElementById:()=>null,querySelector:()=>null};
@@ -28,9 +30,9 @@ for(const p of ['race-course-geometry-v1.js','race-umapot-overlay-v1.js']){
  vm.runInNewContext(fs.readFileSync('docs/lab/'+p,'utf8'),
    {window:w,globalThis:w,document},{filename:p});
 }
-const c=w.RaceCourseGeometry.get('kyoto_turf_inner_2000');
+const c=w.RaceCourseGeometry.get(process.argv[1]);
 const rows=[];
-for(let d=0;d<=2000;d+=5){
+for(let d=0;d<=c.distance_m;d+=5){
  const p=w.RaceUmapotOverlay.point(c,d,0);
  const b=w.RaceUmapotOverlay.point(c,Math.max(0,d-.3),0);
  const a=w.RaceUmapotOverlay.point(c,Math.min(2000,d+.3),0);
@@ -102,17 +104,19 @@ def smooth(rows):
 
 def main():
     cli=argparse.ArgumentParser()
+    cli.add_argument("--course",choices=sorted(COURSE_IMAGES),default="kyoto_turf_inner_2000")
     cli.add_argument("--image",default=None)
     cli.add_argument("--output",default=None)
     cli.add_argument("--log-json",action="store_true")
     args=cli.parse_args()
+    image_url=COURSE_IMAGES[args.course]
     if args.image:
         im=Image.open(args.image).convert("RGB")
     else:
-        req=urllib.request.Request(IMAGE_URL,headers={"User-Agent":"Mozilla/5.0 (LAB geometry validation)"})
+        req=urllib.request.Request(image_url,headers={"User-Agent":"Mozilla/5.0 (LAB geometry validation)"})
         with urllib.request.urlopen(req,timeout=35) as http:im=Image.open(io.BytesIO(http.read())).convert("RGB")
     if im.size!=(620,430):raise ValueError("source illustration image dimensions changed: "+str(im.size))
-    stations=json.loads(subprocess.check_output(["node","-e",JAVASCRIPT],text=True))
+    stations=json.loads(subprocess.check_output(["node","-e",JAVASCRIPT,args.course],text=True))
     for p in stations:
         p["runs"]=get_runs(im,p)
         p["raw"]=select(p["runs"])
@@ -132,8 +136,8 @@ def main():
         widths.append(inner-outer)
     outcome={
       "schema_version":"lab-turf-rail-v1",
-      "course_id":COURSE_ID,
-      "source_url":IMAGE_URL,
+      "course_id":args.course,
+      "source_url":image_url,
       "image_size":[620,430],
       "sampling_m":STEP,
       "source_color_method":"green-stripe-nearest-registered-circuit",
