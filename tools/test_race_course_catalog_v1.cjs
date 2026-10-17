@@ -4,8 +4,8 @@
  */
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs');
-const input=JSON.parse(fs.readFileSync('docs/staging/race-course-catalog-v1.json','utf8'));
-const sdk=require('../docs/staging/race-course-catalog-v1.js');
+const input=JSON.parse(fs.readFileSync('docs/lab/race-course-catalog-v1.json','utf8'));
+const sdk=require('../docs/lab/race-course-catalog-v1.js');
 const c=sdk.create(input);
 assert.deepEqual(c.stats,{venues:10,families:27,rail_variants:27,templates:133,
  geometry_approved:0,stage_experiments:2});
@@ -73,8 +73,8 @@ const stage=c.templates.filter(t=>t.stage_experiment_id).map(t=>t.id).sort();
 assert.deepEqual(stage,['kyoto_turf_outer_A_1400','tokyo_turf_single_A_2000']);
 assert.equal(c.list({venue:'阪神',layout:'outer_to_inner',rail:'D'}).length,1);
 assert.equal(c.list({venue:'新潟',surface:'dirt'}).length,5);
-const doc=fs.readFileSync('docs/staging/race-course-catalog.html','utf8');
-const ui=fs.readFileSync('docs/staging/race-course-catalog-ui-v1.js','utf8');
+const doc=fs.readFileSync('docs/lab/race-course-catalog.html','utf8');
+const ui=fs.readFileSync('docs/lab/race-course-catalog-ui-v1.js','utf8');
 assert.match(doc,/コース型台帳/);assert.match(doc,/id="courseRows"/);
 assert.match(doc,/代表モデル/);
 assert.match(doc,/A相当/);
@@ -83,5 +83,5 @@ assert.ok(!doc.includes('race-sim-engine.js'));
 assert.ok(!ui.includes('RaceSimEngine.create'));
 console.log('PASS_JRA_CATALOG_TEN_VENUES_27_FAMILIES_27_REPRESENTATIVE_ROUTES_133_DISTANCE_TEMPLATES');
 console.log('PASS_CATALOG_ABCD_UNIFICATION_STRICT_SURFACE_LAYOUT_START_AND_FAIL_CLOSED_GEOMETRY');
-console.log('PASS_JRA_CATALOG_STAGE_READ_ONLY_BROWSER');
+console.log('PASS_JRA_CATALOG_LAB_READ_ONLY_BROWSER');
 console.log('TEMPLATE_COUNTS_BY_VENUE '+JSON.stringify(counts));
