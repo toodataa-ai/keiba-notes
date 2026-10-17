@@ -1,0 +1,114 @@
+name: Verify E0 mobile production release and JRA data isolation
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/experience-regime-prod-release-audit.yml'
+      - 'docs/experience-regime.html'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Audit precise release diff and protected tree integrity
+        run: |
+          set -euo pipefail
+          RELEASE=ed548230a50e97b9c796a1ef02de48e82570cdf9
+          git cat-file -e "$RELEASE^{commit}"
+          test "$(git diff --name-only "$RELEASE^" "$RELEASE")" = 'docs/experience-regime.html'
+          for path in docs/data docs/reports docs/pdfs e2e_validation local_racing_shadow_v1 experience_regime_v1; do
+            test "$(git rev-parse "$RELEASE^:$path")" = "$(git rev-parse "$RELEASE:$path")" || { echo "::error::Unexpected change to $path"; exit 1; }
+          done
+          echo PASS_RELEASE_ONLY_APPROVED_HTML_PREDICTIONS_PDFS_BETS_PROOF_UNCHANGED
+      - name: Audit approved staged CSS and latest real data
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          prod=Path('docs/experience-regime.html').read_text()
+          stage=Path('docs/staging/experience-regime.html').read_text()
+          css=lambda h:re.search(r'<style id="experience-regime-mobile-overflow-fix">.*?</style>',h,re.S).group()
+          assert css(prod).replace('/* Mobile containment','/* STAGING REVIEW: mobile containment')==css(stage)
+          assert 'data-stage="preview"' not in prod and 'staging-shell-marker' not in prod and 'noindex' not in prod
+          assert 'id="e012-live-collection"' in prod
+          d=json.loads(Path('docs/data/experience_regime_status.json').read_text())
+          assert d['collection_runs']['2026-10-17']['prerace_proof_valid_races']==9
+          races=json.loads(Path('docs/data/races.json').read_text())['races']
+          current=[r for r in races if r['id'].startswith('2026-10-17')]
+          assert len(current)==3
+          for r in current:
+            assert r['status']=='predicted' and r['purchase_strategy_version']=='v3.15'
+            assert r['final_bets'] and r['proof_commit'] and Path('docs',r['pdf']).is_file()
+            assert Path(r['e2e_prediction']).is_file()
+          print('PASS_LATEST_3_JRA_V315_REGISTRATIONS_WITH_FROZEN_PDFS_AND_BETS')
+          PY
+      - name: Install real browser testing environment
+        run: |
+          set -euo pipefail
+          pip install --disable-pip-version-check playwright==1.56.0
+          command -v google-chrome || command -v chromium || command -v chromium-browser
+      - name: Test all nine production viewport sizes against real Chromium
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --directory docs >/tmp/e012-server.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          from playwright.sync_api import sync_playwright
+          import shutil
+          chrome=next((p for p in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if p),None)
+          assert chrome
+          with sync_playwright() as p:
+            b=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox'])
+            for w in (320,360,375,390,430,600,650,768,1024):
+              page=b.new_page(viewport={'width':w,'height':844})
+              errors=[]
+              page.on('pageerror',lambda error:errors.append(str(error)))
+              page.goto('http://127.0.0.1:8765/experience-regime.html',wait_until='load',timeout=30000)
+              page.wait_for_function("document.querySelector('#e012-run-date')?.textContent.startsWith('取得対象：')",timeout=20000)
+              x=page.evaluate("""() => {
+                const row=document.querySelector('#e012-live-collection tbody tr');
+                const proof=document.querySelector('#e012-proof').textContent;
+                const e0=document.querySelector('#e012-e0').textContent;
+                const e1=document.querySelector('#e012-e1').textContent;
+                const e2=document.querySelector('#e012-e2').textContent;
+                const r=document.querySelector('#e012-live-collection').getBoundingClientRect();
+                return {scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,
+                        display:getComputedStyle(row).display,proof,e0,e1,e2,left:r.left,right:r.right};
+              }""")
+              assert not errors,(w,errors)
+              assert x['scroll']<=w+2 and x['body']<=w+2 and x['left']>=-2 and x['right']<=w+2,(w,x)
+              assert x['display']==('block' if w<=650 else 'table-row'),(w,x)
+              assert (x['proof'],x['e0'],x['e1'],x['e2'])==('9 / 9 レース','16頭 / 1レース','12頭 / 1レース','109頭 / 7レース'),(w,x)
+              print('PASS_REAL_BROWSER_PROD_VIEWPORT',w,'scroll',x['scroll'])
+              page.close()
+            b.close()
+          print('PASS_PRODUCTION_BROWSER_ALL_9_VIEWPORTS')
+          PY
+      - name: Verify live GitHub Pages HTML byte equality and published JRA current predictions
+        run: |
+          set -euo pipefail
+          base=https://toodataa-ai.github.io/keiba-notes
+          for i in $(seq 1 35); do
+            if curl -fsSL --max-time 20 "$base/experience-regime.html?release-audit=$GITHUB_RUN_ID-$i" -o /tmp/e012-prod-live.html &&
+                 cmp -s docs/experience-regime.html /tmp/e012-prod-live.html; then
+              echo PASS_PRODUCTION_PAGES_EXACT_HTML_BYTE_MATCH
+              break
+            fi
+            test "$i" -lt 35 || { echo '::error::Public HTML failed exact parity'; exit 1; }
+            sleep 8
+          done
+          curl -fsSL --max-time 25 "$base/data/races.json?release-audit=$GITHUB_RUN_ID" -o /tmp/e012-races-live.json
+          python3 - <<'PY'
+          import json
+          race_map={r['id']:r for r in json.load(open('/tmp/e012-races-live.json'))['races']}
+          for key in ('fuji-stakes','hokuriku-stakes','tourmaline-stakes'):
+            x=race_map['2026-10-17-'+key]
+            assert x['purchase_strategy_version']=='v3.15' and x['final_bets'] and x['pdf'] and x['proof_commit']
+          print('PASS_PRODUCTION_PAGES_LATEST_JRA_RACE_REGISTRY_AND_BETS')
+          PY
