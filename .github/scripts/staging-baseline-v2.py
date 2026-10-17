@@ -19,12 +19,12 @@ MARKER='<div class="staging-shell-marker" role="status" aria-label="ステージ
 def render(prod):
     assert prod.count('<html lang="ja">')==1
     assert prod.count('<head>')==1 and prod.count('</head>')==1
-    assert len(re.findall(r'<body(?:\\s+[^>]*)?>',prod))==1 and prod.count('</body>')==1
+    assert len(re.findall(r'<body(?:\s+[^>]*)?>',prod))==1 and prod.count('</body>')==1
     assert 'data-stage="preview"' not in prod and 'noindex' not in prod
     out=prod.replace('<html lang="ja">','<html lang="ja" data-stage="preview">',1)
     out=out.replace('<head>','<head>\n<meta name="robots" content="noindex,nofollow"><base href="../">',1)
     out=out.replace('</head>','<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">\n</head>',1)
-    out=re.sub(r'(<body(?:\\s+[^>]*)?>)',lambda m:m.group(1)+'\n'+MARKER,out,count=1)
+    out=re.sub(r'(<body(?:\s+[^>]*)?>)',lambda m:m.group(1)+'\n'+MARKER,out,count=1)
     def fix(match):
         quote,url=match.group(1),match.group(2)
         base,sep,tail=url.partition('?')
