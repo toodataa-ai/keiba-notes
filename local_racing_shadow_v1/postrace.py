@@ -146,7 +146,10 @@ def parse_official(soup, p):
     date = dt.date.fromisoformat(p["date"])
     if clean(f"{date.year}年{date.month}月{date.day}日") not in clean(htext):
         raise Blocked("BLOCKED_PARSE", "Official page date mismatch")
-    if clean(p["venue"]) not in clean(htext):
+    # NAR uses 帯広 in result headings, but frozen prediction labels it 帯広ば.
+    # Apply only this explicit official alias; keep strict venue checking.
+    official_venue = "帯広" if p["venue"] == "帯広ば" else p["venue"]
+    if clean(official_venue) not in clean(htext):
         raise Blocked("BLOCKED_PARSE", "Official venue mismatch")
     if not re.search(r"第\s*" + str(int(p["race_no"])) + r"\s*競走", clean(htext)):
         raise Blocked("BLOCKED_PARSE", "Official race number mismatch")
@@ -208,7 +211,12 @@ def parse_official(soup, p):
     distance = int(dist_match.group(1))
     if distance != int(p["distance"]) or clean(p.get("surface")) != "ダート":
         raise Blocked("BLOCKED_JOIN", "Official distance/surface does not match prediction")
-    going_match = re.search(r"馬場[：:]\s*(良|稍重|重|不良)", body)
+    # Banei publishes numeric track moisture, e.g. 馬場：1.0.
+    # Never convert it to the four-grade thoroughbred going scale.
+    if p["venue"] == "帯広ば":
+        going_match = re.search(r"馬場[：:]\s*(\d{1,2}\.\d)", body)
+    else:
+        going_match = re.search(r"馬場[：:]\s*(良|稍重|重|不良)", body)
     if not going_match:
         raise Blocked("BLOCKED_PARSE", "Official going not found")
     if any(x in body for x in ("競走取り止め", "競走取止め", "競走不成立")):
