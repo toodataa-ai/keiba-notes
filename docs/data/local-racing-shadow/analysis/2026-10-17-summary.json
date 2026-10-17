@@ -4,10 +4,10 @@
   "scope": "predictions_with_valid_proof_only",
   "expected_predictions": 34,
   "eligible_predictions": 34,
-  "completed_reviews": 22,
+  "completed_reviews": 12,
   "pending": 0,
-  "blocked": 12,
-  "skipped_existing": 0,
+  "blocked": 0,
+  "skipped_existing": 22,
   "by_venue": {
     "佐賀": {
       "reviewed": 11,
@@ -17,6 +17,16 @@
       "win_rate": 0.3,
       "top3_rate": 0.6,
       "mean_absolute_top_pick_rank_error": 2.4,
+      "small_sample_warning": true
+    },
+    "帯広ば": {
+      "reviewed": 12,
+      "evaluable": 12,
+      "top_pick_wins": 1,
+      "top_pick_top3": 5,
+      "win_rate": 0.083333,
+      "top3_rate": 0.416667,
+      "mean_absolute_top_pick_rank_error": 3.25,
       "small_sample_warning": true
     },
     "高知": {
@@ -71,6 +81,16 @@
       "mean_absolute_top_pick_rank_error": 4.0,
       "small_sample_warning": true
     },
+    "200": {
+      "reviewed": 12,
+      "evaluable": 12,
+      "top_pick_wins": 1,
+      "top_pick_top3": 5,
+      "win_rate": 0.083333,
+      "top3_rate": 0.416667,
+      "mean_absolute_top_pick_rank_error": 3.25,
+      "small_sample_warning": true
+    },
     "900": {
       "reviewed": 1,
       "evaluable": 0,
@@ -82,22 +102,22 @@
       "small_sample_warning": true
     }
   },
-  "top_pick_win_rate": 0.428571,
-  "top_pick_top3_rate": 0.761905,
+  "top_pick_win_rate": 0.30303,
+  "top_pick_top3_rate": 0.636364,
   "ranking_error_summary": {
-    "top_pick_mean_absolute_rank_error": 1.571429,
-    "evaluable_n": 21
+    "top_pick_mean_absolute_rank_error": 2.181818,
+    "evaluable_n": 33
   },
-  "reviewed_races": 22,
+  "reviewed_races": 34,
   "summary": {
-    "reviewed": 22,
-    "evaluable": 21,
-    "top_pick_wins": 9,
-    "top_pick_top3": 16,
-    "win_rate": 0.428571,
-    "top3_rate": 0.761905,
-    "mean_absolute_top_pick_rank_error": 1.571429,
-    "small_sample_warning": true
+    "reviewed": 34,
+    "evaluable": 33,
+    "top_pick_wins": 10,
+    "top_pick_top3": 21,
+    "win_rate": 0.30303,
+    "top3_rate": 0.636364,
+    "mean_absolute_top_pick_rank_error": 2.181818,
+    "small_sample_warning": false
   },
   "evidence_based_findings": [
     "Frozen ability rank compared with NAR official result without hindsight adjustment"
@@ -121,6 +141,18 @@
       "20261017-kochi-09",
       "20261017-kochi-10",
       "20261017-kochi-11",
+      "20261017-obihiro-01",
+      "20261017-obihiro-02",
+      "20261017-obihiro-03",
+      "20261017-obihiro-04",
+      "20261017-obihiro-05",
+      "20261017-obihiro-06",
+      "20261017-obihiro-07",
+      "20261017-obihiro-08",
+      "20261017-obihiro-09",
+      "20261017-obihiro-10",
+      "20261017-obihiro-11",
+      "20261017-obihiro-12",
       "20261017-saga-01",
       "20261017-saga-02",
       "20261017-saga-03",
@@ -133,20 +165,7 @@
       "20261017-saga-10",
       "20261017-saga-11"
     ],
-    "unresolved_ids": [
-      "20261017-obihiro-01",
-      "20261017-obihiro-02",
-      "20261017-obihiro-03",
-      "20261017-obihiro-04",
-      "20261017-obihiro-05",
-      "20261017-obihiro-06",
-      "20261017-obihiro-07",
-      "20261017-obihiro-08",
-      "20261017-obihiro-09",
-      "20261017-obihiro-10",
-      "20261017-obihiro-11",
-      "20261017-obihiro-12"
-    ],
+    "unresolved_ids": [],
     "ineligible_proof_ids": []
   }
 }
