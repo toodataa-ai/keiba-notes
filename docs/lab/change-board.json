@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "kind": "read_only_ui_development_inventory",
+  "state": "verified_git_source",
+  "scan_commit": "c9aa3470ee620982d2ea1e65fc7e16d6dacb882e",
+  "policy": {
+    "mode": "transitional_lab_gateway",
+    "lab_root": "docs/lab/",
+    "staging_root": "docs/staging/",
+    "public_root": "docs/",
+    "public_source": "main/docs",
+    "approval_rule": "only an explicit user approval can move a UI feature to production; a changed Git SHA is not approval",
+    "data_rule": "official JRA/NAR predictions, results, final_bets, PDF and proof stay in existing canonical locations; no LAB or staging promotion copies them",
+    "migration_rule": "Existing experiments stay at their working staging URLs until dependencies are audited and a separately approved move into docs/lab/ is safe",
+    "release_process": "approved UI paths allowlist + diff review + preserve protected tree SHA + real Pages HTTP parity"
+  },
+  "counts": {
+    "lab_development": 3,
+    "lab_evaluation": 1,
+    "needs_review": 2,
+    "staging_review": 0,
+    "released": 1,
+    "reference_only": 1
+  },
+  "features": [
+    {
+      "id": "simulator",
+      "name": "レースシミュレータ",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "東京・京都の走行線／馬群／コース画像を実機で検品。独立LABへの移動は参照パスを監査してから。",
+      "preview_path": "staging/race-simulator.html",
+      "staging_paths": [
+        "docs/staging/race-simulator.html",
+        "docs/staging/race-simulator.js",
+        "docs/staging/race-simulator.css",
+        "docs/staging/race-sim-engine.js",
+        "docs/staging/race-umapot-overlay-v1.js",
+        "docs/staging/race-sim-manifest-v1.json",
+        "docs/staging/race-ability-model-v1.js",
+        "docs/staging/race-lane-ai-v1.js"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/staging/race-simulator.html": "a1383210f52de8acd56eb8dba2f87388984b22c6",
+        "docs/staging/race-simulator.js": "8d97a44a6814e8f52e0c6c1a96e8e92b81ce468c",
+        "docs/staging/race-simulator.css": "8a905005e09c6828bed4c51ebf2afaf62fdac073",
+        "docs/staging/race-sim-engine.js": "8f9dba1b6ad3099f0277aeed87fad23cb90153af",
+        "docs/staging/race-umapot-overlay-v1.js": "bf425b0fb08067aaf88c84a966cae88760b8a692",
+        "docs/staging/race-sim-manifest-v1.json": "bd141771f18877ac62ca91ad9b90b63361ba0c97",
+        "docs/staging/race-ability-model-v1.js": "b812e2adee39f2933bc6a18392392af33939cfe4",
+        "docs/staging/race-lane-ai-v1.js": "3a9a9aa2e0499ee25f9c56076f9d27bfecda8cb5"
+      },
+      "latest_source_change_commit": "01aa5607a087f80bd2190b2b52d7cd2bcdde0bbb"
+    },
+    {
+      "id": "course-catalog",
+      "name": "JRA全10場のコース型台帳",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "実コース素材・内外回り・スタート位置の形状検証と受入れ判定。",
+      "preview_path": "staging/race-course-catalog.html",
+      "staging_paths": [
+        "docs/staging/race-course-catalog.html",
+        "docs/staging/race-course-catalog-v1.json",
+        "docs/staging/race-course-catalog-v1.js",
+        "docs/staging/race-course-geometry-v1.js"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/staging/race-course-catalog.html": "1acf8d9ab943b0d70129bcfb0f6dd8ae052b270c",
+        "docs/staging/race-course-catalog-v1.json": "eaefa20945eeb1c0ad7654e8993fb084adffd4e4",
+        "docs/staging/race-course-catalog-v1.js": "bd9ce089e3a2592c8f033932cff65b02f994bc18",
+        "docs/staging/race-course-geometry-v1.js": "a9c162b9f9a3d26f58ac98cf4d057d0345da9489"
+      },
+      "latest_source_change_commit": "5ea92ddf73a2d2c9baac05d26b2573dd31dae244"
+    },
+    {
+      "id": "weekend-blueprints",
+      "name": "10/17〜18 全6メインのコース設計",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "未承認の走行線は正式アニメーションに使わず、形状と画面上の位置合わせを確認。",
+      "preview_path": "staging/weekend-main-course-review.html",
+      "staging_paths": [
+        "docs/staging/weekend-main-course-review.html",
+        "docs/staging/weekend-main-course-review-v1.js",
+        "docs/staging/weekend-main-course-blueprints-20261017.json"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/staging/weekend-main-course-review.html": "f518f851e49d1c242a9f0a8881db48da0c57048c",
+        "docs/staging/weekend-main-course-review-v1.js": "5e6ce4bd76f1f86b7c7dc79ce63e9a94fba1b0ad",
+        "docs/staging/weekend-main-course-blueprints-20261017.json": "d6993a0642f02388a8035985f235fd8854cd5125"
+      },
+      "latest_source_change_commit": "0fbf338a6bbf79ebbf7441db7f8e26912ed4c91c"
+    },
+    {
+      "id": "purchase-preview",
+      "name": "馬券購入表示の比較",
+      "phase": "lab_evaluation",
+      "approval": "not_approved_as_ui",
+      "next_action": "正式v3.15の購入データは不変。検証用の旧データや表示案を本番の最新予想で上書きしない。",
+      "preview_path": "staging/purchase-preview.html",
+      "staging_paths": [
+        "docs/staging/purchase-preview.html",
+        "docs/staging/data/three-plus-ana"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/staging/purchase-preview.html": "05ed68cb7a7b5770d06f83d7a32cca2c82110d59",
+        "docs/staging/data/three-plus-ana": "153c192c7ded64cda98d23e52a08e4afe28978c8"
+      },
+      "latest_source_change_commit": "bc67d289a1b6c8a84217a1e8a29b12ad1bfaa9e9"
+    },
+    {
+      "id": "staging-inline-preview",
+      "name": "今週の予想・ページ内表示の検証差分",
+      "phase": "needs_review",
+      "approval": "not_approved_as_stage_override",
+      "next_action": "正式ページ内表示は既に本番稼働。旧レース専用のステージング差し替え動作だけを比較し、必要なら別途承認。",
+      "preview_path": "staging/this-week.html",
+      "staging_paths": [
+        "docs/staging/this-week.html",
+        "docs/staging/stage-week-preview.js",
+        "docs/staging/stage-week-preview.css"
+      ],
+      "production_paths": [
+        "docs/this-week.html",
+        "docs/assets/jra-inline-report.js"
+      ],
+      "file_blob_shas": {
+        "docs/staging/this-week.html": "ea72c786fd2b9ffb30571b6d77dd701d8bf707b9",
+        "docs/staging/stage-week-preview.js": "95a0f7eae86995c266e21ea6286f36887fce729c",
+        "docs/staging/stage-week-preview.css": "67ac8634fb0b9e57aea1db778a64cfd99eb8ed38",
+        "docs/this-week.html": "c59b56117b0f46ff4cb2a756a51baf4b62b5c689",
+        "docs/assets/jra-inline-report.js": "62a798fc87473167fe4f3674d88ec3d490853c49"
+      },
+      "latest_source_change_commit": "b166c2a34c061f1e6c1b2b2d1bccf39f24ea9991"
+    },
+    {
+      "id": "results-staging-diff",
+      "name": "過去の成績・ステージング専用JS差分",
+      "phase": "needs_review",
+      "approval": "not_approved_as_new_change",
+      "next_action": "本番v1.04の結果不明修正とは区別し、表示JavaScriptの残差分を検証。",
+      "preview_path": "staging/results.html",
+      "staging_paths": [
+        "docs/staging/results.html",
+        "docs/staging/assets/results.js"
+      ],
+      "production_paths": [
+        "docs/results.html",
+        "docs/assets/results.js"
+      ],
+      "file_blob_shas": {
+        "docs/staging/results.html": "5056cb2cb320dda4461676b13e244dd7b639c2da",
+        "docs/staging/assets/results.js": "e719fde8113105ffec5c9a973cfd4b1372db39f5",
+        "docs/results.html": "7cb28d8730b0fc15258da21ea2073fa8093ef484",
+        "docs/assets/results.js": "e43c77d6c685797d4563362fe0723bb3a505f9c1"
+      },
+      "latest_source_change_commit": "bd3e86b85650292ab85cfc2be009d7e9478b61a1"
+    },
+    {
+      "id": "historical-v315",
+      "name": "10/12予想レポート表示比較",
+      "phase": "reference_only",
+      "approval": "reference_not_release_candidate",
+      "next_action": "比較・検証資料として保持。最新版のレースHTML/PDFを古いプレビューで置き換えない。",
+      "preview_path": "staging/jra-v315-20261012/",
+      "staging_paths": [
+        "docs/staging/jra-v315-20261012"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/staging/jra-v315-20261012": "25789fb4bc23c32acfc45e466863aeaa555530a0"
+      },
+      "latest_source_change_commit": "2983f6fe7e45cce1a67d2d1a30cafd731d4a79b6"
+    },
+    {
+      "id": "experience-regime",
+      "name": "E0/E1/E2 研究ページのスマホ対応",
+      "phase": "released",
+      "approval": "approved_and_released_2026-10-17",
+      "next_action": "本番更新済み。これ以上の改修は別の承認として扱う。",
+      "preview_path": "staging/experience-regime.html",
+      "staging_paths": [
+        "docs/staging/experience-regime.html"
+      ],
+      "production_paths": [
+        "docs/experience-regime.html"
+      ],
+      "file_blob_shas": {
+        "docs/staging/experience-regime.html": "5adb187b96f0852ed8e334a59fb5c80b654e8086",
+        "docs/experience-regime.html": "f245f2162b31799d994638f6b1e845aad1266f5d"
+      },
+      "latest_source_change_commit": "ed548230a50e97b9c796a1ef02de48e82570cdf9"
+    }
+  ],
+  "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB is currently a gateway to unmoved staging experiments."
+}
