@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>LAB・変更管理 | 競馬AI開発</title>
+<style>
+:root{color-scheme:light;--ink:#1c2533;--muted:#566474;--line:#dce3e9;--canvas:#f3f5f8;--blue:#294b77}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--canvas);font:14px/1.75 "Meiryo UI",Meiryo,"Yu Gothic",sans-serif}
+.wrap{max-width:1010px;width:calc(100% - 32px);margin:auto}header{padding:30px 0 24px;background:#172536;color:#fff}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top a{color:#dce8f4;text-decoration:none;font-weight:700;font-size:12px}.env{letter-spacing:.1em;font-size:12px;color:#aaceee;font-weight:800}
+h1{font-size:clamp(23px,3.6vw,32px);font-weight:750;line-height:1.35;margin:15px 0 10px}header p{max-width:760px;color:#d7e1ed;margin:0;font-size:13px}
+.rule{padding:13px 16px;border-left:3px solid #b6cbe0;background:#e9eff5;border-radius:0 9px 9px 0;margin:18px 0;color:#2e435b;font-size:12px}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:20px 0}
+.metric{border:1px solid var(--line);border-radius:11px;background:#fff;padding:14px}
+.metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:23px;line-height:1.4;font-weight:750}
+h2{font-size:18px;margin:24px 0 6px}p.sub{color:var(--muted);margin:0 0 14px;font-size:12px}
+#featureList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px;min-width:0;display:flex;flex-direction:column}
+.item .head{display:flex;align-items:start;justify-content:space-between;gap:12px}.item h3{margin:0;font-size:15px;line-height:1.5}
+.state{flex-shrink:0;display:inline-block;padding:2px 7px;border:1px solid #d5e1ed;background:#eff4fa;border-radius:6px;font-size:11px;color:#23466e}
+.item p{margin:9px 0;color:#435165;font-size:12px;flex:1}.meta{font-size:11px;color:#627084;margin:8px 0;overflow-wrap:anywhere}
+.links{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.links a{color:#285b85;text-decoration:underline;text-underline-offset:3px;font-size:12px;font-weight:750}
+.policy{background:#fff;border:1px solid var(--line);border-radius:12px;padding:17px;margin:24px 0 36px}
+.policy h2{margin:0 0 7px}.policy ol{margin:0;padding-left:20px;font-size:12px;color:#3f4e60}.policy li{margin:5px 0}
+footer{padding:16px 0 30px;color:#73808e;font-size:11px}
+#loadError{color:#a33131}#scan{font-size:11px;color:#cdd9e4;overflow-wrap:anywhere}
+@media(max-width:700px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}#featureList{grid-template-columns:1fr}.item{padding:14px}.wrap{width:calc(100% - 26px)}h2{font-size:17px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="top"><span class="env">JRA AI · DEVELOPMENT LAB</span><a href="../index.html">本番サイトへ戻る ↗</a></div>
+<h1>工事中の機能・変更管理</h1>
+<p>開発実験、次回リリース候補、公開済みを機能単位で管理します。正式予想・買い目・PDFは変更せず、画面の本番反映だけを承認制にしています。</p>
+<div id="scan" aria-live="polite">GitHub変更台帳を取得中…</div>
+</div></header>
+<main class="wrap">
+<div class="rule"><strong>移行中：</strong> LABの専用入口を新設しました。既存の実験ページはリンク切れを避けるため、現時点ではステージング配下に残しています。自動的に本番へ昇格する仕組みではありません。</div>
+<section aria-label="変更件数" class="summary">
+<div class="metric"><small>開発・評価中</small><strong id="nLab">—</strong></div>
+<div class="metric"><small>差分の検証待ち</small><strong id="nReview">—</strong></div>
+<div class="metric"><small>公開済み</small><strong id="nReleased">—</strong></div>
+<div class="metric"><small>参照用資料</small><strong id="nReference">—</strong></div>
+</section>
+<h2>機能ごとの状況</h2>
+<p class="sub">更新元のGit blob SHAと最終変更コミットは自動で取得。承認状態・次にやることは人が明示的に管理します。</p>
+<div id="loadError" role="alert"></div>
+<div id="featureList" aria-live="polite"><p>管理台帳を読み込み中…</p></div>
+<section class="policy"><h2>本番リリース時の安全ルール</h2>
+<ol>
+<li>完成候補をステージングで確認し、明示的に承認する。</li>
+<li>変更ファイルを画面系だけに限定し、最新の <code>races.json</code>、HTML/PDF、買い目、発走前proofを上書きしない。</li>
+<li>変更前後のGit tree/blob SHA、表示、公開HTTPのバイト一致を監査する。不一致なら公開完了としない。</li>
+<li>新しい機能と単なる古い検証資料を混同しない。LABからの自動本番昇格はしない。</li>
+</ol></section>
+</main>
+<footer class="wrap">LAB / UI Change Management · 研究試作品の検証入口。正式予想サイトとは別の管理画面です。</footer>
+<script>
+(async function(){
+const list=document.getElementById('featureList');
+const labels={lab_development:'開発中',lab_evaluation:'評価中',needs_review:'差分検証待ち',staging_review:'承認待ち',released:'公開済み',reference_only:'参照資料'};
+const set=(id,v)=>{document.getElementById(id).textContent=String(v);};
+try{
+ const resp=await fetch('change-board.json',{cache:'no-store'});
+ if(!resp.ok)throw new Error('HTTP '+resp.status);
+ const data=await resp.json();
+ if(data.schema_version!==1||data.state!=='verified_git_source'||!Array.isArray(data.features))throw new Error('台帳形式が不正');
+ const c=data.counts||{};
+ set('nLab',(c.lab_development||0)+(c.lab_evaluation||0));
+ set('nReview',(c.needs_review||0)+(c.staging_review||0));
+ set('nReleased',c.released||0);set('nReference',c.reference_only||0);
+ document.getElementById('scan').textContent='自動照合元: '+(data.scan_commit||'不明').slice(0,12)+' · GitHub承認状態は手動確定';
+ list.replaceChildren();
+ for(const f of data.features){
+   const item=document.createElement('article');item.className='item';
+   const head=document.createElement('div');head.className='head';
+   const title=document.createElement('h3');title.textContent=f.name;head.append(title);
+   const state=document.createElement('span');state.className='state';state.textContent=labels[f.phase]||'確認中';head.append(state);item.append(head);
+   const next=document.createElement('p');next.textContent=f.next_action;item.append(next);
+   const meta=document.createElement('div');meta.className='meta';
+   const changed=(f.latest_source_change_commit||'未取得').slice(0,12);
+   meta.textContent='最終Git変更: '+changed+' · ソース '+Object.keys(f.file_blob_shas||{}).length+'件';
+   item.append(meta);
+   const links=document.createElement('div');links.className='links';
+   if(typeof f.preview_path==='string' && f.preview_path.startsWith('staging/')){
+      const a=document.createElement('a');a.href='../'+f.preview_path;a.textContent='検証ページを見る ↗';links.append(a);
+   }
+   if(f.latest_source_change_commit&&/^[0-9a-f]{40}$/.test(f.latest_source_change_commit)){
+      const a=document.createElement('a');a.href='https://github.com/toodataa-ai/keiba-notes/commit/'+f.latest_source_change_commit;
+      a.textContent='変更履歴';a.rel='noopener noreferrer';a.target='_blank';links.append(a);
+   }
+   item.append(links);list.append(item);
+ }
+}catch(err){list.textContent='';document.getElementById('loadError').textContent='変更台帳の取得・検証に失敗しました。公開・承認済みとは判断しません: '+String(err);}
+})();
+</script>
+</body>
+</html>

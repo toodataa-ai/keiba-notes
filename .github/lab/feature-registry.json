@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "mode": "transitional_lab_gateway",
+    "lab_root": "docs/lab/",
+    "staging_root": "docs/staging/",
+    "public_root": "docs/",
+    "public_source": "main/docs",
+    "approval_rule": "only an explicit user approval can move a UI feature to production; a changed Git SHA is not approval",
+    "data_rule": "official JRA/NAR predictions, results, final_bets, PDF and proof stay in existing canonical locations; no LAB or staging promotion copies them",
+    "migration_rule": "Existing experiments stay at their working staging URLs until dependencies are audited and a separately approved move into docs/lab/ is safe",
+    "release_process": "approved UI paths allowlist + diff review + preserve protected tree SHA + real Pages HTTP parity"
+  },
+  "features": [
+    {
+      "id": "simulator",
+      "name": "レースシミュレータ",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "東京・京都の走行線／馬群／コース画像を実機で検品。独立LABへの移動は参照パスを監査してから。",
+      "preview_path": "staging/race-simulator.html",
+      "staging_paths": [
+        "docs/staging/race-simulator.html",
+        "docs/staging/race-simulator.js",
+        "docs/staging/race-simulator.css",
+        "docs/staging/race-sim-engine.js",
+        "docs/staging/race-umapot-overlay-v1.js",
+        "docs/staging/race-sim-manifest-v1.json",
+        "docs/staging/race-ability-model-v1.js",
+        "docs/staging/race-lane-ai-v1.js"
+      ],
+      "production_paths": []
+    },
+    {
+      "id": "course-catalog",
+      "name": "JRA全10場のコース型台帳",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "実コース素材・内外回り・スタート位置の形状検証と受入れ判定。",
+      "preview_path": "staging/race-course-catalog.html",
+      "staging_paths": [
+        "docs/staging/race-course-catalog.html",
+        "docs/staging/race-course-catalog-v1.json",
+        "docs/staging/race-course-catalog-v1.js",
+        "docs/staging/race-course-geometry-v1.js"
+      ],
+      "production_paths": []
+    },
+    {
+      "id": "weekend-blueprints",
+      "name": "10/17〜18 全6メインのコース設計",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "未承認の走行線は正式アニメーションに使わず、形状と画面上の位置合わせを確認。",
+      "preview_path": "staging/weekend-main-course-review.html",
+      "staging_paths": [
+        "docs/staging/weekend-main-course-review.html",
+        "docs/staging/weekend-main-course-review-v1.js",
+        "docs/staging/weekend-main-course-blueprints-20261017.json"
+      ],
+      "production_paths": []
+    },
+    {
+      "id": "purchase-preview",
+      "name": "馬券購入表示の比較",
+      "phase": "lab_evaluation",
+      "approval": "not_approved_as_ui",
+      "next_action": "正式v3.15の購入データは不変。検証用の旧データや表示案を本番の最新予想で上書きしない。",
+      "preview_path": "staging/purchase-preview.html",
+      "staging_paths": [
+        "docs/staging/purchase-preview.html",
+        "docs/staging/data/three-plus-ana"
+      ],
+      "production_paths": []
+    },
+    {
+      "id": "staging-inline-preview",
+      "name": "今週の予想・ページ内表示の検証差分",
+      "phase": "needs_review",
+      "approval": "not_approved_as_stage_override",
+      "next_action": "正式ページ内表示は既に本番稼働。旧レース専用のステージング差し替え動作だけを比較し、必要なら別途承認。",
+      "preview_path": "staging/this-week.html",
+      "staging_paths": [
+        "docs/staging/this-week.html",
+        "docs/staging/stage-week-preview.js",
+        "docs/staging/stage-week-preview.css"
+      ],
+      "production_paths": [
+        "docs/this-week.html",
+        "docs/assets/jra-inline-report.js"
+      ]
+    },
+    {
+      "id": "results-staging-diff",
+      "name": "過去の成績・ステージング専用JS差分",
+      "phase": "needs_review",
+      "approval": "not_approved_as_new_change",
+      "next_action": "本番v1.04の結果不明修正とは区別し、表示JavaScriptの残差分を検証。",
+      "preview_path": "staging/results.html",
+      "staging_paths": [
+        "docs/staging/results.html",
+        "docs/staging/assets/results.js"
+      ],
+      "production_paths": [
+        "docs/results.html",
+        "docs/assets/results.js"
+      ]
+    },
+    {
+      "id": "historical-v315",
+      "name": "10/12予想レポート表示比較",
+      "phase": "reference_only",
+      "approval": "reference_not_release_candidate",
+      "next_action": "比較・検証資料として保持。最新版のレースHTML/PDFを古いプレビューで置き換えない。",
+      "preview_path": "staging/jra-v315-20261012/",
+      "staging_paths": [
+        "docs/staging/jra-v315-20261012"
+      ],
+      "production_paths": []
+    },
+    {
+      "id": "experience-regime",
+      "name": "E0/E1/E2 研究ページのスマホ対応",
+      "phase": "released",
+      "approval": "approved_and_released_2026-10-17",
+      "next_action": "本番更新済み。これ以上の改修は別の承認として扱う。",
+      "preview_path": "staging/experience-regime.html",
+      "staging_paths": [
+        "docs/staging/experience-regime.html"
+      ],
+      "production_paths": [
+        "docs/experience-regime.html"
+      ]
+    }
+  ]
+}

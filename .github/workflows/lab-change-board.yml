@@ -1,0 +1,85 @@
+name: Keep LAB UI change board aligned with Git source
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/lab/**'
+      - '.github/scripts/build-lab-change-board.py'
+      - '.github/workflows/lab-change-board.yml'
+      - 'docs/staging/**'
+      - 'docs/experience-regime.html'
+      - 'docs/this-week.html'
+      - 'docs/results.html'
+      - 'docs/assets/jra-inline-report.js'
+      - 'docs/assets/results.js'
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: keiba-lab-change-board, cancel-in-progress: false}
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Build board from fresh main without modifying protected racing data
+        run: |
+          set -euo pipefail
+          python3 -m py_compile .github/scripts/build-lab-change-board.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python3 .github/scripts/build-lab-change-board.py
+            git add -- docs/lab/change-board.json
+            python3 - <<'PY'
+          import subprocess
+          items=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert items.issubset({'docs/lab/change-board.json'}),items
+          print('PASS_LAB_AUTOMATION_WRITES_ONLY_BOARD',items)
+          PY
+            if git diff --cached --quiet; then
+              echo PASS_LAB_BOARD_ALREADY_CURRENT
+              break
+            fi
+            git commit -m "Refresh read-only LAB feature ledger from Git UI source SHAs"
+            if git push origin HEAD:main; then
+              echo PASS_LAB_BOARD_COMMITTED
+              break
+            fi
+            test "$attempt" -lt 5 || { echo '::error::Git concurrency prevented safe ledger publication';exit 1; }
+            sleep 3
+          done
+      - name: Check final recorded board and policy
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/build-lab-change-board.py --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('docs/lab/change-board.json').read_text())
+          assert d['state']=='verified_git_source' and len(d['features'])>=7
+          assert all(f['approval'] for f in d['features'])
+          assert all(f['preview_path'].startswith('staging/') for f in d['features'])
+          assert 'noindex,nofollow' in Path('docs/lab/index.html').read_text()
+          assert not any('docs/data/' in path or 'docs/pdfs/' in path or 'e2e_validation/' in path
+              for f in d['features'] for path in f['staging_paths']+f['production_paths'])
+          print('PASS_LAB_GATEWAY_APPROVAL_IS_MANUAL_DATA_ISOLATION')
+          PY
+      - name: Verify real public LAB dashboard and ledger byte parity
+        run: |
+          set -euo pipefail
+          base=https://toodataa-ai.github.io/keiba-notes/lab
+          for attempt in $(seq 1 35); do
+            ok=1
+            for file in index.html change-board.json; do
+              if ! curl -LfsS --max-time 20 "$base/$file?lab-check=$GITHUB_RUN_ID-$attempt" -o /tmp/lab-http-check; then ok=0;break;fi
+              if ! cmp -s "docs/lab/$file" /tmp/lab-http-check; then ok=0;break;fi
+            done
+            if [[ $ok == 1 ]];then echo PASS_LAB_PUBLIC_HTTP_EXACT_BYTE_MATCH;exit 0;fi
+            sleep 9
+          done
+          echo '::error::New LAB public Pages content not yet verified';exit 1
