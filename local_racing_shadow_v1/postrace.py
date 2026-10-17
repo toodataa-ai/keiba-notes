@@ -209,7 +209,11 @@ def parse_official(soup, p):
     if not dist_match:
         raise Blocked("BLOCKED_PARSE", "Official surface/distance missing")
     distance = int(dist_match.group(1))
-    if distance != int(p["distance"]) or clean(p.get("surface")) != "ダート":
+    # Official Banei pages describe the track as ダート 200m, while the
+    # immutable research snapshot labels its separate racing type ばんえい.
+    # Accept this exact venue/track correspondence, never a generic synonym.
+    expected_surface = "ばんえい" if p["venue"] == "帯広ば" else "ダート"
+    if distance != int(p["distance"]) or clean(p.get("surface")) != expected_surface:
         raise Blocked("BLOCKED_JOIN", "Official distance/surface does not match prediction")
     # Banei publishes numeric track moisture, e.g. 馬場：1.0.
     # Never convert it to the four-grade thoroughbred going scale.
