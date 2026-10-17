@@ -32,6 +32,8 @@ jobs:
           import subprocess
           files=set(subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines())
           allowed={
+            '.github/lab/feature-registry.json',
+            'docs/lab/KYOTO_INNER_2000_INSIDE_TURN_V046.md',
             '.github/workflows/validate-lab-kyoto-inner-v045.yml',
             'docs/lab/race-umapot-overlay-v1.js',
             'docs/lab/race-simulator.html',

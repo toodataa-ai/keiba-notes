@@ -42,7 +42,7 @@ jobs:
             assert (l/name).read_bytes()==(s/name).read_bytes(),name
           # LAB overlay is intentionally newer than the frozen legacy staging geometry.
           assert (l/'race-umapot-overlay-v1.js').read_bytes()!=(s/'race-umapot-overlay-v1.js').read_bytes()
-          assert 'race-umapot-overlay-v1.js?v=20261017-45' in (l/'race-simulator.html').read_text()
+          assert 'race-umapot-overlay-v1.js?v=20261017-46' in (l/'race-simulator.html').read_text()
           for name in ('2026-10-12-october-stakes-three-plus-ana.pdf',
                        '2026-10-12-swan-stakes-three-plus-ana.pdf'):
             assert (l/'pdfs'/name).read_bytes()==(s/'pdfs'/name).read_bytes(),name
