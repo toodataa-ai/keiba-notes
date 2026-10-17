@@ -31,17 +31,29 @@ const expected=[
  [1270,463,136],[1435,510,197],
  [1671.6,490,317],[2000,294,317]
 ];
+const pointProbe=d=>W.RaceUmapotOverlay.point(kyoto,d,0);
+const immutableDistances=new Set([0,100,1270,1435,1671.6,2000]);
 for(const [d,x,y] of expected){
- const p=W.RaceUmapotOverlay.point(kyoto,d,0);
- assert.ok(Math.hypot(p.x-x,p.y-y)<0.02,'exact pixel-calibrated Kyoto inner image anchor: '+d);
+ const p=pointProbe(d),base={x,y};
+ const displacement=Math.hypot(p.x-x,p.y-y);
+ if(immutableDistances.has(d))
+   assert.ok(displacement<.02,'outside early bends unchanged: '+d);
+ else {
+   assert.ok(displacement>=2 && displacement<=9.2,'inward draw-only shift: '+d+' = '+displacement);
+   const prev=pointProbe(d-.1),next=pointProbe(d+.1);
+   const tangent={x:next.x-prev.x,y:next.y-prev.y};
+   const mag=Math.hypot(tangent.x,tangent.y);
+   const inward=(p.x-x)*(-tangent.y/mag)+(p.y-y)*(tangent.x/mag);
+   assert.ok(inward>1.8,'projection must go toward inner rail at '+d+': '+inward);
+ }
+}
+// The inside-pull starts only after the first 200m and must not distort
+// the opposite side, the final straight, or either original registration.
+for(const d of [0,50,100,150,200,1100,1250,1400,1700,1900,2000]){
+ const p=pointProbe(d);
+ assert.ok(Number.isFinite(p.x)&&Number.isFinite(p.y));
 }
 
-const pointProbe=(d)=>W.RaceUmapotOverlay.point(kyoto,d,0);
-// 9 checkpoints remain exact under all 5m sampling and no positional snap
-for(const [metres,x,y] of expected){
- const p=pointProbe(metres);
- assert.ok(Math.hypot(p.x-x,p.y-y)<.02,'anchor registration at '+metres);
-}
 
 let last=null,maxPxPer5m=0;
 for(let d=0;d<=2000;d+=5){
@@ -78,18 +90,20 @@ function tracedTurfAt(d){
 const distanceToTurf=(p,d)=>{
  const g=tracedTurfAt(d);return Math.hypot(p.x-g.x,p.y-g.y);
 };
-const TURF_CENTRE_TOLERANCE_PX=10;
+// The desired INNER racing line is intentionally closer to the rail than
+// the independent legacy turf-center guide; never claim it is the same line.
+const TURF_BAND_INNER_LINE_TOLERANCE_PX=14;
 let worstCentreDeviation=0;
 for(let d=0;d<=2000;d+=5){
  const actual=W.RaceUmapotOverlay.point(kyoto,d,0);
  const delta=distanceToTurf(actual,d);
  worstCentreDeviation=Math.max(worstCentreDeviation,delta);
- assert.ok(delta<TURF_CENTRE_TOLERANCE_PX,
+ assert.ok(delta<TURF_BAND_INNER_LINE_TOLERANCE_PX,
    '5m turf ribbon escape (not merely image bounds) at '+d+'m: '+delta.toFixed(2)+'px');
 }
-assert.ok(distanceToTurf({x:200,y:253},420)>TURF_CENTRE_TOLERANCE_PX,
+assert.ok(distanceToTurf({x:200,y:253},420)>TURF_BAND_INNER_LINE_TOLERANCE_PX,
  'negative control: 44px outside first bend must be rejected');
-assert.ok(distanceToTurf({x:545,y:258},1550)>TURF_CENTRE_TOLERANCE_PX,
+assert.ok(distanceToTurf({x:545,y:258},1550)>TURF_BAND_INNER_LINE_TOLERANCE_PX,
  'negative control: outer loop at fourth bend must be rejected');
 assert.equal(W.RaceUmapotOverlay.outwardShiftPx(kyoto,1435),0);
 const immutableLegacySamples={
@@ -128,7 +142,7 @@ const oldTokyo=W.RaceUmapotOverlay.point(tokyo,0,0);
 assert.ok(oldTokyo.x>500&&oldTokyo.y>265);
 assert.ok(html.includes('id="kyotoCourseImage"'));
 assert.ok(html.includes('src="https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg"'));
-assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261017-45'));
+assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261017-46'));
 assert.ok(html.includes('race-simulator.js?v=20261016-43'));
 assert.ok(html.includes('同じうまぽっとの京都競馬場原画像'));
 assert.ok(js.includes("['kyoto_turf_outer_1400','kyoto_turf_inner_2000'].includes"));
@@ -136,4 +150,4 @@ assert.ok(js.includes("'kyoto_turf_inner_2000'].includes(race.course_id)"));
 const official=JSON.parse(fs.readFileSync(root+'race-sim-manifest-v1.json','utf8'));
 assert.equal(official.races.length,2,'official field must remain two sealed races');
 assert.ok(!official.races.some(x=>x.course_id==='kyoto_turf_inner_2000'));
-console.log('PASS_LAB_V045_KYOTO_INNER_9_ANCHORS_5M_BAND_AND_LEGACY_TRACKS',maxPxPer5m.toFixed(2),'ribbon deviation',worstCentreDeviation.toFixed(2));
+console.log('PASS_LAB_V046_KYOTO_INNER_INSIDE_1C_2C_5M_AND_LEGACY_TRACKS',maxPxPer5m.toFixed(2),'ribbon deviation',worstCentreDeviation.toFixed(2));

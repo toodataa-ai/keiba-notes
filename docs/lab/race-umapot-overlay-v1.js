@@ -108,8 +108,9 @@ function outwardShiftPx(course,d){
 }
 // Pixel registrations from a separately traced INNER-turf-band center on
 // Umapot's 620x430 reference JPEG. These ARE NOT surveyed coordinates.
-// The nine distances are exactly the user's review checkpoints; they correct
-// drawing only, never physics, speed, pace, lane choice, or race timing.
+// The nine image landmarks calibrate the source's green turf ribbon before
+// the later, separately tunable inside-line racing visualization offset.
+// Neither correction modifies physics, speed, pace, lane choice or race timing.
 const kyotoInnerCenterAnchors=Object.freeze([
  [0,350,317],[100,294,316],[308.7,178,301],[530,165,204],
  [900,286,147],[1270,463,136],[1435,510,197],
@@ -156,11 +157,24 @@ function kyotoCenterCorrection(course,d){
  }
  return {x:interpolate('dx'),y:interpolate('dy')};
 }
+// Kyoto inner 2000m is a RIGHT-HAND circuit. After the stand-side start,
+// the live broadcast's early inward cut has to appear on the Umapot image too.
+// Positive right-normal offsets go toward the INNER rail around turns 1–2.
+// Smooth entry/exit keep the distance-to-pixel mapping C1-continuous and avoid
+// a visible "jump" at 1C/2C. Not a lane/velocity/pace/physics adjustment.
+function kyotoEarlyInsidePullPx(d){
+ const smooth=x=>{const t=clamp(x,0,1);return t*t*(3-2*t)};
+ return 8.5*smooth((d-225)/125)*(1-smooth((d-720)/300));
+}
 function point(course,d,lane=0){
  const p=uncalibratedPoint(course,d,lane);
  if(course.id!=='kyoto_turf_inner_2000')return p;
  const delta=kyotoCenterCorrection(course,d);
- return {x:p.x+delta.x,y:p.y+delta.y};
+ const center=referenceLine(course).at(d);
+ const inward=kyotoEarlyInsidePullPx(d);
+ // ( -ty, tx ) is the RIGHT normal of the displayed travel direction.
+ return {x:p.x+delta.x-center.ty*inward,
+         y:p.y+delta.y+center.tx*inward};
 }
 function validate(course){
  const parts=path[course.id];if(!parts||parts.length!==course.segments.length)throw Error('UMAPOT_UNREGISTERED');
