@@ -25,6 +25,9 @@ jobs:
             node --check "$script"
           done
           node --check tools/test_race_sim_lab_kyoto_inner_v045.cjs
+          node --check docs/lab/race-broadcast-map-v1.js
+          node --check tools/test_kyoto_broadcast_shared_map_v047.cjs
+          node tools/test_kyoto_broadcast_shared_map_v047.cjs
           node tools/test_race_sim_lab_kyoto_inner_v045.cjs
           python3 .github/scripts/staging-baseline-v2.py --check
           python3 - <<'PY'
@@ -36,13 +39,15 @@ jobs:
           assert 'race-simulator.js' in (l/'race-simulator.html').read_text()
           assert 'race-umapot-overlay-v1.js' in (l/'race-simulator.html').read_text()
           assert 'race-simulator.html' not in Path('docs/staging/index.html').read_text()
-          for name in ('race-simulator.js','race-course-geometry-v1.js',
+          for name in ('race-course-geometry-v1.js',
             'race-sim-engine.js','race-lane-ai-v1.js',
             'weekend-main-course-blueprints-20261017.json'):
             assert (l/name).read_bytes()==(s/name).read_bytes(),name
           # LAB overlay is intentionally newer than the frozen legacy staging geometry.
           assert (l/'race-umapot-overlay-v1.js').read_bytes()!=(s/'race-umapot-overlay-v1.js').read_bytes()
           assert 'race-umapot-overlay-v1.js?v=20261017-46' in (l/'race-simulator.html').read_text()
+          assert 'race-broadcast-map-v1.js?v=20261018-47' in (l/'race-simulator.html').read_text()
+          assert 'RaceSimBroadcastMap.draw({' in (l/'race-simulator.js').read_text()
           for name in ('2026-10-12-october-stakes-three-plus-ana.pdf',
                        '2026-10-12-swan-stakes-three-plus-ana.pdf'):
             assert (l/'pdfs'/name).read_bytes()==(s/'pdfs'/name).read_bytes(),name

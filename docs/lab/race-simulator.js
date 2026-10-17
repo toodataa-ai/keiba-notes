@@ -1,4 +1,4 @@
-/* Staging race simulator v0.20. JRA bracket colors and licensed actual course reference. */
+/* LAB race simulator v0.47. JRA bracket colors and licensed actual course reference. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id);
@@ -13,7 +13,7 @@ const ui={
 };
 let catalog=[],race=null,sim=null,running=false,frameId=0,lastFrame=0,renderAt=0,scenarioVersion=0;
 let cameraMotion=null;
-// Test fixture lives only inside staging. It cannot impersonate a JRA report.
+// Test fixture lives only inside LAB. It cannot impersonate a JRA report.
 const DEMO_ID='stage-shuka-inner-one-runner-demo-v1';
 const DEMO_MODE='shuka_single_horse_v1';
 function isDemo(r){return r?.id===DEMO_ID&&r.demo_mode===DEMO_MODE}
@@ -199,6 +199,11 @@ function updateCourseReference(){
  if(figure)figure.hidden=!region&&!canUseGeneric;
  if(tokyo)tokyo.hidden=region!=='tokyo';
  if(kyoto)kyoto.hidden=region!=='kyoto';
+ // The LAB broadcast also uses this very image. Force loading even if its
+ // overview panel is below the fold on narrow iPhones.
+ if(region==='kyoto'&&race?.course_id==='kyoto_turf_inner_2000'){
+  const img=$('kyotoCourseImage');if(img)img.loading='eager';
+ }
  if(generic)generic.hidden=!canUseGeneric;
  ui.map=canUseGeneric?$('genericCourseCanvas'):null;
 }
@@ -221,6 +226,7 @@ function setupReferenceMapErrorHandling(){
    img.addEventListener('load',()=>{
      const warn=$('courseMapWarning');
      if(warn && !Array.from(document.querySelectorAll('#referenceMapFigure img')).some(x=>x.hidden))warn.hidden=true;
+     if(id==='kyotoCourseImage'&&race?.course_id==='kyoto_turf_inner_2000'&&sim)render();
    });
  }
 }
@@ -659,6 +665,24 @@ function drawRace(){
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
  const target=focus||state.horses[0];
+ // LAB Kyoto inner 2000m: use the VERY SAME original course raster and the
+ // EXACT RaceUmapotOverlay.point() projection used by the full overview map.
+ // No substitute schematic, independent straight/corner interpolation,
+ // rotation or finish-camera cut. Other courses retain their legacy view.
+ if(window.RaceSimBroadcastMap?.supports(race)){
+  const img=$('kyotoCourseImage');
+  const drawn=RaceSimBroadcastMap.draw({
+   ctx,canvas:ui.canvas,image:img,state,race,course:profile,
+   overlay:RaceUmapotOverlay,focusNo:target.number,
+   passingNo:recentOvertake(state)?.attackerNo??null,
+   paintNumber:raceNumberMarker,renderedWidth,
+   guide:new URLSearchParams(location.search).get('guide')==='1'
+  });
+  if(!drawn.ready)drawIdle('実際の京都コース画像を読み込み中…');
+  drawCourse();
+  drawLicensedOverlay(state);
+  return;
+ }
  if(state.goalCamera){
    drawGoalCamera(ctx,state,profile,w,h,renderedWidth,target);
    drawCourse();
