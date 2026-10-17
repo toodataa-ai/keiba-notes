@@ -180,6 +180,7 @@ function draw(state,race,focus,pathOn,paintNumber){
  // LAB-only manual-review overlay. Normal playback remains visually untouched.
  // ?demo=shuka-one&guide=1 draws the exact nine checkpoints, turf centerline.
  if(race.course_id==='kyoto_turf_inner_2000'&&
+    typeof URLSearchParams!=='undefined'&&
     new URLSearchParams(global.location?.search||'').get('guide')==='1'){
   ctx.save();
   ctx.strokeStyle='#8d27bd';ctx.lineWidth=1.5;

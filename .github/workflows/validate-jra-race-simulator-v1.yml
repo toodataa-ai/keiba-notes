@@ -37,9 +37,12 @@ jobs:
           assert 'race-umapot-overlay-v1.js' in (l/'race-simulator.html').read_text()
           assert 'race-simulator.html' not in Path('docs/staging/index.html').read_text()
           for name in ('race-simulator.js','race-course-geometry-v1.js',
-            'race-umapot-overlay-v1.js','race-sim-engine.js','race-lane-ai-v1.js',
+            'race-sim-engine.js','race-lane-ai-v1.js',
             'weekend-main-course-blueprints-20261017.json'):
             assert (l/name).read_bytes()==(s/name).read_bytes(),name
+          # LAB overlay is intentionally newer than the frozen legacy staging geometry.
+          assert (l/'race-umapot-overlay-v1.js').read_bytes()!=(s/'race-umapot-overlay-v1.js').read_bytes()
+          assert 'race-umapot-overlay-v1.js?v=20261017-45' in (l/'race-simulator.html').read_text()
           for name in ('2026-10-12-october-stakes-three-plus-ana.pdf',
                        '2026-10-12-swan-stakes-three-plus-ana.pdf'):
             assert (l/'pdfs'/name).read_bytes()==(s/'pdfs'/name).read_bytes(),name
@@ -51,7 +54,7 @@ jobs:
           assert (l/'data/three-plus-ana/2026-10-12-october-stakes.json').is_file()
           main=json.loads(Path('docs/data/races.json').read_text())
           assert len([r for r in main['races'] if r['id'].startswith('2026-10-17')])==3
-          print('PASS_LAB_SIM_EXACT_JS_PDF_PROOFS_PRODUCTION_RACE_REGISTRY_INTACT')
+          print('PASS_LAB_SIM_INDEPENDENT_GEOMETRY_PDF_PROOFS_PRODUCTION_RACE_REGISTRY_INTACT')
           PY
       - name: Ensure live LAB simulator exists at canonical URL
         run: |
