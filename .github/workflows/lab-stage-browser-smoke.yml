@@ -1,0 +1,82 @@
+name: Browser-verify isolated LAB experiments and production-mirror staging
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-stage-browser-smoke.yml'
+      - 'docs/lab/**'
+      - '!docs/lab/change-board.json'
+      - 'docs/staging/index.html'
+      - 'docs/staging/this-week.html'
+      - 'docs/staging/results.html'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install real Chromium automation
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          command -v google-chrome || command -v chromium || command -v chromium-browser
+      - name: Assert staging canonical HTML equals approved production transform
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/staging-baseline-v2.py --check
+          git diff --quiet HEAD -- docs/data/races.json docs/reports docs/pdfs e2e_validation
+      - name: Exercise LAB experiments, legacy redirects, and stage baseline in actual Chrome
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --directory docs >/tmp/lab-browser-static.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          from playwright.sync_api import sync_playwright
+          chrome=next((f for f in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if f),None)
+          assert chrome
+          lab=[
+            'lab/index.html','lab/race-simulator.html?demo=shuka-one',
+            'lab/race-course-catalog.html','lab/weekend-main-course-review.html',
+            'lab/purchase-preview.html','lab/this-week-preview.html',
+            'lab/results-preview.html','lab/jra-v315-20261012/index.html']
+          stage=['staging/index.html','staging/this-week.html','staging/results.html','staging/experience-regime.html']
+          redirects={
+            'staging/race-simulator.html?demo=shuka-one':'/lab/race-simulator.html',
+            'staging/race-course-catalog.html':'/lab/race-course-catalog.html',
+            'staging/weekend-main-course-review.html':'/lab/weekend-main-course-review.html',
+            'staging/purchase-preview.html':'/lab/purchase-preview.html'
+          }
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox'])
+            for width in (390,1024):
+              for path in lab+stage+list(redirects):
+                page=browser.new_page(viewport={'width':width,'height':844})
+                errors=[];not_found=[]
+                page.on('pageerror',lambda error:errors.append(str(error)))
+                page.on('response',lambda res:not_found.append((res.status,res.url)) if res.status>=400 and res.url.startswith('http://127.0.0.1:8765/') else None)
+                page.goto('http://127.0.0.1:8765/'+path,wait_until='domcontentloaded',timeout=45000)
+                page.wait_for_timeout(800)
+                assert not not_found,(width,path,'same-origin broken assets',not_found)
+                assert not errors,(width,path,'javascript errors',errors)
+                assert not page.locator('body').is_hidden(),(width,path,'body missing')
+                if path.startswith('staging/') and path in redirects:
+                  assert redirects[path] in page.url,(width,path,'legacy link not redirected',page.url)
+                if path.startswith('staging/') and path not in redirects:
+                  assert page.locator('.staging-shell-marker').count()==1,(width,path,'stage marker')
+                if path=='lab/race-course-catalog.html':
+                  assert page.locator('#courseRows').count()==1,'catalog UI not rendered'
+                if path=='lab/race-simulator.html?demo=shuka-one':
+                  assert page.locator('#tokyoCourseOverlay').count()==1,'real map overlay lost'
+                if path=='lab/index.html':
+                  assert page.locator('#featureList article.item').count()==8,'feature registry lost'
+                print('PASS_LAB_STAGE_REAL_CHROME',width,path)
+                page.close()
+            browser.close()
+          print('PASS_LAB_EIGHT_PAGES_FOUR_STAGING_PAGES_FOUR_LEGACY_REDIRECTS_2_VIEWPORTS')
+          PY
