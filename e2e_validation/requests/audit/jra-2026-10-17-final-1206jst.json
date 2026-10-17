@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "scope": "JRA main Tokyo Kyoto Niigata 11R",
+  "required_purchase_version": "v3.15",
+  "verify": [
+    "all 3 formally predicted race IDs",
+    "no result or review changed",
+    "immutable v3.13 STEP1 and all v3.15 proof commits",
+    "complete actual final buy or pass and <=6000 yen budget",
+    "reader-v1 one horse per page and color/background font audit",
+    "each live Pages HTML PDF and docs/data/races.json SHA256 exact byte equality"
+  ],
+  "publication_change_authorized": false,
+  "request_kind": "read_only_public_http_and_immutable_git_audit"
+}
