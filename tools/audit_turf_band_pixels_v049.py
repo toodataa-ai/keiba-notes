@@ -53,7 +53,9 @@ def main():
     for p in pts:
         lane=p['lane']
         counts[lane]['count']+=1
-        if is_green(im.getpixel((int(round(p['x'])),int(round(p['y'])))):
+        xi=int(round(p['x']))
+        yi=int(round(p['y']))
+        if is_green(im.getpixel((xi,yi))):
             counts[lane]['raw']+=1
         if nearby_green(im,p['x'],p['y'],2):counts[lane]['near']+=1
         else:worst.append([p['d'],lane,round(p['x'],1),round(p['y'],1)])
