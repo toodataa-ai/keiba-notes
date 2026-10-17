@@ -52,8 +52,8 @@
       <div class="status-strip" aria-label="現在地">
         <div class="status-card"><small>運用</small><strong>研究中</strong><span>本番予想への影響なし</span></div>
         <div class="status-card"><small>対象</small><strong>1R–12R</strong><span>全JRAレースを母集団</span></div>
-        <div class="status-card"><small>カバー率</small><strong id="coverage">確認中…</strong><span>Experience付き予想</span></div>
-        <div class="status-card"><small>観測数</small><strong id="observations">確認中…</strong><span>E0/E1/E2合計</span></div>
+        <div class="status-card"><small>発走前証拠の完備</small><strong id="coverage">確認中…</strong><span>固定した研究対象レース</span></div>
+        <div class="status-card"><small>累積馬観測</small><strong id="observations">確認中…</strong><span>通算戦績を出典付きで確認</span></div>
       </div>
     </div>
   </div>
@@ -129,6 +129,8 @@
 
   <section class="chapter" id="e012-live-collection" aria-label="発走前固定研究進捗">
   <div class="chapter-head"><div class="chapter-no">07</div><div><h2>発走前固定の実収集・監査</h2><p class="chapter-lead">GitHub proof_commit の実時刻と公式通算戦績を確認した、研究専用の進捗です。</p></div></div>
+  <p id="e012-cumulative">固定済みの累積研究進捗を確認中…</p>
+  <p>ここでの「観測」は各馬の発走前通算戦績・E0/E1/E2分類です。予測確率、的中実績、正式予想のSTEP1完了件数を意味しません。</p>
   <p id="e012-run-date">対象日データを確認中…</p>
   <table class="metric-table">
     <thead><tr><th>指標</th><th>発走前の確認値</th></tr></thead>
@@ -152,15 +154,33 @@
 async function load(){
   try{
     const r=await fetch('data/experience_regime_status.json',{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));
-    const d=await r.json();const versions=Object.values(d.versions||{});
-    let entries=0,covered=0,obs=0;
-    for(const v of versions){
-      entries+=v.coverage?.required_entries||v.coverage?.prediction_entries||0;
-      covered+=v.coverage?.required_entries_with_experience||v.coverage?.entries_with_experience||0;
-      for(const x of Object.values(v.regimes||{}))obs+=x.horse_observations||0;
+    const d=await r.json();
+    // Research collection is independent from the legacy formal-E2E 'versions'
+    // coverage, which must never appear as the collection total.
+    const runs=Object.values(d.collection_runs||{});
+    const totals={selected:0,complete:0,horses:0,regimes:{E0:0,E1:0,E2:0}};
+    for(const run of runs){
+      const selected=Number(run.selected_today);
+      const complete=Number(run.complete_evidence_races);
+      const proofValid=Number(run.prerace_proof_valid_races);
+      if(!Number.isSafeInteger(selected)||!Number.isSafeInteger(complete)||!Number.isSafeInteger(proofValid)||
+         complete<0||selected<0||proofValid<complete||selected<complete){
+        throw new Error('Invalid collection run coverage');
+      }
+      totals.selected+=selected;
+      totals.complete+=complete;
+      for(const key of ['E0','E1','E2']){
+        const n=Number(run.regimes?.[key]?.horse_observations);
+        if(!Number.isSafeInteger(n)||n<0)throw new Error('Invalid verified horse count '+key);
+        totals.regimes[key]+=n;
+        totals.horses+=n;
+      }
     }
-    document.querySelector('#coverage').textContent=entries?`${covered}/${entries}`:'0 cases';
-    document.querySelector('#observations').textContent=String(obs||0);
+    document.querySelector('#coverage').textContent=runs.length?`${totals.complete} / ${totals.selected}`:'未収集';
+    document.querySelector('#observations').textContent=runs.length?`${totals.horses}頭`:'未収集';
+    document.querySelector('#e012-cumulative').textContent=runs.length?
+      `累積：${totals.complete} / ${totals.selected}レース・${totals.horses}頭（E0 ${totals.regimes.E0}頭 / E1 ${totals.regimes.E1}頭 / E2 ${totals.regimes.E2}頭）`:
+      '発走前研究データは未収集です。';
     const run=d.collection_runs?.[Object.keys(d.collection_runs||{}).sort().slice(-1)[0]];
     if(run){
       const set=(id,value)=>{const e=document.getElementById(id);if(e)e.textContent=String(value)};
@@ -174,7 +194,11 @@ async function load(){
       const e=document.getElementById('e012-run-date');if(e)e.textContent='対象日の発走前証拠は未固定または未公開です。既存の累積観測と混同しません。';
       for(const id of ['e012-selected','e012-proof','e012-e0','e012-e1','e012-e2','e012-gaps','e012-commit']){const e=document.getElementById(id);if(e)e.textContent='未検証';}
     }
-  }catch(e){document.querySelector('#coverage').textContent='取得失敗';document.querySelector('#observations').textContent='—'}
+  }catch(e){
+    document.querySelector('#coverage').textContent='取得失敗';
+    document.querySelector('#observations').textContent='—';
+    document.querySelector('#e012-cumulative').textContent='累積データの検証に失敗しました。';
+  }
 }
 load();
 </script>
