@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "model_version": "e012-shadow-v0.1",
-  "generated_at": "2026-10-16T23:21:08+00:00",
+  "generated_at": "2026-10-17T10:32:23+00:00",
   "mode": "shadow_observation_only",
   "production_effect": false,
   "collection": {
@@ -419,10 +419,10 @@
     },
     "v3.13": {
       "coverage": {
-        "prediction_entries": 2,
+        "prediction_entries": 5,
         "entries_with_experience": 0,
         "missing_experience": 0,
-        "required_entries": 2,
+        "required_entries": 5,
         "required_entries_with_experience": 0,
         "required_missing_experience": 0,
         "coverage_rate": 0.0,
@@ -1215,6 +1215,27 @@
     {
       "case": "e2e_validation/cases/2026-10-12-swan-stakes/case.json",
       "race_id": "2026-10-12-swan-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-17-fuji-stakes/case.json",
+      "race_id": "2026-10-17-fuji-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-17-hokuriku-stakes/case.json",
+      "race_id": "2026-10-17-hokuriku-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-17-tourmaline-stakes/case.json",
+      "race_id": "2026-10-17-tourmaline-stakes",
       "version": "v3.13",
       "grade": "prospective_strict",
       "error": "race_context.race_category is required"

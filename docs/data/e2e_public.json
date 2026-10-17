@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-12T10:42:39.789402+00:00",
+  "generated_at": "2026-10-17T10:32:24.532862+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-10-12T10:42:39.532692+00:00",
+    "generated_at": "2026-10-17T10:32:24.150443+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -40,12 +40,12 @@
     "latest_formal_prompt_version": "v3.13",
     "formal_grade_a": {
       "passed": true,
-      "validated_case_count": 6,
+      "validated_case_count": 9,
       "errors": []
     },
     "shadow_research": {
       "state": "evidence_incomplete",
-      "prerace_evidence_gap_count": 5,
+      "prerace_evidence_gap_count": 8,
       "evidence_gaps": [
         {
           "race_id": "2026-10-10-mimuro-stakes",
@@ -73,6 +73,24 @@
         },
         {
           "race_id": "2026-10-12-swan-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-17-fuji-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-17-hokuriku-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-17-tourmaline-stakes",
           "version": "v3.13",
           "cause": "race_context.race_category is required",
           "source": "sealed_prediction_missing_prerace_fields"
@@ -133,16 +151,798 @@
         ],
         "weekly_improvement_decision": "no_change",
         "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
+      },
+      {
+        "meeting_id": "2026-10-17-to-2026-10-18",
+        "dates": [
+          "2026-10-17",
+          "2026-10-18"
+        ],
+        "registered_races": 3,
+        "expected_races": 6,
+        "formal_grade_a_review_state": "pending",
+        "races": [
+          {
+            "race_id": "2026-10-17-fuji-stakes",
+            "date": "2026-10-17",
+            "formal_state": "complete",
+            "reasons": []
+          },
+          {
+            "race_id": "2026-10-17-hokuriku-stakes",
+            "date": "2026-10-17",
+            "formal_state": "complete",
+            "reasons": []
+          },
+          {
+            "race_id": "2026-10-17-tourmaline-stakes",
+            "date": "2026-10-17",
+            "formal_state": "complete",
+            "reasons": []
+          },
+          {
+            "race_id": "2026-10-18-brazil-cup",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          },
+          {
+            "race_id": "2026-10-18-shuka-sho",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          },
+          {
+            "race_id": "2026-10-18-niigata-himba-stakes",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          }
+        ],
+        "weekly_improvement_decision": "not_evaluated",
+        "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
       }
     ]
   },
   "totals": {
-    "prospective_strict_races": 6,
+    "prospective_strict_races": 9,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 6,
-    "prospective_results_joined": 6
+    "prospective_prediction_entries": 9,
+    "prospective_results_joined": 9
   },
   "races": [
+    {
+      "race_id": "2026-10-17-tourmaline-stakes",
+      "date": "2026-10-17",
+      "venue": "京都",
+      "surface": "dirt",
+      "race_name": "トルマリンステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-17T15:30:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-17-tourmaline-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-17-tourmaline-stakes.json",
+      "official_result_at": "2026-10-17T10:32:01.610Z",
+      "official_going": "良",
+      "finish_order": [
+        10,
+        5,
+        9,
+        6,
+        15,
+        3,
+        12,
+        1,
+        8,
+        14,
+        11,
+        7,
+        4,
+        13,
+        2
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-10-17T02:49:45.820Z",
+          "information_cutoff_at": "2026-10-17T02:49:45.820Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "トルマリンステークス",
+          "marks": {
+            "win": 5,
+            "second": 6,
+            "third": 14
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "ワイド",
+              "selection": [
+                5,
+                10
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "ワイド",
+              "selection": [
+                5,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "ワイド",
+              "selection": [
+                5,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "ワイド",
+              "selection": [
+                5,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "ワイド",
+              "selection": [
+                5,
+                9
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B06",
+              "type": "単勝",
+              "selection": [
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B07",
+              "type": "枠連",
+              "selection": [
+                3,
+                4
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B08",
+              "type": "枠連",
+              "selection": [
+                3,
+                6
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "6f3494dc18d048d8a1e99c21b3da03f3c7a1cf01",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-17-tourmaline-stakes/v3.15-run38996383968-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-17-tourmaline-stakes/v3.15-run38996383968-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-10-17-hokuriku-stakes",
+      "date": "2026-10-17",
+      "venue": "新潟",
+      "surface": "turf",
+      "race_name": "北陸ステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-17T15:15:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-17-hokuriku-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-17-hokuriku-stakes.json",
+      "official_result_at": "2026-10-17T10:32:01.610Z",
+      "official_going": "良",
+      "finish_order": [
+        6,
+        12,
+        15,
+        17,
+        3,
+        10,
+        2,
+        18,
+        1,
+        13,
+        11,
+        16,
+        14,
+        8,
+        4,
+        5,
+        7,
+        9
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-10-17T02:56:59.836Z",
+          "information_cutoff_at": "2026-10-17T02:56:59.836Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "北陸ステークス",
+          "marks": {
+            "win": 6,
+            "second": 17,
+            "third": 15
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "三連複",
+              "selection": [
+                15,
+                17,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "三連複",
+              "selection": [
+                5,
+                15,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "三連複",
+              "selection": [
+                5,
+                15,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "三連複",
+              "selection": [
+                5,
+                17,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "三連複",
+              "selection": [
+                5,
+                6,
+                15
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B06",
+              "type": "三連複",
+              "selection": [
+                5,
+                6,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B07",
+              "type": "三連複",
+              "selection": [
+                5,
+                6,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B08",
+              "type": "三連複",
+              "selection": [
+                5,
+                6,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B09",
+              "type": "三連複",
+              "selection": [
+                5,
+                8,
+                15
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B10",
+              "type": "三連複",
+              "selection": [
+                5,
+                8,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B11",
+              "type": "三連複",
+              "selection": [
+                5,
+                8,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B12",
+              "type": "三連複",
+              "selection": [
+                6,
+                15,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B13",
+              "type": "三連複",
+              "selection": [
+                6,
+                15,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B14",
+              "type": "三連複",
+              "selection": [
+                6,
+                17,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B15",
+              "type": "三連複",
+              "selection": [
+                6,
+                8,
+                15
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B16",
+              "type": "三連複",
+              "selection": [
+                6,
+                8,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B17",
+              "type": "三連複",
+              "selection": [
+                6,
+                8,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B18",
+              "type": "三連複",
+              "selection": [
+                8,
+                15,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B19",
+              "type": "三連複",
+              "selection": [
+                8,
+                15,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B20",
+              "type": "三連複",
+              "selection": [
+                8,
+                17,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B21",
+              "type": "馬単",
+              "selection": [
+                6,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B22",
+              "type": "馬単",
+              "selection": [
+                18,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B23",
+              "type": "ワイド",
+              "selection": [
+                6,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B24",
+              "type": "三連単",
+              "selection": [
+                15,
+                17,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B25",
+              "type": "三連単",
+              "selection": [
+                15,
+                6,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B26",
+              "type": "三連単",
+              "selection": [
+                17,
+                15,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B27",
+              "type": "三連単",
+              "selection": [
+                17,
+                18,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B28",
+              "type": "三連単",
+              "selection": [
+                17,
+                5,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B29",
+              "type": "三連単",
+              "selection": [
+                17,
+                6,
+                15
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B30",
+              "type": "三連単",
+              "selection": [
+                17,
+                6,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B31",
+              "type": "三連単",
+              "selection": [
+                17,
+                6,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B32",
+              "type": "三連単",
+              "selection": [
+                17,
+                6,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B33",
+              "type": "三連単",
+              "selection": [
+                17,
+                8,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B34",
+              "type": "三連単",
+              "selection": [
+                18,
+                17,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B35",
+              "type": "三連単",
+              "selection": [
+                18,
+                6,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B36",
+              "type": "三連単",
+              "selection": [
+                5,
+                17,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B37",
+              "type": "三連単",
+              "selection": [
+                5,
+                6,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B38",
+              "type": "三連単",
+              "selection": [
+                6,
+                15,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B39",
+              "type": "三連単",
+              "selection": [
+                6,
+                17,
+                15
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B40",
+              "type": "三連単",
+              "selection": [
+                6,
+                17,
+                18
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B41",
+              "type": "三連単",
+              "selection": [
+                6,
+                17,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B42",
+              "type": "三連単",
+              "selection": [
+                6,
+                17,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B43",
+              "type": "三連単",
+              "selection": [
+                6,
+                18,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B44",
+              "type": "三連単",
+              "selection": [
+                6,
+                5,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B45",
+              "type": "三連単",
+              "selection": [
+                6,
+                8,
+                17
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B46",
+              "type": "三連単",
+              "selection": [
+                8,
+                17,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B47",
+              "type": "三連単",
+              "selection": [
+                8,
+                6,
+                17
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "03ad17988eea47d237ac1469ebe15ee059c0a672",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-17-hokuriku-stakes/v3.15-run38996831480-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-17-hokuriku-stakes/v3.15-run38996831480-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-10-17-fuji-stakes",
+      "date": "2026-10-17",
+      "venue": "東京",
+      "surface": "turf",
+      "race_name": "富士ステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-17T15:45:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-17-fuji-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-17-fuji-stakes.json",
+      "official_result_at": "2026-10-17T10:32:01.610Z",
+      "official_going": "良",
+      "finish_order": [
+        13,
+        10,
+        14,
+        8,
+        6,
+        5,
+        7,
+        11,
+        9,
+        1,
+        2,
+        4,
+        3,
+        12
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-10-16T23:57:41.727Z",
+          "information_cutoff_at": "2026-10-16T23:57:41.727Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "富士ステークス",
+          "marks": {
+            "win": 4,
+            "second": 10,
+            "third": 5
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "馬単",
+              "selection": [
+                1,
+                10
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "枠連",
+              "selection": [
+                1,
+                6
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "5492d11a268df2ca7c03de1aed9307d217784941",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-17-fuji-stakes/v3.15-run38984039647-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-17-fuji-stakes/v3.15-run38984039647-attempt1-sealed.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-10-12-swan-stakes",
       "date": "2026-10-12",
