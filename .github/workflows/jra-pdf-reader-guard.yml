@@ -86,9 +86,20 @@ jobs:
                       if len(document)<minimum or race.get('full_report_pages')!=len(document):
                           raise SystemExit('Sealed v3.15 total pages / minimum horse pages mismatch: '+race['id'])
                       text=' '.join(page.get_text() for page in document)
+                      # Require only mark classes actually in the sealed STEP1 source.
+                      # Some valid races have no × horse; fabricated marks are forbidden.
+                      plan=json.loads(prediction.read_text(encoding='utf8'))
+                      source_path=Path(plan['source_prediction_path'])
+                      if not source_path.is_file() or not source_path.as_posix().startswith('e2e_validation/predictions/'):
+                          raise SystemExit('Sealed v3.15 original source missing: '+race['id'])
+                      source=json.loads(source_path.read_text(encoding='utf8'))
+                      ranking=source['step1_ranking']
+                      expected_marks={horse['mark'] for horse in ranking}
+                      if len(ranking)!=race['field_size'] or not {'◎','○','▲'}.issubset(expected_marks) or not expected_marks.issubset({'◎','○','▲','△','×'}):
+                          raise SystemExit('Sealed v3.15 STEP1 mark source malformed: '+race['id'])
                       if 'v3.15' not in document[0].get_text() or not all(
-                          mark in text for mark in ('◎','○','▲','△','×')):
-                          raise SystemExit('Sealed v3.15 report content incomplete: '+race['id'])
+                          mark in text for mark in expected_marks):
+                          raise SystemExit('Sealed v3.15 report missing an actual STEP1 mark: '+race['id'])
                   print('PASS_SEALED_FORMAL_V315_A4_PDF',race['id'])
                   checked+=1
                   continue
