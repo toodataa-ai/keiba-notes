@@ -23,7 +23,16 @@ JST = ZoneInfo("Asia/Tokyo")
 MODEL = "e012-shadow-v0.1"
 # Empirically verified on JRA 2026-10-17 racecard URLs: suffix digit checksum.
 # Seeds are real published JRA PC racecards; on mismatch no fallback to guessed data.
-SEEDS = {"2026-10-17":{"東京":(1,0xD0),"京都":(4,0xCD),"新潟":(12,0x4E)}}
+SEEDS = {
+    "2026-10-17": {"東京": (1, 0xD0), "京都": (4, 0xCD), "新潟": (12, 0x4E)},
+    # Independently checked against official 2026-10-18 JRA racecards:
+    # Tokyo 4R /1F, Kyoto 11R /30, Niigata 8R /6A.
+    "2026-10-18": {"東京": (4, 0x1F), "京都": (11, 0x30), "新潟": (8, 0x6A)},
+}
+MEETING_DAY = {
+    "2026-10-17": {"東京": "06", "京都": "06", "新潟": "01"},
+    "2026-10-18": {"東京": "07", "京都": "07", "新潟": "02"},
+}
 VENUES = {"東京":("05","04","06"),"京都":("08","04","06"),"新潟":("04","04","01")}
 
 def jst_now():
@@ -36,7 +45,8 @@ def official_card_url(item):
     known,base=SEEDS[day][venue]
     # JRA URL two decimal race digits; ones coefficient -75, tens +82 (mod 256).
     v=(base-75*((num%10)-(known%10))+82*((num//10)-(known//10)))%256
-    cc,meet,meeting_day=VENUES[venue]
+    cc,meet,_legacy_meeting_day=VENUES[venue]
+    meeting_day=MEETING_DAY[day][venue]
     code=f"pw01dde01{cc}{day[:4]}{meet}{meeting_day}{num:02d}{day.replace('-','')}/{v:02X}"
     return "https://www.jra.go.jp/JRADB/accessD.html?CNAME="+quote(code,safe="")
 
