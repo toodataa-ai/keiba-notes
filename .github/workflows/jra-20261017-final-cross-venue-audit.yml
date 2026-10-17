@@ -1,0 +1,130 @@
+name: JRA 2026-10-17 final 3-venue frozen predictions and public PDF audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/audit/jra-2026-10-17-final-*.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify archived 104-component v3.13 manifests, historical exceptions and sealed current pins
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          python3 -m pip install -q pymupdf==1.26.4
+      - name: Compare the three final v3.15 plans, unchanged STEP1 and actual approved reader-v1 PDF
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime as dt,hashlib,json,subprocess,sys
+          from pathlib import Path
+          ids={
+            '2026-10-17-fuji-stakes':'東京',
+            '2026-10-17-tourmaline-stakes':'京都',
+            '2026-10-17-hokuriku-stakes':'新潟',
+          }
+          index=json.loads(Path('docs/data/races.json').read_text())
+          rows={x.get('id'):x for x in index['races'] if x.get('id') in ids}
+          assert set(rows)==set(ids),(set(rows),set(ids))
+          for raceid,venue in ids.items():
+            row=rows[raceid]
+            assert row['scope']=='jra-main' and row['status']=='predicted'
+            assert row['venue']==venue and row['date']=='2026-10-17'
+            assert row['prompt_version']=='v3.13' and row['purchase_strategy_version']=='v3.15'
+            assert all(k not in row for k in ('result','review','performance','settlements'))
+            rel=row['e2e_prediction']
+            assert rel.startswith('e2e_validation/predictions/'+raceid+'/') and rel.endswith('-sealed.json')
+            plan=json.loads(Path(rel).read_text())
+            assert plan['status']=='formal_prestart' and plan['source_race_id']==raceid
+            assert plan['proof_commit']==row['proof_commit']
+            assert plan['total_stake_yen']==row['total_stake_yen']<=6000
+            assert row['final_bets']==plan['formal_bets'] and len(row['final_bets'])==plan['ticket_count']
+            assert sum(x['stake_yen'] for x in row['final_bets'])==row['total_stake_yen']
+            assert len({(x['type'],tuple(x['selection'])) for x in row['final_bets']})==len(row['final_bets'])
+            assert len(plan['regular_commands'])<=3 and plan['command_count']<=5
+            assert row['purchase_decision']==plan['purchase_decision'] in ('buy','pass')
+            assert (bool(row['final_bets'])==bool(row['purchase_decision']=='buy'))
+            src=Path(plan['source_prediction_path'])
+            data=src.read_bytes()
+            assert hashlib.sha256(data).hexdigest()==plan['source_prediction_sha256']
+            old=json.loads(data)
+            assert old['stage']=='formal_prestart' and old['prompt_version']=='v3.13'
+            assert old['proof_commit']==plan['source_prediction_proof']
+            assert old['step1_fixed_at']==plan['step1_fixed_at']
+            assert old['race_context']==plan['race_context']
+            assert len(old['step1_ranking'])==old['race_context']['sale_field_size']
+            assert old['race_context']['venue']==venue
+            for mark,key in (('◎','win'),('○','second'),('▲','third')):
+              horses=[x for x in old['step1_ranking'] if x['mark']==mark]
+              assert len(horses)==1
+              assert row['marks'][key]==str(horses[0]['horse_number'])+' '+horses[0]['horse_name']
+            race_start=dt.datetime.fromisoformat(plan['race_context']['start_at'])
+            frozen=dt.datetime.fromisoformat(plan['final_bets_fixed_at'].replace('Z','+00:00'))
+            assert frozen<race_start
+            assert len(plan['proof_commit'])==40
+            snap=rel.replace('/predictions/','/snapshots/').replace('-sealed.json','.json')
+            raw=subprocess.check_output(['git','show',plan['proof_commit']+':'+snap])
+            recorded=json.loads(raw)
+            reconstructed=dict(plan,status='pending_git_proof',proof_commit=None)
+            assert recorded==reconstructed,('Git proof mismatch',raceid)
+            assert plan['quote_age_max_seconds']<=600 and plan['quote_capture_span_seconds']<=180
+            for b in plan['formal_bets']:
+              assert b['quote_verified'] is True and b['source_url'].startswith('https://')
+              assert b['observed_at'] and b['market_selection_id']
+            assert row['report'].startswith('reports/') and row['pdf'].startswith('pdfs/')
+            h=Path('docs')/row['report'];p=Path('docs')/row['pdf']
+            assert h.is_file() and p.is_file()
+            subprocess.run([sys.executable,'.github/scripts/validate-jra-pdf-layout.py',
+              '--html',str(h),'--pdf',str(p),'--policy','docs/data/jra_pdf_layout_policy_v1.json'],check=True)
+            print('PASS_FINAL_JRA',venue,raceid,'runners',len(old['step1_ranking']),
+              'decision',plan['purchase_decision'],'tickets',len(row['final_bets']),
+              'stake',row['total_stake_yen'],'proof',row['proof_commit'],
+              'pdf',str(p),flush=True)
+          print('PASS_ALL_THREE_INDEPENDENT_JRA_V315_READER_PROOF_AND_BUDGET_CHECKS')
+          PY
+      - name: Verify exact byte equality of live GitHub Pages registry and all six reader HTML/PDF artifacts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,time,urllib.error,urllib.request
+          from pathlib import Path
+          base='https://toodataa-ai.github.io/keiba-notes/'
+          index=json.loads(Path('docs/data/races.json').read_text())
+          ids=['2026-10-17-fuji-stakes','2026-10-17-tourmaline-stakes','2026-10-17-hokuriku-stakes']
+          races=[next(x for x in index['races'] if x['id']==i) for i in ids]
+          paths=['data/races.json']+[r[k] for r in races for k in ('report','pdf')]
+          paths=list(dict.fromkeys(paths))
+          for attempt in range(24):
+            failed=[]
+            for rel in paths:
+              local=(Path('docs')/rel).read_bytes()
+              try:
+                request=urllib.request.Request(base+rel,headers={'Cache-Control':'no-cache'})
+                with urllib.request.urlopen(request,timeout=20) as resp:
+                  live=resp.read()
+                if hashlib.sha256(local).digest()!=hashlib.sha256(live).digest():
+                  failed.append((rel,'SHA256 mismatch'))
+              except Exception as ex:
+                failed.append((rel,str(ex)[:80]))
+            if not failed:
+              print('PASS_ALL_SEVEN_PUBLIC_HTTP_BYTES',len(paths),paths)
+              break
+            if attempt==23:raise RuntimeError('Pages publication mismatch: '+repr(failed))
+            print('Pages deployment pending',attempt+1,failed,flush=True)
+            time.sleep(10)
+          PY
