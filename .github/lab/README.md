@@ -1,40 +1,45 @@
-# UI change management / transitional LAB (2026-10-17)
+# LAB / STAGING / PRODUCTION — permanent site routing policy
 
-This is an *audited non-destructive LAB migration*. LAB's public gateway is \`docs/lab/index.html\`.
-The underlying experimental files currently remain under \`docs/staging/\`; DO NOT
-describe the physical environments as fully separated yet. Do not move existing
-simulator image/JS paths while dependencies are unresolved.
+Mandatory persistent skill: .github/skills/keiba-site-change-routing/SKILL.md
+Mandatory agent entrypoint: AGENTS.md
+Operational checklist: .github/skills/keiba-site-change-routing/references/release-checklist.md
 
-## Three lanes
-- PRODUCTION: \`main/docs\` legacy GitHub Pages, approved UI only.
-- STAGING: \`docs/staging\`, eventually reserved for acceptance-tested release candidates.
-- LAB: \`docs/lab\` dashboard linking to existing experiments without copying predictions.
-  Existing paths will move here only in a separately approved, dependency-audited change.
+As of 2026-10-17:
+- PRODUCTION: main/docs user-approved UI and independent latest canonical DATA.
+- STAGING: docs/staging/ ordinary 11 HTML pages are generated from the current
+  production UI via .github/scripts/staging-baseline-v2.py with stage-only
+  identification and links. Any changes to features already present in production
+  are first staged and verified here, then require explicit release approval.
+- LAB: docs/lab/ has active copies of unpublished simulators, course layout
+  research, purchase prototypes and historical previews. Changes to features
+  not yet in production must first go here, not to STAGING or production.
+- DATA: formal prediction, result, review, settled bets, PDF and proof remain
+  on the independent canonical evidence-validated publishing workflow.
 
-The GitHub-owned manifest \`.github/lab/feature-registry.json\` lists individual UI
-features, ownerless phase and manual approval status. The GitHub Action
-\`.github/workflows/lab-change-board.yml\` automatically rebuilds
-\`docs/lab/change-board.json\` from Git blob SHA and last-change commits on changes
-to staging / config. **CI never changes approval status**.
+LAB change inventory: .github/lab/feature-registry.json
+Generated Git evidence board: docs/lab/change-board.json
+LAB browser page: docs/lab/index.html
+Prebaseline archive: docs/lab/archive/staging-prebaseline/
+Legacy experimental URLs under staging redirect to LAB; keep compatibility
+assets for rollback rather than deleting them.
 
-## Safe UI-only release
-1. Review source + candidate in staging and get explicit user approval.
-2. Diff an exact allowlist of UI files; forbid staging-wide/branch-wide copying.
-3. Assert SHA equality on all protected data/PDF/E2E proof trees pre/post release.
-4. Validate live GitHub Pages byte-parity and prediction registry consistency.
-5. If any check fails, report a blocker rather than mark success.
-6. Data publication for JRA/NAR continues separately under its existing strict
-   immutable-proof policies without human approval for ordinary data refreshes.
+Promote existing production features as exact user-approved UI behavior and
+a selective reviewed code delta, NEVER as a bulk staging directory copy.
+Staging wrappers (banner, noindex, base tag, staging links, prototype data
+overrides) are not production UI. LAB requires a distinct decision to promote
+a feature to STAGING first; production still requires explicit user approval.
 
-## Protected
-Never overwrite: \`docs/data/races.json\`, \`docs/reports/\`, \`docs/pdfs/\`,
-\`e2e_validation/\`, \`local_racing_shadow_v1/\`, and formal prediction sources.
-The LAB dashboard and source registry are UI metadata only.
+WARNING: jra-staging-week-mirror-publish.yml regenerates staging from
+production on production template changes. Preserve unrelated unapproved
+staging candidates in LAB or a separate immutable Git snapshot before
+allowing any such regeneration; never let mirror erase outstanding work.
 
-## Updating feature statuses
-Modify \`.github/lab/feature-registry.json\` **only** based on explicit decision
-or grounded completion. A changed Git SHA does not mean approved, tested, or
-published. The board generator derives source facts and preserves manual phases.
+The old jra-site-ui-release-v1 workflow has a branch-composition gate and
+v1.01-specific assumptions; do not bypass it. Current Pages source remains
+main/docs. Older staging instructions are historical reference, not current
+general-purpose release commands.
 
-## LAB active migration
-Experiment HTML/JS/JSON and historical preview PDF sources now have canonical working copies at docs/lab. Legacy staging experiment URLs redirect to LAB, while original binary assets and stage source snapshots remain available for compatibility and rollback. All eleven regular staging pages are generated from current production via .github/scripts/staging-baseline-v2.py. No production prediction data or approved UI is copied backwards.
+Never overwrite or roll back docs/data, docs/reports, docs/pdfs,
+e2e_validation, local_racing_shadow_v1, sealed prediction, final_bets
+or proof via UI release. Validate protected tree SHAs and live HTTP bytes.
+The registry tracks approval MANUALLY: a source SHA update is not approval.

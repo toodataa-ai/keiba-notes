@@ -1,3 +1,9 @@
+> **注意（2026-10-17現在）:** 以下は旧v1.01向けの歴史的な手順です。
+> 現在の一般的な改修は AGENTS.md と
+> .github/skills/keiba-site-change-routing/SKILL.md に従ってください。
+> 本番既存機能はSTAGING、本番未公開機能はLAB、正式予想はDATAに分類。
+> 旧v1.01向けActionの安全ゲートを解除・迂回してはいけません。
+
 # JRA サイト: ステージング・本番・版復元の運用 v1
 
 ## 対象
