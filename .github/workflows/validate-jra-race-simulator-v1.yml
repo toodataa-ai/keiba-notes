@@ -24,6 +24,8 @@ jobs:
           for script in docs/lab/race-*.js docs/lab/weekend-main-course-review-v1.js docs/lab/stage-week-preview.js;do
             node --check "$script"
           done
+          node --check tools/test_race_sim_lab_kyoto_inner_v045.cjs
+          node tools/test_race_sim_lab_kyoto_inner_v045.cjs
           python3 .github/scripts/staging-baseline-v2.py --check
           python3 - <<'PY'
           import hashlib,json

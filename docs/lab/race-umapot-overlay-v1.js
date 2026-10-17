@@ -106,18 +106,61 @@ function outwardShiftPx(course,d){
  return (2*z3-3*z2+1)*a[1]+(z3-2*z2+z)*h*m0+
    (-2*z3+3*z2)*b[1]+(z3-z2)*h*m1;
 }
-function point(course,d,lane=0){
+// Pixel registrations from a separately traced INNER-turf-band center on
+// Umapot's 620x430 reference JPEG. These ARE NOT surveyed coordinates.
+// The nine distances are exactly the user's review checkpoints; they correct
+// drawing only, never physics, speed, pace, lane choice, or race timing.
+const kyotoInnerCenterAnchors=Object.freeze([
+ [0,350,317],[100,294,316],[308.7,178,301],[530,165,204],
+ [900,286,147],[1270,463,136],[1435,510,197],
+ [1671.6,490,317],[2000,294,317]
+].map(a=>Object.freeze(a)));
+function uncalibratedPoint(course,d,lane=0){
  if(!path[course?.id])throw Error('UMAPOT_UNSUPPORTED_COURSE');
  const p=referenceLine(course).at(d);
- // The Tokyo 2000m pocket is narrower in the illustration than the main
- // course. Compress DISPLAY-ONLY lane spacing until the chute rejoins the
- // common turf route (120-170m); physics and actual lane decisions are intact.
+ // Keep the Tokyo 2000m chute projection unchanged.
  const smooth=x=>{const q=clamp(x,0,1);return q*q*(3-2*q)};
  const tokyoPocket=course.id==='tokyo_turf_2000'?smooth(d/30)*(1-smooth((d-110)/20)):0;
  const visualLaneScale=1.30-0.35*tokyoPocket;
  const towardInsidePx=railEdgePx(course,d)-(1.8+clamp(Number(lane)||0,0,18)*1.65)*visualLaneScale;
  const offset=-towardInsidePx*(course.turn==='左'?1:-1)-outwardShiftPx(course,d);
  return {x:p.x-p.ty*offset,y:p.y+p.tx*offset};
+}
+const kyotoInnerCorrections=new WeakMap();
+// Piecewise cubic Hermite correction: continuous first derivative at EVERY
+// waypoint. A linear/smoothstep reset at each anchor causes visible jolts.
+function kyotoCenterCorrection(course,d){
+ if(!kyotoInnerCorrections.has(course)){
+  kyotoInnerCorrections.set(course,kyotoInnerCenterAnchors.map(([metres,x,y])=>{
+   const p=uncalibratedPoint(course,metres,0);
+   return {d:metres,dx:x-p.x,dy:y-p.y};
+  }));
+ }
+ const a=kyotoInnerCorrections.get(course),distance=clamp(d,0,course.distance_m);
+ let k=0;while(k<a.length-2&&distance>a[k+1].d)k++;
+ const p=a[k],q=a[k+1],span=q.d-p.d,t=clamp((distance-p.d)/span,0,1);
+ function tangent(i,axis){
+  if(i===0)return (a[1][axis]-a[0][axis])/(a[1].d-a[0].d);
+  if(i===a.length-1)return (a[i][axis]-a[i-1][axis])/(a[i].d-a[i-1].d);
+  const left=(a[i][axis]-a[i-1][axis])/(a[i].d-a[i-1].d);
+  const right=(a[i+1][axis]-a[i][axis])/(a[i+1].d-a[i].d);
+  // Avoid overshooting near local extrema, preserve C1 continuity.
+  if(left*right<=0)return 0;
+  return Math.sign(left)*Math.min(Math.abs(left),Math.abs(right),
+    0.5*(Math.abs(left)+Math.abs(right)));
+ }
+ const t2=t*t,t3=t2*t;
+ function interpolate(axis){
+  return (2*t3-3*t2+1)*p[axis]+(t3-2*t2+t)*span*tangent(k,axis)+
+         (-2*t3+3*t2)*q[axis]+(t3-t2)*span*tangent(k+1,axis);
+ }
+ return {x:interpolate('dx'),y:interpolate('dy')};
+}
+function point(course,d,lane=0){
+ const p=uncalibratedPoint(course,d,lane);
+ if(course.id!=='kyoto_turf_inner_2000')return p;
+ const delta=kyotoCenterCorrection(course,d);
+ return {x:p.x+delta.x,y:p.y+delta.y};
 }
 function validate(course){
  const parts=path[course.id];if(!parts||parts.length!==course.segments.length)throw Error('UMAPOT_UNREGISTERED');
@@ -134,6 +177,27 @@ function draw(state,race,focus,pathOn,paintNumber){
  const ctx=canvas.getContext('2d');if(!ctx)return;
  const course=global.RaceCourseGeometry.get(race.course_id);
  ctx.clearRect(0,0,620,430);
+ // LAB-only manual-review overlay. Normal playback remains visually untouched.
+ // ?demo=shuka-one&guide=1 draws the exact nine checkpoints, turf centerline.
+ if(race.course_id==='kyoto_turf_inner_2000'&&
+    new URLSearchParams(global.location?.search||'').get('guide')==='1'){
+  ctx.save();
+  ctx.strokeStyle='#8d27bd';ctx.lineWidth=1.5;
+  ctx.setLineDash([4,4]);ctx.beginPath();
+  for(let d=0;d<=2000;d+=5){
+   const p=point(course,d,0);
+   if(d===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+  }
+  ctx.stroke();ctx.setLineDash([]);
+  for(const [d] of kyotoInnerCenterAnchors){
+   const p=point(course,d,0);
+   ctx.fillStyle='#fff';ctx.strokeStyle='#6f1aaf';ctx.lineWidth=1.2;
+   ctx.beginPath();ctx.arc(p.x,p.y,3.2,0,Math.PI*2);ctx.fill();ctx.stroke();
+   ctx.fillStyle='#6811ad';ctx.font='bold 10px sans-serif';
+   ctx.fillText(String(d)+'m',p.x+4,p.y-6);
+  }
+  ctx.restore();
+ }
  const selected=focus==='leader'?state.leadingNo:Number(focus);
  // The course bitmap ends at the finishing straight. Once a horse runs
  // past the 40m reference-map extrapolation, let its marker EXIT the map;
