@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "purpose": "Trigger dedicated GitHub Actions JRA PDF reader layout guard against saved sealed reports; audit metadata, not a prediction or publication",
+  "required_engine": "weasyprint==68.0",
+  "policy": "docs/data/jra_pdf_layout_policy_v1.json",
+  "css": "docs/assets/jra-pdf-reader-v1.css",
+  "independent_ci": ".github/workflows/jra-pdf-reader-guard.yml",
+  "race_ids": [
+    "2026-10-18-brazil-cup",
+    "2026-10-18-niigata-himba-stakes",
+    "2026-10-18-shuka-sho"
+  ],
+  "immutable_history": true,
+  "require_existing_pdf_not_rerender_past": true
+}
