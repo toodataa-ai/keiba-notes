@@ -69,6 +69,13 @@ jobs:
               for f in d['features'] for path in f['staging_paths']+f['production_paths'])
           print('PASS_LAB_GATEWAY_APPROVAL_IS_MANUAL_DATA_ISOLATION')
           PY
+      - name: Render LAB UI in actual Chrome at phone and desktop widths
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/lab-static-server.log 2>&1 &
+          sleep 2
+          python3 .github/scripts/verify-lab-dashboard.py
       - name: Verify real public LAB dashboard and ledger byte parity
         run: |
           set -euo pipefail
