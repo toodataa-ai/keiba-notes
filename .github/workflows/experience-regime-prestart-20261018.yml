@@ -67,8 +67,18 @@ jobs:
             git commit -m 'Freeze 2026-10-18 source-verifiable E012 Shadow observations and coverage gaps'
             git push origin HEAD:main
           fi
-          echo "E012_PROOF_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-          echo "E012_PROOF_AT=$(git show -s --format=%cI HEAD)" >> "$GITHUB_ENV"
+          if [[ -f experience_regime_v1/collection/2026-10-17/proof_commit_2026-10-18.json ]];then
+            echo "E012_REUSE_IMMUTABLE_EXISTING_FIRST_PROOF"
+            python - <<'PY' >> "$GITHUB_ENV"
+          import json
+          p=json.load(open('experience_regime_v1/collection/2026-10-17/proof_commit_2026-10-18.json'))
+          print('E012_PROOF_SHA='+p['proof_commit'])
+          print('E012_PROOF_AT='+p['proof_commit_at'])
+          PY
+          else
+            echo "E012_PROOF_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+            echo "E012_PROOF_AT=$(git show -s --format=%cI HEAD)" >> "$GITHUB_ENV"
+          fi
       - name: Verify FIRST Git introduction, prestart timing, field completeness and source record
         run: |
           set -euo pipefail
@@ -115,8 +125,12 @@ jobs:
           python -m experience_regime_v1.collect_prestart_v1 proof_audit --week-id 2026-10-17 --date 2026-10-18 --proof-sha "$E012_PROOF_SHA" --commit-at "$E012_PROOF_AT"
           python experience_regime_v1/publish_progress_v1.py 2026-10-17 2026-10-18
           git add -- experience_regime_v1/collection/2026-10-17/proof_commit_2026-10-18.json docs/data/experience_regime_status.json
-          git commit -m 'Publish 2026-10-18 E012 proof and category-regime public research progress'
-          git push origin HEAD:main
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish 2026-10-18 E012 proof and category-regime public research progress'
+            git push origin HEAD:main
+          else
+            echo 'E012_EXISTING_VERIFIED_PROOF_AND_PUBLIC_STATUS_REUSED_NO_REWRITE'
+          fi
       - name: Verify true aggregate data and exact GitHub Pages public bytes
         run: |
           set -euo pipefail
