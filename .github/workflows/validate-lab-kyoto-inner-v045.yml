@@ -87,6 +87,21 @@ jobs:
               errors=[];network=[]
               page.on('pageerror',lambda error:errors.append(str(error)))
               page.on('response',lambda res:network.append((res.status,res.url)) if res.url.startswith('http://127.0.0.1:8765/') and res.status>=400 else None)
+              # Record actual drawImage calls on live broadcast canvas and
+              # inspect the 2-D transform to reject rotate/skew/stretch.
+              page.add_init_script("""() => {
+                const original=CanvasRenderingContext2D.prototype.drawImage;
+                CanvasRenderingContext2D.prototype.drawImage=function(img,...args){
+                  if(this.canvas?.id==='raceCanvas'&&img?.id==='kyotoCourseImage'){
+                    const t=this.getTransform();
+                    const f=window.__labSharedBitmapFrames||[];
+                    f.push({image:img.id,dimensions:args.slice(0,4),
+                      rotationTerms:[t.b,t.c],scales:[t.a,t.d]});
+                    window.__labSharedBitmapFrames=f.slice(-24);
+                  }
+                  return original.call(this,img,...args);
+                };
+              }""")
               page.goto('http://127.0.0.1:8765/lab/race-simulator.html?demo=shuka-one&guide=1',wait_until='domcontentloaded',timeout=30000)
               page.wait_for_function("document.querySelector('#singleDemoNotice')?.hidden===false",timeout=18000)
               assert page.locator('#kyotoRealCourseMap').is_visible()
@@ -129,6 +144,12 @@ jobs:
                   projected:map.screenPoint(p,view),
                   anchor:view.anchor,rotation:view.rotationRadians};
               }""")
+              frames=page.evaluate("window.__labSharedBitmapFrames||[]")
+              assert len(frames)>=2,('broadcast never painted real source image',width,frames)
+              assert all(f['image']=='kyotoCourseImage' and f['dimensions']==[0,0,620,430] for f in frames),(width,frames)
+              assert all(abs(f['rotationTerms'][0])<1e-7 and abs(f['rotationTerms'][1])<1e-7 and
+                abs(f['scales'][0]-f['scales'][1])<1e-7 for f in frames),(width,frames)
+              print('PASS_ACTUAL_BROADCAST_DRAWIMAGE_SOURCE_EQUALS_OVERVIEW_NO_ROTATION',width,len(frames))
               assert shared['supported'] and shared['imageInLive']
               assert shared['rotation']==0 and abs(shared['projected']['x']-shared['anchor']['x'])<.01
               assert abs(shared['projected']['y']-shared['anchor']['y'])<.01
