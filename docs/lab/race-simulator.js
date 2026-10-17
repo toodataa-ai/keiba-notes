@@ -16,7 +16,10 @@ let cameraMotion=null;
 // Test fixture lives only inside LAB. It cannot impersonate a JRA report.
 const DEMO_ID='stage-shuka-inner-one-runner-demo-v1';
 const DEMO_MODE='shuka_single_horse_v1';
-function isDemo(r){return r?.id===DEMO_ID&&r.demo_mode===DEMO_MODE}
+const isSingleDemo=r=>r?.id===DEMO_ID&&r.demo_mode===DEMO_MODE;
+const isDemo18=r=>r?.id===window.RaceLab18Fixture?.id&&
+ r.demo_mode==='synthetic_18_inner_lane_v048';
+function isDemo(r){return isSingleDemo(r)||isDemo18(r)}
 function demoEntry(){return {id:DEMO_ID,demo_mode:DEMO_MODE,date:'2026-10-18',
  venue:'京都',number:11,race:'秋華賞コース（仮1頭）',surface:'芝',
  turn:'右',distance_m:2000,course_id:'kyoto_turf_inner_2000',
@@ -124,20 +127,30 @@ async function loadRace(id){
    const profile=RaceCourseGeometry.get(entry.course_id);
    if(!profile?.user_approved_stage_geometry||profile.distance_m!==2000)
     throw Error('承認済みの秋華賞走行線がありません');
-   const horses=[demoHorse()];
+   const multi=isDemo18(entry);
+   const horses=multi?RaceLab18Fixture.horses():[demoHorse()];
    RaceSimEngine.validData({...entry,horses});
    race={...entry,horses};
    updateCourseReference();reset(false);
    ui.start.disabled=false;
-   ui.meta.textContent='【非公式・仮1頭】10/18 京都11R 芝2000m内回り';
+   const tag=multi?'【非公式・架空18頭】':'【非公式・仮1頭】';
+   ui.meta.textContent=tag+' 10/18 京都11R 芝2000m内回り';
    ui.course.textContent=profile.layout+' ／ 直線'+profile.straight_m+'m ／ 高低差'+profile.elevation_range_m+'m';
-   if(demoLabel)demoLabel.hidden=false;
-   ui.source.textContent='【仮1頭デモ】馬名・能力・時計は仮の値。JRA出走馬、正式予想、買い目、結果には一切使用しません。';
-   const feat=$('courseFeatures');if(feat)feat.textContent=profile.info+'（仮1頭による走行線の確認）';
-   const measure=$('courseMeasurements');if(measure)measure.textContent='京都芝内A：1周'+profile.lap_m+'m、直線'+profile.straight_m+'m。仮1頭デモ。';
+   if(demoLabel){
+     demoLabel.hidden=false;
+     demoLabel.innerHTML=multi?
+      '<strong>【非公式・架空18頭・LAB専用】</strong> 京都芝2000m内回りの内優先レーンと馬群の試験です。検証馬・能力・時計・展開は合成データ。実馬や正式予想・買い目ではありません。':
+      '<strong>【非公式・仮1頭デモ】</strong> 京都芝2000m内回りの画像走行線確認です。実馬や正式予想・買い目ではありません。';
+   }
+   ui.source.textContent='【LAB専用】'+(multi?'架空18頭の隊列・内ラチ進路を検証。':'仮1頭で走行位置を確認。')+'名前・能力・時計・着順はすべて仮想。JRAの出走馬・正式予想・払戻と無関係です。';
+   const feat=$('courseFeatures');if(feat)feat.textContent=profile.info+'（'+(multi?'架空18頭による内優先・閉塞・復帰テスト':'仮1頭の画像走行線確認')+'）';
+   const measure=$('courseMeasurements');if(measure)measure.textContent='京都芝内A：1周'+profile.lap_m+'m、直線'+profile.straight_m+'m。非公式LABデモ。';
    const official=$('mapSourceLink');if(official){official.href=profile.official;official.textContent='JRA京都競馬場・公式コース図';}
-   ui.focus.innerHTML='<option value="leader">仮の1頭を追跡</option><option value="1">1番 仮の1頭（デモ）</option>';
-   const style=$('runnerStyleInfo');if(style)style.textContent='仮1頭の走行確認専用。脚質・能力・速度・時計はデモ設定です。';
+   ui.focus.innerHTML='<option value="leader">先頭を追跡</option>'+
+    horses.map(h=>'<option value="'+h.number+'">'+h.number+'番 '+esc(h.name)+'</option>').join('');
+   const style=$('runnerStyleInfo');if(style)style.textContent=multi?
+     '18頭：逃げ2・先行5・差し6・追込5。京都芝1400m外回りと同一の内優先レーン選択・発馬100m内寄せ制御を利用（合成データ）。':
+     '仮1頭の走行確認専用。脚質・能力・速度・時計はデモ設定です。';
    return;
   }
   const [dbRes,reportRes]=await Promise.all([
@@ -305,7 +318,7 @@ function renderData(){
   }
  }
  if(ui.paceDynamics){
-   if(isDemo(race)){
+   if(isSingleDemo(race)){
     ui.paceDynamics.textContent='【非公式・仮1頭】コース動作確認／競り合いなし／時計はデモ専用'+
      (state.splitTime!==null?' ／ 1000m '+dur(state.splitTime):'');
    }else{
@@ -355,17 +368,17 @@ function renderData(){
   const finishers=firstThree(state);
   podium.hidden=finishers.length===0;
   podium.innerHTML=finishers.map((h,i)=>
-    '<div class="podium-row"><span class="podium-rank">'+(isDemo(race)?'試走完了':(i+1)+'着')+'</span>'+
+    '<div class="podium-row"><span class="podium-rank">'+(isSingleDemo(race)?'試走完了':(i+1)+'着'+(isDemo18(race)?'（仮想）':''))+'</span>'+
     '<span class="podium-name">'+esc(h.number+'番 '+h.name)+'</span>'+
     '<span class="podium-time">'+dur(h.finishTime)+'</span></div>').join('');
  }
  const latestPass=recentOvertake(state,2.2);
- ui.moment.textContent=isDemo(race)?(state.finished?'仮1頭が完走しました（非公式）':state.firstFinishTime!==null?'仮1頭がゴールを通過・余走中':'京都芝2000m内回り・仮1頭が走行中'):state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':latestPass?latestPass.attackerNo+'番 '+latestPass.attackerName+'が'+latestPass.victimNo+'番をかわす':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
+ ui.moment.textContent=isSingleDemo(race)?(state.finished?'仮1頭が完走しました（非公式）':state.firstFinishTime!==null?'仮1頭がゴールを通過・余走中':'京都芝2000m内回り・仮1頭が走行中'):state.finished?'全馬がゴールを駆け抜けました（仮想結果）':state.firstFinishTime!==null?'着順は線上で確定・全馬ゴール板へ進行中':latestPass?latestPass.attackerNo+'番 '+latestPass.attackerName+'が'+latestPass.victimNo+'番をかわす':state.leader>.05?'先頭 '+state.leadingNo+'番　'+(state.horses.find(h=>h.number===state.leadingNo)?.name||''):'スタートを押すとレースが始まります';
  ui.lap.textContent=Math.round(state.progress*100)+'%';
  ui.bar.style.width=(state.progress*100).toFixed(1)+'%';
  ui.stands.innerHTML=sim.standings().map((h,i)=>{
   const lead=state.leader-h.d;
-  const gap=state.finished?dur(h.finishTime):isDemo(race)?'単独走':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
+  const gap=state.finished?dur(h.finishTime):isSingleDemo(race)?'単独走':i===0?'先頭':lead<.5?'並走':Math.round(lead)+'m';
   const focus=ui.focus.value===String(h.number);
   return '<div class="standing-row'+(focus?' focused':'')+'"><span class="rank-no">'+(i+1)+'</span><span class="saddle" style="background:'+jraWaku(h.number,race.field_size).fill+
      ';color:'+jraWaku(h.number,race.field_size).text+';border:1px solid '+
@@ -870,11 +883,12 @@ async function initialize(){
   if(!res.ok)throw Error('シミュレータのレース登録を取得できません（HTTP '+res.status+'）');
   const registry=await res.json();
   if(registry.schema_version!==1||registry.status!=='STAGING_RESEARCH_ONLY')throw Error('未承認データ形式です');
-  catalog=[...(registry.races||[]),demoEntry()];
+  catalog=[...(registry.races||[]),demoEntry(),RaceLab18Fixture.entry()];
   if(!catalog.length)throw Error('シミュレーション可能なレースがありません');
-  ui.race.innerHTML=catalog.map(x=>'<option value="'+esc(x.id)+'">'+esc((isDemo(x)?'【非公式・仮1頭】 ':'')+x.date+' '+x.venue+x.number+'R '+x.race)+'</option>').join('');
+  ui.race.innerHTML=catalog.map(x=>'<option value="'+esc(x.id)+'">'+esc((isDemo18(x)?'【LAB架空18頭】 ':isSingleDemo(x)?'【非公式・仮1頭】 ':'')+x.date+' '+x.venue+x.number+'R '+x.race)+'</option>').join('');
   const params=new URLSearchParams(location.search);
-  const wanted=params.get('demo')==='shuka-one'?DEMO_ID:params.get('race');
+  const wanted=params.get('demo')==='shuka-18'?RaceLab18Fixture.id:
+    params.get('demo')==='shuka-one'?DEMO_ID:params.get('race');
   if(wanted&&chooseRace(wanted))ui.race.value=wanted;
   await loadRace(ui.race.value);
  }catch(e){ui.stands.innerHTML='<p class="error">'+esc(e.message)+'</p>';ui.moment.textContent='原本データを確認できません'}

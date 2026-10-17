@@ -20,8 +20,10 @@ function frame(points,canvasWidth,canvasHeight,renderedWidth,focusNo){
  const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
  // Constant pixel coordinates for both displays. Wide racing fields scale to
  // fit together; a one-runner demonstration stays centered, never stretched.
- const xspan=Math.max(310,hiX-loX+106);
- const yspan=Math.max(175,hiY-loY+75);
+ // Larger zoom for both one and eighteen runners, but the entire active
+ // field is always included. Larger spreads automatically zoom back out.
+ const xspan=Math.max(points.length===1?185:180,hiX-loX+(points.length===1?0:58));
+ const yspan=Math.max(points.length===1?115:116,hiY-loY+(points.length===1?0:52));
  const zoom=Math.min(canvasWidth/xspan,canvasHeight/yspan);
  const origin=points.length===1?{x:focus.x,y:focus.y}:
   {x:(loX+hiX)/2,y:(loY+hiY)/2};
@@ -72,7 +74,9 @@ function draw(options){
  })).sort((a,b)=>Number(a.passing)-Number(b.passing)||
     Number(a.focused)-Number(b.focused)||Number(a.leading)-Number(b.leading)||a.number-b.number);
  for(const p of markers){
-  paintNumber(ctx,p.number,p.x,p.y,view.markerScale,p.focused,
+  paintNumber(ctx,p.number,p.x,p.y,
+    view.markerScale*(points.length>=12?(p.focused?.72:.59):points.length>=6?.75:1),
+    p.focused,
     p.leading,race.field_size,p.passing);
  }
  return {ready:true,view,points,markers,sourceImage:image.currentSrc||image.src};
