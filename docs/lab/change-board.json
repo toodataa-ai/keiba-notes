@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "d0ef2b2bbf65b8079d03d29617584dcd90a3e4e6",
+  "scan_commit": "67635fae4b1e0a280d6209733a2d67b69ac0e0c4",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v0.47：京都芝2000m内回りの実況を全体図と同一うまぽっと原画像・同一RaceUmapotOverlay.point座標へ統一。回転はせず拡大・追従のみ。自動検証後にユーザーの実況/全体図の目視確認を待つ。本番/STAGING/正式DATAは未変更。",
+      "next_action": "LAB v0.48：京都1400と同一の内優先RaceLaneAIを京都2000架空18頭デモで検証。発馬100m内寄せ、閉塞・再内取り、5区間の馬群、実況/全体図同一座標、18頭画面収容を実際のデータで監査。自動検証後も目視承認待ち。本番/STAGING/正式予想は変更しない。",
       "preview_path": "lab/race-simulator.html",
       "staging_paths": [],
       "lab_paths": [
@@ -40,21 +40,23 @@
         "docs/lab/race-sim-manifest-v1.json",
         "docs/lab/race-ability-model-v1.js",
         "docs/lab/race-lane-ai-v1.js",
-        "docs/lab/race-broadcast-map-v1.js"
+        "docs/lab/race-broadcast-map-v1.js",
+        "docs/lab/race-lab-18-fixture-v1.js"
       ],
       "production_paths": [],
       "file_blob_shas": {
-        "docs/lab/race-simulator.html": "dc30a4934f26bcbea559b2c93287f160e70dfe22",
-        "docs/lab/race-simulator.js": "2389e4199b6345d56753570e257555fdae839bcb",
+        "docs/lab/race-simulator.html": "cec1860e4368ac792be80be3995676297bb4594f",
+        "docs/lab/race-simulator.js": "4d2f44af5fa53b3795e26b5ad3781dca5da52859",
         "docs/lab/race-simulator.css": "8a905005e09c6828bed4c51ebf2afaf62fdac073",
         "docs/lab/race-sim-engine.js": "8f9dba1b6ad3099f0277aeed87fad23cb90153af",
         "docs/lab/race-umapot-overlay-v1.js": "df11c6c856f3296af3b2a9224b06407f75b43874",
         "docs/lab/race-sim-manifest-v1.json": "bd141771f18877ac62ca91ad9b90b63361ba0c97",
         "docs/lab/race-ability-model-v1.js": "b812e2adee39f2933bc6a18392392af33939cfe4",
         "docs/lab/race-lane-ai-v1.js": "3a9a9aa2e0499ee25f9c56076f9d27bfecda8cb5",
-        "docs/lab/race-broadcast-map-v1.js": "ffcc8e392ea7e3a62872a3bef7b583e2b370b625"
+        "docs/lab/race-broadcast-map-v1.js": "06a11ad983cfc9bdd378b3d4a91c28eb5f260483",
+        "docs/lab/race-lab-18-fixture-v1.js": "9bf9b45bbfb17a9a9335f38934e8a45567fe8d3a"
       },
-      "latest_source_change_commit": "d0ef2b2bbf65b8079d03d29617584dcd90a3e4e6"
+      "latest_source_change_commit": "67635fae4b1e0a280d6209733a2d67b69ac0e0c4"
     },
     {
       "id": "course-catalog",
