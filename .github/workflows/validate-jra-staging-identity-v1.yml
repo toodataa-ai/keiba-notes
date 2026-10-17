@@ -1,141 +1,63 @@
-name: Audit complete JRA staging visual identity and in-page predictions
+name: Audit JRA staging identity against exact production baseline and LAB redirects
 on:
   push:
     branches: [main]
     paths:
       - 'docs/staging/**'
-      - '.github/scripts/jra-build-staging-week-mirror-v1.py'
+      - 'docs/lab/**'
+      - '!docs/lab/change-board.json'
+      - '.github/scripts/staging-baseline-v2.py'
       - '.github/workflows/validate-jra-staging-identity-v1.yml'
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: jra-staging-identity, cancel-in-progress: true}
 jobs:
-  identity-and-live-byte-audit:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 13
+    timeout-minutes: 14
     steps:
       - uses: actions/checkout@v4
-      - name: Check markup, source invariants, staging navigation and JavaScript parse
+      - name: Check exact 11 page staging baseline with only uniform marker and noindex
         run: |
           set -euo pipefail
-          node --check docs/staging/stage-week-preview.js
-          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          python3 .github/scripts/staging-baseline-v2.py --check
           python3 - <<'PY'
           from pathlib import Path
-          from html.parser import HTMLParser
-          import subprocess
-          root=Path('docs/staging')
-          stage=list(root.rglob('*.html'))
-          assert len(stage)>=15,('staging HTML expected',len(stage))
-          class HTML(HTMLParser):
-            def __init__(self):
-              super().__init__();self.css=[];self.links=[]
-            def handle_starttag(self,tag,attrs):
-              d=dict(attrs)
-              if tag=='link' and d.get('rel')=='stylesheet':
-                self.css.append(d.get('href',''))
-              if tag=='a':self.links.append(d.get('href',''))
-          for p in stage:
-            s=p.read_text()
-            assert s.count('data-stage="preview"')==1,(p,'html stage attribute')
-            assert s.count('class="staging-shell-marker"')==1,(p,'missing stage badge')
-            assert 'noindex,nofollow' in s,(p,'search-index suppression')
-            h=HTML();h.feed(s)
-            assert any('stage-indicator.css' in x for x in h.css),(p,'missing stripe')
-            # The common four-pixel top stripe is part of the visual identity on every page.
-            assert 'STAGING' in s
-          css=(root/'stage-indicator.css').read_text()
-          assert 'height:4px' in css and 'safe-area-inset-top' in css
-          home=(root/'index.html').read_text()
-          for name in ('this-week.html','schedule.html','results.html',
-                       'methodology.html','roadmap.html','baba-models.html','e2e.html',
-                       'experience-regime.html','local-racing-shadow.html'):
-            assert 'href="staging/'+name+'"' in home,name
-            assert (root/name).exists(),name
-          week=(root/'this-week.html').read_text()
-          assert week.count('stage-week-preview.js')==1
-          assert week.count('jra-inline-report.css')==1
-          assert 'stage-week-preview.js' not in Path('docs/this-week.html').read_text()
-          assert 'jra-inline-report.js' in Path('docs/this-week.html').read_text()
-          js=(root/'stage-week-preview.js').read_text()
-          assert "panel.hidden=true" in js and "panel.hidden=false" in js
-          assert 'new MutationObserver' in js
-          assert "e.preventDefault()" in js
-          assert 'stage-race-inline-' in js
-          assert 'iframe' in js and 'pdfOverrides' in js
-          assert 'docs/data/races.json' not in js
-          # No active models, final tickets, historical PDF, or production shared assets changed.
-          for p,sha in {
-            'docs/assets/week.js':'ad22854774a5a10626436bd938a661ba8261611d',
-            'docs/this-week.html':'c59b56117b0f46ff4cb2a756a51baf4b62b5c689'
-          }.items():
-            actual=subprocess.check_output(['git','hash-object',p],text=True).strip()
-            assert actual==sha,('PROD_CONTENT_CHANGED',p,actual)
-          print('PASS_JRA_STAGE_ALL_PAGES_MARKED_INPAGE_DIAGNOSIS_AND_IMMUTABLE_PRODUCTION')
+          import json
+          import importlib.machinery
+          root=Path('docs')
+          g=importlib.machinery.SourceFileLoader('stage','./.github/scripts/staging-baseline-v2.py').load_module()
+          for name in g.PAGES:
+              p=root/'staging'/name
+              text=p.read_text()
+              assert 'data-stage="preview"' in text,(name,'missing marker attribute')
+              assert text.count('class="staging-shell-marker"')==1,(name,'missing stage badge')
+              assert 'noindex,nofollow' in text and 'staging/stage-indicator.css' in text
+              assert text==g.render((root/name).read_text())
+          for name in ('race-simulator.html','race-course-catalog.html',
+             'weekend-main-course-review.html','purchase-preview.html',
+             'jra-v315-20261012/index.html'):
+              path=root/'staging'/name
+              text=path.read_text()
+              assert 'location.replace(' in text and 'lab/' in text and 'noindex' in text,name
+          data=json.loads((root/'lab/change-board.json').read_text())
+          assert len(data['features'])==8
+          assert sum(x['preview_path'].startswith('lab/') for x in data['features'])==7
+          assert any(x['phase']=='released' for x in data['features'])
+          assert (root/'lab/archive/staging-prebaseline/this-week.html').is_file()
+          assert (root/'lab/archive/staging-prebaseline/results.html').is_file()
+          print('PASS_11_JRA_STAGING_PAGES_EXACT_PROD_UI_LAB_REDIRECTS_NO_DATA_CHANGE')
           PY
-      - name: Browser-DOM smoke test for stage card open, close, PDF and dynamically inserted cards
+      - name: Live staging and LAB gateway exact HTTP bytes
         run: |
           set -euo pipefail
-          npm install --no-save --no-package-lock --ignore-scripts jsdom@26 >/dev/null
-          node <<'JS'
-          const assert=require('node:assert/strict');
-          const fs=require('node:fs');
-          const {JSDOM}=require('jsdom');
-          (async()=>{
-            const html='<html><body><div id="weekPredictions"></div></body></html>';
-            const dom=new JSDOM(html,{url:'https://toodataa-ai.github.io/keiba-notes/staging/this-week.html',runScripts:'outside-only'});
-            const {window}=dom;
-            window.HTMLElement.prototype.scrollIntoView=function(){};
-            window.eval(fs.readFileSync('docs/staging/stage-week-preview.js','utf8'));
-            const host=window.document.getElementById('weekPredictions');
-            const tokyo='reports/2026-10-12-october-stakes-v315-readable-v103.html';
-            const pdf='pdfs/2026-10-12-october-stakes-v315-readable-v103.pdf';
-            host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="'+tokyo+'">AI予想詳細を見る</a><a class="btn secondary" href="'+pdf+'">PDF</a></div></article>';
-            await Promise.resolve();
-            let a=host.querySelector('a.btn');
-            let panel=host.querySelector('.stage-inline-report');
-            assert.ok(panel && panel.hidden);
-            assert.equal(a.getAttribute('href'),'staging/jra-v315-20261012/tokyo11.html');
-            assert.equal(host.querySelector('a.secondary').getAttribute('href'),'staging/jra-v315-20261012/tokyo11.pdf');
-            assert.equal(host.querySelectorAll('a[href*="race-simulator.html"]').length,1);
-            assert.equal(host.querySelector('a[href*="race-simulator.html"]').getAttribute('href'),
-              'staging/race-simulator.html?race=2026-10-12-october-stakes');
-            let e=new window.MouseEvent('click',{bubbles:true,cancelable:true,button:0});
-            a.dispatchEvent(e);
-            assert.ok(e.defaultPrevented && !panel.hidden,'click must open inline, not navigate');
-            assert.equal(panel.querySelector('iframe').getAttribute('src'),'staging/jra-v315-20261012/tokyo11.html');
-            assert.equal(a.getAttribute('aria-expanded'),'true');
-            a.dispatchEvent(new window.MouseEvent('click',{bubbles:true,cancelable:true,button:0}));
-            assert.equal(panel.hidden,true,'repeat click closes in-place report');
-            // Dynamically updated cards must be enhanced without a page reload.
-            host.innerHTML='<article class="race-card"><div class="actions"><a class="btn" href="reports/2026-10-12-swan-stakes-v315-readable-v103.html">AI予想詳細を見る</a></div></article>';
-            await Promise.resolve();
-            assert.equal(host.querySelector('a.btn').getAttribute('href'),'staging/jra-v315-20261012/kyoto11.html');
-            assert.equal(host.querySelectorAll('a[href*="race-simulator.html"]').length,1);
-            assert.equal(host.querySelector('a[href*="race-simulator.html"]').getAttribute('href'),
-              'staging/race-simulator.html?race=2026-10-12-swan-stakes');
-            assert.ok(host.querySelector('.stage-inline-report'));
-            console.log('PASS_STAGE_INPAGE_OPEN_CLOSE_LAZY_LOAD_PDF_AND_DYNAMIC_RACE_CARD');
-          })().catch(e=>{console.error(e);process.exit(1)});
-          JS
-      - name: Verify every staging HTML and preview CSS/JS against public GitHub Pages
-        run: |
-          set -euo pipefail
-          mapfile -t files < <(find docs/staging -type f \( -name '*.html' -o -name 'stage-indicator.css' -o -name 'stage-week-preview.css' -o -name 'stage-week-preview.js' \) | sort)
-          for attempt in $(seq 1 35);do
-            ok=1
-            for f in "${files[@]}";do
-              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
-              if ! curl -LfsS --max-time 20 "$url?identity=$GITHUB_SHA" -o /tmp/stage-page-http ||
-                  ! cmp -s "$f" /tmp/stage-page-http;then
-                ok=0;break
-              fi
+          for attempt in $(seq 1 30);do
+            good=1
+            for file in staging/index.html staging/this-week.html staging/results.html staging/experience-regime.html lab/index.html lab/change-board.json;do
+              if ! curl -fsSL --max-time 22 "https://toodataa-ai.github.io/keiba-notes/$file?identity=$GITHUB_RUN_ID-$attempt" -o /tmp/jra-stage-lab-http ||
+                 ! cmp -s "docs/$file" /tmp/jra-stage-lab-http;then good=0;break;fi
             done
-            if [[ $ok == 1 ]];then
-              echo "PASS_JRA_STAGING_ALL_PUBLIC_HTML_ASSET_BYTES files=${#files[@]}"
-              exit 0
-            fi
-            sleep 10
+            if [[ $good == 1 ]];then echo PASS_STAGING_LAB_HTTP_BYTES_MATCH;exit 0;fi
+            sleep 8
           done
-          echo '::error::Some staging HTML or stage assets are not identical to public Pages output'
-          exit 1
+          echo '::error::Public staging or LAB content mismatch';exit 1

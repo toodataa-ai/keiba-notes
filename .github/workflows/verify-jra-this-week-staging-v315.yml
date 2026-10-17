@@ -1,46 +1,48 @@
-name: Verify JRA staging shares production appearance
+name: Verify JRA this-week staging is current production appearance
 on:
   push:
     branches: [main]
     paths:
       - 'docs/staging/this-week.html'
-      - '.github/scripts/jra-build-staging-week-mirror-v1.py'
+      - 'docs/this-week.html'
+      - '.github/scripts/staging-baseline-v2.py'
       - '.github/workflows/verify-jra-this-week-staging-v315.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
-  staging-only:
+  mirror:
     runs-on: ubuntu-latest
     timeout-minutes: 11
     steps:
       - uses: actions/checkout@v4
-      - name: Compare production and stage template byte-exact after approved exceptions
+      - name: Exactly compare safe stage render with current production HTML
         run: |
           set -euo pipefail
-          python3 .github/scripts/jra-build-staging-week-mirror-v1.py --check
+          python3 .github/scripts/staging-baseline-v2.py --check --only=this-week.html
           node --check docs/assets/week.js
+          node --check docs/assets/jra-inline-report.js
           python3 - <<'PY'
           from pathlib import Path
           prod=Path('docs/this-week.html').read_text()
           stage=Path('docs/staging/this-week.html').read_text()
-          assert 'stagingJraReports' not in stage
-          assert stage.count('class="staging-shell-marker"')==1
-          assert stage.count('stage-week-preview.js')==1
-          assert 'stage-week-preview.js' not in prod
-          assert 'jra-inline-report.js' in prod
-          assert 'jra-inline-report.js' not in stage
           assert 'id="weekPredictions"' in prod and 'id="weekPredictions"' in stage
-          print('PASS_NO_STAGE_ONLY_UI_CONTROLS')
+          assert 'assets/jra-inline-report.js' in stage
+          assert 'staging/stage-week-preview.js' not in stage
+          assert 'staging/stage-week-preview.js' not in prod
+          assert '<base href="../">' in stage
+          assert 'data-stage="preview"' in stage
+          print('PASS_THIS_WEEK_EXACT_SAME_PROD_TEMPLATE_SCRIPTS_COMMON_DATA')
           PY
-      - name: Public stage HTTP equals approved mirror
+      - name: Verify actual public page byte parity
         run: |
           set -euo pipefail
-          url='https://toodataa-ai.github.io/keiba-notes/staging/this-week.html'
-          for try in $(seq 1 35);do
-            if curl -LfsS --max-time 20 "$url?run=$GITHUB_RUN_ID" -o /tmp/jra-stage-week-mirror &&
-               cmp -s docs/staging/this-week.html /tmp/jra-stage-week-mirror;then
-              echo "PASS_STAGE_HTTP_MATCH_AND_PROD_VISUAL_IDENTITY";exit 0
+          url=https://toodataa-ai.github.io/keiba-notes/staging/this-week.html
+          for i in $(seq 1 30);do
+            if curl -fsSL --max-time 22 "$url?week-audit=$GITHUB_RUN_ID-$i" -o /tmp/week-current-stage &&
+               cmp -s docs/staging/this-week.html /tmp/week-current-stage;then
+              echo PASS_THIS_WEEK_STAGING_REAL_HTTP_BYTE_EQUALITY
+              exit 0
             fi
-            sleep 10
+            sleep 8
           done
-          echo "::error::stage URL did not match expected template";exit 1
+          echo '::error::Stage this-week public URL stale';exit 1
