@@ -1,0 +1,133 @@
+name: LAB Kyoto inner 2000 image-registration and demo browser audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/lab/race-umapot-overlay-v1.js'
+      - 'docs/lab/race-simulator.html'
+      - 'docs/lab/race-course-geometry-v1.js'
+      - 'tools/test_race_sim_lab_kyoto_inner_v045.cjs'
+      - '.github/workflows/validate-lab-kyoto-inner-v045.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 2}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Source geometry every 5m, nine anchors, historical-course regression
+        run: |
+          set -euo pipefail
+          node --check docs/lab/race-umapot-overlay-v1.js
+          node tools/test_race_sim_lab_kyoto_inner_v045.cjs
+          python3 .github/scripts/staging-baseline-v2.py --check
+      - name: Enforce display-only scope and unchanged protected race artifacts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          files=set(subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines())
+          allowed={
+            '.github/workflows/validate-lab-kyoto-inner-v045.yml',
+            'docs/lab/race-umapot-overlay-v1.js',
+            'docs/lab/race-simulator.html',
+            '.github/workflows/validate-jra-race-simulator-v1.yml',
+            'tools/test_race_sim_lab_kyoto_inner_v045.cjs',
+          }
+          # Only compare modified source against the frozen initial implementation.
+          for p in ('docs/lab/race-sim-engine.js','docs/lab/race-simulator.js',
+                    'docs/lab/race-course-geometry-v1.js',
+                    'docs/staging/race-umapot-overlay-v1.js',
+                    'docs/staging/race-simulator.html',
+                    'docs/data/races.json'):
+            base=subprocess.check_output(['git','rev-parse','7d653e914dd9723b23bde23cc94a5fe3efb3e989:'+p],text=True).strip()
+            now=subprocess.check_output(['git','rev-parse','HEAD:'+p],text=True).strip()
+            assert now==base,('IMMUTABLE_DISPLAY_ONLY_BOUNDARY',p)
+          for tree in ('docs/data','docs/reports','docs/pdfs','e2e_validation','local_racing_shadow_v1'):
+            base=subprocess.check_output(['git','rev-parse','7d653e914dd9723b23bde23cc94a5fe3efb3e989:'+tree],text=True).strip()
+            now=subprocess.check_output(['git','rev-parse','HEAD:'+tree],text=True).strip()
+            assert now==base,('PROTECTED_DATA_TREE_CHANGED',tree)
+          print('PASS_LAB_GEOMETRY_ONLY_ENGINE_OFFICIAL_PREDICTION_PDF_BETS_PROOFS_FROZEN')
+          PY
+      - name: Install real Chromium and Playwright
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          command -v google-chrome || command -v chromium || command -v chromium-browser
+      - name: Capture actual source image plus nine-station guide and running one-horse demo
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kyoto-lab-review
+          python3 -m http.server 8765 --directory docs >/tmp/lab-kyoto-http.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          import shutil
+          from playwright.sync_api import sync_playwright
+          executable=next((v for v in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if v),None)
+          assert executable
+          checkpoints=[(0,350,317),(100,294,316),(308.7,178,301),(530,165,204),
+            (900,286,147),(1270,463,136),(1435,510,197),(1671.6,490,317),(2000,294,317)]
+          with sync_playwright() as p:
+            b=p.chromium.launch(headless=True,executable_path=executable,args=['--no-sandbox'])
+            for width in (390,1024):
+              page=b.new_page(viewport={'width':width,'height':880})
+              errors=[];network=[]
+              page.on('pageerror',lambda error:errors.append(str(error)))
+              page.on('response',lambda res:network.append((res.status,res.url)) if res.url.startswith('http://127.0.0.1:8765/') and res.status>=400 else None)
+              page.goto('http://127.0.0.1:8765/lab/race-simulator.html?demo=shuka-one&guide=1',wait_until='domcontentloaded',timeout=30000)
+              page.wait_for_function("document.querySelector('#singleDemoNotice')?.hidden===false",timeout=18000)
+              assert page.locator('#kyotoRealCourseMap').is_visible()
+              image=page.locator('#kyotoCourseImage')
+              image.scroll_into_view_if_needed()
+              # Browser verifies the actual licensed external JPEG, not a synthetic stand-in.
+              page.wait_for_function("""() => {
+                const img=document.querySelector('#kyotoCourseImage');
+                return img.complete && img.naturalWidth===620 && img.naturalHeight===430;
+              }""",timeout=25000)
+              samples=page.evaluate("""() => {
+                const course=window.RaceCourseGeometry.get('kyoto_turf_inner_2000');
+                return [0,100,308.7,530,900,1270,1435,1671.6,2000].map(d=>({d,...window.RaceUmapotOverlay.point(course,d,0)}));
+              }""")
+              for got,(d,x,y) in zip(samples,checkpoints):
+                assert got['d']==d and abs(got['x']-x)<.03 and abs(got['y']-y)<.03,(width,got)
+              image.locator('xpath=..').screenshot(path=f'/tmp/kyoto-lab-review/kyoto-{width}-anchors.png')
+              page.locator('#startBtn').click()
+              page.wait_for_function("""() => {
+                const s=document.querySelector('#elapsed').textContent;
+                return s!=='0.0' && !document.querySelector('#startBtn').disabled===false;
+              }""",timeout=20000)
+              page.wait_for_timeout(1200)
+              assert not errors,(width,errors)
+              assert not network,(width,network)
+              assert page.locator('#raceCanvas').is_visible()
+              page.locator('#kyotoRealCourseMap').screenshot(path=f'/tmp/kyoto-lab-review/kyoto-{width}-running.png')
+              print('PASS_LAB_REAL_SOURCE_JPEG_9_ANCHORS_DEMO_RUNNING',width)
+              page.close()
+            b.close()
+          print('PASS_LAB_KYOTO_TWO_VIEWPORTS_REAL_JPEG_AND_ONE_HORSE_DEMO')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kyoto-inner-2000-image-alignment-v045
+          path: /tmp/kyoto-lab-review/*.png
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Confirm exact public LAB overlay/HTML bytes
+        run: |
+          set -euo pipefail
+          base=https://toodataa-ai.github.io/keiba-notes/lab
+          for i in $(seq 1 28);do
+            ok=1
+            for file in race-simulator.html race-umapot-overlay-v1.js;do
+              if ! curl -LfsS --max-time 20 "$base/$file?qa=$GITHUB_RUN_ID-$i" -o /tmp/lab-kyoto-prod ||
+                ! cmp -s "docs/lab/$file" /tmp/lab-kyoto-prod;then ok=0;break;fi
+            done
+            if [[ $ok -eq 1 ]];then echo PASS_PUBLIC_LAB_HTML_OVERLAY_EXACT_BYTES;exit 0;fi
+            sleep 8
+          done
+          echo '::error::Public LAB overlay or demo HTML did not match GitHub';exit 1
