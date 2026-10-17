@@ -49,9 +49,11 @@
   "shadow_gaps_review": {
     "date": "2026-10-17",
     "new_case_count": 3,
-    "ledger_path": "e2e_validation/experience_archived_gaps_v1.json",
+    "ledger_path": "e2e_validation/experience_new_gaps_20261017_v1.json",
     "source": "live experience_regime_status.json: error= race_context.race_category is required",
-    "policy": "all 8 gaps explicitly disclosed and SHA pinned; no postrace experience reconstruction or Shadow promotion; integrity-only recognition"
+    "policy": "all 8 gaps explicitly disclosed and SHA pinned; no postrace experience reconstruction or Shadow promotion; integrity-only recognition",
+    "historical_ledger_path": "e2e_validation/experience_archived_gaps_v1.json",
+    "explanation": "Previously pinned 5-case ledger kept byte-identical; three Oct17 gaps added in separately pinned additive ledger, no postrace source reconstruction."
   },
   "ci_remediation_note": "Update stale staging-only test selector; make PDF guard check frozen page count with unlimited tail, and validate current reviewed HTML/PDF public bytes. No historical predictions, HTML/PDF or stakes modified."
 }

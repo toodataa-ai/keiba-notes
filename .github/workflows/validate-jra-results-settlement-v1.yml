@@ -31,7 +31,8 @@ jobs:
           set -euo pipefail
           node --check docs/staging/assets/results.js
           node --check .github/scripts/test-jra-results-settlement-v1.mjs
-          grep -q 'staging/assets/results.js?v=20261013-readable-results-v105stage' docs/staging/results.html
+          grep -q 'assets/results.js?v=20261013-settlement-v104' docs/staging/results.html
+          ! grep -q 'src="staging/assets/results.js' docs/staging/results.html
           grep -q 'assets/results.js?v=' docs/results.html
           test -f docs/data/races.json
           echo PASS_JRA_PREVIEW_ISOLATION

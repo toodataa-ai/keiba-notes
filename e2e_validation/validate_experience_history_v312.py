@@ -63,7 +63,24 @@ def main():
                 "graded_studies_must_exclude_gaps","shadow_promotion_blocked_while_gaps_exist")):
         raise RuntimeError("Shadow protection policy weakened")
     report=json.loads(REPORT.read_text(encoding="utf-8"))
-    result=validate_known_gaps(report.get("errors"),ledger["entries"],hash_case)
+    # The original five missing-prestart research cases are historically SHA-pinned.
+    # Subsequent cases are separately reviewed and SHA-pinned without rewriting
+    # the immutable v1 archived-gap ledger.
+    supplement_meta=json.loads((ROOT/"docs/data/jra_current_e2e_ci_supersession_v1.json").read_text(encoding="utf-8")).get("new_reviewed_shadow_gap_ledger")
+    if not isinstance(supplement_meta,dict) or supplement_meta.get("path")!="e2e_validation/experience_new_gaps_20261017_v1.json":
+        raise RuntimeError("missing reviewed 2026-10-17 shadow gap supplement")
+    supplement_path=ROOT/supplement_meta["path"]
+    actual_ledger_sha=subprocess.check_output(["git","hash-object",str(supplement_path)],cwd=ROOT,text=True).strip()
+    if actual_ledger_sha!=supplement_meta["git_blob_sha"]:
+        raise RuntimeError("reviewed shadow gap supplement SHA changed")
+    addition=json.loads(supplement_path.read_text(encoding="utf-8"))
+    expected_ids={"2026-10-17-fuji-stakes","2026-10-17-hokuriku-stakes","2026-10-17-tourmaline-stakes"}
+    observed_ids={e.get("race_id") for e in addition.get("entries",[])}
+    if (addition.get("schema_version")!=1 or addition.get("scope")!="explicitly_reviewed_additional_missing_prerace_shadow_evidence"
+        or observed_ids!=expected_ids or len(addition["entries"])!=3 or
+        not all(addition.get("policy",{}).get(k) is True for k in ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
+        raise RuntimeError("reviewed shadow gap supplement not explicitly authorized")
+    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"],hash_case)
     # This is a CI success for no NEW integrity regressions, NOT a claim that
     # research evidence is complete. Existing missing cases remain unusable.
     print("SHADOW_CI_INTEGRITY_PASS:",json.dumps(result,ensure_ascii=False))
