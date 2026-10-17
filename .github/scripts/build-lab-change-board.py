@@ -38,12 +38,13 @@ def main():
         ids.add(fid)
         assert feature["phase"] in ("lab_development","lab_evaluation","needs_review","staging_review","released","reference_only")
         assert feature["approval"] and feature["name"] and feature["next_action"]
-        assert feature["preview_path"].startswith("staging/")
+        assert feature["preview_path"].startswith(("staging/","lab/"))
         assert ((ROOT / "docs" / feature["preview_path"]).is_file() or
                 (ROOT / "docs" / feature["preview_path"] / "index.html").is_file()), feature["preview_path"]
-        paths = feature["staging_paths"] + feature["production_paths"]
+        paths = feature.get("lab_paths",[]) + feature["staging_paths"] + feature["production_paths"]
         assert paths and len(paths) == len(set(paths))
         assert all(p.startswith("docs/staging/") for p in feature["staging_paths"])
+        assert all(p.startswith("docs/lab/") for p in feature.get("lab_paths",[]))
         assert all(p.startswith("docs/") and not p.startswith("docs/staging/") and not p.startswith("docs/data/") for p in feature["production_paths"])
         evidence = {path: tree_blob(path) for path in paths}
         if any(sha is None for sha in evidence.values()):
@@ -54,6 +55,7 @@ def main():
             "approval": feature["approval"], "next_action": feature["next_action"],
             "preview_path": feature["preview_path"],
             "staging_paths": feature["staging_paths"],
+            "lab_paths": feature.get("lab_paths",[]),
             "production_paths": feature["production_paths"],
             "file_blob_shas": evidence,
             "latest_source_change_commit": recent_commit(paths)
@@ -62,14 +64,12 @@ def main():
         "schema_version": 1,
         "kind": "read_only_ui_development_inventory",
         "state": "verified_git_source",
-        "scan_commit": recent_commit([".github/lab/feature-registry.json", "docs/staging",
-            "docs/experience-regime.html", "docs/this-week.html", "docs/results.html",
-            "docs/assets/results.js", "docs/assets/jra-inline-report.js"]),
+        "scan_commit": recent_commit([".github/lab/feature-registry.json"] + [p for f in registry["features"] for p in f.get("lab_paths",[])+f["staging_paths"]+f["production_paths"]]),
         "policy": registry["policy"],
         "counts": {x: sum(f["phase"] == x for f in entries) for x in
                    ("lab_development","lab_evaluation","needs_review","staging_review","released","reference_only")},
         "features": entries,
-        "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB is currently a gateway to unmoved staging experiments."
+        "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB hosts live experiment copies; legacy staging paths redirect for compatibility."
     }
     result = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     if "--check" in sys.argv[1:]:

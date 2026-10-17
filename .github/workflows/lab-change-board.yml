@@ -7,6 +7,8 @@ on:
       - '.github/scripts/build-lab-change-board.py'
       - '.github/workflows/lab-change-board.yml'
       - 'docs/staging/**'
+      - 'docs/lab/**'
+      - '!docs/lab/change-board.json'
       - 'docs/experience-regime.html'
       - 'docs/this-week.html'
       - 'docs/results.html'
@@ -63,10 +65,10 @@ jobs:
           d=json.loads(Path('docs/lab/change-board.json').read_text())
           assert d['state']=='verified_git_source' and len(d['features'])>=7
           assert all(f['approval'] for f in d['features'])
-          assert all(f['preview_path'].startswith('staging/') for f in d['features'])
+          assert all(f['preview_path'].startswith(('staging/','lab/')) for f in d['features'])
           assert 'noindex,nofollow' in Path('docs/lab/index.html').read_text()
           assert not any('docs/data/' in path or 'docs/pdfs/' in path or 'e2e_validation/' in path
-              for f in d['features'] for path in f['staging_paths']+f['production_paths'])
+              for f in d['features'] for path in f.get('lab_paths',[])+f['staging_paths']+f['production_paths'])
           print('PASS_LAB_GATEWAY_APPROVAL_IS_MANUAL_DATA_ISOLATION')
           PY
       - name: Render LAB UI in actual Chrome at phone and desktop widths

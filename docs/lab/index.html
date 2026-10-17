@@ -40,7 +40,7 @@ footer{padding:16px 0 30px;color:#73808e;font-size:11px}
 <div id="scan" aria-live="polite">GitHub変更台帳を取得中…</div>
 </div></header>
 <main class="wrap">
-<div class="rule"><strong>移行中：</strong> LABの専用入口を新設しました。既存の実験ページはリンク切れを避けるため、現時点ではステージング配下に残しています。自動的に本番へ昇格する仕組みではありません。</div>
+<div class="rule"><strong>移行中：</strong> 実験機能の動作場所はLABへ移しました。通常のステージングは本番と同じ画面を表示し、承認対象の変更だけを検証します。旧URLは互換性のためLABへ転送しています。</div>
 <section aria-label="変更件数" class="summary">
 <div class="metric"><small>開発・評価中</small><strong id="nLab">—</strong></div>
 <div class="metric"><small>差分の検証待ち</small><strong id="nReview">—</strong></div>
@@ -87,7 +87,7 @@ try{
    meta.textContent='最終Git変更: '+changed+' · ソース '+Object.keys(f.file_blob_shas||{}).length+'件';
    item.append(meta);
    const links=document.createElement('div');links.className='links';
-   if(typeof f.preview_path==='string' && f.preview_path.startsWith('staging/')){
+   if(typeof f.preview_path==='string' && (f.preview_path.startsWith('staging/')||f.preview_path.startsWith('lab/'))){
       const a=document.createElement('a');a.href='../'+f.preview_path;a.textContent='検証ページを見る ↗';links.append(a);
    }
    if(f.latest_source_change_commit&&/^[0-9a-f]{40}$/.test(f.latest_source_change_commit)){

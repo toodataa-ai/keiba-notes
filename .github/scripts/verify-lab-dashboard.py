@@ -23,7 +23,7 @@ with sync_playwright() as p:
           const n=id=>Number(document.getElementById(id).textContent);
           const scroll=document.documentElement.scrollWidth;
           const body=document.body.scrollWidth;
-          return {width:innerWidth,scroll,body,links:document.querySelectorAll('.links a[href^="../staging/"]').length,
+          return {width:innerWidth,scroll,body,links:document.querySelectorAll('.links a[href^="../lab/"],.links a[href^="../staging/"]').length,
              summary:n('nLab')+n('nReview')+n('nReleased')+n('nReference'),
              allCardsInside:els.every(el=>{const r=el.getBoundingClientRect();return r.left>=-2&&r.right<=innerWidth+2;})};
         }""")

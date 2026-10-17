@@ -12,11 +12,11 @@
 @media(max-width:760px){.results-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.results-stats article{min-height:88px;padding:12px 13px}.results-stats strong{font-size:20px}.results-stats .wide{grid-column:span 2}.bet-panel-head{padding:11px 12px}.bet-row{padding:10px 12px}.bet-total{padding:10px 12px}.bet-total strong{font-size:13px}.bet-selection{font-size:13px}}
 @media(max-width:640px){.page-hero h1{font-size:26px}.page-main{padding-top:20px}.period-panel{padding:14px}.period-panel h2{font-size:20px}.results-note{font-size:12px}.section-head h2{font-size:24px}}
 </style>
-<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+<link rel="stylesheet" href="lab/stage-indicator.css?v=20261012-1">
 </head>
 <body>
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
-<header class="page-hero"><div class="wrap"><a class="home-link" href="staging/index.html">← トップページに戻る</a><h1>過去の成績</h1><p>予想・結果・反省会まで揃ったJRAメインレースだけを集計します。</p></div></header>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">LAB <span>開発中</span></div>
+<header class="page-hero"><div class="wrap"><a class="home-link" href="lab/index.html">← トップページに戻る</a><h1>過去の成績</h1><p>予想・結果・反省会まで揃ったJRAメインレースだけを集計します。</p></div></header>
 <main class="wrap page-main">
 <p class="results-note">旧サイトから移行した購入・的中・払戻のみの履歴は、反省会がないため表示・集計から除外しています。</p>
 <section class="period-panel"><div><h2>集計期間</h2></div><div class="period-controls"><select id="periodMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="periodValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="periodLabel" class="period-label">全期間</p></section>
@@ -34,6 +34,6 @@
 </details>
 <section class="section-head"><div><h2>レース別の結果・反省会</h2></div></section><div id="raceList" class="race-list"><p class="muted">読み込み中…</p></div>
 </main>
-<script src="staging/assets/results.js?v=20261013-readable-results-v105stage"></script>
+<script src="lab/assets/results.js?v=20261013-readable-results-v105stage"></script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

@@ -19,11 +19,11 @@ html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8)
 .staging-visual-marker{position:fixed;right:6px;bottom:6px;display:flex;align-items:center;gap:5px;background:rgba(138,75,8,.92);color:#fff7ed;border-radius:999px;padding:4px 7px;font-family:"Meiryo UI",Meiryo,sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.02em;z-index:2147483647;box-shadow:0 1px 3px rgba(0,0,0,.18);pointer-events:none}
 .staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
 </style>
-<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+<link rel="stylesheet" href="lab/stage-indicator.css?v=20261012-1">
 </head><body>
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">LAB <span>開発中</span></div>
 <div class="staging-visual-marker" role="status">STAGING <small>80275b9</small></div>
-<main class="audit-wrap"><div class="nav"><a href="staging/index.html">← ステージングトップ</a><a href="staging/release-history.html">公開履歴・復元方式</a></div>
+<main class="audit-wrap"><div class="nav"><a href="lab/index.html">← ステージングトップ</a><a href="staging/release-history.html">公開履歴・復元方式</a></div>
 <h1>買いやすい購入方法：最大3操作＋中穴1行＋大穴1行</h1>
 <p class="subtle">通常の購入方法は最大3行、さらに中穴（20倍以上100倍未満）と大穴（100倍以上・的中時1万円以上）をそれぞれ表の外に見出しを置き、最大1行ずつ表示します。各区分の実測オッズとモデル期待利益が採用条件に合わなければ見送ります。三連単は原則6点以上、三連複は3点以上のまとまった買い目を候補とし、1点に絞る推奨は避けます。券種・馬番・JRA画面での指定方法・点数・合計を確認できます。元の正式買い目を無理に3行に隠したものではなく、別の購入セットに選び直す実験です。</p>
 <p class="subtle" style="margin:5px 0 12px"><strong>馬券の表記：</strong>馬連・ワイド・三連複＝「－」（着順を問わない）／馬単・三連単＝「→」（着順あり）／BOXの「・」＝選ぶ馬番一覧</p>
@@ -36,7 +36,7 @@ const yen=n=>Number(n||0).toLocaleString('ja-JP')+'円';
 const pct=n=>(100*Number(n||0)).toFixed(1)+'%';
 const signed=n=>(n>0?'+':'')+Number(n||0).toFixed(1);
 async function loadRace(id,name){
- const res=await fetch('staging/data/three-plus-ana/'+id+'.json',{cache:'no-store'});
+ const res=await fetch('lab/data/three-plus-ana/'+id+'.json',{cache:'no-store'});
  if(!res.ok)throw Error(id+'の検証ファイルが未公開: HTTP '+res.status);
  const d=await res.json();const section=el('section','card'),title=el('h2','',name);
  section.append(title,el('p','report','試験モデル v3.15候補 ｜ 正式版 v3.13は変更なし'));

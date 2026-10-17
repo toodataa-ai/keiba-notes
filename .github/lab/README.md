@@ -1,6 +1,6 @@
 # UI change management / transitional LAB (2026-10-17)
 
-This is a *non-destructive transition*. LAB's new public gateway is \`docs/lab/index.html\`.
+This is an *audited non-destructive LAB migration*. LAB's public gateway is \`docs/lab/index.html\`.
 The underlying experimental files currently remain under \`docs/staging/\`; DO NOT
 describe the physical environments as fully separated yet. Do not move existing
 simulator image/JS paths while dependencies are unresolved.
@@ -35,3 +35,6 @@ The LAB dashboard and source registry are UI metadata only.
 Modify \`.github/lab/feature-registry.json\` **only** based on explicit decision
 or grounded completion. A changed Git SHA does not mean approved, tested, or
 published. The board generator derives source facts and preserves manual phases.
+
+## LAB active migration
+Experiment HTML/JS/JSON and historical preview PDF sources now have canonical working copies at docs/lab. Legacy staging experiment URLs redirect to LAB, while original binary assets and stage source snapshots remain available for compatibility and rollback. All eleven regular staging pages are generated from current production via .github/scripts/staging-baseline-v2.py. No production prediction data or approved UI is copied backwards.
