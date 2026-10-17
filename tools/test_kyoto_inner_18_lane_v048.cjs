@@ -8,14 +8,29 @@ const W={},document={getElementById:()=>null,querySelector:()=>null};
 const base='docs/lab/';
 for(const src of ['race-course-geometry-v1.js','race-lane-ai-v1.js',
  'race-runner-style-v1.js','race-ability-model-v1.js','race-sim-engine.js',
- 'race-umapot-overlay-v1.js','race-broadcast-map-v1.js','race-lab-18-fixture-v1.js']){
+ 'race-umapot-overlay-v1.js','race-broadcast-map-v1.js','race-lab-18-fixture-v1.js',
+ 'race-turf-corridor-v1.js']){
  vm.runInNewContext(fs.readFileSync(base+src,'utf8'),{
   window:W,globalThis:W,document
  },{filename:src});
 }
 const {RaceLab18Fixture:synthetic,RaceSimEngine:engine,RaceCourseGeometry:geometry,
  RaceLaneAI:laneAI,RaceUmapotOverlay:overlay,RaceSimBroadcastMap:broadcast}=W;
+const railsData=JSON.parse(fs.readFileSync(base+'race-turf-rails-kyoto-inner-2000-v1.json','utf8'));
+W.RaceTurfCorridor.register(railsData);
 const entry=synthetic.entry(),horses=synthetic.horses(),course=geometry.get(entry.course_id);
+for(let d=0;d<=2000;d+=5){
+ const band=W.RaceTurfCorridor.rails(course,d,overlay.legacyPoint);
+ assert.ok(band.widthPx>3&&band.widthPx<70);
+ for(const lane of [0,1,3,5,8,14]){
+  const p=overlay.point(course,d,lane);
+  const r=W.RaceTurfCorridor.fraction(course,lane);
+  const want={x:band.inner.x+(band.outer.x-band.inner.x)*r,
+    y:band.inner.y+(band.outer.y-band.inner.y)*r};
+  assert.ok(Math.hypot(p.x-want.x,p.y-want.y)<1e-6,'all lanes must remain INSIDE turf band at '+d);
+  assert.ok(r>.02&&r<.98);
+ }
+}
 assert.equal(entry.field_size,18);
 assert.equal(entry.scope,'LAB_SYNTHETIC_NOT_OFFICIAL');
 assert.equal(horses.length,18);

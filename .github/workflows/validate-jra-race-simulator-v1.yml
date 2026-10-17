@@ -34,6 +34,7 @@ jobs:
           node tools/test_race_sim_lab_kyoto_inner_v045.cjs
           node --check tools/test_kyoto_inner_18_lane_v048.cjs
           node tools/test_kyoto_inner_18_lane_v048.cjs
+          node --check docs/lab/race-turf-corridor-v1.js
           python3 .github/scripts/staging-baseline-v2.py --check
           python3 - <<'PY'
           import hashlib,json
@@ -50,7 +51,9 @@ jobs:
             assert (l/name).read_bytes()==(s/name).read_bytes(),name
           # LAB overlay is intentionally newer than the frozen legacy staging geometry.
           assert (l/'race-umapot-overlay-v1.js').read_bytes()!=(s/'race-umapot-overlay-v1.js').read_bytes()
-          assert 'race-umapot-overlay-v1.js?v=20261017-46' in (l/'race-simulator.html').read_text()
+          assert 'race-umapot-overlay-v1.js?v=20261018-49' in (l/'race-simulator.html').read_text()
+          assert 'race-turf-corridor-v1.js?v=20261018-49' in (l/'race-simulator.html').read_text()
+          assert (l/'race-turf-rails-kyoto-inner-2000-v1.json').is_file()
           assert 'race-broadcast-map-v1.js?v=20261018-47' in (l/'race-simulator.html').read_text()
           assert 'RaceSimBroadcastMap.draw({' in (l/'race-simulator.js').read_text()
           assert 'LAB_SYNTHETIC_NOT_OFFICIAL' in (l/'race-lab-18-fixture-v1.js').read_text()

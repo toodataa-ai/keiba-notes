@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v0.48：京都1400と同一の内優先RaceLaneAIを京都2000架空18頭デモで検証。発馬100m内寄せ、閉塞・再内取り、5区間の馬群、実況/全体図同一座標、18頭画面収容を実際のデータで監査。自動検証後も目視承認待ち。本番/STAGING/正式予想は変更しない。",
+      "next_action": "LAB v0.49：うまぽっと実画像の緑芝帯から内外ラチ境界を5m刻みで自動抽出し、内ラチ距離と物理レーンに基づく全体図/実況共通投影へ刷新。385点実測色判定+16点遮蔽補間。京都18頭・全距離の芝帯内検証、実ブラウザの目視確認待ち。正式予想・STAGING・本番非変更。",
       "preview_path": "lab/race-simulator.html",
       "staging_paths": [],
       "production_paths": [],
@@ -31,7 +31,9 @@
         "docs/lab/race-ability-model-v1.js",
         "docs/lab/race-lane-ai-v1.js",
         "docs/lab/race-broadcast-map-v1.js",
-        "docs/lab/race-lab-18-fixture-v1.js"
+        "docs/lab/race-lab-18-fixture-v1.js",
+        "docs/lab/race-turf-corridor-v1.js",
+        "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json"
       ]
     },
     {

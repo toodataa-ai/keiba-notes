@@ -24,6 +24,16 @@ function demoEntry(){return {id:DEMO_ID,demo_mode:DEMO_MODE,date:'2026-10-18',
  venue:'京都',number:11,race:'秋華賞コース（仮1頭）',surface:'芝',
  turn:'右',distance_m:2000,course_id:'kyoto_turf_inner_2000',
  field_size:1,scope:'STAGING_DEMO_ONLY',going:'デモ',going_observed_at:'—'};}
+async function ensureTurfRails(entry){
+ if(entry.course_id!=='kyoto_turf_inner_2000')return;
+ if(!window.RaceTurfCorridor)throw Error('TURF_RAIL_PROJECTOR_MISSING');
+ if(RaceTurfCorridor.has(entry.course_id))return;
+ const res=await fetch('race-turf-rails-kyoto-inner-2000-v1.json',{cache:'no-store'});
+ if(!res.ok)throw Error('芝帯の内外ラチ境界を取得できません（HTTP '+res.status+'）');
+ const data=await res.json();
+ if(data.course_id!==entry.course_id)throw Error('TURF_RAIL_COURSE_MISMATCH');
+ RaceTurfCorridor.register(data);
+}
 function demoHorse(){return {number:1,name:'仮の1頭（デモ）',mark:'△',
  grade:'B',pace_grade:'B',factorGrades:Array(9).fill('B'),style:'senko',
  styleMeta:{source:'STAGE_SYNTHETIC_ONLY'},recentRuns:[],win_pct:NaN};}
@@ -127,6 +137,8 @@ async function loadRace(id){
    const profile=RaceCourseGeometry.get(entry.course_id);
    if(!profile?.user_approved_stage_geometry||profile.distance_m!==2000)
     throw Error('承認済みの秋華賞走行線がありません');
+   await ensureTurfRails(entry);
+   if(version!==scenarioVersion)return;
    const multi=isDemo18(entry);
    const horses=multi?RaceLab18Fixture.horses():[demoHorse()];
    RaceSimEngine.validData({...entry,horses});
@@ -160,6 +172,8 @@ async function loadRace(id){
   if(!dbRes.ok||!reportRes.ok)throw Error('原本取得に失敗しました（HTTP '+dbRes.status+'/'+reportRes.status+'）');
   const db=await dbRes.json();
   isValidEntry(entry,db);
+  await ensureTurfRails(entry);
+  if(version!==scenarioVersion)return;
   const profile=RaceCourseGeometry.get(entry.course_id);
   if(!profile||profile.distance_m!==entry.distance_m||profile.venue!==entry.venue||profile.turn!==entry.turn)
     throw Error('公式コース条件とレース定義が一致しません');

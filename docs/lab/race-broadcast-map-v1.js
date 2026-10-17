@@ -75,7 +75,7 @@ function draw(options){
     Number(a.focused)-Number(b.focused)||Number(a.leading)-Number(b.leading)||a.number-b.number);
  for(const p of markers){
   paintNumber(ctx,p.number,p.x,p.y,
-    view.markerScale*(points.length>=12?(p.focused?.72:.59):points.length>=6?.75:1),
+    view.markerScale*(points.length>=12?(p.focused?1.10:.88):points.length>=6?.90:1),
     p.focused,
     p.leading,race.field_size,p.passing);
  }

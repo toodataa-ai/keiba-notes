@@ -166,7 +166,7 @@ function kyotoEarlyInsidePullPx(d){
  const smooth=x=>{const t=clamp(x,0,1);return t*t*(3-2*t)};
  return 8.5*smooth((d-225)/125)*(1-smooth((d-720)/300));
 }
-function point(course,d,lane=0){
+function legacyPoint(course,d,lane=0){
  const p=uncalibratedPoint(course,d,lane);
  if(course.id!=='kyoto_turf_inner_2000')return p;
  const delta=kyotoCenterCorrection(course,d);
@@ -175,6 +175,11 @@ function point(course,d,lane=0){
  // ( -ty, tx ) is the RIGHT normal of the displayed travel direction.
  return {x:p.x+delta.x-center.ty*inward,
          y:p.y+delta.y+center.tx*inward};
+}
+function point(course,d,lane=0){
+ if(global.RaceTurfCorridor?.has(course.id))
+   return global.RaceTurfCorridor.point(course,d,lane,legacyPoint);
+ return legacyPoint(course,d,lane);
 }
 function validate(course){
  const parts=path[course.id];if(!parts||parts.length!==course.segments.length)throw Error('UMAPOT_UNREGISTERED');
@@ -257,5 +262,5 @@ function setup(){
  }
 }
 setup();
-global.RaceUmapotOverlay=Object.freeze({point,validate,draw,outwardShiftPx,width:620,height:430});
+global.RaceUmapotOverlay=Object.freeze({point,legacyPoint,validate,draw,outwardShiftPx,width:620,height:430});
 })(typeof window!=='undefined'?window:globalThis);

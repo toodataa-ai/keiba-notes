@@ -73,6 +73,7 @@ assert.equal(operations.filter(x=>x[0]==='image').length,1,'do not use substitut
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
 const sim=fs.readFileSync(base+'race-simulator.js','utf8');
 assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-47'));
+assert.ok(html.includes('race-turf-corridor-v1.js?v=20261018-49'));
 assert.ok(sim.includes('RaceSimBroadcastMap.draw({'));
 assert.ok(sim.indexOf('RaceSimBroadcastMap.draw({')<sim.indexOf('if(state.goalCamera){'),'no separate finish cut for Kyoto');
 assert.ok(!sim.includes("ctx.rotate("),'do not rotate original bitmap');
