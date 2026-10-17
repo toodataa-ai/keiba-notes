@@ -1,0 +1,149 @@
+name: JRA recover unchanged frozen Niigata v3.15 proof after git push race
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/recovery-v315/*.json'
+  workflow_dispatch:
+    inputs:
+      request_path:
+        required: true
+        type: string
+        description: 'Existing new v3.15 purchase-only formal request'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  purchase-only-v315:
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Validate new action estimator and historical v3.13 predictor
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/test-jra-three-command-v1.mjs
+          node .github/scripts/test-jra-ticket-notation-v1.mjs
+          node .github/scripts/test-jra-exacta-wheel-comparison-v1.mjs
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+          node --check .github/scripts/jra-build-formal-3action-v315.mjs
+          python3 -m py_compile .github/scripts/jra-render-formal-reader-v315.py .github/scripts/jra-promote-formal-3action-v315.py
+      - name: Verify the existing immutable Niigata purchase proof, no new modeling
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EVENT" == "push" ]] || { echo "::error::New recovery request must be added via Git";exit 1; }
+          mapfile -t ADD < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- e2e_validation/requests/recovery-v315)
+          [[ ${#ADD[@]} -eq 1 ]] || { echo "::error::Exactly one recovery request required";exit 1; }
+          REQUEST="${ADD[0]}"
+          python3 - "$REQUEST" <<'PY'
+          import json,sys,subprocess,datetime,os
+          from pathlib import Path
+          r=json.load(open(sys.argv[1]))
+          id='2026-10-17-hokuriku-stakes'
+          proof='e9016046a5f989a3f367a86defd2908f2c04dbd3'
+          snap='e2e_validation/snapshots/'+id+'/v3.15-run38996831480-attempt1.json'
+          assert r['race_id']==id and r['proof_commit']==proof and r['snapshot_path']==snap
+          assert Path(snap).is_file()
+          prior=json.loads(subprocess.check_output(['git','show',proof+':'+snap]))
+          plan=json.loads(Path(snap).read_text())
+          assert prior==plan and plan['status']=='pending_git_proof' and plan['proof_commit'] is None
+          assert plan['source_race_id']==id and plan['purchase_strategy_version']=='v3.15'
+          assert plan['quote_age_max_seconds']<=600 and plan['quote_capture_span_seconds']<=180
+          assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat(plan['race_context']['start_at'])
+          src='e2e_validation/predictions/'+id+'/v3.13-rerun38996491193-attempt1.json'
+          assert plan['source_prediction_path']==src and Path(src).is_file()
+          reg=json.load(open('docs/data/races.json'))
+          row=[x for x in reg['races'] if x['id']==id]
+          assert len(row)==1 and row[0]['status']=='predicted' and not row[0].get('purchase_strategy_version')
+          assert row[0]['e2e_prediction']==src and row[0]['proof_commit']==plan['source_prediction_proof']
+          label='v3.15-run38996831480-attempt1'
+          v={
+            'RACE_ID':id,'LABEL':label,'SNAPSHOT':snap,'PROOF':proof,'SOURCE':src,
+            'PREDICTION':'e2e_validation/predictions/'+id+'/'+label+'-sealed.json',
+            'REPORT':'docs/reports/'+id+'-'+label+'-v315.html',
+            'PDF':'docs/pdfs/'+id+'-'+label+'-v315.pdf',
+            'MANIFEST':'docs/data/jra-v315-revision-manifest-'+id+'-'+label+'.json'
+          }
+          for k in ('PREDICTION','REPORT','PDF','MANIFEST'):
+            assert not Path(v[k]).exists(),('Refusing to overwrite existing artifact',v[k])
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+            for k,w in v.items():f.write(k+'='+w+'\n')
+          print('PASS_ARCHIVED_NIIGATA_ORIGINAL_PROOF',proof,'tickets',len(plan['formal_bets']))
+          PY
+      - name: Seal against actual Git snapshot, render full per-horse A4, replace only current pointer
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 - "$SNAPSHOT" "$PREDICTION" "$PROOF" <<'PY'
+          import json,sys
+          from datetime import datetime,timezone
+          from pathlib import Path
+          a,b,proof=sys.argv[1:]
+          p=json.loads(Path(a).read_text())
+          assert p['status']=='pending_git_proof' and p['proof_commit'] is None
+          assert datetime.now(timezone.utc)<datetime.fromisoformat(p['race_context']['start_at'])
+          p['status']='formal_prestart';p['proof_commit']=proof
+          Path(b).parent.mkdir(parents=True,exist_ok=True)
+          Path(b).write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+          PY
+          python3 .github/scripts/jra-render-formal-reader-v315.py \
+            --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          # Approved reader-v1 is the publication gate. Never promote a custom CSS, SHA-leaking,
+          # shortened or overflowed v3.15 PDF, even if its own loose assertions pass.
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html "$REPORT" --pdf "$PDF" \
+            --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 .github/scripts/jra-promote-formal-3action-v315.py \
+            "$PREDICTION" "$SOURCE" "$REPORT" "$PDF" "$MANIFEST"
+      - name: Commit only approved data artifacts, current pointer and immutable audit journal
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST" docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import os,subprocess
+          expected=set(os.environ[x] for x in ('PREDICTION','REPORT','PDF','MANIFEST'))|{'docs/data/races.json','docs/data/jra_publication_revision_log.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert expected==actual,('no UI changes or partial canonical replacements allowed',expected^actual)
+          PY
+          git commit -m "Publish official JRA v3.15 purchase-only three actions + medium/large with full A4 and immutable proof"
+          # Never rebase an already published proof. Merge only conflict-free newer
+          # main history to preserve the exact 40-character fixed prediction proof.
+          for attempt in 1 2 3; do
+            git fetch --no-tags origin main
+            if ! git merge --no-edit origin/main;then
+              git merge --abort || true
+              echo "::error::Main changed incompatibly; do not rewrite original proof"
+              exit 1
+            fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" -eq 3 ]];then echo "::error::Publication push conflict persists";exit 1;fi
+          done
+      - name: Verify public current record, regenerated HTML, PDF and full audit journal byte equality
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 32);do
+            ok=1
+            for f in docs/data/races.json docs/data/jra_publication_revision_log.json "$MANIFEST" "$REPORT" "$PDF";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra-v315-public ||
+                 ! cmp -s "$f" /tmp/jra-v315-public;then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]];then echo "PASS_FORMAL_THREE_PURCHASE_COMMANDS_PUBLIC_VERIFIED $RACE_ID $LABEL";exit 0;fi
+            sleep 12
+          done
+          echo '::error::Published report and actual public HTTP did not match';exit 1
