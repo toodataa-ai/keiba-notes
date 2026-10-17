@@ -39,6 +39,9 @@ jobs:
           assert 'id="e012-live-collection"' in prod
           d=json.loads(Path('docs/data/experience_regime_status.json').read_text())
           assert d['collection_runs']['2026-10-17']['prerace_proof_valid_races']==9
+          assert d['collection_runs']['2026-10-18']['prerace_proof_valid_races']==12
+          assert d['collection_runs']['2026-10-18']['complete_evidence_races']==12
+          assert d['collection_runs']['2026-10-18']['collection_failures']==0
           races=json.loads(Path('docs/data/races.json').read_text())['races']
           current=[r for r in races if r['id'].startswith('2026-10-17')]
           assert len(current)==3
@@ -60,7 +63,15 @@ jobs:
           sleep 2
           python3 - <<'PY'
           from playwright.sync_api import sync_playwright
-          import shutil
+          from pathlib import Path
+          import shutil,json
+          source=Path('docs/experience-regime.html').read_text()
+          runs=json.loads(Path('docs/data/experience_regime_status.json').read_text())['collection_runs']
+          # Audit both the prior approved page and the new latest-date publication.
+          date=(sorted(runs)[-1] if 'Object.keys(d.collection_runs||{}).sort().slice(-1)[0]' in source else '2026-10-17')
+          current=runs[date]
+          expected=(str(current['prerace_proof_valid_races'])+' / '+str(current['complete_evidence_races'])+' レース',)+tuple(
+            str(current['regimes'][k]['horse_observations'])+'頭 / '+str(current['regimes'][k]['races'])+'レース' for k in ('E0','E1','E2'))
           chrome=next((p for p in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if p),None)
           assert chrome
           with sync_playwright() as p:
@@ -73,18 +84,20 @@ jobs:
               page.wait_for_function("document.querySelector('#e012-run-date')?.textContent.startsWith('取得対象：')",timeout=20000)
               x=page.evaluate("""() => {
                 const row=document.querySelector('#e012-live-collection tbody tr');
+                const date=document.querySelector('#e012-run-date').textContent;
                 const proof=document.querySelector('#e012-proof').textContent;
                 const e0=document.querySelector('#e012-e0').textContent;
                 const e1=document.querySelector('#e012-e1').textContent;
                 const e2=document.querySelector('#e012-e2').textContent;
                 const r=document.querySelector('#e012-live-collection').getBoundingClientRect();
                 return {scroll:document.documentElement.scrollWidth,body:document.body.scrollWidth,
-                        display:getComputedStyle(row).display,proof,e0,e1,e2,left:r.left,right:r.right};
+                        display:getComputedStyle(row).display,date,proof,e0,e1,e2,left:r.left,right:r.right};
               }""")
               assert not errors,(w,errors)
               assert x['scroll']<=w+2 and x['body']<=w+2 and x['left']>=-2 and x['right']<=w+2,(w,x)
               assert x['display']==('block' if w<=650 else 'table-row'),(w,x)
-              assert (x['proof'],x['e0'],x['e1'],x['e2'])==('9 / 9 レース','16頭 / 1レース','12頭 / 1レース','109頭 / 7レース'),(w,x)
+              assert x['date']=='取得対象：'+date+' / 自動昇格なし',(w,x)
+              assert (x['proof'],x['e0'],x['e1'],x['e2'])==expected,(w,x,expected)
               print('PASS_REAL_BROWSER_PROD_VIEWPORT',w,'scroll',x['scroll'])
               page.close()
             b.close()
