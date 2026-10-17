@@ -39,7 +39,8 @@ def main():
         assert feature["phase"] in ("lab_development","lab_evaluation","needs_review","staging_review","released","reference_only")
         assert feature["approval"] and feature["name"] and feature["next_action"]
         assert feature["preview_path"].startswith("staging/")
-        assert (ROOT / "docs" / feature["preview_path"]).is_file(), feature["preview_path"]
+        assert ((ROOT / "docs" / feature["preview_path"]).is_file() or
+                (ROOT / "docs" / feature["preview_path"] / "index.html").is_file()), feature["preview_path"]
         paths = feature["staging_paths"] + feature["production_paths"]
         assert paths and len(paths) == len(set(paths))
         assert all(p.startswith("docs/staging/") for p in feature["staging_paths"])
