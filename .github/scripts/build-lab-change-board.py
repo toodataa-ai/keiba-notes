@@ -62,7 +62,9 @@ def main():
         "schema_version": 1,
         "kind": "read_only_ui_development_inventory",
         "state": "verified_git_source",
-        "scan_commit": git("rev-parse", "HEAD"),
+        "scan_commit": recent_commit([".github/lab/feature-registry.json", "docs/staging",
+            "docs/experience-regime.html", "docs/this-week.html", "docs/results.html",
+            "docs/assets/results.js", "docs/assets/jra-inline-report.js"]),
         "policy": registry["policy"],
         "counts": {x: sum(f["phase"] == x for f in entries) for x in
                    ("lab_development","lab_evaluation","needs_review","staging_review","released","reference_only")},
