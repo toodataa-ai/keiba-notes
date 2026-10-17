@@ -1,0 +1,27 @@
+name: LAB extract actual Kyoto turf-inner/outer rail coordinates
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/extract_turf_band_v1.py'
+      - '.github/workflows/lab-extract-turf-rails-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Extract and print derived nonimage turf boundary coordinates
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check Pillow==11.3.0
+          python3 tools/extract_turf_band_v1.py --output /tmp/kyoto-inner-rails.json --log-json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: derived-kyoto-inner-rails
+          path: /tmp/kyoto-inner-rails.json
+          retention-days: 14
