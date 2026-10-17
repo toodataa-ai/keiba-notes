@@ -10,6 +10,7 @@ on:
       - 'docs/staging/weekend-main-course-review.html'
       - 'tools/test_race_sim_lab_kyoto_inner_v045.cjs'
       - 'tools/test_kyoto_broadcast_shared_map_v047.cjs'
+      - 'tools/test_kyoto_inner_18_lane_v048.cjs'
       - '.github/workflows/validate-jra-race-simulator-v1.yml'
   workflow_dispatch:
 permissions: {contents: read}
@@ -31,6 +32,8 @@ jobs:
           node --check tools/test_kyoto_broadcast_shared_map_v047.cjs
           node tools/test_kyoto_broadcast_shared_map_v047.cjs
           node tools/test_race_sim_lab_kyoto_inner_v045.cjs
+          node --check tools/test_kyoto_inner_18_lane_v048.cjs
+          node tools/test_kyoto_inner_18_lane_v048.cjs
           python3 .github/scripts/staging-baseline-v2.py --check
           python3 - <<'PY'
           import hashlib,json
@@ -50,6 +53,8 @@ jobs:
           assert 'race-umapot-overlay-v1.js?v=20261017-46' in (l/'race-simulator.html').read_text()
           assert 'race-broadcast-map-v1.js?v=20261018-47' in (l/'race-simulator.html').read_text()
           assert 'RaceSimBroadcastMap.draw({' in (l/'race-simulator.js').read_text()
+          assert 'LAB_SYNTHETIC_NOT_OFFICIAL' in (l/'race-lab-18-fixture-v1.js').read_text()
+          assert 'race-lab-18-fixture-v1.js?v=20261018-48' in (l/'race-simulator.html').read_text()
           for name in ('2026-10-12-october-stakes-three-plus-ana.pdf',
                        '2026-10-12-swan-stakes-three-plus-ana.pdf'):
             assert (l/'pdfs'/name).read_bytes()==(s/'pdfs'/name).read_bytes(),name
