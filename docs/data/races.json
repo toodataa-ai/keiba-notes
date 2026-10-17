@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-10-17T12:03:11.308+09:00",
+  "updated_at": "2026-10-17T10:32:01.610Z",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -3123,7 +3123,7 @@
       "race": "富士ステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 14,
@@ -3250,7 +3250,94 @@
         "modeled_low_expected_net_profit_yen": 34.3883,
         "modeled_union_hit_probability": 0.0356,
         "modeled_net_loss_probability": 0.9644
-      }
+      },
+      "result": {
+        "summary": "13→10→14 / ◎4 12着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 13,
+            "horse": "シュガークン"
+          },
+          {
+            "pos": 2,
+            "no": 10,
+            "horse": "アンパドゥ"
+          },
+          {
+            "pos": 3,
+            "no": 14,
+            "horse": "エコロアルバ"
+          }
+        ],
+        "finish_order": [
+          13,
+          10,
+          14,
+          8,
+          6,
+          5,
+          7,
+          11,
+          9,
+          1,
+          2,
+          4,
+          3,
+          12
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604061120261017%2FDE",
+        "verified_at": "2026-10-17T10:32:01.610Z",
+        "verified_at_basis": "JRA result/payout observed during 2026-10-17 postrace audit, not initial JRA publication timestamp"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "馬単",
+          "selection": [
+            1,
+            10
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604061120261017%2FDE"
+        },
+        {
+          "bet_id": "B02",
+          "type": "枠連",
+          "selection": [
+            1,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604061120261017%2FDE"
+        }
+      ],
+      "performance": {
+        "stake_yen": 200,
+        "payout_yen": 0,
+        "profit_yen": -200,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 12,
+        "honmei_win": false,
+        "honmei_place": false,
+        "second_mark_finish": 2,
+        "third_mark_finish": 6,
+        "top_marks_in_top3": 1,
+        "hit_bets": [],
+        "miss_bets": [
+          "馬単 1-10",
+          "枠連 1-6"
+        ]
+      },
+      "review": "発走前の◎は後方に置かれたまま上位争いに加われず、○は善戦。前半が速くなり、終盤に後方から脚を伸ばした低人気馬を勝ち馬候補として十分扱えなかった。展開Hの分岐確率・末脚の評価密度と、STEP1評価上位からSTEP2で別組番を買う場合の整合性を再監査する。単一レースの結果から評価順や閾値を事後変更しない。",
+      "review_at": "2026-10-17T10:32:01.610Z",
+      "e2e_case": "e2e_validation/cases/2026-10-17-fuji-stakes/case.json"
     },
     {
       "id": "2026-10-17-hokuriku-stakes",
@@ -3259,7 +3346,7 @@
       "race": "北陸ステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 18,
@@ -4168,7 +4255,727 @@
         "modeled_low_expected_net_profit_yen": 2763.9586,
         "modeled_union_hit_probability": 0.2103,
         "modeled_net_loss_probability": 0.8348
-      }
+      },
+      "result": {
+        "summary": "6→12→15 / ◎6 1着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 6,
+            "horse": "ベイビーキッス"
+          },
+          {
+            "pos": 2,
+            "no": 12,
+            "horse": "シカゴスティング"
+          },
+          {
+            "pos": 3,
+            "no": 15,
+            "horse": "サトノワーグナー"
+          }
+        ],
+        "finish_order": [
+          6,
+          12,
+          15,
+          17,
+          3,
+          10,
+          2,
+          18,
+          1,
+          13,
+          11,
+          16,
+          14,
+          8,
+          4,
+          5,
+          7,
+          9
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55",
+        "verified_at": "2026-10-17T10:32:01.610Z",
+        "verified_at_basis": "JRA result/payout observed during 2026-10-17 postrace audit, not initial JRA publication timestamp"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "三連複",
+          "selection": [
+            15,
+            17,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B02",
+          "type": "三連複",
+          "selection": [
+            5,
+            15,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B03",
+          "type": "三連複",
+          "selection": [
+            5,
+            15,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B04",
+          "type": "三連複",
+          "selection": [
+            5,
+            17,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B05",
+          "type": "三連複",
+          "selection": [
+            5,
+            6,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B06",
+          "type": "三連複",
+          "selection": [
+            5,
+            6,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B07",
+          "type": "三連複",
+          "selection": [
+            5,
+            6,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B08",
+          "type": "三連複",
+          "selection": [
+            5,
+            6,
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B09",
+          "type": "三連複",
+          "selection": [
+            5,
+            8,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B10",
+          "type": "三連複",
+          "selection": [
+            5,
+            8,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B11",
+          "type": "三連複",
+          "selection": [
+            5,
+            8,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B12",
+          "type": "三連複",
+          "selection": [
+            6,
+            15,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B13",
+          "type": "三連複",
+          "selection": [
+            6,
+            15,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B14",
+          "type": "三連複",
+          "selection": [
+            6,
+            17,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B15",
+          "type": "三連複",
+          "selection": [
+            6,
+            8,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B16",
+          "type": "三連複",
+          "selection": [
+            6,
+            8,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B17",
+          "type": "三連複",
+          "selection": [
+            6,
+            8,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B18",
+          "type": "三連複",
+          "selection": [
+            8,
+            15,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B19",
+          "type": "三連複",
+          "selection": [
+            8,
+            15,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B20",
+          "type": "三連複",
+          "selection": [
+            8,
+            17,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B21",
+          "type": "馬単",
+          "selection": [
+            6,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B22",
+          "type": "馬単",
+          "selection": [
+            18,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B23",
+          "type": "ワイド",
+          "selection": [
+            6,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B24",
+          "type": "三連単",
+          "selection": [
+            15,
+            17,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B25",
+          "type": "三連単",
+          "selection": [
+            15,
+            6,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B26",
+          "type": "三連単",
+          "selection": [
+            17,
+            15,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B27",
+          "type": "三連単",
+          "selection": [
+            17,
+            18,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B28",
+          "type": "三連単",
+          "selection": [
+            17,
+            5,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B29",
+          "type": "三連単",
+          "selection": [
+            17,
+            6,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B30",
+          "type": "三連単",
+          "selection": [
+            17,
+            6,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B31",
+          "type": "三連単",
+          "selection": [
+            17,
+            6,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B32",
+          "type": "三連単",
+          "selection": [
+            17,
+            6,
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B33",
+          "type": "三連単",
+          "selection": [
+            17,
+            8,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B34",
+          "type": "三連単",
+          "selection": [
+            18,
+            17,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B35",
+          "type": "三連単",
+          "selection": [
+            18,
+            6,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B36",
+          "type": "三連単",
+          "selection": [
+            5,
+            17,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B37",
+          "type": "三連単",
+          "selection": [
+            5,
+            6,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B38",
+          "type": "三連単",
+          "selection": [
+            6,
+            15,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B39",
+          "type": "三連単",
+          "selection": [
+            6,
+            17,
+            15
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B40",
+          "type": "三連単",
+          "selection": [
+            6,
+            17,
+            18
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B41",
+          "type": "三連単",
+          "selection": [
+            6,
+            17,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B42",
+          "type": "三連単",
+          "selection": [
+            6,
+            17,
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B43",
+          "type": "三連単",
+          "selection": [
+            6,
+            18,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B44",
+          "type": "三連単",
+          "selection": [
+            6,
+            5,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B45",
+          "type": "三連単",
+          "selection": [
+            6,
+            8,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B46",
+          "type": "三連単",
+          "selection": [
+            8,
+            17,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        },
+        {
+          "bet_id": "B47",
+          "type": "三連単",
+          "selection": [
+            8,
+            6,
+            17
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55"
+        }
+      ],
+      "performance": {
+        "stake_yen": 4700,
+        "payout_yen": 0,
+        "profit_yen": -4700,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 1,
+        "honmei_win": true,
+        "honmei_place": true,
+        "second_mark_finish": 4,
+        "third_mark_finish": 3,
+        "top_marks_in_top3": 2,
+        "hit_bets": [],
+        "miss_bets": [
+          "三連複 15-17-18",
+          "三連複 5-15-17",
+          "三連複 5-15-18",
+          "三連複 5-17-18",
+          "三連複 5-6-15",
+          "三連複 5-6-17",
+          "三連複 5-6-18",
+          "三連複 5-6-8",
+          "三連複 5-8-15",
+          "三連複 5-8-17",
+          "三連複 5-8-18",
+          "三連複 6-15-17",
+          "三連複 6-15-18",
+          "三連複 6-17-18",
+          "三連複 6-8-15",
+          "三連複 6-8-17",
+          "三連複 6-8-18",
+          "三連複 8-15-17",
+          "三連複 8-15-18",
+          "三連複 8-17-18",
+          "馬単 6-18",
+          "馬単 18-6",
+          "ワイド 6-18",
+          "三連単 15-17-6",
+          "三連単 15-6-17",
+          "三連単 17-15-6",
+          "三連単 17-18-6",
+          "三連単 17-5-6",
+          "三連単 17-6-15",
+          "三連単 17-6-18",
+          "三連単 17-6-5",
+          "三連単 17-6-8",
+          "三連単 17-8-6",
+          "三連単 18-17-6",
+          "三連単 18-6-17",
+          "三連単 5-17-6",
+          "三連単 5-6-17",
+          "三連単 6-15-17",
+          "三連単 6-17-15",
+          "三連単 6-17-18",
+          "三連単 6-17-5",
+          "三連単 6-17-8",
+          "三連単 6-18-17",
+          "三連単 6-5-17",
+          "三連単 6-8-17",
+          "三連単 8-17-6",
+          "三連単 8-6-17"
+        ]
+      },
+      "review": "◎の能力・先行力評価は整合し、▲も上位に入った一方、2着候補の取りこぼしで広い三連系BOX・マルチを含む購入セットが不的中となった。前残り決着への分岐と無印馬の補完候補選定、買い目点数の多さに対するモデル化された期待損益・集合的中確率を、発走前スナップショットと対照する。結果から相手馬を遡及採用せず、複数週のペア比較に留保する。",
+      "review_at": "2026-10-17T10:32:01.610Z",
+      "e2e_case": "e2e_validation/cases/2026-10-17-hokuriku-stakes/case.json"
     },
     {
       "id": "2026-10-17-tourmaline-stakes",
@@ -4177,7 +4984,7 @@
       "race": "トルマリンステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 15,
@@ -4449,7 +5256,173 @@
         "modeled_low_expected_net_profit_yen": 234.9447,
         "modeled_union_hit_probability": 0.4235,
         "modeled_net_loss_probability": 0.6216
-      }
+      },
+      "result": {
+        "summary": "10→5→9 / ◎5 2着",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 10,
+            "horse": "マジックローズ"
+          },
+          {
+            "pos": 2,
+            "no": 5,
+            "horse": "ジューンエオス"
+          },
+          {
+            "pos": 3,
+            "no": 9,
+            "horse": "エアトベーレ"
+          }
+        ],
+        "finish_order": [
+          10,
+          5,
+          9,
+          6,
+          15,
+          3,
+          12,
+          1,
+          8,
+          14,
+          11,
+          7,
+          4,
+          13,
+          2
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC",
+        "verified_at": "2026-10-17T10:32:01.610Z",
+        "verified_at_basis": "JRA result/payout observed during 2026-10-17 postrace audit, not initial JRA publication timestamp"
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "ワイド",
+          "selection": [
+            5,
+            10
+          ],
+          "stake_yen": 100,
+          "hit": true,
+          "payout_yen": 1430,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B02",
+          "type": "ワイド",
+          "selection": [
+            5,
+            14
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B03",
+          "type": "ワイド",
+          "selection": [
+            5,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B04",
+          "type": "ワイド",
+          "selection": [
+            5,
+            7
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B05",
+          "type": "ワイド",
+          "selection": [
+            5,
+            9
+          ],
+          "stake_yen": 100,
+          "hit": true,
+          "payout_yen": 980,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B06",
+          "type": "単勝",
+          "selection": [
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B07",
+          "type": "枠連",
+          "selection": [
+            3,
+            4
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        },
+        {
+          "bet_id": "B08",
+          "type": "枠連",
+          "selection": [
+            3,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": true,
+          "payout_yen": 3470,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+        }
+      ],
+      "performance": {
+        "stake_yen": 800,
+        "payout_yen": 5880,
+        "profit_yen": 5080,
+        "roi_pct": 735,
+        "ticket_hit": true,
+        "honmei_finish": 2,
+        "honmei_win": false,
+        "honmei_place": true,
+        "second_mark_finish": 4,
+        "third_mark_finish": 10,
+        "top_marks_in_top3": 1,
+        "hit_bets": [
+          "ワイド 5-10",
+          "ワイド 5-9",
+          "枠連 3-6"
+        ],
+        "miss_bets": [
+          "ワイド 5-14",
+          "ワイド 5-6",
+          "ワイド 5-7",
+          "単勝 5",
+          "枠連 3-4"
+        ]
+      },
+      "review": "◎は上位で粘り、先頭を取った馬が押し切る先行優位の決着。STEP2の固定購入セットには、無印の勝ち馬を含むワイドと枠連の的中があり、複数券種を合わせる設計の効果が今回の結果では観察された。一方、能力印の上位と購入対象が異なる判断の説明、逃げ切りシナリオの事前重み付け、枠連を含む相関管理は追試対象。的中結果を利用した重みの遡及変更や新ルール即時採用はしない。",
+      "review_at": "2026-10-17T10:32:01.610Z",
+      "e2e_case": "e2e_validation/cases/2026-10-17-tourmaline-stakes/case.json"
     }
   ]
 }

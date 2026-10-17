@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-17",
+  "observed_at": "2026-10-17T10:32:01.610Z",
+  "status": "REVIEW_EVIDENCE_COMMITTED_AWAITING_GITHUB_ACTIONS_AND_PAGES_PARITY",
+  "immutable_forecasts": true,
+  "immutable_final_bets": true,
+  "reviewed_races": [
+    "2026-10-17-fuji-stakes",
+    "2026-10-17-hokuriku-stakes",
+    "2026-10-17-tourmaline-stakes"
+  ],
+  "proof_publication_commits": {
+    "2026-10-17-fuji-stakes": "5492d11a268df2ca7c03de1aed9307d217784941",
+    "2026-10-17-hokuriku-stakes": "03ad17988eea47d237ac1469ebe15ee059c0a672",
+    "2026-10-17-tourmaline-stakes": "6f3494dc18d048d8a1e99c21b3da03f3c7a1cf01"
+  },
+  "source_publication_commits": {
+    "2026-10-17-fuji-stakes": "5e2969a64a3da8d4e9d1127f39a6327d9155e39d",
+    "2026-10-17-hokuriku-stakes": "b08000dec01bf6546cf21e0dc631168e19ccc7cf",
+    "2026-10-17-tourmaline-stakes": "e485105ea49ad3bdf68dddb37914ea738dc0a72e"
+  },
+  "jra_official_result_urls": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604061120261017%2FDE",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604011120261017%2F55",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604061120261017%2FBC"
+  ],
+  "e2e_schema_adapter": "read-only sealed v3.15 with SHA256-pinned v3.13 STEP1",
+  "weekly_change_decision": "not_evaluated",
+  "weekly_reason": "2026-10-18 JRA main races still ahead; no A/B/C approval or optimization today",
+  "manual_approval_rules": "A/B/C retained",
+  "overfit_control": "no isolated race threshold changes",
+  "preserved_versions": true,
+  "preserved_inflight_e2e_comparison": true,
+  "shadow_evidence_gaps_are_separate": true,
+  "original_html_pdf_unchanged": true,
+  "files_changed": [
+    "e2e_validation/results/2026-10-17-fuji-stakes.json",
+    "e2e_validation/cases/2026-10-17-fuji-stakes/case.json",
+    "e2e_validation/results/2026-10-17-hokuriku-stakes.json",
+    "e2e_validation/cases/2026-10-17-hokuriku-stakes/case.json",
+    "e2e_validation/results/2026-10-17-tourmaline-stakes.json",
+    "e2e_validation/cases/2026-10-17-tourmaline-stakes/case.json",
+    "docs/data/races.json",
+    "docs/data/jra_postrace_meetings_v1.json",
+    "docs/data/jra_postrace_audit_2026-10-17.json"
+  ]
+}
