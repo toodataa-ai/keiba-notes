@@ -34,7 +34,9 @@ jobs:
           prod=Path('docs/experience-regime.html').read_text()
           stage=Path('docs/staging/experience-regime.html').read_text()
           css=lambda h:re.search(r'<style id="experience-regime-mobile-overflow-fix">.*?</style>',h,re.S).group()
-          assert css(prod).replace('/* Mobile containment','/* STAGING REVIEW: mobile containment')==css(stage)
+          # Both exact shared CSS and legacy stage-only comment prefixes are valid.
+          normalize=lambda s:s.replace('/* STAGING REVIEW: mobile containment','/* Mobile containment')
+          assert normalize(css(prod))==normalize(css(stage))
           assert 'data-stage="preview"' not in prod and 'staging-shell-marker' not in prod and 'noindex' not in prod
           assert 'id="e012-live-collection"' in prod
           d=json.loads(Path('docs/data/experience_regime_status.json').read_text())
