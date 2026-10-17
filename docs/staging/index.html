@@ -60,7 +60,6 @@
 </div></div></section>
 <section class="portal-section" aria-labelledby="researchTitle"><div class="portal-head"><span class="portal-kicker">精度向上のための研究</span><h2 id="researchTitle">予想を強くするための研究・検証</h2><p>本番予想とは切り分けながら、精度向上につながる要素を検証しています。</p></div>
 <div class="portal-grid research-grid">
-<a class="portal-card research-card" href="staging/race-simulator.html?race=2026-10-12-october-stakes"><span><span class="portal-title">レースシミュレータ（検証版）</span><span class="portal-desc">実際の出走馬で位置取り・進路・馬群を動かす仮想レース</span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card research-card" href="staging/baba-models.html"><span><span class="portal-title">馬場状態予測の研究</span><span class="portal-desc">10競馬場×芝・ダートを個別に検証</span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card research-card" href="staging/e2e.html"><span><span class="portal-title">プロンプト改良前後の比較検証</span><span class="portal-desc">同じレースを改良前・改良後のプロンプトで予想し、結果で比較</span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card research-card" href="staging/experience-regime.html"><span><span class="portal-title">新馬・戦歴の少ない馬の予想研究</span><span class="portal-desc">実戦経験の少なさがAI予想の精度にどう影響するかを検証</span></span><span class="portal-arrow">→</span></a>
@@ -73,9 +72,8 @@
 </section>
 </div>
 <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
-<p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="staging/release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.03 ／ ステージング（本番と同一構成）</small></p>
+<p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="staging/release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.03</small></p>
 <p class="photo-credit">背景写真：<a href="https://commons.wikimedia.org/wiki/File:Racing_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Racing (Unsplash)／CC0</a>（海外の競馬場で撮影）</p>
-<p style="font-size:11px;text-align:center;margin:18px 0 0"><a href="staging/purchase-preview.html" style="color:#bac4d3">検証用：購入方法のステージング比較を見る →</a></p>
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
 <script>
@@ -97,6 +95,5 @@ fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)thro
  }
 }).catch(()=>{document.getElementById('releaseHistoryList').textContent='履歴の取得に失敗しました。'});
 </script>
-
-  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
+<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

@@ -1,18 +1,24 @@
 <!doctype html><html lang="ja" data-stage="preview"><head>
-<meta name="robots" content="noindex,nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../">
-<title>サイト公開履歴とロールバック・ステージング</title><link rel="stylesheet" href="assets/style.css">
-<style>body{font:13px/1.75 Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;background:#f5f6f8;color:#232834}.wrap{max-width:860px;margin:0 auto;padding:25px 16px}h1{font-size:22px}h2{font-size:17px}.card{padding:16px;background:#fff;border:1px solid #e0e3e7;border-radius:9px;margin:12px 0}.small{color:#5c6674;font-size:12px}.warning{border-left:3px solid #a34b24;padding:10px;background:#fffbf4}code{overflow-wrap:anywhere}.pill{display:inline-block;background:#eee;padding:2px 7px;border-radius:6px}</style><style id="staging-visual-marker">
-html::after{content:"";position:fixed;inset:0;border:2px solid rgba(138,75,8,.8);pointer-events:none;z-index:2147483646}
-.staging-visual-marker{position:fixed;right:6px;bottom:6px;display:flex;align-items:center;gap:5px;background:rgba(138,75,8,.92);color:#fff7ed;border-radius:999px;padding:4px 7px;font-family:"Meiryo UI",Meiryo,sans-serif;font-size:9px;font-weight:800;line-height:1;letter-spacing:.02em;z-index:2147483647;box-shadow:0 1px 3px rgba(0,0,0,.18);pointer-events:none}
-.staging-visual-marker small{font-size:8px;font-weight:700;opacity:.9}
-</style>
-<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+<meta name="robots" content="noindex,nofollow"><base href="../"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>競馬研究所｜公開履歴・旧バージョン復元</title><link rel="stylesheet" href="assets/style.css">
+<style>body{font:13px/1.7 Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;background:#f6f7f8;color:#252b34}.shell{max-width:900px;margin:0 auto;padding:24px 15px 48px}h1{font-size:22px}h2{font-size:17px}.release{background:#fff;border:1px solid #dce1e8;border-radius:10px;padding:13px;margin:12px 0}.pill{font-size:11px;padding:2px 7px;border-radius:5px;background:#f1f2f4}.sub{font-size:12px;color:#677381}.grid{display:grid;grid-template-columns:1fr auto;gap:8px}.small{font-size:12px;color:#556476;line-height:1.65}.link{color:#1d527b}.boundary{background:#fff7ef;padding:10px;border-left:3px solid #bd8852}</style><link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head><body>
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
-<div class="staging-visual-marker" role="status">STAGING <small>80275b9</small></div>
-<main class="wrap"><a href="staging/index.html">← ステージングトップ</a><h1>サイト公開履歴・旧版復元</h1><p class="small">表示改修の公開版と、予想・結果などのデータ更新を別々に管理します。画面はステージング検証→承認→正式リリース、データ更新は従来の本番更新を継続します。</p>
-<section class="card"><h2>v1.00 <span class="pill">正式版（現行）</span></h2><p>10月12日改修前のサイト画面。復元対象はHTML/CSS/JSなど画面ファイルのみ。すでに固定された予想原本・結果・払戻・最新データの巻き戻しは禁止です。</p><p>復元スナップショットは次のリリース時にGitの不変タグとして固定します。</p></section>
-<section class="card"><h2>v1.01 <span class="pill">ステージング</span></h2><p>12R臨時予想の通常画面からの撤去、通常購入最大3操作＋穴狙い最大1行、スマートフォン向け4行以内の見本表示、公開履歴導線。</p><p>正式モデルv3.13は変更なし。新しい購入セットは反実仮想の研究段階で、承認と正式CIまで本番購入指示に昇格させません。</p><p><a href="staging/purchase-preview.html">購入指示のステージングを確認 →</a></p></section>
-<section class="card"><h2>正式リリース／戻す運用</h2><p>ステージング上の機能・画面・端末表示・CIが合格したら、明示承認のあとにのみ表示版を公開します。次の正式版に変更後も v1.00 タグおよび各版タグから画面を再構築できます。</p><p>復元も明示指示で実施し、対象の画面ファイルだけを復元して公開HTTPの一致まで検証します。履歴・原本・買い目・ライブデータは一切戻しません。</p></section>
-<p class="warning">公開済みの正式レース結果・証跡はリリース版と独立しています。過去の予想に最新の買い目選択を上書きしません。</p></main>  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div><main class="shell">
+<a class="link" href="staging/index.html">← 研究所トップ</a><h1>サイト公開履歴</h1>
+<p class="sub">画面の公開版とレース予想・結果データは独立管理しています。復元は画面ファイルだけに適用し、過去の予想や最新レース台帳を変更しません。</p>
+<div id="versions" aria-live="polite"><p>公開履歴を読み込み中…</p></div>
+<h2>リリースの運用</h2><p class="small">改修はステージングで表示とテストを確認し、明示承認後に正式版へ切り替えます。正式公開済み画面をGitのリリースブランチで保存し、指定版へ画面のみ復元します。予想・回顧などのデータ更新は検証合格後に承認不要で本番反映します。</p>
+<p class="boundary small">正式な購入候補を変更する場合は、画面だけでなく別途予測モデルの版管理・新規レースでのE2E監査が必要です。未承認の検証版を実購入指示として公開しません。</p>
+</main><script>
+const list=document.getElementById('versions');const el=(t,s)=>{let e=document.createElement(t);e.textContent=s;return e};
+fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{
+list.textContent='';const h=el('p','現在の正式画面：v'+(d.current_public_version||'—'));h.className='sub';list.append(h);
+for(const r of [...(d.releases||[])].reverse()){const b=el('section','');b.className='release';
+ const title=el('div','v'+r.public_version+(r.public_version===d.current_public_version?'　現在公開中':'　過去の正式版'));title.style.fontWeight='700';b.append(title);
+ const date=el('p',r.deployed_at?'公開検証日：'+new Date(r.deployed_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'公開日時：記録なし');date.className='sub';b.append(date);
+ b.append(el('p',r.note||'')); const backup=el('p','保存ブランチ：'+r.branch);backup.className='sub';b.append(backup);
+ list.append(b);
+}
+}).catch(()=>{list.textContent='';list.append(el('div','公開履歴の取得に失敗しました。'));});
+</script>  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
