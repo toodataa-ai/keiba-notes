@@ -7,8 +7,10 @@ import {runInNewContext} from 'node:vm';
 const source=readFileSync('docs/staging/assets/results.js','utf8');
 const previewHtml=readFileSync('docs/staging/results.html','utf8');
 const productionHtml=readFileSync('docs/results.html','utf8');
-assert(previewHtml.includes('src="staging/assets/results.js?v=20261013-readable-results-v105stage"'),
-  'staging must load its dedicated new renderer');
+assert(previewHtml.includes('src="assets/results.js?v=20261013-settlement-v104"'),
+  'staging must load the exact production-mirror renderer, not unapproved stage-only script');
+assert(!previewHtml.includes('src="staging/assets/results.js'),
+  'staging must not activate lab-only JRA readable-alias renderer');
 assert(productionHtml.includes('src="assets/results.js?v='),
   'production HTML must continue using the untouched production renderer');
 const db=JSON.parse(readFileSync('docs/data/races.json','utf8'));

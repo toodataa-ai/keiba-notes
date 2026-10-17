@@ -79,9 +79,12 @@ jobs:
                   if not pdf.is_file() or not prediction.is_file() or not race.get('proof_commit'):
                       raise SystemExit('Missing sealed formal v3.15 PDF/prediction/proof: '+race['id'])
                   with fitz.open(pdf) as document:
-                      expected=1+race['field_size']
-                      if len(document)!=expected or race.get('full_report_pages')!=expected:
-                          raise SystemExit('Sealed v3.15 A4 horse-page mismatch: '+race['id'])
+                      minimum=1+race['field_size']
+                      # v3.15 has one cover, one page per horse and UNLIMITED
+                      # separately audited purchase/risk/omission chapters.
+                      # Enforce exact registered total, never impose a false page cap.
+                      if len(document)<minimum or race.get('full_report_pages')!=len(document):
+                          raise SystemExit('Sealed v3.15 total pages / minimum horse pages mismatch: '+race['id'])
                       text=' '.join(page.get_text() for page in document)
                       if 'v3.15' not in document[0].get_text() or not all(
                           mark in text for mark in ('◎','○','▲','△','×')):

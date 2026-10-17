@@ -6,6 +6,7 @@ on:
       - '.github/workflows/jra-postrace-e2e-public-v1.yml'
       - 'e2e_validation/cases/**/case.json'
       - 'docs/data/jra_postrace_audit_2026-10-11.json'
+      - 'docs/data/jra_postrace_audit_2026-10-17.json'
       - 'docs/data/jra_postrace_meetings_v1.json'
       - 'e2e_validation/weekly_review_status_v1.py'
       - 'e2e_validation/test_weekly_review_status_v1.py'
@@ -95,7 +96,7 @@ jobs:
               sleep 2
             done
           fi
-      - name: Verify actual published Pages byte parity for all reviewed holiday-week JRA main artifacts
+      - name: Verify actual published Pages byte parity for all reviewed JRA main artifacts including October 17
         run: |
           set -euo pipefail
           BASE=https://toodataa-ai.github.io/keiba-notes
@@ -103,10 +104,10 @@ jobs:
           import json
           from pathlib import Path
           reg=json.loads(Path('docs/data/races.json').read_text())
-          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json']
+          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json','docs/data/jra_postrace_audit_2026-10-17.json', 'docs/data/experience_regime_status.json']
           for r in reg['races']:
-              if r['date'] in ('2026-10-10','2026-10-11','2026-10-12') and r['scope']=='jra-main' and r['status']=='reviewed':
-                  paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json'])
+              if r['date'] in ('2026-10-10','2026-10-11','2026-10-12','2026-10-17') and r['scope']=='jra-main' and r['status']=='reviewed':
+                  paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json','docs/data/e2e-shadow/results/'+r['id']+'.json'])
           for p in paths:
               assert Path(p).is_file(),p
               print(p)
@@ -124,7 +125,7 @@ jobs:
               fi
             done </tmp/jra-postrace-files.txt
             if [ "$ok" = 1 ]; then
-              echo 'JRA_POSTRACE_HTTP_BYTES_VERIFIED: all reviewed race HTML, frozen PDF and public records match Git byte-for-byte'
+              echo 'JRA_POSTRACE_HTTP_BYTES_VERIFIED: all reviewed race HTML, frozen PDF, case/result and public records match Git byte-for-byte'
               exit 0
             fi
             sleep 10

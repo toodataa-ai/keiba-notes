@@ -42,6 +42,30 @@
       "version": "v3.13",
       "grade": "prospective_strict",
       "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-17-fuji-stakes/case.json",
+      "sha": "1e8ed038dbfffbfae3798bf194608874889f7698",
+      "race_id": "2026-10-17-fuji-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-17-hokuriku-stakes/case.json",
+      "sha": "6d58737f400a452887bf1b0d2bb9b98ff3e1372b",
+      "race_id": "2026-10-17-hokuriku-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-17-tourmaline-stakes/case.json",
+      "sha": "ce411c7ff8062650a2b935a279dc620429e5d3b1",
+      "race_id": "2026-10-17-tourmaline-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
     }
   ],
   "policy": {
@@ -55,5 +79,7 @@
     "appending_new_exceptions_requires_explicit_review": true,
     "production_model_and_bets_unchanged": true
   },
-  "note": "Records irrecoverable missing prestart E0/E1/E2 research fields. This is a transparent CI baseline and is NOT a remediation of missing data."
+  "note": "Five previous prereace gaps and three newly confirmed 2026-10-17 gaps are recorded with immutable case blob SHA and the exact unremediated errors. Research data are NOT reconstructed. Shadow promotion remains blocked. This is case-by-case integrity review, not a waiver.",
+  "last_explicit_gap_review_on": "2026-10-17",
+  "review_record": "docs/data/jra_postrace_audit_2026-10-17.json"
 }

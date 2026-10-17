@@ -28,7 +28,7 @@ jobs:
         with: {python-version: '3.11'}
       - name: Enforce preserved historic SHA manifests
         run: python e2e_validation/validate_manifests.py
-      - name: Verify reviewed six-race registry, public Grade A and immutable source
+      - name: Verify all reviewed-race registry entries, public Grade A and immutable sources
         run: |
           python3 - <<'PY'
           import json
@@ -42,18 +42,20 @@ jobs:
           assert meeting['meeting_id']=='2026-10-10-to-2026-10-12'
           assert meeting['formal_grade_a_review_state']=='complete'
           assert meeting['weekly_improvement_decision']=='no_change'
-          assert review['formal_grade_a']['passed'] and review['formal_grade_a']['validated_case_count']==6
-          assert grade['case_counts']['strict']==6 and not grade['errors']
-          assert public['totals']['prospective_strict_races']==6
-          expected={x['race_id'] for x in meeting['races']}
-          assert len(expected)==6
+          assert review['formal_grade_a']['passed'] and review['formal_grade_a']['validated_case_count']>=6
+          assert grade['case_counts']['strict']==public['totals']['prospective_strict_races'] and not grade['errors']
+          expected={r['id'] for r in registry['races'] if r.get('scope')=='jra-main' and r.get('e2e_case') and r.get('status')=='reviewed'}
+          assert len(expected)==grade['case_counts']['strict']
+          assert {x['race_id'] for x in meeting['races']}<=expected
+          assert all(m['weekly_improvement_decision']=='not_evaluated' for m in review['meetings'][1:] if m['formal_grade_a_review_state']!='complete')
           by_id={r['id']:r for r in registry['races']}
           display={r['race_id']:r for r in public['races']}
           paths={'docs/data/races.json','docs/data/e2e_status.json',
                  'docs/data/experience_regime_status.json','docs/data/e2e_public.json',
                  'docs/data/jra_review_completion.json',
                  'docs/data/jra_postrace_audit_2026-10-11.json',
-                 'docs/data/jra_postrace_audit_2026-10-12.json'}
+                 'docs/data/jra_postrace_audit_2026-10-12.json',
+                 'docs/data/jra_postrace_audit_2026-10-17.json'}
           for rid in sorted(expected):
               r=by_id[rid]
               assert r['status']=='reviewed' and r.get('settlements') and r.get('review')
@@ -71,7 +73,7 @@ jobs:
               assert (root/'docs'/x['prediction_path']).is_file()
               paths.add('docs/'+x['prediction_path'])
           Path('/tmp/jra-live-parity-files.txt').write_text(''.join(p+'\n' for p in sorted(paths)))
-          print('JRA_GRADE_A_SIX_CASES_COMPLETE; exact public artifacts:',len(paths))
+          print('JRA_GRADE_A_ALL_REVIEWED_CASES_VERIFIED; exact public artifacts:',len(paths))
           PY
       - name: Verify actual HTTP bytes equal approved Git files
         run: |
@@ -92,7 +94,7 @@ jobs:
               fi
             done < /tmp/jra-live-parity-files.txt
             if [ "$ok" = 1 ]; then
-              echo "JRA_LIVE_PUBLIC_ALL_BYTES_MATCH_GIT: Grade A registry, proofs, six immutable HTML/PDF and public reports"
+              echo "JRA_LIVE_PUBLIC_ALL_BYTES_MATCH_GIT: Grade A registry, proofs, all reviewed immutable HTML/PDF and public reports"
               exit 0
             fi
             sleep 10

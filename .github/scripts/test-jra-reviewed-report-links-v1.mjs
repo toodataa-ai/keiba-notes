@@ -23,7 +23,10 @@ const w=vmSource(week,['jraReadableLinks']);
 assert(!prod.includes('JRA_V102_READABLE_REPORT_ALIASES'),
   'production must remain untouched until user approves the stage');
 const preview=read('docs/staging/results.html');
-assert(preview.includes('src="staging/assets/results.js?v=20261013-readable-results-v105stage"'));
+assert(preview.includes('src="assets/results.js?v=20261013-settlement-v104"'),
+  'production-mirror staging must not enable the unapproved lab-only renderer');
+assert(!preview.includes('src="staging/assets/results.js'),
+  'lab-only renderer should remain inert in staging');
 assert(read('docs/results.html').includes('src="assets/results.js?v=20261013-settlement-v104"'));
 const links=[];
 for(const [id,perf] of Object.entries(expected)){
