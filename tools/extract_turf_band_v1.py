@@ -61,6 +61,7 @@ def get_runs(im, point):
     return runs
 
 def select(runs):
+    runs=[(a,b) for a,b in runs if b-a>=7]
     # Only choose a green stripe close to the already-registered circuit.
     # A second circuit behind a white divider must not be mistaken for this one.
     ranked=sorted(runs,key=lambda x:(max(0,x[0]-2,-x[1]-2),
@@ -120,6 +121,10 @@ def main():
     # Assume the inner direction is the RIGHT normal of course travel in
     # bitmap coordinates. The derived inner edge is high-normal; outer is low.
     # At each station both edges must be traced from the SAME turf stripe.
+    print("TURF_RAIL_SAMPLE_PRECHECK "+json.dumps([
+      {"d":p["d"],"green":p["runs"],"edge":p["edge"]}
+      for p in stations if p["d"] in (0,100,310,530,720,900,1270,1435,1670,1900,2000)
+    ],separators=(",",":")))
     widths=[]
     for p in stations:
         outer,inner=p["edge"]
