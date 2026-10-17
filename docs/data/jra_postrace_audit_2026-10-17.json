@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-10-17",
   "observed_at": "2026-10-17T10:32:01.610Z",
-  "status": "REVIEW_EVIDENCE_COMMITTED_AWAITING_GITHUB_ACTIONS_AND_PAGES_PARITY",
+  "status": "REVIEW_GRADE_A_AND_PUBLIC_HTML_PDF_BYTE_PARITY_VERIFIED",
   "immutable_forecasts": true,
   "immutable_final_bets": true,
   "reviewed_races": [
@@ -55,5 +55,23 @@
     "historical_ledger_path": "e2e_validation/experience_archived_gaps_v1.json",
     "explanation": "Previously pinned 5-case ledger kept byte-identical; three Oct17 gaps added in separately pinned additive ledger, no postrace source reconstruction."
   },
-  "ci_remediation_note": "Update stale staging-only test selector; make PDF guard check frozen page count with unlimited tail, and validate current reviewed HTML/PDF public bytes. No historical predictions, HTML/PDF or stakes modified."
+  "ci_remediation_note": "Update stale staging-only test selector; make PDF guard check frozen page count with unlimited tail, and validate current reviewed HTML/PDF public bytes. No historical predictions, HTML/PDF or stakes modified.",
+  "publication_verification": {
+    "observed_at": "2026-10-17T10:39:56.718Z",
+    "jra_postrace_workflow_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/39025635603",
+    "formal_e2e_validation_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/39025635520",
+    "staging_settlement_guard_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/39025635461",
+    "pdf_reader_guard_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/39025517468",
+    "e2e_grade_a_cases": 9,
+    "e2e_errors": 0,
+    "compared": "all reviewed 2026-10-10 through 2026-10-17 JRA mains: registry, formal E2E reports, per-race HTML/PDF and public case/result, compared byte-for-byte with deployed Pages",
+    "verified": true
+  },
+  "unresolved_separate_items": {
+    "shadow_e012_prerace_gaps": 8,
+    "shadow_promotion_blocked": true,
+    "meeting_20261017_20261018_incomplete": true,
+    "weekly_improvement_not_evaluated": true,
+    "legacy_v311_balanced_ci": "previously failing historical adapter compatibility, unrelated to 2026-10-17 postrace Grade A and Pages parity"
+  }
 }
