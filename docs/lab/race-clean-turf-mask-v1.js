@@ -48,25 +48,40 @@ function create(image){
   if(opened!==null&&lastGreen-opened>=7.5)
    runs.push({a:opened,b:lastGreen,m:(opened+lastGreen)/2});
   if(runs.length>1)possibleForks++;
-  // Neighbouring stations must remain on the SAME spatially contiguous
-  // segment, even as the normal vector changes around a tight corner.
-  // Comparing normal offset parameters alone causes 20px teleports.
+  // FOLLOW A CONTINUOUS INNER-TURF FILE, not the midpoint of every
+  // green run. A junction merges two original green strokes into one
+  // 80px-wide segment: using that segment's midpoint caused a ~23px
+  // teleport at 616m (and similar jumps at 537/1514/1578m).
   const prev=samples[d-1];
   const prevX=prev?prev.x+prev.nx*prev.shift:0;
   const prevY=prev?prev.y+prev.ny*prev.shift:0;
-  const score=run=>Math.abs(run.m)*.30+
-   (prev?Math.hypot(mid.x+nx*run.m-prevX,mid.y+ny*run.m-prevY)*4.5:0)+
-   (run.b-run.a<2*MARGIN+4?35:0);
-  runs.sort((a,b)=>score(a)-score(b));
-  let match=runs[0];
-  if(!match){
-   missing++;
-   // Missing station is never silently used to draw off-turf numbers.
-   samples.push(null);continue;
+  const predicted=prev?(prevX-mid.x)*nx+(prevY-mid.y)*ny:0;
+  function score(run){
+   const lo=run.a+MARGIN,hi=run.b-MARGIN;
+   const t=clamp(predicted,Math.min(lo,hi),Math.max(lo,hi));
+   const ux=mid.x+nx*t,uy=mid.y+ny*t;
+   // Seek the closest still-green point to the previous route, even
+   // when this band's width suddenly expands near crossing rails.
+   return (prev?Math.hypot(ux-prevX,uy-prevY)*4.5:Math.abs(t))+
+    Math.abs(t)*.12+(hi-lo<5?35:0);
   }
-  let low=match.a+MARGIN,high=match.b-MARGIN;
-  if(low>high){const t=(match.a+match.b)/2;low=t;high=t;}
-  const shift=match.m;
+  runs.sort((a,b)=>score(a)-score(b));
+  if(!runs.length){
+   missing++;samples.push(null);continue;
+  }
+  const match=runs[0];
+  const safeLo=match.a+MARGIN,safeHi=match.b-MARGIN;
+  if(safeLo>safeHi){missing++;samples.push(null);continue;}
+  const half=Math.min(9,(safeHi-safeLo)/2);
+  // Moving files should occupy a realistic local portion of a very
+  // wide green junction, never fan out across both green rings.
+  const optimal=clamp(predicted,safeLo+half,safeHi-half);
+  const limited=prev?clamp(optimal,predicted-1.5,predicted+1.5):optimal;
+  const shift=clamp(limited,safeLo,safeHi);
+  // At a dividing rail temporarily narrow the lateral usable band
+  // instead of teleporting runners or crossing white/dirt.
+  const actualHalf=Math.max(0,Math.min(half,shift-safeLo,safeHi-shift));
+  const low=shift-actualHalf,high=shift+actualHalf;
   maxShift=Math.max(maxShift,Math.abs(shift));
   samples.push({x:mid.x,y:mid.y,nx,ny,low,high,shift,
    width:match.b-match.a});
