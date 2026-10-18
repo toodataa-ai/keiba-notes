@@ -286,7 +286,9 @@ window.CleanLab=Object.freeze({
    directMarkerMaxError:lastLabelPositions.reduce((m,p)=>
      Math.max(m,Math.hypot(p.x-p.actual.x,p.y-p.actual.y)),0),
    turfBadCenters:turfReady?points.filter(p=>!turf.isGreen(p.x,p.y)).length:null,
-   turfBadDiscs:turfReady?points.filter(p=>!turf.discOnTurf(p.x,p.y)).length:null,
+   turfBadDiscs:turfReady?points.filter(p=>
+     !turf.discOnTurf(p.x,p.y,
+       13.5*(live.width<540?.68:.76)/Math.max(1.7,lastCamera?.scale||2.3)+.6)).length:null,
    calibratedRunPositions:turfReady,
    uniformMarkerRadiusPx:lastLabelPositions[0]?.r??null,
    markerRadiusSpreadPx:lastLabelPositions.length?
