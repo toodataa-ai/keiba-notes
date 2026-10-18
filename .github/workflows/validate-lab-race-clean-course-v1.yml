@@ -1,4 +1,4 @@
-name: LAB Umapot SVG turf mask and uniform direct-running numbers acceptance
+name: LAB Kyoto inner rail smooth route 500-750m and source turf occupancy acceptance
 on:
   push:
     branches: [main]
@@ -34,7 +34,7 @@ jobs:
         run: |
           python3 -m pip install playwright==1.56.0
           command -v google-chrome || command -v chromium
-      - name: Verify readable true-position 18 horse numbers at nine race sections on mobile and desktop
+      - name: Verify inside-first continuous true-position 18 horse numbers on mobile and desktop
         run: |
           set -euo pipefail
           mkdir -p /tmp/clean-lab
@@ -48,7 +48,7 @@ jobs:
           with sync_playwright() as p:
             browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
             for width in (390,1024):
-              for d in (0,100,310,478,530,900,909,1270,1672,1900):
+              for d in (0,100,310,478,530,585,600,602,616,630,640,660,700,720,750,900,909,1270,1672,1900):
                 page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
                 errors=[]
                 page.on('pageerror',lambda error:errors.append(str(error)))
@@ -122,13 +122,44 @@ jobs:
                     'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
-                if d==909:
-                  audit=page.evaluate("() => window.RaceCleanTurf.audit(5)")
-                  print('FULL_DISTANCE_TURF_GREEN_AUDIT',width,audit)
+                if d==602:
+                  audit=page.evaluate("() => window.RaceCleanTurf.audit(1,3)")
+                  print('CONTINUOUS_SOURCE_INNER_RAIL_AUDIT',width,audit)
                   assert audit['missing']==0,('TURF_STATIONS_MISSING',width,audit)
-                  assert audit['badCenters']==0,('TURF_SURFACE_CENTER_FAILURES',width,audit)
-                  assert audit['badDiscs']==0,('HORSE_CIRCLE_NOT_COMPLETELY_ON_GREEN',width,audit)
-                  assert audit['maxGap']<3 and audit['jumpsOver4']==0,('TURF_ROUTE_JUMP',width,audit)
+                  assert audit['badCenters']==0,('HORSES_CENTER_NOT_GREEN',width,audit)
+                  assert audit['badDiscs']==0,('HORSES_DIAMETER_NOT_ON_GREEN',width,audit)
+                  assert audit['maxStationJump']<1.6,('ABRUPT_JUMP_EVERY_1M',width,audit)
+                  assert audit['maxLane0FromInner']<19,('LEADER_WENT_TOO_FAR_OUTSIDE',width,audit)
+                  assert audit['tooFarOut']==0,('LEADER_OUTSIDE_FIRST_CORRIDOR',width,audit)
+                  assert audit['minWidth']>=9,('CORRIDOR_TOO_NARROW',width,audit)
+                  assert audit['maxJump']<1.7,('HORSE_JUMP_PER_METRE',width,audit)
+                  # Dynamically check the full problematic curve at 0.5m spacing.
+                  curve=page.evaluate("""() => {
+                    const turf=window.RaceCleanTurf,ref=window.RaceCleanCourse;
+                    let maxJump=0,maxInnerOffset=0,offGreen=0;
+                    const lanes=[0,1,2,3,4,6,9,14];
+                    for(const lane of lanes){
+                      let prev=null;
+                      for(let distance=500;distance<=750;distance+=.5){
+                        const p=turf.point(distance,lane);
+                        if(!turf.discOnTurf(p.x,p.y,2.9))offGreen++;
+                        if(prev)maxJump=Math.max(maxJump,
+                          Math.hypot(p.x-prev.x,p.y-prev.y));
+                        if(lane===0){
+                          const inner=ref.rails(distance).inner;
+                          maxInnerOffset=Math.max(maxInnerOffset,
+                            Math.hypot(p.x-inner.x,p.y-inner.y));
+                        }
+                        prev=p;
+                      }
+                    }
+                    return {maxJump,maxInnerOffset,offGreen};
+                  }""")
+                  print('KYOTO_500_750_SMOOTH_INNER_RUNNING',width,curve)
+                  assert curve['offGreen']==0,('TURN_OFF_GREEN',width,curve)
+                  assert curve['maxJump']<1.1,('SUDDEN_OUT_IN_VEHICLE_MOTION',width,curve)
+                  assert curve['maxInnerOffset']<19,('WIDE_OUTER_SWERVE',width,curve)
+                if d==909:
                   if width==390:
                     runoff=page.evaluate("""() => {
                       const turf=window.RaceCleanTurf;
@@ -149,7 +180,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-green-boundary-v10-mobile-desktop
+          name: lab-inside-rail-smooth-v11-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14
