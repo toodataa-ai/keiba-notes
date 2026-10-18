@@ -1,4 +1,4 @@
-name: LAB Kyoto inner rail close smooth numbered horses fixed camera acceptance
+name: LAB Kyoto source inner course, rail-gap bridge and extended finish acceptance
 on:
   push:
     branches: [main]
@@ -130,6 +130,7 @@ jobs:
                   assert audit['badDiscs']==0,('HORSES_DIAMETER_NOT_ON_GREEN',width,audit)
                   assert audit['maxStationJump']<1.6,('ABRUPT_JUMP_EVERY_1M',width,audit)
                   assert audit['maxLane0FromInner']<15,('LEADER_STILL_TOO_FAR_OUTSIDE',width,audit)
+                  print('SOURCE_RAIL_GAP_BRIDGES',width,audit['hiddenRailBridges'])
                   assert audit['tooFarOut']==0,('LEADER_OUTSIDE_FIRST_CORRIDOR',width,audit)
                   assert audit['minWidth']>=9,('CORRIDOR_TOO_NARROW',width,audit)
                   assert audit['maxJump']<1.7,('HORSE_JUMP_PER_METRE',width,audit)
@@ -238,10 +239,105 @@ jobs:
               page.close()
             browser.close()
           PY
+      - name: Cinematic finish and continuous 560-650m missing-rail bridge
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8767 --directory docs >/tmp/clean-lab-finish-server.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          import shutil,math,json
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+           for width in (390,1024):
+            page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
+            errors=[]
+            page.on('pageerror',lambda err:errors.append(str(err)))
+            page.goto('http://127.0.0.1:8767/lab/race-clean-course-v1.html?checkpoint=600')
+            page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=20000)
+            geo=page.evaluate("""() => {
+             const turf=RaceCleanTurf,trace=turf.trace(530,740,1);
+             const bridges=turf.stats().hiddenRailBridges;
+             const nums=[550,560,570,585,600,620,635,650,670,700,720].map(d=>{
+              const p=turf.point(d,0),a=RaceCleanCourse.rails(d).inner;
+              return {d,x:p.x,y:p.y,offset:Math.hypot(p.x-a.x,p.y-a.y),
+               onTurf:turf.discOnTurf(p.x,p.y,1.8)};
+             });
+             let maxJump=0;
+             for(let d=530.5;d<=740;d+=.5){
+              const a=turf.point(d-.5,0),b=turf.point(d,0);
+              maxJump=Math.max(maxJump,Math.hypot(a.x-b.x,a.y-b.y));
+             }
+             return {bridges,nums,maxJump};
+            }""")
+            print('HIDDEN_INNER_RAIL_CONTINUOUS_ROUTE',width,json.dumps(geo,ensure_ascii=False))
+            assert all(p['onTurf'] for p in geo['nums']),('COURSE_CUTS_INTO_INFIELD',width,geo)
+            assert geo['maxJump']<1.1,('DISAPPEARING_RAIL_ROUTE_JUMP',width,geo)
+            page.evaluate('() => CleanLab.advanceTo(1950)')
+            page.locator('#speed').select_option('4')
+            page.locator('#startBtn').click()
+            page.wait_for_function('window.CleanLab?.inspect()?.finishSequenceActive===true',timeout=15000)
+            init=page.evaluate("""() => ({
+             state:{finished:CleanLab.getState().finished,t:CleanLab.getState().t},
+             frame:CleanLab.frameSample()
+            })""")
+            assert init['state']['finished'],('ENGINE_NOT_FINISHED_AT_COAST_START',width,init)
+            frames=page.evaluate("""async () => {
+             const samples=[],start=performance.now();
+             return await new Promise(resolve=>{
+              const frame=()=>{
+               const r=CleanLab.frameSample();
+               if(r.finishSequenceActive){
+                samples.push({phase:r.finishSequenceElapsedMs,
+                 zoom:r.zoom,playing:r.playing,done:r.finishSequenceDone,
+                 d:r.horses.find(h=>h.number===1)?.d,
+                 x:r.horses.find(h=>h.number===1)?.x});
+               }
+               if(r.finishSequenceDone||performance.now()-start>8000)resolve(samples);
+               else requestAnimationFrame(frame);
+              };
+              requestAnimationFrame(frame);
+             });
+            }""")
+            final=page.evaluate("""() => {
+             const s=CleanLab.getState(),r=CleanLab.inspect();
+             return {finished:s.finished,done:r.finishSequenceDone,
+              ms:r.finishSequenceElapsedMs,banner:r.finishedBannerVisible,
+              heading:document.getElementById('finishHeading').textContent,
+              podium:document.getElementById('finishPodium').textContent,
+              playing:CleanLab.frameSample().playing,
+              text:document.getElementById('startBtn').textContent,
+              physicalClock:s.t,view:r.positions.length,
+              positions:r.positions.map(p=>({
+               no:p.number,d:p.d,
+               green:RaceCleanTurf.discOnTurf(p.x,p.y,1.8)}))};
+            }""")
+            print('FINISH_REALTIME_CINEMATIC',width,{
+             'frames':len(frames),'start':frames[0] if frames else None,
+             'last':frames[-1] if frames else None,'final':final})
+            assert not errors,('JS_ERRORS',width,errors)
+            assert final['done'] and final['banner'] and final['finished']
+            assert len(frames)>=35,('TOO_FEW_POST_FINISH_FRAMES',width,len(frames))
+            assert final['ms']>=3150,('DID_NOT_SHOW_FULL_FINISH_SEQUENCE',width,final)
+            assert final['view']==18 and not final['playing']
+            assert '1着' in final['podium'] and '3着' in final['podium']
+            assert '再スタート' in final['text']
+            assert all(p['green'] for p in final['positions']),('FINISH_RUNOFF_OFF_TURF',width,final)
+            z=[f['zoom'] for f in frames]
+            assert z[-1] < z[0]*.87,('NO_FINISH_CAMERA_PULLBACK',width,z[0],z[-1])
+            assert max(abs(a-b) for a,b in zip(z,z[1:]))<.14,('ABRUPT_FINISH_ZOOM',width)
+            xs=[f['x'] for f in frames]
+            assert all(b<=a+.2 for a,b in zip(xs,xs[1:])),('HORSE_REVERSED_DURING_COAST',width)
+            page.locator('#broadcastStage').screenshot(path=f'/tmp/clean-lab/finish-v14-{width}.png')
+            print('PASS_VISIBLE_SMOOTH_AFTER_FINISH_NO_INNER_SHORTCUT',width)
+            page.close()
+           browser.close()
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-inner-close-smooth-v12-mobile-desktop
+          name: lab-inner-rail-gap-finish-v14-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14
