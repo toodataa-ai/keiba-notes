@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "32d72e0fa6d4e28c22b1842e379bd51db0b529df",
+  "scan_commit": "07d1ac4a10a37a075255ca1bf1a59b9d2c9dd0a8",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "2026-10-18 source-image shape audit: v4 smoothness/18-label CI passed BUT faithful Umapot turf position FAILED. On original 620x430 screenshot, 2px color-tolerant green membership across 2001 sampled points: lane0 78.7%, lane6 88.3%, center 89.5%; particularly 1C entry and 900-1200m backstretch misregistration. Audit includes text/label occlusion false negatives so thresholds are diagnostic, not measured accuracy. Must retake source-image-centered inner/outer rail tracings, validate whole length against original and review screenshots BEFORE any approval. LAB only; STAGING/production/formal DATA untouched.",
+      "next_action": "LAB v5：うまぽっと京都620×430原画像を内・外2本の芝ラチとして独立トレース。60ノットを弧長走行距離ベースのC1 splineに統合、中央固定幅方式は廃止。ローカル画像の2px許容HSV緑帯検査で各2001地点×6レーンが99.3〜100%一致（文字などの偽陰性あり）。スマホ/PC実ブラウザQAと目視承認待ち。LAB限定、本番・STAGING・正式DATA不変。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -63,12 +63,12 @@
         "docs/lab/race-lab-18-fixture-v1.js": "9bf9b45bbfb17a9a9335f38934e8a45567fe8d3a",
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
-        "docs/lab/race-clean-course-v1.js": "fd746502db0dc287a2f46fdacb3e767cd45abb4b",
+        "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
         "docs/lab/race-clean-course-app-v1.js": "4887e4a5cfdc94783bce74e48f14ce44e2677cb2",
-        "docs/lab/race-clean-course-v1.html": "d18b29a7a3c4461ccd1e871690896e2948b5616f",
+        "docs/lab/race-clean-course-v1.html": "1d22466f091c276338eeb764e0ce1d83b5dfadf4",
         "docs/lab/race-clean-course-v1.css": "03c0d206ae634c4f79d1ae8fc755f365f5ea32ee"
       },
-      "latest_source_change_commit": "23c55ead63008db752fb3929a9c791b80c844d41"
+      "latest_source_change_commit": "07d1ac4a10a37a075255ca1bf1a59b9d2c9dd0a8"
     },
     {
       "id": "course-catalog",
