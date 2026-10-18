@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "e6cc4ccf4f202b55c32f1c628c90bc89571c9070",
+  "scan_commit": "55f8b200eb3bbb976c21d3e9d6452f4dc07770a6",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v0.51：京都1400型の馬群幅に応じた最大4.6倍（単独5.2倍）カメラへ修正し、18頭時のマーカーを通常0.92/注目1.02へ縮小。実芝帯の色抽出境界は描画専用の平滑化＋C1連続二次曲線（原境界から最大3px以内）へ。画像/文字は実況非表示、俯瞰図は元画像。スマホ・PCの画像目視承認待ち。正式予想や他コース非変更。",
+      "next_action": "LAB v0.52：京都1400型カメラと中サイズ番号を維持。画像由来芝帯境界の波打ちは対称105m重み平均・二次曲線で軽減し、原境界から最大6pxの表示専用差分。線色と線幅を弱める。コース実線/実況の位置は同一、18頭スマホスクリーンショットで再目視・未承認。正式予想・STAGING・本番は非変更。",
       "preview_path": "lab/race-simulator.html",
       "staging_paths": [],
       "lab_paths": [
@@ -47,7 +47,7 @@
       ],
       "production_paths": [],
       "file_blob_shas": {
-        "docs/lab/race-simulator.html": "1c7adccfcdc056813aedda57584bc9b58c5468fa",
+        "docs/lab/race-simulator.html": "d935fb00413d4ebe5e3c5b7934e6aedda5f86861",
         "docs/lab/race-simulator.js": "52b50b5108a936eafe5d2869cd45bdc93e775cc0",
         "docs/lab/race-simulator.css": "8a905005e09c6828bed4c51ebf2afaf62fdac073",
         "docs/lab/race-sim-engine.js": "8f9dba1b6ad3099f0277aeed87fad23cb90153af",
@@ -55,12 +55,12 @@
         "docs/lab/race-sim-manifest-v1.json": "bd141771f18877ac62ca91ad9b90b63361ba0c97",
         "docs/lab/race-ability-model-v1.js": "b812e2adee39f2933bc6a18392392af33939cfe4",
         "docs/lab/race-lane-ai-v1.js": "3a9a9aa2e0499ee25f9c56076f9d27bfecda8cb5",
-        "docs/lab/race-broadcast-map-v1.js": "2c26fcd1760d06c709163db66c71565a7bcfe73b",
+        "docs/lab/race-broadcast-map-v1.js": "fa285348d1d57bfba492359ac52b72e3e8f45f1f",
         "docs/lab/race-lab-18-fixture-v1.js": "9bf9b45bbfb17a9a9335f38934e8a45567fe8d3a",
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d"
       },
-      "latest_source_change_commit": "fa953cd59d13624991c8c150d17717f4f6600738"
+      "latest_source_change_commit": "55f8b200eb3bbb976c21d3e9d6452f4dc07770a6"
     },
     {
       "id": "course-catalog",
