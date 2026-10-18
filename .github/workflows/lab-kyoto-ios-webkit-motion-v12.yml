@@ -29,8 +29,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1350&v=19',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=1350&v=19'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1350&v=20',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=1350&v=20'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
@@ -107,6 +107,20 @@ jobs:
              }""")
              print('WEBKIT_SOURCE_SVG_GENTLE_CURVE_LENS',url,json.dumps(lens,ensure_ascii=False)[:3800])
              assert lens['ready'] and lens['enabled'] and lens['unchanged'],('CURVE_LENS_MISSING_WEBKIT',url,lens)
+             number=page.evaluate("""() => {
+               const r=CleanLab.inspect();
+               return {radius:r.uniformMarkerRadiusPx,focus:r.focusedMarkerRadiusPx,
+                spread:r.markerRadiusSpreadPx,snap:r.cameraSnapErrorPx,
+                aligned:r.foregroundCameraPixelSnapped,
+                longitudinal:r.visualLongitudinalTau,
+                lateral:r.visualLateralTau}
+             }""")
+             print('SAFARI_LARGER_BADGE_AND_PIXEL_ALIGNED_CAMERA',url,json.dumps(number))
+             assert abs(number['radius']-13.5*.78)<.000001,('IPHONE_BADGES_NOT_ENLARGED',url,number)
+             assert abs(number['radius']-number['focus'])<.000001
+             assert abs(number['spread'])<.000001
+             assert number['snap']<=.36 and number['aligned']
+             assert abs(number['longitudinal']-.070)<.001 and abs(number['lateral']-.21)<.001
              assert lens['source']==lens['live'] and 'kyoto-umapot-course-clean-v8.svg' in lens['source']
              assert lens['stats']['imageUnmodified'] and lens['stats']['physicsUnmodified']
              assert lens['stats']['thirdFourthTurn']['ratioAfter']<lens['stats']['thirdFourthTurn']['ratioBefore']
