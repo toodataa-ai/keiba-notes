@@ -125,6 +125,17 @@ jobs:
              'imageRatioBefore':p1440['pixelRatio'],
              'imageRatioAfter':p1460['pixelRatio']},ensure_ascii=False))
            assert image_source['registration']['immutableSharedEngine'] is True
+           assert image_source['registration']['anchoredMetres']==[1270,1435,1672]
+           for anchor in (1270,1435,1672):
+            found=next(v for v in image_source['markers'] if v['raceD']==anchor)
+            assert abs(found['sourceD']-anchor)<1e-8,('CORNER_ANCHOR_DISPLACED',anchor,found)
+           assert image_source['registration']['maxMetresOfImagePhaseAdjustment']<12,('CORNER_TIME_FIDELITY_LOST',image_source)
+           physicalLoss=p1440['physicalGap']-p1460['physicalGap']
+           imageLoss=p1440['imageGap']-p1460['imageGap']
+           assert .5<physicalLoss<1.4,('SHARED_PHYSICS_PACK_CORRUPTED',physicalLoss)
+           assert imageLoss<1.8,('UNNATURAL_1440_1460_VISIBLE_PACK_TELESCOPE',imageLoss)
+           problematic=[x for x in result['jumps'] if x['from']>=1300 and x['to']<=1550]
+           assert all(x['dSourceGap']> -1.25 for x in problematic),('UNNATURAL_JUMP_MOVED_TO_OTHER_CHECKPOINT',problematic)
            for row in result['geometry']:
             if row['d']%20==0:
              print('IMAGE_SOURCE_METRES_PER_DISTANCE',json.dumps(row,ensure_ascii=False))
