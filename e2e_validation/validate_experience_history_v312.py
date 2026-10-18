@@ -80,7 +80,25 @@ def main():
         or observed_ids!=expected_ids or len(addition["entries"])!=3 or
         not all(addition.get("policy",{}).get(k) is True for k in ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
         raise RuntimeError("reviewed shadow gap supplement not explicitly authorized")
-    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"],hash_case)
+
+    # New Oct18 formal Grade A cases also lack original prestart E0/E1/E2 race_category.
+    # Preserve and SHA-pin both earlier ledgers; disclose exact new omissions only.
+    extra_meta=json.loads((ROOT/"docs/data/jra_current_e2e_ci_supersession_v1.json").read_text(encoding="utf-8")).get("new_reviewed_shadow_gap_ledger_20261018")
+    if not isinstance(extra_meta,dict) or extra_meta.get("path")!="e2e_validation/experience_new_gaps_20261018_v1.json":
+        raise RuntimeError("missing reviewed 2026-10-18 shadow gap supplement")
+    extra_path=ROOT/extra_meta["path"]
+    extra_sha=subprocess.check_output(["git","hash-object",str(extra_path)],cwd=ROOT,text=True).strip()
+    if extra_sha!=extra_meta.get("git_blob_sha"):
+        raise RuntimeError("reviewed 2026-10-18 shadow supplement SHA changed")
+    extra=json.loads(extra_path.read_text(encoding="utf-8"))
+    required={"2026-10-18-brazil-cup","2026-10-18-niigata-himba-stakes","2026-10-18-shuka-sho"}
+    if (extra.get("schema_version")!=1 or extra.get("scope")!="explicitly_reviewed_additional_missing_prerace_shadow_evidence"
+        or {e.get("race_id") for e in extra.get("entries",[])}!=required
+        or len(extra["entries"])!=3
+        or not all(extra.get("policy",{}).get(k) is True for k in
+            ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
+        raise RuntimeError("2026-10-18 shadow omissions not separately reviewed and pinned")
+    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"]+extra["entries"],hash_case)
     # This is a CI success for no NEW integrity regressions, NOT a claim that
     # research evidence is complete. Existing missing cases remain unusable.
     print("SHADOW_CI_INTEGRITY_PASS:",json.dumps(result,ensure_ascii=False))

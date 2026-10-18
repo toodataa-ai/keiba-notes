@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "scope": "explicitly_reviewed_additional_missing_prerace_shadow_evidence",
+  "reviewed_on": "2026-10-18",
+  "source_audit": "docs/data/jra_postrace_audit_2026-10-18.json",
+  "earlier_baseline_path": "e2e_validation/experience_new_gaps_20261017_v1.json",
+  "entries": [
+    {
+      "case": "e2e_validation/cases/2026-10-18-brazil-cup/case.json",
+      "sha": "c12ccc6e579d9aca6062c8b924ceb4121f2a4268",
+      "race_id": "2026-10-18-brazil-cup",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-18-niigata-himba-stakes/case.json",
+      "sha": "431669c47d5c5edcdc4ef453738d91779313fe23",
+      "race_id": "2026-10-18-niigata-himba-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-18-shuka-sho/case.json",
+      "sha": "9010e584a34818a276c212913701b01adb22acad",
+      "race_id": "2026-10-18-shuka-sho",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    }
+  ],
+  "policy": {
+    "case_git_blob_sha_required": true,
+    "exact_error_set_required": true,
+    "do_not_backfill_postrace": true,
+    "formal_grade_a_independent": true,
+    "shadow_promotion_blocked": true
+  },
+  "note": "Research-only missing prerace race_category evidence for three strict reviewed 2026-10-18 mains. No postrace imputation; never promote Shadow with missing source records."
+}

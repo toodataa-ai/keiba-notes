@@ -55,7 +55,8 @@ jobs:
                  'docs/data/jra_review_completion.json',
                  'docs/data/jra_postrace_audit_2026-10-11.json',
                  'docs/data/jra_postrace_audit_2026-10-12.json',
-                 'docs/data/jra_postrace_audit_2026-10-17.json'}
+                 'docs/data/jra_postrace_audit_2026-10-17.json',
+                 'docs/data/jra_postrace_audit_2026-10-18.json'}
           for rid in sorted(expected):
               r=by_id[rid]
               assert r['status']=='reviewed' and r.get('settlements') and r.get('review')
