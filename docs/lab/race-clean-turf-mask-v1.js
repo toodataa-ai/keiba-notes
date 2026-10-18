@@ -1,14 +1,31 @@
-/* LAB v10 — rasterize the ACTUAL publisher SVG only for turf occupancy.
- * Turf edges are not redrawn. The UI computes its physical route position
- * from the already-approved racing model, then maps lane fractions inside
- * the original green band's cross-section, preserving the inside preference.
- * Shared Kyoto1400 physics / time / positions remain unchanged.
+/* LAB v11 — original Umapot SVG, continuous INSIDE rail anchored corridor.
+ * v10 wrongly targeted the CENTER of an often-merged green region; where
+ * inside/outside green paths meet, it steered horses outside then suddenly
+ * recentered. v11 instead selects a SAFE inner corridor relative to the
+ * historical rail (the physical race engine is completely untouched).
+ * Only SVG-relative VISUAL coordinates are calibrated, never race distances,
+ * lane preference, pace, overtaking, outcomes, bets or other production data.
  */
 (function(global){'use strict';
-const W=620,H=430,RASTER=3,MARGIN=2.8;
-const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+const W=620,H=430,RASTER=3;
+const CLEARANCE=4.0, MIN_INNER_OFFSET=9.5, MAX_SPAN=18, SLOPE=.65;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 let grid=null,samples=null,statistics=null;
+function isGreen(x,y){
+ if(!grid||!Number.isFinite(x)||!Number.isFinite(y))return false;
+ const ix=Math.floor(x*RASTER),iy=Math.floor(y*RASTER);
+ return ix>=0&&iy>=0&&ix<W*RASTER&&iy<H*RASTER&&
+  grid[iy*W*RASTER+ix]===1;
+}
+function discOnTurf(x,y,r=CLEARANCE){
+ if(!isGreen(x,y))return false;
+ for(let i=0;i<16;i++){
+  const a=Math.PI*2*i/16;
+  if(!isGreen(x+r*Math.cos(a),y+r*Math.sin(a)))return false;
+ }
+ return true;
+}
 function create(image){
  if(!image||!image.complete||image.naturalWidth!==W||image.naturalHeight!==H)
   throw Error('TURF_ORIGINAL_VECTOR_IMAGE_UNAVAILABLE');
@@ -18,161 +35,124 @@ function create(image){
  if(!ctx)throw Error('TURF_IMAGE_CONTEXT_MISSING');
  ctx.drawImage(image,0,0,canvas.width,canvas.height);
  const raw=ctx.getImageData(0,0,canvas.width,canvas.height).data;
- const bits=new Uint8Array(canvas.width*canvas.height);
- for(let i=0;i<bits.length;i++){
+ grid=new Uint8Array(canvas.width*canvas.height);
+ let greenPixels=0;
+ for(let i=0;i<grid.length;i++){
   const j=i*4,r=raw[j],g=raw[j+1],b=raw[j+2],a=raw[j+3];
-  if(a>=240&&g>=108&&g>r*1.40&&g>b*1.40)bits[i]=1;
+  if(a>=240&&g>=108&&g>r*1.4&&g>b*1.4){grid[i]=1;greenPixels++}
  }
- grid=bits;
  samples=[];
- let missing=0,maxShift=0,maxGap=0,maxGapAt=0,jumpsOver4=0,possibleForks=0;
- const jumps=[];
+ let forkSections=0,missing=0;
+ const previousRuns=[];
+ // 2001 scalar distances, each using the physically meaningful INNER rail
+ // and its outward normal, rather than the moving midpoint of a green blob.
  for(let d=0;d<=2000;d++){
-  const rail=c.rails(d),mid=rail.center,wx=rail.outer.x-rail.inner.x,
-   wy=rail.outer.y-rail.inner.y,den=Math.hypot(wx,wy)||1,
-   nx=wx/den,ny=wy/den;
+  const rr=c.rails(d),inner=rr.inner,ox=rr.outer.x-inner.x,
+   oy=rr.outer.y-inner.y,len=Math.hypot(ox,oy)||1,
+   nx=ox/len,ny=oy/len;
   const runs=[];
-  let opened=null,lastGreen=-1000;
-  for(let ix=-180;ix<=180;ix++){
-   const t=ix/3;
-   const green=isGreen(mid.x+nx*t,mid.y+ny*t);
-   if(green){
-    if(opened===null)opened=t;
-    lastGreen=t;
-   }else if(opened!==null){
-    if(lastGreen-opened>=7.5)runs.push({a:opened,b:lastGreen,
-     m:(opened+lastGreen)/2});
-    opened=null;
+  let first=null,last=null;
+  // Search only where the illustrated inner track is expected; never
+  // follow a second outer-course stripe or join between green branches.
+  for(let i=-45;i<=225;i++){
+   const t=i/3,x=inner.x+nx*t,y=inner.y+ny*t;
+   const safe=discOnTurf(x,y,CLEARANCE);
+   if(safe){
+    if(first===null)first=t;
+    last=t;
+   }else if(first!==null){
+    if(last-first>=8)runs.push({a:first,b:last});
+    first=null;
    }
   }
-  if(opened!==null&&lastGreen-opened>=7.5)
-   runs.push({a:opened,b:lastGreen,m:(opened+lastGreen)/2});
-  if(runs.length>1)possibleForks++;
-  // FOLLOW A CONTINUOUS INNER-TURF FILE, not the midpoint of every
-  // green run. A junction merges two original green strokes into one
-  // 80px-wide segment: using that segment's midpoint caused a ~23px
-  // teleport at 616m (and similar jumps at 537/1514/1578m).
-  const prev=samples[d-1];
-  const prevX=prev?prev.x+prev.nx*prev.shift:0;
-  const prevY=prev?prev.y+prev.ny*prev.shift:0;
-  const predicted=prev?(prevX-mid.x)*nx+(prevY-mid.y)*ny:0;
-  function score(run){
-   const lo=run.a+MARGIN,hi=run.b-MARGIN;
-   const t=clamp(predicted,Math.min(lo,hi),Math.max(lo,hi));
-   const ux=mid.x+nx*t,uy=mid.y+ny*t;
-   // Seek the closest still-green point to the previous route, even
-   // when this band's width suddenly expands near crossing rails.
-   return (prev?Math.hypot(ux-prevX,uy-prevY)*4.5:Math.abs(t))+
-    Math.abs(t)*.12+(hi-lo<5?35:0);
-  }
-  runs.sort((a,b)=>score(a)-score(b));
-  if(!runs.length){
-   missing++;samples.push(null);continue;
-  }
-  const match=runs[0];
-  const safeLo=match.a+MARGIN,safeHi=match.b-MARGIN;
-  if(safeLo>safeHi){missing++;samples.push(null);continue;}
-  const half=Math.min(9,(safeHi-safeLo)/2);
-  // Moving files should occupy a realistic local portion of a very
-  // wide green junction, never fan out across both green rings.
-  const optimal=clamp(predicted,safeLo+half,safeHi-half);
-  const limited=prev?clamp(optimal,predicted-1.5,predicted+1.5):optimal;
-  const shift=clamp(limited,safeLo,safeHi);
-  // At a dividing rail temporarily narrow the lateral usable band
-  // instead of teleporting runners or crossing white/dirt.
-  const actualHalf=Math.max(0,Math.min(half,shift-safeLo,safeHi-shift));
-  const low=shift-actualHalf,high=shift+actualHalf;
-  maxShift=Math.max(maxShift,Math.abs(shift));
-  samples.push({x:mid.x,y:mid.y,nx,ny,low,high,shift,
-   width:match.b-match.a});
-  if(prev){
-   const dx=(mid.x+nx*shift)-(prev.x+prev.nx*prev.shift),
-    dy=(mid.y+ny*shift)-(prev.y+prev.ny*prev.shift);
-   const jump=Math.hypot(dx,dy);
-   if(jump>4){jumpsOver4++;
-    jumps.push({d,jump,prevShift:prev.shift,nowShift:shift,
-      prevX:prev.x+prev.nx*prev.shift,prevY:prev.y+prev.ny*prev.shift,
-      x:mid.x+nx*shift,y:mid.y+ny*shift,
-      options:runs.map(run=>({a:run.a,b:run.b,m:run.m,
-       x:mid.x+nx*run.m,y:mid.y+ny*run.m}))});
-   }
-   if(jump>maxGap){maxGap=jump;maxGapAt=d;}
+  if(first!==null&&last-first>=8)runs.push({a:first,b:last});
+  if(runs.length>1)forkSections++;
+  // Fixed target near the true *inner* rail: merging green corridors must
+  // not pull the horses to the centroid of the whole green region.
+  const wanted=11;
+  runs.sort((a,b)=>
+   Math.max(a.a-wanted,wanted-a.b,0)-Math.max(b.a-wanted,wanted-b.b,0)||
+   Math.abs(a.a-5)-Math.abs(b.a-5));
+  const run=runs[0];
+  if(!run){samples.push(null);missing++;continue}
+  const low=Math.max(MIN_INNER_OFFSET,run.a+.6);
+  const high=Math.min(run.b-.6,low+MAX_SPAN);
+  if(high-low<3){samples.push(null);missing++;continue}
+  samples.push({x:inner.x,y:inner.y,nx,ny,low,high});
+  if(previousRuns.length<7&&d%400===0)
+   previousRuns.push({d,first:run.a,last:run.b,low,high});
+ }
+ if(missing)throw Error('TURF_INNER_CORRIDOR_MISSING:'+missing);
+ // The safe interval may NARROW abruptly at the split of the green paths.
+ // The physically continuous route must taper BEFORE that split; a
+ // two-pass Lipschitz envelope limits *both* its sides to 0.65px/metre.
+ for(let d=1;d<samples.length;d++){
+  const p=samples[d-1],r=samples[d];
+  r.low=Math.max(r.low,p.low-SLOPE);
+  r.high=Math.min(r.high,p.high+SLOPE);
+ }
+ for(let d=samples.length-2;d>=0;d--){
+  const p=samples[d+1],r=samples[d];
+  r.low=Math.max(r.low,p.low-SLOPE);
+  r.high=Math.min(r.high,p.high+SLOPE);
+ }
+ let minWidth=Infinity,maxLane0FromInner=0,maxStationJump=0,
+  maxStationJumpAt=0,badStations=0,tooFarOut=0;
+ for(let d=0;d<=2000;d++){
+  const p=samples[d];
+  minWidth=Math.min(minWidth,p.high-p.low);
+  if(p.high-p.low<3)throw Error('TURF_INNER_CORRIDOR_TOO_NARROW_'+d);
+  const at=e=>{
+   const t=e.low+(e.high-e.low)*c.fraction(0);
+   return {x:e.x+e.nx*t,y:e.y+e.ny*t,t};
+  };
+  const a=at(p);
+  maxLane0FromInner=Math.max(maxLane0FromInner,a.t);
+  if(a.t>19)tooFarOut++;
+  if(!discOnTurf(a.x,a.y,3.2))badStations++;
+  if(d>0){
+   const b=at(samples[d-1]);
+   const jump=Math.hypot(a.x-b.x,a.y-b.y);
+   if(jump>maxStationJump){maxStationJump=jump;maxStationJumpAt=d}
   }
  }
- statistics={missing,maxShift,maxGap,maxGapAt,jumpsOver4,jumps,possibleForks,count:samples.length,
-  greenPixels:bits.reduce((a,v)=>a+v,0)};
- if(missing){
-  // The caller displays a safe loading error rather than perpetuating
-  // wrong turf positions if the source SVG changes unexpectedly.
-  throw Error('TURF_SOURCE_CALIBRATION_GAPS:'+missing);
- }
+ statistics={count:samples.length,missing,forkSections,minWidth,
+  maxLane0FromInner,tooFarOut,maxStationJump,maxStationJumpAt,
+  badStations,greenPixels,slopeLimit:SLOPE,source:'original-publisher-inner-rail'};
+ if(badStations||tooFarOut||maxStationJump>1.6)
+  throw Error('TURF_INNER_ROUTE_UNSAFE:'+JSON.stringify(statistics));
  return statistics;
 }
-function isGreen(x,y){
- if(!grid||!Number.isFinite(x)||!Number.isFinite(y))return false;
- const ix=Math.floor(x*RASTER),iy=Math.floor(y*RASTER);
- return ix>=0&&ix<W*RASTER&&iy>=0&&iy<H*RASTER&&
-  grid[iy*W*RASTER+ix]===1;
+function positionAt(d,lane){
+ const r=samples[d],f=c.fraction(lane);
+ const t=r.low+(r.high-r.low)*f;
+ return {x:r.x+r.nx*t,y:r.y+r.ny*t};
 }
-function discOnTurf(x,y,r=4.4){
- if(!isGreen(x,y))return false;
- for(let i=0;i<16;i++){
-  const a=2*Math.PI*i/16;
-  if(!isGreen(x+r*Math.cos(a),y+r*Math.sin(a)))return false;
- }
- return true;
-}
-function point(distance,lane){
- if(!samples)throw Error('TURF_MASK_NOT_READY');
- // Carry finished horses along the same tangent beyond the finishing line.
- // Never freeze all the horse numbers at exactly 2000m (LAB regression).
+function point(distance,lane=0){
+ if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
  if(distance>2000){
-  const end=point(2000,lane),rawEnd=c.point(2000,lane),
-   rawBeyond=c.point(distance,lane);
-  let x=end.x+rawBeyond.x-rawEnd.x,y=end.y+rawBeyond.y-rawEnd.y;
-  if(!discOnTurf(x,y,MARGIN)){
+  const end=point(2000,lane),originalEnd=c.point(2000,lane),
+   originalBeyond=c.point(distance,lane);
+  let x=end.x+originalBeyond.x-originalEnd.x;
+  let y=end.y+originalBeyond.y-originalEnd.y;
+  // Retain the existing runoff on green beyond the finish line.
+  if(!discOnTurf(x,y,3.0)){
    const r=c.rails(2000),nx=(r.outer.x-r.inner.x)/r.widthPx,
     ny=(r.outer.y-r.inner.y)/r.widthPx;
-   let nearest=null;
-   for(let a=-10;a<=10;a+=.4){
+   let best=null;
+   for(let a=-8;a<=8;a+=.25){
     const tx=x+nx*a,ty=y+ny*a;
-    if(discOnTurf(tx,ty,MARGIN)){
-     const cost=Math.abs(a);
-     if(!nearest||cost<nearest.cost)nearest={x:tx,y:ty,cost};
-    }
+    if(discOnTurf(tx,ty,3.0)&&(!best||Math.abs(a)<best.delta))
+     best={x:tx,y:ty,delta:Math.abs(a)};
    }
-   if(nearest){x=nearest.x;y=nearest.y}
+   if(best){x=best.x;y=best.y}
   }
   return {x,y,d:distance,lane,section:'ゴール後'};
  }
  const d=clamp(Number(distance)||0,0,2000);
- const lo=Math.floor(d),hi=Math.ceil(d),f=d-lo;
- const a=samples[lo],b=samples[hi];
- const portion=c.fraction(lane);
- const at=e=>{
-  const t=e.low+(e.high-e.low)*portion;
-  return {x:e.x+e.nx*t,y:e.y+e.ny*t};
- };
- const pa=at(a),pb=at(b);
- let x=pa.x+(pb.x-pa.x)*f,y=pa.y+(pb.y-pa.y)*f;
- // Guarantee complete 18px-ish visual badge is inside source green;
- // snap only ALONG the local turf normal, never freely onto a dirt path.
- if(!discOnTurf(x,y,MARGIN)){
-  const m=a,half=Math.max(0,(m.high-m.low)/2);
-  const midT=(m.high+m.low)/2;
-  let nearest=null;
-  for(let delta=0;delta<=half+3;delta+=.35){
-   for(const t of [midT-delta,midT+delta]){
-    const tx=m.x+m.nx*t,ty=m.y+m.ny*t;
-    if(discOnTurf(tx,ty,MARGIN)){
-     const score=Math.hypot(tx-x,ty-y);
-     if(!nearest||score<nearest.score)nearest={x:tx,y:ty,score};
-    }
-   }
-   if(nearest&&nearest.score<delta+.4)break;
-  }
-  if(nearest){x=nearest.x;y=nearest.y;}
- }
+ const a=Math.floor(d),b=Math.ceil(d),t=d-a;
+ const first=positionAt(a,lane),last=positionAt(b,lane);
+ const x=first.x+(last.x-first.x)*t,y=first.y+(last.y-first.y)*t;
  return {x,y,d:distance,lane,section:c.center(distance).section};
 }
 function runners(state){
@@ -181,20 +161,30 @@ function runners(state){
   return {number:h.number,d,lane:h.lane,...point(d,h.lane),finished:h.finished};
  });
 }
-function audit(step=5){
- let total=0,badCenters=0,badDiscs=0,maxJump=0;
- for(let lane=0;lane<=14;lane+=1){
+function audit(step=1,radius=3){
+ let total=0,badCenters=0,badDiscs=0,maxJump=0,maxJumpAt=0,
+  maxActualInnerOffset=0;
+ for(let lane=0;lane<=14;lane++){
   let prev=null;
   for(let d=0;d<=2000;d+=step){
    const p=point(d,lane);
    total++;
    if(!isGreen(p.x,p.y))badCenters++;
-   if(!discOnTurf(p.x,p.y,MARGIN))badDiscs++;
-   if(prev)maxJump=Math.max(maxJump,Math.hypot(p.x-prev.x,p.y-prev.y));
+   if(!discOnTurf(p.x,p.y,radius))badDiscs++;
+   const inner=c.rails(d).inner;
+   maxActualInnerOffset=Math.max(maxActualInnerOffset,
+    Math.hypot(p.x-inner.x,p.y-inner.y));
+   if(prev){
+    const diff=Math.hypot(p.x-prev.x,p.y-prev.y);
+    if(diff>maxJump){maxJump=diff;maxJumpAt=d}
+   }
    prev=p;
   }
  }
- return {...statistics,total,badCenters,badDiscs,maxJump,step};
+ return {...statistics,total,badCenters,badDiscs,maxJump,maxJumpAt,
+  maxActualInnerOffset,step,radius};
 }
-global.RaceCleanTurf=Object.freeze({create,point,runners,isGreen,discOnTurf,audit,stats:()=>statistics});
+global.RaceCleanTurf=Object.freeze({
+ create,point,runners,isGreen,discOnTurf,audit,stats:()=>statistics
+});
 })(typeof window!=='undefined'?window:globalThis);
