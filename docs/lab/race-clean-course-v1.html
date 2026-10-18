@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#192d2c">
+<title>新コース方式・18頭検証｜JRAシミュレータLAB</title>
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261018-1">
+</head><body>
+<header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
+<h1>京都芝2000m内回り｜新コース方式</h1>
+<p>LAB開発中・非公式／架空18頭。独立したベクターコースを実況と全体図で共有します。正式予想・実馬・買い目・払戻とは無関係です。</p>
+</div></header>
+<main class="shell">
+<div class="tag">新方式 v1・設計検証中／旧v0.52から独立</div>
+<section class="panel toolbar" aria-label="シミュレーション操作">
+<button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
+<label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
+<label>速度<select id="speed"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="4">4倍</option></select></label>
+</section>
+<section class="panel">
+<div class="panel-title"><h2>実況ビュー</h2><span id="progress">0m / 2000m</span></div>
+<canvas id="broadcast" role="img" aria-label="滑らかな芝帯を大きく表示し18頭の馬番が走る実況"></canvas>
+<div class="status"><span id="section">スタート直後の直線</span><span id="clock">0.0秒</span></div>
+</section>
+<section class="panel">
+<div class="panel-title"><h2>全体図</h2><span>実況と同一の走行座標</span></div>
+<canvas id="overview" role="img" aria-label="同じベクターコースを俯瞰した18頭の位置"></canvas>
+<div class="status"><span>芝帯・内外ラチ・馬番のみ</span><span>右回り・内回り</span></div>
+</section>
+<section class="panel"><div class="panel-title"><h2>架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
+<section class="panel notes">
+<p><strong>今回の検証点：</strong>スタート直後（0〜308.7m）と2コーナー出口〜3コーナー入口（530〜1270m）は完全な直線です。1〜2・3〜4コーナーは接線が途切れない曲線です。</p>
+<p>両画面とも位置決定は距離・レーンから一度だけ計算します。走行エンジンと京都1400共通の内優先レーン選択は変更していません。拡大時も画像由来の文字・波打ち・補助線は存在しません。</p>
+<p>コース外形はJRA公開寸法・既存LABの区間情報に基づく<strong>設計用近似</strong>であり、現地測量図やうまぽっと画像を複製したものではありません。形状と馬番の見やすさは目視承認前です。</p>
+<p>確認：<a href="?checkpoint=100">100m</a> ／ <a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1270">3角</a> ／ <a href="?checkpoint=1672">直線入口</a> ／ <a href="?checkpoint=1900">ゴール前</a></p>
+</section>
+</main>
+<script src="race-course-geometry-v1.js?v=20261016-40"></script>
+<script src="race-lane-ai-v1.js?v=20261015-25"></script>
+<script src="race-runner-style-v1.js?v=20261015-24"></script>
+<script src="race-ability-model-v1.js?v=20261015-22"></script>
+<script src="race-sim-engine.js?v=20261016-41"></script>
+<script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
+<script src="race-clean-course-v1.js?v=20261018-1"></script>
+<script src="race-clean-course-app-v1.js?v=20261018-1"></script>
+</body></html>

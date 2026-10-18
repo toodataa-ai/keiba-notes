@@ -1,0 +1,25 @@
+:root{font-family:"Meiryo UI",Meiryo,"Hiragino Kaku Gothic ProN",sans-serif;color:#21302c;background:#f1f4f2;font-size:13px}
+*{box-sizing:border-box}body{margin:0}button,select{font:inherit}
+.shell{max-width:960px;margin:0 auto;padding:0 14px}
+header{background:#192d2c;color:white;padding:17px 0 19px;border-bottom:3px solid #8eb49c}
+header a{color:#d3e9db}h1{font-size:21px;margin:9px 0 7px}
+header p{font-size:12px;line-height:1.55;color:#d6e4dd;margin:0}
+small{font-size:11px}main{padding-top:13px;padding-bottom:32px}
+.panel{background:#fff;border:1px solid #d4ded9;border-radius:11px;overflow:hidden;margin-bottom:13px}
+.toolbar{padding:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+button,select{background:#fff;border:1px solid #b7c9bf;border-radius:7px;color:#263a34;padding:9px 12px;font-weight:700;min-height:40px}
+button.primary{background:#236548;color:white;border-color:#236548}
+button:focus-visible,select:focus-visible{outline:3px solid #99baff;outline-offset:2px}
+label{display:flex;align-items:center;gap:6px;color:#53665b;font-size:12px}
+.tag{display:inline-block;color:#714218;background:#fff0d8;border:1px solid #f0cf9b;border-radius:6px;font-weight:800;font-size:11px;padding:5px 8px;margin:0 0 8px}
+.panel-title{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-bottom:1px solid #e4ebe6;gap:10px}
+.panel-title h2{font-size:15px;margin:0}.panel-title span{font-size:12px;color:#55705f}
+canvas{display:block;width:100%;background:#f4f6f0}
+#broadcast{height:315px}
+#overview{height:310px}
+.status{display:flex;justify-content:space-between;gap:8px;padding:8px 13px;font-size:11px;color:#46584e;background:#f7faf8;font-variant-numeric:tabular-nums}
+#horseGrid{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;padding:9px}
+.horsechip{font-size:11px;border-radius:6px;text-align:center;padding:6px 2px;border:1px solid #d9dfdc;font-weight:800}
+.notes{padding:12px 14px;font-size:12px;color:#455b4e;line-height:1.7}
+.notes p{margin:4px 0 9px}
+@media(max-width:540px){.shell{padding:0 10px}h1{font-size:19px}#broadcast{height:288px}#overview{height:255px}.panel-title h2{font-size:14px}.toolbar{gap:6px}button,select{padding:8px}#horseGrid{grid-template-columns:repeat(9,minmax(0,1fr))}.horsechip{font-size:10px;padding:6px 1px}}
