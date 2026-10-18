@@ -30,7 +30,8 @@ for(const d of [0,100,210,308.7,440,530,620,720,800,900,1000,1200,1270,1435,1671
    assert.equal(view.rotationRadians,0);
    const screen=map.screenPoint(actual[0],view);
    assert.ok(Math.hypot(screen.x-view.anchor.x,screen.y-view.anchor.y)<1e-8);
-   assert.ok(view.zoom>1&&view.zoom<=10.5);
+   assert.ok(view.zoom>=1.7&&view.zoom<=5.2);
+   assert.equal(view.cameraMode,'kyoto-1400-like-group-framing');
  }
 }
 
@@ -44,6 +45,7 @@ const ctx={fillStyle:null,strokeStyle:null,lineWidth:0,
  beginPath:()=>operations.push(['begin']),
  moveTo:(...v)=>operations.push(['move',...v]),
  lineTo:(...v)=>operations.push(['line',...v]),
+ quadraticCurveTo:(...v)=>operations.push(['quad',...v]),
  closePath:()=>operations.push(['close']),
  fill:(...v)=>operations.push(['fill',...v]),
  stroke:()=>operations.push(['stroke']),
@@ -55,20 +57,32 @@ const out=map.draw({ctx,canvas:{width:1000,height:620},image,state,
  race:{course_id:profile.id,field_size:1},course:profile,overlay,
  focusNo:1,paintNumber:(c,n,x,y,size)=>markers.push({n,x,y,size}),renderedWidth:390});
 assert.equal(out.ready,true);
-assert.equal(out.renderMode,'source-derived-vector-rails');
+assert.equal(out.renderMode,'smoothed-source-derived-vector-rails');
 assert.equal(out.turfStations,401);
 assert.equal(operations.filter(x=>x[0]==='fill').length,1,'one connected turf ribbon');
 assert.equal(operations.filter(x=>x[0]==='stroke').length,2,'only inside/outside boundaries');
-assert.ok(operations.filter(x=>x[0]==='line').length>=800);
+assert.ok(operations.filter(x=>x[0]==='quad').length>=800,'smooth vector interpolation');
 assert.equal(markers.length,1);
 assert.ok(markers[0].size>3,'one-runner readable marker scale');
 assert.equal(operations.filter(x=>x[0]==='scale').length,1);
 assert.equal(operations.filter(x=>x[0]==='translate').length,2);
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
 const sim=fs.readFileSync(base+'race-simulator.js','utf8');
-assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-50'));
+assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-51'));
 assert.ok(html.includes('height="620"'));
 assert.ok(html.includes('race-turf-corridor-v1.js?v=20261018-49'));
 assert.ok(sim.includes('RaceSimBroadcastMap.draw({'));
 assert.ok(sim.indexOf('RaceSimBroadcastMap.draw({')<sim.indexOf('if(state.goalCamera){'));
 console.log('PASS_LAB_V050_SHARP_GREEN_RAIL_VECTOR_NO_LABELS_17_STATIONS_SHARED_COORDS');
+
+const smooth=map.smoothTurfRails(profile,overlay);
+let maxShift=0;
+for(let i=0;i<smooth.length;i++){
+ const raw=sandbox.RaceTurfCorridor.rails(profile,i*5,overlay.legacyPoint);
+ for(const side of ['inner','outer']){
+  maxShift=Math.max(maxShift,Math.hypot(
+   smooth[i][side].x-raw[side].x,smooth[i][side].y-raw[side].y));
+ }
+}
+assert.ok(maxShift<=3.00001,'smoothed turf cannot drift from source by more than 3 px');
+console.log('PASS_V051_BOUNDARY_QUALITY_MAX_SHIFT_PX',maxShift.toFixed(2));

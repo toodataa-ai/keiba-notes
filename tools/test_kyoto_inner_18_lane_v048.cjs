@@ -71,7 +71,7 @@ function snapshot(sim,at){
   const screen=broadcast.screenPoint(focused,view);
   assert.ok(screen.x>=-margin&&screen.x<=width+margin&&
     screen.y>=-margin&&screen.y<=height+margin,'focused horse must stay in close-up '+at);
-  assert.ok(view.zoom>=5 && view.zoom<=9,'high detail close-up '+view.zoom);
+  assert.ok(view.zoom>=1.7 && view.zoom<=4.6,'Kyoto1400-like no extreme close-up '+view.zoom);
  }
  return {at,leader:Number(s.leader.toFixed(1)),median:Number(median.toFixed(2)),
   initialMedian:Number(median0.toFixed(2)),inside4:pack,farOutside:outer,

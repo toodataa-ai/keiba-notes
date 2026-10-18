@@ -56,6 +56,7 @@ jobs:
             'docs/lab/KYOTO_INNER_18_RUNNER_QA_V048.md',
             'docs/lab/KYOTO_INNER_RAIL_CORRIDOR_V049.md',
             'docs/lab/KYOTO_BROADCAST_CLEAN_VECTOR_V050.md',
+            'docs/lab/KYOTO_BROADCAST_ZOOM_SMOOTH_V051.md',
             'docs/lab/race-turf-corridor-v1.js',
             'docs/lab/race-turf-rails-kyoto-inner-2000-v1.json',
           }
@@ -175,6 +176,14 @@ jobs:
               assert vector['turf']>=2,(width,vector,'Vector turf must actually be drawn')
               print('PASS_BROADCAST_VECTOR_SHARP_NO_RASTER_NO_PRINTED_SOURCE_LINES',width,vector)
               assert shared['supported'] and shared['imageInLive']
+              # Match Kyoto 1400-style framing; no fixed extreme close-up.
+              group=page.evaluate("""() => {
+                const f=RaceSimBroadcastMap.frame;
+                const points=[...Array(18)].map((_,i)=>({number:i+1,d:310,x:210+i*.5,y:220+i*.3}));
+                const v=f(points,1000,730,390,1);
+                return {zoom:v.zoom,cameraMode:v.cameraMode};
+              }""")
+              assert group['zoom']<=4.6 and group['cameraMode']=='kyoto-1400-like-group-framing',(width,group)
               assert shared['rotation']==0 and abs(shared['projected']['x']-shared['anchor']['x'])<.01
               assert abs(shared['projected']['y']-shared['anchor']['y'])<.01
               page.locator('#raceCanvas').screenshot(path=f'/tmp/kyoto-lab-review/kyoto-{width}-sharp-clean-vector-live.png')
@@ -227,7 +236,7 @@ jobs:
                     })};
                 }""",checkpoint)
                 assert result['valid'] and result['count']==18 and result['allSame'] and result['focusInView'],(width,result)
-                assert result['visibleCount']>=1 and result['turfStations']==401 and result['renderMode']=='source-derived-vector-rails',(width,result)
+                assert result['visibleCount']>=1 and result['turfStations']==401 and result['renderMode']=='smoothed-source-derived-vector-rails',(width,result)
                 if checkpoint>=310:assert result['inside4']>=10,(width,result)
                 page.locator('.live-display-grid').screenshot(path=f'/tmp/kyoto-lab-review/kyoto-{width}-18horses-{checkpoint}m.png')
                 print('PASS_LAB_REAL_18_HORSES_LIVE_OVERVIEW',width,checkpoint,result['inside4'])
