@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "92483abea60c714a2e9a688862b3e740a6169a93",
+  "scan_commit": "5b1fd42d7e51201d6a20cff87f7d37689902ef20",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v9: うまぽっと原図SVG、京都1400共通の走行ロジックを維持。馬番1〜18はスマホ/PC実況でそれぞれ一律の円直径、全体図でも一律。追跡馬・先頭馬の拡大と外側金輪を廃止、同じ円周の金枠だけで強調。ブラウザ390/1024px×各9地点で半径spread=0、追跡馬の半径一致、実座標誤差0、内寄せ・元画像・本番隔離・Pages反映を監査。LAB未承認、ユーザー目視承認待ち。",
+      "next_action": "LAB v10: 京都芝2000でうまぽっと原図SVGのgreen pixel occupancyをブラウザ内でサンプリングし、2001距離地点×内外レーンで芝帯の安全範囲を計算。馬番は物理距離・レーンを保ち、背景の緑帯を外れない位置に描画。内側優先/脚質/ペース/馬番の同一サイズは従来共通。390/1024の各10地点（909mを含む）と全距離芝内監査、Pagesバイト一致、LABのみ。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -48,7 +48,8 @@
         "docs/lab/race-clean-course-app-v1.js",
         "docs/lab/race-clean-course-v1.html",
         "docs/lab/race-clean-course-v1.css",
-        "docs/lab/assets/kyoto-umapot-course-clean-v8.svg"
+        "docs/lab/assets/kyoto-umapot-course-clean-v8.svg",
+        "docs/lab/race-clean-turf-mask-v1.js"
       ],
       "production_paths": [],
       "file_blob_shas": {
@@ -65,12 +66,13 @@
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
-        "docs/lab/race-clean-course-app-v1.js": "fdd2d712839bf549344d626409df7631a0afe469",
-        "docs/lab/race-clean-course-v1.html": "51a4ada80bc6df9a937da292857ebb3c379ee809",
+        "docs/lab/race-clean-course-app-v1.js": "95c0a3dbedb52472a2195b4d6f0a8fc960faea12",
+        "docs/lab/race-clean-course-v1.html": "eceb9ddb7b73e9249356f6df767447d826ae1dec",
         "docs/lab/race-clean-course-v1.css": "027324a3ad4713e5fbb3e95a3c7407439db93648",
-        "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19"
+        "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19",
+        "docs/lab/race-clean-turf-mask-v1.js": "1fd4225e5c8136796366c532a58d1f1dde42aec8"
       },
-      "latest_source_change_commit": "92483abea60c714a2e9a688862b3e740a6169a93"
+      "latest_source_change_commit": "5b1fd42d7e51201d6a20cff87f7d37689902ef20"
     },
     {
       "id": "course-catalog",
