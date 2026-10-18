@@ -2,14 +2,14 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#192d2c">
 <title>新コース方式・18頭検証｜JRAシミュレータLAB</title>
-<link rel="stylesheet" href="race-clean-course-v1.css?v=20261018-3">
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261018-4">
 </head><body>
 <header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
 <h1>京都芝2000m内回り｜新コース方式</h1>
 <p>LAB開発中・非公式／架空18頭。実況は本物の京都コース図に合わせたベクター走路を描き、全体図にはうまぽっと原画像を使用します。正式予想・実馬・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">新方式 v3・画像の芝帯に補正した座標／LAB未承認</div>
+<div class="tag">新方式 v4・高密度スムーズ走路＋全馬の馬番重なり回避／LAB未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
@@ -34,8 +34,8 @@
 <section class="panel"><div class="panel-title"><h2>架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
 <section class="panel notes">
 <p><strong>今回の検証点：</strong>スタート直後（0〜308.7m）と2コーナー出口〜3コーナー入口（登録上720〜1270m）は完全な直線です。1〜2・3〜4コーナーは接線が途切れない曲線です。</p>
-<p>両画面とも位置決定は距離・レーンから一度だけ計算します。走行エンジンと京都1400共通の内優先レーン選択は変更していません。拡大時も画像由来の文字・波打ち・補助線は存在しません。</p>
-<p><strong>番号の読み分け：</strong>実走行上の18頭が重なった場合も位置を偽って横に広げず、実況画面下の全18頭の隊列で番号を確認できます。番号を選択すると実況の追跡馬が切り替わります。実画像の芝帯上の目視検証は引き続き必要です。</p>
+<p>原画像を参照して芝コース中心線を再登録し、1mごとにサンプリングした連続パスで実況と全体図の走行位置を統一。芝帯は1本のパスとして描画し、区間ごとの継ぎ目や法線補正の折れを排除。実画像を実況画面に拡大していないため、拡大で画像が粗くなりません。</p>
+<p><strong>番号の読み分け：</strong>実走行座標は変更せず、実況画面の馬番だけを画面上で避け合わせます。位置が変わった番号には元の走行点を示す薄い線と点が付きます。下の隊列バーでは常に全18頭の番号を表示し、タップで追跡できます。</p>
 <p>コース寸法はJRA芝Aコース基準（1周1,782.8m・最後の直線328.4m・初角まで308.7m・幅員27〜38m・内回り高低差3.1m）を参照。コースの形状はうまぽっと原画像に合わせたイラスト上の較正であり、測量図の精度ではありません。18頭の重なり・コース形状は目視承認前です。</p>
 <p>確認：<a href="?checkpoint=100">100m</a> ／ <a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1270">3角</a> ／ <a href="?checkpoint=1672">直線入口</a> ／ <a href="?checkpoint=1900">ゴール前</a></p>
 </section>
@@ -46,7 +46,7 @@
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
 <script src="race-sim-engine.js?v=20261016-41"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
-<script src="race-clean-course-v1.js?v=20261018-3"></script>
-<script src="race-clean-course-app-v1.js?v=20261018-3"></script>
+<script src="race-clean-course-v1.js?v=20261018-4"></script>
+<script src="race-clean-course-app-v1.js?v=20261018-4"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

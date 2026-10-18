@@ -1,106 +1,106 @@
-/* LAB Clean Course v1 — normalized geometry, independent of image pixels.
- * Kyoto turf inner 2000m demonstration model; illustration-scale coordinates,
- * NOT GPS/surveyed rail geometry. Only race distances and 328.4m final straight
- * use the JRA profile. 1C 308.7m, 2C exit 530m, 3C entry 1270m are blueprint
- * checkpoints. Physical simulation and formal predictions are not modified. */
+/* LAB clean course v4 - source-image registered inner Kyoto 2000 course.
+ * The SVG-quality rendered guide is sampled every ONE race-metre in a common
+ * arc-length-parametrized centerline. The guide is derived from visual
+ * registrations against the original 620x430 Umapot reference and is NOT GPS.
+ * Physical speed, lanes and official JRA data are never adjusted here. */
 (function(global){'use strict';
-const id='kyoto_turf_inner_2000';
-// Umapot original (620x430) visual-registration points, separate from
-// JRA's physical measurements. Intermediate section breaks are approximate.
-const sections=Object.freeze([
- {from:0,to:308.7,kind:'straight',name:'スタート後の直線',
-  p0:[350,317],p3:[178,303]},
- {from:308.7,to:530,kind:'turn',name:'1コーナー',
-  p0:[178,303],p1:[135,299.5],p2:[153,223],p3:[165,203]},
- {from:530,to:720,kind:'turn',name:'2コーナー',
-  p0:[165,203],p1:[177,183],p2:[173,164.431372549],p3:[208,161]},
- {from:720,to:1270,kind:'straight',name:'向正面（2角出口〜3角入口）',
-  p0:[208,161],p3:[463,136]},
- {from:1270,to:1435,kind:'turn',name:'3コーナー',
-  p0:[463,136],p1:[498.7,132.5],p2:[510,165],p3:[510,197]},
- {from:1435,to:1671.6,kind:'turn',name:'4コーナー',
-  p0:[510,197],p1:[510,235],p2:[526,317],p3:[490,317]},
- {from:1671.6,to:2000,kind:'straight',name:'最後の直線',
-  p0:[490,317],p3:[294,317]}
-]);
-// LAB image registration is a display coordinate, NOT the actual turf width.
-// 18px corridor was fitted to the GREEN reference band in the 620x430 Umapot
-// image. 27m is the published Kyoto INNER A minimum width, not outer's 24m.
-const WIDTH_PX=18,WIDTH_M=27,DISTANCE=2000;
-// Source-image registration: signed screen-normal correction from the original
-// LAB v2 path. Extracted from eight unaltered-overview browser checkpoints
-// using a green-band mask; 401 points at 5m, simplified to <=1px error.
-// It cannot alter engine lanes, race pace, split times, rankings or predictions.
-// Each course can supply its OWN measured correction knots using this method.
-const TURF_IMAGE_CORRECTIONS=Object.freeze([[0,-0.97],[40,-1.29],[190,-7.79],[220,-7.43],[270,0.21],[330,15.92],[360,18.56],[395,16.35],[530,1.1],[575,2.64],[640,2.42],[685,0.23],[780,-0.6],[1095,-16.85],[1200,-20.84],[1245,-18.05],[1305,-6.75],[1340,-3.86],[1380,-5.66],[1455,-17.29],[1490,-19.13],[1535,-16.2],[1600,-3.89],[1635,-0.55],[1725,0.72],[2000,-0.26]]);
-function corridorShift(distance){
- const d=Math.max(0,Math.min(DISTANCE,Number(distance)||0));
- let lo=0,hi=TURF_IMAGE_CORRECTIONS.length-1;
- while(lo<hi){const i=(lo+hi)>>1;if(TURF_IMAGE_CORRECTIONS[i][0]<d)lo=i+1;else hi=i}
- const a=TURF_IMAGE_CORRECTIONS[Math.max(0,lo-1)];
- const b=TURF_IMAGE_CORRECTIONS[lo];
- const t=(d-a[0])/(b[0]-a[0]||1);
- return a[1]+(b[1]-a[1])*Math.max(0,Math.min(1,t));
-}
+const id='kyoto_turf_inner_2000',DISTANCE=2000;
+const WIDTH_PX=16,WIDTH_M=27;
 const JRA_DIMENSIONS=Object.freeze({distanceM:2000,lapInnerA:1782.8,
  firstTurnDistanceM:308.7,homeStraightA:328.4,
  minTurfWidthM:27,maxTurfWidthM:38,elevationInnerM:3.1});
+const sections=Object.freeze([
+ {from:0,to:308.7,kind:'straight',name:'スタート後の直線',p0:[350,317],p3:[183,317]},
+ {from:308.7,to:530,kind:'turn',name:'1コーナー',
+  p0:[183,317],p1:[159,317],p2:[166,280],p3:[167,226]},
+ {from:530,to:720,kind:'turn',name:'2コーナー',
+  p0:[167,226],p1:[167.5,199],p2:[181,166.8],p3:[215,162]},
+ {from:720,to:1270,kind:'straight',name:'向正面（2角出口〜3角入口）',
+  p0:[215,162],p3:[470,126]},
+ {from:1270,to:1435,kind:'turn',name:'3コーナー',
+  p0:[470,126],p1:[504,121.2],p2:[532,163],p3:[531,212]},
+ {from:1435,to:1671.6,kind:'turn',name:'4コーナー',
+  p0:[531,212],p1:[529.84,269],p2:[527,317],p3:[487,317]},
+ {from:1671.6,to:2000,kind:'straight',name:'最後の直線',
+  p0:[487,317],p3:[294,317]}
+]);
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 function segment(distance){
  const d=clamp(distance,0,DISTANCE);
  return sections.find(s=>d<=s.to+1e-8)||sections[sections.length-1];
 }
-function cubic(s,t){
+function raw(s,t){
  const q=1-t;
+ if(s.kind==='straight')return {x:s.p0[0]*q+s.p3[0]*t,y:s.p0[1]*q+s.p3[1]*t};
  const x=q*q*q*s.p0[0]+3*q*q*t*s.p1[0]+3*q*t*t*s.p2[0]+t*t*t*s.p3[0];
  const y=q*q*q*s.p0[1]+3*q*q*t*s.p1[1]+3*q*t*t*s.p2[1]+t*t*t*s.p3[1];
- const dx=3*q*q*(s.p1[0]-s.p0[0])+6*q*t*(s.p2[0]-s.p1[0])+3*t*t*(s.p3[0]-s.p2[0]);
- const dy=3*q*q*(s.p1[1]-s.p0[1])+6*q*t*(s.p2[1]-s.p1[1])+3*t*t*(s.p3[1]-s.p2[1]);
- return {x,y,dx,dy};
+ return {x,y};
 }
-function raw(s,t){
- if(s.kind==='straight'){
-  const dx=s.p3[0]-s.p0[0],dy=s.p3[1]-s.p0[1];
-  return {x:s.p0[0]+dx*t,y:s.p0[1]+dy*t,dx,dy};
- }
- return cubic(s,t);
-}
-const tables=new WeakMap();
-function byArc(s,fraction){
- if(s.kind==='straight')return fraction;
- if(!tables.has(s)){
-  const arc=[0];let last=raw(s,0),length=0;
-  for(let i=1;i<=200;i++){
-   const p=raw(s,i/200);length+=Math.hypot(p.x-last.x,p.y-last.y);
-   arc.push(length);last=p;
+// Each source-image guide curve is parametrized by visual arc length,
+// not by its Bezier t value; race distance changes position continuously.
+const arcTables=new WeakMap();
+function arcT(s,f){
+ if(s.kind==='straight')return f;
+ if(!arcTables.has(s)){
+  const steps=600,arc=[0];let prev=raw(s,0),len=0;
+  for(let i=1;i<=steps;i++){
+   const next=raw(s,i/steps);
+   len+=Math.hypot(next.x-prev.x,next.y-prev.y);
+   arc.push(len);prev=next;
   }
-  tables.set(s,{arc,length});
+  arcTables.set(s,{arc,len,steps});
  }
- const table=tables.get(s),wanted=clamp(fraction,0,1)*table.length;
- let lo=0,hi=200;
- while(lo<hi){const mid=Math.floor((lo+hi)/2);if(table.arc[mid]<wanted)lo=mid+1;else hi=mid}
- const j=Math.max(0,lo-1);
- return (j+(wanted-table.arc[j])/(table.arc[j+1]-table.arc[j]||1))/200;
+ const {arc,len,steps}=arcTables.get(s),want=clamp(f,0,1)*len;
+ let lo=0,hi=steps;
+ while(lo<hi){const m=(lo+hi)>>1;if(arc[m]<want)lo=m+1;else hi=m}
+ const j=clamp(lo-1,0,steps-1);
+ return (j+(want-arc[j])/(arc[j+1]-arc[j]||1))/steps;
+}
+function sourcePosition(distance){
+ const d=clamp(distance,0,DISTANCE),s=segment(d);
+ return raw(s,arcT(s,(d-s.from)/(s.to-s.from)));
+}
+// A dense shared 1m lookup eliminates per-frame image masks and permits
+// smooth C1 Hermite interpolation across all section boundaries.
+const coordinates=Array.from({length:DISTANCE+1},(_,d)=>sourcePosition(d));
+const velocities=coordinates.map((pt,i)=>{
+ const a=coordinates[Math.max(0,i-1)],b=coordinates[Math.min(DISTANCE,i+1)];
+ const divisor=i===0||i===DISTANCE?1:2;
+ return {x:(b.x-a.x)/divisor,y:(b.y-a.y)/divisor};
+});
+function smoothPoint(d){
+ if(d>=DISTANCE){
+  const end=coordinates[DISTANCE],v=velocities[DISTANCE];
+  return {x:end.x+v.x*Math.min(42,d-DISTANCE),y:end.y+v.y*Math.min(42,d-DISTANCE),
+   dx:v.x,dy:v.y};
+ }
+ const x=clamp(d,0,DISTANCE),i=Math.min(1999,Math.floor(x)),t=x-i;
+ const a=coordinates[i],b=coordinates[i+1],u=velocities[i],v=velocities[i+1];
+ const t2=t*t,t3=t2*t;
+ const h00=2*t3-3*t2+1,h10=t3-2*t2+t,h01=-2*t3+3*t2,h11=t3-t2;
+ return {
+  x:h00*a.x+h10*u.x+h01*b.x+h11*v.x,
+  y:h00*a.y+h10*u.y+h01*b.y+h11*v.y,
+  dx:(6*t2-6*t)*a.x+(3*t2-4*t+1)*u.x+(-6*t2+6*t)*b.x+(3*t2-2*t)*v.x,
+  dy:(6*t2-6*t)*a.y+(3*t2-4*t+1)*u.y+(-6*t2+6*t)*b.y+(3*t2-2*t)*v.y
+ };
 }
 function center(distance){
- const s=segment(distance);
- const t=byArc(s,clamp((distance-s.from)/(s.to-s.from),0,1));
- const p=raw(s,t),m=Math.hypot(p.dx,p.dy)||1;
- const endOver=Math.max(0,Math.min(40,distance-DISTANCE));
- return {x:p.x+p.dx/m*endOver*.52,y:p.y+p.dy/m*endOver*.52,
-   tx:p.dx/m,ty:p.dy/m,section:s.name,kind:s.kind};
+ const c=smoothPoint(distance),m=Math.hypot(c.dx,c.dy)||1;
+ const sec=segment(distance);
+ return {x:c.x,y:c.y,tx:c.dx/m,ty:c.dy/m,section:sec.name,kind:sec.kind};
 }
 function rails(d){
  const c=center(d),nx=-c.ty,ny=c.tx;
- const correction=corridorShift(d);
- // One source-registered physical corridor for LIVE and ORIGINAL overview.
- // The screen offset is a purely visual projection; d and lane never change.
- const mid={x:c.x+nx*correction,y:c.y+ny*correction};
- return {inner:{x:mid.x+nx*WIDTH_PX/2,y:mid.y+ny*WIDTH_PX/2},
-  outer:{x:mid.x-nx*WIDTH_PX/2,y:mid.y-ny*WIDTH_PX/2},
-  center:c,visualCenter:mid,widthPx:WIDTH_PX,widthMetres:WIDTH_M};
+ // Both rails use the same tangent and a constant visual corridor.
+ // No independently interpolated per-section normal offsets or seams.
+ return {inner:{x:c.x+nx*WIDTH_PX/2,y:c.y+ny*WIDTH_PX/2},
+  outer:{x:c.x-nx*WIDTH_PX/2,y:c.y-ny*WIDTH_PX/2},
+  center:c,widthPx:WIDTH_PX,widthMetres:WIDTH_M};
 }
-function fraction(lane){return clamp((1.8+Math.max(0,Number(lane)||0)*1.65)/WIDTH_M,.025,.95)}
+function fraction(lane){
+ return clamp((1.8+Math.max(0,Number(lane)||0)*1.65)/WIDTH_M,.025,.95);
+}
 function point(d,lane=0){
  const edges=rails(d),f=fraction(lane);
  return {x:edges.inner.x+(edges.outer.x-edges.inner.x)*f,
@@ -112,28 +112,26 @@ function runners(state){
   ...point(h.displayD??h.d,h.lane),finished:h.finished}));
 }
 function validate(){
- if(sections[0].from!==0||sections.at(-1).to!==DISTANCE)throw Error('CLEAN_COURSE_DISTANCE');
- for(let i=0;i<sections.length;i++){
-  const s=sections[i];
-  if(!(s.to>s.from))throw Error('CLEAN_COURSE_BAD_SPAN');
-  if(i){
-   const p=sections[i-1];
-   if(Math.abs(s.from-p.to)>1e-8 ||
-    Math.hypot(s.p0[0]-p.p3[0],s.p0[1]-p.p3[1])>1e-6)
-      throw Error('CLEAN_COURSE_DISCONNECTED');
-   const a=raw(p,1),b=raw(s,0);
-   const cross=a.dx*b.dy-a.dy*b.dx,dot=a.dx*b.dx+a.dy*b.dy;
-   if(Math.abs(cross)>Math.hypot(a.dx,a.dy)*Math.hypot(b.dx,b.dy)*1e-8||dot<=0)
-    throw Error('CLEAN_COURSE_TANGENT_BROKEN');
-  }
+ if(coordinates.length!==2001||sections[0].from!==0||sections.at(-1).to!==2000)
+  throw Error('LAB_PATH_LENGTH');
+ for(let i=1;i<sections.length;i++){
+  const a=sections[i-1],b=sections[i];
+  if(Math.abs(a.to-b.from)>1e-8||
+   Math.hypot(a.p3[0]-b.p0[0],a.p3[1]-b.p0[1])>1e-7)
+    throw Error('LAB_JOIN_DISCONNECTED');
  }
- for(let d=0;d<=DISTANCE;d+=5){
-  const e=rails(d);
-  for(const l of [0,1,3,6,9,12]){
-   const p=point(d,l),f=fraction(l);
-   if(Math.hypot(p.x-e.inner.x-(e.outer.x-e.inner.x)*f,
-    p.y-e.inner.y-(e.outer.y-e.inner.y)*f)>1e-7)
-    throw Error('CLEAN_COURSE_OUTSIDE_TURF');
+ for(let d=1;d<=2000;d++){
+  const a=center(d-1),b=center(d);
+  if(!Number.isFinite(b.x+b.y+b.tx+b.ty) ||
+   Math.hypot(a.x-b.x,a.y-b.y)>2.2)throw Error('LAB_PATH_JUMP_'+d);
+ }
+ for(let d=0;d<=2000;d+=5){
+  const r=rails(d);
+  for(const lane of [0,1,3,6,9,12]){
+   const p=point(d,lane),f=fraction(lane);
+   if(Math.hypot(p.x-r.inner.x-(r.outer.x-r.inner.x)*f,
+    p.y-r.inner.y-(r.outer.y-r.inner.y)*f)>1e-7)
+    throw Error('LAB_LANE_PROJECTION_'+d);
   }
  }
  return true;
@@ -141,8 +139,9 @@ function validate(){
 const api=Object.freeze({id,distance:DISTANCE,widthPx:WIDTH_PX,
  widthMetres:WIDTH_M,jraDimensions:JRA_DIMENSIONS,
  sourceImageSize:{width:620,height:430},
- illustratedRouteModel:'Umapot visual alignment, not surveyed coordinates',
- sections,segment,center,rails,fraction,point,runners,validate,corridorShift,imageCorrectionKnots:TURF_IMAGE_CORRECTIONS});
+ illustratedRouteModel:'Umapot traced smooth 1m path, not surveyed geometry',
+ sections,segment,center,rails,fraction,point,runners,validate,
+ densePointCount:coordinates.length,denseSpacingM:1});
 api.validate();
 global.RaceCleanCourse=api;
 })(typeof window!=='undefined'?window:globalThis);

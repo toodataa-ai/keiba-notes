@@ -19,7 +19,7 @@ function waku(no){
  for(let i=0;i<8;i++){offset+=groups[i];if(no<=offset)return palette[i]}
  return palette[7];
 }
-let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null;
+let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null,lastLabelPositions=[];
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
  playing=false;last=0;acc=0;lastCamera=null;paint();
@@ -45,29 +45,32 @@ function sizeCanvas(canvas){
  return {ctx,w,h};
 }
 function track(ctx,loc){
- // A fill and two smooth rail strokes for each 5-segment centerline.
- // Bezier control points remain geometrically C1-continuous at boundaries.
+ // ONE source-aligned ribbon, drawn from the dense common position lookup.
+ // No section-by-section fills or duplicated join strokes (former kinks).
  ctx.save();
  ctx.translate(loc.cx,loc.cy);
  ctx.scale(loc.scale,loc.scale);
  ctx.translate(-loc.x,-loc.y);
- const W=model;
- for(const s of W.sections){
-  const n=Math.max(12,Math.ceil((s.to-s.from)/7)),inPts=[],outPts=[];
-  for(let i=0;i<=n;i++){
-   const e=W.rails(s.from+(s.to-s.from)*i/n);
-   inPts.push(e.inner);outPts.push(e.outer);
+ const inside=[],outside=[];
+ for(let d=0;d<=model.distance;d+=2){
+  const r=model.rails(d);
+  inside.push(r.inner);outside.push(r.outer);
+ }
+ for(const d of [model.distance]){
+  if(inside.length&&inside.at(-1).x!==model.rails(d).inner.x){
+   const r=model.rails(d);inside.push(r.inner);outside.push(r.outer);
   }
-  ctx.beginPath();ctx.moveTo(inPts[0].x,inPts[0].y);
-  inPts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
-  outPts.slice().reverse().forEach(p=>ctx.lineTo(p.x,p.y));
-  ctx.closePath();ctx.fillStyle='#7abc75';ctx.fill();
-  ctx.strokeStyle='#3d7f50';ctx.lineWidth=.8;
-  for(const arr of [inPts,outPts]){
-   ctx.beginPath();ctx.moveTo(arr[0].x,arr[0].y);
-   arr.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));
-   ctx.stroke();
-  }
+ }
+ ctx.lineJoin='round';ctx.lineCap='round';
+ ctx.beginPath();ctx.moveTo(inside[0].x,inside[0].y);
+ for(const p of inside.slice(1))ctx.lineTo(p.x,p.y);
+ for(const p of outside.slice().reverse())ctx.lineTo(p.x,p.y);
+ ctx.closePath();ctx.fillStyle='#83bb79';ctx.fill();
+ ctx.strokeStyle='#367a48';ctx.lineWidth=.65;
+ for(const pts of [inside,outside]){
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  for(const p of pts.slice(1))ctx.lineTo(p.x,p.y);
+  ctx.stroke();
  }
  ctx.restore();
 }
@@ -79,7 +82,7 @@ function cameraFor(points,w,h,chosen){
  // Kyoto 1400 approach: follow the nearby racing group (not all 18 horses).
  // Camera zoom and numbered circles are independent; circles remain readable.
  const focus=points.find(p=>p.number===chosen)||points.slice().sort((a,b)=>b.d-a.d)[0];
- const group=points.filter(p=>Math.abs(p.d-focus.d)<=48);
+ const group=points.filter(p=>Math.abs(p.d-focus.d)<=56);
  if(!group.some(p=>p.number===focus.number))group.push(focus);
  const xs=group.map(p=>p.x),ys=group.map(p=>p.y);
  const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
@@ -90,34 +93,89 @@ function cameraFor(points,w,h,chosen){
  return {x:focus.x*.87+mid.x*.13,y:focus.y*.87+mid.y*.13,
   cx:w*.5,cy:h*.52,scale:zoom};
 }
-function roundedWaku(ctx,p,x,y,mobile,focused){
- const colors=waku(p.number);
- const radius=focused?14.5:12.5; // CSS pixels, independent of camera zoom.
- if(focused){ctx.beginPath();ctx.arc(x,y,radius+2,0,Math.PI*2);
+function roundedWaku(ctx,p,x,y,focused){
+ const colors=waku(p.number),radius=focused?14:11.7;
+ if(focused){ctx.beginPath();ctx.arc(x,y,radius+2.6,0,Math.PI*2);
   ctx.fillStyle='#f1bd53';ctx.fill()}
  ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
  ctx.fillStyle=colors.fill;ctx.fill();
  ctx.strokeStyle=colors.fill==='#ffffff'?'#4c5961':'#22333b';
- ctx.lineWidth=1.7;ctx.stroke();
+ ctx.lineWidth=1.4;ctx.stroke();
  ctx.fillStyle=colors.ink;ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.font=(p.number>9?'800 12px':'900 14px')+' Arial, sans-serif';
+ ctx.font=(p.number>9?'900 12.5px':'900 14px')+' Arial,sans-serif';
  ctx.fillText(String(p.number),x,y+.4);
 }
-function markers(ctx,points,loc,focused,mini=false){
- const ordered=points.slice().sort((a,b)=>
-  Number(a.number===focused)-Number(b.number===focused));
- for(const p of ordered){
-  const s=position(p,loc);
-  if(s.x< -20||s.x>loc.w+20||s.y<-20||s.y>loc.h+20)continue;
-  if(mini){
-   const col=waku(p.number);
-   ctx.fillStyle=col.fill;
-   ctx.beginPath();ctx.arc(s.x,s.y,6.3,0,Math.PI*2);ctx.fill();
-   ctx.strokeStyle='#182d26';ctx.lineWidth=.8;ctx.stroke();
-   ctx.fillStyle=col.ink;ctx.font='bold 7.5px Arial,sans-serif';
-   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(p.number),s.x,s.y+.3);
-  }else roundedWaku(ctx,p,s.x,s.y,loc.w<500,p.number===focused);
+// Layout applies ONLY to label positions in LIVE, never to the racing model
+// or the original-image overview coordinates. Stable numeric ordering makes
+// multi-runner collisions reproducible without random flicker.
+function placeReadableLabels(points,loc,focused){
+ const nodes=points.map(p=>{
+  const actual=position(p,loc);
+  return {...p,actual,x:actual.x,y:actual.y,r:p.number===focused?14:11.7};
+ });
+ const valid=nodes.filter(p=>p.actual.x>=-45&&p.actual.x<=loc.w+45&&
+  p.actual.y>=-45&&p.actual.y<=loc.h+45);
+ valid.sort((a,b)=>a.number-b.number);
+ const minSep=2.5;
+ for(let pass=0;pass<95;pass++){
+  // The selected runner stays at its TRUE screen coordinate, other labels
+  // yield to it. Text badges get compact non-overlapping placement.
+  let moved=0;
+  for(let i=0;i<valid.length;i++)for(let j=i+1;j<valid.length;j++){
+   const a=valid[i],b=valid[j],dx=b.x-a.x,dy=b.y-a.y;
+   let dist=Math.hypot(dx,dy),required=a.r+b.r+minSep;
+   if(dist>=required)continue;
+   const ang=dist<1e-5?(i*3+j)*2.39996:Math.atan2(dy,dx);
+   const ux=Math.cos(ang),uy=Math.sin(ang),step=Math.min(6,(required-dist)*.60);
+   const aFixed=a.number===focused,bFixed=b.number===focused;
+   if(!aFixed){a.x-=ux*step*(bFixed?1:.5);a.y-=uy*step*(bFixed?1:.5)}
+   if(!bFixed){b.x+=ux*step*(aFixed?1:.5);b.y+=uy*step*(aFixed?1:.5)}
+   moved+=step;
+  }
+  for(const a of valid){
+   if(a.number!==focused){
+    // Weak anchor attraction avoids a separate numbered grid overlay.
+    a.x+=(a.actual.x-a.x)*.007;a.y+=(a.actual.y-a.y)*.007;
+    a.x=Math.max(a.r+3,Math.min(loc.w-a.r-3,a.x));
+    a.y=Math.max(a.r+3,Math.min(loc.h-a.r-3,a.y));
+   }
+  }
+  if(moved<.09)break;
  }
+ return valid;
+}
+function markers(ctx,points,loc,focused,mini=false){
+ if(mini){
+  // The overview is metrically exact; labels are intentionally small.
+  const ordered=points.slice().sort((a,b)=>Number(a.number===focused)-Number(b.number===focused));
+  for(const p of ordered){
+   const s=position(p,loc);
+   if(s.x<-15||s.x>loc.w+15||s.y<-15||s.y>loc.h+15)continue;
+   const col=waku(p.number);
+   ctx.beginPath();ctx.arc(s.x,s.y,6.3,0,Math.PI*2);
+   ctx.fillStyle=col.fill;ctx.fill();ctx.strokeStyle='#182d26';ctx.lineWidth=.8;ctx.stroke();
+   ctx.fillStyle=col.ink;ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.font='bold 7.5px Arial,sans-serif';ctx.fillText(String(p.number),s.x,s.y+.3);
+  }
+  return [];
+ }
+ const placed=placeReadableLabels(points,loc,focused);
+ // Trace horse locations with tiny dots. Only moved labels are connected;
+ // keep the leader selected at its actual physical position.
+ for(const p of placed){
+  const dd=Math.hypot(p.x-p.actual.x,p.y-p.actual.y);
+  if(dd>16){
+   ctx.beginPath();ctx.moveTo(p.actual.x,p.actual.y);ctx.lineTo(p.x,p.y);
+   ctx.strokeStyle='rgba(36,63,48,.25)';ctx.lineWidth=.8;ctx.stroke();
+   ctx.beginPath();ctx.arc(p.actual.x,p.actual.y,2.7,0,Math.PI*2);
+   ctx.fillStyle='#233f30';ctx.fill();
+  }
+ }
+ for(const p of placed.filter(p=>p.number!==focused))
+  roundedWaku(ctx,p,p.x,p.y,false);
+ for(const p of placed.filter(p=>p.number===focused))
+  roundedWaku(ctx,p,p.x,p.y,true);
+ return placed;
 }
 function updateRunningOrder(points,chosen){
  const host=$('runningOrder');
@@ -161,7 +219,8 @@ function paint(){
       y:lastCamera.y*.85+target.y*.15,
       scale:lastCamera.scale*.88+target.scale*.12};
  track(live.ctx,{...lastCamera,w:live.w,h:live.h});
- markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
+ const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
+ lastLabelPositions=labels;
  const map=sizeCanvas($('overview'));
  // Transparent numbers over the ACTUAL original 620x430 course diagram.
  const overview={x:310,y:215,cx:map.w/2,cy:map.h/2,
@@ -230,6 +289,8 @@ window.CleanLab=Object.freeze({
    mapAspect:rect.width/Math.max(1,rect.height),
    zoom:lastCamera?.scale??0,
    visibleOrder:[...$('runningOrder').children].map(el=>Number(el.dataset.horse)),
+   liveLabelPositions:lastLabelPositions.map(p=>({number:p.number,x:p.x,y:p.y,r:p.r,
+     anchorX:p.actual.x,anchorY:p.actual.y})),
    turfVisualWidthPx:model.widthPx,physicalWidthM:model.widthMetres,
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&

@@ -17,9 +17,14 @@ assert.equal(course.jraDimensions.lapInnerA,1782.8);
 assert.equal(course.jraDimensions.firstTurnDistanceM,308.7);
 assert.deepEqual(Array.from([course.jraDimensions.minTurfWidthM,course.jraDimensions.maxTurfWidthM]),[27,38]);
 assert.equal(course.widthMetres,27);
-assert.equal(course.widthPx,18);
-assert.equal(course.imageCorrectionKnots.length,26);
-for(let d=0;d<=2000;d+=5)assert.ok(Number.isFinite(course.corridorShift(d)));
+assert.equal(course.widthPx,16);
+assert.equal(course.densePointCount,2001);
+assert.equal(course.denseSpacingM,1);
+for(let d=0;d<=2000;d+=.25){
+ const pos=course.center(d),next=course.center(Math.min(2000,d+.25));
+ assert.ok(Math.hypot(next.x-pos.x,next.y-pos.y)<.8,'SMOOTH_PATH_'+d);
+ assert.ok(Math.hypot(next.tx-pos.tx,next.ty-pos.ty)<.06,'SMOOTH_TANGENT_'+d);
+}
 assert.deepEqual(Array.from(course.sections.filter(s=>s.kind==='straight').map(s=>[s.from,s.to])),
  [[0,308.7],[720,1270],[1671.6,2000]]);
 // Exact geometry invariants: straight headings cannot vary with distance.
@@ -36,9 +41,9 @@ for(const join of [308.7,530,720,1270,1435,1671.6]){
  assert.ok(Math.hypot(a.x-b.x,a.y-b.y)<.012,'JOIN_POSITION_JUMP_'+join);
  assert.ok(Math.hypot(a.tx-b.tx,a.ty-b.ty)<.003,'JOIN_DIRECTION_JUMP_'+join);
 }
-const anchors=new Map([[0,[350,317]],[308.7,[178,303]],[530,[165,203]],
- [720,[208,161]],[1270,[463,136]],[1435,[510,197]],
- [1671.6,[490,317]],[2000,[294,317]]]);
+const anchors=new Map([[0,[350,317]],[308.7,[183,317]],[530,[167,226]],
+ [720,[215,162]],[1270,[470,126]],[1435,[531,212]],
+ [1671.6,[487,317]],[2000,[294,317]]]);
 for(const [d,c] of anchors){
  const p=course.center(d);
  assert.ok(Math.hypot(p.x-c[0],p.y-c[1])<1e-4,'UMAPOT_ANCHOR_'+d);
@@ -81,8 +86,8 @@ assert.ok(snapshots.find(x=>x.d===100).in4>=8,'inner convergence by 100m');
 assert.ok(snapshots.find(x=>x.d===310).in4>=8,'inside remains preferred');
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
-assert.ok(html.includes('race-clean-course-v1.js?v=20261018-3'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261018-3'));
+assert.ok(html.includes('race-clean-course-v1.js?v=20261018-4'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261018-4'));
 assert.ok(html.includes('umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg'));
 assert.ok(!html.includes('race-turf-corridor-v1.js'));
 assert.ok(!app.includes('drawImage('));
@@ -90,6 +95,8 @@ assert.ok(!app.includes('track(map.ctx,overview)'));
 assert.ok(app.includes('Math.max(3.4,Math.min(7.2'));
 assert.ok(app.includes('RaceSimEngine.create('));
 assert.ok(app.includes('updateRunningOrder('));
+assert.ok(app.includes('placeReadableLabels('));
+assert.ok(!app.includes('for(const s of W.sections)'));
 assert.ok(html.includes('id="runningOrder"'));
 assert.ok(app.includes('point(')||app.includes('model.runners('));
 console.log('PASS_LAB_CLEAN_COURSE_STRICT_STRAIGHTS_C1_CURVES_AND_TURF_BAND',samples);
