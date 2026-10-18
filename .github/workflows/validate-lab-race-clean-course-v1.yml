@@ -212,6 +212,57 @@ jobs:
                 page.close()
             browser.close()
           PY
+      - name: A/B check same untouched course and identical real horse coordinates
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8770 --directory docs >/tmp/clean-lab-compare-server.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          import shutil,math
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+            for width in (390,1024):
+              results=[]
+              for mode in ('off','on'):
+                suffix='&lens=off' if mode=='off' else ''
+                page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
+                page.goto('http://127.0.0.1:8770/lab/race-clean-course-v1.html?checkpoint=1560'+suffix,wait_until='load')
+                page.wait_for_function('window.CleanLab?.inspect()?.cameraLensReady===true',timeout=18000)
+                read=page.evaluate("""() => {
+                  const a=CleanLab.inspect(),s=CleanLab.getState();
+                  return {
+                    img:a.originalImageSrc,live:a.liveImageSrc,
+                    imageElements:document.querySelectorAll('img').length,
+                    lensEnabled:a.cameraLensEnabled,
+                    gain:a.cameraLensGain,
+                    zoom:a.zoom,
+                    physics:s.horses.map(h=>[h.number,h.d,h.lane,h.speed]),
+                    positions:a.positions.map(h=>[h.number,h.x,h.y,h.d,h.lane]),
+                    error:a.directMarkerMaxError,
+                    turf:a.turfBadDiscs,
+                    extraRenderer:!!document.getElementById('distanceCamera')
+                  };
+                }""")
+                page.locator('#broadcastStage').screenshot(path=f'/tmp/clean-lab/same-svg-{mode}-{width}-1560m.png')
+                results.append(read)
+                page.close()
+              off,on=results
+              assert off['img']==on['img']==off['live']==on['live']=='assets/kyoto-umapot-course-clean-v8.svg'
+              assert off['imageElements']==on['imageElements']==2
+              assert not off['extraRenderer'] and not on['extraRenderer']
+              assert not off['lensEnabled'] and on['lensEnabled']
+              assert off['physics']==on['physics'],('ENGINE_CHANGED_BY_CAMERA',width)
+              assert off['positions']==on['positions'],('HORSE_SOURCE_PIXELS_MOVED',width)
+              assert off['error']==on['error']==0
+              assert off['turf']==on['turf']==0
+              assert 1.05<on['zoom']/off['zoom']<1.46,(width,off['zoom'],on['zoom'])
+              print('PASS_AB_SAME_ORIGINAL_SVG_AND_IDENTICAL_18_PHYSICAL_RUNNERS',
+                    width,'zoomBefore',off['zoom'],'zoomAfter',on['zoom'],
+                    'gain',on['gain'])
+            browser.close()
+          PY
       - name: Realtime fourfold playback - no shaking or zoom breathing
         run: |
           set -euo pipefail
