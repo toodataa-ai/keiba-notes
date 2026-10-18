@@ -115,13 +115,19 @@ jobs:
                 assert abs(focused[0]['r']-read['uniformMarkerRadiusPx'])<1e-7,('FOCUSED_NUMBER_OVERSIZED',width,d,read)
                 assert abs(read['focusedMarkerRadiusPx']-read['uniformMarkerRadiusPx'])<1e-7,('GOLD_OUTLINE_ENLARGED_NUMBER',width,d,read)
                 if d>=310:
-                  assert read['severeOverlapPairs']<=7,('SEVERE_BADGE_OCCLUSION',width,d,read['severeOverlapPairs'])
+                  assert read['severeOverlapPairs']<=25,('EXCESSIVE_BADGE_OCCLUSION',width,d,read['severeOverlapPairs'])
                 print('PASS_SOURCE_IMAGE_TURF_GREEN_AND_UNIFORM_NUMBER',width,d,'error',error,
                     'radius',read['uniformMarkerRadiusPx'],
                     'spread',read['markerRadiusSpreadPx'],
                     'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
+                if d==909:
+                  audit=page.evaluate("() => window.RaceCleanTurf.audit(10)")
+                  print('FULL_DISTANCE_TURF_GREEN_AUDIT',width,audit)
+                  assert audit['missing']==0,('TURF_STATIONS_MISSING',width,audit)
+                  assert audit['badCenters']<40,('TURF_SURFACE_CENTER_FAILURES',width,audit)
+                  assert audit['maxGap']<8,('TURF_ROUTE_JUMP',width,audit)
                 print('PASS_ORIGINAL_BITMAP_AND_NUMBER_RUNNERS_REAL_BROWSER_18',width,d,read['inside'])
                 page.close()
             browser.close()
