@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v5：うまぽっと京都620×430原画像を内・外2本の芝ラチとして独立トレース。60ノットを弧長走行距離ベースのC1 splineに統合、中央固定幅方式は廃止。ローカル画像の2px許容HSV緑帯検査で各2001地点×6レーンが99.3〜100%一致（文字などの偽陰性あり）。スマホ/PC実ブラウザQAと目視承認待ち。LAB限定、本番・STAGING・正式DATA不変。",
+      "next_action": "LAB v6: LIVE/overview both use exact same Umapot original remote image; broadcast applies uniform camera translate+scale with native browser-local 4x image resampling canvas; NO newly drawn turf/rails, NO leader lines/pins, direct running circled horse numbers only. Require fresh Actions browser QA at 390/1024 width 8 checkpoints and live Pages byte-parity before accept. LAB only; no staging, production UI, official data, predictions, final_bets, PDFs.",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -39,7 +39,7 @@
         "docs/lab/race-clean-course-v1.html",
         "docs/lab/race-clean-course-v1.css"
       ],
-      "shape_alignment": "v5_source_image_dual_rail_audit_pending_browser_qa"
+      "shape_alignment": "v6_no_generated_course_background_same_original_image_in_both_views_pending_browser_QA"
     },
     {
       "id": "course-catalog",

@@ -52,6 +52,7 @@ jobs:
                 page.on('pageerror',lambda error:errors.append(str(error)))
                 page.goto(f'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint={d}',wait_until='load')
                 page.wait_for_function('window.CleanLab?.getState()?.horses?.length===18',timeout=12000)
+                page.wait_for_function('window.CleanLab?.inspect()?.upscaledReady===true',timeout=15000)
                 read=page.evaluate("""() => {
                   const a=CleanLab.inspect(),c=RaceCleanCourse;
                   const sim=CleanLab.getState();
@@ -62,6 +63,11 @@ jobs:
                     running:sim.horses.length,inside:sim.horses.filter(h=>h.lane<=3.45).length,
                     live:live.width,full:full.width,canvasCSS:live.getBoundingClientRect().width,
                     imageElements:document.querySelectorAll('img').length,
+                    liveImageLoaded:a.liveImageLoaded,liveImageSrc:a.liveImageSrc,
+                    upscaledReady:a.upscaledReady,upscaledCanvasWidth:a.upscaledCanvasWidth,
+                    upscaledCanvasHeight:a.upscaledCanvasHeight,
+                    actualNumberCircles:a.actualNumberCircles,
+                    paintedTrack:a.paintedTrack,leaderLines:a.leaderLines,
                     originalImageSrc:a.originalImageSrc,
                     originalLoaded:a.originalLoaded,mapAspect:a.mapAspect,zoom:a.zoom,
                     selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen,
@@ -71,7 +77,11 @@ jobs:
                 assert read['count']==read['running']==18,(width,d,read)
                 assert read['selectedVisible'],('FOCUSED_HORSE_OFF_CAMERA',width,d,read)
                 assert read['leader']+3>=d,(width,d,read)
-                assert read['sourceCalls']==0 and read['imageElements']==1,(width,d,read)
+                assert read['sourceCalls']==1 and read['imageElements']==2,(width,d,read)
+                assert read['liveImageLoaded'] and read['upscaledReady'],('ORIGINAL_UPSCALE_NOT_READY',width,d,read)
+                assert read['upscaledCanvasWidth']==2480 and read['upscaledCanvasHeight']==1720,(width,d,read)
+                assert read['originalImageSrc']==read['liveImageSrc'],('TWO_DIFFERENT_COURSE_IMAGES',width,d,read)
+                assert read['actualNumberCircles'] and not read['paintedTrack'] and not read['leaderLines']
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
@@ -91,7 +101,7 @@ jobs:
                 print('PASS_BADGE_VISIBILITY',width,d,len(labels),'max_overlap',round(worst,3))
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
-                print('PASS_CLEAN_VECTOR_REAL_BROWSER_18',width,d,read['inside'])
+                print('PASS_ORIGINAL_BITMAP_AND_NUMBER_RUNNERS_REAL_BROWSER_18',width,d,read['inside'])
                 page.close()
             browser.close()
           PY

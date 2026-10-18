@@ -1,5 +1,7 @@
-/* Independent LAB clean-vector trial. Only the synthetic 18-horse engine is
- * connected; no official prediction, no Umapot bitmap or green-pixel extraction.
+/* LAB v6: native Umapot bitmap in BOTH views; only numbered runners move.
+ * Source bitmap is never redrawn as an approximate course. A browser-local,
+ * fourfold high-quality resample is a display cache, not a new detailed source.
+ * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
  */
 (function(){'use strict';
 const $=id=>document.getElementById(id);
@@ -20,6 +22,10 @@ function waku(no){
  return palette[7];
 }
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null,lastLabelPositions=[];
+let hiResReady=false,originalReady=false,originalError=false;
+// Source image is linked directly from Umapot in a regular <img>. Browser
+// local resampling does not upload, store or rehost the source image.
+const IMAGE_SCALE=4;
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
  playing=false;last=0;acc=0;lastCamera=null;paint();
@@ -44,35 +50,38 @@ function sizeCanvas(canvas){
  ctx.clearRect(0,0,w,h);
  return {ctx,w,h};
 }
-function track(ctx,loc){
- // ONE source-aligned ribbon, drawn from the dense common position lookup.
- // No section-by-section fills or duplicated join strokes (former kinks).
- ctx.save();
- ctx.translate(loc.cx,loc.cy);
- ctx.scale(loc.scale,loc.scale);
- ctx.translate(-loc.x,-loc.y);
- const inside=[],outside=[];
- for(let d=0;d<=model.distance;d+=2){
-  const r=model.rails(d);
-  inside.push(r.inner);outside.push(r.outer);
+function backdrop(camera){
+ // The photo and canvas must share EXACTLY the same affine projection.
+ // This transform crops the unchanged image; it never draws new rail shapes.
+ const left=camera.cx-camera.x*camera.scale;
+ const top=camera.cy-camera.y*camera.scale;
+ const transform='translate('+left+'px,'+top+'px) scale('+camera.scale+')';
+ for(const id of ['liveCourseImage','liveCourseHiRes']){
+  const element=$(id);
+  if(element)element.style.transform=transform;
  }
- for(const d of [model.distance]){
-  if(inside.length&&inside.at(-1).x!==model.rails(d).inner.x){
-   const r=model.rails(d);inside.push(r.inner);outside.push(r.outer);
-  }
+}
+function upscaleOriginal(){
+ const original=$('realCourseImage'),out=$('liveCourseHiRes');
+ if(!original||!out||!original.complete||!original.naturalWidth)return;
+ originalReady=true;
+ try{
+  const targetWidth=original.naturalWidth*IMAGE_SCALE,
+   targetHeight=original.naturalHeight*IMAGE_SCALE;
+  if(out.width!==targetWidth)out.width=targetWidth;
+  if(out.height!==targetHeight)out.height=targetHeight;
+  const ctx=out.getContext('2d');
+  if(!ctx)throw Error('UPSCALE_CANVAS_CONTEXT');
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  // Upsample the ORIGINAL pixels. Does not hallucinate missing detail.
+  ctx.drawImage(original,0,0,targetWidth,targetHeight);
+  hiResReady=true;
+  out.classList.add('is-ready');
+  $('liveCourseImage').classList.add('is-upscaled');
+ }catch(err){
+  hiResReady=false;
+  console.warn('Native image remains visible; browser upscale unavailable',err);
  }
- ctx.lineJoin='round';ctx.lineCap='round';
- ctx.beginPath();ctx.moveTo(inside[0].x,inside[0].y);
- for(const p of inside.slice(1))ctx.lineTo(p.x,p.y);
- for(const p of outside.slice().reverse())ctx.lineTo(p.x,p.y);
- ctx.closePath();ctx.fillStyle='#83bb79';ctx.fill();
- ctx.strokeStyle='#367a48';ctx.lineWidth=.65;
- for(const pts of [inside,outside]){
-  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-  for(const p of pts.slice(1))ctx.lineTo(p.x,p.y);
-  ctx.stroke();
- }
- ctx.restore();
 }
 function position(p,camera){
  return {x:camera.cx+(p.x-camera.x)*camera.scale,
@@ -189,17 +198,9 @@ function markers(ctx,points,loc,focused,mini=false){
   return [];
  }
  const placed=placeReadableLabels(points,loc,focused);
- // Trace horse locations with tiny dots. Only moved labels are connected;
- // keep the leader selected at its actual physical position.
- for(const p of placed){
-  const dd=Math.hypot(p.x-p.actual.x,p.y-p.actual.y);
-  if(dd>16){
-   ctx.beginPath();ctx.moveTo(p.actual.x,p.actual.y);ctx.lineTo(p.x,p.y);
-   ctx.strokeStyle='rgba(36,63,48,.25)';ctx.lineWidth=.8;ctx.stroke();
-   ctx.beginPath();ctx.arc(p.actual.x,p.actual.y,2.7,0,Math.PI*2);
-   ctx.fillStyle='#233f30';ctx.fill();
-  }
- }
+ // The numbered circles ARE the runners. No locator pins, pointers,
+ // leader lines, horse silhouettes or fake painted racecourse. Only the
+ // numbers move. The overlap solver affects visual badge placement alone.
  for(const p of placed.filter(p=>p.number!==focused))
   roundedWaku(ctx,p,p.x,p.y,false);
  for(const p of placed.filter(p=>p.number===focused))
@@ -240,14 +241,14 @@ function paint(){
  const state=engine.state,points=model.runners(state);
  const chosen=focusNo==='leader'?state.leadingNo:Number(focusNo);
  const live=sizeCanvas($('broadcast'));
- live.ctx.fillStyle='#f0f4ed';live.ctx.fillRect(0,0,live.w,live.h);
+ // Transparent canvas: original Umapot image is the only course background.
  const target=cameraFor(points,live.w,live.h,chosen);
  // Smooth camera pan with state-time-independent interpolation on each frame.
  if(!lastCamera)lastCamera=target;
  else lastCamera={...target,x:lastCamera.x*.85+target.x*.15,
       y:lastCamera.y*.85+target.y*.15,
       scale:lastCamera.scale*.88+target.scale*.12};
- track(live.ctx,{...lastCamera,w:live.w,h:live.h});
+ backdrop(lastCamera);
  const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
  lastLabelPositions=labels;
  const map=sizeCanvas($('overview'));
@@ -275,10 +276,17 @@ function tick(ts){
 }
 function setup(){
  const original=$('realCourseImage');
- if(original)original.addEventListener('error',()=>{
-  const credit=document.querySelector('.source-credit');
-  if(credit)credit.textContent='コースの原画像を読み込めません。うまぽっとの配信状況をご確認ください。';
- });
+ if(original){
+  original.addEventListener('load',upscaleOriginal);
+  original.addEventListener('error',()=>{
+   originalError=true;
+   const credit=document.querySelector('.source-credit');
+   if(credit)credit.textContent='コースの原画像を読み込めません。うまぽっとの配信状況をご確認ください。';
+  });
+  if(original.complete&&original.naturalWidth)upscaleOriginal();
+ }
+ const liveImage=$('liveCourseImage');
+ if(liveImage)liveImage.addEventListener('error',()=>{originalError=true;});
  $('focus').insertAdjacentHTML('beforeend',fixture.horses().map(h=>
    '<option value="'+h.number+'">'+h.number+'番</option>').join(''));
  $('horseGrid').innerHTML=fixture.horses().map(h=>{
@@ -315,6 +323,12 @@ window.CleanLab=Object.freeze({
   return {leader:engine.state.leader,positions:points,
    originalImageSrc:image?.getAttribute('src')||null,
    originalLoaded:Boolean(image?.complete&&image?.naturalWidth===620&&image?.naturalHeight===430),
+   liveImageLoaded:Boolean($('liveCourseImage')?.complete&&$('liveCourseImage')?.naturalWidth===620),
+   liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
+   originalError,upscaledReady:hiResReady,
+   upscaledCanvasWidth:$('liveCourseHiRes')?.width||0,
+   upscaledCanvasHeight:$('liveCourseHiRes')?.height||0,
+   actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
    zoom:lastCamera?.scale??0,
    visibleOrder:[...$('runningOrder').children].map(el=>Number(el.dataset.horse)),
@@ -324,7 +338,7 @@ window.CleanLab=Object.freeze({
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&
      screen.y>=16&&screen.y<=live.height-16),
-    imageCalls:0,section:model.center(engine.state.leader).section,
+    imageCalls:hiResReady?1:0,section:model.center(engine.state.leader).section,
     fixedSegments:model.sections.filter(s=>s.kind==='straight').map(s=>[s.from,s.to])};
  },advanceTo
 });

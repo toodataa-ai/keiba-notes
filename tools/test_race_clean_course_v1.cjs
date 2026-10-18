@@ -1,5 +1,5 @@
-/* Independent LAB clean vector course gate — no JPEG, no image-derived
- * green stripe, no official prediction mutation, 18 synthetic horses only. */
+/* LAB original-photo broadcast + numbers-only gate; fixture horses only.
+ * Source image is linked, not stored or raster-reconstructed in repository. */
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const root='docs/lab/',window={},scripts=[
@@ -87,11 +87,20 @@ assert.ok(snapshots.find(x=>x.d===100).in4>=8,'inner convergence by 100m');
 assert.ok(snapshots.find(x=>x.d===310).in4>=8,'inside remains preferred');
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
-assert.ok(html.includes('race-clean-course-v1.js?v=20261018-5'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261018-5'));
+assert.ok(html.includes('race-clean-course-v1.js?v=20261018-6'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261018-6'));
 assert.ok(html.includes('umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg'));
 assert.ok(!html.includes('race-turf-corridor-v1.js'));
-assert.ok(!app.includes('drawImage('));
+assert.ok(app.includes('ctx.drawImage(original,0,0,targetWidth,targetHeight)'));
+assert.ok(html.includes('id="liveCourseImage"'));
+assert.ok(html.includes('id="liveCourseHiRes"'));
+assert.equal((html.match(/kyoto_couse_1.jpg/g)||[]).length,2);
+assert.ok(app.includes('backdrop(lastCamera);'));
+assert.ok(!app.includes('function track('));
+assert.ok(!app.includes('track(live.ctx'));
+assert.ok(!app.includes("ctx.lineTo(p.actual.x,p.actual.y)"));
+assert.ok(app.includes('actualNumberCircles:true,paintedTrack:false,leaderLines:false'));
+assert.ok(app.includes('const IMAGE_SCALE=4'));
 assert.ok(!app.includes('track(map.ctx,overview)'));
 assert.ok(app.includes('Math.max(3.4,Math.min(7.2'));
 assert.ok(app.includes('RaceSimEngine.create('));
@@ -100,5 +109,5 @@ assert.ok(app.includes('placeReadableLabels('));
 assert.ok(!app.includes('for(const s of W.sections)'));
 assert.ok(html.includes('id="runningOrder"'));
 assert.ok(app.includes('point(')||app.includes('model.runners('));
-console.log('PASS_LAB_DUAL_RAIL_SOURCE_TRACE_C1_AND_TURF_LANES',samples);
+console.log('PASS_LAB_ORIGINAL_IMAGE_BOTH_VIEWS_AND_4X_RENDER_NUMBERS',samples);
 console.log('PASS_LAB_CLEAN_COURSE_SHARED_KYOTO1400_LANE_ENGINE_18_HORSES',JSON.stringify(snapshots));
