@@ -33,7 +33,7 @@ jobs:
            page.on('pageerror',lambda e:errors.append(str(e)))
            page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1400',wait_until='load')
            page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=30000)
-           results=page.evaluate("""() => {
+           result=page.evaluate("""() => {
             const turf=RaceCleanTurf,model=RaceCleanCourse;
             const sections=model.sections;
             const profile=sections.map(s=>({from:s.from,to:s.to,
