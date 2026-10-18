@@ -1,0 +1,98 @@
+name: LAB clean vector race course 18-runner browser acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/lab/race-clean-course-*'
+      - 'tools/test_race_clean_course_v1.cjs'
+      - '.github/workflows/validate-lab-race-clean-course-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 2}
+      - name: Data untouched, geometry/lane/layout tests
+        run: |
+          set -euo pipefail
+          for f in docs/lab/race-clean-course*.js;do node --check "$f";done
+          node tools/test_race_clean_course_v1.cjs
+          python3 .github/scripts/staging-baseline-v2.py --check
+          python3 - <<'PY'
+          import subprocess
+          files=set(subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines())
+          for p in files:
+            assert not p.startswith(('docs/data/','docs/reports/','docs/pdfs/','docs/staging/','e2e_validation/','local_racing_shadow_v1/')),p
+          print('PASS_CLEAN_LAB_UI_ONLY_NO_STAGING_NO_FORMAL_BETS')
+          PY
+      - name: Playwright
+        run: |
+          python3 -m pip install playwright==1.56.0
+          command -v google-chrome || command -v chromium
+      - name: Run 18 horses at seven race sections in actual mobile/desktop browser
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/clean-lab
+          python3 -m http.server 8765 --directory docs >/tmp/clean-lab-server.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          import shutil
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          assert exe
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+            for width in (390,1024):
+              for d in (0,100,310,530,900,1270,1672,1900):
+                page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
+                errors=[]
+                page.on('pageerror',lambda error:errors.append(str(error)))
+                page.goto(f'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint={d}',wait_until='load')
+                page.wait_for_function('window.CleanLab?.getState()?.horses?.length===18',timeout=12000)
+                read=page.evaluate("""() => {
+                  const a=CleanLab.inspect(),c=RaceCleanCourse;
+                  const sim=CleanLab.getState();
+                  const live=document.getElementById('broadcast');
+                  const full=document.getElementById('overview');
+                  return {count:a.positions.length,sourceCalls:a.imageCalls,
+                    leader:a.leader,courseSeg:a.section,straightSpans:a.fixedSegments,
+                    running:sim.horses.length,inside:sim.horses.filter(h=>h.lane<=3.45).length,
+                    live:live.width,full:full.width,canvasCSS:live.getBoundingClientRect().width,
+                    imageElements:document.querySelectorAll('img').length};
+                }""")
+                assert not errors,(width,d,errors)
+                assert read['count']==read['running']==18,(width,d,read)
+                assert read['leader']+3>=d,(width,d,read)
+                assert read['sourceCalls']==0 and read['imageElements']==0,(width,d,read)
+                assert read['live']>=read['canvasCSS'],(width,d,read)
+                assert read['inside']>=8 if d>=100 else True,(width,d,read)
+                page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
+                page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
+                print('PASS_CLEAN_VECTOR_REAL_BROWSER_18',width,d,read['inside'])
+                page.close()
+            browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab-clean-vector-18-mobile-desktop
+          path: /tmp/clean-lab/*.png
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Live Pages bytes reflect this commit
+        run: |
+          set -euo pipefail
+          base=https://toodataa-ai.github.io/keiba-notes/lab
+          for i in $(seq 1 28);do
+            ok=1
+            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-course-v1.css;do
+              if ! curl -fLsS --max-time 20 "$base/$f?ci=$GITHUB_RUN_ID-$i" -o /tmp/clean-file ||
+                ! cmp -s "docs/lab/$f" /tmp/clean-file;then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]];then echo PASS_CLEAN_LAB_PUBLIC_BYTES;exit 0;fi
+            sleep 8
+          done
+          echo '::error::Published LAB clean course has not caught up';exit 1
