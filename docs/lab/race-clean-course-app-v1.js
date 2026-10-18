@@ -142,6 +142,35 @@ function placeReadableLabels(points,loc,focused){
   }
   if(moved<.09)break;
  }
+ // Strict fallback: symmetric forces occasionally converge to a pile at
+ // the starting gate. Assign only the still-overlapping labels to nearby
+ // deterministic 31px lattice cells. Never change the actual horse position.
+ const ordered=valid.slice().sort((a,b)=>
+  Number(b.number===focused)-Number(a.number===focused)||a.number-b.number);
+ const placed=[];
+ for(const p of ordered){
+  const intersects=()=>placed.some(q=>Math.hypot(p.x-q.x,p.y-q.y)<p.r+q.r+2.5);
+  if(p.number!==focused&&intersects()){
+   let found=null;
+   for(let ring=0;ring<=12&&!found;ring++){
+    const cells=[];
+    for(let dx=-ring;dx<=ring;dx++)for(let dy=-ring;dy<=ring;dy++){
+     if(Math.max(Math.abs(dx),Math.abs(dy))!==ring)continue;
+     cells.push([dx,dy]);
+    }
+    cells.sort((a,b)=>Math.hypot(...a)-Math.hypot(...b)||a[1]-b[1]||a[0]-b[0]);
+    for(const [dx,dy] of cells){
+     const x=p.actual.x+dx*31,y=p.actual.y+dy*31;
+     if(x<p.r+3||x>loc.w-p.r-3||y<p.r+3||y>loc.h-p.r-3)continue;
+     if(placed.every(q=>Math.hypot(x-q.x,y-q.y)>=p.r+q.r+2.5)){
+      found={x,y};break;
+     }
+    }
+   }
+   if(found){p.x=found.x;p.y=found.y}
+  }
+  placed.push(p);
+ }
  return valid;
 }
 function markers(ctx,points,loc,focused,mini=false){
