@@ -1,4 +1,4 @@
-/* LAB v6: native Umapot bitmap in BOTH views; only numbered runners move.
+/* LAB v7: Kyoto 1400 number markers + shared inside-first racing logic.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -9,18 +9,61 @@ const model=window.RaceCleanCourse;
 const fixture=window.RaceLab18Fixture;
 const entries=fixture.horses();
 const race={...fixture.entry(),horses:entries};
-const palette=[
- {fill:'#ffffff',ink:'#202a32'}, {fill:'#20242a',ink:'#ffffff'},
- {fill:'#c7374e',ink:'#ffffff'}, {fill:'#2556a9',ink:'#ffffff'},
- {fill:'#f2d345',ink:'#202b34'}, {fill:'#29905f',ink:'#ffffff'},
- {fill:'#ed8832',ink:'#272b30'}, {fill:'#eb9dc6',ink:'#272b30'}
-];
-function waku(no){
- const groups=[2,2,2,2,2,2,3,3];
- let offset=0;
- for(let i=0;i<8;i++){offset+=groups[i];if(no<=offset)return palette[i]}
- return palette[7];
+// Ported faithfully from working Kyoto 1400 RaceSimNumbers.marker.
+const JRA_WAKU=Object.freeze([
+ {name:'白',fill:'#fffdf5',text:'#111827',border:'#111827'},
+ {name:'黒',fill:'#15191f',text:'#ffffff',border:'#f4f4f5'},
+ {name:'赤',fill:'#d9142f',text:'#ffffff',border:'#fff4f4'},
+ {name:'青',fill:'#164bb8',text:'#ffffff',border:'#f1f5ff'},
+ {name:'黄',fill:'#ffde30',text:'#171717',border:'#35301c'},
+ {name:'緑',fill:'#1d8c49',text:'#ffffff',border:'#edfff4'},
+ {name:'橙',fill:'#f9811f',text:'#111827',border:'#422509'},
+ {name:'桃',fill:'#f4a1c5',text:'#171717',border:'#542e3f'}
+]);
+function jraWaku(number,fieldSize=18){
+ // Only the separately flagged one-runner course demonstration gets a
+ // neutral white marker. Official 8–18 runner JRA waku validation is unchanged.
+ 
+ if(!Number.isInteger(number)||!Number.isInteger(fieldSize)||
+   fieldSize<8||fieldSize>18||number<1||number>fieldSize)
+   throw Error('JRA_WAKU_FIELD_INVALID');
+ const base=Math.floor(fieldSize/8),extra=fieldSize%8;
+ let first=1;
+ for(let i=0;i<8;i++){
+   const n=base+(i>=8-extra?1:0);
+   if(number<first+n)return {waku:i+1,...JRA_WAKU[i]};
+   first+=n;
+ }
+ throw Error('JRA_WAKU_NOT_FOUND');
 }
+function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,fieldSize=18,passing=false){
+ if(!Number.isInteger(number)||number<1||!Number.isFinite(x)||!Number.isFinite(y))
+  throw Error('SIM_NUMBER_POSITION_INVALID');
+ const radius=(focused?15.5:13.5)*scale;
+ const waku=jraWaku(number,fieldSize);
+ ctx.save();
+ ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
+ ctx.fillStyle=waku.fill;ctx.fill();
+ ctx.lineWidth=(focused?2.8:2.1)*scale;
+ ctx.strokeStyle=waku.border;ctx.stroke();
+ if(focused){
+   ctx.beginPath();ctx.arc(x,y,radius+4.3*scale,0,Math.PI*2);
+   ctx.lineWidth=3.2*scale;ctx.strokeStyle='#f9d46c';ctx.stroke();
+ }
+ if(passing){
+   // A thin ring around the genuine crossing point; no position offset.
+   ctx.beginPath();ctx.arc(x,y,radius+7*scale,0,Math.PI*2);
+   ctx.lineWidth=2.6*scale;ctx.strokeStyle='#b6f3a0';ctx.stroke();
+ }
+ ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.fillStyle=waku.text;
+ ctx.font='900 '+(number>9?16:18)*scale+'px Arial, sans-serif';
+ ctx.fillText(String(number),x,y+.4*scale);
+ ctx.restore();
+ return {number,x,y,waku:waku.waku};
+}
+
+function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null,lastLabelPositions=[];
 let hiResReady=false,originalReady=false,originalError=false;
 // Source image is linked directly from Umapot in a regular <img>. Browser
@@ -88,101 +131,37 @@ function position(p,camera){
          y:camera.cy+(p.y-camera.y)*camera.scale};
 }
 function cameraFor(points,w,h,chosen){
- // Kyoto 1400 approach: follow the nearby racing group (not all 18 horses).
- // Camera zoom and numbered circles are independent; circles remain readable.
+ // Same local +/-110m group camera algorithm as working Kyoto 1400.
+ // Numbers remain at their TRUE horse positions; only the camera pans.
  const focus=points.find(p=>p.number===chosen)||points.slice().sort((a,b)=>b.d-a.d)[0];
- const group=points.filter(p=>Math.abs(p.d-focus.d)<=56);
+ const group=points.filter(p=>Math.abs(p.d-focus.d)<=110);
  if(!group.some(p=>p.number===focus.number))group.push(focus);
  const xs=group.map(p=>p.x),ys=group.map(p=>p.y);
  const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
- const zoom=Math.max(3.4,Math.min(7.2,
-  (w-36)/Math.max(44,hiX-loX+7),
-  (h-56)/Math.max(42,hiY-loY+7)));
- const mid={x:(loX+hiX)/2,y:(loY+hiY)/2};
- return {x:focus.x*.87+mid.x*.13,y:focus.y*.87+mid.y*.13,
-  cx:w*.5,cy:h*.52,scale:zoom};
+ const marginX=Math.min(w*.24,Math.max(48,22));
+ const marginY=Math.min(h*.30,Math.max(64,42));
+ const zoom=Math.max(1.7,Math.min(points.length===1?5.2:4.6,
+   (w-2*marginX)/Math.max(65,hiX-loX+15),
+   (h-2*marginY)/Math.max(55,hiY-loY+12)));
+ const mean={x:(loX+hiX)/2,y:(loY+hiY)/2};
+ const origin={x:focus.x+.16*(mean.x-focus.x),y:focus.y+.16*(mean.y-focus.y)};
+ return {x:origin.x,y:origin.y,cx:w/2,cy:h*.5,scale:zoom};
 }
-function roundedWaku(ctx,p,x,y,focused){
- const colors=waku(p.number),radius=focused?14:11.7;
- if(focused){ctx.beginPath();ctx.arc(x,y,radius+2.6,0,Math.PI*2);
-  ctx.fillStyle='#f1bd53';ctx.fill()}
- ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
- ctx.fillStyle=colors.fill;ctx.fill();
- ctx.strokeStyle=colors.fill==='#ffffff'?'#4c5961':'#22333b';
- ctx.lineWidth=1.4;ctx.stroke();
- ctx.fillStyle=colors.ink;ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.font=(p.number>9?'900 12.5px':'900 14px')+' Arial,sans-serif';
- ctx.fillText(String(p.number),x,y+.4);
-}
-// Layout applies ONLY to label positions in LIVE, never to the racing model
-// or the original-image overview coordinates. Stable numeric ordering makes
-// multi-runner collisions reproducible without random flicker.
-function placeReadableLabels(points,loc,focused){
- // A horse is its circled number, never an external callout. To resolve
- // overlap, choose label locations ON the source-image turf strip at nearby
- // race-distance/rail fractions. Underlying racing positions never change.
- const nodes=points.map(p=>{
-  const actual=position(p,loc);
-  return {...p,actual,x:actual.x,y:actual.y,r:p.number===focused?14:11.7,onTurf:true};
- }).filter(p=>p.actual.x>=-45&&p.actual.x<=loc.w+45&&
-  p.actual.y>=-45&&p.actual.y<=loc.h+45);
- const ordered=nodes.slice().sort((a,b)=>
-  Number(b.number===focused)-Number(a.number===focused)||b.d-a.d||a.number-b.number);
- const placed=[];
- const distanceOffsets=[0];
- for(let k=1;k<=17;k++){distanceOffsets.push(-k*8,k*8)}
- for(const p of ordered){
-  if(p.number===focused){placed.push(p);continue}
-  const originalFraction=model.fraction(p.lane);
-  const fractions=[originalFraction,.12,.23,.34,.45,.56,.67,.78,.90]
-   .sort((a,b)=>Math.abs(a-originalFraction)-Math.abs(b-originalFraction));
-  let choice=null,best=Infinity;
-  for(const dd of distanceOffsets){
-   const dist=Math.max(0,Math.min(model.distance,p.d+dd)),rail=model.rails(dist);
-   for(const f of fractions){
-    const point={x:rail.inner.x+(rail.outer.x-rail.inner.x)*f,
-      y:rail.inner.y+(rail.outer.y-rail.inner.y)*f};
-    const pos=position(point,loc);
-    if(pos.x<p.r+3||pos.x>loc.w-p.r-3||
-      pos.y<p.r+3||pos.y>loc.h-p.r-3)continue;
-    if(placed.some(q=>Math.hypot(pos.x-q.x,pos.y-q.y)<p.r+q.r+2.5))continue;
-    const score=Math.hypot(pos.x-p.actual.x,pos.y-p.actual.y)+
-      Math.abs(dd)*.05;
-    if(score<best){best=score;choice=pos}
-   }
-  }
-  if(choice){p.x=choice.x;p.y=choice.y}
-  else { // Keep the source position if no non-overlapping turf point exists.
-   p.onTurf=true;
-  }
-  placed.push(p);
- }
- return nodes;
-}
+// A circled number IS the moving horse (Kyoto 1400 contract). No pixel
+// position displacement to evade overlap; dense packs may obscure neighbours.
 function markers(ctx,points,loc,focused,mini=false){
- if(mini){
-  // The overview is metrically exact; labels are intentionally small.
-  const ordered=points.slice().sort((a,b)=>Number(a.number===focused)-Number(b.number===focused));
-  for(const p of ordered){
-   const s=position(p,loc);
-   if(s.x<-15||s.x>loc.w+15||s.y<-15||s.y>loc.h+15)continue;
-   const col=waku(p.number);
-   ctx.beginPath();ctx.arc(s.x,s.y,6.3,0,Math.PI*2);
-   ctx.fillStyle=col.fill;ctx.fill();ctx.strokeStyle='#182d26';ctx.lineWidth=.8;ctx.stroke();
-   ctx.fillStyle=col.ink;ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.font='bold 7.5px Arial,sans-serif';ctx.fillText(String(p.number),s.x,s.y+.3);
-  }
-  return [];
+ const sorted=points.map(p=>({...p,actual:position(p,loc)}))
+  .sort((a,b)=>Number(a.number===focused)-Number(b.number===focused)||a.number-b.number);
+ const displayed=[];
+ for(const p of sorted){
+  const x=p.actual.x,y=p.actual.y;
+  const scale=mini?.48:(points.length>=12?(p.number===focused?1.02:.92):1);
+  const radius=(p.number===focused?15.5:13.5)*scale;
+  if(x+radius<0||x-radius>loc.w||y+radius<0||y-radius>loc.h)continue;
+  raceNumberMarker(ctx,p.number,x,y,scale,p.number===focused,false,18,false);
+  displayed.push({...p,x,y,r:radius});
  }
- const placed=placeReadableLabels(points,loc,focused);
- // The numbered circles ARE the runners. No locator pins, pointers,
- // leader lines, horse silhouettes or fake painted racecourse. Only the
- // numbers move. The overlap solver affects visual badge placement alone.
- for(const p of placed.filter(p=>p.number!==focused))
-  roundedWaku(ctx,p,p.x,p.y,false);
- for(const p of placed.filter(p=>p.number===focused))
-  roundedWaku(ctx,p,p.x,p.y,true);
- return placed;
+ return displayed;
 }
 function updateRunningOrder(points,chosen){
  const host=$('runningOrder');
@@ -237,7 +216,8 @@ function paint(){
  $('progress').textContent=Math.round(state.leader)+'m / 2000m';
  $('clock').textContent=state.t.toFixed(1)+'秒';
  $('section').textContent=model.center(state.leader).section+
-   ' ／ 内4列 '+state.horses.filter(h=>h.lane<=3.45).length+'頭';
+   ' ／ 内4列 '+state.horses.filter(h=>h.lane<=3.45).length+'頭'+
+   ' ／ 内へ '+state.totalInsideMoves+'回';
  if(state.finished){playing=false;$('startBtn').textContent='▶ 再スタート'}
 }
 function tick(ts){
@@ -310,7 +290,13 @@ window.CleanLab=Object.freeze({
    zoom:lastCamera?.scale??0,
    visibleOrder:[...$('runningOrder').children].map(el=>Number(el.dataset.horse)),
    liveLabelPositions:lastLabelPositions.map(p=>({number:p.number,x:p.x,y:p.y,r:p.r,
-     anchorX:p.actual.x,anchorY:p.actual.y,onTurf:p.onTurf})),
+     anchorX:p.actual.x,anchorY:p.actual.y})),
+   directMarkerMaxError:lastLabelPositions.reduce((m,p)=>
+     Math.max(m,Math.hypot(p.x-p.actual.x,p.y-p.actual.y)),0),
+   commonLaneController:Boolean(window.RaceLaneAI?.plan&&window.RaceLaneAI?.launchStepSafe),
+   inwardMoves:engine.state.totalInsideMoves,
+   outwardMoves:engine.state.totalOutsidePasses,
+   insideFour:engine.state.horses.filter(h=>h.lane<=3.45).length,
    turfVisualWidthPx:model.widthPx,physicalWidthM:model.widthMetres,
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&

@@ -71,7 +71,9 @@ jobs:
                     originalImageSrc:a.originalImageSrc,
                     originalLoaded:a.originalLoaded,mapAspect:a.mapAspect,zoom:a.zoom,
                     selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen,
-                    labelCoords:a.liveLabelPositions};
+                    labelCoords:a.liveLabelPositions,selectedHorse:a.selectedHorse,
+                    inwardMoves:a.inwardMoves,commonLaneController:a.commonLaneController,
+                    directMarkerMaxError:a.directMarkerMaxError};
                 }""")
                 assert not errors,(width,d,errors)
                 assert read['count']==read['running']==18,(width,d,read)
@@ -85,21 +87,18 @@ jobs:
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
-                assert 3.35<=read['zoom']<=7.25,(width,d,read)
+                assert 1.65<=read['zoom']<=5.25,(width,d,read)
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
-                # Readable badges must be separated; exact physical anchor points are
-                # NOT moved by this purely visual collision-avoidance layer.
+                assert read['commonLaneController'],('SHARED_KYOTO1400_ENGINE_MISSING',width,d)
+                assert read['inwardMoves']>=5 if d>=100 else True,(width,d,read)
                 labels=read['labelCoords']
-                assert len(labels)>=12,('TOO_FEW_LIVE_LABELS',width,d,len(labels))
-                pairs=[(a,b) for i,a in enumerate(labels) for b in labels[i+1:]]
-                worst=max([max(0,a['r']+b['r']-
-                    ((a['x']-b['x'])**2+(a['y']-b['y'])**2)**.5)
-                    for a,b in pairs] or [0])
-                assert worst<2.5,('BADGE_COLLISION',width,d,worst)
-                assert all(a['onTurf'] for a in labels),('TURF_BADGE',width,d)
-                assert all(-2<=a['x']<=read['canvasCSS']+2 for a in labels),('LABEL_X_CLIPPED',width,d)
-                print('PASS_BADGE_VISIBILITY',width,d,len(labels),'max_overlap',round(worst,3))
+                assert len(labels)>=1,('NO_MOVING_NUMBERS',width,d)
+                error=max((((a['x']-a['anchorX'])**2+
+                    (a['y']-a['anchorY'])**2)**.5 for a in labels),default=0)
+                assert error<1e-6,('NUMBER_MUST_BE_AT_HORSE_POSITION',width,d,error)
+                assert any(a['number']==read['selectedHorse'] for a in labels),('FOCUSED_HORSE_NUMBER_HIDDEN',width,d)
+                print('PASS_KYOTO1400_DIRECT_NUMBER',width,d,'error',error)
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
                 print('PASS_ORIGINAL_BITMAP_AND_NUMBER_RUNNERS_REAL_BROWSER_18',width,d,read['inside'])
