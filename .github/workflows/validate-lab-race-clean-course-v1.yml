@@ -99,7 +99,7 @@ jobs:
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
-                assert 2.25<=read['zoom']<=9.65,(width,d,read)
+                assert abs(read['zoom']-(7.0 if width==390 else 7.8))<1e-6,('CAMERA_ZOOM_MUST_STAY_FIXED',width,d,read['zoom'])
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
                 assert read['commonLaneController'],('SHARED_KYOTO1400_ENGINE_MISSING',width,d)
