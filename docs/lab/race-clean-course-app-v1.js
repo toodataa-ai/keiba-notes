@@ -116,7 +116,7 @@ function verifyVectorSource(){
  if(vectorReady){
   originalError=false;
   if(!turfReady&&!turfError){
-   try{turfStats=turf.create(full);turfReady=true;}
+   try{turfStats=turf.create(a);turfReady=true;}
    catch(err){turfError=String(err);console.error('KYOTO_TURF_MASK_INIT',err)}
   }
  }
