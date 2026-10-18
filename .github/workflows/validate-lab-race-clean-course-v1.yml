@@ -1,4 +1,4 @@
-name: LAB original Umapot SVG affine camera correction only and no sudden pack breathing
+name: LAB v20 visible uniform badges and steady UHD Safari camera with original SVG unchanged
 on:
   push:
     branches: [main]
@@ -425,7 +425,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-unchanged-SVG-curve-lens-v19-mobile-desktop
+          name: lab-v20-larger-no-jitter-original-SVG-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14

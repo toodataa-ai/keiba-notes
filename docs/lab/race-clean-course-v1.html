@@ -9,7 +9,7 @@
 <p>LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・実馬・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">LAB v19・原図完全維持／3・4コーナーの馬群伸縮をカメラだけで軽減／未承認</div>
+<div class="tag">LAB v20・馬番を拡大／走行中の細かな震えを軽減／原図・走行計算は不変／未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
@@ -43,7 +43,7 @@
 <section class="panel notes">
 <p><strong>今回の検証点：</strong>コース形状は原画像と完全に同じものを使い、画像の変形は等倍率の拡大・平行移動のみ。走行位置の内部座標と18頭の丸番号の視認性を検証します。</p>
 <p>実況のコースは一切描き直しません。うまぽっと原本PowerPointのコース図形から直接書き出したベクターSVGを全体図・実況の双方で使用します。JPEGの4倍引き伸ばしをやめたため、ズームしても線が鮮明です。不要な注記や矢印はありません。</p>
-<p><strong>馬番そのものが走る：</strong>普段の実況は従来より近く、スマホで7.0倍から8.8倍に拡大します。<strong>ゴール前80mで京都1400と同じゴール板固定カメラへ切り替え</strong>、右回りの京都では馬番が右から左へゴール板を通過します。ゴール後は緩やかな余走を映し、1〜3着を表示します。馬番は全馬同じ大きさです。</p>
+<p><strong>馬番そのものが走る：</strong>実況の馬番をスマホは約15%、PCは約11%大きくしました。背景SVGと馬番の画面位置を同じピクセル基準にそろえ、物理演算の更新間隔をまたぐ表示位置も滑らかにしています。普段の実況は従来より近く、スマホで7.0倍から8.8倍に拡大します。<strong>ゴール前80mで京都1400と同じゴール板固定カメラへ切り替え</strong>、右回りの京都では馬番が右から左へゴール板を通過します。ゴール後は緩やかな余走を映し、1〜3着を表示します。馬番は全馬同じ大きさです。</p>
 <p><strong>カーブで馬群が縮んで見える対策：</strong>原図の背景を一切描き直さず、コース上の馬番位置も変更しません。曲線上の距離を画面の直線距離で見ると自然に短くなるため、コーナーでは<strong>カメラの拡大率を距離に応じてごく緩やかに調整</strong>し、直線で急に広がって見える変化を軽減します。全体図は従来どおり原SVGそのものです。比較用にURL末尾に <code>&amp;lens=off</code> を付けると以前の固定倍率に戻せます。京都1400共通の走行計算・着順・時計・予想は変わりません。</p>
 <p><strong>走り方も京都1400と共通：</strong>RaceLaneAIとRaceSimEngineをそのまま利用。スタート後は衝突を避けて内へ寄り、内側が空けば内優先、詰まれば必要に応じて外へ。逃げ・先行・差し・追込、先行争いによるペース変化も従来ロジックを継承しています。</p>
 <p>コース寸法はJRA芝Aコース基準（1周1,782.8m・最後の直線328.4m・初角まで308.7m・幅員27〜38m・内回り高低差3.1m）を参照。コースの形状はうまぽっと原画像に合わせたイラスト上の較正であり、測量図の精度ではありません。18頭の重なり・コース形状は目視承認前です。</p>
@@ -58,8 +58,8 @@
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
 <script src="race-clean-course-v1.js?v=20261018-14"></script>
 <script src="race-clean-turf-mask-v1.js?v=20261019-17"></script>
-<script src="race-clean-goal-view-v1.js?v=20261019-15"></script>
+<script src="race-clean-goal-view-v1.js?v=20261019-20"></script>
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
-<script src="race-clean-course-app-v1.js?v=20261019-19"></script>
+<script src="race-clean-course-app-v1.js?v=20261019-20"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

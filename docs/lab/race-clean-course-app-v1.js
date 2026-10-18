@@ -1,4 +1,4 @@
-/* LAB v19: preserve untouched Umapot SVG and use slowly adapted affine TV zoom to counter chord perspective.
+/* LAB v20: clearer same-size runner circles and no subpixel camera/number trembling; source SVG unchanged.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -70,7 +70,7 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 
 function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
- lastCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
+ lastCamera=null,lastPaintCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
  visualLaneState=new Map(),visualRenderTime=null,
  finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
 const FINISH_SEQUENCE_MS=3200;
@@ -80,7 +80,7 @@ const CURVE_LENS_ENABLED=new URLSearchParams(location.search).get('lens')!=='off
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
- playing=false;last=0;acc=0;lastCamera=null;lastRenderedPoints=[];
+ playing=false;last=0;acc=0;lastCamera=null;lastPaintCamera=null;lastRenderedPoints=[];
  cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();
  finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
  const banner=$('finishBanner');if(banner)banner.hidden=true;
@@ -93,7 +93,7 @@ function advanceTo(distance){
  while(engine.state.leader<distance&&!engine.state.finished&&i++<1500)engine.step(.12);
  // Seek is a jump in simulation time. Do NOT interpolate the camera from
  // the starting gate across 900 metres: it leaves every horse off-screen.
- lastCamera=null;cameraRenderTime=0;visualRenderTime=null;
+ lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;visualRenderTime=null;
  visualLaneState.clear();
  finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
  const banner=$('finishBanner');if(banner)banner.hidden=true;
@@ -109,6 +109,19 @@ function sizeCanvas(canvas){
  ctx.setTransform(pxW/w,0,0,pxH/h,0,0);
  ctx.clearRect(0,0,w,h);
  return {ctx,w,h};
+}
+function pixelAlignedCamera(camera,ctx){
+ // Safari composites the original SVG as a CSS transform while the horse
+ // markers live on a high-DPI canvas. Without a shared device-pixel
+ // translation the two independently rasterised layers can shimmer.
+ // Keep camera scale and all original source coordinates IDENTICAL;
+ // snap only their COMMON final screen translation to the device grid.
+ const deviceScale=ctx.getTransform().a||Math.max(1,window.devicePixelRatio||1);
+ const left=camera.cx-camera.x*camera.scale;
+ const top=camera.cy-camera.y*camera.scale;
+ const alignedLeft=Math.round(left*deviceScale)/deviceScale;
+ const alignedTop=Math.round(top*deviceScale)/deviceScale;
+ return {...camera,cx:camera.cx+alignedLeft-left,cy:camera.cy+alignedTop-top};
 }
 function backdrop(camera){
  // The photo and canvas must share EXACTLY the same affine projection.
@@ -191,7 +204,12 @@ function displayPoints(state){
     ...turf.point(d,h.lane),finished:true};
   });
  }
- if(!playing||state.finished){
+ if(!playing&&!state.finished){
+  // On pause, retain exactly the last drawn positions. Resetting to the
+  // unsmoothed physics samples made numbers snap sideways when stopping.
+  return lastRenderedPoints.length?lastRenderedPoints:turf.runners(state);
+ }
+ if(state.finished){
   visualLaneState.clear();visualRenderTime=null;
   return turf.runners(state);
  }
@@ -203,16 +221,21 @@ function displayPoints(state){
   const trail=h.trail||[];
   const last=trail.at(-1),before=trail.at(-2);
   const travel=last&&before?Math.max(0,last.d-before.d):0;
-  const lastStep=.08;
-  const visualD=(h.displayD??h.d)+Math.min(1.7,travel/lastStep*fraction);
-  const desiredLane=Math.max(0,Math.min(14,h.lane+(h.laneVelocity||0)*fraction));
+  // Longitudinal and lateral filtering are DISPLAY-ONLY. Smooth the
+  // fraction-to-fraction change in speed and lane across physics ticks.
+  // Always apply the ORIGINAL turf.point(d,lane), so smoothing cannot
+  // drag a number into white or distort the source course drawing.
+  const predictedD=(h.displayD??h.d)+Math.min(1.7,travel/.08*fraction);
+  const predictedLane=Math.max(0,Math.min(14,h.lane+(h.laneVelocity||0)*fraction));
   const previous=visualLaneState.get(h.number);
-  const alpha=1-Math.exp(-dt/.14);
-  const smoothed=previous===undefined?desiredLane:
-   previous+(desiredLane-previous)*alpha;
-  visualLaneState.set(h.number,smoothed);
-  return {number:h.number,d:visualD,lane:smoothed,
-   ...turf.point(visualD,smoothed),finished:h.finished};
+  const alongBlend=1-Math.exp(-dt/.070),laneBlend=1-Math.exp(-dt/.21);
+  const smoothD=previous===undefined?predictedD:
+    Math.max(previous.d,previous.d+(predictedD-previous.d)*alongBlend);
+  const smoothLane=previous===undefined?predictedLane:
+    previous.lane+(predictedLane-previous.lane)*laneBlend;
+  visualLaneState.set(h.number,{d:smoothD,lane:smoothLane});
+  return {number:h.number,d:smoothD,lane:smoothLane,
+   ...turf.point(smoothD,smoothLane),finished:h.finished};
  });
 }
 // A circled number IS the moving horse (Kyoto 1400 contract). No pixel
@@ -226,7 +249,9 @@ function markers(ctx,points,loc,focused,mini=false){
   // All 18 horses receive the same scale in each view, including focus.
   // No offset from the running coordinates and no larger highlighted marker.
   const compact=loc.w<540;
-  const scale=mini?.48:(points.length>=12?(compact?.68:.76):.82);
+  // +14.7% on mobile and +10.5% desktop; mini overview unchanged.
+  // Every horse (including focus) retains precisely the same radius.
+  const scale=mini?.48:(points.length>=12?(compact?.78:.84):.90);
   const radius=13.5*scale;
   if(x+radius<0||x-radius>loc.w||y+radius<0||y-radius>loc.h)continue;
   raceNumberMarker(ctx,p.number,x,y,scale,p.number===focused,false,18,false);
@@ -286,7 +311,7 @@ function paint(){
  cameraRenderTime=now;
  if(!lastCamera)lastCamera=target;
  else {
-  const blend=1-Math.exp(-dt/.13);
+  const blend=1-Math.exp(-dt/.20);
   lastCamera={...target,
    x:lastCamera.x+(target.x-lastCamera.x)*blend,
    y:lastCamera.y+(target.y-lastCamera.y)*blend,
@@ -294,8 +319,10 @@ function paint(){
    // untouched source SVG and all 18 corresponding numbers.
    scale:lastCamera.scale+(target.scale-lastCamera.scale)*blend};
  }
- backdrop(lastCamera);
- const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
+ const paintCamera=pixelAlignedCamera(lastCamera,live.ctx);
+ lastPaintCamera=paintCamera;
+ backdrop(paintCamera);
+ const labels=markers(live.ctx,points,{...paintCamera,w:live.w,h:live.h},chosen);
  lastLabelPositions=labels;
  // Kyoto1400 contract: exactly 80 metres from the finish, replace the
  // zoomed course with the right-to-left GOAL-board television camera.
@@ -379,7 +406,7 @@ function setup(){
    '">'+h.number+'</div>';
  }).join('');
  $('focus').addEventListener('change',e=>{
-  focusNo=e.target.value;lastCamera=null;cameraRenderTime=0;
+  focusNo=e.target.value;lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;
   visualLaneState.clear();visualRenderTime=null;paint();
  });
  $('startBtn').addEventListener('click',()=>{
@@ -390,7 +417,7 @@ function setup(){
   playing=false;$('startBtn').textContent='▶ 再開';
  });
  $('resetBtn').addEventListener('click',reset);
- addEventListener('resize',()=>{lastCamera=null;cameraRenderTime=0;paint()});
+ addEventListener('resize',()=>{lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;paint()});
  reset();
  const params=new URLSearchParams(location.search);
  const checkpoint=Number(params.get('checkpoint'));
@@ -403,6 +430,8 @@ window.CleanLab=Object.freeze({
  // Cheap, per-animation-frame diagnostic for REAL 4x playback QA.
  frameSample:()=>({t:engine?.state?.t??0,playing,zoom:lastCamera?.scale??0,
   camera:lastCamera?{x:lastCamera.x,y:lastCamera.y}:null,
+  pixelCamera:lastPaintCamera?{x:lastPaintCamera.x,y:lastPaintCamera.y,
+   cx:lastPaintCamera.cx,cy:lastPaintCamera.cy}:null,
   finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
   horses:lastRenderedPoints.map(p=>({number:p.number,x:p.x,y:p.y,d:p.d,lane:p.lane}))}),
  inspect:()=>{
@@ -410,7 +439,7 @@ window.CleanLab=Object.freeze({
   turf.runners(engine.state)):model.runners(engine.state);
   const selected=focusNo==='leader'?engine.state.leadingNo:Number(focusNo);
   const chosen=points.find(p=>p.number===selected)||points[0];
-  const screen=lastCamera?position(chosen,lastCamera):null;
+  const screen=lastPaintCamera?position(chosen,lastPaintCamera):null;
   const live=$('broadcast').getBoundingClientRect();
   const rect=$('overview').getBoundingClientRect();
   const image=$('realCourseImage');
@@ -432,6 +461,12 @@ window.CleanLab=Object.freeze({
       const b=points.reduce((a,b)=>a.d<b.d?a:b);
       return Math.hypot(a.x-b.x,a.y-b.y);})(),
    visualInterpolationEnabled:true,fixedCameraZoom:!finishSequenceActive,
+   markerScaleMobile:.78,markerScaleDesktop:.84,miniMarkerScale:.48,
+   foregroundCameraPixelSnapped:true,visualLongitudinalTau:.070,
+   visualLateralTau:.21,cameraSmoothTau:.20,
+   cameraSnapErrorPx:lastCamera&&lastPaintCamera?
+    Math.hypot(lastPaintCamera.cx-lastCamera.cx,
+      lastPaintCamera.cy-lastCamera.cy):0,
    goalBoardVisible:Boolean(!$('goalCamera')?.hidden),
    goalFrame:lastGoalFrame,goalCameraSwitchDistance:1920,
    finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
@@ -455,7 +490,7 @@ window.CleanLab=Object.freeze({
    turfBadCenters:turfReady?points.filter(p=>!turf.isGreen(p.x,p.y)).length:null,
    turfBadDiscs:turfReady?points.filter(p=>
      !turf.discOnTurf(p.x,p.y,
-       13.5*(live.width<540?.68:.76)/Math.max(1.7,lastCamera?.scale||2.3)+.6)).length:null,
+       13.5*(live.width<540?.78:.84)/Math.max(1.7,lastCamera?.scale||2.3)+.6)).length:null,
    calibratedRunPositions:turfReady,
    uniformMarkerRadiusPx:lastLabelPositions[0]?.r??null,
    markerRadiusSpreadPx:lastLabelPositions.length?

@@ -54,7 +54,7 @@ function render(options){
  for(const p of points.slice().sort((a,b)=>
   Number(a.number===focusedNo)-Number(b.number===focusedNo)||a.number-b.number)){
   const q=goalScreenPosition(p.d,p.lane,distance,w,h,maxLane,turn,pullback);
-  const scale=.73,rad=13.5*scale;
+  const scale=.81,rad=13.5*scale;
   if(q.x<-rad||q.x>w+rad||q.y<-rad||q.y>h+rad)continue;
   paintNumber(ctx,p.number,q.x,q.y,scale,p.number===focusedNo,
    p.number===leaderNo,fieldSize,false);
