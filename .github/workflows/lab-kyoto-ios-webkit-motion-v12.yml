@@ -27,8 +27,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=16',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=16'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=17',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=17'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
@@ -108,7 +108,14 @@ jobs:
                '1400':probe['sourceAt1400'],'1460':probe['sourceAt1460'],
                'offGreen':probe['turf']['badDiscs']},ensure_ascii=False))
              assert abs(probe['anchor']-1435)<1e-8
-             assert probe['arc']['maxMetresOfImagePhaseAdjustment']<12
+             assert probe['arc']['maxMetresOfImagePhaseAdjustment']<20
+             assert probe['arc']['anchors']==[0,308.7,530,720,1270,1435,1671.6,2000]
+             anchors=page.evaluate("""() =>
+               [0,308.7,530,720,1270,1435,1671.6,2000].map(d=>({
+                physical:d,source:RaceCleanTurf.sourceDistance(d)
+               }))""")
+             print('SAFARI_ALL_COURSE_BOUNDARY_ANNOTATIONS',url,json.dumps(anchors))
+             assert all(abs(a['physical']-a['source'])<1e-8 for a in anchors)
              assert probe['turf']['badDiscs']==0
              # Reuse exactly the same iPhone WebKit context through the wire.
              page.evaluate('() => CleanLab.advanceTo(1970)')

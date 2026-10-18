@@ -130,6 +130,25 @@ jobs:
            print('IMAGE_TURF_SAFE_CHECK',sum(1 for row in result['points'] if not row['turfSafe']))
            assert all(x['turfSafe'] for x in result['points'])
            assert not errors,errors
+           # Validate every physical named section against the pre-fix
+           # rapid illustrated pixel-per-metre changes. All boundaries
+           # stay at exactly the same picture positions.
+           limits={'スタート後の直線':1.20,'1コーナー':1.20,
+              '2コーナー':1.20,'向正面':1.40,'3コーナー':2.00,
+              '4コーナー':1.45,'最後の直線':1.30}
+           for section in result['sections']:
+            pts=[x['imagePXperM'] for x in result['points']
+             if x['d']>=section['from'] and x['d']<section['to']]
+            assert max(pts)/min(pts)<limits[section['label']],(
+             'IMAGE_SPATIAL_RATE_REGRESSION',section,max(pts),min(pts))
+           for boundary in (0,308.7,530,720,1270,1435,1671.6,2000):
+            measured=page.evaluate('(d)=>RaceCleanTurf.sourceDistance(d)',boundary)
+            assert abs(measured-boundary)<1e-7,('SOURCE_ILLUSTRATION_ANCHOR_MOVED',boundary,measured)
+           jumps=result['topImageContractions']
+           assert all(not (
+             0<=x['from']<2000 and x['imageDelta']<-3.0 and
+             x['realDelta']>-1.0) for x in jumps),('ABRUPT_HORSE_CROWD_TELESCOPE',jumps)
+           print('PASS_WHOLE_COURSE_SOURCE_METRE_RATE_AND_ALL_LANDMARKS')
            with open('/tmp/kyoto-whole-route/full-course-geometry-audit.json','w') as f:
             json.dump(result,f,ensure_ascii=False,indent=2)
            for d in (100,290,320,500,550,700,720,850,1050,

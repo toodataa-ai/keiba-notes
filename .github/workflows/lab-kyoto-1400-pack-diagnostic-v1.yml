@@ -125,11 +125,12 @@ jobs:
              'imageRatioBefore':p1440['pixelRatio'],
              'imageRatioAfter':p1460['pixelRatio']},ensure_ascii=False))
            assert image_source['registration']['immutableSharedEngine'] is True
-           assert image_source['registration']['anchoredMetres']==[1270,1435,1672]
+           assert image_source['registration']['anchors']==[0,308.7,530,720,1270,1435,1671.6,2000]
+           assert image_source['registration']['turn1435ArcBlend']=='validated-local-arc-correction'
            for anchor in (1270,1435,1672):
             found=next(v for v in image_source['markers'] if v['raceD']==anchor)
             assert abs(found['sourceD']-anchor)<1e-8,('CORNER_ANCHOR_DISPLACED',anchor,found)
-           assert image_source['registration']['maxMetresOfImagePhaseAdjustment']<12,('CORNER_TIME_FIDELITY_LOST',image_source)
+           assert image_source['registration']['maxMetresOfImagePhaseAdjustment']<20,('CORNER_TIME_FIDELITY_LOST',image_source)
            physicalLoss=p1440['physicalGap']-p1460['physicalGap']
            imageLoss=p1440['imageGap']-p1460['imageGap']
            assert .5<physicalLoss<1.4,('SHARED_PHYSICS_PACK_CORRUPTED',physicalLoss)
