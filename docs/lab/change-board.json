@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "598f43ca85fd549c437c19edf68d5a5f760046d4",
+  "scan_commit": "6a35241cc1cd3111d8f4f11cdde49c15eebca5fc",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v12: 内ラチへ近づける画像投影(芝帯最小安全マージン3.25px、距離17m平滑化2パス)、0.08秒物理ステップ間の映像補間、カメラ固定倍率7.0（スマホ）/7.8（PC）＋上位馬群ソフト追従。GitHub Actions run 39121795508 success: 390/1024px×20チェックポイント、2001m×15レーン=30015点芝外中心0/安全円周外0、500–750mも0.5m刻みで内側距離最大14.235px。4倍速実Playwright各158フレーム:ズーム変動0、馬番の静止フレーム0、馬番最大変化0.733source px/frame、カメラ最大変化0.486source px/frame、後退0。Pages全LABファイルSHA一致。京都1400物理/JRA正式データ/本番/stagingは変更なし。残りはユーザーの実iPhone目視確認と必要に応じた見た目調整のみ、LAB未承認。",
+      "next_action": "LAB v13 Safari/WebKit 実機相当で『再生ボタンを押してもコース上の番号・距離が全く動かない』不具合の再現に成功（Github Actions 39122726041）。根本原因: original SVGのHTMLImageElement.naturalWidthはiPhone Safariで368px (高さ255)となるが、v12は620×430の完全一致を描画開始条件としていた。物理レースは進むがpaint()がturfReady=falseで早期returnしUIだけ0m静止。v13で原図の縦横比と画像のロード成功で判定、描画用canvasに元図ベクターを620x430座標として投影。Safariの実際の公開URLで起動・再生・距離進捗をCI監査して承認。本番/JRA予想データ・京都1400物理は変更しない。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -66,13 +66,13 @@
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
-        "docs/lab/race-clean-course-app-v1.js": "d6247d2ce34842aadab4af07898572e7a1bf9850",
-        "docs/lab/race-clean-course-v1.html": "d4db170655e51df58b8703a664c0ae7eb0c94bd5",
+        "docs/lab/race-clean-course-app-v1.js": "8dd5faef63d715f54ce93f31d70af4dc8914d4e0",
+        "docs/lab/race-clean-course-v1.html": "a33f08410de04d34c20f18404986397e920305d0",
         "docs/lab/race-clean-course-v1.css": "027324a3ad4713e5fbb3e95a3c7407439db93648",
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19",
-        "docs/lab/race-clean-turf-mask-v1.js": "f5d45652d2e4a3429de324494262ab00aed852e4"
+        "docs/lab/race-clean-turf-mask-v1.js": "d51b6f65ad925c7015138ea46d4b1106d75ef67f"
       },
-      "latest_source_change_commit": "643f72b9791e251bff751b025f78750faf88956b"
+      "latest_source_change_commit": "6a35241cc1cd3111d8f4f11cdde49c15eebca5fc"
     },
     {
       "id": "course-catalog",
