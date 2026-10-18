@@ -24,8 +24,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=12',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=12'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=13',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=13'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
@@ -84,6 +84,8 @@ jobs:
               raise AssertionError('LAB_SCRIPT_NOT_LOADED')
              if not before['inspect']['turfReady'] or not after['inspect']['turfReady']:
               raise AssertionError('LAB_TURF_INITIALIZATION_FAILURE')
+             if not before['inspect']['vectorReady'] or not after['inspect']['vectorReady']:
+              raise AssertionError('SAFARI_SOURCE_IMAGE_VIEWBOX_RESIZE_STILL_BLOCKED')
              if after['state']['leader']<before['inspect']['leader']+5:
               raise AssertionError('LAB_NOT_MOVING_AFTER_START')
              if exceptions:raise AssertionError('WEBKIT_JS_ERRORS')

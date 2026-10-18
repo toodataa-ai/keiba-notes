@@ -1,4 +1,4 @@
-/* LAB v12: original publisher SVG, closer inner rail, time-continuous camera and horse glyphs.
+/* LAB v13: fix real iPhone WebKit SVG naturalWidth resizing and playback blocking.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -110,19 +110,31 @@ function backdrop(camera){
   if(element)element.style.transform=transform;
  }
 }
+function sourceImageReady(img){
+ // Crucial Safari/WebKit fix: a responsive SVG <img> can report its
+ // layout-scaled naturalWidth (368x255 on iPhone), despite the exact
+ // original file being 620x430. Pixel-equality wrongly blocked painting.
+ // The source viewBox and intended 620:430 coordinate space are unchanged.
+ return Boolean(img&&img.complete&&img.naturalWidth>0&&img.naturalHeight>0&&
+  Math.abs(img.naturalWidth/img.naturalHeight-620/430)<.025&&
+  img.getAttribute('src')===SOURCE_VECTOR);
+}
 function verifyVectorSource(){
  const a=$('realCourseImage'),b=$('liveCourseImage');
- vectorReady=Boolean(a&&b&&a.complete&&b.complete&&
-   a.naturalWidth===620&&a.naturalHeight===430&&
-   b.naturalWidth===620&&b.naturalHeight===430&&
-   a.getAttribute('src')===SOURCE_VECTOR&&b.getAttribute('src')===SOURCE_VECTOR);
- if(vectorReady){
-  originalError=false;
-  if(!turfReady&&!turfError){
-   try{turfStats=turf.create(a);turfReady=true;}
-   catch(err){turfError=String(err);console.error('KYOTO_TURF_MASK_INIT',err)}
+ const sourceLoaded=sourceImageReady(a);
+ const broadcastLoaded=sourceImageReady(b);
+ vectorReady=sourceLoaded&&broadcastLoaded;
+ // Do not let an unrelated viewport's computed SVG naturalWidth prevent
+ // loading. Calibrate from the image's scalable source viewBox instead.
+ if(sourceLoaded&&!turfReady&&!turfError){
+  try{turfStats=turf.create(a);turfReady=true;}
+  catch(err){
+   turfError=String(err);console.error('KYOTO_TURF_MASK_INIT',err);
+   const note=document.querySelector('.source-credit');
+   if(note)note.textContent='コース初期化に失敗しました: '+turfError;
   }
  }
+ if(vectorReady)originalError=false;
 }
 function position(p,camera){
  return {x:camera.cx+(p.x-camera.x)*camera.scale,
@@ -325,8 +337,10 @@ window.CleanLab=Object.freeze({
   const image=$('realCourseImage');
   return {leader:engine.state.leader,positions:points,
    originalImageSrc:image?.getAttribute('src')||null,
-   originalLoaded:Boolean(image?.complete&&image?.naturalWidth===620&&image?.naturalHeight===430),
-   liveImageLoaded:Boolean($('liveCourseImage')?.complete&&$('liveCourseImage')?.naturalWidth===620),
+   originalLoaded:sourceImageReady(image),
+   liveImageLoaded:sourceImageReady($('liveCourseImage')),
+   sourceNaturalSize:image?{
+    width:image.naturalWidth,height:image.naturalHeight}:null,
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
    originalError,vectorReady,turfReady,turfError,turfStats,
    visualInterpolationEnabled:true,fixedCameraZoom:true,

@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v12: 内ラチへ近づける画像投影(芝帯最小安全マージン3.25px、距離17m平滑化2パス)、0.08秒物理ステップ間の映像補間、カメラ固定倍率7.0（スマホ）/7.8（PC）＋上位馬群ソフト追従。GitHub Actions run 39121795508 success: 390/1024px×20チェックポイント、2001m×15レーン=30015点芝外中心0/安全円周外0、500–750mも0.5m刻みで内側距離最大14.235px。4倍速実Playwright各158フレーム:ズーム変動0、馬番の静止フレーム0、馬番最大変化0.733source px/frame、カメラ最大変化0.486source px/frame、後退0。Pages全LABファイルSHA一致。京都1400物理/JRA正式データ/本番/stagingは変更なし。残りはユーザーの実iPhone目視確認と必要に応じた見た目調整のみ、LAB未承認。",
+      "next_action": "LAB v13 Safari/WebKit 実機相当で『再生ボタンを押してもコース上の番号・距離が全く動かない』不具合の再現に成功（Github Actions 39122726041）。根本原因: original SVGのHTMLImageElement.naturalWidthはiPhone Safariで368px (高さ255)となるが、v12は620×430の完全一致を描画開始条件としていた。物理レースは進むがpaint()がturfReady=falseで早期returnしUIだけ0m静止。v13で原図の縦横比と画像のロード成功で判定、描画用canvasに元図ベクターを620x430座標として投影。Safariの実際の公開URLで起動・再生・距離進捗をCI監査して承認。本番/JRA予想データ・京都1400物理は変更しない。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -41,7 +41,7 @@
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg",
         "docs/lab/race-clean-turf-mask-v1.js"
       ],
-      "shape_alignment": "v12_inner_close_smoothed_constant_zoom_interpolated_4x_QA_passed_39121795508_unapproved"
+      "shape_alignment": "v13_safari_natural_image_size_playback_gate_bug_fixed_iOS_public_browser_QA_PENDING"
     },
     {
       "id": "course-catalog",

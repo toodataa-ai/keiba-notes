@@ -1,4 +1,4 @@
-/* LAB v12 — source inner green safety pixels with smoothed and tightened lane bounds.
+/* LAB v13 — iPhone WebKit-resized SVG accepted; original source green sampling stays identical.
  * v10 wrongly targeted the CENTER of an often-merged green region; where
  * inside/outside green paths meet, it steered horses outside then suddenly
  * recentered. v11 instead selects a SAFE inner corridor relative to the
@@ -28,8 +28,11 @@ function discOnTurf(x,y,r=CLEARANCE){
  return true;
 }
 function create(image){
- if(!image||!image.complete||image.naturalWidth!==W||image.naturalHeight!==H)
+ if(!image||!image.complete||image.naturalWidth<=0||image.naturalHeight<=0||
+    Math.abs(image.naturalWidth/image.naturalHeight-W/H)>.025)
   throw Error('TURF_ORIGINAL_VECTOR_IMAGE_UNAVAILABLE');
+ // drawImage(...,W*RASTER,H*RASTER) rescales the SAME vector viewBox,
+ // irrespective of Safari reporting 368x255 CSS density-corrected pixels.
  const canvas=document.createElement('canvas');
  canvas.width=W*RASTER;canvas.height=H*RASTER;
  const ctx=canvas.getContext('2d',{willReadFrequently:true});
