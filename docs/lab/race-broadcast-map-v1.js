@@ -1,4 +1,4 @@
-/* LAB v0.50: sharp vector turf rail preview from SAME derived pixel geometry
+/* LAB v0.51: Kyoto 1400-inspired broadcast camera, smoothed original turf-rail geometry
    as the Umapot overview. NO raster zoom, label, arrow or extraneous helper
    stroke in broadcast. Full overview original JPEG is untouched.
    Physics, race timing, official predictions and actual lanes are unchanged. */
@@ -16,25 +16,65 @@ function entries(state,course,overlay){
 function frame(points,canvasWidth,canvasHeight,renderedWidth,focusNo){
  if(!Array.isArray(points)||!points.length)throw Error('LAB_SHARED_IMAGE_EMPTY_FIELD');
  const focus=points.find(p=>p.number===focusNo)||points[0];
- const xs=points.map(p=>p.x),ys=points.map(p=>p.y);
+ // Kyoto 1400's camera principle: use actual LOCAL group spread with
+ // margins instead of zooming as close as possible to a single horse.
+ const group=points.filter(p=>Math.abs(p.d-focus.d)<=110);
+ if(!group.includes(focus))group.push(focus);
+ const xs=group.map(p=>p.x),ys=group.map(p=>p.y);
  const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
- // A broadcast is an optically close camera, NOT a "fit all 18" map.
- // The full overview retains all 18. Here the selected horse and its nearby
- // rivals remain legible on phones; off-camera horses are intentionally cropped.
- const zoom=Math.min(points.length===1?10.5:8.5,
-   canvasWidth/(points.length===1?90:120),
-   canvasHeight/(points.length===1?70:80));
- const nearby=points.filter(p=>Math.hypot(p.x-focus.x,p.y-focus.y)<20);
- const mean=nearby.reduce((a,p)=>({x:a.x+p.x/nearby.length,y:a.y+p.y/nearby.length}),{x:0,y:0});
- const origin={x:focus.x+.18*(mean.x-focus.x),y:focus.y+.18*(mean.y-focus.y)};
+ const pixelRatio=canvasWidth/Math.max(1,renderedWidth||canvasWidth);
+ const marginX=Math.min(canvasWidth*.24,Math.max(48,22*pixelRatio));
+ const marginY=Math.min(canvasHeight*.30,Math.max(64,42*pixelRatio));
+ const zoom=Math.max(1.7,Math.min(points.length===1?5.2:4.6,
+   (canvasWidth-2*marginX)/Math.max(65,hiX-loX+15),
+   (canvasHeight-2*marginY)/Math.max(55,hiY-loY+12)));
+ const mean={x:(loX+hiX)/2,y:(loY+hiY)/2};
+ const origin={x:focus.x+.16*(mean.x-focus.x),y:focus.y+.16*(mean.y-focus.y)};
  const anchor={x:canvasWidth/2,y:canvasHeight*.50};
  const actualWidth=Math.max(1,renderedWidth||canvasWidth);
  return {zoom,origin,anchor,markerScale:canvasWidth/actualWidth,
-  sourceWidth:width,sourceHeight:height,rotationRadians:0};
+  sourceWidth:width,sourceHeight:height,rotationRadians:0,
+  cameraMode:'kyoto-1400-like-group-framing'};
 }
 function screenPoint(p,view){
  return {x:view.anchor.x+(p.x-view.origin.x)*view.zoom,
    y:view.anchor.y+(p.y-view.origin.y)*view.zoom};
+}
+// SOURCE-RAIL VISUAL SMOOTHING ONLY: no change to horse location or game physics.
+const smoothCache=new WeakMap();
+function smoothTurfRails(course,overlay){
+ if(smoothCache.has(course))return smoothCache.get(course);
+ const raw=[];
+ for(let d=0;d<=course.distance_m;d+=5)
+   raw.push(global.RaceTurfCorridor.rails(course,d,overlay.legacyPoint));
+ const radius=9,limit=3;
+ const data=raw.map((p,i)=>{
+  const sm={};
+  for(const side of ['inner','outer']){
+   let sx=0,sy=0,sw=0;
+   for(let k=-radius;k<=radius;k++){
+    const idx=Math.max(0,Math.min(raw.length-1,i+k));
+    const w=(radius+1-Math.abs(k))**2;
+    sx+=raw[idx][side].x*w;sy+=raw[idx][side].y*w;sw+=w;
+   }
+   const dx=sx/sw-p[side].x,dy=sy/sw-p[side].y;
+   const mag=Math.hypot(dx,dy),factor=mag>limit?limit/mag:1;
+   sm[side]={x:p[side].x+dx*factor,y:p[side].y+dy*factor};
+  }
+  return sm;
+ });
+ smoothCache.set(course,data);return data;
+}
+// Midpoint quadratic joining eliminates visible kinks at 5-metre data stations.
+function traceRail(ctx,points,side,reverse=false,append=false){
+ const list=reverse?points.slice().reverse():points;
+ const first=list[0][side];
+ if(append)ctx.lineTo(first.x,first.y);else ctx.moveTo(first.x,first.y);
+ for(let i=1;i<list.length-1;i++){
+  const p=list[i][side],n=list[i+1][side];
+  ctx.quadraticCurveTo(p.x,p.y,(p.x+n.x)/2,(p.y+n.y)/2);
+ }
+ const last=list[list.length-1][side];ctx.lineTo(last.x,last.y);
 }
 function draw(options){
  const {ctx,canvas,image,state,race,course,overlay,focusNo,paintNumber,
@@ -55,21 +95,19 @@ function draw(options){
  ctx.translate(view.anchor.x,view.anchor.y);
  ctx.scale(view.zoom,view.zoom);
  ctx.translate(-view.origin.x,-view.origin.y);
- const stations=[];
- for(let d=0;d<=course.distance_m;d+=5)
-   stations.push(global.RaceTurfCorridor.rails(course,d,overlay.legacyPoint));
+ const stations=smoothTurfRails(course,overlay);
  if(stations.length<3)throw Error('TURF_RAIL_VECTOR_EMPTY');
  // A single connected ribbon traces the entire 2000m inner course.
  ctx.beginPath();
- stations.forEach((s,i)=>i?ctx.lineTo(s.inner.x,s.inner.y):ctx.moveTo(s.inner.x,s.inner.y));
- for(let i=stations.length-1;i>=0;i--)ctx.lineTo(stations[i].outer.x,stations[i].outer.y);
+ traceRail(ctx,stations,'inner');
+ traceRail(ctx,stations,'outer',true,true);
  ctx.closePath();
  ctx.fillStyle='#65af63';ctx.fill('evenodd');
- // Preserve only the two actual turf/rail boundaries; NOT course captions.
- ctx.strokeStyle='#276c45';ctx.lineWidth=1.2;
+ ctx.strokeStyle='#276c45';ctx.lineWidth=1.0;
+ ctx.lineJoin='round';ctx.lineCap='round';
  for(const side of ['inner','outer']){
   ctx.beginPath();
-  stations.forEach((s,i)=>i?ctx.lineTo(s[side].x,s[side].y):ctx.moveTo(s[side].x,s[side].y));
+  traceRail(ctx,stations,side);
   ctx.stroke();
  }
  if(guide){
@@ -96,15 +134,15 @@ function draw(options){
   p.visible=visible;
   if(!visible)continue;
   paintNumber(ctx,p.number,p.x,p.y,
-    view.markerScale*(points.length>=12?(p.focused?1.55:1.34):points.length>=6?1.30:1.48),
+    view.markerScale*(points.length>=12?(p.focused?1.02:.92):points.length>=6?.98:1.02),
     p.focused,
     p.leading,race.field_size,p.passing);
  }
  return {ready:true,view,points,markers,visibleCount:markers.filter(x=>x.visible).length,
-    renderMode:'source-derived-vector-rails',
+    renderMode:'smoothed-source-derived-vector-rails',
     turfStations:stations.length,sourceImage:null};
 }
 global.RaceSimBroadcastMap=Object.freeze({
- supports,entries,frame,screenPoint,draw,width,height
+ supports,entries,frame,screenPoint,smoothTurfRails,draw,width,height
 });
 })(typeof window!=='undefined'?window:globalThis);
