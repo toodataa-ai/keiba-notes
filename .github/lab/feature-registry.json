@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB Clean Course v4：京都内回りを原画像参考で7区間再登録し、2001点(1m間隔)のC1連続弧長走行線、コース全体の単一芝帯描画、実況馬番の重なり回避と実位置アンカーを開発。スマホ/PC CI・ソース画像整合性の実機目視確認を行い、LAB承認まではSTAGING/本番には移さない。正式DATA不変。",
+      "next_action": "2026-10-18 source-image shape audit: v4 smoothness/18-label CI passed BUT faithful Umapot turf position FAILED. On original 620x430 screenshot, 2px color-tolerant green membership across 2001 sampled points: lane0 78.7%, lane6 88.3%, center 89.5%; particularly 1C entry and 900-1200m backstretch misregistration. Audit includes text/label occlusion false negatives so thresholds are diagnostic, not measured accuracy. Must retake source-image-centered inner/outer rail tracings, validate whole length against original and review screenshots BEFORE any approval. LAB only; STAGING/production/formal DATA untouched.",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -38,7 +38,8 @@
         "docs/lab/race-clean-course-app-v1.js",
         "docs/lab/race-clean-course-v1.html",
         "docs/lab/race-clean-course-v1.css"
-      ]
+      ],
+      "shape_alignment": "failed_pending_original_image_retrace"
     },
     {
       "id": "course-catalog",
