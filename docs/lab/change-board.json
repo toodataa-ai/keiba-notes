@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "b52975ecbd107e0a842462e723bdb8d5b5e6acea",
+  "scan_commit": "cab18d79f8e727d0bd7ab9cc41ea986e910b1b19",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v10実装・自動QA合格／実機目視承認待ち。うまぽっと原本SVGの芝帯を3倍密度で解析し、2001距離地点で連続した緑帯を追跡、馬番の中心と円周を芝内に配置。内側優先の物理計算／全馬同じ馬番サイズ／本番データ不変。スマホ390px・PC1024px×10地点（909m含む）で芝外0・番号座標ずれ0を確認。各6015点全距離監査でも芝外0、最大1m座標変化2.38画像px、4px超の飛び0、ゴール後32mまで緑帯上、公開Pagesバイト一致。Actions run 39118115612。ユーザーがLAB画面確認して承認するまで本番リリース禁止。",
+      "next_action": "LAB v11：v10の広い緑帯の中心へ吸着する画像座標補正を廃止。うまぽっと原本内ラチの走行レールからの安全な距離を基準に芝上の内側細帯へ馬番を投影。源泉SVG画像・京都1400共通RaceLaneAI/SimEngine・同サイズ馬番は維持。芝帯の分合流でも高低の横方向制御を0.65画像px/mまでに制限、500–750mを0.5m刻みで外回し/内戻り/芝外を監査。390/1024px×20地点・全2000m連続・公開Pages同期後にLAB限定で確認依頼。本番・正式予想・買い目・JRA/NARデータは変更しない。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -67,12 +67,12 @@
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
         "docs/lab/race-clean-course-app-v1.js": "d610c1ea2cee4e566e84182912443cfb6ba77ad6",
-        "docs/lab/race-clean-course-v1.html": "eceb9ddb7b73e9249356f6df767447d826ae1dec",
+        "docs/lab/race-clean-course-v1.html": "fed2fe98a964fc5745293dedf5507d1abcee5bba",
         "docs/lab/race-clean-course-v1.css": "027324a3ad4713e5fbb3e95a3c7407439db93648",
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19",
         "docs/lab/race-clean-turf-mask-v1.js": "7b167be0022983c144846df5c3c0ead0743e1fd3"
       },
-      "latest_source_change_commit": "b52975ecbd107e0a842462e723bdb8d5b5e6acea"
+      "latest_source_change_commit": "cab18d79f8e727d0bd7ab9cc41ea986e910b1b19"
     },
     {
       "id": "course-catalog",
