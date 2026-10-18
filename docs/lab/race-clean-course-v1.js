@@ -5,19 +5,28 @@
  * checkpoints. Physical simulation and formal predictions are not modified. */
 (function(global){'use strict';
 const id='kyoto_turf_inner_2000';
+// Umapot original (620x430) visual-registration points, separate from
+// JRA's physical measurements. Intermediate section breaks are approximate.
 const sections=Object.freeze([
  {from:0,to:308.7,kind:'straight',name:'スタート後の直線',
-  p0:[348,316],p3:[184,316]},
- {from:308.7,to:530,kind:'turn',name:'1〜2コーナー',
-  p0:[184,316],p1:[76,316],p2:[76,124],p3:[184,124]},
- {from:530,to:1270,kind:'straight',name:'向正面（2角出口〜3角入口）',
-  p0:[184,124],p3:[458,124]},
- {from:1270,to:1671.6,kind:'turn',name:'3〜4コーナー',
-  p0:[458,124],p1:[570,124],p2:[570,316],p3:[458,316]},
+  p0:[350,317],p3:[178,303]},
+ {from:308.7,to:530,kind:'turn',name:'1コーナー',
+  p0:[178,303],p1:[135,299.5],p2:[153,223],p3:[165,203]},
+ {from:530,to:720,kind:'turn',name:'2コーナー',
+  p0:[165,203],p1:[177,183],p2:[173,164.431372549],p3:[208,161]},
+ {from:720,to:1270,kind:'straight',name:'向正面（2角出口〜3角入口）',
+  p0:[208,161],p3:[463,136]},
+ {from:1270,to:1435,kind:'turn',name:'3コーナー',
+  p0:[463,136],p1:[498.7,132.5],p2:[510,165],p3:[510,197]},
+ {from:1435,to:1671.6,kind:'turn',name:'4コーナー',
+  p0:[510,197],p1:[510,235],p2:[526,317],p3:[490,317]},
  {from:1671.6,to:2000,kind:'straight',name:'最後の直線',
-  p0:[458,316],p3:[292,316]}
+  p0:[490,317],p3:[294,317]}
 ]);
-const WIDTH_PX=31,WIDTH_M=27,DISTANCE=2000;
+const WIDTH_PX=28,WIDTH_M=24,DISTANCE=2000;
+const JRA_DIMENSIONS=Object.freeze({distanceM:2000,lapInnerA:1782.8,
+ firstTurnDistanceM:308.7,homeStraightA:328.4,
+ minTurfWidthM:24,maxTurfWidthM:38,elevationInnerM:3.1});
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 function segment(distance){
  const d=clamp(distance,0,DISTANCE);
@@ -108,7 +117,10 @@ function validate(){
  return true;
 }
 const api=Object.freeze({id,distance:DISTANCE,widthPx:WIDTH_PX,
- widthMetres:WIDTH_M,sections,segment,center,rails,fraction,point,runners,validate});
+ widthMetres:WIDTH_M,jraDimensions:JRA_DIMENSIONS,
+ sourceImageSize:{width:620,height:430},
+ illustratedRouteModel:'Umapot visual alignment, not surveyed coordinates',
+ sections,segment,center,rails,fraction,point,runners,validate});
 api.validate();
 global.RaceCleanCourse=api;
 })(typeof window!=='undefined'?window:globalThis);

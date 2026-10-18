@@ -76,18 +76,19 @@ function position(p,camera){
          y:camera.cy+(p.y-camera.y)*camera.scale};
 }
 function cameraFor(points,w,h,chosen){
- // Field-relative camera inspired by the earlier Kyoto 1400 view.
+ // Kyoto 1400 approach: follow the nearby racing group (not all 18 horses).
+ // Camera zoom and numbered circles are independent; circles remain readable.
  const focus=points.find(p=>p.number===chosen)||points.slice().sort((a,b)=>b.d-a.d)[0];
- const pack=points.filter(p=>Math.abs(p.d-focus.d)<80);
- if(!pack.some(p=>p.number===focus.number))pack.push(focus);
- const xs=pack.map(p=>p.x),ys=pack.map(p=>p.y);
- const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
- const zoom=Math.max(1.35,Math.min(3.15,(w-70)/Math.max(85,maxX-minX+20),
-  (h-60)/Math.max(72,maxY-minY+22)));
- // Keep a modest amount of nearby pack in view without hiding the leader.
- const mid={x:(minX+maxX)/2,y:(minY+maxY)/2};
- return {x:focus.x*.79+mid.x*.21,y:focus.y*.79+mid.y*.21,
-  cx:w*.51,cy:h*.54,scale:zoom};
+ const group=points.filter(p=>Math.abs(p.d-focus.d)<=48);
+ if(!group.some(p=>p.number===focus.number))group.push(focus);
+ const xs=group.map(p=>p.x),ys=group.map(p=>p.y);
+ const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
+ const zoom=Math.max(3.4,Math.min(7.2,
+  (w-36)/Math.max(44,hiX-loX+7),
+  (h-56)/Math.max(42,hiY-loY+7)));
+ const mid={x:(loX+hiX)/2,y:(loY+hiY)/2};
+ return {x:focus.x*.87+mid.x*.13,y:focus.y*.87+mid.y*.13,
+  cx:w*.5,cy:h*.52,scale:zoom};
 }
 function roundedWaku(ctx,p,x,y,mobile,focused){
  const colors=waku(p.number);
@@ -133,10 +134,10 @@ function paint(){
  track(live.ctx,{...lastCamera,w:live.w,h:live.h});
  markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
  const map=sizeCanvas($('overview'));
- map.ctx.fillStyle='#fafcf9';map.ctx.fillRect(0,0,map.w,map.h);
- const scale=Math.min((map.w-25)/620,(map.h-12)/430);
- const overview={x:310,y:220,cx:map.w/2,cy:map.h/2,scale,w:map.w,h:map.h};
- track(map.ctx,overview);markers(map.ctx,points,overview,chosen,true);
+ // Transparent numbers over the ACTUAL original 620x430 course diagram.
+ const overview={x:310,y:215,cx:map.w/2,cy:map.h/2,
+  scale:Math.min(map.w/620,map.h/430),w:map.w,h:map.h};
+ markers(map.ctx,points,overview,chosen,true);
  $('progress').textContent=Math.round(state.leader)+'m / 2000m';
  $('clock').textContent=state.t.toFixed(1)+'秒';
  $('section').textContent=model.center(state.leader).section+
@@ -155,6 +156,11 @@ function tick(ts){
  requestAnimationFrame(tick);
 }
 function setup(){
+ const original=$('realCourseImage');
+ if(original)original.addEventListener('error',()=>{
+  const credit=document.querySelector('.source-credit');
+  if(credit)credit.textContent='コースの原画像を読み込めません。うまぽっとの配信状況をご確認ください。';
+ });
  $('focus').insertAdjacentHTML('beforeend',fixture.horses().map(h=>
    '<option value="'+h.number+'">'+h.number+'番</option>').join(''));
  $('horseGrid').innerHTML=fixture.horses().map(h=>{
@@ -186,7 +192,13 @@ window.CleanLab=Object.freeze({
   const chosen=points.find(p=>p.number===selected)||points[0];
   const screen=lastCamera?position(chosen,lastCamera):null;
   const live=$('broadcast').getBoundingClientRect();
+  const rect=$('overview').getBoundingClientRect();
+  const image=$('realCourseImage');
   return {leader:engine.state.leader,positions:points,
+   originalImageSrc:image?.getAttribute('src')||null,
+   originalLoaded:Boolean(image?.complete&&image?.naturalWidth===620&&image?.naturalHeight===430),
+   mapAspect:rect.width/Math.max(1,rect.height),
+   zoom:lastCamera?.scale??0,
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&
      screen.y>=16&&screen.y<=live.height-16),

@@ -62,13 +62,19 @@ jobs:
                     running:sim.horses.length,inside:sim.horses.filter(h=>h.lane<=3.45).length,
                     live:live.width,full:full.width,canvasCSS:live.getBoundingClientRect().width,
                     imageElements:document.querySelectorAll('img').length,
+                    originalImageSrc:a.originalImageSrc,
+                    originalLoaded:a.originalLoaded,mapAspect:a.mapAspect,zoom:a.zoom,
                     selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen};
                 }""")
                 assert not errors,(width,d,errors)
                 assert read['count']==read['running']==18,(width,d,read)
                 assert read['selectedVisible'],('FOCUSED_HORSE_OFF_CAMERA',width,d,read)
                 assert read['leader']+3>=d,(width,d,read)
-                assert read['sourceCalls']==0 and read['imageElements']==0,(width,d,read)
+                assert read['sourceCalls']==0 and read['imageElements']==1,(width,d,read)
+                assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
+                assert 'umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg' in read['originalImageSrc']
+                assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
+                assert 3.35<=read['zoom']<=7.25,(width,d,read)
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
