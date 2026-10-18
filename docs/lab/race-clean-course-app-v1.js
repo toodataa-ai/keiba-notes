@@ -118,69 +118,46 @@ function roundedWaku(ctx,p,x,y,focused){
 // or the original-image overview coordinates. Stable numeric ordering makes
 // multi-runner collisions reproducible without random flicker.
 function placeReadableLabels(points,loc,focused){
+ // A horse is its circled number, never an external callout. To resolve
+ // overlap, choose label locations ON the source-image turf strip at nearby
+ // race-distance/rail fractions. Underlying racing positions never change.
  const nodes=points.map(p=>{
   const actual=position(p,loc);
-  return {...p,actual,x:actual.x,y:actual.y,r:p.number===focused?14:11.7};
- });
- const valid=nodes.filter(p=>p.actual.x>=-45&&p.actual.x<=loc.w+45&&
+  return {...p,actual,x:actual.x,y:actual.y,r:p.number===focused?14:11.7,onTurf:true};
+ }).filter(p=>p.actual.x>=-45&&p.actual.x<=loc.w+45&&
   p.actual.y>=-45&&p.actual.y<=loc.h+45);
- valid.sort((a,b)=>a.number-b.number);
- const minSep=2.5;
- for(let pass=0;pass<95;pass++){
-  // The selected runner stays at its TRUE screen coordinate, other labels
-  // yield to it. Text badges get compact non-overlapping placement.
-  let moved=0;
-  for(let i=0;i<valid.length;i++)for(let j=i+1;j<valid.length;j++){
-   const a=valid[i],b=valid[j],dx=b.x-a.x,dy=b.y-a.y;
-   let dist=Math.hypot(dx,dy),required=a.r+b.r+minSep;
-   if(dist>=required)continue;
-   const ang=dist<1e-5?(i*3+j)*2.39996:Math.atan2(dy,dx);
-   const ux=Math.cos(ang),uy=Math.sin(ang),step=Math.min(6,(required-dist)*.60);
-   const aFixed=a.number===focused,bFixed=b.number===focused;
-   if(!aFixed){a.x-=ux*step*(bFixed?1:.5);a.y-=uy*step*(bFixed?1:.5)}
-   if(!bFixed){b.x+=ux*step*(aFixed?1:.5);b.y+=uy*step*(aFixed?1:.5)}
-   moved+=step;
-  }
-  for(const a of valid){
-   if(a.number!==focused){
-    // Weak anchor attraction avoids a separate numbered grid overlay.
-    a.x+=(a.actual.x-a.x)*.007;a.y+=(a.actual.y-a.y)*.007;
-    a.x=Math.max(a.r+3,Math.min(loc.w-a.r-3,a.x));
-    a.y=Math.max(a.r+3,Math.min(loc.h-a.r-3,a.y));
-   }
-  }
-  if(moved<.09)break;
- }
- // Strict fallback: symmetric forces occasionally converge to a pile at
- // the starting gate. Assign only the still-overlapping labels to nearby
- // deterministic 31px lattice cells. Never change the actual horse position.
- const ordered=valid.slice().sort((a,b)=>
-  Number(b.number===focused)-Number(a.number===focused)||a.number-b.number);
+ const ordered=nodes.slice().sort((a,b)=>
+  Number(b.number===focused)-Number(a.number===focused)||b.d-a.d||a.number-b.number);
  const placed=[];
+ const distanceOffsets=[0];
+ for(let k=1;k<=17;k++){distanceOffsets.push(-k*8,k*8)}
  for(const p of ordered){
-  const intersects=()=>placed.some(q=>Math.hypot(p.x-q.x,p.y-q.y)<p.r+q.r+2.5);
-  if(p.number!==focused&&intersects()){
-   let found=null;
-   for(let ring=0;ring<=12&&!found;ring++){
-    const cells=[];
-    for(let dx=-ring;dx<=ring;dx++)for(let dy=-ring;dy<=ring;dy++){
-     if(Math.max(Math.abs(dx),Math.abs(dy))!==ring)continue;
-     cells.push([dx,dy]);
-    }
-    cells.sort((a,b)=>Math.hypot(...a)-Math.hypot(...b)||a[1]-b[1]||a[0]-b[0]);
-    for(const [dx,dy] of cells){
-     const x=p.actual.x+dx*31,y=p.actual.y+dy*31;
-     if(x<p.r+3||x>loc.w-p.r-3||y<p.r+3||y>loc.h-p.r-3)continue;
-     if(placed.every(q=>Math.hypot(x-q.x,y-q.y)>=p.r+q.r+2.5)){
-      found={x,y};break;
-     }
-    }
+  if(p.number===focused){placed.push(p);continue}
+  const originalFraction=model.fraction(p.lane);
+  const fractions=[originalFraction,.12,.23,.34,.45,.56,.67,.78,.90]
+   .sort((a,b)=>Math.abs(a-originalFraction)-Math.abs(b-originalFraction));
+  let choice=null,best=Infinity;
+  for(const dd of distanceOffsets){
+   const dist=Math.max(0,Math.min(model.distance,p.d+dd)),rail=model.rails(dist);
+   for(const f of fractions){
+    const point={x:rail.inner.x+(rail.outer.x-rail.inner.x)*f,
+      y:rail.inner.y+(rail.outer.y-rail.inner.y)*f};
+    const pos=position(point,loc);
+    if(pos.x<p.r+3||pos.x>loc.w-p.r-3||
+      pos.y<p.r+3||pos.y>loc.h-p.r-3)continue;
+    if(placed.some(q=>Math.hypot(pos.x-q.x,pos.y-q.y)<p.r+q.r+2.5))continue;
+    const score=Math.hypot(pos.x-p.actual.x,pos.y-p.actual.y)+
+      Math.abs(dd)*.05;
+    if(score<best){best=score;choice=pos}
    }
-   if(found){p.x=found.x;p.y=found.y}
+  }
+  if(choice){p.x=choice.x;p.y=choice.y}
+  else { // Keep the source position if no non-overlapping turf point exists.
+   p.onTurf=true;
   }
   placed.push(p);
  }
- return valid;
+ return nodes;
 }
 function markers(ctx,points,loc,focused,mini=false){
  if(mini){
@@ -333,7 +310,7 @@ window.CleanLab=Object.freeze({
    zoom:lastCamera?.scale??0,
    visibleOrder:[...$('runningOrder').children].map(el=>Number(el.dataset.horse)),
    liveLabelPositions:lastLabelPositions.map(p=>({number:p.number,x:p.x,y:p.y,r:p.r,
-     anchorX:p.actual.x,anchorY:p.actual.y})),
+     anchorX:p.actual.x,anchorY:p.actual.y,onTurf:p.onTurf})),
    turfVisualWidthPx:model.widthPx,physicalWidthM:model.widthMetres,
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&

@@ -97,6 +97,7 @@ jobs:
                     ((a['x']-b['x'])**2+(a['y']-b['y'])**2)**.5)
                     for a,b in pairs] or [0])
                 assert worst<2.5,('BADGE_COLLISION',width,d,worst)
+                assert all(a['onTurf'] for a in labels),('TURF_BADGE',width,d)
                 assert all(-2<=a['x']<=read['canvasCSS']+2 for a in labels),('LABEL_X_CLIPPED',width,d)
                 print('PASS_BADGE_VISIBILITY',width,d,len(labels),'max_overlap',round(worst,3))
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
