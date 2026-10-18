@@ -23,10 +23,28 @@ const sections=Object.freeze([
  {from:1671.6,to:2000,kind:'straight',name:'最後の直線',
   p0:[490,317],p3:[294,317]}
 ]);
-const WIDTH_PX=28,WIDTH_M=24,DISTANCE=2000;
+// LAB image registration is a display coordinate, NOT the actual turf width.
+// 18px corridor was fitted to the GREEN reference band in the 620x430 Umapot
+// image. 27m is the published Kyoto INNER A minimum width, not outer's 24m.
+const WIDTH_PX=18,WIDTH_M=27,DISTANCE=2000;
+// Source-image registration: signed screen-normal correction from the original
+// LAB v2 path. Extracted from eight unaltered-overview browser checkpoints
+// using a green-band mask; 401 points at 5m, simplified to <=1px error.
+// It cannot alter engine lanes, race pace, split times, rankings or predictions.
+// Each course can supply its OWN measured correction knots using this method.
+const TURF_IMAGE_CORRECTIONS=Object.freeze([[0,-0.97],[40,-1.29],[190,-7.79],[220,-7.43],[270,0.21],[330,15.92],[360,18.56],[395,16.35],[530,1.1],[575,2.64],[640,2.42],[685,0.23],[780,-0.6],[1095,-16.85],[1200,-20.84],[1245,-18.05],[1305,-6.75],[1340,-3.86],[1380,-5.66],[1455,-17.29],[1490,-19.13],[1535,-16.2],[1600,-3.89],[1635,-0.55],[1725,0.72],[2000,-0.26]]);
+function corridorShift(distance){
+ const d=Math.max(0,Math.min(DISTANCE,Number(distance)||0));
+ let lo=0,hi=TURF_IMAGE_CORRECTIONS.length-1;
+ while(lo<hi){const i=(lo+hi)>>1;if(TURF_IMAGE_CORRECTIONS[i][0]<d)lo=i+1;else hi=i}
+ const a=TURF_IMAGE_CORRECTIONS[Math.max(0,lo-1)];
+ const b=TURF_IMAGE_CORRECTIONS[lo];
+ const t=(d-a[0])/(b[0]-a[0]||1);
+ return a[1]+(b[1]-a[1])*Math.max(0,Math.min(1,t));
+}
 const JRA_DIMENSIONS=Object.freeze({distanceM:2000,lapInnerA:1782.8,
  firstTurnDistanceM:308.7,homeStraightA:328.4,
- minTurfWidthM:24,maxTurfWidthM:38,elevationInnerM:3.1});
+ minTurfWidthM:27,maxTurfWidthM:38,elevationInnerM:3.1});
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 function segment(distance){
  const d=clamp(distance,0,DISTANCE);
@@ -74,9 +92,13 @@ function center(distance){
 }
 function rails(d){
  const c=center(d),nx=-c.ty,ny=c.tx;
- return {inner:{x:c.x+nx*WIDTH_PX/2,y:c.y+ny*WIDTH_PX/2},
-  outer:{x:c.x-nx*WIDTH_PX/2,y:c.y-ny*WIDTH_PX/2},
-  center:c,widthPx:WIDTH_PX,widthMetres:WIDTH_M};
+ const correction=corridorShift(d);
+ // One source-registered physical corridor for LIVE and ORIGINAL overview.
+ // The screen offset is a purely visual projection; d and lane never change.
+ const mid={x:c.x+nx*correction,y:c.y+ny*correction};
+ return {inner:{x:mid.x+nx*WIDTH_PX/2,y:mid.y+ny*WIDTH_PX/2},
+  outer:{x:mid.x-nx*WIDTH_PX/2,y:mid.y-ny*WIDTH_PX/2},
+  center:c,visualCenter:mid,widthPx:WIDTH_PX,widthMetres:WIDTH_M};
 }
 function fraction(lane){return clamp((1.8+Math.max(0,Number(lane)||0)*1.65)/WIDTH_M,.025,.95)}
 function point(d,lane=0){
@@ -120,7 +142,7 @@ const api=Object.freeze({id,distance:DISTANCE,widthPx:WIDTH_PX,
  widthMetres:WIDTH_M,jraDimensions:JRA_DIMENSIONS,
  sourceImageSize:{width:620,height:430},
  illustratedRouteModel:'Umapot visual alignment, not surveyed coordinates',
- sections,segment,center,rails,fraction,point,runners,validate});
+ sections,segment,center,rails,fraction,point,runners,validate,corridorShift,imageCorrectionKnots:TURF_IMAGE_CORRECTIONS});
 api.validate();
 global.RaceCleanCourse=api;
 })(typeof window!=='undefined'?window:globalThis);

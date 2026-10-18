@@ -19,6 +19,11 @@ canvas{display:block;width:100%;background:#f4f6f0}
 #overview{position:absolute;inset:0;width:100%;height:100%;background:transparent}
 .real-overview{position:relative;width:100%;aspect-ratio:620/430;background:white;overflow:hidden}
 .real-overview img{display:block;width:100%;height:100%;object-fit:fill}
+.running-order{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:9px 12px;background:#fff;border-top:1px solid #e4ebe6}
+.order-note{font-size:11px;color:#4c6057;padding:8px 12px 0}
+.position-chip{font-weight:900;font-size:14px;line-height:1;border-radius:50%;border:2px solid #283b35;width:31px;height:31px;min-height:31px;min-width:31px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.position-chip.is-focus{outline:3px solid #d4a143;outline-offset:1px}
+.position-chip:focus-visible{outline:3px solid #397ad3;outline-offset:2px}
 .source-credit{font-size:11px;color:#53655a;margin:0;padding:7px 12px;background:#fafcf9;line-height:1.55}
 .source-credit a{color:#236548}
 .status{display:flex;justify-content:space-between;gap:8px;padding:8px 13px;font-size:11px;color:#46584e;background:#f7faf8;font-variant-numeric:tabular-nums}

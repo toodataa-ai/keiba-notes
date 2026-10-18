@@ -119,6 +119,35 @@ function markers(ctx,points,loc,focused,mini=false){
   }else roundedWaku(ctx,p,s.x,s.y,loc.w<500,p.number===focused);
  }
 }
+function updateRunningOrder(points,chosen){
+ const host=$('runningOrder');
+ if(!host)return;
+ if(!host.dataset.ready){
+  for(const p of points){
+   const btn=document.createElement('button');
+   btn.type='button';btn.className='position-chip';btn.dataset.horse=p.number;
+   btn.setAttribute('aria-label',p.number+'番を追跡');
+   btn.addEventListener('click',()=>{
+    focusNo=String(p.number);$('focus').value=focusNo;
+    lastCamera=null;paint();
+   });
+   host.appendChild(btn);
+  }
+  host.dataset.ready='true';
+ }
+ const chips=new Map([...host.children].map(x=>[Number(x.dataset.horse),x]));
+ const order=points.slice().sort((a,b)=>b.d-a.d||a.number-b.number);
+ for(let i=0;i<order.length;i++){
+  const p=order[i],chip=chips.get(p.number),col=waku(p.number);
+  chip.textContent=String(p.number);
+  chip.style.backgroundColor=col.fill;
+  chip.style.color=col.ink;
+  chip.classList.toggle('is-focus',p.number===chosen);
+  chip.title=(i+1)+'番手・'+p.number+'番を追跡';
+  host.appendChild(chip);
+ }
+ $('orderNote').textContent='左から先頭順 / '+order.length+'頭。タップで追跡';
+}
 function paint(){
  if(!engine)return;
  const state=engine.state,points=model.runners(state);
@@ -138,6 +167,7 @@ function paint(){
  const overview={x:310,y:215,cx:map.w/2,cy:map.h/2,
   scale:Math.min(map.w/620,map.h/430),w:map.w,h:map.h};
  markers(map.ctx,points,overview,chosen,true);
+ updateRunningOrder(points,chosen);
  $('progress').textContent=Math.round(state.leader)+'m / 2000m';
  $('clock').textContent=state.t.toFixed(1)+'秒';
  $('section').textContent=model.center(state.leader).section+
@@ -199,6 +229,8 @@ window.CleanLab=Object.freeze({
    originalLoaded:Boolean(image?.complete&&image?.naturalWidth===620&&image?.naturalHeight===430),
    mapAspect:rect.width/Math.max(1,rect.height),
    zoom:lastCamera?.scale??0,
+   visibleOrder:[...$('runningOrder').children].map(el=>Number(el.dataset.horse)),
+   turfVisualWidthPx:model.widthPx,physicalWidthM:model.widthMetres,
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&
      screen.y>=16&&screen.y<=live.height-16),
