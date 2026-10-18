@@ -1,4 +1,4 @@
-name: LAB Kyoto source inner course, rail-gap bridge and extended finish acceptance
+name: LAB Kyoto1400 fixed GOAL board camera, closer broadcast and shared engine acceptance
 on:
   push:
     branches: [main]
@@ -48,7 +48,7 @@ jobs:
           with sync_playwright() as p:
             browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
             for width in (390,1024):
-              for d in (0,100,310,478,530,585,600,602,616,630,640,660,700,720,750,900,909,1270,1672,1900):
+              for d in (0,100,310,478,530,585,600,602,616,630,640,660,700,720,750,900,909,1270,1672,1900,1920,1950,1985):
                 page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
                 errors=[]
                 page.on('pageerror',lambda error:errors.append(str(error)))
@@ -75,6 +75,8 @@ jobs:
                     paintedTrack:a.paintedTrack,leaderLines:a.leaderLines,
                     originalImageSrc:a.originalImageSrc,
                     originalLoaded:a.originalLoaded,mapAspect:a.mapAspect,zoom:a.zoom,
+                    goalBoardVisible:a.goalBoardVisible,goalFrame:a.goalFrame,
+                    goalCameraSwitchDistance:a.goalCameraSwitchDistance,
                     selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen,
                     labelCoords:a.liveLabelPositions,selectedHorse:a.selectedHorse,
                     inwardMoves:a.inwardMoves,commonLaneController:a.commonLaneController,
@@ -99,7 +101,14 @@ jobs:
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
-                assert abs(read['zoom']-(7.0 if width==390 else 7.8))<1e-6,('CAMERA_ZOOM_MUST_STAY_FIXED',width,d,read['zoom'])
+                assert abs(read['zoom']-(8.8 if width==390 else 9.7))<1e-6,('CAMERA_ZOOM_MUST_STAY_FIXED',width,d,read['zoom'])
+                assert read['goalCameraSwitchDistance']==1920
+                assert read['goalBoardVisible']==(d>=1920),('GOAL_CAMERA_MUST_SWITCH_80M_BEFORE_FINISH',width,d,read)
+                if d>=1920:
+                  assert read['goalFrame'] is not None,('GOAL_BOARD_NOT_DRAWN',width,d,read)
+                  assert read['goalFrame']['mode']=='kyoto1400-goal-camera',(width,d,read)
+                  assert abs(read['goalFrame']['goalX']-read['canvasCSS']*.30)<1.5,('KYOTO_RIGHT_TO_LEFT_GOAL_X',width,d,read)
+                  assert read['goalFrame']['visible']>0,('HORSE_NUMBERS_NOT_RUNNING_PAST_GOAL',width,d,read)
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
                 assert read['commonLaneController'],('SHARED_KYOTO1400_ENGINE_MISSING',width,d)
@@ -120,7 +129,7 @@ jobs:
                     'radius',read['uniformMarkerRadiusPx'],
                     'spread',read['markerRadiusSpreadPx'],
                     'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
-                page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
+                page.locator('#broadcastStage').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
                 if d==602:
                   audit=page.evaluate("() => window.RaceCleanTurf.audit(1,1.8)")
@@ -337,7 +346,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-inner-rail-gap-finish-v14-mobile-desktop
+          name: lab-kyoto1400-goal-closer-v15-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14
@@ -347,7 +356,7 @@ jobs:
           base=https://toodataa-ai.github.io/keiba-notes/lab
           for i in $(seq 1 28);do
             ok=1
-            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-turf-mask-v1.js race-clean-course-v1.css assets/kyoto-umapot-course-clean-v8.svg;do
+            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-goal-view-v1.js race-clean-turf-mask-v1.js race-clean-course-v1.css assets/kyoto-umapot-course-clean-v8.svg;do
               if ! curl -fLsS --max-time 20 "$base/$f?ci=$GITHUB_RUN_ID-$i" -o /tmp/clean-file ||
                 ! cmp -s "docs/lab/$f" /tmp/clean-file;then ok=0;break;fi
             done
