@@ -18,7 +18,7 @@
  <div class="shell heading">
   <div><div class="eyebrow">HYPOTHETICAL RACE ANIMATION</div><h1>レースシミュレータ</h1>
   <p class="subtitle">実際の出走馬を、仮想の馬群・進路・展開で走らせる。レトロな実況画面で展開を比較。</p>
-   <p class="subtitle"><a href="race-simulator.html?demo=shuka-18&v=48" style="color:#fbd4ac;text-decoration:underline">LAB：京都芝2000m内回り・架空18頭の内優先検証はこちら →</a></p>
+   <p class="subtitle"><a href="race-simulator.html?demo=shuka-18&v=50" style="color:#fbd4ac;text-decoration:underline">LAB：京都芝2000m内回り・架空18頭の内優先検証はこちら →</a></p>
    <p class="subtitle"><a href="weekend-main-course-review.html" style="color:#94d2fd;text-decoration:underline">10/17–18 全6メインのコース設計案を確認（走行線レビュー・再生未承認） →</a></p></div>
   <div class="demo-stamp"><span>SCENARIO</span><strong>SIM</strong><small>JRA正式予想とは別</small></div>
  </div>
@@ -49,7 +49,7 @@
   <div class="live-display-grid" aria-label="実況と全体図の同時表示">
    <div class="live-picture">
   <div class="track-stage">
-   <canvas id="raceCanvas" width="1000" height="470" role="img" aria-label="京都芝2000m内回りは全体図と同じうまぽっと実コース画像を拡大して馬番を追跡する実況。ほかのコースは従来の近似表示です"></canvas>
+   <canvas id="raceCanvas" width="1000" height="620" role="img" aria-label="京都芝2000m内回りは元画像から抽出した芝帯を鮮明な線画で拡大し、読める大きさの馬番を追跡する実況。18頭全体の位置は全体図で確認できます"></canvas>
    <div class="stage-top"><span id="stageCaption">発走前</span>
     <div class="stage-clock-stack" aria-label="走破時計と前半通過タイム">
      <span id="elapsed">0.0</span>
@@ -128,12 +128,12 @@
   <p>実況ビューは馬の絵を使わず、数字そのものが走路上を走ります。番号の中心が馬の位置で、引き出し線や移動したラベルはありません。注目馬は元の枠色の外側を金色の輪で強調します。密集時は正確な位置を優先するため、数字が一部重なる場合があります。</p>
   <p>実況映像は一番寄った全頭追跡アングルのみです。馬群の広がりに合わせて中心と倍率を自動調整し、後続馬も見失わないようにします。マーカーが接近した場合に番号同士が重なることはありますが、実際の座標をずらして表示することはありません。</p>
   <p>出走馬名・馬番・印・STEP1の評価（未校正の勝率を含む）は、既に保存済みの予想レポートから読み取ります。馬の向きは走路の接線と横移動から計算します。通常は内側の短い進路を優先し、前後の安全間隔が足りなければ進路変更せず、状況によっては外からかわす動きを表現します。直線で実際に前後関係が逆転した馬だけ、馬番の中心位置を動かさず短時間リングを付けて手前に描画し、実況下部に追い抜き情報を表示します。</p>
-  <p><strong>ここでの到達順や騎乗判断は公式予想やレース結果ではありません。</strong>内寄りの進路選択、馬同士の間隔・進路の譲り合いも仮定した簡易モデルです。接触や落馬を扱う実際の競走シミュレータではありません。JRAが公表する直線距離・一周距離・高低差・内外のコース構造を区別して参照し、コースごとのスタート位置と走路を描いています。京都芝2000m内回りの仮1頭デモでは、実況ビューも全体図とまったく同じうまぽっとの画像と馬番座標を使用し、拡大・平行移動だけで追従します。それ以外のコースは従来の連続走行スプラインとカメラ追従を維持しています。カーブのベジェ座標、勾配の途中区間、騎手の進路判断・馬ごとの実測ラップは公開された測量原本から復元していない近似・仮定です。同じシード・設定なら再現可能ですが、統計的な勝率評価や正式買い目の変更には使いません。</p>
+  <p><strong>ここでの到達順や騎乗判断は公式予想やレース結果ではありません。</strong>内寄りの進路選択、馬同士の間隔・進路の譲り合いも仮定した簡易モデルです。接触や落馬を扱う実際の競走シミュレータではありません。JRAが公表する直線距離・一周距離・高低差・内外のコース構造を区別して参照し、コースごとのスタート位置と走路を描いています。京都芝2000m内回りのLABデモでは、実況画面はうまぽっと原画像から抽出した芝帯境界のベクター図を鮮明に拡大します。全体図には元画像を表示し、両画面の馬番は同じ走行座標を使用します。それ以外のコースは従来の連続走行スプラインとカメラ追従を維持しています。カーブのベジェ座標、勾配の途中区間、騎手の進路判断・馬ごとの実測ラップは公開された測量原本から復元していない近似・仮定です。同じシード・設定なら再現可能ですが、統計的な勝率評価や正式買い目の変更には使いません。</p>
   <p id="sourceInfo" class="source">出典と原本情報を確認しています…</p>
  </section>
 </main>
-<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ LAB v0.49 / Finish spacing v0.36 / Kyoto curve v0.37 / Overtake view v0.38 / Shared transitions v0.39 / Closing balance v0.40 / Shuka route v0.41 / One-runner demo v0.42 / Kyoto image overlay v0.43 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
-<!-- LAB v0.49: both views use same inner/outer turf corridor projection derived from linked source green ribbon. -->
+<footer class="shell site-footer">競馬予想精度向上AI · シミュレータ LAB v0.50 / Finish spacing v0.36 / Kyoto curve v0.37 / Overtake view v0.38 / Shared transitions v0.39 / Closing balance v0.40 / Shuka route v0.41 / One-runner demo v0.42 / Kyoto image overlay v0.43 · 仮説比較専用 / 本番の印・買い目は非変更</footer>
+<!-- LAB v0.50: close-up draws sharp source-derived vector turf, clean of bitmap labels; overview retains original licensed JPEG and same runner coordinates. -->
 <script src="race-course-geometry-v1.js?v=20261016-40"></script>
 <script src="race-lane-ai-v1.js?v=20261015-25"></script>
 <script src="race-runner-style-v1.js?v=20261015-24"></script>
@@ -141,7 +141,7 @@
 <script src="race-turf-corridor-v1.js?v=20261018-49"></script>
 <script src="race-umapot-overlay-v1.js?v=20261018-49"></script>
 <script src="race-sim-engine.js?v=20261016-41"></script>
-<script src="race-broadcast-map-v1.js?v=20261018-47"></script>
+<script src="race-broadcast-map-v1.js?v=20261018-50"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
  <script src="race-simulator.js?v=20261018-49"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>

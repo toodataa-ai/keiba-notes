@@ -8,13 +8,14 @@ const sandbox={};const doc={
  querySelector:()=>null
 };
 for(const name of ['race-course-geometry-v1.js','race-umapot-overlay-v1.js',
-  'race-broadcast-map-v1.js']){
+  'race-broadcast-map-v1.js','race-turf-corridor-v1.js']){
  vm.runInNewContext(fs.readFileSync(base+name,'utf8'),{
   window:sandbox,globalThis:sandbox,document:doc
  },{filename:name});
 }
 const map=sandbox.RaceSimBroadcastMap,overlay=sandbox.RaceUmapotOverlay;
 const profile=sandbox.RaceCourseGeometry.get('kyoto_turf_inner_2000');
+sandbox.RaceTurfCorridor.register(JSON.parse(fs.readFileSync(base+'race-turf-rails-kyoto-inner-2000-v1.json','utf8')));
 assert.equal(map.supports({course_id:profile.id}),true);
 assert.equal(map.supports({course_id:'tokyo_turf_2000'}),false);
 assert.equal(map.width,620);assert.equal(map.height,430);
@@ -32,49 +33,42 @@ for(const d of [0,100,210,308.7,440,530,620,720,800,900,1000,1200,1270,1435,1671
    assert.ok(view.zoom>1&&view.zoom<6);
  }
 }
+
 const operations=[];
-const ctx={
- fillStyle:null,strokeStyle:null,lineWidth:0,imageSmoothingEnabled:true,
- clearRect:(...args)=>operations.push(['clear',...args]),
- fillRect:(...args)=>operations.push(['fill',...args]),
+const ctx={fillStyle:null,strokeStyle:null,lineWidth:0,
+ clearRect:(...v)=>operations.push(['clear',...v]),
+ fillRect:(...v)=>operations.push(['fillRect',...v]),
  save:()=>operations.push(['save']),restore:()=>operations.push(['restore']),
- translate:(...args)=>operations.push(['translate',...args]),
- scale:(...args)=>operations.push(['scale',...args]),
- drawImage:(...args)=>operations.push(['image',...args]),
- beginPath:()=>operations.push(['path']),
- moveTo:()=>{},lineTo:()=>{},stroke:()=>{},
+ translate:(...v)=>operations.push(['translate',...v]),scale:(...v)=>operations.push(['scale',...v]),
+ drawImage:()=>{throw Error('BROADCAST_RASTER_MUST_NEVER_BE_SCALED')},
+ beginPath:()=>operations.push(['begin']),
+ moveTo:(...v)=>operations.push(['move',...v]),
+ lineTo:(...v)=>operations.push(['line',...v]),
+ closePath:()=>operations.push(['close']),
+ fill:(...v)=>operations.push(['fill',...v]),
+ stroke:()=>operations.push(['stroke']),
  setLineDash:()=>{}
 };
-const img={complete:true,naturalWidth:620,naturalHeight:430,src:'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg'};
 const state={distance:2000,leadingNo:1,horses:[{number:1,d:800,lane:0,finished:false}]};
-const markers=[];
-const output=map.draw({ctx,canvas:{width:1000,height:730},image:img,state,
+const markers=[],image=null; // source image is only needed by the full overview
+const out=map.draw({ctx,canvas:{width:1000,height:620},image,state,
  race:{course_id:profile.id,field_size:1},course:profile,overlay,
- focusNo:1,paintNumber:(context,n,x,y,scale)=>markers.push({n,x,y,scale}),renderedWidth:390});
-assert.equal(output.ready,true);
-const imageCalls=operations.filter(x=>x[0]==='image');
-assert.equal(imageCalls.length,1);
-assert.equal(imageCalls[0][1],img,'must draw exact existing external HTML image');
-assert.deepEqual(Array.from(imageCalls[0].slice(2)),[0,0,620,430],'original aspect and bytes unchanged');
-const coords=overlay.point(profile,800,0);
-assert.equal(output.points[0].x,coords.x);
-assert.equal(output.points[0].y,coords.y);
+ focusNo:1,paintNumber:(c,n,x,y,size)=>markers.push({n,x,y,size}),renderedWidth:390});
+assert.equal(out.ready,true);
+assert.equal(out.renderMode,'source-derived-vector-rails');
+assert.equal(out.turfStations,401);
+assert.equal(operations.filter(x=>x[0]==='fill').length,1,'one connected turf ribbon');
+assert.equal(operations.filter(x=>x[0]==='stroke').length,2,'only inside/outside boundaries');
+assert.ok(operations.filter(x=>x[0]==='line').length>=1600);
 assert.equal(markers.length,1);
-assert.ok(Math.hypot(markers[0].x-500,markers[0].y-365)<1e-9);
+assert.ok(markers[0].size>3,'one-runner readable marker scale');
 assert.equal(operations.filter(x=>x[0]==='scale').length,1);
 assert.equal(operations.filter(x=>x[0]==='translate').length,2);
-const notReady=map.draw({...{
- ctx,canvas:{width:1000,height:730},image:{complete:false},state,
- race:{course_id:profile.id,field_size:1},course:profile,overlay,
- focusNo:1,paintNumber:()=>{},renderedWidth:390
-}});
-assert.equal(notReady.ready,false);
-assert.equal(operations.filter(x=>x[0]==='image').length,1,'do not use substitute geometry');
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
 const sim=fs.readFileSync(base+'race-simulator.js','utf8');
-assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-47'));
+assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-50'));
+assert.ok(html.includes('height="620"'));
 assert.ok(html.includes('race-turf-corridor-v1.js?v=20261018-49'));
 assert.ok(sim.includes('RaceSimBroadcastMap.draw({'));
-assert.ok(sim.indexOf('RaceSimBroadcastMap.draw({')<sim.indexOf('if(state.goalCamera){'),'no separate finish cut for Kyoto');
-assert.ok(!sim.includes("ctx.rotate("),'do not rotate original bitmap');
-console.log('PASS_LAB_KYOTO_SHARED_IMAGE_BROADCAST_17_STATIONS_2_VIEWPORTS_SINGLE_PIXEL_COORDINATE');
+assert.ok(sim.indexOf('RaceSimBroadcastMap.draw({')<sim.indexOf('if(state.goalCamera){'));
+console.log('PASS_LAB_V050_SHARP_GREEN_RAIL_VECTOR_NO_LABELS_17_STATIONS_SHARED_COORDS');

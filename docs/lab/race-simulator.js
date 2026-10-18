@@ -692,10 +692,9 @@ function drawRace(){
  const focus=ui.focus.value==='leader'?state.horses.find(x=>x.number===state.leadingNo):
        state.horses.find(x=>String(x.number)===ui.focus.value);
  const target=focus||state.horses[0];
- // LAB Kyoto inner 2000m: use the VERY SAME original course raster and the
- // EXACT RaceUmapotOverlay.point() projection used by the full overview map.
- // No substitute schematic, independent straight/corner interpolation,
- // rotation or finish-camera cut. Other courses retain their legacy view.
+ // LAB: broadcast uses sharp source-derived turf RAIL VECTORS, not an enlarged
+ // low-res JPEG. Both views use EXACT RaceUmapotOverlay.point() coordinates.
+ // Other courses retain their existing images/camera and physics.
  if(window.RaceSimBroadcastMap?.supports(race)){
   const img=$('kyotoCourseImage');
   const drawn=RaceSimBroadcastMap.draw({
@@ -705,7 +704,7 @@ function drawRace(){
    paintNumber:raceNumberMarker,renderedWidth,
    guide:new URLSearchParams(location.search).get('guide')==='1'
   });
-  if(!drawn.ready)drawIdle('実際の京都コース画像を読み込み中…');
+  if(!drawn.ready)drawIdle('京都芝帯の境界データを読み込み中…');
   drawCourse();
   drawLicensedOverlay(state);
   return;
