@@ -135,6 +135,8 @@ assert.ok(html.includes('race-lane-ai-v1.js?v=20261015-25'));
 const goal=fs.readFileSync(root+'race-clean-goal-view-v1.js','utf8');
 assert.ok(goal.includes("turn==='右'?-1:1"));
 assert.ok(goal.includes('drawGoalPost('));
+assert.ok(goal.includes('function laneStep('));
+assert.ok(goal.includes('const step=laneStep(height,maxLane)/pullback;'));
 assert.ok(goal.includes("mode:'kyoto1400-goal-camera'"));
 assert.ok(app.includes('state.goalCamera||state.firstFinishTime!==null'));
 assert.ok(app.includes('goalCameraSwitchDistance:1920'));
