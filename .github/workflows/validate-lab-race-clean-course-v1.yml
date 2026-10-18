@@ -54,7 +54,10 @@ jobs:
                 page.on('pageerror',lambda error:errors.append(str(error)))
                 page.goto(f'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint={d}',wait_until='load')
                 page.wait_for_function('window.CleanLab?.getState()?.horses?.length===18',timeout=12000)
-                page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=20000)
+                page.wait_for_function("() => {const a=window.CleanLab?.inspect?.();return a?.turfReady || a?.turfError}",timeout=15000)
+                diagnostic=page.evaluate("() => {const a=CleanLab.inspect();return {turfReady:a.turfReady,turfError:a.turfError,turfStats:a.turfStats,source:a.originalImageSrc}}")
+                print('TURF_MASK_BOOT_AUDIT',width,d,diagnostic)
+                assert not diagnostic['turfError'],('TURF_IMAGE_REGISTRATION_FAILED',width,d,diagnostic)
                 read=page.evaluate("""() => {
                   const a=CleanLab.inspect(),c=RaceCleanCourse;
                   const sim=CleanLab.getState();
