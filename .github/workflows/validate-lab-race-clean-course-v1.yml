@@ -103,8 +103,7 @@ jobs:
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
-                assert (8.8 if width==390 else 9.7)<=read['zoom']<=
-                    (8.8 if width==390 else 9.7)*1.46,('CAMERA_ZOOM_OUTSIDE_BOUNDED_AFFINE',width,d,read['zoom'])
+                assert (8.8 if width==390 else 9.7)<=read['zoom']<=(8.8 if width==390 else 9.7)*1.46,('CAMERA_ZOOM_OUTSIDE_BOUNDED_AFFINE',width,d,read['zoom'])
                 assert read['goalCameraSwitchDistance']==1920
                 assert read['goalBoardVisible']==(d>=1920),('GOAL_CAMERA_MUST_SWITCH_80M_BEFORE_FINISH',width,d,read)
                 if d>=1920:
