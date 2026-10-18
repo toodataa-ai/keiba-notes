@@ -115,7 +115,7 @@ assert.ok(surface.includes('MAX_SPAN=18'));
 assert.ok(surface.includes('r.low=Math.max(r.low,p.low-SLOPE)'));
 assert.ok(surface.includes('r.high=Math.min(r.high,p.high+SLOPE)'));
 assert.ok(surface.includes('maxLane0FromInner'));
-assert.ok(!surface.includes('const optimal=clamp(predicted')));
+assert.ok(!surface.includes('const optimal=clamp(predicted'));
 assert.ok(!surface.includes('const half=Math.min(9'));
 assert.ok(surface.includes('function discOnTurf('));
 assert.ok(surface.includes('function runners(state)'));
