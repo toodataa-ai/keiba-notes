@@ -60,7 +60,7 @@ jobs:
            print('PDF',f,'pages',len(pdf))
            for i,page in enumerate(pdf):
             pix=page.get_pixmap(matrix=fitz.Matrix(4,4),alpha=False)
-            out=d/(f.stem+f'-slide{i+1}.png')
+            out=d/f'kyoto-2020-publisher-slide{i+1}.png'
             pix.save(str(out))
             print('EXPORTED',out,pix.width,pix.height)
           PY
