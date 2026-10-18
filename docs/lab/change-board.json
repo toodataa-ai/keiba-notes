@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "cab18d79f8e727d0bd7ab9cc41ea986e910b1b19",
+  "scan_commit": "d5d250a4a3a1a69efc5e8c1ffdd826aa8aefae22",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v11：v10の広い緑帯の中心へ吸着する画像座標補正を廃止。うまぽっと原本内ラチの走行レールからの安全な距離を基準に芝上の内側細帯へ馬番を投影。源泉SVG画像・京都1400共通RaceLaneAI/SimEngine・同サイズ馬番は維持。芝帯の分合流でも高低の横方向制御を0.65画像px/mまでに制限、500–750mを0.5m刻みで外回し/内戻り/芝外を監査。390/1024px×20地点・全2000m連続・公開Pages同期後にLAB限定で確認依頼。本番・正式予想・買い目・JRA/NARデータは変更しない。",
+      "next_action": "LAB v11のコード・ブラウザQA合格、実機目視承認待ち。うまぽっと原本内回り芝帯の画像投影を『広い緑の中心』から『内ラチを軸にした安全細帯』へ変更、芝の分岐・合流時も内側線から16.13px以内（先頭最内レーン）かつ連続。固定レーン1m刻み×15レーン=30,015点で芝外0、最大1m画像移動1.085px。500–750mを0.5m刻み×8レーンで芝外0、最大0.5002px/0.5m。390/1024px×20区間、同サイズ馬番・Pages一致・隔離監査合格。Actions 39120551591。実機の4倍速表示で確認後、本番昇格判断。京都1400共通物理/予想/買い目/データ/本番は未変更。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
