@@ -1,4 +1,4 @@
-/* LAB v8: unmodified publisher clean vector and small direct horse numbers.
+/* LAB v9: original publisher SVG, uniform-size horse numbers and gold-only focus border.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -39,16 +39,20 @@ function jraWaku(number,fieldSize=18){
 function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,fieldSize=18,passing=false){
  if(!Number.isInteger(number)||number<1||!Number.isFinite(x)||!Number.isFinite(y))
   throw Error('SIM_NUMBER_POSITION_INVALID');
- const radius=(focused?15.5:13.5)*scale;
+ // Equal diameter for all horses. Focus uses the same circumference:
+ // a gold stroke, without any larger marker or external gold halo.
+ const radius=13.5*scale;
  const waku=jraWaku(number,fieldSize);
  ctx.save();
  ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);
  ctx.fillStyle=waku.fill;ctx.fill();
- ctx.lineWidth=(focused?2.8:2.1)*scale;
- ctx.strokeStyle=waku.border;ctx.stroke();
+ ctx.lineWidth=(focused?3.4:2.1)*scale;
+ ctx.strokeStyle=focused?'#e9af30':waku.border;
+ ctx.stroke();
  if(focused){
-   ctx.beginPath();ctx.arc(x,y,radius+4.3*scale,0,Math.PI*2);
-   ctx.lineWidth=3.2*scale;ctx.strokeStyle='#f9d46c';ctx.stroke();
+   // The inner hairline keeps the original JRA bracket border recognizable.
+   ctx.beginPath();ctx.arc(x,y,radius-2.5*scale,0,Math.PI*2);
+   ctx.lineWidth=.8*scale;ctx.strokeStyle=waku.border;ctx.stroke();
  }
  if(passing){
    // A thin ring around the genuine crossing point; no position offset.
@@ -137,11 +141,11 @@ function markers(ctx,points,loc,focused,mini=false){
  const displayed=[];
  for(const p of sorted){
   const x=p.actual.x,y=p.actual.y;
-  // Smaller true-position markers leave room for physically close runners.
+  // All 18 horses receive the same scale in each view, including focus.
+  // No offset from the running coordinates and no larger highlighted marker.
   const compact=loc.w<540;
-  const scale=mini?.48:(points.length>=12?
-    (p.number===focused?(compact?.82:.90):(compact?.62:.72)):.86);
-  const radius=(p.number===focused?15.5:13.5)*scale;
+  const scale=mini?.48:(points.length>=12?(compact?.68:.76):.82);
+  const radius=13.5*scale;
   if(x+radius<0||x-radius>loc.w||y+radius<0||y-radius>loc.h)continue;
   raceNumberMarker(ctx,p.number,x,y,scale,p.number===focused,false,18,false);
   displayed.push({...p,x,y,r:radius});
@@ -272,6 +276,11 @@ window.CleanLab=Object.freeze({
      anchorX:p.actual.x,anchorY:p.actual.y})),
    directMarkerMaxError:lastLabelPositions.reduce((m,p)=>
      Math.max(m,Math.hypot(p.x-p.actual.x,p.y-p.actual.y)),0),
+   uniformMarkerRadiusPx:lastLabelPositions[0]?.r??null,
+   markerRadiusSpreadPx:lastLabelPositions.length?
+     Math.max(...lastLabelPositions.map(p=>p.r))-
+     Math.min(...lastLabelPositions.map(p=>p.r)):0,
+   focusedMarkerRadiusPx:lastLabelPositions.find(p=>p.number===selected)?.r??null,
    severeOverlapPairs:lastLabelPositions.reduce((n,a,i)=>n+
     lastLabelPositions.slice(i+1).filter(b=>
      Math.hypot(a.x-b.x,a.y-b.y)<.55*(a.r+b.r)).length,0),

@@ -1,4 +1,4 @@
-name: LAB highres clean SVG compact numbers browser acceptance
+name: LAB original SVG uniform circle size and gold focus outline acceptance
 on:
   push:
     branches: [main]
@@ -74,7 +74,10 @@ jobs:
                     selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen,
                     labelCoords:a.liveLabelPositions,selectedHorse:a.selectedHorse,
                     inwardMoves:a.inwardMoves,commonLaneController:a.commonLaneController,
-                    directMarkerMaxError:a.directMarkerMaxError};
+                    directMarkerMaxError:a.directMarkerMaxError,
+                    uniformMarkerRadiusPx:a.uniformMarkerRadiusPx,
+                    markerRadiusSpreadPx:a.markerRadiusSpreadPx,
+                    focusedMarkerRadiusPx:a.focusedMarkerRadiusPx};
                 }""")
                 assert not errors,(width,d,errors)
                 assert read['count']==read['running']==18,(width,d,read)
@@ -98,10 +101,17 @@ jobs:
                 error=max((((a['x']-a['anchorX'])**2+
                     (a['y']-a['anchorY'])**2)**.5 for a in labels),default=0)
                 assert error<1e-6,('NUMBER_MUST_BE_AT_HORSE_POSITION',width,d,error)
-                assert any(a['number']==read['selectedHorse'] for a in labels),('FOCUSED_HORSE_NUMBER_HIDDEN',width,d)
+                focused=[a for a in labels if a['number']==read['selectedHorse']]
+                assert len(focused)==1,('FOCUSED_HORSE_NUMBER_HIDDEN',width,d)
+                assert read['markerRadiusSpreadPx']<1e-7,('UNEQUAL_NUMBER_DIAMETERS',width,d,read)
+                assert abs(focused[0]['r']-read['uniformMarkerRadiusPx'])<1e-7,('FOCUSED_NUMBER_OVERSIZED',width,d,read)
+                assert abs(read['focusedMarkerRadiusPx']-read['uniformMarkerRadiusPx'])<1e-7,('GOLD_OUTLINE_ENLARGED_NUMBER',width,d,read)
                 if d>=310:
                   assert read['severeOverlapPairs']<=7,('SEVERE_BADGE_OCCLUSION',width,d,read['severeOverlapPairs'])
-                print('PASS_KYOTO1400_DIRECT_NUMBER',width,d,'error',error,'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
+                print('PASS_UNIFORM_GOLD_FOCUS_NUMBER',width,d,'error',error,
+                    'radius',read['uniformMarkerRadiusPx'],
+                    'spread',read['markerRadiusSpreadPx'],
+                    'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
                 print('PASS_ORIGINAL_BITMAP_AND_NUMBER_RUNNERS_REAL_BROWSER_18',width,d,read['inside'])
@@ -111,7 +121,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-clean-source-v8-mobile-desktop
+          name: lab-uniform-number-v9-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14
