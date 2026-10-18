@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'docs/lab/race-clean-course-*'
+      - 'docs/lab/race-clean-goal-view-v1.js'
       - 'docs/lab/race-clean-turf-mask-v1.js'
       - 'docs/lab/assets/kyoto-umapot-course-clean-v8.svg'
       - 'tools/test_race_clean_course_v1.cjs'
@@ -109,6 +110,10 @@ jobs:
                   assert read['goalFrame']['mode']=='kyoto1400-goal-camera',(width,d,read)
                   assert abs(read['goalFrame']['goalX']-read['canvasCSS']*.30)<1.5,('KYOTO_RIGHT_TO_LEFT_GOAL_X',width,d,read)
                   assert read['goalFrame']['visible']>0,('HORSE_NUMBERS_NOT_RUNNING_PAST_GOAL',width,d,read)
+                  frame=read['goalFrame']
+                  assert all(
+                    frame['top']+13+6 <= marker['y'] <= frame['bottom']-13-6
+                    for marker in frame['markers']),('GOAL_HORSE_NUMBER_OFF_TURF',width,d,frame)
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
                 assert read['commonLaneController'],('SHARED_KYOTO1400_ENGINE_MISSING',width,d)
