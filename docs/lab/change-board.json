@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "fa953cd59d13624991c8c150d17717f4f6600738",
+  "scan_commit": "e6cc4ccf4f202b55c32f1c628c90bc89571c9070",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v0.50：実況の拡大で画像が粗くなる問題を、うまぽっと由来の実芝帯境界をベクター描画する方式に変更。文字・補助線なし。選択馬周辺を拡大、馬番の読みやすい倍率へ。俯瞰図は原画像を維持、描画位置は共通。スマホ/PCおよび18頭で目視承認待ち。本番・STAGING・正式予想は変更しない。",
+      "next_action": "LAB v0.51：京都1400型の馬群幅に応じた最大4.6倍（単独5.2倍）カメラへ修正し、18頭時のマーカーを通常0.92/注目1.02へ縮小。実芝帯の色抽出境界は描画専用の平滑化＋C1連続二次曲線（原境界から最大3px以内）へ。画像/文字は実況非表示、俯瞰図は元画像。スマホ・PCの画像目視承認待ち。正式予想や他コース非変更。",
       "preview_path": "lab/race-simulator.html",
       "staging_paths": [],
       "lab_paths": [
