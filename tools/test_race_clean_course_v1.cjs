@@ -105,7 +105,7 @@ assert.ok(!app.includes("ctx.lineTo(p.actual.x,p.actual.y)"));
 assert.ok(app.includes('actualNumberCircles:true,paintedTrack:false,leaderLines:false'));
 assert.ok(!app.includes('const IMAGE_SCALE=4'));
 assert.ok(!app.includes('track(map.ctx,overview)'));
-assert.ok(app.includes('Math.max(2.3,Math.min(w<540?8.2:9.6'));
+assert.ok(app.includes('scale:w<540?7.0:7.8'));
 assert.ok(app.includes('RaceSimEngine.create('));
 assert.ok(html.includes('race-clean-turf-mask-v1.js?v=20261018-12'));
 const surface=fs.readFileSync(root+'race-clean-turf-mask-v1.js','utf8');
