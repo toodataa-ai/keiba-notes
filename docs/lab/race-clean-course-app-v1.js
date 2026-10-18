@@ -94,7 +94,9 @@ function advanceTo(distance){
  // Seek is a jump in simulation time. Do NOT interpolate the camera from
  // the starting gate across 900 metres: it leaves every horse off-screen.
  lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;visualRenderTime=null;
- visualLaneState.clear();
+ // A seek invalidates every previous rendered pose. Without this reset,
+ // a paused view would retain the starting gate although physics advanced.
+ lastRenderedPoints=[];visualLaneState.clear();
  finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
  const banner=$('finishBanner');if(banner)banner.hidden=true;
  paint();return engine.state;
