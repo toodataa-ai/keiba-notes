@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "af8821e1324c2de5223c66fd8f89399eb19d8b6e",
+  "scan_commit": "18096fc94ac0927c6ce4ab1f864200c9d381f8ae",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v13 Safari/WebKit 実機相当で『再生ボタンを押してもコース上の番号・距離が全く動かない』不具合の再現に成功（Github Actions 39122726041）。根本原因: original SVGのHTMLImageElement.naturalWidthはiPhone Safariで368px (高さ255)となるが、v12は620×430の完全一致を描画開始条件としていた。物理レースは進むがpaint()がturfReady=falseで早期returnしUIだけ0m静止。v13で原図の縦横比と画像のロード成功で判定、描画用canvasに元図ベクターを620x430座標として投影。Safariの実際の公開URLで起動・再生・距離進捗をCI監査して承認。本番/JRA予想データ・京都1400物理は変更しない。",
+      "next_action": "LAB v14 京都2000内回りの3課題を修正しQA合格、ユーザー実機承認待ち。①ゴール後の余走を3.2秒のカメラ引き＋最大6mの表示専用前進＋1〜3着馬番表示で自然に終了（物理結果不変）。②うまぽっと原図で約558〜634mの内ラチが途切れる箇所を、前後546〜646mの安全な走行端から補間し、緑のインフィールドへのショートカットを防止。③馬番の原画像上半径約1.31pxに合わせ安全余裕1.95pxへ変更し、最内レーンの内ラチからの最大距離をv13 14.235px→v14 11.772pxに縮小。距離1m刻み×15レーン=30015点で芝外0（実馬番半径1.8px）、500〜750mの0.5m連続監査飛びなし。CI Chromium+公開Pages一致 run 39124288535 PASS、iPhone WebKitローカル/実公開URLで再生+余走終了 run 39124357581 PASS。LAB限定・STAGING/本番/京都1400共通RaceSimEngine/正式JRA/NARデータ・買い目/PDF不変。実機iPhoneで見た目の承認前に本番公開しない。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
