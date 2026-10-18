@@ -4,8 +4,14 @@
  * fixed at 30% of the broadcast width. Display only: no race physics.
  */
 (function(global){'use strict';
+// The original Kyoto1400 goal camera has a 94px HUD margin. The clean
+// LAB broadcast is only 380px high, so compute the lane step to keep all
+// 15 lanes *inside* the painted turf rather than above the track on iPhone.
+function laneStep(height,maxLane){
+ return Math.min(30,height/16,(height-100)/(maxLane+3.2));
+}
 function goalScreenPosition(distance,lane,finish,width,height,maxLane,turn='左',pullback=1){
- const center=height*.52,step=Math.min(30,height/16)/pullback;
+ const center=height*.52,step=laneStep(height,maxLane)/pullback;
  const direction=turn==='右'?-1:1,finishX=turn==='右'?width*.30:width*.70;
  return {x:finishX+direction*(distance-finish)*width/(290*pullback),
          y:center+(lane-maxLane/2)*step};
@@ -32,8 +38,8 @@ function render(options){
  }
  const ctx=canvas.getContext('2d');
  ctx.setTransform(pixelW/w,0,0,pixelH/h,0,0);
- const center=h*.52,span=(maxLane/2+1.6)*Math.min(30,h/16);
- const top=Math.max(94,center-span),bottom=Math.min(h-48,center+span);
+ const center=h*.52,span=(maxLane/2+1.6)*laneStep(h,maxLane);
+ const top=Math.max(18,center-span),bottom=Math.min(h-22,center+span);
  ctx.clearRect(0,0,w,h);
  ctx.fillStyle='#244736';ctx.fillRect(0,0,w,h);
  ctx.fillStyle='#e3dfbe';ctx.fillRect(0,top,w,bottom-top);
@@ -57,5 +63,5 @@ function render(options){
  return {mode:'kyoto1400-goal-camera',goalX,top,bottom,
   markers,visible:markers.length,pullback,leaderD:Math.max(...points.map(p=>p.d))};
 }
-global.RaceCleanGoalView=Object.freeze({goalScreenPosition,drawGoalPost,render});
+global.RaceCleanGoalView=Object.freeze({goalScreenPosition,drawGoalPost,render,laneStep});
 })(typeof window!=='undefined'?window:globalThis);
