@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "4838442eae025b3dff40cf82a9164ab3cfeb3cbc",
+  "scan_commit": "643f72b9791e251bff751b025f78750faf88956b",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v11のコード・ブラウザQA合格、実機目視承認待ち。うまぽっと原本内回り芝帯の画像投影を『広い緑の中心』から『内ラチを軸にした安全細帯』へ変更、芝の分岐・合流時も内側線から16.13px以内（先頭最内レーン）かつ連続。固定レーン1m刻み×15レーン=30,015点で芝外0、最大1m画像移動1.085px。500–750mを0.5m刻み×8レーンで芝外0、最大0.5002px/0.5m。390/1024px×20区間、同サイズ馬番・Pages一致・隔離監査合格。Actions 39120551591。実機の4倍速表示で確認後、本番昇格判断。京都1400共通物理/予想/買い目/データ/本番は未変更。",
+      "next_action": "LAB v12：前版v11の『内ラチからかなり離れた状態』と『馬番が震える』を是正。元図芝帯から円が外れないことを実測しつつ最内レーンの画像オフセットを低減（下限3.25px、元SVG緑帯安全を検証）、1m毎の安全走路上下限を±17m×2回距離方向に平滑化。カメラの倍率と目標位置を馬群の人数出入りで変えず、先頭群ソフトウェイト追従＆定倍率。物理0.08秒刻みの間を描画時補間、レーン進路も描画のみ平滑化。物理計算は京都1400共通不変。390/1024px×20地点＋500–750m連続＋4倍速フレーム統計で監査、LAB目視承認待ち。本番/正式予想不変。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -66,13 +66,13 @@
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
-        "docs/lab/race-clean-course-app-v1.js": "4ec0ea3c2229835b5ba5e4db4290f51753ad276a",
-        "docs/lab/race-clean-course-v1.html": "fed2fe98a964fc5745293dedf5507d1abcee5bba",
+        "docs/lab/race-clean-course-app-v1.js": "d6247d2ce34842aadab4af07898572e7a1bf9850",
+        "docs/lab/race-clean-course-v1.html": "d4db170655e51df58b8703a664c0ae7eb0c94bd5",
         "docs/lab/race-clean-course-v1.css": "027324a3ad4713e5fbb3e95a3c7407439db93648",
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19",
         "docs/lab/race-clean-turf-mask-v1.js": "f5d45652d2e4a3429de324494262ab00aed852e4"
       },
-      "latest_source_change_commit": "4838442eae025b3dff40cf82a9164ab3cfeb3cbc"
+      "latest_source_change_commit": "643f72b9791e251bff751b025f78750faf88956b"
     },
     {
       "id": "course-catalog",
