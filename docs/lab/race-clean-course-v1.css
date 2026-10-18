@@ -54,3 +54,9 @@ canvas{display:block;width:100%;background:#f4f6f0}
  * It overlays (never alters) the source SVG & visual horse coordinates. */
 .goal-camera{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:2;background:#244736}
 .goal-camera[hidden]{display:none}
+
+/* LAB v18: SVG-source-derived straightened distance-faithful broadcast.
+   Whole-course overview and legacy image-follow mode stay untouched. */
+.distance-camera{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:1;background:#304a38;pointer-events:none}
+.distance-camera[hidden]{display:none}
+.broadcast-explainer{margin:0;padding:5px 12px;background:#eff6f0;color:#49604f;font-size:11px;line-height:1.5}
