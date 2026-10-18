@@ -1,0 +1,76 @@
+name: LAB inspect official Umapot clean Kyoto source (no production assets)
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/lab-umapot-clean-source-probe-v1.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download publisher original files for QA only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/umapot/original /tmp/umapot/preview
+          curl -fLsS --retry 2 --connect-timeout 10 --max-time 90 -A 'Mozilla/5.0' 'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse.zip' -o /tmp/umapot/original/kyoto_couse.zip
+          curl -fLsS --retry 2 --connect-timeout 10 --max-time 45 -A 'Mozilla/5.0' 'https://umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg' -o /tmp/umapot/original/marked.jpg
+          curl -fLsS --retry 2 --connect-timeout 10 --max-time 45 -A 'Mozilla/5.0' 'https://umapot.com/web_sozai/lace2/kyt.jpg' -o /tmp/umapot/original/blank-2015.jpg
+          unzip -l /tmp/umapot/original/kyoto_couse.zip
+          unzip -qo /tmp/umapot/original/kyoto_couse.zip -d /tmp/umapot/original/source
+          find /tmp/umapot/original/source -maxdepth 3 -type f -printf '%p %s bytes\n'
+      - name: Inspect source PPTX structure and render full-detail clean slides
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends libreoffice-impress python3-pil >/tmp/umapot/install.log 2>&1
+          python3 -m pip install --quiet --break-system-packages python-pptx pymupdf pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from pptx import Presentation
+          from PIL import Image
+          p=Path('/tmp/umapot/original/source')
+          sources=list(p.rglob('*.pptx'))+list(p.rglob('*.ppt'))
+          print('SLIDE_SOURCES',[(str(f),f.stat().st_size) for f in sources])
+          for f in sources:
+           if f.suffix.lower()!='.pptx':continue
+           pres=Presentation(str(f))
+           print('PPTX_PROFILE',str(f),'slides',len(pres.slides),'ratio',pres.slide_width/pres.slide_height)
+           for k,sl in enumerate(pres.slides):
+            txt=[sh.text[:90] for sh in sl.shapes if sh.has_text_frame and sh.text.strip()]
+            print('PPTX_SLIDE',k,'shapes',len(sl.shapes),'nonblank_text',txt[:25])
+          for u in ('marked.jpg','blank-2015.jpg'):
+           with Image.open('/tmp/umapot/original/'+u) as im: print('JPEG',u,im.size)
+          PY
+          find /tmp/umapot/original/source -iname '*.pptx' -print0 |
+          while IFS= read -r -d '' f; do
+            echo "RENDERING $f"
+            mkdir -p /tmp/umapot/pdf
+            libreoffice -env:UserInstallation=file:///tmp/umapot-lo-${RANDOM} --headless --convert-to pdf --outdir /tmp/umapot/pdf "$f"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import fitz
+          from PIL import Image
+          d=Path('/tmp/umapot/preview')
+          for f in Path('/tmp/umapot/pdf').glob('*.pdf'):
+           pdf=fitz.open(str(f))
+           print('PDF',f,'pages',len(pdf))
+           for i,page in enumerate(pdf):
+            pix=page.get_pixmap(matrix=fitz.Matrix(4,4),alpha=False)
+            out=d/(f.stem+f'-slide{i+1}.png')
+            pix.save(str(out))
+            print('EXPORTED',out,pix.width,pix.height)
+          PY
+      - name: Upload QA only - never copy source images into published docs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publisher-original-kyoto-clean-slide-QA-only
+          path: |
+            /tmp/umapot/preview/*.png
+            /tmp/umapot/install.log
+          if-no-files-found: warn
+          retention-days: 3
