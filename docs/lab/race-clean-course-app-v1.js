@@ -164,7 +164,7 @@ function displayPoints(state){
   const trail=h.trail||[];
   const last=trail.at(-1),before=trail.at(-2);
   const travel=last&&before?Math.max(0,last.d-before.d):0;
-  const lastStep=state.tick>0?.08:.08;
+  const lastStep=.08;
   const visualD=(h.displayD??h.d)+Math.min(1.7,travel/lastStep*fraction);
   const desiredLane=Math.max(0,Math.min(14,h.lane+(h.laneVelocity||0)*fraction));
   const previous=visualLaneState.get(h.number);
@@ -309,7 +309,12 @@ function setup(){
  requestAnimationFrame(tick);
 }
 window.CleanLab=Object.freeze({
- getState:()=>engine?.state,inspect:()=>{
+ getState:()=>engine?.state,
+ // Cheap, per-animation-frame diagnostic for REAL 4x playback QA.
+ frameSample:()=>({t:engine?.state?.t??0,playing,zoom:lastCamera?.scale??0,
+  camera:lastCamera?{x:lastCamera.x,y:lastCamera.y}:null,
+  horses:lastRenderedPoints.map(p=>({number:p.number,x:p.x,y:p.y,d:p.d,lane:p.lane}))}),
+ inspect:()=>{
   const points=turfReady?(lastRenderedPoints.length?lastRenderedPoints:
   turf.runners(engine.state)):model.runners(engine.state);
   const selected=focusNo==='leader'?engine.state.leadingNo:Number(focusNo);

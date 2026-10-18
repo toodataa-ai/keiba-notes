@@ -1,4 +1,4 @@
-name: LAB Kyoto inner rail smooth route 500-750m and source turf occupancy acceptance
+name: LAB Kyoto inner rail close smooth numbered horses fixed camera acceptance
 on:
   push:
     branches: [main]
@@ -129,7 +129,7 @@ jobs:
                   assert audit['badCenters']==0,('HORSES_CENTER_NOT_GREEN',width,audit)
                   assert audit['badDiscs']==0,('HORSES_DIAMETER_NOT_ON_GREEN',width,audit)
                   assert audit['maxStationJump']<1.6,('ABRUPT_JUMP_EVERY_1M',width,audit)
-                  assert audit['maxLane0FromInner']<19,('LEADER_WENT_TOO_FAR_OUTSIDE',width,audit)
+                  assert audit['maxLane0FromInner']<15,('LEADER_STILL_TOO_FAR_OUTSIDE',width,audit)
                   assert audit['tooFarOut']==0,('LEADER_OUTSIDE_FIRST_CORRIDOR',width,audit)
                   assert audit['minWidth']>=9,('CORRIDOR_TOO_NARROW',width,audit)
                   assert audit['maxJump']<1.7,('HORSE_JUMP_PER_METRE',width,audit)
@@ -158,7 +158,7 @@ jobs:
                   print('KYOTO_500_750_SMOOTH_INNER_RUNNING',width,curve)
                   assert curve['offGreen']==0,('TURN_OFF_GREEN',width,curve)
                   assert curve['maxJump']<1.1,('SUDDEN_OUT_IN_VEHICLE_MOTION',width,curve)
-                  assert curve['maxInnerOffset']<19,('WIDE_OUTER_SWERVE',width,curve)
+                  assert curve['maxInnerOffset']<14.5,('STILL_TOO_FAR_FROM_INNER_RAIL',width,curve)
                 if d==909:
                   if width==390:
                     runoff=page.evaluate("""() => {
@@ -180,7 +180,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-inside-rail-smooth-v11-mobile-desktop
+          name: lab-inner-close-smooth-v12-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14

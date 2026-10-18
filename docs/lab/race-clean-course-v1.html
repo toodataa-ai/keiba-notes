@@ -9,7 +9,7 @@
 <p>LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・実馬・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">新方式 v11・内ラチ沿いに滑らかに走る芝帯固定＋同サイズ馬番／LAB未承認</div>
+<div class="tag">新方式 v12・内ラチへ接近・馬番の震えを軽減／LAB未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
@@ -38,7 +38,7 @@
 <section class="panel notes">
 <p><strong>今回の検証点：</strong>コース形状は原画像と完全に同じものを使い、画像の変形は等倍率の拡大・平行移動のみ。走行位置の内部座標と18頭の丸番号の視認性を検証します。</p>
 <p>実況のコースは一切描き直しません。うまぽっと原本PowerPointのコース図形から直接書き出したベクターSVGを全体図・実況の双方で使用します。JPEGの4倍引き伸ばしをやめたため、ズームしても線が鮮明です。不要な注記や矢印はありません。</p>
-<p><strong>馬番そのものが走る：</strong>京都1400共通の走行計算に基づき、うまぽっと原図の<strong>内ラチ側の芝帯</strong>に沿って走行番号を配置します。緑色の芝が広くつながっていても、芝全体の中央へ引っ張られたり突然内側へ戻ったりしないよう、基準内ラチからの距離と走行線の変化速度を制限しています。番号の円サイズは全馬同じで、追跡中は金枠のみです。</p>
+<p><strong>馬番そのものが走る：</strong>京都1400共通の走行計算に基づき、うまぽっと原図の<strong>内ラチに寄せた芝帯内のライン</strong>を走ります。芝との安全距離を検査し、線の細かな誤差を距離方向にならします。<strong>4倍速でも震えないよう</strong>、馬の表示位置は物理演算のフレーム間を補間し、カメラの倍率を固定しています。番号は全馬同じサイズで、追跡は金枠だけです。</p>
 <p><strong>走り方も京都1400と共通：</strong>RaceLaneAIとRaceSimEngineをそのまま利用。スタート後は衝突を避けて内へ寄り、内側が空けば内優先、詰まれば必要に応じて外へ。逃げ・先行・差し・追込、先行争いによるペース変化も従来ロジックを継承しています。</p>
 <p>コース寸法はJRA芝Aコース基準（1周1,782.8m・最後の直線328.4m・初角まで308.7m・幅員27〜38m・内回り高低差3.1m）を参照。コースの形状はうまぽっと原画像に合わせたイラスト上の較正であり、測量図の精度ではありません。18頭の重なり・コース形状は目視承認前です。</p>
 <p>確認：<a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=585">585m</a> ／ <a href="?checkpoint=602">602m</a> ／ <a href="?checkpoint=640">640m</a> ／ <a href="?checkpoint=700">700m</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1672">直線入口</a></p>
@@ -50,8 +50,8 @@
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
 <script src="race-sim-engine.js?v=20261016-41"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
-<script src="race-clean-course-v1.js?v=20261018-11"></script>
-<script src="race-clean-turf-mask-v1.js?v=20261018-11"></script>
-<script src="race-clean-course-app-v1.js?v=20261018-11"></script>
+<script src="race-clean-course-v1.js?v=20261018-12"></script>
+<script src="race-clean-turf-mask-v1.js?v=20261018-12"></script>
+<script src="race-clean-course-app-v1.js?v=20261018-12"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
