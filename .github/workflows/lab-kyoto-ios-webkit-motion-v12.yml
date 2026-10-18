@@ -39,11 +39,12 @@ jobs:
             page.on('pageerror',lambda e:exceptions.append(str(e)))
             page.on('console',lambda m:print('SAFARI_JS_CONSOLE',m.type,m.text) if m.type=='error' else None)
             page.on('requestfailed',lambda request:print('SAFARI_FAILED_REQUEST',request.url,request.failure))
+            page.on('response',lambda response:print('SAFARI_NETWORK',response.status,response.request.resource_type,response.url) if ('kyoto-umapot' in response.url or response.status>=400) else None)
             try:
              started=time.monotonic()
              page.goto(url,wait_until='domcontentloaded',timeout=35000)
              print('WEBKIT_DOCUMENT_LOADED',url,'seconds',round(time.monotonic()-started,2))
-             page.wait_for_timeout(4500)
+             page.wait_for_timeout(8000)
              before=page.evaluate("""() => ({
                start:document.getElementById('startBtn')?.textContent,
                progress:document.getElementById('progress')?.textContent,
@@ -51,9 +52,15 @@ jobs:
                  leader:CleanLab.inspect().leader,vectorReady:CleanLab.inspect().vectorReady,
                  turfReady:CleanLab.inspect().turfReady,turfError:CleanLab.inspect().turfError
                })})""")
+             images=page.evaluate("""() => [...document.images].map(e=>({
+               id:e.id,src:e.src,complete:e.complete,naturalWidth:e.naturalWidth,
+               naturalHeight:e.naturalHeight,currentSrc:e.currentSrc,
+               crossOrigin:e.crossOrigin
+             }))""")
+             print('SAFARI_IMAGE_DETAIL',json.dumps(images,ensure_ascii=False))
              print('SAFARI_BEFORE_CLICK',json.dumps(before,ensure_ascii=False))
              page.locator('#startBtn').click(timeout=15000)
-             page.wait_for_timeout(3400)
+             page.wait_for_timeout(5000)
              after=page.evaluate("""() => ({
                start:document.getElementById('startBtn')?.textContent,
                progress:document.getElementById('progress')?.textContent,
@@ -69,6 +76,10 @@ jobs:
                  'state':after.get('state'),'play':after.get('frame',{}).get('playing'),
                  'turf':after.get('inspect'),'numHorses':len(after.get('frame',{}).get('horses',[]))},ensure_ascii=False))
              print('SAFARI_JS_ERRORS',json.dumps(exceptions,ensure_ascii=False))
+             print('SAFARI_IMAGE_DETAIL_AFTER',json.dumps(page.evaluate("""() => [...document.images].map(e=>({
+               id:e.id,src:e.src,complete:e.complete,naturalWidth:e.naturalWidth,
+               naturalHeight:e.naturalHeight
+             }))"""),ensure_ascii=False))
              if not after.get('state') or not before.get('inspect') or not after.get('inspect'):
               raise AssertionError('LAB_SCRIPT_NOT_LOADED')
              if not before['inspect']['turfReady'] or not after['inspect']['turfReady']:
