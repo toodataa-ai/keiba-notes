@@ -1,4 +1,4 @@
-/* LAB v16 — source-arc-length calibrated visual metres across both Kyoto turns.
+/* LAB v17 — every-course-section continuous metre-to-source-image arc calibration.
  * v10 wrongly targeted the CENTER of an often-merged green region; where
  * inside/outside green paths meet, it steered horses outside then suddenly
  * recentered. v11 instead selects a SAFE inner corridor relative to the
@@ -14,7 +14,7 @@ const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 let grid=null,samples=null,statistics=null,sourceDistanceTable=null;
-const ARC_FROM=1270, ARC_TO=1672;
+const ARC_ANCHORS=Object.freeze([0,308.7,530,720,1270,1435,1671.6,2000]);
 // SVG artwork is stylized rather than surveyed. Around 1435m the drawn
 // centreline changes from about 0.76 to 0.50 source px per race metre,
 // making real horses appear to telescope together. Equalize physical
@@ -199,75 +199,99 @@ function positionAt(d,lane){
 }
 // A monotonically increasing picture-distance mapping, fully anchored to
 // the source drawing and race metre checkpoints.
+// Deterministic non-visual anchor preservation, including the fractional
+// 308.7m and 1671.6m entries. Both the SVG and RaceSimEngine are untouched.
+// Only the distance -> source-image path parameter is changed.
 function buildSourceArcMap(){
- // Use the EXACT illustrated third/fourth turn boundary as a hard anchor.
- // The old free arc-length calibration erased 1435m and shifted the split
- // by more than 30 illustrated race metres: not acceptable for fidelity.
- const count=ARC_TO-ARC_FROM,pivot=1435-ARC_FROM,
-   arc=new Float64Array(count+1);
- let prev=positionAt(ARC_FROM,2);
- for(let i=1;i<=count;i++){
-  const p=positionAt(ARC_FROM+i,2);
-  arc[i]=arc[i-1]+Math.hypot(p.x-prev.x,p.y-prev.y);
+ const end=2000,arc=new Float64Array(end+1);
+ let prev=positionAt(0,2);
+ for(let d=1;d<=end;d++){
+  const p=positionAt(d,2);
+  arc[d]=arc[d-1]+Math.hypot(p.x-prev.x,p.y-prev.y);
   prev=p;
  }
- const total=arc[count],left=arc[pivot],right=total-left;
- if(left<50||right<50||total>500)throw Error('UMAPOT_ARC_LENGTH_UNEXPECTED:'+total);
- // Cubic Hermite: C1 continuous source-image speed at 1435m while
- // preserving all three source-labeled real race metre anchors:
- // physical 1270 -> image 1270; 1435 -> 1435; 1672 -> 1672.
- const leftMean=left/pivot,rightMean=right/(count-pivot);
- const common=2*leftMean*rightMean/(leftMean+rightMean);
- const hermite=(q,h,start,end,startSlope,endSlope)=>{
-  const u=q/h,u2=u*u,u3=u2*u;
-  return (2*u3-3*u2+1)*start+
-   (u3-2*u2+u)*h*startSlope+
-   (-2*u3+3*u2)*end+
-   (u3-u2)*h*endSlope;
+ const arcAt=d=>{
+  const a=Math.floor(d),b=Math.ceil(d),t=d-a;
+  return arc[a]*(1-t)+arc[b]*t;
  };
- const mapped=new Float64Array(count+1);
- let maxShift=0,maxSlope=0,minSlope=Infinity;
- for(let i=0;i<=count;i++){
-  const desiredArc=i<=pivot?
-   hermite(i,pivot,0,left,leftMean,common):
-   hermite(i-pivot,count-pivot,left,total,common,rightMean);
-  let lo=0,hi=count;
+ // Mean illustrated arc px per race metre within every physically named
+ // course section; adapt segment velocity continuously at the boundaries.
+ const edgeArc=ARC_ANCHORS.map(arcAt);
+ const rates=ARC_ANCHORS.slice(1).map((b,i)=>
+  (edgeArc[i+1]-edgeArc[i])/(b-ARC_ANCHORS[i]));
+ const slopes=ARC_ANCHORS.map((_,i)=>{
+  if(i===0)return rates[0];
+  if(i===ARC_ANCHORS.length-1)return rates.at(-1);
+  const a=rates[i-1],b=rates[i];
+  // Harmonic mean gives C1 image progress at section boundaries without
+  // allowing a nonmonotonic spline between any two fixed checkpoints.
+  return 2*a*b/(a+b);
+ });
+ const hermite=(q,len,start,finish,startSlope,endSlope)=>{
+  const t=q/len,t2=t*t,t3=t2*t;
+  return (2*t3-3*t2+1)*start+
+   (t3-2*t2+t)*len*startSlope+
+   (-2*t3+3*t2)*finish+
+   (t3-t2)*len*endSlope;
+ };
+ const nodes=Array.from({length:end+1},(_,i)=>i);
+ for(const a of ARC_ANCHORS){
+  if(!Number.isInteger(a))nodes.push(a);
+ }
+ nodes.sort((a,b)=>a-b);
+ const dedup=nodes.filter((x,i)=>i===0||x>nodes[i-1]+1e-8);
+ const mapped=[];
+ const locate=px=>{
+  let lo=0,hi=end;
   while(lo<hi){
    const mid=(lo+hi)>>1;
-   if(arc[mid]<desiredArc)lo=mid+1;else hi=mid;
+   if(arc[mid]<px)lo=mid+1;else hi=mid;
   }
-  const idx=Math.max(0,Math.min(count-1,lo-1));
-  const delta=arc[idx+1]-arc[idx];
-  const imageD=ARC_FROM+idx+(delta>.00001?(desiredArc-arc[idx])/delta:0);
-  mapped[i]=imageD;
-  maxShift=Math.max(maxShift,Math.abs(imageD-(ARC_FROM+i)));
-  if(i>0){
-   const advance=imageD-mapped[i-1];
-   if(advance<=.12||advance>=3)
-    throw Error('UMAPOT_ARC_PARAMETER_SPEED_UNSAFE_'+i+'_'+advance);
-   maxSlope=Math.max(maxSlope,advance);
-   minSlope=Math.min(minSlope,advance);
+  const i=Math.max(0,Math.min(end-1,lo-1)),
+   span=arc[i+1]-arc[i];
+  return i+(span>.00000001?(px-arc[i])/span:0);
+ };
+ let section=0,maxShift=0,maxRate=0,minRate=Infinity;
+ for(let n=0;n<dedup.length;n++){
+  const d=dedup[n];
+  while(section<ARC_ANCHORS.length-2&&d>ARC_ANCHORS[section+1]+1e-8)
+   section++;
+  const from=ARC_ANCHORS[section],to=ARC_ANCHORS[section+1],
+   base=edgeArc[section],goal=edgeArc[section+1];
+  const target=hermite(d-from,to-from,base,goal,slopes[section],slopes[section+1]);
+  let src=locate(target);
+  if(ARC_ANCHORS.some(a=>Math.abs(d-a)<1e-8))src=d;
+  if(!Number.isFinite(src)||src<0||src>end)
+   throw Error('FULL_COURSE_IMAGE_PROJECTION_OUTSIDE_SOURCE_'+d);
+  mapped.push(src);
+  maxShift=Math.max(maxShift,Math.abs(src-d));
+  if(n>0){
+   const rate=(src-mapped[n-1])/(d-dedup[n-1]);
+   if(!Number.isFinite(rate)||rate<.10||rate>3)
+    throw Error('FULL_COURSE_IMAGE_PROJECTION_NONMONOTONE_'+d+'_'+rate);
+   maxRate=Math.max(maxRate,rate);
+   minRate=Math.min(minRate,rate);
   }
  }
- if(Math.abs(mapped[pivot]-1435)>.00001||
-    Math.abs(mapped[0]-ARC_FROM)>.00001||
-    Math.abs(mapped[count]-ARC_TO)>.00001)
-  throw Error('SOURCE_RACE_ANCHOR_PRESERVATION_FAILED');
- mapped.summary={from:ARC_FROM,turnBoundary:1435,to:ARC_TO,
-  originalArcPx:total,thirdTurnArcPx:left,fourthTurnArcPx:right,
-  thirdTurnAveragePxPerM:leftMean,fourthTurnAveragePxPerM:rightMean,
-  continuousBoundaryRatePxPerM:common,
-  anchoredMetres:[1270,1435,1672],maxMetresOfImagePhaseAdjustment:maxShift,
-  minSourceAdvancePerM:minSlope,maxSourceAdvancePerM:maxSlope,
-  immutableSharedEngine:true};
- return mapped;
+ const summary={anchors:ARC_ANCHORS.slice(),rates,slopes,
+  illustratedArcPx:arc[end],maxMetresOfImagePhaseAdjustment:maxShift,
+  minSourceAdvancePerRaceM:minRate,maxSourceAdvancePerRaceM:maxRate,
+  immutableSharedEngine:true,samplingEveryM:1};
+ return {nodes:dedup,mapped,summary};
 }
 function sourceDistance(distance){
  const d=clamp(Number(distance)||0,0,2000);
- if(!sourceDistanceTable||d<=ARC_FROM||d>=ARC_TO)return d;
- const x=d-ARC_FROM,i=Math.floor(x),fraction=x-i;
- return sourceDistanceTable[i]*(1-fraction)+
-  sourceDistanceTable[Math.min(sourceDistanceTable.length-1,i+1)]*fraction;
+ if(!sourceDistanceTable)return d;
+ const nodes=sourceDistanceTable.nodes,map=sourceDistanceTable.mapped;
+ let lo=0,hi=nodes.length-1;
+ while(lo<hi){
+  const mid=(lo+hi)>>1;
+  if(nodes[mid]<d)lo=mid+1;else hi=mid;
+ }
+ if(Math.abs(nodes[lo]-d)<1e-9)return map[lo];
+ const lower=Math.max(0,lo-1),span=nodes[lo]-nodes[lower];
+ const frac=span>0?(d-nodes[lower])/span:0;
+ return map[lower]*(1-frac)+map[lo]*frac;
 }
 function point(distance,lane=0){
  if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
