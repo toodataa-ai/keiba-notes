@@ -2,7 +2,10 @@ name: LAB Kyoto iOS WebKit GOAL-board switch and racing-finish presentation
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/lab-kyoto-ios-webkit-motion-v12.yml']
+    paths:
+      - '.github/workflows/lab-kyoto-ios-webkit-motion-v12.yml'
+      - 'docs/lab/race-clean-turf-mask-v1.js'
+      - 'docs/lab/race-clean-course-v1.html'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -24,8 +27,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=15',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=15'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=16',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=16'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
@@ -91,6 +94,22 @@ jobs:
              if exceptions:raise AssertionError('WEBKIT_JS_ERRORS')
              page.screenshot(path='/tmp/webkit-kyoto-'+('local' if '127.0.0.1' in url else 'public')+'.png')
              print('PASS_WEBKIT_IPHONE_START_AND_MOVEMENT',url)
+             # The fixed 1435m illustrated corner must not cause apparent
+             # pack telescoping or move the landmark when on iPhone WebKit.
+             probe=page.evaluate("""() => ({
+               arc:RaceCleanTurf.stats().imageArcRegistration,
+               anchor:RaceCleanTurf.sourceDistance(1435),
+               sourceAt1400:RaceCleanTurf.sourceDistance(1400),
+               sourceAt1460:RaceCleanTurf.sourceDistance(1460),
+               turf:RaceCleanTurf.audit(5,1.8)
+             })""")
+             print('SAFARI_1400M_SMOOTH_PACK_REGISTRATION',url,json.dumps({
+               'arc':probe['arc'],'anchor':probe['anchor'],
+               '1400':probe['sourceAt1400'],'1460':probe['sourceAt1460'],
+               'offGreen':probe['turf']['badDiscs']},ensure_ascii=False))
+             assert abs(probe['anchor']-1435)<1e-8
+             assert probe['arc']['maxMetresOfImagePhaseAdjustment']<12
+             assert probe['turf']['badDiscs']==0
              # Reuse exactly the same iPhone WebKit context through the wire.
              page.evaluate('() => CleanLab.advanceTo(1970)')
              board=page.evaluate("""() => ({
