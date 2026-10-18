@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v14 京都2000内回りの3課題を修正しQA合格、ユーザー実機承認待ち。①ゴール後の余走を3.2秒のカメラ引き＋最大6mの表示専用前進＋1〜3着馬番表示で自然に終了（物理結果不変）。②うまぽっと原図で約558〜634mの内ラチが途切れる箇所を、前後546〜646mの安全な走行端から補間し、緑のインフィールドへのショートカットを防止。③馬番の原画像上半径約1.31pxに合わせ安全余裕1.95pxへ変更し、最内レーンの内ラチからの最大距離をv13 14.235px→v14 11.772pxに縮小。距離1m刻み×15レーン=30015点で芝外0（実馬番半径1.8px）、500〜750mの0.5m連続監査飛びなし。CI Chromium+公開Pages一致 run 39124288535 PASS、iPhone WebKitローカル/実公開URLで再生+余走終了 run 39124357581 PASS。LAB限定・STAGING/本番/京都1400共通RaceSimEngine/正式JRA/NARデータ・買い目/PDF不変。実機iPhoneで見た目の承認前に本番公開しない。",
+      "next_action": "LAB v15 実装・Chromium+WebKit公開QA合格／ユーザーiPhone目視承認待ち。京都1400のゴール板固定カメラを京都2000へ移植し、発走距離1920m（ゴール前80m）から右→左GOAL板通過の専用実況画面へ切替、ゴール後は既存3.2秒余走＋1〜3着表示。実況ズームはスマホ7.0→8.8倍、PC7.8→9.7倍、カメラ倍率可変による震えを復活させない。馬群の追走/失速/ペース/進路/渋滞補正は京都1400と正確に同じRaceSimEngine(v20261016-41)、RaceLaneAI(v20261015-25)、新しい京都2000独自の補正なし。架空18頭テレメトリでは先頭〜最後尾実間隔900m37.7m→1500m21.2m、最大100m縮小1200-1300m4.0mで段階的。CI Chromium 390/1024px×23地点・ゴール板マーカー全馬芝領域・4倍速・既存内ラチ・公開LAB一致 run39167272741 PASS。WebKit iPhone相当の公開ページ再生・1920m切替・表示・余走 run39167429536 PASS。LABのみ、本番・staging・正式予想・買い目・NAR/Shadow、京都1400物理は無変更。ユーザーの見た目承認後にのみ昇格可。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -39,9 +39,10 @@
         "docs/lab/race-clean-course-v1.html",
         "docs/lab/race-clean-course-v1.css",
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg",
-        "docs/lab/race-clean-turf-mask-v1.js"
+        "docs/lab/race-clean-turf-mask-v1.js",
+        "docs/lab/race-clean-goal-view-v1.js"
       ],
-      "shape_alignment": "v14_original_svg_inner_gap_bridge_558_634_and_tighter_badge_clearance_finished_coast_3p2s_verified_39124288535_39124357581_approval_pending"
+      "shape_alignment": "v15_kyoto1400_shared_physics_goal_board_80m_25percent_closer_chrome_39167272741_webkit_39167429536_lab_unapproved"
     },
     {
       "id": "course-catalog",
