@@ -49,3 +49,8 @@ canvas{display:block;width:100%;background:#f4f6f0}
 .finish-banner strong{font-size:14px}
 .finish-banner span{font-variant-numeric:tabular-nums}
 @keyframes finish-arrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+
+/* LAB v15: Kyoto1400-style fixed GOAL board camera from the final 80m.
+ * It overlays (never alters) the source SVG & visual horse coordinates. */
+.goal-camera{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:2;background:#244736}
+.goal-camera[hidden]{display:none}
