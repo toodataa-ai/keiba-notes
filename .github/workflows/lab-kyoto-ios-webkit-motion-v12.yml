@@ -1,4 +1,4 @@
-name: LAB Kyoto iOS WebKit GOAL-board switch and racing-finish presentation
+name: LAB Kyoto iOS WebKit unchanged original SVG camera zoom and finish
 on:
   push:
     branches: [main]
@@ -6,6 +6,8 @@ on:
       - '.github/workflows/lab-kyoto-ios-webkit-motion-v12.yml'
       - 'docs/lab/race-clean-turf-mask-v1.js'
       - 'docs/lab/race-clean-course-v1.html'
+      - 'docs/lab/race-clean-course-app-v1.js'
+      - 'docs/lab/race-clean-curve-camera-v1.js'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -27,8 +29,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=17',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=17'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1350&v=19',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=1350&v=19'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
@@ -92,6 +94,23 @@ jobs:
              if after['state']['leader']<before['inspect']['leader']+5:
               raise AssertionError('LAB_NOT_MOVING_AFTER_START')
              if exceptions:raise AssertionError('WEBKIT_JS_ERRORS')
+             # Assert original SVG and all horse coords survive iPhone WebKit.
+             lens=page.evaluate("""() => {
+               const a=CleanLab.inspect();
+               return {ready:a.cameraLensReady,
+                 enabled:a.cameraLensEnabled,unchanged:a.unchangedBackgroundAffineOnly,
+                 source:a.originalImageSrc,live:a.liveImageSrc,
+                 gain:a.cameraLensGain,stats:a.cameraLensStats,
+                 numbers:a.liveLabelPositions.length,
+                 offTurf:a.turfBadDiscs,coordError:a.directMarkerMaxError,
+                 brokenImage:!a.liveImageLoaded}
+             }""")
+             print('WEBKIT_SOURCE_SVG_GENTLE_CURVE_LENS',url,json.dumps(lens,ensure_ascii=False)[:3800])
+             assert lens['ready'] and lens['enabled'] and lens['unchanged'],('CURVE_LENS_MISSING_WEBKIT',url,lens)
+             assert lens['source']==lens['live'] and 'kyoto-umapot-course-clean-v8.svg' in lens['source']
+             assert lens['stats']['imageUnmodified'] and lens['stats']['physicsUnmodified']
+             assert lens['stats']['thirdFourthTurn']['ratioAfter']<lens['stats']['thirdFourthTurn']['ratioBefore']
+             assert lens['numbers']>0 and lens['offTurf']==0 and lens['coordError']==0 and not lens['brokenImage']
              page.screenshot(path='/tmp/webkit-kyoto-'+('local' if '127.0.0.1' in url else 'public')+'.png')
              print('PASS_WEBKIT_IPHONE_START_AND_MOVEMENT',url)
              # The fixed 1435m illustrated corner must not cause apparent
