@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "2026-10-18 source-image shape audit: v4 smoothness/18-label CI passed BUT faithful Umapot turf position FAILED. On original 620x430 screenshot, 2px color-tolerant green membership across 2001 sampled points: lane0 78.7%, lane6 88.3%, center 89.5%; particularly 1C entry and 900-1200m backstretch misregistration. Audit includes text/label occlusion false negatives so thresholds are diagnostic, not measured accuracy. Must retake source-image-centered inner/outer rail tracings, validate whole length against original and review screenshots BEFORE any approval. LAB only; STAGING/production/formal DATA untouched.",
+      "next_action": "LAB v5：うまぽっと京都620×430原画像を内・外2本の芝ラチとして独立トレース。60ノットを弧長走行距離ベースのC1 splineに統合、中央固定幅方式は廃止。ローカル画像の2px許容HSV緑帯検査で各2001地点×6レーンが99.3〜100%一致（文字などの偽陰性あり）。スマホ/PC実ブラウザQAと目視承認待ち。LAB限定、本番・STAGING・正式DATA不変。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -39,7 +39,7 @@
         "docs/lab/race-clean-course-v1.html",
         "docs/lab/race-clean-course-v1.css"
       ],
-      "shape_alignment": "failed_pending_original_image_retrace"
+      "shape_alignment": "v5_source_image_dual_rail_audit_pending_browser_qa"
     },
     {
       "id": "course-catalog",
