@@ -1,4 +1,4 @@
-/* LAB v11 — original Umapot SVG, continuous INSIDE rail anchored corridor.
+/* LAB v12 — source inner green safety pixels with smoothed and tightened lane bounds.
  * v10 wrongly targeted the CENTER of an often-merged green region; where
  * inside/outside green paths meet, it steered horses outside then suddenly
  * recentered. v11 instead selects a SAFE inner corridor relative to the
@@ -8,7 +8,8 @@
  */
 (function(global){'use strict';
 const W=620,H=430,RASTER=3;
-const CLEARANCE=4.0, MIN_INNER_OFFSET=9.5, MAX_SPAN=18, SLOPE=.65;
+const CLEARANCE=3.1, MIN_INNER_OFFSET=3.25, MAX_SPAN=17.5,
+ SLOPE=.55, SMOOTH_RADIUS=17;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 let grid=null,samples=null,statistics=null;
@@ -69,33 +70,59 @@ function create(image){
   if(runs.length>1)forkSections++;
   // Fixed target near the true *inner* rail: merging green corridors must
   // not pull the horses to the centroid of the whole green region.
-  const wanted=11;
+  const wanted=7;
   runs.sort((a,b)=>
    Math.max(a.a-wanted,wanted-a.b,0)-Math.max(b.a-wanted,wanted-b.b,0)||
    Math.abs(a.a-5)-Math.abs(b.a-5));
   const run=runs[0];
   if(!run){samples.push(null);missing++;continue}
-  const low=Math.max(MIN_INNER_OFFSET,run.a+.6);
-  const high=Math.min(run.b-.6,low+MAX_SPAN);
+  const low=Math.max(MIN_INNER_OFFSET,run.a+.45);
+  const high=Math.min(run.b-.45,low+MAX_SPAN);
   if(high-low<3){samples.push(null);missing++;continue}
-  samples.push({x:inner.x,y:inner.y,nx,ny,low,high});
+  samples.push({x:inner.x,y:inner.y,nx,ny,low,high,
+   safeLow:low,safeHigh:high});
   if(previousRuns.length<7&&d%400===0)
    previousRuns.push({d,first:run.a,last:run.b,low,high});
  }
  if(missing)throw Error('TURF_INNER_CORRIDOR_MISSING:'+missing);
- // The safe interval may NARROW abruptly at the split of the green paths.
- // The physically continuous route must taper BEFORE that split; a
- // two-pass Lipschitz envelope limits *both* its sides to 0.65px/metre.
- for(let d=1;d<samples.length;d++){
-  const p=samples[d-1],r=samples[d];
-  r.low=Math.max(r.low,p.low-SLOPE);
-  r.high=Math.min(r.high,p.high+SLOPE);
+ // Smoothing is over distance, not over frames, so it is deterministic and
+ // retains exactly the same result when the user changes playback speed.
+ function limitSlope(){
+  for(let i=1;i<samples.length;i++){
+   let a=samples[i-1],b=samples[i];
+   b.low=Math.max(b.low,a.low-SLOPE);
+   b.high=Math.min(b.high,a.high+SLOPE);
+  }
+  for(let i=samples.length-2;i>=0;i--){
+   let a=samples[i+1],b=samples[i];
+   b.low=Math.max(b.low,a.low-SLOPE);
+   b.high=Math.min(b.high,a.high+SLOPE);
+  }
  }
- for(let d=samples.length-2;d>=0;d--){
-  const p=samples[d+1],r=samples[d];
-  r.low=Math.max(r.low,p.low-SLOPE);
-  r.high=Math.min(r.high,p.high+SLOPE);
+ function lowpass(values){
+  const prefix=new Float64Array(values.length+1);
+  for(let i=0;i<values.length;i++)prefix[i+1]=prefix[i]+values[i];
+  return values.map((_,i)=>{
+   const left=i-SMOOTH_RADIUS,right=i+SMOOTH_RADIUS;
+   let sum=prefix[Math.min(values.length,right+1)]-prefix[Math.max(0,left)];
+   if(left<0)sum-=left*values[0];
+   if(right>=values.length)sum+=(right-values.length+1)*values.at(-1);
+   return sum/(2*SMOOTH_RADIUS+1);
+  });
  }
+ limitSlope();
+ // Pixel-grid fluctuations at adjacent metre stations are removed by
+ // two symmetric averaging passes; stay within each original safe interval.
+ for(let iteration=0;iteration<2;iteration++){
+  const low=lowpass(samples.map(p=>p.low)),
+   high=lowpass(samples.map(p=>p.high));
+  for(let i=0;i<samples.length;i++){
+   const p=samples[i];
+   p.low=Math.max(p.safeLow,Math.min(low[i],p.high-5));
+   p.high=Math.min(p.safeHigh,Math.max(high[i],p.low+5));
+  }
+ }
+ limitSlope();
  let minWidth=Infinity,maxLane0FromInner=0,maxStationJump=0,
   maxStationJumpAt=0,badStations=0,tooFarOut=0;
  for(let d=0;d<=2000;d++){
@@ -118,7 +145,8 @@ function create(image){
  }
  statistics={count:samples.length,missing,forkSections,minWidth,
   maxLane0FromInner,tooFarOut,maxStationJump,maxStationJumpAt,
-  badStations,greenPixels,slopeLimit:SLOPE,source:'original-publisher-inner-rail'};
+  badStations,greenPixels,slopeLimit:SLOPE,smoothRadius:SMOOTH_RADIUS,
+  source:'original-publisher-inner-rail'};
  if(badStations||tooFarOut||maxStationJump>1.6)
   throw Error('TURF_INNER_ROUTE_UNSAFE:'+JSON.stringify(statistics));
  return statistics;
