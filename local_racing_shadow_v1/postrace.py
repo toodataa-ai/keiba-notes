@@ -206,8 +206,15 @@ def parse_official(soup, p):
                     and 0 <= len(after_f) - len(after_s) <= 4)
         # NAR RaceList can truncate just the final closing parenthesis.
         # Other mismatches remain blocked by date/venue/R/distance/runners.
-        clipped_final_paren = (standard_name == card_name + ")" and
-                               card_name.count("(") == card_name.count(")") + 1)
+        # First retain meaningful parenthesized race qualifiers; stripping
+        # parentheticals was intended for optional readings, not race identity.
+        full_official_key = title_key(clean(official_name))
+        full_card_key = title_key(clean(p["race_name"]))
+        clipped_final_paren = (
+            card_name.count("(") == card_name.count(")") + 1
+            and (standard_name == card_name + ")"
+                 or full_official_key == full_card_key + ")")
+        )
         if (standard_name != card_name and
                 not clipped_final_paren and
                 (len(card_name) < 6 or card_name not in standard_name) and
