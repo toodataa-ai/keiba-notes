@@ -3,8 +3,8 @@
   "date": "2026-10-18",
   "prompt": "local_racing_shadow_v1/shadow_review_prompt_v0_2.txt",
   "expected_predictions": 56,
-  "completed_or_verified": 54,
-  "total_unresolved": 2,
+  "completed_or_verified": 56,
+  "total_unresolved": 0,
   "races": {
     "20261018-kanazawa-01": {
       "status": "SKIPPED_VERIFIED",
@@ -55,10 +55,11 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-kanazawa-08.json"
     },
     "20261018-kanazawa-09": {
-      "status": "BLOCKED_JOIN",
-      "reason": "Race name differs: 第２４回 金沢スプリントカップ３歳上（地方全国交流） != 金沢スプリントカップ３歳上（地方全国交流",
-      "result_path": null,
-      "review_path": null
+      "status": "COMPLETED",
+      "reason": null,
+      "result_path": "local_racing_shadow_v1/results/2026-10-18/20261018-kanazawa-09.json",
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-kanazawa-09.json",
+      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=22&k_raceDate=2026%2F10%2F18&k_raceNo=9"
     },
     "20261018-kanazawa-10": {
       "status": "SKIPPED_VERIFIED",
@@ -67,10 +68,11 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-kanazawa-10.json"
     },
     "20261018-kochi-01": {
-      "status": "BLOCKED_JOIN",
-      "reason": "Cold-start horse set differs from runner list",
-      "result_path": null,
-      "review_path": null
+      "status": "COMPLETED",
+      "reason": null,
+      "result_path": "local_racing_shadow_v1/results/2026-10-18/20261018-kochi-01.json",
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-kochi-01.json",
+      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=31&k_raceDate=2026%2F10%2F18&k_raceNo=1"
     },
     "20261018-kochi-02": {
       "status": "SKIPPED_VERIFIED",
@@ -169,11 +171,10 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-morioka-06.json"
     },
     "20261018-morioka-07": {
-      "status": "COMPLETED",
+      "status": "SKIPPED_VERIFIED",
       "reason": null,
       "result_path": "local_racing_shadow_v1/results/2026-10-18/20261018-morioka-07.json",
-      "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-morioka-07.json",
-      "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=10&k_raceDate=2026%2F10%2F18&k_raceNo=7"
+      "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-morioka-07.json"
     },
     "20261018-morioka-08": {
       "status": "SKIPPED_VERIFIED",
@@ -344,9 +345,6 @@
       "review_path": "local_racing_shadow_v1/reviews/2026-10-18/20261018-saga-11.json"
     }
   },
-  "retry_only_race_ids": [
-    "20261018-kanazawa-09",
-    "20261018-kochi-01"
-  ],
-  "status": "PARTIAL"
+  "retry_only_race_ids": [],
+  "status": "SUCCESS"
 }

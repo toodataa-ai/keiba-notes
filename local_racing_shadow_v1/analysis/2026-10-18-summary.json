@@ -4,10 +4,10 @@
   "scope": "predictions_with_valid_proof_only",
   "expected_predictions": 56,
   "eligible_predictions": 56,
-  "completed_reviews": 1,
+  "completed_reviews": 2,
   "pending": 0,
-  "blocked": 2,
-  "skipped_existing": 53,
+  "blocked": 0,
+  "skipped_existing": 54,
   "by_venue": {
     "佐賀": {
       "reviewed": 11,
@@ -40,17 +40,17 @@
       "small_sample_warning": true
     },
     "金沢": {
-      "reviewed": 9,
-      "evaluable": 9,
+      "reviewed": 10,
+      "evaluable": 10,
       "top_pick_wins": 2,
       "top_pick_top3": 5,
-      "win_rate": 0.222222,
-      "top3_rate": 0.555556,
-      "mean_absolute_top_pick_rank_error": 2.555556,
+      "win_rate": 0.2,
+      "top3_rate": 0.5,
+      "mean_absolute_top_pick_rank_error": 3.0,
       "small_sample_warning": true
     },
     "高知": {
-      "reviewed": 10,
+      "reviewed": 11,
       "evaluable": 10,
       "top_pick_wins": 3,
       "top_pick_top3": 7,
@@ -82,7 +82,7 @@
       "small_sample_warning": true
     },
     "1300": {
-      "reviewed": 9,
+      "reviewed": 10,
       "evaluable": 9,
       "top_pick_wins": 2,
       "top_pick_top3": 5,
@@ -92,13 +92,13 @@
       "small_sample_warning": true
     },
     "1400": {
-      "reviewed": 18,
-      "evaluable": 18,
+      "reviewed": 19,
+      "evaluable": 19,
       "top_pick_wins": 6,
       "top_pick_top3": 11,
-      "win_rate": 0.333333,
-      "top3_rate": 0.611111,
-      "mean_absolute_top_pick_rank_error": 2.444444,
+      "win_rate": 0.315789,
+      "top3_rate": 0.578947,
+      "mean_absolute_top_pick_rank_error": 2.684211,
       "small_sample_warning": true
     },
     "1500": {
@@ -152,21 +152,21 @@
       "small_sample_warning": true
     }
   },
-  "top_pick_win_rate": 0.222222,
-  "top_pick_top3_rate": 0.537037,
+  "top_pick_win_rate": 0.218182,
+  "top_pick_top3_rate": 0.527273,
   "ranking_error_summary": {
-    "top_pick_mean_absolute_rank_error": 2.722222,
-    "evaluable_n": 54
+    "top_pick_mean_absolute_rank_error": 2.8,
+    "evaluable_n": 55
   },
-  "reviewed_races": 54,
+  "reviewed_races": 56,
   "summary": {
-    "reviewed": 54,
-    "evaluable": 54,
+    "reviewed": 56,
+    "evaluable": 55,
     "top_pick_wins": 12,
     "top_pick_top3": 29,
-    "win_rate": 0.222222,
-    "top3_rate": 0.537037,
-    "mean_absolute_top_pick_rank_error": 2.722222,
+    "win_rate": 0.218182,
+    "top3_rate": 0.527273,
+    "mean_absolute_top_pick_rank_error": 2.8,
     "small_sample_warning": false
   },
   "evidence_based_findings": [
@@ -188,7 +188,9 @@
       "20261018-kanazawa-06",
       "20261018-kanazawa-07",
       "20261018-kanazawa-08",
+      "20261018-kanazawa-09",
       "20261018-kanazawa-10",
+      "20261018-kochi-01",
       "20261018-kochi-02",
       "20261018-kochi-03",
       "20261018-kochi-04",
@@ -235,10 +237,7 @@
       "20261018-saga-10",
       "20261018-saga-11"
     ],
-    "unresolved_ids": [
-      "20261018-kanazawa-09",
-      "20261018-kochi-01"
-    ],
+    "unresolved_ids": [],
     "ineligible_proof_ids": []
   }
 }
