@@ -117,8 +117,7 @@ jobs:
                   assert stats['imageUnmodified'] and stats['physicsUnmodified']
                   assert stats['maxGain']<=1.45001
                   assert stats['maxGainStepPerMetre']<.012,('ABRUPT_ZOOM_CURVE',stats)
-                  assert stats['thirdFourthTurn']['ratioAfter']<
-                     stats['thirdFourthTurn']['ratioBefore']*1.01,('NO_CURVE_VISUAL_IMPROVEMENT',stats)
+                  assert stats['thirdFourthTurn']['ratioAfter']<stats['thirdFourthTurn']['ratioBefore']*1.01,('NO_CURVE_VISUAL_IMPROVEMENT',stats)
                 
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
