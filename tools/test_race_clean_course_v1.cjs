@@ -177,7 +177,7 @@ assert.ok(!app.includes('ctx.drawImage(original,0,0,targetWidth,targetHeight)'))
 assert.ok(html.includes('id="liveCourseImage"'));
 assert.ok(!html.includes('id="liveCourseHiRes"'));
 assert.equal((html.match(/kyoto-umapot-course-clean-v8.svg/g)||[]).length,2);
-assert.ok(app.includes('backdrop(lastCamera);'));
+assert.ok(app.includes('backdrop(paintCamera);'));
 assert.ok(!app.includes('function track('));
 assert.ok(!app.includes('track(live.ctx'));
 assert.ok(!app.includes("ctx.lineTo(p.actual.x,p.actual.y)"));
