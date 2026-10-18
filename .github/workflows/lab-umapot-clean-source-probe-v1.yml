@@ -41,6 +41,23 @@ jobs:
            for k,sl in enumerate(pres.slides):
             txt=[sh.text[:90] for sh in sl.shapes if sh.has_text_frame and sh.text.strip()]
             print('PPTX_SLIDE',k,'shapes',len(sl.shapes),'nonblank_text',txt[:25])
+          from pptx.enum.shapes import MSO_SHAPE_TYPE
+          def walk(shapes,prefix=''):
+           for j,sh in enumerate(shapes):
+            xy=tuple(round(v/914400,3) for v in (sh.left,sh.top,sh.width,sh.height))
+            t=(sh.text[:90].replace('\\n',' ') if sh.has_text_frame else '')
+            try: fill=str(sh.fill.type)
+            except Exception: fill='?'
+            try: line=str(sh.line.color.type)
+            except Exception: line='?'
+            print('SHAPE_TREE',prefix+str(j),'id',sh.shape_id,'type',str(sh.shape_type),'xy',xy,'fill',fill,'line',line,'text',repr(t))
+            if sh.shape_type==MSO_SHAPE_TYPE.GROUP:walk(sh.shapes,prefix+str(j)+'.')
+          for file in sources:
+           if file.suffix.lower()=='.pptx':
+            pr=Presentation(str(file))
+            for j,slide in enumerate(pr.slides):
+             print('SLIDE_STRUCTURE',j)
+             walk(slide.shapes)
           for u in ('marked.jpg','blank-2015.jpg'):
            with Image.open('/tmp/umapot/original/'+u) as im: print('JPEG',u,im.size)
           PY
