@@ -1,4 +1,4 @@
-/* LAB v10: original publisher SVG with SOURCE GREEN turf occupancy and same-size horse numbers.
+/* LAB v12: original publisher SVG, closer inner rail, time-continuous camera and horse glyphs.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -69,12 +69,15 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 }
 
 function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
-let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null,lastLabelPositions=[];
+let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
+ lastCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
+ visualLaneState=new Map(),visualRenderTime=null;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
- playing=false;last=0;acc=0;lastCamera=null;paint();
+ playing=false;last=0;acc=0;lastCamera=null;lastRenderedPoints=[];
+ cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();paint();
 }
 function advanceTo(distance){
  reset();
@@ -82,8 +85,8 @@ function advanceTo(distance){
  while(engine.state.leader<distance&&!engine.state.finished&&i++<1500)engine.step(.12);
  // Seek is a jump in simulation time. Do NOT interpolate the camera from
  // the starting gate across 900 metres: it leaves every horse off-screen.
- lastCamera=null;
- paint();return engine.state;
+ lastCamera=null;cameraRenderTime=0;visualRenderTime=null;
+ visualLaneState.clear();paint();return engine.state;
 }
 function sizeCanvas(canvas){
  const rect=canvas.getBoundingClientRect();
@@ -125,20 +128,53 @@ function position(p,camera){
  return {x:camera.cx+(p.x-camera.x)*camera.scale,
          y:camera.cy+(p.y-camera.y)*camera.scale};
 }
-function cameraFor(points,w,h,chosen){
- // Kyoto1400's real-position number rendering with a closer group camera.
- const focus=points.find(p=>p.number===chosen)||points.slice().sort((a,b)=>b.d-a.d)[0];
- const group=points.filter(p=>Math.abs(p.d-focus.d)<=80);
- if(!group.some(p=>p.number===focus.number))group.push(focus);
- const xs=group.map(p=>p.x),ys=group.map(p=>p.y);
- const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
- const mx=Math.min(w*.18,28),my=Math.min(h*.18,40);
- const zoom=Math.max(2.3,Math.min(w<540?8.2:9.6,
-  (w-2*mx)/Math.max(30,hiX-loX+12),
-  (h-2*my)/Math.max(25,hiY-loY+8)));
- const mean={x:(loX+hiX)/2,y:(loY+hiY)/2};
- const origin={x:focus.x+.16*(mean.x-focus.x),y:focus.y+.16*(mean.y-focus.y)};
- return {x:origin.x,y:origin.y,cx:w/2,cy:h*.5,scale:zoom};
+// For a crowd's leader camera, use SOFT race-order weights (no membership
+// toggles when a horse crosses +/-80m or when the lead changes at the wire).
+// The focal point can still follow an individually selected horse.
+function cameraFor(points,w,h,chosen,autoLeader=true){
+ let center=points.find(p=>p.number===chosen)||points[0];
+ if(autoLeader){
+  const leaderDistance=Math.max(...points.map(p=>p.d));
+  let x=0,y=0,total=0;
+  for(const p of points){
+   const weight=Math.exp(Math.max(-25,(p.d-leaderDistance)/15));
+   x+=p.x*weight;y+=p.y*weight;total+=weight;
+  }
+  center={x:x/total,y:y/total};
+ }
+ // Fix the optical zoom; the old density-based group bounds changed camera
+ // magnification at every overtake and caused visible frame-to-frame shakes.
+ return {x:center.x,y:center.y,cx:w*.54,cy:h*.51,
+  scale:w<540?7.0:7.8};
+}
+// At 4x playback, physics advances in 80ms simulation steps. A canvas drawn
+// between steps used to alternate between a stationary and jumping position.
+// Extrapolate ONLY visual positions over the unconsumed simulation accumulator
+// and low-pass rapid physical LANE reversals; physics state stays immutable.
+function displayPoints(state){
+ if(!playing||state.finished){
+  visualLaneState.clear();visualRenderTime=null;
+  return turf.runners(state);
+ }
+ const fraction=Math.max(0,Math.min(acc,.08));
+ const simTime=state.t+fraction;
+ const dt=visualRenderTime===null?0:Math.max(0,Math.min(.16,simTime-visualRenderTime));
+ visualRenderTime=simTime;
+ return state.horses.map(h=>{
+  const trail=h.trail||[];
+  const last=trail.at(-1),before=trail.at(-2);
+  const travel=last&&before?Math.max(0,last.d-before.d):0;
+  const lastStep=state.tick>0?.08:.08;
+  const visualD=(h.displayD??h.d)+Math.min(1.7,travel/lastStep*fraction);
+  const desiredLane=Math.max(0,Math.min(14,h.lane+(h.laneVelocity||0)*fraction));
+  const previous=visualLaneState.get(h.number);
+  const alpha=1-Math.exp(-dt/.14);
+  const smoothed=previous===undefined?desiredLane:
+   previous+(desiredLane-previous)*alpha;
+  visualLaneState.set(h.number,smoothed);
+  return {number:h.number,d:visualD,lane:smoothed,
+   ...turf.point(visualD,smoothed),finished:h.finished};
+ });
 }
 // A circled number IS the moving horse (Kyoto 1400 contract). No pixel
 // position displacement to evade overlap; dense packs may obscure neighbours.
@@ -192,16 +228,24 @@ function paint(){
  // Refuse to paint numbers using the obsolete JPEG-position centerline
  // while the real Umapot SVG green-corridor occupancy is loading.
  if(!engine||!turfReady)return;
- const state=engine.state,points=turf.runners(state);
+ const state=engine.state,points=displayPoints(state);
+ lastRenderedPoints=points;
  const chosen=focusNo==='leader'?state.leadingNo:Number(focusNo);
  const live=sizeCanvas($('broadcast'));
  // Transparent canvas: original Umapot image is the only course background.
- const target=cameraFor(points,live.w,live.h,chosen);
- // Smooth camera pan with state-time-independent interpolation on each frame.
+ const target=cameraFor(points,live.w,live.h,chosen,focusNo==='leader');
+ // Stabilize view with a real elapsed-time exponential filter; frame rate
+ // changes do not change the amount of camera smoothing.
+ const now=performance.now(),dt=cameraRenderTime?
+  Math.min(.06,(now-cameraRenderTime)/1000):0;
+ cameraRenderTime=now;
  if(!lastCamera)lastCamera=target;
- else lastCamera={...target,x:lastCamera.x*.85+target.x*.15,
-      y:lastCamera.y*.85+target.y*.15,
-      scale:lastCamera.scale*.88+target.scale*.12};
+ else {
+  const blend=1-Math.exp(-dt/.13);
+  lastCamera={...target,
+   x:lastCamera.x+(target.x-lastCamera.x)*blend,
+   y:lastCamera.y+(target.y-lastCamera.y)*blend};
+ }
  backdrop(lastCamera);
  const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
  lastLabelPositions=labels;
@@ -225,7 +269,7 @@ function tick(ts){
   acc+=delta*Number($('speed').value);
   let count=0;
   while(acc>=.08&&count++<8&&!engine.state.finished){engine.step(.08);acc-=.08}
-  if(ts-renderStamp>25){paint();renderStamp=ts}
+  if(ts-renderStamp>14){paint();renderStamp=ts}
  }
  requestAnimationFrame(tick);
 }
@@ -244,7 +288,10 @@ function setup(){
   return '<div class="horsechip" style="background:'+col.fill+';color:'+col.ink+
    '">'+h.number+'</div>';
  }).join('');
- $('focus').addEventListener('change',e=>{focusNo=e.target.value;lastCamera=null;paint()});
+ $('focus').addEventListener('change',e=>{
+  focusNo=e.target.value;lastCamera=null;cameraRenderTime=0;
+  visualLaneState.clear();visualRenderTime=null;paint();
+ });
  $('startBtn').addEventListener('click',()=>{
   if(engine.state.finished)reset();
   playing=true;$('startBtn').textContent='▶ 再生中';
@@ -253,7 +300,7 @@ function setup(){
   playing=false;$('startBtn').textContent='▶ 再開';
  });
  $('resetBtn').addEventListener('click',reset);
- addEventListener('resize',()=>{lastCamera=null;paint()});
+ addEventListener('resize',()=>{lastCamera=null;cameraRenderTime=0;paint()});
  reset();
  const params=new URLSearchParams(location.search);
  const checkpoint=Number(params.get('checkpoint'));
@@ -263,7 +310,8 @@ function setup(){
 }
 window.CleanLab=Object.freeze({
  getState:()=>engine?.state,inspect:()=>{
-  const points=turfReady?turf.runners(engine.state):model.runners(engine.state);
+  const points=turfReady?(lastRenderedPoints.length?lastRenderedPoints:
+  turf.runners(engine.state)):model.runners(engine.state);
   const selected=focusNo==='leader'?engine.state.leadingNo:Number(focusNo);
   const chosen=points.find(p=>p.number===selected)||points[0];
   const screen=lastCamera?position(chosen,lastCamera):null;
@@ -276,6 +324,12 @@ window.CleanLab=Object.freeze({
    liveImageLoaded:Boolean($('liveCourseImage')?.complete&&$('liveCourseImage')?.naturalWidth===620),
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
    originalError,vectorReady,turfReady,turfError,turfStats,
+   visualInterpolationEnabled:true,fixedCameraZoom:true,
+   visualSimulationTime:visualRenderTime,
+   displayedDeltas:points.map(p=>({
+     number:p.number,d:p.d-(engine.state.horses.find(h=>h.number===p.number)?.displayD||0),
+     lane:p.lane-(engine.state.horses.find(h=>h.number===p.number)?.lane||0)
+   })),
    highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
