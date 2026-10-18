@@ -1,4 +1,4 @@
-/* LAB v18: arc-chord geometry fixed with physical-distance rolling TV view.
+/* LAB v15: Kyoto1400 GOAL board camera at 80m, closer broadcast zoom and reasoned pack diagnostics.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -75,7 +75,7 @@ let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
 const FINISH_SEQUENCE_MS=3200;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
-let lastGoalFrame=null,lastDistanceFrame=null,distanceTextureError=null;
+let lastGoalFrame=null;
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
@@ -142,17 +142,6 @@ function verifyVectorSource(){
    turfError=String(err);console.error('KYOTO_TURF_MASK_INIT',err);
    const note=document.querySelector('.source-credit');
    if(note)note.textContent='コース初期化に失敗しました: '+turfError;
-  }
- }
- if(turfReady&&!window.RaceCleanDistanceCamera.ready()&&!distanceTextureError){
-  // A source-derived rolling image atlas is created ONCE. The unchanged SVG
-  // overview is always available; if the atlas fails, use the previous LAB
-  // course-image follow view rather than leaving the display motionless.
-  try{window.RaceCleanDistanceCamera.create(a,turf);}
-  catch(err){
-   distanceTextureError=String(err);
-   console.error('KYOTO_DISTANCE_TV_ATLAS_INIT',err);
-   const selector=$('viewMode');if(selector)selector.value='map';
   }
  }
  if(vectorReady)originalError=false;
@@ -300,26 +289,6 @@ function paint(){
  backdrop(lastCamera);
  const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
  lastLabelPositions=labels;
- const distanceCanvas=$('distanceCamera'),
-  useDistance=$('viewMode')?.value!=='map'&&
-   window.RaceCleanDistanceCamera.ready();
- if(distanceCanvas){
-  distanceCanvas.hidden=!useDistance;
-  $('liveCourseImage').style.visibility=useDistance?'hidden':'visible';
-  $('broadcast').style.visibility=useDistance?'hidden':'visible';
-  if(useDistance){
-   // Two media share exactly the same physical metres and horses:
-   // broadcast is the straightened source-SVG racetrack strip, while
-   // overview remains the untouched entire publisher course diagram.
-   const focusHorse=points.find(p=>p.number===chosen)||points[0];
-   const focusD=focusNo==='leader'?Math.max(...points.map(p=>p.d)):focusHorse.d;
-   lastDistanceFrame=window.RaceCleanDistanceCamera.render({
-    canvas:distanceCanvas,points,focusNo:chosen,
-    leaderNo:state.leadingNo,paintNumber:raceNumberMarker,
-    focusD,fieldSize:18
-   });
-  }else lastDistanceFrame=null;
- }
  // Kyoto1400 contract: exactly 80 metres from the finish, replace the
  // zoomed course with the right-to-left GOAL-board television camera.
  // RaceSimEngine.goalCamera was already computed on physical race distance.
@@ -401,7 +370,6 @@ function setup(){
   return '<div class="horsechip" style="background:'+col.fill+';color:'+col.ink+
    '">'+h.number+'</div>';
  }).join('');
- $('viewMode')?.addEventListener('change',()=>{lastCamera=null;paint()});
  $('focus').addEventListener('change',e=>{
   focusNo=e.target.value;lastCamera=null;cameraRenderTime=0;
   visualLaneState.clear();visualRenderTime=null;paint();
@@ -428,8 +396,6 @@ window.CleanLab=Object.freeze({
  frameSample:()=>({t:engine?.state?.t??0,playing,zoom:lastCamera?.scale??0,
   camera:lastCamera?{x:lastCamera.x,y:lastCamera.y}:null,
   finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
-  broadcastMode:lastDistanceFrame?'physical-distance-running-camera':'source-map-follow',
-  screenHorses:lastDistanceFrame?.allPositions??[],
   horses:lastRenderedPoints.map(p=>({number:p.number,x:p.x,y:p.y,d:p.d,lane:p.lane}))}),
  inspect:()=>{
   const points=turfReady?(lastRenderedPoints.length?lastRenderedPoints:
@@ -459,16 +425,6 @@ window.CleanLab=Object.freeze({
      lane:p.lane-(engine.state.horses.find(h=>h.number===p.number)?.lane||0)
    })),
    highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
-   broadcastMode:lastDistanceFrame?'physical-distance-running-camera':'source-map-follow',
-   broadcastDistanceGeometry:lastDistanceFrame?.geometry??null,
-   broadcastNumbers:lastDistanceFrame?.numbers??null,
-   unwrappedTextureStats:window.RaceCleanDistanceCamera.stats(),
-   textureInitError:distanceTextureError,
-   actualLongitudinalSpanPx:lastDistanceFrame?
-     (()=>{const p=lastDistanceFrame.allPositions;
-       const first=p.reduce((a,b)=>a.d>b.d?a:b);
-       const last=p.reduce((a,b)=>a.d<b.d?a:b);
-       return Math.abs(first.x-last.x);})():null,
    normalBroadcastZoom:8.8,normalDesktopZoom:9.7,
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
