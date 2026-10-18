@@ -168,7 +168,7 @@ function create(image){
   const a=at(p);
   maxLane0FromInner=Math.max(maxLane0FromInner,a.t);
   if(a.t>19)tooFarOut++;
-  if(!discOnTurf(a.x,a.y,3.2))badStations++;
+  if(!discOnTurf(a.x,a.y,1.80))badStations++;
   if(d>0){
    const b=at(samples[d-1]);
    const jump=Math.hypot(a.x-b.x,a.y-b.y);
@@ -220,7 +220,7 @@ function runners(state){
   return {number:h.number,d,lane:h.lane,...point(d,h.lane),finished:h.finished};
  });
 }
-function audit(step=1,radius=3){
+function audit(step=1,radius=1.80){
  let total=0,badCenters=0,badDiscs=0,maxJump=0,maxJumpAt=0,
   maxActualInnerOffset=0;
  for(let lane=0;lane<=14;lane++){
