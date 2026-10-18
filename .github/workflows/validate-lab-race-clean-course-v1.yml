@@ -93,7 +93,14 @@ jobs:
                     turfBadCenters:a.turfBadCenters,turfBadDiscs:a.turfBadDiscs,
                     uniformMarkerRadiusPx:a.uniformMarkerRadiusPx,
                     markerRadiusSpreadPx:a.markerRadiusSpreadPx,
-                    focusedMarkerRadiusPx:a.focusedMarkerRadiusPx};
+                    focusedMarkerRadiusPx:a.focusedMarkerRadiusPx,
+                    markerScaleMobile:a.markerScaleMobile,
+                    markerScaleDesktop:a.markerScaleDesktop,
+                    foregroundCameraPixelSnapped:a.foregroundCameraPixelSnapped,
+                    cameraSnapErrorPx:a.cameraSnapErrorPx,
+                    visualLongitudinalTau:a.visualLongitudinalTau,
+                    visualLateralTau:a.visualLateralTau,
+                    cameraSmoothTau:a.cameraSmoothTau};
                 }""")
                 assert not errors,(width,d,errors)
                 assert read['count']==read['running']==18,(width,d,read)
@@ -103,6 +110,15 @@ jobs:
                 assert read['liveImageLoaded'] and read['vectorReady'] and read['turfReady'],('VECTOR_TURF_MASK_NOT_READY',width,d,read)
                 assert read['turfBadCenters']==0,('HORSE_CENTER_OFF_GREEN_SOURCE',width,d,read)
                 assert read['turfBadDiscs']==0,('HORSE_BADGE_PARTLY_OFF_GREEN_SOURCE',width,d,read)
+                desiredRadius=13.5*(.78 if width==390 else .84)
+                assert abs(read['uniformMarkerRadiusPx']-desiredRadius)<.00001,('HORSE_BADGE_NOT_ENLARGED',width,d,read)
+                assert abs(read['focusedMarkerRadiusPx']-desiredRadius)<.00001,('SELECTED_HORSE_DIAMETER_DIFFERENT',width,d,read)
+                assert abs(read['markerRadiusSpreadPx'])<.00001,('HORSE_BADGES_NOT_UNIFORM',width,d,read)
+                assert read['foregroundCameraPixelSnapped'],('CSS_SVG_AND_MARKERS_NOT_ALIGNED',width,d,read)
+                assert read['cameraSnapErrorPx']<.355,('DEVICE_PIXEL_ALIGNMENT_TOO_LARGE',width,d,read)
+                assert abs(read['visualLongitudinalTau']-.070)<.0001
+                assert abs(read['visualLateralTau']-.21)<.0001
+                assert abs(read['cameraSmoothTau']-.20)<.0001
                 assert read['highResolutionMode']=='publisher-original-svg-not-resampled-jpeg',(width,d,read)
                 assert read['originalImageSrc']==read['liveImageSrc'],('TWO_DIFFERENT_COURSE_IMAGES',width,d,read)
                 assert read['actualNumberCircles'] and not read['paintedTrack'] and not read['leaderLines']
