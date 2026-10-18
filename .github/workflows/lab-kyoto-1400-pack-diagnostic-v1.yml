@@ -1,0 +1,135 @@
+name: LAB Kyoto 1400m point pack-compression root-cause probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/lab-kyoto-1400-pack-diagnostic-v1.yml']
+permissions: {contents: read}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node and screenshot dependencies
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/lab-1400http.log 2>&1 &
+          sleep 2
+      - name: Compare physical metres, original-image pixels, and screen pixels from 1200-1600m
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kyoto1400
+          python3 - <<'PY'
+          import shutil,json,math
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+           page=browser.new_page(viewport={'width':390,'height':900},device_scale_factor=2)
+           errors=[]
+           page.on('pageerror',lambda e:errors.append(str(e)))
+           page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1200',wait_until='load')
+           page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=18000)
+           result=page.evaluate("""() => {
+            const turf=RaceCleanTurf,original=RaceCleanCourse;
+            const fixture=RaceLab18Fixture,sim=RaceSimEngine.create(
+              {...fixture.entry(),horses:fixture.horses()},
+              {seed:2026,bias:'neutral'});
+            const rows=[],geometry=[];
+            for(let d=1180;d<=1600;d+=5){
+              // Source meter: adjacent 5 metre image curve length vs chord,
+              // including lane14 and original inner route pixel positions.
+              const lanes=[0,3,7,14],perLane={};
+              for(const lane of lanes){
+                const p=turf.point(d,lane),q=turf.point(d+5,lane),
+                 mid=turf.point(d+2.5,lane);
+                const a=original.rails(d).inner;
+                const distance=Math.hypot(q.x-p.x,q.y-p.y)/5;
+                const seg=Math.hypot(mid.x-p.x,mid.y-p.y)+
+                  Math.hypot(q.x-mid.x,q.y-mid.y);
+                perLane[lane]={sourcePxPerM:distance,
+                  realPxPerM:seg/5,innerGapPx:Math.hypot(p.x-a.x,p.y-a.y),
+                  x:p.x,y:p.y};
+              }
+              geometry.push({d,perLane});
+            }
+            let mark=1180,limit=0;
+            while(mark<=1600&&limit++<1800){
+              if(sim.state.leader>=mark){
+                const horses=sim.state.horses.slice().sort((a,b)=>b.d-a.d);
+                const points=horses.map(h=>({number:h.number,
+                  d:h.d,lane:h.lane,
+                  position:turf.point(h.d,h.lane),
+                  raw:original.point(h.d,h.lane)}));
+                const extreme=points.at(-1),leader=points[0];
+                const physicalGap=leader.d-extreme.d;
+                const imageGap=Math.hypot(
+                  leader.position.x-extreme.position.x,
+                  leader.position.y-extreme.position.y);
+                const rawGap=Math.hypot(
+                  leader.raw.x-extreme.raw.x,
+                  leader.raw.y-extreme.raw.y);
+                let meanNearest=0,close=0,veryClose=0,geoPairs=0;
+                for(let i=0;i<points.length;i++){
+                  let near=1e6;
+                  for(let j=0;j<points.length;j++){
+                    if(i===j)continue;
+                    const a=points[i].position,b=points[j].position;
+                    const dd=Math.hypot(a.x-b.x,a.y-b.y);
+                    near=Math.min(near,dd);
+                    if(j>i){geoPairs++;if(dd<2.1)close++;if(dd<1.1)veryClose++;}
+                  }
+                  meanNearest+=near;
+                }
+                rows.push({mark,leaderD:leader.d,time:sim.state.t,
+                  physicalGap,imageGap,rawGap,pixelRatio:imageGap/physicalGap,
+                  nearestMean:meanNearest/points.length,
+                  pairsClose:close,pairsVeryClose:veryClose,
+                  meanLane:points.reduce((a,p)=>a+p.lane,0)/points.length,
+                  maxLane:Math.max(...points.map(p=>p.lane)),
+                  within10:points.filter(p=>leader.d-p.d<=10).length,
+                  effort:horses.slice(0,5).reduce((a,h)=>a+h.effortDebt,0)/5,
+                  fatigue:horses.slice(0,5).reduce((a,h)=>a+h.fatigue,0)/5,
+                  pace:sim.state.pacePressure,
+                  shortCore:points.filter(p=>p.lane<4).length});
+                mark+=10;
+              }else sim.step(.08);
+            }
+            const jumps=rows.slice(1).map((r,i)=>({from:rows[i].mark,to:r.mark,
+              dPhysicalGap:r.physicalGap-rows[i].physicalGap,
+              dSourceGap:r.imageGap-rows[i].imageGap,
+              dMeanNearest:r.nearestMean-rows[i].nearestMean,
+              dPairsClose:r.pairsClose-rows[i].pairsClose})).sort((a,b)=>a.dSourceGap-b.dSourceGap);
+            return {rows,geometry,jumps:jumps.slice(0,12)};
+           }""")
+           for row in result['rows']:
+            if row['mark']%20==0 or abs(row['imageGap']/(row['physicalGap'] or 1))<.08:
+             print('PACK_DETAIL',json.dumps({k:round(v,4) if isinstance(v,float) else v for k,v in row.items()},ensure_ascii=False))
+           print('LARGEST_IMAGE_PACK_COLLAPSE',json.dumps(result['jumps'],ensure_ascii=False))
+           for row in result['geometry']:
+            if row['d']%20==0:
+             print('IMAGE_SOURCE_METRES_PER_DISTANCE',json.dumps(row,ensure_ascii=False))
+           assert len(result['rows'])==43
+           assert not errors,errors
+           # Capture real sequence across 1360-1480m with constant time step
+           for distance in (1270,1320,1360,1380,1400,1420,1440,1460,1480,1500):
+            page.evaluate(f'() => CleanLab.advanceTo({distance})')
+            page.locator('#broadcastStage').screenshot(
+             path=f'/tmp/kyoto1400/live-{distance}.png')
+            page.locator('#overview').screenshot(
+             path=f'/tmp/kyoto1400/overview-{distance}.png')
+            read=page.evaluate("""() => {
+              const r=CleanLab.inspect(),s=CleanLab.getState();
+              return {d:s.leader,zoom:r.zoom,cam:r.selectedScreen,number:r.liveLabelPositions.length};
+            }""")
+            print('CAPTURE_CHECKPOINT',distance,json.dumps(read,ensure_ascii=False))
+           page.close();browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kyoto-1300-1500-pack-and-geometry-source-diagnostic
+          path: /tmp/kyoto1400/*.png
+          if-no-files-found: warn
+          retention-days: 7
