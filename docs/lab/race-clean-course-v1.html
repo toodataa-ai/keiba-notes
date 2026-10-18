@@ -2,14 +2,14 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#192d2c">
 <title>新コース方式・18頭検証｜JRAシミュレータLAB</title>
-<link rel="stylesheet" href="race-clean-course-v1.css?v=20261018-9">
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261018-14">
 </head><body>
 <header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
 <h1>京都芝2000m内回り｜新コース方式</h1>
 <p>LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・実馬・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">新方式 v13・iPhone Safariで再生できない不具合修正／LAB未承認</div>
+<div class="tag">新方式 v14・内ラチ途切れのショートカット防止／内寄せ改善／ゴール後の自然な余走／LAB未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
@@ -20,6 +20,10 @@
 <div class="broadcast-stage" id="broadcastStage">
 <img id="liveCourseImage" width="620" height="430" loading="eager" decoding="async" alt="" aria-hidden="true" src="assets/kyoto-umapot-course-clean-v8.svg">
 <canvas id="broadcast" role="img" aria-label="うまぽっと原画像上を18頭の馬番丸が走る実況"></canvas>
+<div class="finish-banner" id="finishBanner" role="status" aria-live="polite" hidden>
+ <strong id="finishHeading">全馬ゴール・余走中</strong>
+ <span id="finishPodium"></span>
+</div>
 </div>
 <div class="status"><span id="section">スタート直後の直線</span><span id="clock">0.0秒</span></div>
 <div class="order-note" id="orderNote" aria-live="off">先頭からの並びを読みやすく表示します</div>
@@ -38,7 +42,7 @@
 <section class="panel notes">
 <p><strong>今回の検証点：</strong>コース形状は原画像と完全に同じものを使い、画像の変形は等倍率の拡大・平行移動のみ。走行位置の内部座標と18頭の丸番号の視認性を検証します。</p>
 <p>実況のコースは一切描き直しません。うまぽっと原本PowerPointのコース図形から直接書き出したベクターSVGを全体図・実況の双方で使用します。JPEGの4倍引き伸ばしをやめたため、ズームしても線が鮮明です。不要な注記や矢印はありません。</p>
-<p><strong>馬番そのものが走る：</strong>京都1400共通の走行計算に基づき、うまぽっと原図の<strong>内ラチに寄せた芝帯内のライン</strong>を走ります。4倍速では馬番をフレーム間補間し、カメラ倍率を固定しています。<strong>Safariなどで原図SVGのnaturalWidthが表示幅に応じて変わっても、コースの読み込み・再生を止めない</strong>ようにしました。全馬番は同じ大きさです。</p>
+<p><strong>馬番そのものが走る：</strong>京都1400共通の物理計算を使用。うまぽっとの無地原図の内ラチにさらに近い芝帯内を走ります。<strong>内ラチの絵が途切れる場所は前後の線をつなぎ、緑の空き地へ内側ショートカットしません。</strong>馬番は全頭同じ大きさです。4倍速の描画補間を維持し、全馬のゴール後は余走を数秒映してゆっくり引いたカメラで1〜3着を表示します。</p>
 <p><strong>走り方も京都1400と共通：</strong>RaceLaneAIとRaceSimEngineをそのまま利用。スタート後は衝突を避けて内へ寄り、内側が空けば内優先、詰まれば必要に応じて外へ。逃げ・先行・差し・追込、先行争いによるペース変化も従来ロジックを継承しています。</p>
 <p>コース寸法はJRA芝Aコース基準（1周1,782.8m・最後の直線328.4m・初角まで308.7m・幅員27〜38m・内回り高低差3.1m）を参照。コースの形状はうまぽっと原画像に合わせたイラスト上の較正であり、測量図の精度ではありません。18頭の重なり・コース形状は目視承認前です。</p>
 <p>確認：<a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=585">585m</a> ／ <a href="?checkpoint=602">602m</a> ／ <a href="?checkpoint=640">640m</a> ／ <a href="?checkpoint=700">700m</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1672">直線入口</a></p>
@@ -50,8 +54,8 @@
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
 <script src="race-sim-engine.js?v=20261016-41"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
-<script src="race-clean-course-v1.js?v=20261018-13"></script>
-<script src="race-clean-turf-mask-v1.js?v=20261018-13"></script>
-<script src="race-clean-course-app-v1.js?v=20261018-13"></script>
+<script src="race-clean-course-v1.js?v=20261018-14"></script>
+<script src="race-clean-turf-mask-v1.js?v=20261018-14"></script>
+<script src="race-clean-course-app-v1.js?v=20261018-14"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
