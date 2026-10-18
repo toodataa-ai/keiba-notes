@@ -85,6 +85,42 @@ for(let i=0;i<1600&&!sim.state.finished;i++){
 assert.equal(snapshots.length,targets.length,'all race sections tested');
 assert.ok(snapshots.find(x=>x.d===100).in4>=8,'inner convergence by 100m');
 assert.ok(snapshots.find(x=>x.d===310).in4>=8,'inside remains preferred');
+// Correction audit: Kyoto1400/2000 must share physics; log *actual*
+// physical longitudinal spread rather than diagnose apparent SVG clumping
+// from screen pixels. This does not change the common engine or odds.
+const physical=window.RaceSimEngine.create(
+ {...entry,horses:window.RaceLab18Fixture.horses()},
+ {seed:2026,bias:'neutral'});
+const physicalDistances=[100,200,300,400,500,600,700,800,900,1000,
+ 1100,1200,1300,1400,1500,1600,1700,1800,1900],physicalPacks=[];
+let bucket=0;
+for(let i=0;i<2000&&bucket<physicalDistances.length&&!physical.state.finished;i++){
+ if(physical.state.leader>=physicalDistances[bucket]){
+  const sorted=physical.state.horses.slice().sort((a,b)=>b.d-a.d);
+  const front=sorted.slice(0,Math.min(5,sorted.length));
+  const maxD=sorted[0].d,minD=sorted.at(-1).d;
+  physicalPacks.push({
+    d:physicalDistances[bucket],
+    simClock:Number(physical.state.t.toFixed(1)),
+    actualFullPackGapM:Number((maxD-minD).toFixed(1)),
+    within10m:sorted.filter(h=>maxD-h.d<=10).length,
+    frontMeanEffortDebt:Number((front.reduce((a,h)=>a+h.effortDebt,0)/front.length).toFixed(3)),
+    frontMeanFatigue:Number((front.reduce((a,h)=>a+h.fatigue,0)/front.length).toFixed(3)),
+    pacePressure:Number(physical.state.pacePressure.toFixed(3))
+  });
+  bucket++;continue;
+ }
+ physical.step(.12);
+}
+assert.equal(physicalPacks.length,physicalDistances.length);
+const contractions=physicalPacks.slice(1).map((p,i)=>({
+ from:physicalPacks[i].d,to:p.d,
+ contractM:Number((physicalPacks[i].actualFullPackGapM-p.actualFullPackGapM).toFixed(1)),
+ fromGapM:physicalPacks[i].actualFullPackGapM,toGapM:p.actualFullPackGapM
+})).sort((a,b)=>b.contractM-a.contractM);
+console.log('KYOTO1400_SHARED_PHYSICAL_PACK_GAPS',JSON.stringify(physicalPacks));
+console.log('TOP_PHYSICAL_CONTRACTIONS_100M',JSON.stringify(contractions.slice(0,5)));
+assert.ok(physicalPacks.every(x=>Number.isFinite(x.actualFullPackGapM)));
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
