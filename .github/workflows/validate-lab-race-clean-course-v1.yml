@@ -33,7 +33,7 @@ jobs:
         run: |
           python3 -m pip install playwright==1.56.0
           command -v google-chrome || command -v chromium
-      - name: Run 18 horses at seven race sections in actual mobile/desktop browser
+      - name: Verify readable true-position 18 horse numbers at nine race sections on mobile and desktop
         run: |
           set -euo pipefail
           mkdir -p /tmp/clean-lab
@@ -47,7 +47,7 @@ jobs:
           with sync_playwright() as p:
             browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
             for width in (390,1024):
-              for d in (0,100,310,530,900,1270,1672,1900):
+              for d in (0,100,310,478,530,900,1270,1672,1900):
                 page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
                 errors=[]
                 page.on('pageerror',lambda error:errors.append(str(error)))
@@ -99,6 +99,8 @@ jobs:
                     (a['y']-a['anchorY'])**2)**.5 for a in labels),default=0)
                 assert error<1e-6,('NUMBER_MUST_BE_AT_HORSE_POSITION',width,d,error)
                 assert any(a['number']==read['selectedHorse'] for a in labels),('FOCUSED_HORSE_NUMBER_HIDDEN',width,d)
+                if d>=310:
+                  assert read['severeOverlapPairs']<=7,('SEVERE_BADGE_OCCLUSION',width,d,read['severeOverlapPairs'])
                 print('PASS_KYOTO1400_DIRECT_NUMBER',width,d,'error',error,'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
