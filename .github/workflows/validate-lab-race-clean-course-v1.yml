@@ -123,11 +123,25 @@ jobs:
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
                 if d==909:
-                  audit=page.evaluate("() => window.RaceCleanTurf.audit(10)")
+                  audit=page.evaluate("() => window.RaceCleanTurf.audit(5)")
                   print('FULL_DISTANCE_TURF_GREEN_AUDIT',width,audit)
                   assert audit['missing']==0,('TURF_STATIONS_MISSING',width,audit)
-                  assert audit['badCenters']<40,('TURF_SURFACE_CENTER_FAILURES',width,audit)
-                  assert audit['maxGap']<8,('TURF_ROUTE_JUMP',width,audit)
+                  assert audit['badCenters']==0,('TURF_SURFACE_CENTER_FAILURES',width,audit)
+                  assert audit['badDiscs']==0,('HORSE_CIRCLE_NOT_COMPLETELY_ON_GREEN',width,audit)
+                  assert audit['maxGap']<3 and audit['jumpsOver4']==0,('TURF_ROUTE_JUMP',width,audit)
+                  if width==390:
+                    runoff=page.evaluate("""() => {
+                      const turf=window.RaceCleanTurf;
+                      const result=[];
+                      for(let lane=0;lane<=14;lane+=2){
+                        for(let d=2000;d<=2032;d+=4){
+                          const p=turf.point(d,lane);
+                          result.push({d,lane,onGreen:turf.discOnTurf(p.x,p.y,2.8),x:p.x,y:p.y});
+                        }
+                      }
+                      return result;
+                    }""")
+                    assert all(p['onGreen'] for p in runoff),('AFTER_GOAL_RUNOFF_LEFT_TURF',runoff)
                 print('PASS_ORIGINAL_BITMAP_AND_NUMBER_RUNNERS_REAL_BROWSER_18',width,d,read['inside'])
                 page.close()
             browser.close()
