@@ -1,4 +1,4 @@
-name: LAB Kyoto iOS WebKit playback, invisible rail bridge and finish coast
+name: LAB Kyoto iOS WebKit GOAL-board switch and racing-finish presentation
 on:
   push:
     branches: [main]
@@ -24,8 +24,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=14',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=14'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=602&v=15',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=602&v=15'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
@@ -93,6 +93,18 @@ jobs:
              print('PASS_WEBKIT_IPHONE_START_AND_MOVEMENT',url)
              # Reuse exactly the same iPhone WebKit context through the wire.
              page.evaluate('() => CleanLab.advanceTo(1970)')
+             board=page.evaluate("""() => ({
+               displayed:CleanLab.inspect().goalBoardVisible,
+               goal:CleanLab.inspect().goalFrame,
+               boardCanvas:document.getElementById('goalCamera')?.getBoundingClientRect().width,
+               stageWidth:document.getElementById('broadcastStage')?.getBoundingClientRect().width,
+               originalEngineSame:Boolean(window.RaceSimEngine&&window.RaceLaneAI)
+             })""")
+             print('SAFARI_KYOTO1400_GOAL_CAMERA',url,json.dumps(board,ensure_ascii=False)[:1800])
+             assert board['displayed'] and board['originalEngineSame'],('GOAL_BOARD_NOT_SHOWN',url,board)
+             assert board['goal']['mode']=='kyoto1400-goal-camera'
+             assert abs(board['goal']['goalX']-board['stageWidth']*.30)<2
+             assert board['goal']['visible']>0
              page.locator('#speed').select_option('4')
              page.locator('#startBtn').click()
              page.wait_for_function('window.CleanLab?.inspect()?.finishSequenceDone===true',timeout=25000)
@@ -107,6 +119,7 @@ jobs:
                last:CleanLab.frameSample().horses.find(x=>x.number===1)?.d
              })""")
              print('SAFARI_GENTLE_FINISH',url,json.dumps(finish,ensure_ascii=False))
+             assert page.evaluate('() => CleanLab.inspect().goalBoardVisible')
              assert finish['done'] and finish['visible']
              assert finish['ms']>=3150 and finish['count']==18
              assert '1着' in finish['podium'] and '3着' in finish['podium']
