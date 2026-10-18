@@ -5,7 +5,7 @@
  * Shared Kyoto1400 physics / time / positions remain unchanged.
  */
 (function(global){'use strict';
-const W=620,H=430,RASTER=3,MARGIN=4.6;
+const W=620,H=430,RASTER=3,MARGIN=2.8;
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
 const c=global.RaceCleanCourse;
 let grid=null,samples=null,statistics=null;
@@ -25,7 +25,7 @@ function create(image){
  }
  grid=bits;
  samples=[];
- let missing=0,maxShift=0,maxGap=0,possibleForks=0;
+ let missing=0,maxShift=0,maxGap=0,maxGapAt=0,jumpsOver4=0,possibleForks=0;
  for(let d=0;d<=2000;d++){
   const rail=c.rails(d),mid=rail.center,wx=rail.outer.x-rail.inner.x,
    wy=rail.outer.y-rail.inner.y,den=Math.hypot(wx,wy)||1,
@@ -47,12 +47,15 @@ function create(image){
   if(opened!==null&&lastGreen-opened>=7.5)
    runs.push({a:opened,b:lastGreen,m:(opened+lastGreen)/2});
   if(runs.length>1)possibleForks++;
-  // Pick the race's illustrated inner-green band, never the dirt/white.
-  // Adjacent race samples bias to the SAME band to avoid route switching.
+  // Neighbouring stations must remain on the SAME spatially contiguous
+  // segment, even as the normal vector changes around a tight corner.
+  // Comparing normal offset parameters alone causes 20px teleports.
   const prev=samples[d-1];
-  const score=run=>Math.abs(run.m)*1.0+
-   (prev?Math.abs(run.m-prev.shift)*.85:0)+
-   (run.b-run.a<2*MARGIN+2?40:0);
+  const prevX=prev?prev.x+prev.nx*prev.shift:0;
+  const prevY=prev?prev.y+prev.ny*prev.shift:0;
+  const score=run=>Math.abs(run.m)*.30+
+   (prev?Math.hypot(mid.x+nx*run.m-prevX,mid.y+ny*run.m-prevY)*4.5:0)+
+   (run.b-run.a<2*MARGIN+4?35:0);
   runs.sort((a,b)=>score(a)-score(b));
   let match=runs[0];
   if(!match){
@@ -69,10 +72,12 @@ function create(image){
   if(prev){
    const dx=(mid.x+nx*shift)-(prev.x+prev.nx*prev.shift),
     dy=(mid.y+ny*shift)-(prev.y+prev.ny*prev.shift);
-   maxGap=Math.max(maxGap,Math.hypot(dx,dy));
+   const jump=Math.hypot(dx,dy);
+   if(jump>4)jumpsOver4++;
+   if(jump>maxGap){maxGap=jump;maxGapAt=d;}
   }
  }
- statistics={missing,maxShift,maxGap,possibleForks,count:samples.length,
+ statistics={missing,maxShift,maxGap,maxGapAt,jumpsOver4,possibleForks,count:samples.length,
   greenPixels:bits.reduce((a,v)=>a+v,0)};
  if(missing){
   // The caller displays a safe loading error rather than perpetuating
@@ -109,14 +114,14 @@ function point(distance,lane){
  let x=pa.x+(pb.x-pa.x)*f,y=pa.y+(pb.y-pa.y)*f;
  // Guarantee complete 18px-ish visual badge is inside source green;
  // snap only ALONG the local turf normal, never freely onto a dirt path.
- if(!discOnTurf(x,y)){
+ if(!discOnTurf(x,y,MARGIN)){
   const m=a,half=Math.max(0,(m.high-m.low)/2);
   const midT=(m.high+m.low)/2;
   let nearest=null;
   for(let delta=0;delta<=half+3;delta+=.35){
    for(const t of [midT-delta,midT+delta]){
     const tx=m.x+m.nx*t,ty=m.y+m.ny*t;
-    if(discOnTurf(tx,ty)){
+    if(discOnTurf(tx,ty,MARGIN)){
      const score=Math.hypot(tx-x,ty-y);
      if(!nearest||score<nearest.score)nearest={x:tx,y:ty,score};
     }
@@ -141,7 +146,7 @@ function audit(step=5){
    const p=point(d,lane);
    total++;
    if(!isGreen(p.x,p.y))badCenters++;
-   if(!discOnTurf(p.x,p.y))badDiscs++;
+   if(!discOnTurf(p.x,p.y,MARGIN))badDiscs++;
    if(prev)maxJump=Math.max(maxJump,Math.hypot(p.x-prev.x,p.y-prev.y));
    prev=p;
   }
