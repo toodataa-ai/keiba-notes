@@ -1,4 +1,4 @@
-/* LAB v7: Kyoto 1400 number markers + shared inside-first racing logic.
+/* LAB v8: unmodified publisher clean vector and small direct horse numbers.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -65,10 +65,8 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 
 function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null,lastLabelPositions=[];
-let hiResReady=false,originalReady=false,originalError=false;
-// Source image is linked directly from Umapot in a regular <img>. Browser
-// local resampling does not upload, store or rehost the source image.
-const IMAGE_SCALE=4;
+let vectorReady=false,originalError=false;
+const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
  playing=false;last=0;acc=0;lastCamera=null;paint();
@@ -99,50 +97,34 @@ function backdrop(camera){
  const left=camera.cx-camera.x*camera.scale;
  const top=camera.cy-camera.y*camera.scale;
  const transform='translate('+left+'px,'+top+'px) scale('+camera.scale+')';
- for(const id of ['liveCourseImage','liveCourseHiRes']){
+ for(const id of ['liveCourseImage']){
   const element=$(id);
   if(element)element.style.transform=transform;
  }
 }
-function upscaleOriginal(){
- const original=$('realCourseImage'),out=$('liveCourseHiRes');
- if(!original||!out||!original.complete||!original.naturalWidth)return;
- originalReady=true;
- try{
-  const targetWidth=original.naturalWidth*IMAGE_SCALE,
-   targetHeight=original.naturalHeight*IMAGE_SCALE;
-  if(out.width!==targetWidth)out.width=targetWidth;
-  if(out.height!==targetHeight)out.height=targetHeight;
-  const ctx=out.getContext('2d');
-  if(!ctx)throw Error('UPSCALE_CANVAS_CONTEXT');
-  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  // Upsample the ORIGINAL pixels. Does not hallucinate missing detail.
-  ctx.drawImage(original,0,0,targetWidth,targetHeight);
-  hiResReady=true;
-  out.classList.add('is-ready');
-  $('liveCourseImage').classList.add('is-upscaled');
- }catch(err){
-  hiResReady=false;
-  console.warn('Native image remains visible; browser upscale unavailable',err);
- }
+function verifyVectorSource(){
+ const a=$('realCourseImage'),b=$('liveCourseImage');
+ vectorReady=Boolean(a&&b&&a.complete&&b.complete&&
+   a.naturalWidth===620&&a.naturalHeight===430&&
+   b.naturalWidth===620&&b.naturalHeight===430&&
+   a.getAttribute('src')===SOURCE_VECTOR&&b.getAttribute('src')===SOURCE_VECTOR);
+ if(vectorReady)originalError=false;
 }
 function position(p,camera){
  return {x:camera.cx+(p.x-camera.x)*camera.scale,
          y:camera.cy+(p.y-camera.y)*camera.scale};
 }
 function cameraFor(points,w,h,chosen){
- // Same local +/-110m group camera algorithm as working Kyoto 1400.
- // Numbers remain at their TRUE horse positions; only the camera pans.
+ // Kyoto1400's real-position number rendering with a closer group camera.
  const focus=points.find(p=>p.number===chosen)||points.slice().sort((a,b)=>b.d-a.d)[0];
- const group=points.filter(p=>Math.abs(p.d-focus.d)<=110);
+ const group=points.filter(p=>Math.abs(p.d-focus.d)<=80);
  if(!group.some(p=>p.number===focus.number))group.push(focus);
  const xs=group.map(p=>p.x),ys=group.map(p=>p.y);
  const loX=Math.min(...xs),hiX=Math.max(...xs),loY=Math.min(...ys),hiY=Math.max(...ys);
- const marginX=Math.min(w*.24,Math.max(48,22));
- const marginY=Math.min(h*.30,Math.max(64,42));
- const zoom=Math.max(1.7,Math.min(points.length===1?5.2:4.6,
-   (w-2*marginX)/Math.max(65,hiX-loX+15),
-   (h-2*marginY)/Math.max(55,hiY-loY+12)));
+ const mx=Math.min(w*.18,28),my=Math.min(h*.18,40);
+ const zoom=Math.max(2.3,Math.min(w<540?8.2:9.6,
+  (w-2*mx)/Math.max(30,hiX-loX+12),
+  (h-2*my)/Math.max(25,hiY-loY+8)));
  const mean={x:(loX+hiX)/2,y:(loY+hiY)/2};
  const origin={x:focus.x+.16*(mean.x-focus.x),y:focus.y+.16*(mean.y-focus.y)};
  return {x:origin.x,y:origin.y,cx:w/2,cy:h*.5,scale:zoom};
@@ -155,7 +137,10 @@ function markers(ctx,points,loc,focused,mini=false){
  const displayed=[];
  for(const p of sorted){
   const x=p.actual.x,y=p.actual.y;
-  const scale=mini?.48:(points.length>=12?(p.number===focused?1.02:.92):1);
+  // Smaller true-position markers leave room for physically close runners.
+  const compact=loc.w<540;
+  const scale=mini?.48:(points.length>=12?
+    (p.number===focused?(compact?.82:.90):(compact?.62:.72)):.86);
   const radius=(p.number===focused?15.5:13.5)*scale;
   if(x+radius<0||x-radius>loc.w||y+radius<0||y-radius>loc.h)continue;
   raceNumberMarker(ctx,p.number,x,y,scale,p.number===focused,false,18,false);
@@ -232,18 +217,13 @@ function tick(ts){
  requestAnimationFrame(tick);
 }
 function setup(){
- const original=$('realCourseImage');
- if(original){
-  original.addEventListener('load',upscaleOriginal);
-  original.addEventListener('error',()=>{
-   originalError=true;
-   const credit=document.querySelector('.source-credit');
-   if(credit)credit.textContent='コースの原画像を読み込めません。うまぽっとの配信状況をご確認ください。';
-  });
-  if(original.complete&&original.naturalWidth)upscaleOriginal();
+ for(const id of ['realCourseImage','liveCourseImage']){
+  const img=$(id);
+  if(!img)throw Error('ORIGINAL_VECTOR_MISSING');
+  img.addEventListener('load',()=>{verifyVectorSource();paint()});
+  img.addEventListener('error',()=>{originalError=true;vectorReady=false});
  }
- const liveImage=$('liveCourseImage');
- if(liveImage)liveImage.addEventListener('error',()=>{originalError=true;});
+ verifyVectorSource();
  $('focus').insertAdjacentHTML('beforeend',fixture.horses().map(h=>
    '<option value="'+h.number+'">'+h.number+'番</option>').join(''));
  $('horseGrid').innerHTML=fixture.horses().map(h=>{
@@ -282,9 +262,8 @@ window.CleanLab=Object.freeze({
    originalLoaded:Boolean(image?.complete&&image?.naturalWidth===620&&image?.naturalHeight===430),
    liveImageLoaded:Boolean($('liveCourseImage')?.complete&&$('liveCourseImage')?.naturalWidth===620),
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
-   originalError,upscaledReady:hiResReady,
-   upscaledCanvasWidth:$('liveCourseHiRes')?.width||0,
-   upscaledCanvasHeight:$('liveCourseHiRes')?.height||0,
+   originalError,vectorReady,
+   highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
    zoom:lastCamera?.scale??0,
@@ -293,6 +272,12 @@ window.CleanLab=Object.freeze({
      anchorX:p.actual.x,anchorY:p.actual.y})),
    directMarkerMaxError:lastLabelPositions.reduce((m,p)=>
      Math.max(m,Math.hypot(p.x-p.actual.x,p.y-p.actual.y)),0),
+   severeOverlapPairs:lastLabelPositions.reduce((n,a,i)=>n+
+    lastLabelPositions.slice(i+1).filter(b=>
+     Math.hypot(a.x-b.x,a.y-b.y)<.55*(a.r+b.r)).length,0),
+   touchingPairs:lastLabelPositions.reduce((n,a,i)=>n+
+    lastLabelPositions.slice(i+1).filter(b=>
+     Math.hypot(a.x-b.x,a.y-b.y)<a.r+b.r).length,0),
    commonLaneController:Boolean(window.RaceLaneAI?.plan&&window.RaceLaneAI?.launchStepSafe),
    inwardMoves:engine.state.totalInsideMoves,
    outwardMoves:engine.state.totalOutsidePasses,
@@ -301,7 +286,7 @@ window.CleanLab=Object.freeze({
     selectedHorse:selected,selectedScreen:screen,
     selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&
      screen.y>=16&&screen.y<=live.height-16),
-    imageCalls:hiResReady?1:0,section:model.center(engine.state.leader).section,
+    imageCalls:vectorReady?1:0,section:model.center(engine.state.leader).section,
     fixedSegments:model.sections.filter(s=>s.kind==='straight').map(s=>[s.from,s.to])};
  },advanceTo
 });

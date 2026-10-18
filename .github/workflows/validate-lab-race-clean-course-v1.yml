@@ -1,9 +1,10 @@
-name: LAB clean vector race course 18-runner browser acceptance
+name: LAB highres clean SVG compact numbers browser acceptance
 on:
   push:
     branches: [main]
     paths:
       - 'docs/lab/race-clean-course-*'
+      - 'docs/lab/assets/kyoto-umapot-course-clean-v8.svg'
       - 'tools/test_race_clean_course_v1.cjs'
       - '.github/workflows/validate-lab-race-clean-course-v1.yml'
   workflow_dispatch:
@@ -52,7 +53,7 @@ jobs:
                 page.on('pageerror',lambda error:errors.append(str(error)))
                 page.goto(f'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint={d}',wait_until='load')
                 page.wait_for_function('window.CleanLab?.getState()?.horses?.length===18',timeout=12000)
-                page.wait_for_function('window.CleanLab?.inspect()?.upscaledReady===true',timeout=15000)
+                page.wait_for_function('window.CleanLab?.inspect()?.vectorReady===true',timeout=15000)
                 read=page.evaluate("""() => {
                   const a=CleanLab.inspect(),c=RaceCleanCourse;
                   const sim=CleanLab.getState();
@@ -64,8 +65,8 @@ jobs:
                     live:live.width,full:full.width,canvasCSS:live.getBoundingClientRect().width,
                     imageElements:document.querySelectorAll('img').length,
                     liveImageLoaded:a.liveImageLoaded,liveImageSrc:a.liveImageSrc,
-                    upscaledReady:a.upscaledReady,upscaledCanvasWidth:a.upscaledCanvasWidth,
-                    upscaledCanvasHeight:a.upscaledCanvasHeight,
+                    vectorReady:a.vectorReady,highResolutionMode:a.highResolutionMode,
+                    severeOverlapPairs:a.severeOverlapPairs,touchingPairs:a.touchingPairs,
                     actualNumberCircles:a.actualNumberCircles,
                     paintedTrack:a.paintedTrack,leaderLines:a.leaderLines,
                     originalImageSrc:a.originalImageSrc,
@@ -80,14 +81,14 @@ jobs:
                 assert read['selectedVisible'],('FOCUSED_HORSE_OFF_CAMERA',width,d,read)
                 assert read['leader']+3>=d,(width,d,read)
                 assert read['sourceCalls']==1 and read['imageElements']==2,(width,d,read)
-                assert read['liveImageLoaded'] and read['upscaledReady'],('ORIGINAL_UPSCALE_NOT_READY',width,d,read)
-                assert read['upscaledCanvasWidth']==2480 and read['upscaledCanvasHeight']==1720,(width,d,read)
+                assert read['liveImageLoaded'] and read['vectorReady'],('VECTOR_NOT_READY',width,d,read)
+                assert read['highResolutionMode']=='publisher-original-svg-not-resampled-jpeg',(width,d,read)
                 assert read['originalImageSrc']==read['liveImageSrc'],('TWO_DIFFERENT_COURSE_IMAGES',width,d,read)
                 assert read['actualNumberCircles'] and not read['paintedTrack'] and not read['leaderLines']
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
-                assert 'umapot.com/data/powerpoint/kyoto_couse/kyoto_couse_1.jpg' in read['originalImageSrc']
+                assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
-                assert 1.65<=read['zoom']<=5.25,(width,d,read)
+                assert 2.25<=read['zoom']<=9.65,(width,d,read)
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
                 assert read['commonLaneController'],('SHARED_KYOTO1400_ENGINE_MISSING',width,d)
@@ -98,7 +99,7 @@ jobs:
                     (a['y']-a['anchorY'])**2)**.5 for a in labels),default=0)
                 assert error<1e-6,('NUMBER_MUST_BE_AT_HORSE_POSITION',width,d,error)
                 assert any(a['number']==read['selectedHorse'] for a in labels),('FOCUSED_HORSE_NUMBER_HIDDEN',width,d)
-                print('PASS_KYOTO1400_DIRECT_NUMBER',width,d,'error',error)
+                print('PASS_KYOTO1400_DIRECT_NUMBER',width,d,'error',error,'severe',read['severeOverlapPairs'],'touching',read['touchingPairs'])
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
                 print('PASS_ORIGINAL_BITMAP_AND_NUMBER_RUNNERS_REAL_BROWSER_18',width,d,read['inside'])
@@ -108,7 +109,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-clean-vector-18-mobile-desktop
+          name: lab-clean-source-v8-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14
@@ -118,7 +119,7 @@ jobs:
           base=https://toodataa-ai.github.io/keiba-notes/lab
           for i in $(seq 1 28);do
             ok=1
-            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-course-v1.css;do
+            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-course-v1.css assets/kyoto-umapot-course-clean-v8.svg;do
               if ! curl -fLsS --max-time 20 "$base/$f?ci=$GITHUB_RUN_ID-$i" -o /tmp/clean-file ||
                 ! cmp -s "docs/lab/$f" /tmp/clean-file;then ok=0;break;fi
             done
