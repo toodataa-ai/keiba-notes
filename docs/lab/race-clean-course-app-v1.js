@@ -1,4 +1,4 @@
-/* LAB v14: continuous no-cut inner running line and gentle post-wire finish presentation.
+/* LAB v15: Kyoto1400 GOAL board camera at 80m, closer broadcast zoom and reasoned pack diagnostics.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -75,6 +75,7 @@ let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
 const FINISH_SEQUENCE_MS=3200;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
+let lastGoalFrame=null;
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
@@ -166,7 +167,8 @@ function cameraFor(points,w,h,chosen,autoLeader=true){
  // Fix the optical zoom; the old density-based group bounds changed camera
  // magnification at every overtake and caused visible frame-to-frame shakes.
  return {x:center.x,y:center.y,cx:w*.54,cy:h*.51,
-  scale:w<540?7.0:7.8};
+  // Tighter normal broadcast. Fixed across overtakes to prevent breathing.
+  scale:w<540?8.8:9.7};
 }
 // At 4x playback, physics advances in 80ms simulation steps. A canvas drawn
 // between steps used to alternate between a stationary and jumping position.
@@ -287,6 +289,24 @@ function paint(){
  backdrop(lastCamera);
  const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
  lastLabelPositions=labels;
+ // Kyoto1400 contract: exactly 80 metres from the finish, replace the
+ // zoomed course with the right-to-left GOAL-board television camera.
+ // RaceSimEngine.goalCamera was already computed on physical race distance.
+ const goalCanvas=$('goalCamera');
+ if(goalCanvas){
+  const goalMode=Boolean(state.goalCamera||state.firstFinishTime!==null);
+  goalCanvas.hidden=!goalMode;
+  if(goalMode){
+   const p=finishSequenceActive?
+     Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS):0;
+   const eased=p*p*(3-2*p);
+   lastGoalFrame=window.RaceCleanGoalView.render({
+    canvas:goalCanvas,points,leaderNo:state.leadingNo,focusedNo:chosen,
+    paintNumber:raceNumberMarker,maxLane:14,distance:2000,turn:'右',
+    fieldSize:18,pullback:1+.22*eased
+   });
+  }else lastGoalFrame=null;
+ }
  const map=sizeCanvas($('overview'));
  // Transparent numbers over the ACTUAL original 620x430 course diagram.
  const overview={x:310,y:215,cx:map.w/2,cy:map.h/2,
@@ -296,7 +316,7 @@ function paint(){
  $('progress').textContent=Math.round(state.leader)+'m / 2000m';
  $('clock').textContent=state.t.toFixed(1)+'秒';
  $('section').textContent=(state.allCrossedAt!==null?'全馬ゴール・余走中':
-   model.center(state.leader).section)+
+   state.goalCamera?'ゴール板固定カメラ':model.center(state.leader).section)+
    ' ／ 内4列 '+state.horses.filter(h=>h.lane<=3.45).length+'頭'+
    ' ／ 内へ '+state.totalInsideMoves+'回';
  const banner=$('finishBanner');
@@ -395,6 +415,8 @@ window.CleanLab=Object.freeze({
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
    originalError,vectorReady,turfReady,turfError,turfStats,
    visualInterpolationEnabled:true,fixedCameraZoom:!finishSequenceActive,
+   goalBoardVisible:Boolean(!$('goalCamera')?.hidden),
+   goalFrame:lastGoalFrame,goalCameraSwitchDistance:1920,
    finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
    finishedBannerVisible:Boolean(!$('finishBanner')?.hidden),
    visualSimulationTime:visualRenderTime,
@@ -403,6 +425,7 @@ window.CleanLab=Object.freeze({
      lane:p.lane-(engine.state.horses.find(h=>h.number===p.number)?.lane||0)
    })),
    highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
+   normalBroadcastZoom:8.8,normalDesktopZoom:9.7,
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
    zoom:lastCamera?.scale??0,
