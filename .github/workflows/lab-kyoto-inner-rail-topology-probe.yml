@@ -1,0 +1,87 @@
+name: LAB Kyoto 2000 inner-rail topology and finish diagnosis
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/lab-kyoto-inner-rail-topology-probe.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize local browser test
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/kyoto-topology.log 2>&1 &
+          sleep 2
+      - name: Sample drawn rail continuity and end-of-race display
+        run: |
+          python3 - <<'PY'
+          import json,shutil,math
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+           page=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=2)
+           page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=600')
+           page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=15000)
+           for a,b,step in [(250,950,20),(1000,1680,40),(1720,2000,50)]:
+            info=page.evaluate(f'() => window.RaceCleanTurf.trace({a},{b},{step})')
+            print('RAIL_TOPOLOGY',a,b,json.dumps(info,ensure_ascii=False))
+           report=page.evaluate("""() => {
+            const out=[];
+            for(let d=0;d<=2000;d+=1){
+             const a=RaceCleanTurf.trace(d,d,1)[0];
+             out.push(a);
+            }
+            return out.filter((p,i)=>i>0&&i<2000&&(
+              Math.abs(p.low-out[i-1].low)>.40||
+              Math.abs(p.greenInside-out[i-1].greenInside)>=8
+            )).slice(0,100);
+           }""")
+           print('NOTABLE_RAIL_TOPOLOGY_CHANGE',json.dumps(report,ensure_ascii=False))
+           page.screenshot(path='/tmp/kyoto-topology-600.png')
+           finish=page.evaluate("""() => {
+            CleanLab.advanceTo(1970);
+            const a=CleanLab.getState(),states=[];
+            for(let i=0;i<1200&&!a.finished;i++){
+             RaceSimEngine; // inspect only; no engine access to mutate
+             states.push({leader:a.leader,finished:a.finished,
+              allCrossed:a.allCrossedAt,
+              minDisplay:Math.min(...a.horses.map(h=>h.displayD)),
+              maxDisplay:Math.max(...a.horses.map(h=>h.displayD))});
+             // LAB exposes seek only; playback simulation continues below.
+             break;
+            }
+            return {leader:a.leader,allCrossedAt:a.allCrossedAt,
+             firstFinish:a.firstFinishTime,finished:a.finished,
+             before:states.at(-1)};
+           }""")
+           print('FINISH_START',json.dumps(finish,ensure_ascii=False))
+           page.screenshot(path='/tmp/kyoto-topology-1970.png')
+           page.locator('#speed').select_option('4')
+           page.locator('#startBtn').click()
+           page.wait_for_timeout(10000)
+           end=page.evaluate("""() => ({
+            state:{finished:CleanLab.getState().finished,
+             leader:CleanLab.getState().leader,t:CleanLab.getState().t,
+             allCrossedAt:CleanLab.getState().allCrossedAt},
+            progress:document.getElementById('progress').textContent,
+            start:document.getElementById('startBtn').textContent,
+            positions:CleanLab.frameSample().horses
+            })""")
+           print('FINISH_FINAL',json.dumps(end,ensure_ascii=False)[:4000])
+           page.screenshot(path='/tmp/kyoto-topology-finished.png')
+           assert end['state']['finished']
+           page.close()
+           browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kyoto-original-inner-track-diagnostic
+          path: /tmp/kyoto-topology-*.png
+          if-no-files-found: warn
+          retention-days: 3
