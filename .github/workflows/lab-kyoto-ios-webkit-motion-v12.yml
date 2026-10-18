@@ -105,6 +105,9 @@ jobs:
              assert board['goal']['mode']=='kyoto1400-goal-camera'
              assert abs(board['goal']['goalX']-board['stageWidth']*.30)<2
              assert board['goal']['visible']>0
+             assert all(
+               board['goal']['top']+19 <= m['y'] <= board['goal']['bottom']-19
+               for m in board['goal']['markers']),('WEBKIT_MARKERS_OFF_GOAL_TURF',url,board)
              page.locator('#speed').select_option('4')
              page.locator('#startBtn').click()
              page.wait_for_function('window.CleanLab?.inspect()?.finishSequenceDone===true',timeout=25000)
