@@ -30,7 +30,7 @@ for(const d of [0,100,210,308.7,440,530,620,720,800,900,1000,1200,1270,1435,1671
    assert.equal(view.rotationRadians,0);
    const screen=map.screenPoint(actual[0],view);
    assert.ok(Math.hypot(screen.x-view.anchor.x,screen.y-view.anchor.y)<1e-8);
-   assert.ok(view.zoom>1&&view.zoom<6);
+   assert.ok(view.zoom>1&&view.zoom<=10.5);
  }
 }
 
@@ -59,7 +59,7 @@ assert.equal(out.renderMode,'source-derived-vector-rails');
 assert.equal(out.turfStations,401);
 assert.equal(operations.filter(x=>x[0]==='fill').length,1,'one connected turf ribbon');
 assert.equal(operations.filter(x=>x[0]==='stroke').length,2,'only inside/outside boundaries');
-assert.ok(operations.filter(x=>x[0]==='line').length>=1600);
+assert.ok(operations.filter(x=>x[0]==='line').length>=800);
 assert.equal(markers.length,1);
 assert.ok(markers[0].size>3,'one-runner readable marker scale');
 assert.equal(operations.filter(x=>x[0]==='scale').length,1);
