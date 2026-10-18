@@ -64,7 +64,8 @@ jobs:
                     imageElements:document.querySelectorAll('img').length,
                     originalImageSrc:a.originalImageSrc,
                     originalLoaded:a.originalLoaded,mapAspect:a.mapAspect,zoom:a.zoom,
-                    selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen};
+                    selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen,
+                    labelCoords:a.liveLabelPositions};
                 }""")
                 assert not errors,(width,d,errors)
                 assert read['count']==read['running']==18,(width,d,read)
@@ -77,6 +78,17 @@ jobs:
                 assert 3.35<=read['zoom']<=7.25,(width,d,read)
                 assert read['live']>=read['canvasCSS'],(width,d,read)
                 assert read['inside']>=8 if d>=100 else True,(width,d,read)
+                # Readable badges must be separated; exact physical anchor points are
+                # NOT moved by this purely visual collision-avoidance layer.
+                labels=read['labelCoords']
+                assert len(labels)>=12,('TOO_FEW_LIVE_LABELS',width,d,len(labels))
+                pairs=[(a,b) for i,a in enumerate(labels) for b in labels[i+1:]]
+                worst=max([max(0,a['r']+b['r']-
+                    ((a['x']-b['x'])**2+(a['y']-b['y'])**2)**.5)
+                    for a,b in pairs] or [0])
+                assert worst<2.5,('BADGE_COLLISION',width,d,worst)
+                assert all(-2<=a['x']<=read['canvasCSS']+2 for a in labels),('LABEL_X_CLIPPED',width,d)
+                print('PASS_BADGE_VISIBILITY',width,d,len(labels),'max_overlap',round(worst,3))
                 page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-{width}-{d}.png')
                 page.locator('#overview').screenshot(path=f'/tmp/clean-lab/overview-{width}-{d}.png')
                 print('PASS_CLEAN_VECTOR_REAL_BROWSER_18',width,d,read['inside'])
