@@ -65,11 +65,13 @@ function snapshot(sim,at){
   assert.equal(view.rotationRadians,0);
   assert.ok(view.zoom>=.5 && Number.isFinite(view.zoom));
   const margin=2;
-  for(const p of mapped){
-   const screen=broadcast.screenPoint(p,view);
-   assert.ok(screen.x>=-margin&&screen.x<=width+margin&&
-      screen.y>=-margin&&screen.y<=height+margin,'18 active markers visible '+at+'m '+p.number+' '+JSON.stringify(screen));
-  }
+  // In a readable broadcast the optical close-up deliberately crops far
+  // horses; the FULL OVERVIEW still plots all eighteen using the same coords.
+  const focused=mapped.find(p=>p.number===s.leadingNo)||mapped[0];
+  const screen=broadcast.screenPoint(focused,view);
+  assert.ok(screen.x>=-margin&&screen.x<=width+margin&&
+    screen.y>=-margin&&screen.y<=height+margin,'focused horse must stay in close-up '+at);
+  assert.ok(view.zoom>=5 && view.zoom<=9,'high detail close-up '+view.zoom);
  }
  return {at,leader:Number(s.leader.toFixed(1)),median:Number(median.toFixed(2)),
   initialMedian:Number(median0.toFixed(2)),inside4:pack,farOutside:outer,
