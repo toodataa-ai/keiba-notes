@@ -1,4 +1,4 @@
-/* LAB v15: Kyoto1400 GOAL board camera at 80m, closer broadcast zoom and reasoned pack diagnostics.
+/* LAB v19: preserve untouched Umapot SVG and use slowly adapted affine TV zoom to counter chord perspective.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -75,7 +75,8 @@ let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
 const FINISH_SEQUENCE_MS=3200;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
-let lastGoalFrame=null;
+let lastGoalFrame=null,curveLensStats=null,curveLensError=null;
+const CURVE_LENS_ENABLED=new URLSearchParams(location.search).get('lens')!=='off';
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
@@ -144,6 +145,10 @@ function verifyVectorSource(){
    if(note)note.textContent='コース初期化に失敗しました: '+turfError;
   }
  }
+ if(turfReady&&!curveLensStats&&!curveLensError){
+  try{curveLensStats=window.RaceCleanCurveCamera.profile(turf);}
+  catch(err){curveLensError=String(err);console.error('LAB_CURVE_LENS_CALIBRATION',err);}
+ }
  if(vectorReady)originalError=false;
 }
 function position(p,camera){
@@ -155,20 +160,20 @@ function position(p,camera){
 // The focal point can still follow an individually selected horse.
 function cameraFor(points,w,h,chosen,autoLeader=true){
  let center=points.find(p=>p.number===chosen)||points[0];
+ const leaderDistance=Math.max(...points.map(p=>p.d));
  if(autoLeader){
-  const leaderDistance=Math.max(...points.map(p=>p.d));
-  let x=0,y=0,total=0;
-  for(const p of points){
-   const weight=Math.exp(Math.max(-25,(p.d-leaderDistance)/15));
-   x+=p.x*weight;y+=p.y*weight;total+=weight;
-  }
-  center={x:x/total,y:y/total};
+  // Lock the camera to the RACE DISTANCE instead of the physical pack's
+  // moment-to-moment centroid. Group membership and overtakes cannot
+  // make the entire course abruptly jump or appear to collapse.
+  center=turf.point(Math.max(0,Math.min(2000,leaderDistance-10)),3);
  }
  // Fix the optical zoom; the old density-based group bounds changed camera
  // magnification at every overtake and caused visible frame-to-frame shakes.
  return {x:center.x,y:center.y,cx:w*.54,cy:h*.51,
   // Tighter normal broadcast. Fixed across overtakes to prevent breathing.
-  scale:w<540?8.8:9.7};
+  scale:(w<540?8.8:9.7)*
+   (CURVE_LENS_ENABLED&&curveLensStats?
+    window.RaceCleanCurveCamera.gain(leaderDistance):1)};
 }
 // At 4x playback, physics advances in 80ms simulation steps. A canvas drawn
 // between steps used to alternate between a stationary and jumping position.
@@ -284,7 +289,10 @@ function paint(){
   const blend=1-Math.exp(-dt/.13);
   lastCamera={...target,
    x:lastCamera.x+(target.x-lastCamera.x)*blend,
-   y:lastCamera.y+(target.y-lastCamera.y)*blend};
+   y:lastCamera.y+(target.y-lastCamera.y)*blend,
+   // Uniform crop zoom uses the exact SAME affine scale for both the
+   // untouched source SVG and all 18 corresponding numbers.
+   scale:lastCamera.scale+(target.scale-lastCamera.scale)*blend};
  }
  backdrop(lastCamera);
  const labels=markers(live.ctx,points,{...lastCamera,w:live.w,h:live.h},chosen);
@@ -414,6 +422,15 @@ window.CleanLab=Object.freeze({
     width:image.naturalWidth,height:image.naturalHeight}:null,
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
    originalError,vectorReady,turfReady,turfError,turfStats,
+   cameraLensEnabled:CURVE_LENS_ENABLED,cameraLensReady:Boolean(curveLensStats),
+   cameraLensError:curveLensError,cameraLensStats:curveLensStats,
+   cameraLensGain:CURVE_LENS_ENABLED&&curveLensStats?
+      window.RaceCleanCurveCamera.gain(engine.state.leader):1,
+   rawPackPhysicalGapM:Math.max(...points.map(p=>p.d))-
+      Math.min(...points.map(p=>p.d)),
+   rawPackChordSourcePx:(()=>{const a=points.reduce((a,b)=>a.d>b.d?a:b);
+      const b=points.reduce((a,b)=>a.d<b.d?a:b);
+      return Math.hypot(a.x-b.x,a.y-b.y);})(),
    visualInterpolationEnabled:true,fixedCameraZoom:!finishSequenceActive,
    goalBoardVisible:Boolean(!$('goalCamera')?.hidden),
    goalFrame:lastGoalFrame,goalCameraSwitchDistance:1920,
@@ -426,6 +443,7 @@ window.CleanLab=Object.freeze({
    })),
    highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
    normalBroadcastZoom:8.8,normalDesktopZoom:9.7,
+   unchangedBackgroundAffineOnly:true,
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
    zoom:lastCamera?.scale??0,

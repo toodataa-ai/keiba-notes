@@ -1,9 +1,10 @@
-name: LAB Kyoto1400 fixed GOAL board camera, closer broadcast and shared engine acceptance
+name: LAB original Umapot SVG affine camera correction only and no sudden pack breathing
 on:
   push:
     branches: [main]
     paths:
       - 'docs/lab/race-clean-course-*'
+      - 'docs/lab/race-clean-curve-camera-v1.js'
       - 'docs/lab/race-clean-goal-view-v1.js'
       - 'docs/lab/race-clean-turf-mask-v1.js'
       - 'docs/lab/assets/kyoto-umapot-course-clean-v8.svg'
@@ -102,7 +103,8 @@ jobs:
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
-                assert abs(read['zoom']-(8.8 if width==390 else 9.7))<1e-6,('CAMERA_ZOOM_MUST_STAY_FIXED',width,d,read['zoom'])
+                assert (8.8 if width==390 else 9.7)<=read['zoom']<=
+                    (8.8 if width==390 else 9.7)*1.46,('CAMERA_ZOOM_OUTSIDE_BOUNDED_AFFINE',width,d,read['zoom'])
                 assert read['goalCameraSwitchDistance']==1920
                 assert read['goalBoardVisible']==(d>=1920),('GOAL_CAMERA_MUST_SWITCH_80M_BEFORE_FINISH',width,d,read)
                 if d>=1920:
@@ -351,7 +353,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lab-kyoto1400-goal-closer-v15-mobile-desktop
+          name: lab-unchanged-SVG-curve-lens-v19-mobile-desktop
           path: /tmp/clean-lab/*.png
           if-no-files-found: warn
           retention-days: 14
@@ -361,7 +363,7 @@ jobs:
           base=https://toodataa-ai.github.io/keiba-notes/lab
           for i in $(seq 1 28);do
             ok=1
-            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-goal-view-v1.js race-clean-turf-mask-v1.js race-clean-course-v1.css assets/kyoto-umapot-course-clean-v8.svg;do
+            for f in race-clean-course-v1.html race-clean-course-v1.js race-clean-course-app-v1.js race-clean-goal-view-v1.js race-clean-curve-camera-v1.js race-clean-turf-mask-v1.js race-clean-course-v1.css assets/kyoto-umapot-course-clean-v8.svg;do
               if ! curl -fLsS --max-time 20 "$base/$f?ci=$GITHUB_RUN_ID-$i" -o /tmp/clean-file ||
                 ! cmp -s "docs/lab/$f" /tmp/clean-file;then ok=0;break;fi
             done
