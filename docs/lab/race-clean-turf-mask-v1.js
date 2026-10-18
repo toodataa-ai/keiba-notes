@@ -215,7 +215,25 @@ function audit(step=1,radius=3){
  return {...statistics,total,badCenters,badDiscs,maxJump,maxJumpAt,
   maxActualInnerOffset,step,radius};
 }
+// Read-only geometry diagnostics for tracing missing drawn-rail segments.
+function trace(from=0,to=2000,step=25){
+ if(!samples)return [];
+ const out=[];
+ for(let d=Math.max(0,from);d<=Math.min(2000,to);d+=step){
+  const p=samples[Math.round(d)],rr=c.rails(d),
+   pos=point(d,0),dist=Math.hypot(pos.x-rr.inner.x,pos.y-rr.inner.y);
+  let greenInside=0;
+  // How far into the infield is still green from inner runner position?
+  for(let t=0;t<=35;t+=.5){
+   if(!isGreen(pos.x-p.nx*t,pos.y-p.ny*t)){greenInside=t;break}
+  }
+  out.push({d,low:+p.low.toFixed(2),high:+p.high.toFixed(2),
+   safeLow:+p.safeLow.toFixed(2),safeHigh:+p.safeHigh.toFixed(2),
+   dist:+dist.toFixed(2),greenInside});
+ }
+ return out;
+}
 global.RaceCleanTurf=Object.freeze({
- create,point,runners,isGreen,discOnTurf,audit,stats:()=>statistics
+ create,point,runners,isGreen,discOnTurf,audit,trace,stats:()=>statistics
 });
 })(typeof window!=='undefined'?window:globalThis);
