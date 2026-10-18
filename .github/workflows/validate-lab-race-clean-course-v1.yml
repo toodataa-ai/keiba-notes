@@ -177,6 +177,67 @@ jobs:
                 page.close()
             browser.close()
           PY
+      - name: Realtime fourfold playback - no shaking or zoom breathing
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8766 --directory docs >/tmp/clean-lab-motion-server.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          import shutil,math
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+            for width in (390,1024):
+              page=browser.new_page(viewport={'width':width,'height':900},device_scale_factor=2)
+              errors=[]
+              page.on('pageerror',lambda err:errors.append(str(err)))
+              page.goto('http://127.0.0.1:8766/lab/race-clean-course-v1.html?checkpoint=602',wait_until='load')
+              page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=20000)
+              frames=page.evaluate("""async() => {
+                const speed=document.getElementById('speed');
+                speed.value='4';
+                speed.dispatchEvent(new Event('change'));
+                document.getElementById('startBtn').click();
+                const out=[];
+                let t0=null;
+                return await new Promise(resolve=>{
+                  function frame(t){
+                    if(t0===null)t0=t;
+                    const s=window.CleanLab.frameSample();
+                    const h=s.horses.find(h=>h.number===1);
+                    if(h&&s.camera)out.push({
+                      time:t-t0,t:s.t,d:h.d,lane:h.lane,
+                      x:h.x,y:h.y,camX:s.camera.x,camY:s.camera.y,zoom:s.zoom
+                    });
+                    if(t-t0<2600)requestAnimationFrame(frame);
+                    else resolve(out);
+                  }
+                  requestAnimationFrame(frame);
+                });
+              }""")
+              page.locator('#pauseBtn').click()
+              assert not errors,(width,errors)
+              assert len(frames)>=35,('TOO_FEW_REALTIME_RENDER_FRAMES',width,len(frames))
+              assert frames[-1]['t']-frames[0]['t']>=5,('NOT_REALLY_4X',width,frames[-1]['t']-frames[0]['t'])
+              zoom_spread=max(f['zoom'] for f in frames)-min(f['zoom'] for f in frames)
+              steps=[math.hypot(b['x']-a['x'],b['y']-a['y']) for a,b in zip(frames,frames[1:])]
+              cam_steps=[math.hypot(b['camX']-a['camX'],b['camY']-a['camY']) for a,b in zip(frames,frames[1:])]
+              neg=sum(b['d']-a['d'] < -.20 for a,b in zip(frames,frames[1:]))
+              still=sum(x<.001 for x in steps)
+              print('PASS_OR_FAIL_4X_REALTIME_JITTER',width,{
+                'frames':len(frames),'simSeconds':round(frames[-1]['t']-frames[0]['t'],2),
+                'zoomSpread':zoom_spread,'maxHorseStep':max(steps),
+                'maxCameraStep':max(cam_steps),'stillFrames':still,'regressions':neg})
+              assert zoom_spread<1e-8,('ZOOM_BREATHING',width,zoom_spread)
+              assert max(steps)<4.5,('NUMBER_SHAKE_JUMP',width,max(steps))
+              assert max(cam_steps)<3.8,('CAMERA_SHAKE_JUMP',width,max(cam_steps))
+              assert still/len(steps)<.55,('STEPWISE_FROZEN_JITTER',width,still,len(steps))
+              assert neg<=2,('RUNNERS_JERK_BACKWARD',width,neg)
+              page.locator('#broadcast').screenshot(path=f'/tmp/clean-lab/live-4x-realtime-{width}.png')
+              page.close()
+            browser.close()
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
