@@ -251,19 +251,56 @@ function buildSourceArcMap(){
    span=arc[i+1]-arc[i];
   return i+(span>.00000001?(px-arc[i])/span:0);
  };
- let section=0,maxShift=0,maxRate=0,minRate=Infinity;
+ // First equalize every physical section while retaining its endpoints.
+ // The complex third/fourth-turn bend additionally uses the narrower
+ // v16-style two-section profile, which passed the 1440–1460m collapse
+ // regression better than the all-section derivative choice.
+ let section=0;
  for(let n=0;n<dedup.length;n++){
   const d=dedup[n];
   while(section<ARC_ANCHORS.length-2&&d>ARC_ANCHORS[section+1]+1e-8)
    section++;
   const from=ARC_ANCHORS[section],to=ARC_ANCHORS[section+1],
    base=edgeArc[section],goal=edgeArc[section+1];
-  const target=hermite(d-from,to-from,base,goal,slopes[section],slopes[section+1]);
+  const target=hermite(d-from,to-from,base,goal,
+   slopes[section],slopes[section+1]);
   let src=locate(target);
   if(ARC_ANCHORS.some(a=>Math.abs(d-a)<1e-8))src=d;
+  mapped.push(src);
+ }
+ // Preserve the validated 1435m boundary compression fix. Blend it into
+ // the overall image-distance profile over 45m on either side of the
+ // outer endpoints to avoid generating a new jolt at 1270 or 1671.6m.
+ const thirdStart=1270,thirdEnd=1435,fourthEnd=1671.6;
+ const thirdArc=arcAt(thirdStart),junctionArc=arcAt(thirdEnd),
+  fourthArc=arcAt(fourthEnd);
+ const leftRate=(junctionArc-thirdArc)/(thirdEnd-thirdStart),
+  rightRate=(fourthArc-junctionArc)/(fourthEnd-thirdEnd),
+  junctionRate=2*leftRate*rightRate/(leftRate+rightRate);
+ const fade=t=>{
+  const v=clamp(t,0,1);
+  return v*v*(3-2*v);
+ };
+ const transitionM=45;
+ for(let n=0;n<dedup.length;n++){
+  const d=dedup[n];
+  if(d<=thirdStart||d>=fourthEnd)continue;
+  const target=d<=thirdEnd?
+   hermite(d-thirdStart,thirdEnd-thirdStart,thirdArc,junctionArc,
+    leftRate,junctionRate):
+   hermite(d-thirdEnd,fourthEnd-thirdEnd,junctionArc,fourthArc,
+    junctionRate,rightRate);
+  const special=locate(target);
+  const w=fade((d-thirdStart)/transitionM)*
+   fade((fourthEnd-d)/transitionM);
+  mapped[n]=mapped[n]*(1-w)+special*w;
+  if(ARC_ANCHORS.some(a=>Math.abs(d-a)<1e-8))mapped[n]=d;
+ }
+ let maxShift=0,maxRate=0,minRate=Infinity;
+ for(let n=0;n<dedup.length;n++){
+  const d=dedup[n],src=mapped[n];
   if(!Number.isFinite(src)||src<0||src>end)
    throw Error('FULL_COURSE_IMAGE_PROJECTION_OUTSIDE_SOURCE_'+d);
-  mapped.push(src);
   maxShift=Math.max(maxShift,Math.abs(src-d));
   if(n>0){
    const rate=(src-mapped[n-1])/(d-dedup[n-1]);
@@ -275,6 +312,8 @@ function buildSourceArcMap(){
  }
  const summary={anchors:ARC_ANCHORS.slice(),rates,slopes,
   illustratedArcPx:arc[end],maxMetresOfImagePhaseAdjustment:maxShift,
+  turn1435ArcBlend:'validated-local-arc-correction',
+  physicalMarkersUnchanged:true,
   minSourceAdvancePerRaceM:minRate,maxSourceAdvancePerRaceM:maxRate,
   immutableSharedEngine:true,samplingEveryM:1};
  return {nodes:dedup,mapped,summary};
