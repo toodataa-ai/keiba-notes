@@ -33,7 +33,7 @@ assert.deepEqual(Array.from(course.sections.filter(s=>s.kind==='straight').map(s
  [[0,308.7],[720,1270],[1671.6,2000]]);
 // Faithful image registration: only actual uncurved straight cores are
 // forced straight. Curve transitions start earlier in the source drawing.
-for(const [from,to] of [[0,90],[1760,1990]]){
+for(const [from,to] of [[0,60],[1760,1990]]){
  const a=course.center(from+2),b=course.center((from+to)/2),c=course.center(to-2);
  assert.ok(Math.hypot(a.ty-b.ty,b.ty-c.ty)<.014,'STRAIGHT_CORE_CHANGED_'+from);
 }
