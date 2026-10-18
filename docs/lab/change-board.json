@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "50a60f2b113993d0a7ff1c2d1f6a76cc33462ad0",
+  "scan_commit": "8e1b555b623cd05b2bceeea94c8217f1f0c5327c",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v10: 京都芝2000でうまぽっと原図SVGのgreen pixel occupancyをブラウザ内でサンプリングし、2001距離地点×内外レーンで芝帯の安全範囲を計算。馬番は物理距離・レーンを保ち、背景の緑帯を外れない位置に描画。内側優先/脚質/ペース/馬番の同一サイズは従来共通。390/1024の各10地点（909mを含む）と全距離芝内監査、Pagesバイト一致、LABのみ。",
+      "next_action": "LAB v10実装・自動QA合格／実機目視承認待ち。うまぽっと原本SVGの芝帯を3倍密度で解析し、2001距離地点で連続した緑帯を追跡、馬番の中心と円周を芝内に配置。内側優先の物理計算／全馬同じ馬番サイズ／本番データ不変。スマホ390px・PC1024px×10地点（909m含む）で芝外0・番号座標ずれ0を確認。各6015点全距離監査でも芝外0、最大1m座標変化2.38画像px、4px超の飛び0、ゴール後32mまで緑帯上、公開Pagesバイト一致。Actions run 39118115612。ユーザーがLAB画面確認して承認するまで本番リリース禁止。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
