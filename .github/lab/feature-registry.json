@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v12：前版v11の『内ラチからかなり離れた状態』と『馬番が震える』を是正。元図芝帯から円が外れないことを実測しつつ最内レーンの画像オフセットを低減（下限3.25px、元SVG緑帯安全を検証）、1m毎の安全走路上下限を±17m×2回距離方向に平滑化。カメラの倍率と目標位置を馬群の人数出入りで変えず、先頭群ソフトウェイト追従＆定倍率。物理0.08秒刻みの間を描画時補間、レーン進路も描画のみ平滑化。物理計算は京都1400共通不変。390/1024px×20地点＋500–750m連続＋4倍速フレーム統計で監査、LAB目視承認待ち。本番/正式予想不変。",
+      "next_action": "LAB v12: 内ラチへ近づける画像投影(芝帯最小安全マージン3.25px、距離17m平滑化2パス)、0.08秒物理ステップ間の映像補間、カメラ固定倍率7.0（スマホ）/7.8（PC）＋上位馬群ソフト追従。GitHub Actions run 39121795508 success: 390/1024px×20チェックポイント、2001m×15レーン=30015点芝外中心0/安全円周外0、500–750mも0.5m刻みで内側距離最大14.235px。4倍速実Playwright各158フレーム:ズーム変動0、馬番の静止フレーム0、馬番最大変化0.733source px/frame、カメラ最大変化0.486source px/frame、後退0。Pages全LABファイルSHA一致。京都1400物理/JRA正式データ/本番/stagingは変更なし。残りはユーザーの実iPhone目視確認と必要に応じた見た目調整のみ、LAB未承認。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -41,7 +41,7 @@
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg",
         "docs/lab/race-clean-turf-mask-v1.js"
       ],
-      "shape_alignment": "v12_inner_close_smooth_4x_visual_interpolation_pending_browser_qa"
+      "shape_alignment": "v12_inner_close_smoothed_constant_zoom_interpolated_4x_QA_passed_39121795508_unapproved"
     },
     {
       "id": "course-catalog",
