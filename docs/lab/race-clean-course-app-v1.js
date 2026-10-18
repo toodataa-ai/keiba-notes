@@ -1,4 +1,4 @@
-/* LAB v9: original publisher SVG, uniform-size horse numbers and gold-only focus border.
+/* LAB v10: original publisher SVG with SOURCE GREEN turf occupancy and same-size horse numbers.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -6,6 +6,7 @@
 (function(){'use strict';
 const $=id=>document.getElementById(id);
 const model=window.RaceCleanCourse;
+const turf=window.RaceCleanTurf;
 const fixture=window.RaceLab18Fixture;
 const entries=fixture.horses();
 const race={...fixture.entry(),horses:entries};
@@ -69,7 +70,7 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 
 function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',lastCamera=null,lastLabelPositions=[];
-let vectorReady=false,originalError=false;
+let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
@@ -112,7 +113,13 @@ function verifyVectorSource(){
    a.naturalWidth===620&&a.naturalHeight===430&&
    b.naturalWidth===620&&b.naturalHeight===430&&
    a.getAttribute('src')===SOURCE_VECTOR&&b.getAttribute('src')===SOURCE_VECTOR);
- if(vectorReady)originalError=false;
+ if(vectorReady){
+  originalError=false;
+  if(!turfReady&&!turfError){
+   try{turfStats=turf.create(full);turfReady=true;}
+   catch(err){turfError=String(err);console.error('KYOTO_TURF_MASK_INIT',err)}
+  }
+ }
 }
 function position(p,camera){
  return {x:camera.cx+(p.x-camera.x)*camera.scale,
@@ -182,8 +189,10 @@ function updateRunningOrder(points,chosen){
  $('orderNote').textContent='左から先頭順 / '+order.length+'頭。タップで追跡';
 }
 function paint(){
- if(!engine)return;
- const state=engine.state,points=model.runners(state);
+ // Refuse to paint numbers using the obsolete JPEG-position centerline
+ // while the real Umapot SVG green-corridor occupancy is loading.
+ if(!engine||!turfReady)return;
+ const state=engine.state,points=turf.runners(state);
  const chosen=focusNo==='leader'?state.leadingNo:Number(focusNo);
  const live=sizeCanvas($('broadcast'));
  // Transparent canvas: original Umapot image is the only course background.
@@ -254,7 +263,7 @@ function setup(){
 }
 window.CleanLab=Object.freeze({
  getState:()=>engine?.state,inspect:()=>{
-  const points=model.runners(engine.state);
+  const points=turfReady?turf.runners(engine.state):model.runners(engine.state);
   const selected=focusNo==='leader'?engine.state.leadingNo:Number(focusNo);
   const chosen=points.find(p=>p.number===selected)||points[0];
   const screen=lastCamera?position(chosen,lastCamera):null;
@@ -266,7 +275,7 @@ window.CleanLab=Object.freeze({
    originalLoaded:Boolean(image?.complete&&image?.naturalWidth===620&&image?.naturalHeight===430),
    liveImageLoaded:Boolean($('liveCourseImage')?.complete&&$('liveCourseImage')?.naturalWidth===620),
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
-   originalError,vectorReady,
+   originalError,vectorReady,turfReady,turfError,turfStats,
    highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,
    mapAspect:rect.width/Math.max(1,rect.height),
@@ -276,6 +285,9 @@ window.CleanLab=Object.freeze({
      anchorX:p.actual.x,anchorY:p.actual.y})),
    directMarkerMaxError:lastLabelPositions.reduce((m,p)=>
      Math.max(m,Math.hypot(p.x-p.actual.x,p.y-p.actual.y)),0),
+   turfBadCenters:turfReady?points.filter(p=>!turf.isGreen(p.x,p.y)).length:null,
+   turfBadDiscs:turfReady?points.filter(p=>!turf.discOnTurf(p.x,p.y)).length:null,
+   calibratedRunPositions:turfReady,
    uniformMarkerRadiusPx:lastLabelPositions[0]?.r??null,
    markerRadiusSpreadPx:lastLabelPositions.length?
      Math.max(...lastLabelPositions.map(p=>p.r))-
