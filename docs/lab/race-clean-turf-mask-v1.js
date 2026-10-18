@@ -26,6 +26,7 @@ function create(image){
  grid=bits;
  samples=[];
  let missing=0,maxShift=0,maxGap=0,maxGapAt=0,jumpsOver4=0,possibleForks=0;
+ const jumps=[];
  for(let d=0;d<=2000;d++){
   const rail=c.rails(d),mid=rail.center,wx=rail.outer.x-rail.inner.x,
    wy=rail.outer.y-rail.inner.y,den=Math.hypot(wx,wy)||1,
@@ -73,11 +74,17 @@ function create(image){
    const dx=(mid.x+nx*shift)-(prev.x+prev.nx*prev.shift),
     dy=(mid.y+ny*shift)-(prev.y+prev.ny*prev.shift);
    const jump=Math.hypot(dx,dy);
-   if(jump>4)jumpsOver4++;
+   if(jump>4){jumpsOver4++;
+    jumps.push({d,jump,prevShift:prev.shift,nowShift:shift,
+      prevX:prev.x+prev.nx*prev.shift,prevY:prev.y+prev.ny*prev.shift,
+      x:mid.x+nx*shift,y:mid.y+ny*shift,
+      options:runs.map(run=>({a:run.a,b:run.b,m:run.m,
+       x:mid.x+nx*run.m,y:mid.y+ny*run.m}))});
+   }
    if(jump>maxGap){maxGap=jump;maxGapAt=d;}
   }
  }
- statistics={missing,maxShift,maxGap,maxGapAt,jumpsOver4,possibleForks,count:samples.length,
+ statistics={missing,maxShift,maxGap,maxGapAt,jumpsOver4,jumps,possibleForks,count:samples.length,
   greenPixels:bits.reduce((a,v)=>a+v,0)};
  if(missing){
   // The caller displays a safe loading error rather than perpetuating
