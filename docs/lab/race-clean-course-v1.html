@@ -9,10 +9,14 @@
 <p>LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・実馬・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">新方式 v17・0～2000m全域の馬群見かけの急密集を改善／京都1400共通補正は変更なし／LAB未承認</div>
+<div class="tag">新方式 v18・曲がったコースによる馬群の見かけの伸縮を根本修正／LAB未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
+<label>実況方式<select id="viewMode" aria-label="実況カメラ方式">
+<option value="distance" selected>前後の実距離を維持</option>
+<option value="map">従来の原図追跡（比較用）</option>
+</select></label>
 <label>速度<select id="speed"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="4">4倍</option></select></label>
 </section>
 <section class="panel">
@@ -20,12 +24,14 @@
 <div class="broadcast-stage" id="broadcastStage">
 <img id="liveCourseImage" width="620" height="430" loading="eager" decoding="async" alt="" aria-hidden="true" src="assets/kyoto-umapot-course-clean-v8.svg">
 <canvas id="broadcast" role="img" aria-label="うまぽっと原画像上を18頭の馬番丸が走る実況"></canvas>
+<canvas id="distanceCamera" class="distance-camera" role="img" aria-label="うまぽっとの芝帯を進行方向に展開し、馬間の実際の前後距離を変えずに表示する実況" hidden></canvas>
 <canvas id="goalCamera" class="goal-camera" role="img" aria-label="京都1400式ゴール板固定カメラ。全馬番が右から左へゴール線を通過" hidden></canvas>
 <div class="finish-banner" id="finishBanner" role="status" aria-live="polite" hidden>
  <strong id="finishHeading">全馬ゴール・余走中</strong>
  <span id="finishPodium"></span>
 </div>
 </div>
+<p class="broadcast-explainer">前後距離を維持：原図の芝を走路方向に展開した実況。コーナーでも馬同士の間隔は実距離に比例します。全体図は元画像のままです。</p>
 <div class="status"><span id="section">スタート直後の直線</span><span id="clock">0.0秒</span></div>
 <div class="order-note" id="orderNote" aria-live="off">先頭からの並びを読みやすく表示します</div>
 <div class="running-order" id="runningOrder" aria-label="全18頭の現在の隊列"></div>
@@ -41,10 +47,10 @@
 </section>
 <section class="panel"><div class="panel-title"><h2>架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
 <section class="panel notes">
-<p><strong>今回の検証点：</strong>コース形状は原画像と完全に同じものを使い、画像の変形は等倍率の拡大・平行移動のみ。走行位置の内部座標と18頭の丸番号の視認性を検証します。</p>
-<p>実況のコースは一切描き直しません。うまぽっと原本PowerPointのコース図形から直接書き出したベクターSVGを全体図・実況の双方で使用します。JPEGの4倍引き伸ばしをやめたため、ズームしても線が鮮明です。不要な注記や矢印はありません。</p>
+<p><strong>今回の検証点：</strong>全体図はうまぽっと原SVGそのままです。実況の「前後の実距離を維持」では、同じSVGの芝部分を距離方向に展開し、曲がったコースの弦の長さによって馬群が突然縮んだり広がったりしない方式に変更しました。「従来の原図追跡」も切り替えて比較できます。レース展開・走行距離・着順には影響しません。</p>
+<p>うまぽっと原本PowerPointのコース図形から直接書き出したベクターSVGを使用しています。全体図と従来方式では原画像をそのまま表示し、新実況方式では同じSVGの芝ピクセルを距離方向に展開しています。架空のコース形状は新しく描きません。</p>
 <p><strong>馬番そのものが走る：</strong>普段の実況は従来より近く、スマホで7.0倍から8.8倍に拡大します。<strong>ゴール前80mで京都1400と同じゴール板固定カメラへ切り替え</strong>、右回りの京都では馬番が右から左へゴール板を通過します。ゴール後は緩やかな余走を映し、1〜3着を表示します。馬番は全馬同じ大きさです。</p>
-<p><strong>コース全域の馬群表示を補正：</strong>1440～1460mでは馬間距離の実際の変化は約0.9mでしたが、元の絵では約4.7画像pxも急に縮んでいました。v17はこの問題に加え、<strong>1コーナー・2コーナー・向正面・最後の直線入口</strong>の距離換算も同じ方法で修正しました。<strong>308.7m・530m・720m・1270m・1435m・1671.6mのコース区切りは元画像の位置から動かさず</strong>、馬番が走る距離だけ連続して補正しています。京都1400の共通走行エンジンと予想・買い目は変更していません。</p>
+<p><strong>コーナーで馬群全体が縮む根本原因：</strong>これまでの実況は曲がったコース上の2点を画面上の直線で表示するため、実際の馬間距離が同じでもカーブでは縮んで見え、直線で急に広がっていました。v18の新実況は<strong>画面の横座標を各馬の実走行距離で決める</strong>ため、1～4コーナーで同じ現象を繰り返しません。ゴール板カメラと京都1400共通のペース・スタミナ・追走・進路取りは変更していません。</p>
 <p><strong>走り方も京都1400と共通：</strong>RaceLaneAIとRaceSimEngineをそのまま利用。スタート後は衝突を避けて内へ寄り、内側が空けば内優先、詰まれば必要に応じて外へ。逃げ・先行・差し・追込、先行争いによるペース変化も従来ロジックを継承しています。</p>
 <p>コース寸法はJRA芝Aコース基準（1周1,782.8m・最後の直線328.4m・初角まで308.7m・幅員27〜38m・内回り高低差3.1m）を参照。コースの形状はうまぽっと原画像に合わせたイラスト上の較正であり、測量図の精度ではありません。18頭の重なり・コース形状は目視承認前です。</p>
 <p>確認：<a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=585">585m</a> ／ <a href="?checkpoint=602">602m</a> ／ <a href="?checkpoint=640">640m</a> ／ <a href="?checkpoint=700">700m</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1672">直線入口</a></p>
@@ -59,6 +65,7 @@
 <script src="race-clean-course-v1.js?v=20261018-14"></script>
 <script src="race-clean-turf-mask-v1.js?v=20261019-17"></script>
 <script src="race-clean-goal-view-v1.js?v=20261019-15"></script>
-<script src="race-clean-course-app-v1.js?v=20261019-15"></script>
+<script src="race-clean-distance-camera-v1.js?v=20261019-18"></script>
+<script src="race-clean-course-app-v1.js?v=20261019-18"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
