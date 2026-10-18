@@ -1,4 +1,4 @@
-/* LAB v14 — source-anchored narrow inner path; bridge missing drawn rails; extend runoff smoothly.
+/* LAB v16 — source-arc-length calibrated visual metres across both Kyoto turns.
  * v10 wrongly targeted the CENTER of an often-merged green region; where
  * inside/outside green paths meet, it steered horses outside then suddenly
  * recentered. v11 instead selects a SAFE inner corridor relative to the
@@ -13,7 +13,14 @@ const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
  SLOPE=.44, SMOOTH_RADIUS=19;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
-let grid=null,samples=null,statistics=null;
+let grid=null,samples=null,statistics=null,sourceDistanceTable=null;
+const ARC_FROM=1270, ARC_TO=1672, ARC_BLEND_METRES=45;
+// SVG artwork is stylized rather than surveyed. Around 1435m the drawn
+// centreline changes from about 0.76 to 0.50 source px per race metre,
+// making real horses appear to telescope together. Equalize physical
+// metres along the ORIGINAL turf path across the connected third/fourth
+// turns while keeping each horse on the source image and the original
+// physics (RaceSimEngine / RaceLaneAI) untouched.
 function isGreen(x,y){
  if(!grid||!Number.isFinite(x)||!Number.isFinite(y))return false;
  const ix=Math.floor(x*RASTER),iy=Math.floor(y*RASTER);
@@ -175,10 +182,12 @@ function create(image){
    if(jump>maxStationJump){maxStationJump=jump;maxStationJumpAt=d}
   }
  }
+ sourceDistanceTable=buildSourceArcMap();
  statistics={count:samples.length,missing,forkSections,minWidth,
   maxLane0FromInner,tooFarOut,maxStationJump,maxStationJumpAt,
   badStations,greenPixels,slopeLimit:SLOPE,smoothRadius:SMOOTH_RADIUS,
-  hiddenRailBridges:gaps,source:'original-publisher-inner-rail'};
+  hiddenRailBridges:gaps,source:'original-publisher-inner-rail',
+  imageArcRegistration:sourceDistanceTable.summary};
  if(badStations||tooFarOut||maxStationJump>1.6)
   throw Error('TURF_INNER_ROUTE_UNSAFE:'+JSON.stringify(statistics));
  return statistics;
@@ -187,6 +196,61 @@ function positionAt(d,lane){
  const r=samples[d],f=c.fraction(lane);
  const t=r.low+(r.high-r.low)*f;
  return {x:r.x+r.nx*t,y:r.y+r.ny*t};
+}
+// This is a monotone reparameterization of the source image's physical
+// centreline, not a change in real metres or in the horse formation.
+function smootherStep(t){
+ const q=clamp(t,0,1);
+ return q*q*(3-2*q);
+}
+function buildSourceArcMap(){
+ const count=ARC_TO-ARC_FROM,arc=new Float64Array(count+1);
+ let prev=positionAt(ARC_FROM,2);
+ for(let i=1;i<=count;i++){
+  const p=positionAt(ARC_FROM+i,2);
+  arc[i]=arc[i-1]+Math.hypot(p.x-prev.x,p.y-prev.y);
+  prev=p;
+ }
+ const total=arc[count];
+ if(total<100||total>500)throw Error('UMAPOT_ARC_LENGTH_UNEXPECTED:'+total);
+ const mapped=new Float64Array(count+1);
+ let maxShift=0,maxSlope=0,minSlope=Infinity;
+ for(let i=0;i<=count;i++){
+  const goal=total*i/count;
+  let lo=0,hi=count;
+  while(lo<hi){
+   const mid=(lo+hi)>>1;
+   if(arc[mid]<goal)lo=mid+1;else hi=mid;
+  }
+  const idx=Math.max(0,Math.min(count-1,lo-1));
+  const delta=arc[idx+1]-arc[idx];
+  const exact=ARC_FROM+idx+(delta>.00001?(goal-arc[idx])/delta:0);
+  const raceD=ARC_FROM+i;
+  const weight=smootherStep(i/ARC_BLEND_METRES)*
+   smootherStep((count-i)/ARC_BLEND_METRES);
+  const imgD=raceD+(exact-raceD)*weight;
+  mapped[i]=imgD;
+  maxShift=Math.max(maxShift,Math.abs(imgD-raceD));
+  if(i>0){
+   const advance=imgD-mapped[i-1];
+   if(advance<=.12||advance>=3)
+    throw Error('UMAPOT_ARC_PARAMETER_SPEED_UNSAFE_'+raceD+'_'+advance);
+   maxSlope=Math.max(maxSlope,advance);
+   minSlope=Math.min(minSlope,advance);
+  }
+ }
+ mapped.summary={from:ARC_FROM,to:ARC_TO,blend:ARC_BLEND_METRES,
+  illustratedArcPx:total,averagePxPerRaceMetre:total/count,
+  maxMetresOfImagePhaseAdjustment:maxShift,minSourceAdvancePerM:minSlope,
+  maxSourceAdvancePerM:maxSlope,immutableSharedEngine:true};
+ return mapped;
+}
+function sourceDistance(distance){
+ const d=clamp(Number(distance)||0,0,2000);
+ if(!sourceDistanceTable||d<=ARC_FROM||d>=ARC_TO)return d;
+ const x=d-ARC_FROM,i=Math.floor(x),fraction=x-i;
+ return sourceDistanceTable[i]*(1-fraction)+
+  sourceDistanceTable[Math.min(sourceDistanceTable.length-1,i+1)]*fraction;
 }
 function point(distance,lane=0){
  if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
@@ -208,11 +272,13 @@ function point(distance,lane=0){
   }
   return {x,y,d:distance,lane,section:'ゴール後'};
  }
- const d=clamp(Number(distance)||0,0,2000);
+ const raceD=clamp(Number(distance)||0,0,2000);
+ const d=sourceDistance(raceD);
  const a=Math.floor(d),b=Math.ceil(d),t=d-a;
  const first=positionAt(a,lane),last=positionAt(b,lane);
  const x=first.x+(last.x-first.x)*t,y=first.y+(last.y-first.y)*t;
- return {x,y,d:distance,lane,section:c.center(distance).section};
+ return {x,y,d:distance,lane,imageCourseDistance:d,
+  section:c.center(distance).section};
 }
 function runners(state){
  return state.horses.map(h=>{
@@ -230,7 +296,7 @@ function audit(step=1,radius=1.80){
    total++;
    if(!isGreen(p.x,p.y))badCenters++;
    if(!discOnTurf(p.x,p.y,radius))badDiscs++;
-   const inner=c.rails(d).inner;
+   const inner=c.rails(sourceDistance(d)).inner;
    maxActualInnerOffset=Math.max(maxActualInnerOffset,
     Math.hypot(p.x-inner.x,p.y-inner.y));
    if(prev){
@@ -248,20 +314,22 @@ function trace(from=0,to=2000,step=25){
  if(!samples)return [];
  const out=[];
  for(let d=Math.max(0,from);d<=Math.min(2000,to);d+=step){
-  const p=samples[Math.round(d)],rr=c.rails(d),
+  const sourceD=sourceDistance(d),
+   p=samples[Math.round(sourceD)],rr=c.rails(sourceD),
    pos=point(d,0),dist=Math.hypot(pos.x-rr.inner.x,pos.y-rr.inner.y);
   let greenInside=0;
   // How far into the infield is still green from inner runner position?
   for(let t=0;t<=35;t+=.5){
    if(!isGreen(pos.x-p.nx*t,pos.y-p.ny*t)){greenInside=t;break}
   }
-  out.push({d,low:+p.low.toFixed(2),high:+p.high.toFixed(2),
+  out.push({d,sourceD:+sourceD.toFixed(3),low:+p.low.toFixed(2),high:+p.high.toFixed(2),
    safeLow:+p.safeLow.toFixed(2),safeHigh:+p.safeHigh.toFixed(2),
    dist:+dist.toFixed(2),greenInside});
  }
  return out;
 }
 global.RaceCleanTurf=Object.freeze({
- create,point,runners,isGreen,discOnTurf,audit,trace,stats:()=>statistics
+ create,point,runners,isGreen,discOnTurf,audit,trace,sourceDistance,
+  stats:()=>statistics
 });
 })(typeof window!=='undefined'?window:globalThis);
