@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "39cb97508f810105a00020cf9939ca0ce175677c",
+  "scan_commit": "e793d3f8f1766cc3262b918e7623d9895e43e07a",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,8 +28,8 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "新方式 LAB clean-course-v1：旧v0.52とは別URLの完全独立18頭プロトタイプ。設計用の正規化ベクターコース（0〜308.7mと530〜1270mは厳密な直線、各カーブC1）、全体図・実況で同じ馬番座標。京都1400共通のレーン/速度エンジンは変更しない。実ブラウザとユーザー目視受入待ち。旧LABファイル・STAGING/本番・予想/PDF/proof無変更。",
-      "preview_path": "lab/race-simulator.html",
+      "next_action": "新LAB clean-course-v1は単独URLで18頭と純ベクターのコースを確認。直線0〜308.7/530〜1270は厳密に直線でコーナー接線C1。390/1024ブラウザ16地点、画像拡大・輪郭抽出なし、公開バイト一致成功。実際のスクショ目視で『密集時18頭の馬番重複』が残ることを確認、未解決・目視未承認。正確な座標を変更せず番号の視認性を改善する方式が次課題。本番・STAGING・正式予想・PDFは不変更。",
+      "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
         "docs/lab/race-simulator.html",
@@ -51,7 +51,7 @@
       ],
       "production_paths": [],
       "file_blob_shas": {
-        "docs/lab/race-simulator.html": "d935fb00413d4ebe5e3c5b7934e6aedda5f86861",
+        "docs/lab/race-simulator.html": "658c5af9b10c8871f899637a819a7855502c532a",
         "docs/lab/race-simulator.js": "52b50b5108a936eafe5d2869cd45bdc93e775cc0",
         "docs/lab/race-simulator.css": "8a905005e09c6828bed4c51ebf2afaf62fdac073",
         "docs/lab/race-sim-engine.js": "8f9dba1b6ad3099f0277aeed87fad23cb90153af",
@@ -65,10 +65,10 @@
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "862c7bac56bc25f36b31663b34eda04276983bd0",
         "docs/lab/race-clean-course-app-v1.js": "89cf8dc9876ba4923d8d5921f3174dec3fc63de7",
-        "docs/lab/race-clean-course-v1.html": "fed55364daaf6a6a42b6ff6b2fdcaf5a1b88477c",
+        "docs/lab/race-clean-course-v1.html": "8c892d0230ea19d4004dc9bc945c2cd77ce20f4a",
         "docs/lab/race-clean-course-v1.css": "75d96520944b4a1c8c78f7408888bd8d4cf66cbf"
       },
-      "latest_source_change_commit": "39cb97508f810105a00020cf9939ca0ce175677c"
+      "latest_source_change_commit": "e793d3f8f1766cc3262b918e7623d9895e43e07a"
     },
     {
       "id": "course-catalog",
