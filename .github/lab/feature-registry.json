@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v17の京都芝2000内回り映像：1400m付近だけでなく0～2000mの原図距離縮尺を一括修正。元のコース図と7区間境界 (0,308.7,530,720,1270,1435,1671.6,2000m) を不変にし、各区間の進行を原図の弧長から単調・C1連続の転写で描画、3/4コーナーではv16で効果検証した1400mの局所転写と境界45mブレンドを維持。京都1400共通RaceSimEngine/RaceLaneAI、物理速度/スタミナ/追走・進路取り/順位/買い目は無変更。v15の1440～1460mは実0.86m縮小に対し画像4.73px縮小→v17画像1.26pxへ改善。全コース20m/10m監査で1角のpx/m 0.362～0.543→0.434～0.472、2角0.378～0.499→0.418～0.444。全チェックポイントと元芝帯安全を維持。Actions QA: 39171363549 全区間通過、39171363586 PC/スマホ＋ゴール余走＋公開バイト一致、39171363572 Safari実公開URL再生と全アンカー位置、39171447141 1300-1500m距離比較。LABのみ・本番/ステージング不変。ユーザーiPhone実機の目視承認待ち。",
+      "next_action": "LAB v19: うまぽっと原本の無地ベクターSVG(assets/kyoto-umapot-course-clean-v8.svg)と芝/内ラチ/全体図を一切変更せず、3・4コーナーで原図上の弦長として馬群が一斉に縮み直線で伸びる視覚問題を補正。新規js race-clean-curve-camera-v1.js は65mの固定実距離区間のSVG上の見かけの弦長を全コースで計測し、物理距離だけをパラメータにする緩慢なカメラ等倍率拡大(最大1.45倍、±48m方向に平滑化)を適用。先頭追跡のカメラは物理的先頭距離-10mの線上へ安定固定し、走行座標18頭/予想/馬番サイズ/脚質/京都1400共通エンジンは変更なし。65mの仮想一定間隔で3・4コーナー〜直線の表示弦長比が従来1.8479倍→補正後1.3299倍（約28%変動軽減）、完全一定ではない（曲率上の幾何学的制約）。QA Chromium 390/1024px×23地点、4倍速各158フレームで位置停止0・ズーム1フレーム変動最大0.006・ゴール余走、本番隔離とPages一致成功(run39174430183)。画面差分A/Bでoriginal SVG2画像・RaceSimEngineの物理値・馬番の原図座標18頭すべて一致(run39174662953)、1550mスマホ倍率8.8→11.5924倍。WebKit iPhone相当のローカルと実公開URLの再生・ゴール(run39174484895)成功。デバッグ比較URLには&lens=offが可能。公式予想/買い目/PDF/本番/stagingに変更なし、LABのみ、ユーザー実機目視承認待ち。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -40,9 +40,10 @@
         "docs/lab/race-clean-course-v1.css",
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg",
         "docs/lab/race-clean-turf-mask-v1.js",
-        "docs/lab/race-clean-goal-view-v1.js"
+        "docs/lab/race-clean-goal-view-v1.js",
+        "docs/lab/race-clean-curve-camera-v1.js"
       ],
-      "shape_alignment": "v17_all_course_C1_image_metres_unchanged_physics_1400_pack_fixed_39171363549_39171363586_39171363572_39171447141_unapproved"
+      "shape_alignment": "v19_original_svg_unchanged_affine_zoom_only_chord_variation_1p8479_to_1p3299_qa_39174430183_39174484895_39174662953_unapproved"
     },
     {
       "id": "course-catalog",
