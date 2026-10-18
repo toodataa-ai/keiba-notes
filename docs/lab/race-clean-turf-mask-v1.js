@@ -14,7 +14,7 @@ const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 let grid=null,samples=null,statistics=null,sourceDistanceTable=null;
-const ARC_FROM=1270, ARC_TO=1672, ARC_BLEND_METRES=45;
+const ARC_FROM=1270, ARC_TO=1672;
 // SVG artwork is stylized rather than surveyed. Around 1435m the drawn
 // centreline changes from about 0.76 to 0.50 source px per race metre,
 // making real horses appear to telescope together. Equalize physical
@@ -197,52 +197,69 @@ function positionAt(d,lane){
  const t=r.low+(r.high-r.low)*f;
  return {x:r.x+r.nx*t,y:r.y+r.ny*t};
 }
-// This is a monotone reparameterization of the source image's physical
-// centreline, not a change in real metres or in the horse formation.
-function smootherStep(t){
- const q=clamp(t,0,1);
- return q*q*(3-2*q);
-}
+// A monotonically increasing picture-distance mapping, fully anchored to
+// the source drawing and race metre checkpoints.
 function buildSourceArcMap(){
- const count=ARC_TO-ARC_FROM,arc=new Float64Array(count+1);
+ // Use the EXACT illustrated third/fourth turn boundary as a hard anchor.
+ // The old free arc-length calibration erased 1435m and shifted the split
+ // by more than 30 illustrated race metres: not acceptable for fidelity.
+ const count=ARC_TO-ARC_FROM,pivot=1435-ARC_FROM,
+   arc=new Float64Array(count+1);
  let prev=positionAt(ARC_FROM,2);
  for(let i=1;i<=count;i++){
   const p=positionAt(ARC_FROM+i,2);
   arc[i]=arc[i-1]+Math.hypot(p.x-prev.x,p.y-prev.y);
   prev=p;
  }
- const total=arc[count];
- if(total<100||total>500)throw Error('UMAPOT_ARC_LENGTH_UNEXPECTED:'+total);
+ const total=arc[count],left=arc[pivot],right=total-left;
+ if(left<50||right<50||total>500)throw Error('UMAPOT_ARC_LENGTH_UNEXPECTED:'+total);
+ // Cubic Hermite: C1 continuous source-image speed at 1435m while
+ // preserving all three source-labeled real race metre anchors:
+ // physical 1270 -> image 1270; 1435 -> 1435; 1672 -> 1672.
+ const leftMean=left/pivot,rightMean=right/(count-pivot);
+ const common=2*leftMean*rightMean/(leftMean+rightMean);
+ const hermite=(q,h,start,end,startSlope,endSlope)=>{
+  const u=q/h,u2=u*u,u3=u2*u;
+  return (2*u3-3*u2+1)*start+
+   (u3-2*u2+u)*h*startSlope+
+   (-2*u3+3*u2)*end+
+   (u3-u2)*h*endSlope;
+ };
  const mapped=new Float64Array(count+1);
  let maxShift=0,maxSlope=0,minSlope=Infinity;
  for(let i=0;i<=count;i++){
-  const goal=total*i/count;
+  const desiredArc=i<=pivot?
+   hermite(i,pivot,0,left,leftMean,common):
+   hermite(i-pivot,count-pivot,left,total,common,rightMean);
   let lo=0,hi=count;
   while(lo<hi){
    const mid=(lo+hi)>>1;
-   if(arc[mid]<goal)lo=mid+1;else hi=mid;
+   if(arc[mid]<desiredArc)lo=mid+1;else hi=mid;
   }
   const idx=Math.max(0,Math.min(count-1,lo-1));
   const delta=arc[idx+1]-arc[idx];
-  const exact=ARC_FROM+idx+(delta>.00001?(goal-arc[idx])/delta:0);
-  const raceD=ARC_FROM+i;
-  const weight=smootherStep(i/ARC_BLEND_METRES)*
-   smootherStep((count-i)/ARC_BLEND_METRES);
-  const imgD=raceD+(exact-raceD)*weight;
-  mapped[i]=imgD;
-  maxShift=Math.max(maxShift,Math.abs(imgD-raceD));
+  const imageD=ARC_FROM+idx+(delta>.00001?(desiredArc-arc[idx])/delta:0);
+  mapped[i]=imageD;
+  maxShift=Math.max(maxShift,Math.abs(imageD-(ARC_FROM+i)));
   if(i>0){
-   const advance=imgD-mapped[i-1];
+   const advance=imageD-mapped[i-1];
    if(advance<=.12||advance>=3)
-    throw Error('UMAPOT_ARC_PARAMETER_SPEED_UNSAFE_'+raceD+'_'+advance);
+    throw Error('UMAPOT_ARC_PARAMETER_SPEED_UNSAFE_'+i+'_'+advance);
    maxSlope=Math.max(maxSlope,advance);
    minSlope=Math.min(minSlope,advance);
   }
  }
- mapped.summary={from:ARC_FROM,to:ARC_TO,blend:ARC_BLEND_METRES,
-  illustratedArcPx:total,averagePxPerRaceMetre:total/count,
-  maxMetresOfImagePhaseAdjustment:maxShift,minSourceAdvancePerM:minSlope,
-  maxSourceAdvancePerM:maxSlope,immutableSharedEngine:true};
+ if(Math.abs(mapped[pivot]-1435)>.00001||
+    Math.abs(mapped[0]-ARC_FROM)>.00001||
+    Math.abs(mapped[count]-ARC_TO)>.00001)
+  throw Error('SOURCE_RACE_ANCHOR_PRESERVATION_FAILED');
+ mapped.summary={from:ARC_FROM,turnBoundary:1435,to:ARC_TO,
+  originalArcPx:total,thirdTurnArcPx:left,fourthTurnArcPx:right,
+  thirdTurnAveragePxPerM:leftMean,fourthTurnAveragePxPerM:rightMean,
+  continuousBoundaryRatePxPerM:common,
+  anchoredMetres:[1270,1435,1672],maxMetresOfImagePhaseAdjustment:maxShift,
+  minSourceAdvancePerM:minSlope,maxSourceAdvancePerM:maxSlope,
+  immutableSharedEngine:true};
  return mapped;
 }
 function sourceDistance(distance){
