@@ -1,0 +1,148 @@
+name: LAB Kyoto 0-2000m image spatial uniformity audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-kyoto-full-course-image-metre-audit.yml'
+      - 'docs/lab/race-clean-turf-mask-v1.js'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup browser
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/kyoto-whole-route.log 2>&1 &
+          sleep 2
+      - name: Check entire illustration scale along distance and racing field
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/kyoto-whole-route
+          python3 - <<'PY'
+          import shutil,json,math
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+           page=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=2)
+           errors=[]
+           page.on('pageerror',lambda e:errors.append(str(e)))
+           page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1400',wait_until='load')
+           page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=30000)
+           results=page.evaluate("""() => {
+            const turf=RaceCleanTurf,model=RaceCleanCourse;
+            const sections=model.sections;
+            const profile=sections.map(s=>({from:s.from,to:s.to,
+             label:s.name,kind:s.kind}));
+            const points=[];
+            for(let d=0;d<=1990;d+=10){
+             const p=turf.point(d,2),q=turf.point(d+10,2),
+             m=turf.point(d+5,2);
+             const pixels=Math.hypot(p.x-m.x,p.y-m.y)+
+               Math.hypot(m.x-q.x,m.y-q.y);
+             const original=model.point(d,2),orig2=model.point(d+10,2);
+             const sourceTravel=Math.hypot(q.x-p.x,q.y-p.y);
+             const sourceRate=pixels/10;
+             const nearest=sections.find(s=>d>=s.from&&d<s.to)||
+               sections.at(-1);
+             points.push({
+              d,label:nearest.name,
+              imagePXperM:sourceRate,
+              originalPXperM:Math.hypot(orig2.x-original.x,
+                orig2.y-original.y)/10,
+              sourceDStart:turf.sourceDistance(d),
+              sourceDEnd:turf.sourceDistance(d+10),
+              turfSafe:[0,2,4,7,14].every(l=>{
+               const q=turf.point(d+5,l);
+               return turf.discOnTurf(q.x,q.y,1.8);
+              })
+             });
+            }
+            const windows=[];
+            for(let start=0;start<=1840;start+=10){
+             const window=points.filter(p=>p.d>=start&&p.d<start+160);
+             const max=Math.max(...window.map(p=>p.imagePXperM));
+             const min=Math.min(...window.map(p=>p.imagePXperM));
+             const avg=window.reduce((a,p)=>a+p.imagePXperM,0)/window.length;
+             windows.push({start,end:start+160,min,max,
+              change:max-min,relative:min>0?max/min:1e9,mean:avg,
+              worst:window.find(p=>p.imagePXperM===min)?.d});
+            }
+            const boundaryChecks=[100,308.7,530,720,1270,1435,1671.6];
+            const boundaries=boundaryChecks.map(d=>{
+             const a=turf.point(d-10,2),b=turf.point(d,2),c=turf.point(d+10,2);
+             return {d,leftDist10:Math.hypot(a.x-b.x,a.y-b.y),
+              rightDist10:Math.hypot(b.x-c.x,b.y-c.y),
+              sourceDistance:turf.sourceDistance(d)};
+            });
+            const engine=RaceSimEngine.create({
+              ...RaceLab18Fixture.entry(),
+              horses:RaceLab18Fixture.horses()
+            },{seed:2026,bias:'neutral'});
+            const pack=[];
+            let goal=200,limit=0;
+            while(goal<=1940&&limit++<2500&&!engine.state.finished){
+             if(engine.state.leader>=goal){
+              const sorted=engine.state.horses.slice().sort((a,b)=>b.d-a.d);
+              const leader=sorted[0],last=sorted.at(-1);
+              const first=turf.point(leader.d,leader.lane),
+                end=turf.point(last.d,last.lane);
+              const real=leader.d-last.d;
+              pack.push({d:goal,realGapM:real,
+               imageGapPx:Math.hypot(first.x-end.x,first.y-end.y),
+               actualNearestMedian:0});
+              goal+=10;
+             }else engine.step(.08);
+            }
+            const changes=pack.slice(1).map((p,i)=>({
+             from:pack[i].d,to:p.d,
+             realDelta:p.realGapM-pack[i].realGapM,
+             imageDelta:p.imageGapPx-pack[i].imageGapPx,
+             imageToPhysicalDelta:p.imageGapPx-pack[i].imageGapPx
+              -(p.realGapM-pack[i].realGapM)*.55
+            })).sort((a,b)=>a.imageToPhysicalDelta-b.imageToPhysicalDelta);
+            return {
+             sections:profile,points,windows,boundaries,
+             pack,topImageContractions:changes.slice(0,35),
+             worstWindows:windows.slice().sort((a,b)=>b.relative-a.relative).slice(0,30),
+             stats:turf.stats(),entry:RaceLab18Fixture.entry()
+            };
+           }""")
+           print('SOURCE_IMAGE_SCALE_CHANGES_TOP_30',
+             json.dumps(result['worstWindows'],ensure_ascii=False))
+           print('SOURCE_IMAGE_PHYSICAL_PACK_TELESCOPES_TOP_35',
+             json.dumps(result['topImageContractions'],ensure_ascii=False))
+           print('SOURCE_IMAGE_FIXED_BOUNDARY_CHECKS',
+             json.dumps(result['boundaries'],ensure_ascii=False))
+           for s in result['sections']:
+            subset=[r for r in result['points']
+             if r['d']>=s['from'] and r['d']<s['to']]
+            print('COURSE_SEGMENT_IMAGE_RATE',s['label'],json.dumps({
+             'from':s['from'],'to':s['to'],
+             'min':min(p['imagePXperM'] for p in subset),
+             'max':max(p['imagePXperM'] for p in subset),
+             'startRate':subset[0]['imagePXperM'],
+             'endRate':subset[-1]['imagePXperM']},ensure_ascii=False))
+           print('IMAGE_TURF_SAFE_CHECK',sum(1 for row in result['points'] if not row['turfSafe']))
+           assert all(x['turfSafe'] for x in result['points'])
+           assert not errors,errors
+           with open('/tmp/kyoto-whole-route/full-course-geometry-audit.json','w') as f:
+            json.dump(result,f,ensure_ascii=False,indent=2)
+           for d in (100,290,320,500,550,700,720,850,1050,
+                     1200,1280,1350,1400,1435,1460,1510,1600,1660,1700,1900):
+            page.evaluate(f'() => CleanLab.advanceTo({d})')
+            page.locator('#broadcastStage').screenshot(
+             path=f'/tmp/kyoto-whole-route/normal-{d}.png')
+           page.close();browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kyoto-0-to-2000-image-scale-geometry-and-pack-diagnostics
+          path: /tmp/kyoto-whole-route/*
+          if-no-files-found: warn
+          retention-days: 7
