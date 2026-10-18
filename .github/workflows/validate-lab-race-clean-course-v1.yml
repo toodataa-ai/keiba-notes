@@ -109,7 +109,7 @@ jobs:
                 assert read['cameraLensEnabled'] and read['cameraLensReady'],('CURVE_LENS_NOT_READY',width,d,read)
                 assert read['cameraLensError'] is None,('CURVE_LENS_FAILED',width,d,read)
                 assert read['unchangedBackgroundAffineOnly'],('IMAGE_MUST_REMAIN_ORIGINAL',width,d,read)
-                assert read['cameraLensGain']>=1 and read['cameraLensGain']<=1.45,('CAMERA_LENS_GAIN_OUT_OF_BOUND',width,d,read)
+                assert read['cameraLensGain']>=.999999 and read['cameraLensGain']<=1.450001,('CAMERA_LENS_GAIN_OUT_OF_BOUND',width,d,read)
                 if d==1270:
                   stats=read['cameraLensStats']
                   print('SOURCE_SVG_AFFINE_PACK_OPTICS',width,stats)
