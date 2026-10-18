@@ -61,10 +61,12 @@ jobs:
                     leader:a.leader,courseSeg:a.section,straightSpans:a.fixedSegments,
                     running:sim.horses.length,inside:sim.horses.filter(h=>h.lane<=3.45).length,
                     live:live.width,full:full.width,canvasCSS:live.getBoundingClientRect().width,
-                    imageElements:document.querySelectorAll('img').length};
+                    imageElements:document.querySelectorAll('img').length,
+                    selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen};
                 }""")
                 assert not errors,(width,d,errors)
                 assert read['count']==read['running']==18,(width,d,read)
+                assert read['selectedVisible'],('FOCUSED_HORSE_OFF_CAMERA',width,d,read)
                 assert read['leader']+3>=d,(width,d,read)
                 assert read['sourceCalls']==0 and read['imageElements']==0,(width,d,read)
                 assert read['live']>=read['canvasCSS'],(width,d,read)

@@ -28,6 +28,9 @@ function advanceTo(distance){
  reset();
  let i=0;
  while(engine.state.leader<distance&&!engine.state.finished&&i++<1500)engine.step(.12);
+ // Seek is a jump in simulation time. Do NOT interpolate the camera from
+ // the starting gate across 900 metres: it leaves every horse off-screen.
+ lastCamera=null;
  paint();return engine.state;
 }
 function sizeCanvas(canvas){
@@ -179,7 +182,14 @@ function setup(){
 window.CleanLab=Object.freeze({
  getState:()=>engine?.state,inspect:()=>{
   const points=model.runners(engine.state);
+  const selected=focusNo==='leader'?engine.state.leadingNo:Number(focusNo);
+  const chosen=points.find(p=>p.number===selected)||points[0];
+  const screen=lastCamera?position(chosen,lastCamera):null;
+  const live=$('broadcast').getBoundingClientRect();
   return {leader:engine.state.leader,positions:points,
+    selectedHorse:selected,selectedScreen:screen,
+    selectedVisible:Boolean(screen&&screen.x>=16&&screen.x<=live.width-16&&
+     screen.y>=16&&screen.y<=live.height-16),
     imageCalls:0,section:model.center(engine.state.leader).section,
     fixedSegments:model.sections.filter(s=>s.kind==='straight').map(s=>[s.from,s.to])};
  },advanceTo
