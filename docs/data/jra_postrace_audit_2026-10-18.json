@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "observed_at": "2026-10-18T10:12:37.055Z",
+  "status": "RESULT_CASES_COMMITTED_CI_HTTP_VERIFICATION_PENDING",
+  "immutable_forecasts": true,
+  "immutable_final_bets": true,
+  "original_html_pdf_unchanged": true,
+  "reviewed_races": [
+    "2026-10-18-brazil-cup",
+    "2026-10-18-niigata-himba-stakes",
+    "2026-10-18-shuka-sho"
+  ],
+  "source_publication_commits": {
+    "2026-10-18-brazil-cup": "1bc9995df09c81d80c5aae73d6186880556295a0",
+    "2026-10-18-niigata-himba-stakes": "81f84f3cd5832e52a06362f45c5247707ea1469e",
+    "2026-10-18-shuka-sho": "3bb0c54e0e9b6fcfb2b452d7eac2849e33957b0e"
+  },
+  "proof_publication_commits": {
+    "2026-10-18-brazil-cup": "2d31466f6bc066bd4374f32bbfa08423edf4300e",
+    "2026-10-18-niigata-himba-stakes": "2d33e1d51117acacffeb5a3b19f2ac4b63544b2b",
+    "2026-10-18-shuka-sho": "d771a1285e7de6c9e67383b9ea448e558b2f7b4a"
+  },
+  "official_result_urls": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604071120261018%2F0E",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604021120261018%2F85",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604071120261018%2FEC"
+  ],
+  "e2e_schema_adapter": "read-only v3.15 purchase + v3.13 STEP1 Grade A",
+  "weekly_change_decision": "no_change_if_grade_a_valid",
+  "weekly_reason": "No sufficient shared prospective Grade A paired evidence for version promotion",
+  "manual_approval_rules": "A/B/C retained",
+  "overfit_control": "No postrace retuning; independent paired E2E required",
+  "preserved_versions": true,
+  "preserved_inflight_e2e_comparison": true,
+  "shadow_evidence_gaps_are_separate": true,
+  "publication_verification": {
+    "verified": false,
+    "reason": "pending GitHub Actions run, generated reports and deployed HTTP parity"
+  },
+  "files_changed": [
+    "e2e_validation/results/2026-10-18-brazil-cup.json",
+    "e2e_validation/cases/2026-10-18-brazil-cup/case.json",
+    "e2e_validation/results/2026-10-18-niigata-himba-stakes.json",
+    "e2e_validation/cases/2026-10-18-niigata-himba-stakes/case.json",
+    "e2e_validation/results/2026-10-18-shuka-sho.json",
+    "e2e_validation/cases/2026-10-18-shuka-sho/case.json",
+    "docs/data/races.json",
+    "docs/data/jra_postrace_audit_2026-10-18.json"
+  ]
+}
