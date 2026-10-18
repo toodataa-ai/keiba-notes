@@ -58,10 +58,24 @@ jobs:
             for j,slide in enumerate(pr.slides):
              print('SLIDE_STRUCTURE',j)
              walk(slide.shapes)
+          # Keep the original source vector course group ID37. All other
+          # slide-2 top-level elements are publisher labels/GOAL/direction.
+          for f in sources:
+           if f.suffix.lower()!='.pptx':continue
+           pres=Presentation(str(f))
+           slide=pres.slides[1]
+           assert len(slide.shapes)==5 and sum(sh.shape_id==37 for sh in slide.shapes)==1
+           for sh in list(slide.shapes):
+            if sh.shape_id!=37:sh._element.getparent().remove(sh._element)
+           assert len(slide.shapes)==1
+           out=Path('/tmp/umapot/clean')
+           out.mkdir(parents=True,exist_ok=True)
+           pres.save(str(out/'kyoto-clean-course-source.pptx'))
+           print('CLEAN_VECTOR_SOURCE_OK_ONLY_PUBLISHER_COURSE_GROUP_ID37')
           for u in ('marked.jpg','blank-2015.jpg'):
            with Image.open('/tmp/umapot/original/'+u) as im: print('JPEG',u,im.size)
           PY
-          find /tmp/umapot/original/source -iname '*.pptx' -print0 |
+          find /tmp/umapot/clean -iname '*.pptx' -print0 |
           while IFS= read -r -d '' f; do
             echo "RENDERING $f"
             mkdir -p /tmp/umapot/pdf
@@ -75,11 +89,17 @@ jobs:
           for f in Path('/tmp/umapot/pdf').glob('*.pdf'):
            pdf=fitz.open(str(f))
            print('PDF',f,'pages',len(pdf))
-           for i,page in enumerate(pdf):
-            pix=page.get_pixmap(matrix=fitz.Matrix(4,4),alpha=False)
-            out=d/f'kyoto-2020-publisher-slide{i+1}.png'
-            pix.save(str(out))
-            print('EXPORTED',out,pix.width,pix.height)
+           assert len(pdf)==2
+           page=pdf[1]
+           pix=page.get_pixmap(matrix=fitz.Matrix(4,4),alpha=False)
+           out=d/'kyoto-clean-course-original.png'
+           pix.save(str(out))
+           svg=page.get_svg_image(text_as_path=True)
+           svg_file=d/'kyoto-clean-course-original.svg'
+           svg_file.write_text(svg,encoding='utf8')
+           print('CLEAN_PNG_EXPORTED',out,pix.width,pix.height)
+           print('CLEAN_SVG_EXPORTED',svg_file,svg_file.stat().st_size)
+           assert '<path' in svg
           PY
       - name: Upload QA only - never copy source images into published docs
         if: always()
@@ -88,6 +108,7 @@ jobs:
           name: publisher-original-kyoto-clean-slide-QA-only
           path: |
             /tmp/umapot/preview/*.png
+            /tmp/umapot/preview/*.svg
             /tmp/umapot/install.log
           if-no-files-found: warn
           retention-days: 3
