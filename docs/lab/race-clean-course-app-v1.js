@@ -1,4 +1,4 @@
-/* LAB v13: fix real iPhone WebKit SVG naturalWidth resizing and playback blocking.
+/* LAB v14: continuous no-cut inner running line and gentle post-wire finish presentation.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -71,13 +71,19 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  lastCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
- visualLaneState=new Map(),visualRenderTime=null;
+ visualLaneState=new Map(),visualRenderTime=null,
+ finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
+const FINISH_SEQUENCE_MS=3200;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
  playing=false;last=0;acc=0;lastCamera=null;lastRenderedPoints=[];
- cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();paint();
+ cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();
+ finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
+ const banner=$('finishBanner');if(banner)banner.hidden=true;
+ $('startBtn').textContent='▶ スタート';
+ paint();
 }
 function advanceTo(distance){
  reset();
@@ -86,7 +92,10 @@ function advanceTo(distance){
  // Seek is a jump in simulation time. Do NOT interpolate the camera from
  // the starting gate across 900 metres: it leaves every horse off-screen.
  lastCamera=null;cameraRenderTime=0;visualRenderTime=null;
- visualLaneState.clear();paint();return engine.state;
+ visualLaneState.clear();
+ finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
+ const banner=$('finishBanner');if(banner)banner.hidden=true;
+ paint();return engine.state;
 }
 function sizeCanvas(canvas){
  const rect=canvas.getBoundingClientRect();
@@ -164,6 +173,17 @@ function cameraFor(points,w,h,chosen,autoLeader=true){
 // Extrapolate ONLY visual positions over the unconsumed simulation accumulator
 // and low-pass rapid physical LANE reversals; physics state stays immutable.
 function displayPoints(state){
+ if(state.finished&&finishSequenceActive){
+  // Extend the drawn run-off gently after the virtual results are locked.
+  // This is a display-only coast, not an extra RaceSimEngine step.
+  const progress=Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS);
+  const coast=6*(1-Math.pow(1-progress,3));
+  return state.horses.map(h=>{
+   const d=(h.displayD??h.d)+coast;
+   return {number:h.number,d,lane:h.lane,
+    ...turf.point(d,h.lane),finished:true};
+  });
+ }
  if(!playing||state.finished){
   visualLaneState.clear();visualRenderTime=null;
   return turf.runners(state);
@@ -246,6 +266,12 @@ function paint(){
  const live=sizeCanvas($('broadcast'));
  // Transparent canvas: original Umapot image is the only course background.
  const target=cameraFor(points,live.w,live.h,chosen,focusNo==='leader');
+ if(finishSequenceActive){
+  // Ease from the horse-focused close camera to a wider finish tableau.
+  const p=Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS);
+  const eased=p*p*(3-2*p);
+  target.scale*=1-.22*eased;
+ }
  // Stabilize view with a real elapsed-time exponential filter; frame rate
  // changes do not change the amount of camera smoothing.
  const now=performance.now(),dt=cameraRenderTime?
@@ -269,19 +295,43 @@ function paint(){
  updateRunningOrder(points,chosen);
  $('progress').textContent=Math.round(state.leader)+'m / 2000m';
  $('clock').textContent=state.t.toFixed(1)+'秒';
- $('section').textContent=model.center(state.leader).section+
+ $('section').textContent=(state.allCrossedAt!==null?'全馬ゴール・余走中':
+   model.center(state.leader).section)+
    ' ／ 内4列 '+state.horses.filter(h=>h.lane<=3.45).length+'頭'+
    ' ／ 内へ '+state.totalInsideMoves+'回';
- if(state.finished){playing=false;$('startBtn').textContent='▶ 再スタート'}
+ const banner=$('finishBanner');
+ if(banner&&finishSequenceActive){
+  const p=Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS);
+  banner.hidden=p<.30;
+  if(!banner.hidden){
+   const podium=state.horses.slice().filter(h=>h.finishTime!==null)
+    .sort((a,b)=>a.finishTime-b.finishTime).slice(0,3);
+   $('finishHeading').textContent=finishSequenceDone?'全馬ゴール・余走終了':'全馬ゴール・余走中';
+   $('finishPodium').textContent=podium.map((h,i)=>(i+1)+'着 '+h.number+'番').join('　');
+  }
+ }else if(banner){banner.hidden=true}
 }
 function tick(ts){
  if(!last)last=ts;
  let delta=Math.min(.06,(ts-last)/1000);last=ts;
  if(playing){
-  acc+=delta*Number($('speed').value);
-  let count=0;
-  while(acc>=.08&&count++<8&&!engine.state.finished){engine.step(.08);acc-=.08}
-  if(ts-renderStamp>14){paint();renderStamp=ts}
+  if(!engine.state.finished){
+   acc+=delta*Number($('speed').value);
+   let count=0;
+   while(acc>=.08&&count++<8&&!engine.state.finished){engine.step(.08);acc-=.08}
+  }
+  if(engine.state.finished){
+   // The physics state is final. Keep the animation alive for a gentle
+   // 3.2s real-time camera pullback and 6m display-only coasting.
+   finishSequenceActive=true;
+   finishSequenceElapsedMs=Math.min(FINISH_SEQUENCE_MS,
+    finishSequenceElapsedMs+delta*1000);
+   if(finishSequenceElapsedMs>=FINISH_SEQUENCE_MS){
+    playing=false;finishSequenceDone=true;
+    $('startBtn').textContent='▶ 再スタート';
+   }
+  }
+  if(ts-renderStamp>14||finishSequenceDone){paint();renderStamp=ts}
  }
  requestAnimationFrame(tick);
 }
@@ -325,6 +375,7 @@ window.CleanLab=Object.freeze({
  // Cheap, per-animation-frame diagnostic for REAL 4x playback QA.
  frameSample:()=>({t:engine?.state?.t??0,playing,zoom:lastCamera?.scale??0,
   camera:lastCamera?{x:lastCamera.x,y:lastCamera.y}:null,
+  finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
   horses:lastRenderedPoints.map(p=>({number:p.number,x:p.x,y:p.y,d:p.d,lane:p.lane}))}),
  inspect:()=>{
   const points=turfReady?(lastRenderedPoints.length?lastRenderedPoints:
@@ -343,7 +394,9 @@ window.CleanLab=Object.freeze({
     width:image.naturalWidth,height:image.naturalHeight}:null,
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
    originalError,vectorReady,turfReady,turfError,turfStats,
-   visualInterpolationEnabled:true,fixedCameraZoom:true,
+   visualInterpolationEnabled:true,fixedCameraZoom:!finishSequenceActive,
+   finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
+   finishedBannerVisible:Boolean(!$('finishBanner')?.hidden),
    visualSimulationTime:visualRenderTime,
    displayedDeltas:points.map(p=>({
      number:p.number,d:p.d-(engine.state.horses.find(h=>h.number===p.number)?.displayD||0),
