@@ -124,7 +124,35 @@ assert.ok(physicalPacks.every(x=>Number.isFinite(x.actualFullPackGapM)));
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-15'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-18'));
+assert.ok(html.includes('race-clean-distance-camera-v1.js?v=20261019-18'));
+assert.ok(html.includes('id="distanceCamera"'));
+assert.ok(html.includes('id="viewMode"'));
+const cameraSrc=fs.readFileSync(root+'race-clean-distance-camera-v1.js','utf8');
+assert.ok(cameraSrc.includes('const pxPerMetre=w<540?4.25:5.2'));
+assert.ok(cameraSrc.includes('originalPublisherTexture:true'));
+assert.ok(cameraSrc.includes('sourceTurfUnwrapped:true'));
+assert.ok(cameraSrc.includes('screenPoint(p.d,p.lane,geo)'));
+assert.ok(cameraSrc.includes('imageTextureSource:'));
+assert.ok(cameraSrc.includes('SOURCE_SCALE=2'));
+assert.ok(!cameraSrc.includes('RaceSimEngine.step('));
+vm.runInNewContext(cameraSrc,{window,globalThis:window},{filename:'race-clean-distance-camera-v1.js'});
+const tv=window.RaceCleanDistanceCamera;
+for(const width of [390,1024]){
+ for(const focusD of [310,530,720,1270,1400,1435,1500,1671.6,1800]){
+  const geo=tv.geometry(width,width===390?348:380,focusD);
+  const px=width===390?4.25:5.2;
+  for(const lane of [0,1,3,7,12,14]){
+   const a=tv.screenPoint(focusD-30,lane,geo);
+   const b=tv.screenPoint(focusD+30,lane,geo);
+   assert.ok(Math.abs((a.x-b.x)-60*px)<1e-8,'TV_FULL_CURVE_METRES_NEVER_COMPRESS_'+focusD);
+   assert.ok(Math.abs(a.y-b.y)<1e-8,'TV_LANES_NO_CHORD_PROJECTION_'+focusD);
+  }
+ }
+}
+assert.ok(app.includes('RaceCleanDistanceCamera.render('));
+assert.ok(app.includes("useDistance=$('viewMode')?.value!=='map'"));
+assert.ok(app.includes('physical-distance-running-camera'));
 assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-15'));
 assert.ok(html.includes('id="goalCamera"'));
 const kyoto1400=fs.readFileSync(root+'race-simulator.html','utf8');
