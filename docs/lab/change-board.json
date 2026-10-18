@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "d83d61ac0dd908610e0b428920b4c68927184973",
+  "scan_commit": "c3bbd23b5d82c2bb7c03257b1dbfa9b68d729d1c",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v7: 京都1400 RaceSimNumbersからJRA8枠の描画関数を移植し、馬番そのものを馬の実位置に描画（表示位置ずらしを廃止）。京都1400既存RaceSimEngine＋RaceLaneAI共通で開始100mの安全な内寄せ、空き内優先と外追越し、脚質・展開ロジックを利用。元画像そのまま＋4倍ブラウザ補間。CI/ブラウザ/Pages同期検証後も未承認LAB、STAGING/本番/正式DATA不変。",
+      "next_action": "LAB v8実装中：うまぽっと公式の京都PowerPoint元図の第2シートを使用し、コースgroup shape ID37は無変更、テキスト・GOAL・方向の他4レイヤーのみ除去してSVG書出し。実況＋俯瞰の両方を鮮明な無地SVGへ切替え、旧620x430 JPEGの4x拡大を廃止。馬番自体が走る京都1400共通の描画・LaneAI/SimEngineを維持。実位置変更なしで馬番を小さく、局所カメラを最大スマホ8.2倍/PC9.6倍。390/1024px各9地点で478m重なり監査、SVG/Pagesバイト一致、STAGING・本番・正式DATA等に変更なし。次は画面実機で形状・馬番を目視して承認判定。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -47,7 +47,8 @@
         "docs/lab/race-clean-course-v1.js",
         "docs/lab/race-clean-course-app-v1.js",
         "docs/lab/race-clean-course-v1.html",
-        "docs/lab/race-clean-course-v1.css"
+        "docs/lab/race-clean-course-v1.css",
+        "docs/lab/assets/kyoto-umapot-course-clean-v8.svg"
       ],
       "production_paths": [],
       "file_blob_shas": {
@@ -66,7 +67,8 @@
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
         "docs/lab/race-clean-course-app-v1.js": "e2e52ab059331440ee795c485e98adef46e3c2f3",
         "docs/lab/race-clean-course-v1.html": "0b40db6f3dcfba1352cc556ce3f60c709d7dc7db",
-        "docs/lab/race-clean-course-v1.css": "027324a3ad4713e5fbb3e95a3c7407439db93648"
+        "docs/lab/race-clean-course-v1.css": "027324a3ad4713e5fbb3e95a3c7407439db93648",
+        "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19"
       },
       "latest_source_change_commit": "d83d61ac0dd908610e0b428920b4c68927184973"
     },
