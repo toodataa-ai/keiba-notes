@@ -200,20 +200,31 @@ def parse_official(soup, p):
                     and 0 <= len(before_f) - len(before_s) <= 3
                     and after_f.startswith(after_s)
                     and 0 <= len(after_f) - len(after_s) <= 4)
+        # NAR RaceList can truncate just the final closing parenthesis.
+        # Other mismatches remain blocked by date/venue/R/distance/runners.
+        clipped_final_paren = (standard_name == card_name + ")" and
+                               card_name.count("(") == card_name.count(")") + 1)
         if (standard_name != card_name and
+                not clipped_final_paren and
                 (len(card_name) < 6 or card_name not in standard_name) and
                 not verified_short_title(standard_name, card_name)):
             raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
     body = soup.get_text(" ", strip=True)
-    dist_match = re.search(r"ダート\s*(\d{3,4})\s*[ｍm]", body)
-    if not dist_match:
+    surface_match = re.search(r"(ダート|芝)\s*(\d{3,4})\s*[ｍm]", body)
+    if not surface_match:
         raise Blocked("BLOCKED_PARSE", "Official surface/distance missing")
-    distance = int(dist_match.group(1))
-    # Official Banei pages describe the track as ダート 200m, while the
-    # immutable research snapshot labels its separate racing type ばんえい.
-    # Accept this exact venue/track correspondence, never a generic synonym.
-    expected_surface = "ばんえい" if p["venue"] == "帯広ば" else "ダート"
-    if distance != int(p["distance"]) or clean(p.get("surface")) != expected_surface:
+    official_surface, distance = surface_match.group(1), int(surface_match.group(2))
+    # Banei's official 200m ダート is frozen as ばんえい; otherwise match
+    # official 芝/ダート explicitly against the immutable prediction.
+    frozen_surface = clean(p.get("surface"))
+    if p["venue"] == "帯広ば":
+        if frozen_surface != "ばんえい":
+            raise Blocked("BLOCKED_JOIN", "Unexpected frozen Banei surface")
+        expected_surface = "ダート"
+    else:
+        expected_surface = frozen_surface
+    if (expected_surface not in ("芝", "ダート") or official_surface != expected_surface
+            or distance != int(p["distance"])):
         raise Blocked("BLOCKED_JOIN", "Official distance/surface does not match prediction")
     # Banei publishes numeric track moisture, e.g. 馬場：1.0.
     # Never convert it to the four-grade thoroughbred going scale.
