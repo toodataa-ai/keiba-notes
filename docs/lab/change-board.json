@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "55f8b200eb3bbb976c21d3e9d6452f4dc07770a6",
+  "scan_commit": "0d635cf40ace352d7d526dc10e8b1e71b12b4043",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v0.52：京都1400型カメラと中サイズ番号を維持。画像由来芝帯境界の波打ちは対称105m重み平均・二次曲線で軽減し、原境界から最大6pxの表示専用差分。線色と線幅を弱める。コース実線/実況の位置は同一、18頭スマホスクリーンショットで再目視・未承認。正式予想・STAGING・本番は非変更。",
+      "next_action": "新方式 LAB clean-course-v1：旧v0.52とは別URLの完全独立18頭プロトタイプ。設計用の正規化ベクターコース（0〜308.7mと530〜1270mは厳密な直線、各カーブC1）、全体図・実況で同じ馬番座標。京都1400共通のレーン/速度エンジンは変更しない。実ブラウザとユーザー目視受入待ち。旧LABファイル・STAGING/本番・予想/PDF/proof無変更。",
       "preview_path": "lab/race-simulator.html",
       "staging_paths": [],
       "lab_paths": [
@@ -43,7 +43,11 @@
         "docs/lab/race-broadcast-map-v1.js",
         "docs/lab/race-lab-18-fixture-v1.js",
         "docs/lab/race-turf-corridor-v1.js",
-        "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json"
+        "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json",
+        "docs/lab/race-clean-course-v1.js",
+        "docs/lab/race-clean-course-app-v1.js",
+        "docs/lab/race-clean-course-v1.html",
+        "docs/lab/race-clean-course-v1.css"
       ],
       "production_paths": [],
       "file_blob_shas": {
@@ -58,9 +62,13 @@
         "docs/lab/race-broadcast-map-v1.js": "fa285348d1d57bfba492359ac52b72e3e8f45f1f",
         "docs/lab/race-lab-18-fixture-v1.js": "9bf9b45bbfb17a9a9335f38934e8a45567fe8d3a",
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
-        "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d"
+        "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
+        "docs/lab/race-clean-course-v1.js": "862c7bac56bc25f36b31663b34eda04276983bd0",
+        "docs/lab/race-clean-course-app-v1.js": "2407c71801d898e3adaafbcbc696b0e4e28e45e9",
+        "docs/lab/race-clean-course-v1.html": "fed55364daaf6a6a42b6ff6b2fdcaf5a1b88477c",
+        "docs/lab/race-clean-course-v1.css": "75d96520944b4a1c8c78f7408888bd8d4cf66cbf"
       },
-      "latest_source_change_commit": "55f8b200eb3bbb976c21d3e9d6452f4dc07770a6"
+      "latest_source_change_commit": "0d635cf40ace352d7d526dc10e8b1e71b12b4043"
     },
     {
       "id": "course-catalog",
