@@ -1,4 +1,4 @@
-/* LAB v13 — iPhone WebKit-resized SVG accepted; original source green sampling stays identical.
+/* LAB v14 — source-anchored narrow inner path; bridge missing drawn rails; extend runoff smoothly.
  * v10 wrongly targeted the CENTER of an often-merged green region; where
  * inside/outside green paths meet, it steered horses outside then suddenly
  * recentered. v11 instead selects a SAFE inner corridor relative to the
@@ -8,8 +8,9 @@
  */
 (function(global){'use strict';
 const W=620,H=430,RASTER=3;
-const CLEARANCE=3.1, MIN_INNER_OFFSET=3.25, MAX_SPAN=17.5,
- SLOPE=.55, SMOOTH_RADIUS=17;
+// A smartphone badge radius 13.5*0.68/7=1.31 source px.
+const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
+ SLOPE=.44, SMOOTH_RADIUS=19;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 let grid=null,samples=null,statistics=null;
@@ -73,21 +74,49 @@ function create(image){
   if(runs.length>1)forkSections++;
   // Fixed target near the true *inner* rail: merging green corridors must
   // not pull the horses to the centroid of the whole green region.
-  const wanted=7;
+  const wanted=5.0;
   runs.sort((a,b)=>
    Math.max(a.a-wanted,wanted-a.b,0)-Math.max(b.a-wanted,wanted-b.b,0)||
    Math.abs(a.a-5)-Math.abs(b.a-5));
   const run=runs[0];
   if(!run){samples.push(null);missing++;continue}
-  const low=Math.max(MIN_INNER_OFFSET,run.a+.45);
-  const high=Math.min(run.b-.45,low+MAX_SPAN);
+  const low=Math.max(MIN_INNER_OFFSET,run.a+.30);
+  const high=Math.min(run.b-.30,low+MAX_SPAN);
   if(high-low<3){samples.push(null);missing++;continue}
   samples.push({x:inner.x,y:inner.y,nx,ny,low,high,
-   safeLow:low,safeHigh:high});
+   safeLow:low,safeHigh:high,rawInnerEdge:run.a});
   if(previousRuns.length<7&&d%400===0)
    previousRuns.push({d,first:run.a,last:run.b,low,high});
  }
  if(missing)throw Error('TURF_INNER_CORRIDOR_MISSING:'+missing);
+ // At some crossings the illustrated physical inner rail vanishes, even
+ // though the infield is GREEN. A long safe-edge collapse would incorrectly
+ // steer the horses inside the track. Interpolate BETWEEN the adjacent
+ // visible rail boundaries and never target an infield centroid.
+ const gaps=[];
+ let open=-1;
+ for(let i=0;i<=samples.length;i++){
+  const p=samples[i];
+  const suspect=Boolean(p&&p.safeLow<=MIN_INNER_OFFSET+1.2);
+  if(suspect&&open<0)open=i;
+  if((!suspect||i===samples.length)&&open>=0){
+   const end=i-1;
+   if(end-open>=22){
+    const from=Math.max(0,open-12),to=Math.min(samples.length-1,end+12);
+    const left=samples[from].safeLow,right=samples[to].safeLow;
+    for(let j=from+1;j<to;j++){
+     const q=(j-from)/(to-from),eased=q*q*(3-2*q);
+     const floor=left+(right-left)*eased;
+     const r=samples[j];
+     const newLow=Math.max(r.low,Math.min(floor,r.safeHigh-5.5));
+     r.low=newLow;
+     r.high=Math.min(r.safeHigh,Math.max(r.high,newLow+5.5));
+    }
+    gaps.push({start:open,end,from,to,left,right});
+   }
+   open=-1;
+  }
+ }
  // Smoothing is over distance, not over frames, so it is deterministic and
  // retains exactly the same result when the user changes playback speed.
  function limitSlope(){
@@ -149,7 +178,7 @@ function create(image){
  statistics={count:samples.length,missing,forkSections,minWidth,
   maxLane0FromInner,tooFarOut,maxStationJump,maxStationJumpAt,
   badStations,greenPixels,slopeLimit:SLOPE,smoothRadius:SMOOTH_RADIUS,
-  source:'original-publisher-inner-rail'};
+  hiddenRailBridges:gaps,source:'original-publisher-inner-rail'};
  if(badStations||tooFarOut||maxStationJump>1.6)
   throw Error('TURF_INNER_ROUTE_UNSAFE:'+JSON.stringify(statistics));
  return statistics;
@@ -162,21 +191,20 @@ function positionAt(d,lane){
 function point(distance,lane=0){
  if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
  if(distance>2000){
-  const end=point(2000,lane),originalEnd=c.point(2000,lane),
-   originalBeyond=c.point(distance,lane);
-  let x=end.x+originalBeyond.x-originalEnd.x;
-  let y=end.y+originalBeyond.y-originalEnd.y;
-  // Retain the existing runoff on green beyond the finish line.
-  if(!discOnTurf(x,y,3.0)){
-   const r=c.rails(2000),nx=(r.outer.x-r.inner.x)/r.widthPx,
-    ny=(r.outer.y-r.inner.y)/r.widthPx;
-   let best=null;
-   for(let a=-8;a<=8;a+=.25){
-    const tx=x+nx*a,ty=y+ny*a;
-    if(discOnTurf(tx,ty,3.0)&&(!best||Math.abs(a)<best.delta))
-     best={x:tx,y:ty,delta:Math.abs(a)};
+  // Unclamped tangent extension after the finish. The old source spline
+  // capped extra metres at 45 and visibly stopped the leading numbers.
+  const end=point(2000,lane),before=point(1990,lane),extra=distance-2000;
+  const tx=(end.x-before.x)/10,ty=(end.y-before.y)/10;
+  let x=end.x+tx*extra,y=end.y+ty*extra;
+  if(!discOnTurf(x,y,1.9)){
+   const normal=samples[2000];
+   let nearest=null;
+   for(let a=-5;a<=5;a+=.25){
+    const px=x+normal.nx*a,py=y+normal.ny*a;
+    if(discOnTurf(px,py,1.9)&&(!nearest||Math.abs(a)<nearest.delta))
+     nearest={x:px,y:py,delta:Math.abs(a)};
    }
-   if(best){x=best.x;y=best.y}
+   if(nearest){x=nearest.x;y=nearest.y}
   }
   return {x,y,d:distance,lane,section:'ゴール後'};
  }
