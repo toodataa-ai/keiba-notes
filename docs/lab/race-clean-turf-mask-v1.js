@@ -124,6 +124,27 @@ function discOnTurf(x,y,r=4.4){
 }
 function point(distance,lane){
  if(!samples)throw Error('TURF_MASK_NOT_READY');
+ // Carry finished horses along the same tangent beyond the finishing line.
+ // Never freeze all the horse numbers at exactly 2000m (LAB regression).
+ if(distance>2000){
+  const end=point(2000,lane),rawEnd=c.point(2000,lane),
+   rawBeyond=c.point(distance,lane);
+  let x=end.x+rawBeyond.x-rawEnd.x,y=end.y+rawBeyond.y-rawEnd.y;
+  if(!discOnTurf(x,y,MARGIN)){
+   const r=c.rails(2000),nx=(r.outer.x-r.inner.x)/r.widthPx,
+    ny=(r.outer.y-r.inner.y)/r.widthPx;
+   let nearest=null;
+   for(let a=-10;a<=10;a+=.4){
+    const tx=x+nx*a,ty=y+ny*a;
+    if(discOnTurf(tx,ty,MARGIN)){
+     const cost=Math.abs(a);
+     if(!nearest||cost<nearest.cost)nearest={x:tx,y:ty,cost};
+    }
+   }
+   if(nearest){x=nearest.x;y=nearest.y}
+  }
+  return {x,y,d:distance,lane,section:'ゴール後'};
+ }
  const d=clamp(Number(distance)||0,0,2000);
  const lo=Math.floor(d),hi=Math.ceil(d),f=d-lo;
  const a=samples[lo],b=samples[hi];
