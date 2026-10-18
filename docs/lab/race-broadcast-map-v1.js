@@ -1,4 +1,4 @@
-/* LAB v0.51: Kyoto 1400-inspired broadcast camera, smoothed original turf-rail geometry
+/* LAB v0.52: Kyoto 1400-inspired broadcast camera, smoothed original turf-rail geometry
    as the Umapot overview. NO raster zoom, label, arrow or extraneous helper
    stroke in broadcast. Full overview original JPEG is untouched.
    Physics, race timing, official predictions and actual lanes are unchanged. */
@@ -47,7 +47,7 @@ function smoothTurfRails(course,overlay){
  const raw=[];
  for(let d=0;d<=course.distance_m;d+=5)
    raw.push(global.RaceTurfCorridor.rails(course,d,overlay.legacyPoint));
- const radius=9,limit=3;
+ const radius=21,limit=6;
  const data=raw.map((p,i)=>{
   const sm={};
   for(const side of ['inner','outer']){
@@ -103,7 +103,7 @@ function draw(options){
  traceRail(ctx,stations,'outer',true,true);
  ctx.closePath();
  ctx.fillStyle='#65af63';ctx.fill('evenodd');
- ctx.strokeStyle='#276c45';ctx.lineWidth=1.0;
+ ctx.strokeStyle='rgba(39,108,69,.60)';ctx.lineWidth=.75;
  ctx.lineJoin='round';ctx.lineCap='round';
  for(const side of ['inner','outer']){
   ctx.beginPath();

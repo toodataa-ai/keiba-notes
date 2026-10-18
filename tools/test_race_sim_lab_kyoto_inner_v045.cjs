@@ -146,7 +146,7 @@ assert.ok(html.includes('race-umapot-overlay-v1.js?v=20261018-49'));
 assert.ok(html.includes('race-turf-corridor-v1.js?v=20261018-49'));
 assert.ok(html.includes('race-simulator.js?v=20261018-49'));
 assert.ok(html.includes('race-lab-18-fixture-v1.js?v=20261018-48'));
-assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-51'));
+assert.ok(html.includes('race-broadcast-map-v1.js?v=20261018-52'));
 assert.ok(html.includes('同じうまぽっとの京都競馬場原画像'));
 assert.ok(js.includes("['kyoto_turf_outer_1400','kyoto_turf_inner_2000'].includes"));
 assert.ok(js.includes("'kyoto_turf_inner_2000'].includes(race.course_id)"));
