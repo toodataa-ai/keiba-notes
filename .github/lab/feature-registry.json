@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v19: うまぽっと原本の無地ベクターSVG(assets/kyoto-umapot-course-clean-v8.svg)と芝/内ラチ/全体図を一切変更せず、3・4コーナーで原図上の弦長として馬群が一斉に縮み直線で伸びる視覚問題を補正。新規js race-clean-curve-camera-v1.js は65mの固定実距離区間のSVG上の見かけの弦長を全コースで計測し、物理距離だけをパラメータにする緩慢なカメラ等倍率拡大(最大1.45倍、±48m方向に平滑化)を適用。先頭追跡のカメラは物理的先頭距離-10mの線上へ安定固定し、走行座標18頭/予想/馬番サイズ/脚質/京都1400共通エンジンは変更なし。65mの仮想一定間隔で3・4コーナー〜直線の表示弦長比が従来1.8479倍→補正後1.3299倍（約28%変動軽減）、完全一定ではない（曲率上の幾何学的制約）。QA Chromium 390/1024px×23地点、4倍速各158フレームで位置停止0・ズーム1フレーム変動最大0.006・ゴール余走、本番隔離とPages一致成功(run39174430183)。画面差分A/Bでoriginal SVG2画像・RaceSimEngineの物理値・馬番の原図座標18頭すべて一致(run39174662953)、1550mスマホ倍率8.8→11.5924倍。WebKit iPhone相当のローカルと実公開URLの再生・ゴール(run39174484895)成功。デバッグ比較URLには&lens=offが可能。公式予想/買い目/PDF/本番/stagingに変更なし、LABのみ、ユーザー実機目視承認待ち。",
+      "next_action": "LAB v20 実装・自動QA合格、iPhone実機での目視承認待ち。18頭の実況馬番を同一径のままスマホscale .68→.78(+14.7%、半径9.18→10.53画面px)、PC .76→.84(+10.5%、半径10.26→11.34px)に拡大、GOALカメラも .73→.81。全体図縮小番号は密集/重なり防止のため.48を維持。4倍速の物理0.08秒刻み表示の前後補間を0.070s、レーン方向の視覚補間を0.21s、カメラ平滑化を0.20sにし、一時停止で表示位置スナップバックしない。途中地点へのseekでは平滑履歴を破棄しスタート時の位置を誤表示しない。SafariのSVG CSS transform と高DPI canvasの画面移動を同じdevice-pixel丸めの均一平行移動で位置合わせ。生のRaceSimEngine距離/レーン/時計/馬券/馬番原図座標/うまぽっとコースSVGは変更しない。Chromium 390px/1024px×23地点で半径/追跡馬同径/芝内/元画像/座標/ピクセル整合、4倍速各158フレームで位置停止0・逆行0・ズーム微変化とゴール余走の受入、Pagesバイト一致・本番無変更、Actions 39176426898 success。WebKit公開URLの再生～GOAL余走/JSエラー0は39176217648 success。Pages deployment 39176425869 success。LABのみ・ステージング/本番は未変更。iPhone実機の見た目と重なりは未承認、承認なし本番反映禁止。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -43,7 +43,7 @@
         "docs/lab/race-clean-goal-view-v1.js",
         "docs/lab/race-clean-curve-camera-v1.js"
       ],
-      "shape_alignment": "v19_original_svg_unchanged_affine_zoom_only_chord_variation_1p8479_to_1p3299_qa_39174430183_39174484895_39174662953_unapproved"
+      "shape_alignment": "v20_uniform_enlarged_numbers_mobile_0p78_desktop_0p84_goal_0p81_subpixel_camera_lock_tau_0p070_0p21_0p20_qa_39176426898_webkit_39176217648_lab_unapproved"
     },
     {
       "id": "course-catalog",
