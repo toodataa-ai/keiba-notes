@@ -78,6 +78,12 @@ jobs:
                     originalImageSrc:a.originalImageSrc,
                     originalLoaded:a.originalLoaded,mapAspect:a.mapAspect,zoom:a.zoom,
                     goalBoardVisible:a.goalBoardVisible,goalFrame:a.goalFrame,
+                    cameraLensEnabled:a.cameraLensEnabled,
+                    cameraLensReady:a.cameraLensReady,
+                    cameraLensError:a.cameraLensError,
+                    cameraLensGain:a.cameraLensGain,
+                    cameraLensStats:a.cameraLensStats,
+                    unchangedBackgroundAffineOnly:a.unchangedBackgroundAffineOnly,
                     goalCameraSwitchDistance:a.goalCameraSwitchDistance,
                     selectedVisible:a.selectedVisible,selectedScreen:a.selectedScreen,
                     labelCoords:a.liveLabelPositions,selectedHorse:a.selectedHorse,
@@ -100,6 +106,20 @@ jobs:
                 assert read['highResolutionMode']=='publisher-original-svg-not-resampled-jpeg',(width,d,read)
                 assert read['originalImageSrc']==read['liveImageSrc'],('TWO_DIFFERENT_COURSE_IMAGES',width,d,read)
                 assert read['actualNumberCircles'] and not read['paintedTrack'] and not read['leaderLines']
+                assert read['cameraLensEnabled'] and read['cameraLensReady'],('CURVE_LENS_NOT_READY',width,d,read)
+                assert read['cameraLensError'] is None,('CURVE_LENS_FAILED',width,d,read)
+                assert read['unchangedBackgroundAffineOnly'],('IMAGE_MUST_REMAIN_ORIGINAL',width,d,read)
+                assert read['cameraLensGain']>=1 and read['cameraLensGain']<=1.45,('CAMERA_LENS_GAIN_OUT_OF_BOUND',width,d,read)
+                if d==1270:
+                  stats=read['cameraLensStats']
+                  print('SOURCE_SVG_AFFINE_PACK_OPTICS',width,stats)
+                  assert stats['source']=='publisher-svg-uniform-affine-only'
+                  assert stats['imageUnmodified'] and stats['physicsUnmodified']
+                  assert stats['maxGain']<=1.45001
+                  assert stats['maxGainStepPerMetre']<.012,('ABRUPT_ZOOM_CURVE',stats)
+                  assert stats['thirdFourthTurn']['ratioAfter']<
+                     stats['thirdFourthTurn']['ratioBefore']*1.01,('NO_CURVE_VISUAL_IMPROVEMENT',stats)
+                
                 assert read['originalLoaded'],('UMAPOT_ORIGINAL_IMAGE_UNAVAILABLE',width,d,read)
                 assert 'assets/kyoto-umapot-course-clean-v8.svg' in read['originalImageSrc']
                 assert abs(read['mapAspect']-620/430)<.03,(width,d,read)
@@ -237,15 +257,18 @@ jobs:
               assert len(frames)>=35,('TOO_FEW_REALTIME_RENDER_FRAMES',width,len(frames))
               assert frames[-1]['t']-frames[0]['t']>=5,('NOT_REALLY_4X',width,frames[-1]['t']-frames[0]['t'])
               zoom_spread=max(f['zoom'] for f in frames)-min(f['zoom'] for f in frames)
+              zoom_steps=[abs(b['zoom']-a['zoom']) for a,b in zip(frames,frames[1:])]
               steps=[math.hypot(b['x']-a['x'],b['y']-a['y']) for a,b in zip(frames,frames[1:])]
               cam_steps=[math.hypot(b['camX']-a['camX'],b['camY']-a['camY']) for a,b in zip(frames,frames[1:])]
               neg=sum(b['d']-a['d'] < -.20 for a,b in zip(frames,frames[1:]))
               still=sum(x<.001 for x in steps)
               print('PASS_OR_FAIL_4X_REALTIME_JITTER',width,{
                 'frames':len(frames),'simSeconds':round(frames[-1]['t']-frames[0]['t'],2),
-                'zoomSpread':zoom_spread,'maxHorseStep':max(steps),
+                'zoomSpread':zoom_spread,'maxZoomStep':max(zoom_steps),
+                'maxHorseStep':max(steps),
                 'maxCameraStep':max(cam_steps),'stillFrames':still,'regressions':neg})
-              assert zoom_spread<1e-8,('ZOOM_BREATHING',width,zoom_spread)
+              assert max(zoom_steps)<.11,('ABRUPT_CAMERA_ZOOM_SHAKE',width,max(zoom_steps))
+              assert zoom_spread<1.5,('CAMERA_ZOOM_EXCESSIVE_IN_3_SECONDS',width,zoom_spread)
               assert max(steps)<4.5,('NUMBER_SHAKE_JUMP',width,max(steps))
               assert max(cam_steps)<3.8,('CAMERA_SHAKE_JUMP',width,max(cam_steps))
               assert still/len(steps)<.55,('STEPWISE_FROZEN_JITTER',width,still,len(steps))
