@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "cbfb0ecf3928ef85e93b5c93f0e35c45f89dacb7",
+  "scan_commit": "4e2bd43e54e04fc719212bd285bd22fd0e473430",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v6: LIVE/overview both use exact same Umapot original remote image; broadcast applies uniform camera translate+scale with native browser-local 4x image resampling canvas; NO newly drawn turf/rails, NO leader lines/pins, direct running circled horse numbers only. Require fresh Actions browser QA at 390/1024 width 8 checkpoints and live Pages byte-parity before accept. LAB only; no staging, production UI, official data, predictions, final_bets, PDFs.",
+      "next_action": "LAB v7: 京都1400 RaceSimNumbersからJRA8枠の描画関数を移植し、馬番そのものを馬の実位置に描画（表示位置ずらしを廃止）。京都1400既存RaceSimEngine＋RaceLaneAI共通で開始100mの安全な内寄せ、空き内優先と外追越し、脚質・展開ロジックを利用。元画像そのまま＋4倍ブラウザ補間。CI/ブラウザ/Pages同期検証後も未承認LAB、STAGING/本番/正式DATA不変。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -64,11 +64,11 @@
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
-        "docs/lab/race-clean-course-app-v1.js": "503bfcaab8c8b8f5db135a56c53a08143d28c752",
-        "docs/lab/race-clean-course-v1.html": "b8c48868f47dcbf464b94adcf571de2c54683ba5",
+        "docs/lab/race-clean-course-app-v1.js": "844b77bfbd90325a865632a77c11e3f674dd79a1",
+        "docs/lab/race-clean-course-v1.html": "d06b003077c034e3e76d21381394c45972892efb",
         "docs/lab/race-clean-course-v1.css": "048dd039ec2f61f20343149903f5a46d8af0f20c"
       },
-      "latest_source_change_commit": "cbfb0ecf3928ef85e93b5c93f0e35c45f89dacb7"
+      "latest_source_change_commit": "4e2bd43e54e04fc719212bd285bd22fd0e473430"
     },
     {
       "id": "course-catalog",
