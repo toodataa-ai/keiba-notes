@@ -126,8 +126,12 @@ def validate_prediction(path, p, date, enabled):
         # A result may be archived but is NOT an evaluable prediction.
         if p.get("top_pick") is not None or any(x.get("ability_rank") is not None for x in order):
             raise Blocked("BLOCKED_JOIN", "Cold-start abstention has unexpected ranking")
-        if sorted(int(x["horse_no"]) for x in order) != sorted(nums):
-            raise Blocked("BLOCKED_JOIN", "Cold-start horse set differs from runner list")
+        # The frozen runners list also retains declared scratches (non_runner).
+        # An all-debut abstention ranks only eligible runners; never manufacture
+        # an ability-order entry for a frozen non-runner after the result.
+        eligible_nums = sorted(int(x["horse_no"]) for x in runners if x.get("non_runner") is not True)
+        if sorted(int(x["horse_no"]) for x in order) != eligible_nums:
+            raise Blocked("BLOCKED_JOIN", "Cold-start eligible horse set differs from ability order")
     else:
         ranks = [x["ability_rank"] for x in order]
         if sorted(ranks) != list(range(1, len(ranks) + 1)):
