@@ -63,7 +63,9 @@ assert.equal(operations.filter(x=>x[0]==='fill').length,1,'one connected turf ri
 assert.equal(operations.filter(x=>x[0]==='stroke').length,2,'only inside/outside boundaries');
 assert.ok(operations.filter(x=>x[0]==='quad').length>=800,'smooth vector interpolation');
 assert.equal(markers.length,1);
-assert.ok(markers[0].size>3,'one-runner readable marker scale');
+// In CSS pixels 1.02x focused, rather than the former enormous 1.55x.
+const cssScale=markers[0].size*390/1000;
+assert.ok(cssScale>=1&&cssScale<=1.1,'modest one-runner label size '+cssScale);
 assert.equal(operations.filter(x=>x[0]==='scale').length,1);
 assert.equal(operations.filter(x=>x[0]==='translate').length,2);
 const html=fs.readFileSync(base+'race-simulator.html','utf8');
