@@ -6,10 +6,29 @@
  */
 (function(g){'use strict';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-function goalScreenPosition(d,lane,distance,width,height,maxLane,turn='右'){
- const right=turn==='右',finishX=width*(right?.32:.68);
+/* TV camera follows the pack until the board enters the picture.
+ * A previous fixed goal board stretched 215 metres across one screen:
+ * actual 22m gaps appeared as only 40px on a phone, compressing the pack.
+ * This camera uses one truthful metres->px scale and moves its viewpoint;
+ * no stretching of individual horses or change to physics gaps.
+ */
+function packCamera({points,distance,width,turn='右'}){
+ const leader=Math.max(...points.map(p=>p.d)),last=Math.min(...points.map(p=>p.d));
+ const right=turn==='右',gap=Math.max(0,leader-last);
+ const scale=clamp(width/62,5.25,8.5);
+ const fixedGoalX=width*(right?.30:.70),leadX=width*(right?.52:.48);
+ const remaining=distance-leader;
+ const natural=leadX+(right?-1:1)*remaining*scale;
+ // Once the board reaches its broadcast-safe position it remains fixed;
+ // horses keep crossing at the exact distance-proportional screen speed.
+ const goalX=right?Math.min(fixedGoalX,natural):Math.max(fixedGoalX,natural);
+ return {goalX,leader,last,gap,pxPerMetre:scale,remaining,
+  cameraMode:Math.abs(goalX-fixedGoalX)<1e-6?'fixed-finish':'tracking-pack'};
+}
+function goalScreenPosition(d,lane,distance,width,height,maxLane,turn='右',camera){
+ const view=camera??packCamera({points:[{d}],distance,width,turn});
  const laneStep=Math.min(24,(height-76)/(maxLane+2.2));
- return {x:finishX+(right?-1:1)*(d-distance)*width/215,
+ return {x:view.goalX+(turn==='右'?1:-1)*(distance-d)*view.pxPerMetre,
   y:height*.51+(lane-maxLane/2)*laneStep};
 }
 function drawGoalBoard(ctx,{x,top,bottom,venueLabel='KYOTO'}){
@@ -74,7 +93,8 @@ function render({canvas,points,paintNumber,focusedNo,leaderNo,turn='右',distanc
  for(const y of [innerY,outerY]){
   ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
  }
- const x=turn==='右'?w*.32:w*.68;
+ const camera=packCamera({points,distance,width:w,turn});
+ const x=camera.goalX;
  // Thin checkered winning line across all lanes, visible UNDER the horses.
  for(let y=innerY+2,part=0;y<outerY-2;y+=9,part++){
   ctx.fillStyle=part%2?'rgba(251,252,244,.88)':'rgba(21,47,34,.9)';
@@ -90,15 +110,18 @@ function render({canvas,points,paintNumber,focusedNo,leaderNo,turn='右',distanc
  ctx.restore();
  const markers=[];
  for(const p of points){
-  const q=goalScreenPosition(p.d,p.lane,distance,w,h,maxLane,turn);
+  const q=goalScreenPosition(p.d,p.lane,distance,w,h,maxLane,turn,camera);
   const scale=.95,rad=13.5*scale;
   if(q.x<-rad||q.x>w+rad||q.y<-rad||q.y>h+rad)continue;
   paintNumber(ctx,p.number,q.x,q.y,scale,p.number===focusedNo);
   markers.push({number:p.number,x:q.x,y:q.y,d:p.d});
  }
  return {mode:'finish-100m-camera',goalX:x,visible:markers.length,
-  markers,remaining:Math.max(0,distance-Math.max(...points.map(p=>p.d))),venueLabel};
+  markers,remaining:Math.max(0,camera.remaining),venueLabel,
+  physicalSpreadM:camera.gap,visualSpreadPx:camera.gap*camera.pxPerMetre,
+  pxPerMetre:camera.pxPerMetre,cameraMode:camera.cameraMode};
 }
 g.RaceFinishBroadcastV2=Object.freeze({render,goalScreenPosition,drawGoalBoard,
-  transitionRemainingM:100,sourceGeometryIndependent:true,physicalResultsUnchanged:true});
+  packCamera,transitionRemainingM:100,sourceGeometryIndependent:true,
+  physicalResultsUnchanged:true,physicalGapScaleLinear:true});
 })(typeof window!=='undefined'?window:globalThis);
