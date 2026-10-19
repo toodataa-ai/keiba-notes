@@ -1,0 +1,140 @@
+name: LAB Kyoto third corner whole-pack stretch diagnosis
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-kyoto-turn-entry-pack-stretch-probe.yml'
+permissions: {contents: read}
+jobs:
+  analyse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare browser
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/lab-kyoto-turn-probe.log 2>&1 &
+          sleep 2
+      - name: Diagnose simulated physics versus projected third-turn pack length
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,math,shutil
+          from playwright.sync_api import sync_playwright
+          executable=shutil.which('google-chrome') or shutil.which('chromium')
+          assert executable, 'Chromium missing'
+          with sync_playwright() as p:
+           browser=p.chromium.launch(executable_path=executable,headless=True,args=['--no-sandbox'])
+           page=browser.new_page(viewport={'width':390,'height':900},device_scale_factor=2)
+           errs=[]
+           page.on('pageerror',lambda err:errs.append(str(err)))
+           page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1200&v=20',wait_until='load')
+           page.wait_for_function('window.CleanLab?.inspect()?.turfReady && window.CleanLab?.inspect()?.cameraLensReady',timeout=24000)
+           d=page.evaluate("""() => {
+            const turf=RaceCleanTurf,fixture=RaceLab18Fixture,engine=RaceSimEngine.create(
+             {...fixture.entry(),horses:fixture.horses()},{seed:2026,bias:'neutral'});
+            const maxD=1920,clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+            const options=[];
+            for(const span of [20,25,30,35,40,50,65]){
+             const chords=Float64Array.from({length:maxD+1},(_,d)=>{
+              const a=Math.max(span,d),b=a-span;
+              const p=turf.point(a,2),q=turf.point(b,2);
+              return Math.hypot(p.x-q.x,p.y-q.y);
+             });
+             const values=Array.from(chords).slice(120,1850).sort((a,b)=>a-b);
+             const ref=values[Math.floor(values.length*.88)];
+             const raw=Array.from(chords,chord=>clamp(ref/chord,1,1.45));
+             for(const radius of [48,75,105]){
+              const prefix=new Float64Array(raw.length+1);
+              for(let i=0;i<raw.length;i++)prefix[i+1]=prefix[i]+raw[i];
+              const smooth=d=>{
+               const left=Math.max(0,d-radius),right=Math.min(maxD,d+radius);
+               return (prefix[right+1]-prefix[left])/(right-left+1);
+              };
+              const ease=t=>{const q=clamp(t,0,1);return q*q*(3-2*q)};
+              const gain=Array.from({length:maxD+1},(_,d)=>{
+               const fade=ease(d/130)*ease((maxD-d)/155);
+               return 1+(smooth(d)-1)*fade;
+              });
+              options.push({key:span+'m_'+radius+'r',span,radius,gain,
+               minGain:Math.min(...gain),maxGain:Math.max(...gain)});
+             }
+            }
+            const snapshot=[],markStart=1100,markEnd=1770;
+            let mark=markStart,safety=0;
+            while(mark<=markEnd && safety++<2500 && !engine.state.finished){
+             if(engine.state.leader>=mark){
+              const runners=engine.state.horses.slice().sort((a,b)=>b.d-a.d);
+              const a=runners[0],b=runners.at(-1),meanLane=runners.reduce((x,h)=>x+h.lane,0)/runners.length;
+              const la=turf.point(a.d,a.lane),lb=turf.point(b.d,b.lane);
+              const s1=turf.point(a.d,2),s2=turf.point(b.d,2);
+              const chord=Math.hypot(la.x-lb.x,la.y-lb.y);
+              const sameLaneChord=Math.hypot(s1.x-s2.x,s1.y-s2.y);
+              const physicsGap=a.d-b.d;
+              const normalGain=RaceCleanCurveCamera.gain(engine.state.leader);
+              snapshot.push({d:mark,leadD:a.d,tailD:b.d,leaderNumber:a.number,
+               rawPhysicalGap:physicsGap,avgLane:meanLane,
+               physicalMeanSpeed:runners.reduce((x,h)=>x+h.d,0)/runners.length,
+               sourceChord:chord,sameLaneChord,
+               noLensVisibleChord:8.8*chord,
+               presentGain:normalGain,
+               presentVisibleChord:8.8*chord*normalGain,
+               candidate:options.map(o=>8.8*chord*o.gain[Math.min(maxD,Math.max(0,Math.floor(a.d)))])});
+              mark+=5;
+             }else engine.step(.08);
+            }
+            const summaries=[];
+            const pct=(a,b)=>(b-a)/(a||1)*100;
+            const ranges=[[1120,1240],[1240,1360],[1360,1490],[1490,1665],[1665,1750]];
+            const baseline=snapshot.map(x=>x.noLensVisibleChord),
+             present=snapshot.map(x=>x.presentVisibleChord);
+            const metrics=(values)=>{
+             const deltas=values.slice(1).map((b,i)=>({
+              d:snapshot[i].d,delta:b-values[i],
+              deltaPct:pct(values[i],b),
+              physicalPct:pct(snapshot[i].rawPhysicalGap,snapshot[i+1].rawPhysicalGap)
+             }));
+             const deltaTop=deltas.filter(x=>x.d>=1170&&x.d<=1435)
+              .sort((a,b)=>b.deltaPct-a.deltaPct).slice(0,8);
+             const chunks=ranges.map(([a,b])=>{
+              const arr=snapshot.filter(x=>x.d>=a&&x.d<=b);
+              const vals=arr.map(x=>values[snapshot.indexOf(x)]);
+              const phys=arr.map(x=>x.rawPhysicalGap);
+              return {from:a,to:b,screenRatio:Math.max(...vals)/Math.min(...vals),
+               screenChangePct:pct(vals[0],vals.at(-1)),
+               physicalChangePct:pct(phys[0],phys.at(-1))};
+             });
+             const overshoots=deltas.filter(x=>x.d>=1170&&x.d<=1435&&x.deltaPct-x.physicalPct>2.6);
+             return {maxSuddenStretchPct:Math.max(...deltas.filter(x=>x.d>=1170&&x.d<=1435).map(x=>x.deltaPct)),
+              topStretch:deltaTop,overstretches:overshoots.length,chunks};
+            };
+            summaries.push({key:'NO_LENS',...metrics(baseline)});
+            summaries.push({key:'CURRENT_65m_48r',...metrics(present)});
+            options.forEach((o,i)=>{
+             const m=metrics(snapshot.map(x=>x.candidate[i]));
+             summaries.push({key:o.key,...m,maxGain:o.maxGain});
+            });
+            return {rows:snapshot.map(x=>({...x,candidate:undefined})),summaries};
+           }""")
+           assert not errs,errs
+           print('THIRD_TURN_PHYSICAL_PROJECTION_ROWS',json.dumps([{
+            'd':r['d'],'actualGapM':round(r['rawPhysicalGap'],2),
+            'svgChordPx':round(r['sourceChord'],2),
+            'lens':round(r['presentGain'],4),
+            'viewSpanPx':round(r['presentVisibleChord'],2),
+            'nolensSpanPx':round(r['noLensVisibleChord'],2)
+           } for r in d['rows'] if r['d']%10==0 and 1160<=r['d']<=1500],ensure_ascii=False))
+           for entry in sorted(d['summaries'],key=lambda r:(r['overstretches'],r['maxSuddenStretchPct']))[:16]:
+            print('CANDIDATE_THIRD_CORNER_STRETCH',json.dumps({
+             'key':entry['key'],
+             'maxSuddenStretchPct':round(entry['maxSuddenStretchPct'],4),
+             'overstretches':entry['overstretches'],
+             'turnIntervals':entry['chunks'][:3],
+             'top':entry['topStretch'][:4]},ensure_ascii=False))
+           print('CURRENT_65m_48r',json.dumps(next(x for x in d['summaries'] if x['key']=='CURRENT_65m_48r'),ensure_ascii=False))
+           print('NO_LENS',json.dumps(next(x for x in d['summaries'] if x['key']=='NO_LENS'),ensure_ascii=False))
+           assert len(d['rows'])>100
+           page.close();browser.close()
+          PY
