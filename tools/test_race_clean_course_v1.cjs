@@ -313,7 +313,32 @@ assert.ok(!app.includes('const IMAGE_SCALE=4'));
 assert.ok(!app.includes('track(map.ctx,overview)'));
 assert.ok(app.includes("scale:(w<540?8.8:9.7)*"));
 assert.ok(app.includes('RaceSimEngine.create('));
-assert.ok(html.includes('race-clean-turf-mask-v1.js?v=20261019-21'));
+assert.ok(html.includes('race-safe-rail-projection-v1.js?v=20261020-26'));
+assert.ok(html.includes('race-clean-turf-mask-v1.js?v=20261020-26'));
+assert.ok(html.includes('race-clean-course-v1.css?v=20261020-26'));
+assert.ok(html.indexOf('race-safe-rail-projection-v1.js')<html.indexOf('race-clean-turf-mask-v1.js'));
+const safeRailSource=fs.readFileSync(root+'race-safe-rail-projection-v1.js','utf8');
+assert.ok(!safeRailSource.includes('kyoto')&&!safeRailSource.includes('tokyo'));
+const railGlobal={};
+vm.runInNewContext(safeRailSource,{window:railGlobal});
+const rail=railGlobal.RaceSafeRailProjection;
+assert.equal(rail.courseIndependent,true);
+assert.equal(rail.immutablePhysicalLane,true);
+const oldLane0Fraction=course.fraction(0);
+const newLane0Fraction=rail.fraction(oldLane0Fraction);
+assert.ok(newLane0Fraction>0&&newLane0Fraction<oldLane0Fraction);
+const oldLane14Fraction=course.fraction(14);
+const newLane14Fraction=rail.fraction(oldLane14Fraction);
+assert.ok(Math.abs((oldLane14Fraction-oldLane0Fraction)-(newLane14Fraction-newLane0Fraction))<1e-8,
+ 'LANE_SPACING_MUST_BE_UNCHANGED');
+for(const width of [5,9,13,17.5]){
+ const low=1.95,high=low+width;
+ const oldT=low+width*oldLane0Fraction;
+ const newT=rail.offset(low,high,oldLane0Fraction);
+ assert.ok(newT<oldT&&newT>low,'INNER_RAIL_CLOSER_BUT_SAFE_'+width);
+ assert.ok(oldT-newT<=.50,'SMALL_VISUAL_ONLY_INSET_'+width);
+}
+
 const surface=fs.readFileSync(root+'race-clean-turf-mask-v1.js','utf8');
 assert.ok(surface.includes('activateSharedGeometry'));
 assert.ok(surface.includes('greenPixels++'));
@@ -325,6 +350,9 @@ assert.ok(app.includes('broadcastLoaded=sourceImageReady(b)'));
 assert.ok(!app.includes('a.naturalWidth===620'));
 assert.ok(!app.includes('image?.naturalWidth===620'));
 
+assert.ok(surface.includes('railProjection.offset(r.low,r.high,f)'));
+assert.ok(surface.includes('safeRailInsetFraction:railProjection.INNER_INSET_FRACTION'));
+assert.ok(surface.includes('innerShiftPx:'));
 assert.ok(surface.includes('MIN_INNER_OFFSET=1.60'));
 assert.ok(surface.includes('CLEARANCE=1.95'));
 assert.ok(surface.includes('hiddenRailBridges:gaps'));

@@ -111,3 +111,13 @@ canvas{display:block;width:100%;background:#f4f6f0}
  .broadcast-split strong{font-size:19px}
  .finish-banner span{font-size:13px}
 }
+
+/* LAB v26: unified compact clock for every race, independent of course. */
+.broadcast-clock{min-width:135px;padding:9px 11px}
+.broadcast-clock #clock{font-size:clamp(27px,2.9vw,38px)}
+.broadcast-split strong{font-size:18px}
+@media(max-width:760px){
+ .broadcast-clock{min-width:124px;padding:7px 9px}
+ .broadcast-clock #clock{font-size:30px}
+ .broadcast-split strong{font-size:17px}
+}

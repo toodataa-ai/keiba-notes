@@ -13,6 +13,8 @@ const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
  SLOPE=.44, SMOOTH_RADIUS=19;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
+const railProjection=global.RaceSafeRailProjection;
+if(!railProjection)throw Error('SAFE_RAIL_PROJECTION_MISSING');
 let grid=null,samples=null,statistics=null,sourceDistanceTable=null,sharedGeometry=null;
 const ARC_ANCHORS=Object.freeze([0,308.7,530,720,1270,1435,1671.6,2000]);
 // SVG artwork is stylized rather than surveyed. Around 1435m the drawn
@@ -170,7 +172,7 @@ function create(image){
   minWidth=Math.min(minWidth,p.high-p.low);
   if(p.high-p.low<3)throw Error('TURF_INNER_CORRIDOR_TOO_NARROW_'+d);
   const at=e=>{
-   const t=e.low+(e.high-e.low)*c.fraction(0);
+   const t=railProjection.offset(e.low,e.high,c.fraction(0));
    return {x:e.x+e.nx*t,y:e.y+e.ny*t,t};
   };
   const a=at(p);
@@ -186,6 +188,7 @@ function create(image){
  sourceDistanceTable=buildSourceArcMap();
  statistics={count:samples.length,missing,forkSections,minWidth,
   maxLane0FromInner,tooFarOut,maxStationJump,maxStationJumpAt,
+   safeRailInsetFraction:railProjection.INNER_INSET_FRACTION,
   badStations,greenPixels,slopeLimit:SLOPE,smoothRadius:SMOOTH_RADIUS,
   hiddenRailBridges:gaps,source:'original-publisher-inner-rail',
   imageArcRegistration:sourceDistanceTable.summary};
@@ -195,7 +198,7 @@ function create(image){
 }
 function positionAt(d,lane){
  const r=samples[d],f=c.fraction(lane);
- const t=r.low+(r.high-r.low)*f;
+ const t=railProjection.offset(r.low,r.high,f);
  return {x:r.x+r.nx*t,y:r.y+r.ny*t};
 }
 // A monotonically increasing picture-distance mapping, fully anchored to
@@ -442,7 +445,9 @@ function trace(from=0,to=2000,step=25){
   for(let t=0;t<=35;t+=.5){
    if(!isGreen(pos.x-p.nx*t,pos.y-p.ny*t)){greenInside=t;break}
   }
-  out.push({d,sourceD:+sourceD.toFixed(3),low:+p.low.toFixed(2),high:+p.high.toFixed(2),
+  const inwardPx=(p.high-p.low)*(c.fraction(0)-railProjection.fraction(c.fraction(0)));
+   out.push({d,sourceD:+sourceD.toFixed(3),innerShiftPx:+inwardPx.toFixed(3),
+    low:+p.low.toFixed(2),high:+p.high.toFixed(2),
    safeLow:+p.safeLow.toFixed(2),safeHigh:+p.safeHigh.toFixed(2),
    dist:+dist.toFixed(2),greenInside});
  }
