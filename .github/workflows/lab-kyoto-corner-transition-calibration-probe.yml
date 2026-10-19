@@ -90,7 +90,12 @@ jobs:
             while(nextD<=1750&&loops++<2500&&!sim.state.finished){
              if(sim.state.leader>=nextD){
               const runners=sim.state.horses.slice().sort((a,b)=>b.d-a.d);
-              snapshots.push({d:nextD,leader:runners[0],last:runners.at(-1),
+              snapshots.push({d:nextD,
+               // Clone positions. RaceSimEngine mutates runner objects on every
+               // subsequent step; retaining references would incorrectly
+               // make every historic image span identical to the final one.
+               leader:{d:runners[0].d,lane:runners[0].lane,number:runners[0].number},
+               last:{d:runners.at(-1).d,lane:runners.at(-1).lane,number:runners.at(-1).number},
                physical:runners[0].d-runners.at(-1).d});
               nextD+=5;
              }else sim.step(.08);
