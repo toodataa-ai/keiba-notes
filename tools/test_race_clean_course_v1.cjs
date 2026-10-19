@@ -124,7 +124,7 @@ assert.ok(physicalPacks.every(x=>Number.isFinite(x.actualFullPackGapM)));
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-20'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-21'));
 assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-20'));
 assert.ok(app.includes('const scale=mini?.48:(points.length>=12?(compact?.78:.84):.90)'));
 assert.ok(app.includes('const paintCamera=pixelAlignedCamera(lastCamera,live.ctx)'));
@@ -149,6 +149,17 @@ assert.ok(app.includes("CURVE_LENS_ENABLED=new URLSearchParams(location.search).
 assert.ok(app.includes('lastCamera.scale+(target.scale-lastCamera.scale)*blend'));
 assert.ok(app.includes('Math.min(2000,leaderDistance-10)'));
 assert.ok(app.includes('unchangedBackgroundAffineOnly:true'));
+assert.ok(html.includes('race-course-image-geometry-v1.js?v=20261019-21'));
+const sharedSource=fs.readFileSync(root+'race-course-image-geometry-v1.js','utf8');
+assert.ok(sharedSource.includes('courseSpecificSlopeOverrides:0'));
+assert.ok(sharedSource.includes('globalOptimizationPasses:optimizationPasses'));
+assert.ok(sharedSource.includes('immutableSharedEngine:true'));
+assert.ok(!sharedSource.includes('1270'));
+assert.ok(!sharedSource.includes('kyoto'));
+assert.ok(!sharedSource.includes('tokyo'));
+assert.ok(app.includes("get('geometry')==='shared'"));
+
+
 assert.ok(!app.includes('RaceCleanDistanceCamera'));
 assert.ok(!app.includes('ctx.drawImage('));
 assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-20'));
@@ -186,8 +197,9 @@ assert.ok(!app.includes('const IMAGE_SCALE=4'));
 assert.ok(!app.includes('track(map.ctx,overview)'));
 assert.ok(app.includes("scale:(w<540?8.8:9.7)*"));
 assert.ok(app.includes('RaceSimEngine.create('));
-assert.ok(html.includes('race-clean-turf-mask-v1.js?v=20261019-17'));
+assert.ok(html.includes('race-clean-turf-mask-v1.js?v=20261019-21'));
 const surface=fs.readFileSync(root+'race-clean-turf-mask-v1.js','utf8');
+assert.ok(surface.includes('activateSharedGeometry'));
 assert.ok(surface.includes('greenPixels++'));
 assert.ok(!surface.includes('image.naturalWidth!==W'));
 assert.ok(surface.includes('image.naturalWidth<=0'));
