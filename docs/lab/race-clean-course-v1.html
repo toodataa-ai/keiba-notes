@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#192d2c">
-<title>新コース方式・18頭検証｜JRAシミュレータLAB</title>
-<link rel="stylesheet" href="race-clean-course-v1.css?v=20261019-15">
+<title>実況＋全体図・秋華賞17頭｜JRAシミュレータLAB</title>
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261019-23">
 </head><body>
 <header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
 <h1>京都芝2000m内回り｜新コース方式</h1>
 <p id="labDescription">LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">LAB v22・実出走馬17頭の仮想レース検証／既存18頭も維持／未承認</div>
+<div class="tag">LAB v23・実況と全体図を統合／全馬時計・推定着差／未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <label>出走馬<select id="trialMode" aria-label="出走馬データを切り替える">
 <option value="synthetic">架空18頭（従来テスト）</option>
@@ -20,30 +20,40 @@
 <label>速度<select id="speed"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="4">4倍</option></select></label>
 </section>
 <p class="trial-description" id="trialDescription">架空18頭の比較テスト。</p>
-<section class="panel">
-<div class="panel-title"><h2>実況ビュー</h2><span id="progress">0m / 2000m</span></div>
+<section class="panel race-display-panel">
+<div class="panel-title"><h2>実況 ＋ 全体図</h2><span id="progress">0m / 2000m</span></div>
+<div class="race-view-grid" aria-label="実況と全体図の同時表示">
+<div class="race-broadcast-view">
+<div class="race-view-label">実況ビュー</div>
 <div class="broadcast-stage" id="broadcastStage">
 <img id="liveCourseImage" width="620" height="430" loading="eager" decoding="async" alt="" aria-hidden="true" src="assets/kyoto-umapot-course-clean-v8.svg">
-<canvas id="broadcast" role="img" aria-label="うまぽっと原画像上を18頭の馬番丸が走る実況"></canvas>
-<canvas id="goalCamera" class="goal-camera" role="img" aria-label="京都1400式ゴール板固定カメラ。全馬番が右から左へゴール線を通過" hidden></canvas>
+<canvas id="broadcast" role="img" aria-label="元SVG上を馬番が走る実況"></canvas>
+<canvas id="goalCamera" class="goal-camera" role="img" aria-label="ゴール板固定カメラ" hidden></canvas>
+<div class="broadcast-clock" aria-label="シミュレーションの時計"><strong id="clock">0.00.0</strong>
+<div class="broadcast-split"><span id="splitLabel">1000m 通過</span><strong id="splitTime">—</strong></div></div>
 <div class="finish-banner" id="finishBanner" role="status" aria-live="polite" hidden>
- <strong id="finishHeading">全馬ゴール・余走中</strong>
- <span id="finishPodium"></span>
+<strong id="finishHeading">ゴール速報</strong><span id="finishPodium"></span></div>
 </div>
+<div class="status"><span id="section">スタート直後の直線</span><span>仮想展開</span></div>
 </div>
-<div class="status"><span id="section">スタート直後の直線</span><span id="clock">0.0秒</span></div>
-<div class="order-note" id="orderNote" aria-live="off">先頭からの並びを読みやすく表示します</div>
-<div class="running-order" id="runningOrder" aria-label="全18頭の現在の隊列"></div>
-</section>
-<section class="panel">
-<div class="panel-title"><h2>全体図（実コース画像）</h2><span>うまぽっと原画像・共通馬番位置</span></div>
+<div class="race-overview-view">
+<div class="race-view-label">全体図（実況と同期）</div>
 <div class="real-overview">
 <img id="realCourseImage" width="620" height="430" loading="eager" decoding="async" alt="うまぽっとの京都競馬場主要コース原画像" src="assets/kyoto-umapot-course-clean-v8.svg">
-<canvas id="overview" role="img" aria-label="うまぽっと実コース図に馬番を重ねた全体図"></canvas>
+<canvas id="overview" role="img" aria-label="コース全体図に重ねた全馬位置"></canvas></div>
+<div class="status"><span>元SVG（無変形）</span><span>右回り・内回り</span></div>
 </div>
-<p class="source-credit">元図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと 京都競馬場コース素材（PowerPoint）</a>。コース図形は原本のまま、文字・GOAL・矢印などコース以外の4レイヤーを除去した鮮明な無地SVGを使用しています。</p>
-<div class="status"><span>原画像＋馬番のみ</span><span>右回り・内回り</span></div>
+</div>
+<p class="source-credit">元図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと 京都競馬場コース素材</a>。ベクターSVGの図形や境界線は描き直さず、元画像のまま拡大表示します。</p>
+<div class="legacy-order-telemetry" hidden aria-hidden="true"><div class="order-note" id="orderNote"></div>
+<div class="running-order" id="runningOrder"></div></div>
 </section>
+<section class="panel full-results" id="fullResults" hidden>
+<div class="panel-title"><h2>全馬の走破タイム・着差（仮想）</h2><span>全馬ゴール時に表示</span></div>
+<div class="full-results-scroll"><table class="finish-times-table">
+<thead><tr><th>順位</th><th>馬番</th><th>馬名</th><th>タイム</th><th>前馬との着差</th><th>1着との差</th></tr></thead>
+<tbody id="resultsBody"></tbody></table></div>
+<p class="results-note">馬身差はゴール時の推定速度と時間差から、1馬身=約2.4mとして換算。公式の着差ではありません。</p></section>
 <section class="panel"><div class="panel-title"><h2 id="horseGridTitle">架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
 <section class="panel benchmark-panel" id="benchmarkPanel" hidden>
 <div class="panel-title"><h2>実レースとの比較（観測結果は入力に不使用）</h2><span>2026年秋華賞</span></div>
@@ -75,6 +85,7 @@
 <script src="race-clean-turf-mask-v1.js?v=20261019-21"></script>
 <script src="race-clean-goal-view-v1.js?v=20261019-20"></script>
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
-<script src="race-clean-course-app-v1.js?v=20261019-22"></script>
+<script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
+<script src="race-clean-course-app-v1.js?v=20261019-23"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

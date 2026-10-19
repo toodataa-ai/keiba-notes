@@ -18,6 +18,8 @@ let fixture=trialMode===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
 let entries=fixture.horses();
 let race={...fixture.entry(),horses:entries};
 let postraceBenchmarkVisible=false;
+const hud=window.RaceBroadcastHud,resultCache={signature:''};
+function hudElements(){return {clock:$('clock'),split:$('splitTime'),splitLabel:$('splitLabel'),banner:$('finishBanner'),heading:$('finishHeading'),podium:$('finishPodium'),results:$('fullResults'),rows:$('resultsBody')}}
 const trialIsReal=()=>trialMode===REAL_TRIAL;
 // Ported faithfully from working Kyoto 1400 RaceSimNumbers.marker.
 const JRA_WAKU=Object.freeze([
@@ -194,6 +196,7 @@ function reset(){
  cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();
  finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
  const banner=$('finishBanner');if(banner)banner.hidden=true;
+ resultCache.signature='';$('fullResults').hidden=true;$('resultsBody').replaceChildren();
  $('startBtn').textContent='▶ スタート';
  paint();
 }
@@ -489,22 +492,13 @@ function paint(){
  markers(map.ctx,points,overview,chosen,true);
  updateRunningOrder(points,chosen);
  $('progress').textContent=Math.round(state.leader)+'m / 2000m';
- $('clock').textContent=state.t.toFixed(1)+'秒';
+ hud.render(state,hudElements(),resultCache);
  $('section').textContent=(state.allCrossedAt!==null?'全馬ゴール・余走中':
    state.goalCamera?'ゴール板固定カメラ':model.center(state.leader).section)+
    ' ／ 内4列 '+state.horses.filter(h=>h.lane<=3.45).length+'頭'+
    ' ／ 内へ '+state.totalInsideMoves+'回';
- const banner=$('finishBanner');
- if(banner&&finishSequenceActive){
-  const p=Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS);
-  banner.hidden=p<.30;
-  if(!banner.hidden){
-   const podium=state.horses.slice().filter(h=>h.finishTime!==null)
-    .sort((a,b)=>a.finishTime-b.finishTime).slice(0,3);
-   $('finishHeading').textContent=finishSequenceDone?'全馬ゴール・余走終了':'全馬ゴール・余走中';
-   $('finishPodium').textContent=podium.map((h,i)=>(i+1)+'着 '+h.number+'番').join('　');
-  }
- }else if(banner){banner.hidden=true}
+ // Shared HUD shows each simulated horse at the actual wire crossing.
+
 }
 function tick(ts){
  if(!last)last=ts;
@@ -531,7 +525,7 @@ function tick(ts){
  requestAnimationFrame(tick);
 }
 function setup(){
- if(!FIXTURE_REAL||FIXTURE_REAL.horses().length!==17)
+ if(!hud||!FIXTURE_REAL||FIXTURE_REAL.horses().length!==17)
   throw Error('REAL_SHUKA_PRESTART_FIXTURE_MISSING');
  for(const id of ['realCourseImage','liveCourseImage']){
   const img=$(id);
@@ -630,6 +624,10 @@ window.CleanLab=Object.freeze({
      lane:p.lane-(engine.state.horses.find(h=>h.number===p.number)?.lane||0)
    })),
    highResolutionMode:'publisher-original-svg-not-resampled-jpeg',
+   broadcastClock:$('clock').textContent,splitClock:$('splitTime').textContent,
+   podiumNames:$('finishPodium').textContent,allResultRows:$('resultsBody').children.length,
+   resultsVisible:!$('fullResults').hidden,combinedRaceView:!!document.querySelector('.race-view-grid'),
+   leaderboardDisplayed:false,
    normalBroadcastZoom:8.8,normalDesktopZoom:9.7,
    unchangedBackgroundAffineOnly:true,
    actualNumberCircles:true,paintedTrack:false,leaderLines:false,

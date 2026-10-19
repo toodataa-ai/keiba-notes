@@ -70,3 +70,44 @@ canvas{display:block;width:100%;background:#f4f6f0}
 .horsechip.is-real strong{display:inline-flex;width:23px;min-width:23px;height:23px;align-items:center;justify-content:center;font-size:13px}
 .horsechip.is-real small{font-weight:750;line-height:1.2;overflow-wrap:anywhere}
 @media(max-width:540px){#trialMode{width:210px;max-width:100%}#horseGrid.real-field{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* LAB v23: course-independent shared broadcast layout; source SVG unchanged */
+.shell{max-width:1220px}
+.race-view-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)}
+.race-broadcast-view,.race-overview-view{min-width:0}
+.race-overview-view{border-left:1px solid #dce5de;background:#fbfdfb}
+.race-view-label{font-size:12px;font-weight:800;color:#315b46;background:#eaf3ec;padding:7px 12px}
+.race-display-panel .broadcast-stage{height:435px}
+.race-overview-view .real-overview{aspect-ratio:620/430}
+.broadcast-stage #liveCourseImage{will-change:auto;image-rendering:auto}
+.race-overview-view .real-overview img{image-rendering:auto}
+.broadcast-clock{position:absolute;z-index:5;right:12px;top:12px;min-width:150px;
+ text-align:right;padding:10px 13px;background:rgba(17,29,24,.90);color:white;
+ border-radius:9px;pointer-events:none;font-variant-numeric:tabular-nums;
+ box-shadow:0 3px 10px rgba(0,0,0,.22)}
+.broadcast-clock #clock{display:block;font-weight:900;font-size:clamp(31px,3.5vw,45px);
+ line-height:1.13;white-space:nowrap}
+.broadcast-split{margin-top:7px;padding-top:6px;border-top:1px solid #82928c;
+ display:flex;justify-content:flex-end;align-items:center;gap:9px;font-size:12px}
+.broadcast-split strong{font-size:21px;white-space:nowrap}
+.broadcast-clock #splitLabel{white-space:nowrap}
+.finish-banner:not([hidden]){z-index:6;display:flex;flex-direction:column;bottom:12px;
+ left:8px;right:8px;background:rgba(16,41,28,.94);gap:3px;text-align:center}
+.finish-banner span{font-size:clamp(12px,1.5vw,17px);line-height:1.45}
+.legacy-order-telemetry[hidden],.full-results[hidden]{display:none!important}
+.full-results-scroll{overflow-x:auto}
+.finish-times-table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+.finish-times-table th,.finish-times-table td{padding:9px 10px;text-align:left;border-bottom:1px solid #dce5de}
+.finish-times-table th{background:#eaf3ec;white-space:nowrap}
+.finish-times-table td:nth-child(n+4){white-space:nowrap}
+.finish-times-table tbody tr:first-child{font-weight:900;background:#f3f9f1}
+.results-note{padding:10px 12px;color:#536459;font-size:11px;margin:0;line-height:1.6}
+@media(max-width:760px){
+ .race-view-grid{grid-template-columns:1fr}
+ .race-overview-view{border-left:0;border-top:2px solid #dce5de}
+ .race-display-panel .broadcast-stage{height:356px}
+ .broadcast-clock{right:8px;top:8px;min-width:139px;padding:8px 10px}
+ .broadcast-clock #clock{font-size:35px}
+ .broadcast-split strong{font-size:19px}
+ .finish-banner span{font-size:13px}
+}
