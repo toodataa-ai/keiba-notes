@@ -1,4 +1,4 @@
-/* LAB v20: clearer same-size runner circles and no subpixel camera/number trembling; source SVG unchanged.
+/* LAB v22: source-authenticated real-runner fixture + independent postrace benchmark in LAB only; original SVG untouched.
  * Source bitmap is never redrawn as an approximate course. A browser-local,
  * fourfold high-quality resample is a display cache, not a new detailed source.
  * Only synthetic 18-horse data; no official prediction/odds/bets/PDF changes.
@@ -7,9 +7,18 @@
 const $=id=>document.getElementById(id);
 const model=window.RaceCleanCourse;
 const turf=window.RaceCleanTurf;
-const fixture=window.RaceLab18Fixture;
-const entries=fixture.horses();
-const race={...fixture.entry(),horses:entries};
+// Actual Oct 18 entrants are used ONLY on explicit selection. The real
+// finish positions / laps belong to a wholly separate holdout reference.
+const FIXTURE_SYNTHETIC=window.RaceLab18Fixture;
+const FIXTURE_REAL=window.RaceRealShuka2026Fixture;
+const REAL_TRIAL='shuka2026';
+let trialMode=new URLSearchParams(location.search).get('trial')===REAL_TRIAL?
+ REAL_TRIAL:'synthetic';
+let fixture=trialMode===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
+let entries=fixture.horses();
+let race={...fixture.entry(),horses:entries};
+let postraceBenchmarkVisible=false;
+const trialIsReal=()=>trialMode===REAL_TRIAL;
 // Ported faithfully from working Kyoto 1400 RaceSimNumbers.marker.
 const JRA_WAKU=Object.freeze([
  {name:'白',fill:'#fffdf5',text:'#111827',border:'#111827'},
@@ -68,7 +77,7 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
  return {number,x,y,waku:waku.waku};
 }
 
-function waku(no){const w=jraWaku(no,18);return {fill:w.fill,ink:w.text};}
+function waku(no){const w=jraWaku(no,race.field_size);return {fill:w.fill,ink:w.text};}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  lastCamera=null,lastPaintCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
  visualLaneState=new Map(),visualRenderTime=null,
@@ -82,6 +91,103 @@ const CURVE_LENS_ENABLED=new URLSearchParams(location.search).get('lens')!=='off
  // Append ?geometry=legacy to revert instantly; no production change.
 const SHARED_IMAGE_GEOMETRY=new URLSearchParams(location.search).get('geometry')!=='legacy';
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
+function rebuildFixtureUi(){
+ const focus=$('focus');
+ focus.innerHTML='<option value="leader">先頭</option>';
+ for(const h of entries){
+  const opt=document.createElement('option');opt.value=String(h.number);
+  opt.textContent=h.number+'番'+(trialIsReal()?' '+h.name:'');
+  focus.appendChild(opt);
+ }
+ focus.value='leader';focusNo='leader';
+ const grid=$('horseGrid');grid.innerHTML='';
+ grid.classList.toggle('real-field',trialIsReal());
+ for(const h of entries){
+  const col=waku(h.number),chip=document.createElement('div');
+  chip.className='horsechip'+(trialIsReal()?' is-real':'');
+  chip.style.background=col.fill;chip.style.color=col.ink;
+  const number=document.createElement('strong');number.textContent=h.number;
+  chip.appendChild(number);
+  if(trialIsReal()){
+   const name=document.createElement('small');name.textContent=h.name;
+   chip.appendChild(name);
+  }
+  chip.title=h.number+'番 '+h.name;
+  grid.appendChild(chip);
+ }
+ const host=$('runningOrder');host.innerHTML='';delete host.dataset.ready;
+ const real=trialIsReal();
+ $('trialMode').value=trialMode;
+ $('labDescription').textContent=real?
+  '2026年10月18日・秋華賞｜発走前に記録された実出走馬17頭で仮想シミュレーション。実際のレースの再現映像ではありません。':
+  'LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。';
+ $('horseGridTitle').textContent=real?'2026年秋華賞・実出走馬17頭':'架空18頭の馬番';
+ $('trialDescription').textContent=real?
+  '出走馬・前走位置取り・能力9項目は発走前保存データ。今回の着順や結果ラップは走行計算に使用しません。':
+  '架空18頭の比較テスト。実レースデータは読み込んでいません。';
+ $('benchmarkPanel').hidden=!real;
+ $('benchmarkResults').hidden=true;
+ $('compareBtn').textContent='JRA公式結果と比較（別データ）';
+ postraceBenchmarkVisible=false;
+}
+function switchTrial(next){
+ if(next!==REAL_TRIAL&&next!=='synthetic')return;
+ trialMode=next;fixture=next===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
+ entries=fixture.horses();
+ race={...fixture.entry(),horses:entries};
+ rebuildFixtureUi();
+ reset();
+}
+function compareWithOfficialResult(){
+ // Separate, postrace-only readout. Never call this function from reset,
+ // physical stepping, lane control or prestart fixture construction.
+ if(!trialIsReal())return;
+ const ref=window.RaceRealShuka2026Reference;
+ if(!ref||ref.race_id!==race.source_report?.match(/shuka-sho/)?.[0]&&
+    ref.race_id!=='2026-10-18-shuka-sho')
+  throw Error('OFFICIAL_POSTRACE_HOLDOUT_MISSING');
+ const sim=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
+ const orders=[],splitTargets=[1000,...ref.officialCorners.map(c=>c.distanceApprox)]
+  .sort((a,b)=>a-b);
+ let i=0,loops=0,splitTime=null,splitPace=null;
+ while(i<splitTargets.length&&loops++<3200&&!sim.state.finished){
+  if(sim.state.leader>=splitTargets[i]){
+   const distance=splitTargets[i];
+   if(distance===1000){splitTime=sim.state.t;splitPace=sim.state.splitPaceBand||sim.state.paceBand;}
+   else orders.push({distance,order:sim.state.horses.slice()
+    .sort((a,b)=>b.d-a.d||a.number-b.number).map(h=>h.number)});
+   i++;
+  }else sim.step(.08);
+ }
+ if(orders.length!==4||splitTime===null)throw Error('BENCHMARK_MILESTONE_MISSING');
+ const root=$('benchmarkResults');root.innerHTML='';
+ const note=document.createElement('p');
+ note.textContent='観測されたJRA公式のコーナー通過順・ラップと仮想レースの隊列を照合します。実際の結果はエンジンへ入力していません。';
+ root.appendChild(note);
+ const table=document.createElement('table');table.className='benchmark-table';
+ const thead=document.createElement('thead');
+ thead.innerHTML='<tr><th>地点</th><th>JRA公式（先頭5頭）</th><th>仮想走行（先頭5頭）</th></tr>';
+ table.appendChild(thead);
+ const tbody=document.createElement('tbody');
+ for(const corner of ref.officialCorners){
+  const actual=corner.order.slice(0,5);
+  const virtual=orders.find(o=>Math.abs(o.distance-corner.distanceApprox)<1e-6).order.slice(0,5);
+  const row=document.createElement('tr');
+  for(const value of [corner.label,actual.join('・'),virtual.join('・')]){
+   const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);
+  }
+  tbody.appendChild(row);
+ }
+ table.appendChild(tbody);root.appendChild(table);
+ const time=document.createElement('p');
+ time.textContent='1000m通過（先頭）：JRA実際 '+ref.cumulative200m[4].toFixed(1)+'秒 ／ 仮想 '+
+  splitTime.toFixed(1)+'秒（仮想ペース '+splitPace+'）。実際の通過地点とシミュレータの距離目盛りには近似差があります。';
+ root.appendChild(time);
+ const source=document.createElement('a');
+ source.href=ref.source_url;source.target='_blank';source.rel='noopener noreferrer';
+ source.textContent='出典：JRA 第31回秋華賞・公式レース結果';
+ root.appendChild(source);
+}
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
  playing=false;last=0;acc=0;lastCamera=null;lastPaintCamera=null;lastRenderedPoints=[];
@@ -286,7 +392,7 @@ function markers(ctx,points,loc,focused,mini=false){
   const scale=mini?.48:(points.length>=12?(compact?.78:.84):.90);
   const radius=13.5*scale;
   if(x+radius<0||x-radius>loc.w||y+radius<0||y-radius>loc.h)continue;
-  raceNumberMarker(ctx,p.number,x,y,scale,p.number===focused,false,18,false);
+  raceNumberMarker(ctx,p.number,x,y,scale,p.number===focused,false,race.field_size,false);
   displayed.push({...p,x,y,r:radius});
  }
  return displayed;
@@ -298,7 +404,8 @@ function updateRunningOrder(points,chosen){
   for(const p of points){
    const btn=document.createElement('button');
    btn.type='button';btn.className='position-chip';btn.dataset.horse=p.number;
-   btn.setAttribute('aria-label',p.number+'番を追跡');
+   const horse=entries.find(h=>h.number===p.number);
+   btn.setAttribute('aria-label',p.number+'番'+(horse?' '+horse.name:'')+'を追跡');
    btn.addEventListener('click',()=>{
     focusNo=String(p.number);$('focus').value=focusNo;
     lastCamera=null;paint();
@@ -315,7 +422,8 @@ function updateRunningOrder(points,chosen){
   chip.style.backgroundColor=col.fill;
   chip.style.color=col.ink;
   chip.classList.toggle('is-focus',p.number===chosen);
-  chip.title=(i+1)+'番手・'+p.number+'番を追跡';
+  const horse=entries.find(h=>h.number===p.number);
+  chip.title=(i+1)+'番手・'+p.number+'番 '+(horse?.name||'')+'を追跡';
   host.appendChild(chip);
  }
  $('orderNote').textContent='左から先頭順 / '+order.length+'頭。タップで追跡';
@@ -370,7 +478,7 @@ function paint(){
    lastGoalFrame=window.RaceCleanGoalView.render({
     canvas:goalCanvas,points,leaderNo:state.leadingNo,focusedNo:chosen,
     paintNumber:raceNumberMarker,maxLane:14,distance:2000,turn:'右',
-    fieldSize:18,pullback:1+.22*eased
+    fieldSize:race.field_size,pullback:1+.22*eased
    });
   }else lastGoalFrame=null;
  }
@@ -423,6 +531,8 @@ function tick(ts){
  requestAnimationFrame(tick);
 }
 function setup(){
+ if(!FIXTURE_REAL||FIXTURE_REAL.horses().length!==17)
+  throw Error('REAL_SHUKA_PRESTART_FIXTURE_MISSING');
  for(const id of ['realCourseImage','liveCourseImage']){
   const img=$(id);
   if(!img)throw Error('ORIGINAL_VECTOR_MISSING');
@@ -430,13 +540,15 @@ function setup(){
   img.addEventListener('error',()=>{originalError=true;vectorReady=false});
  }
  verifyVectorSource();
- $('focus').insertAdjacentHTML('beforeend',fixture.horses().map(h=>
-   '<option value="'+h.number+'">'+h.number+'番</option>').join(''));
- $('horseGrid').innerHTML=fixture.horses().map(h=>{
-  const col=waku(h.number);
-  return '<div class="horsechip" style="background:'+col.fill+';color:'+col.ink+
-   '">'+h.number+'</div>';
- }).join('');
+ rebuildFixtureUi();
+ $('trialMode').addEventListener('change',e=>switchTrial(e.target.value));
+ $('compareBtn').addEventListener('click',()=>{
+  postraceBenchmarkVisible=!postraceBenchmarkVisible;
+  $('benchmarkResults').hidden=!postraceBenchmarkVisible;
+  $('compareBtn').textContent=postraceBenchmarkVisible?'結果比較を閉じる':
+   'JRA公式結果と比較（別データ）';
+  if(postraceBenchmarkVisible)compareWithOfficialResult();
+ });
  $('focus').addEventListener('change',e=>{
   focusNo=e.target.value;lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;
   visualLaneState.clear();visualRenderTime=null;paint();
@@ -459,6 +571,10 @@ function setup(){
 }
 window.CleanLab=Object.freeze({
  getState:()=>engine?.state,
+ setTrial:mode=>{switchTrial(mode);return trialMode},
+ trial:()=>({id:trialMode,fixtureId:fixture.id,fieldSize:race.field_size,
+  names:entries.map(h=>({number:h.number,name:h.name,style:h.style})),
+  prestart:trialIsReal(),postraceComparisonVisible:postraceBenchmarkVisible}),
  // Cheap, per-animation-frame diagnostic for REAL 4x playback QA.
  frameSample:()=>({t:engine?.state?.t??0,playing,zoom:lastCamera?.scale??0,
   camera:lastCamera?{x:lastCamera.x,y:lastCamera.y}:null,
@@ -476,6 +592,8 @@ window.CleanLab=Object.freeze({
   const rect=$('overview').getBoundingClientRect();
   const image=$('realCourseImage');
   return {leader:engine.state.leader,positions:points,
+   trialMode,fixtureId:fixture.id,raceFieldSize:race.field_size,
+   realPrestartOnly:trialIsReal(),
    originalImageSrc:image?.getAttribute('src')||null,
    originalLoaded:sourceImageReady(image),
    liveImageLoaded:sourceImageReady($('liveCourseImage')),

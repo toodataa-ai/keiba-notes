@@ -54,3 +54,19 @@ canvas{display:block;width:100%;background:#f4f6f0}
  * It overlays (never alters) the source SVG & visual horse coordinates. */
 .goal-camera{position:absolute;inset:0;display:block;width:100%;height:100%;z-index:2;background:#244736}
 .goal-camera[hidden]{display:none}
+
+/* LAB v22: reversible actual-prestart entrant trial, original vector unchanged */
+.trial-description{font-size:11px;color:#355a45;padding:4px 2px 8px;margin:0;line-height:1.6}
+#trialMode{max-width:260px}
+.benchmark-panel[hidden],#benchmarkResults[hidden]{display:none}
+.benchmark-body{padding:12px;font-size:12px;color:#425b4b;line-height:1.65}
+.benchmark-body p{margin:0 0 9px}
+.benchmark-table{border-collapse:collapse;width:100%;margin:12px 0;font-variant-numeric:tabular-nums}
+.benchmark-table th,.benchmark-table td{border-bottom:1px solid #dde7dd;text-align:left;padding:9px 5px;vertical-align:top}
+.benchmark-table th{font-size:11px;color:#445b4b;background:#f4f8f4}
+.benchmark-body a{color:#166341}
+#horseGrid.real-field{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.horsechip.is-real{display:flex;align-items:center;gap:7px;text-align:left;padding:8px 5px;min-width:0;line-height:1.4}
+.horsechip.is-real strong{display:inline-flex;width:23px;min-width:23px;height:23px;align-items:center;justify-content:center;font-size:13px}
+.horsechip.is-real small{font-weight:750;line-height:1.2;overflow-wrap:anywhere}
+@media(max-width:540px){#trialMode{width:210px;max-width:100%}#horseGrid.real-field{grid-template-columns:repeat(2,minmax(0,1fr))}}

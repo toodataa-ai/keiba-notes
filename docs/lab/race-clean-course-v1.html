@@ -6,15 +6,20 @@
 </head><body>
 <header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
 <h1>京都芝2000m内回り｜新コース方式</h1>
-<p>LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・実馬・買い目・払戻とは無関係です。</p>
+<p id="labDescription">LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">LAB v21・汎用コース距離エンジンを標準搭載／元の背景SVG・物理不変／未承認</div>
+<div class="tag">LAB v22・実出走馬17頭の仮想レース検証／既存18頭も維持／未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
+<label>出走馬<select id="trialMode" aria-label="出走馬データを切り替える">
+<option value="synthetic">架空18頭（従来テスト）</option>
+<option value="shuka2026">2026年秋華賞・実出走馬17頭</option>
+</select></label>
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
 <label>速度<select id="speed"><option value="1">1倍</option><option value="2" selected>2倍</option><option value="4">4倍</option></select></label>
 </section>
+<p class="trial-description" id="trialDescription">架空18頭の比較テスト。</p>
 <section class="panel">
 <div class="panel-title"><h2>実況ビュー</h2><span id="progress">0m / 2000m</span></div>
 <div class="broadcast-stage" id="broadcastStage">
@@ -34,18 +39,25 @@
 <div class="panel-title"><h2>全体図（実コース画像）</h2><span>うまぽっと原画像・共通馬番位置</span></div>
 <div class="real-overview">
 <img id="realCourseImage" width="620" height="430" loading="eager" decoding="async" alt="うまぽっとの京都競馬場主要コース原画像" src="assets/kyoto-umapot-course-clean-v8.svg">
-<canvas id="overview" role="img" aria-label="うまぽっと実コース図に架空18頭の馬番を重ねた全体図"></canvas>
+<canvas id="overview" role="img" aria-label="うまぽっと実コース図に馬番を重ねた全体図"></canvas>
 </div>
 <p class="source-credit">元図：<a href="https://umapot.com/?p=13277" target="_blank" rel="noopener noreferrer">うまぽっと 京都競馬場コース素材（PowerPoint）</a>。コース図形は原本のまま、文字・GOAL・矢印などコース以外の4レイヤーを除去した鮮明な無地SVGを使用しています。</p>
 <div class="status"><span>原画像＋馬番のみ</span><span>右回り・内回り</span></div>
 </section>
-<section class="panel"><div class="panel-title"><h2>架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
+<section class="panel"><div class="panel-title"><h2 id="horseGridTitle">架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
+<section class="panel benchmark-panel" id="benchmarkPanel" hidden>
+<div class="panel-title"><h2>実レースとの比較（観測結果は入力に不使用）</h2><span>2026年秋華賞</span></div>
+<div class="benchmark-body"><p>まず発走前データだけで仮想レースを走らせ、その後にJRA公式のコーナー通過順や1000m通過を照合できます。</p>
+<button id="compareBtn" type="button">JRA公式結果と比較（別データ）</button>
+<div id="benchmarkResults" hidden></div></div>
+</section>
 <section class="panel notes">
 <p><strong>今回の検証点：</strong>コース形状は原画像と完全に同じものを使い、画像の変形は等倍率の拡大・平行移動のみ。走行位置の内部座標と18頭の丸番号の視認性を検証します。</p>
 <p>実況のコースは一切描き直しません。うまぽっと原本PowerPointのコース図形から直接書き出したベクターSVGを全体図・実況の双方で使用します。JPEGの4倍引き伸ばしをやめたため、ズームしても線が鮮明です。不要な注記や矢印はありません。</p>
 <p><strong>馬番そのものが走る：</strong>実況の馬番をスマホは約15%、PCは約11%大きくしました。背景SVGと馬番の画面位置を同じピクセル基準にそろえ、物理演算の更新間隔をまたぐ表示位置も滑らかにしています。普段の実況は従来より近く、スマホで7.0倍から8.8倍に拡大します。<strong>ゴール前80mで京都1400と同じゴール板固定カメラへ切り替え</strong>、右回りの京都では馬番が右から左へゴール板を通過します。ゴール後は緩やかな余走を映し、1〜3着を表示します。馬番は全馬同じ大きさです。</p>
 <p><strong>共通のコース距離補正 v21：</strong>コースID専用の補正値を使わず、元の走路線とコース距離基準点から画像上の進行量を共通計算します。3コーナー入口の1270〜1310mで、実際には縮む馬群が画面上で約29%伸びて見えていた現象を約6〜7%まで軽減しました。<strong>背景はうまぽっと原SVGのまま、京都1400共通の走行計算も変更なし。</strong> 比較のため <a href="?geometry=legacy&amp;checkpoint=1270&amp;v=21">従来方式を開く</a> こともできます。元のイラストの曲率に起因する見かけの伸縮は一部残ります。</p>
 <p><strong>走り方も京都1400と共通：</strong>RaceLaneAIとRaceSimEngineをそのまま利用。スタート後は衝突を避けて内へ寄り、内側が空けば内優先、詰まれば必要に応じて外へ。逃げ・先行・差し・追込、先行争いによるペース変化も従来ロジックを継承しています。</p>
+<p>実出走馬モードは当時の発走前記録を使用した仮想展開であり、実際のレース映像・通過順を再生するものではありません。実結果は比較用の別ファイルに隔離し、出走前入力の変更や後付け調整に使用しません。</p>
 <p>コース寸法はJRA芝Aコース基準（1周1,782.8m・最後の直線328.4m・初角まで308.7m・幅員27〜38m・内回り高低差3.1m）を参照。コースの形状はうまぽっと原画像に合わせたイラスト上の較正であり、測量図の精度ではありません。18頭の重なり・コース形状は目視承認前です。</p>
 <p>確認：<a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=585">585m</a> ／ <a href="?checkpoint=602">602m</a> ／ <a href="?checkpoint=640">640m</a> ／ <a href="?checkpoint=700">700m</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1672">直線入口</a></p>
 </section>
@@ -56,11 +68,13 @@
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
 <script src="race-sim-engine.js?v=20261016-41"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
+<script src="race-real-shuka-2026-fixture-v1.js?v=20261019-22"></script>
+<script src="race-real-shuka-2026-reference-v1.js?v=20261019-22"></script>
 <script src="race-clean-course-v1.js?v=20261018-14"></script>
 <script src="race-course-image-geometry-v1.js?v=20261019-21"></script>
 <script src="race-clean-turf-mask-v1.js?v=20261019-21"></script>
 <script src="race-clean-goal-view-v1.js?v=20261019-20"></script>
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
-<script src="race-clean-course-app-v1.js?v=20261019-21"></script>
+<script src="race-clean-course-app-v1.js?v=20261019-22"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
