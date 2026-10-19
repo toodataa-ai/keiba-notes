@@ -106,17 +106,39 @@ function build({image,course,guide,projection,geometry}){
   const low=a.low+(b.low-a.low)*t,high=boundedHigh(a)+(boundedHigh(b)-boundedHigh(a))*t;
   const f=projection.fraction((1.8+l*1.65)/27);
   const off=low+(high-low)*f;
-  let x=(a.inner.x+(b.inner.x-a.inner.x)*t)+(a.ux+(b.ux-a.ux)*t)*off,
-      y=(a.inner.y+(b.inner.y-a.inner.y)*t)+(a.uy+(b.uy-a.uy)*t)*off;
+  const baseX=a.inner.x+(b.inner.x-a.inner.x)*t,
+        baseY=a.inner.y+(b.inner.y-a.inner.y)*t,
+        ux=a.ux+(b.ux-a.ux)*t,uy=a.uy+(b.uy-a.uy)*t;
+  let x=baseX+ux*off,y=baseY+uy*off,corrected=0;
+  // Original green-border pixels may rasterize fractionally between two
+  // metre samples. Search ONLY toward the interior of the already selected
+  // source-derived corridor, never towards another green band. No course ID,
+  // corner anchor or hidden manual offset is consulted.
+  if(d<=distance&&!disc(x,y)){
+   const mid=(low+high)/2,sign=off<mid?1:-1;
+   let repaired=false;
+   for(let shift=.25;shift<=3.0;shift+=.25){
+    const local=off+sign*shift;
+    if(local<=low||local>=high)break;
+    const testX=baseX+ux*local,testY=baseY+uy*local;
+    if(disc(testX,testY)){x=testX;y=testY;corrected=shift;repaired=true;break}
+   }
+   if(!repaired)corrected=null;
+  }
   if(d>distance){const last=samples[distance],before=samples[distance-10],
     ux=last.inner.x-before.inner.x,uy=last.inner.y-before.inner.y,
     extra=d-distance;x+=ux*extra/10;y+=uy*extra/10;}
-  return {x,y,d,lane:l};
+  return {x,y,d,lane:l,corrected};
  }
- let checked=0,bad=0,maxProjectedStep=0,maxProjectedStepAt=0;
- for(let d=0;d<=distance;d+=5)for(const lane of [0,2,4,8,11,14]){
+ let checked=0,bad=0,maxProjectedStep=0,maxProjectedStepAt=0,maxSafeInsetCorrection=0;
+ // Inspect EVERY race metre and six representative lanes. A sparse 5m
+ // audit missed a borderline image transition on some rasterizers.
+ for(let d=0;d<=distance;d++)for(const lane of [0,2,4,8,11,14]){
   const p=position(d,lane);checked++;
-  if(!disc(p.x,p.y)){bad++;if(failures.length<20)failures.push({d,lane})}
+  if(!disc(p.x,p.y)||p.corrected===null){
+   bad++;if(failures.length<20)failures.push({d,lane});
+  }
+  if(p.corrected!==null)maxSafeInsetCorrection=Math.max(maxSafeInsetCorrection,p.corrected);
  }
  for(let d=1;d<=distance;d++)for(const lane of [0,2,4,8,11,14]){
   const a=position(d-1,lane),b=position(d,lane);
@@ -124,7 +146,7 @@ function build({image,course,guide,projection,geometry}){
   if(step>maxProjectedStep){maxProjectedStep=step;maxProjectedStepAt=d}
  }
  const report=Object.freeze({id:course.id,checked,badDiscs:bad,
-  typicalBandWidth,maxProjectedStep,maxProjectedStepAt,
+  typicalBandWidth,maxProjectedStep,maxProjectedStepAt,maxSafeInsetCorrection,
   maxGuideDeviation,maxCenterStep,maxCenterStepAt,minBandWidth,badSamples:failures,
   sourceUnchanged:true,corridorFromOriginalSvg:true,
   perCourseManualOffsets:0});
