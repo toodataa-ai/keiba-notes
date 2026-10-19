@@ -11,7 +11,7 @@ const race={...base,id:'outer-1400-hypothetical-18',
  race:'京都芝1400m外回り・架空18頭'};
 const STEP=RaceFrameInterpolator.STEP_SECONDS;
 let route=null,engine=null,playing=false,last=0,acc=0,prev=null,curr=null;
-let shown=[],camera=null,lastPaint=0,finishElapsed=0,blocked=null;
+let shown=[],camera=null,lastCameraTime=null,lastPaint=0,finishElapsed=0,blocked=null;
 const cache={signature:''};
 const markerVisibility=RaceMarkerVisibility.create();
 let visualMetrics=null;
@@ -40,7 +40,7 @@ function elements(){return{clock:$('clock'),split:$('splitTime'),splitLabel:$('s
 function capture(){return RaceFrameInterpolator.capture(engine.state.horses)}
 function reset(){
  engine=RaceSimEngine.create(race,{seed:2026,bias:'neutral'});
- prev=curr=capture();acc=0;last=0;playing=false;camera=null;shown=[];
+ prev=curr=capture();acc=0;last=0;playing=false;camera=null;lastCameraTime=null;shown=[];
  finishElapsed=0;cache.signature='';markerVisibility.reset();visualMetrics=null;
  $('resultsBody').replaceChildren();
  $('fullResults').hidden=true;$('startBtn').textContent='▶ スタート';draw();
@@ -91,27 +91,33 @@ function draw(){
  const state=engine.state,items=points();shown=items;
  const b=surface('broadcast'),m=surface('overview');
  const leaderD=Math.max(...items.map(h=>h.d));
+ // The same physical clock drives visual offsets AND camera smoothing.
+ // Repainting, pausing, or a faster display cannot advance their animation.
+ const visualTime=state.finished?state.t:
+   Math.max(0,state.t-STEP+Math.min(STEP,acc));
  const center=route.point(Math.max(0,Math.min(course.distance_m,leaderD-18)),3);
- if(!camera)camera={x:center.x,y:center.y};
- else{camera.x+=(center.x-camera.x)*.16;camera.y+=(center.y-camera.y)*.16}
- const zoom=b.w<540?9.75:10.55,dpr=b.ctx.getTransform().a||1;
- const left=Math.round((b.w*.54-camera.x*zoom)*dpr)/dpr;
- const top=Math.round((b.h*.51-camera.y*zoom)*dpr)/dpr;
+ if(!camera){camera={x:center.x,y:center.y};lastCameraTime=visualTime}
+ else{
+  const dt=Math.max(0,Math.min(.3,visualTime-(lastCameraTime??visualTime)));
+  const easing=1-Math.exp(-dt*6);
+  camera.x+=(center.x-camera.x)*easing;
+  camera.y+=(center.y-camera.y)*easing;
+  lastCameraTime=visualTime;
+ }
+ const zoom=b.w<540?9.75:10.55;
+ // Keep image and number positions in the SAME continuous coordinates.
+ // Snapping to DPR pixel boundaries introduced a 1-pixel stair-step.
+ const left=b.w*.54-camera.x*zoom;
+ const top=b.h*.51-camera.y*zoom;
  $('liveCourseImage').style.transform='translate('+left+'px,'+top+'px) scale('+zoom+')';
  const screen=items.map(h=>({...h,x:left+h.x*zoom,y:top+h.y*zoom}));
- const visible=markerVisibility.layout(screen,{normalAt:h=>{
+ const visible=markerVisibility.layout(screen,{timeSeconds:visualTime,normalAt:h=>{
   const a=route.point(Math.max(0,h.d-2),h.lane);
   const z=route.point(Math.min(course.distance_m,h.d+2),h.lane);
   return{x:-(z.y-a.y),y:z.x-a.x};
  }});
  visualMetrics=markerVisibility.metrics();
- RaceOverviewDistanceLabels.draw({ctx:m.ctx,point:route.point,
-  distance:course.distance_m,width:m.w,height:m.h,interval:200});
  for(const h of visible){
-  if(Math.abs(h.labelOffset)>4){
-   b.ctx.beginPath();b.ctx.moveTo(h.anchorX,h.anchorY);b.ctx.lineTo(h.x,h.y);
-   b.ctx.strokeStyle='rgba(28,61,43,.7)';b.ctx.lineWidth=1.1;b.ctx.stroke();
-  }
   if(h.x>=-18&&h.x<=b.w+18&&h.y>=-18&&h.y<=b.h+18)
    numbers(b.ctx,h.number,h.x,h.y,b.w<540?.78:.84,h.number===state.leadingNo);
  }
@@ -170,12 +176,14 @@ window.CrossCoursePilot=Object.freeze({
   const requested=Math.max(0,Math.min(course.distance_m-20,Number(distance)||0));
   playing=false;let i=0;
   while(engine.state.leader<requested&&!engine.state.finished&&i++<2500)engine.step(STEP);
-  prev=curr=capture();acc=0;shown=[];camera=null;draw();
+  prev=curr=capture();acc=0;shown=[];camera=null;lastCameraTime=null;
+  markerVisibility.reset();draw();
   return engine.state.leader;
  },
  inspect:()=>({courseId,blocked,ready:!!engine,playing,fieldSize:engine?.state.horses.length,
   source:RaceLabCourseRollout.get(courseId).svg,
- sharedVisualMode:true,visibilityMetrics:visualMetrics})
+ sharedVisualMode:true,markerTimeDriven:true,visualCameraTime:lastCameraTime,
+ visibilityMetrics:visualMetrics})
 });
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);
 else setup();
