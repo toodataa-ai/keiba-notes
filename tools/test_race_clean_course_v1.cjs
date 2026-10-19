@@ -162,7 +162,7 @@ const realRace=window.RaceSimEngine.create({...real.entry(),horses:real.horses()
 assert.equal(realRace.state.horses.length,17);
 let realPositions=0;
 for(let i=0;i<1900&&!realRace.state.finished;i++){
- realRace.step(.10);
+ realRace.step(.08);
  if(i%80===0){
   const names=realRace.state.horses.map(h=>h.name);
   assert.ok(names.includes('モンローウォーク'));
@@ -173,6 +173,7 @@ for(let i=0;i<1900&&!realRace.state.finished;i++){
 assert.ok(realRace.state.finished,'REAL_17_RUNNERS_MUST_FINISH');
 assert.equal(realRace.state.horses.filter(h=>h.finishTime!==null).length,17);
 assert.equal(realRace.state.nominalCruiseSpeedMps,16.65);
+
 assert.equal(sim.state.nominalCruiseSpeedMps,17.0);
 assert.ok(realRace.state.firstFinishTime>=116.5&&realRace.state.firstFinishTime<=119,
  'FILLY_RECORD_BREAKING_VIRTUAL_TIME_'+realRace.state.firstFinishTime);
@@ -217,6 +218,9 @@ assert.ok(html.includes('id="splitTime"'));
 assert.ok(html.includes('id="resultsBody"'));
 assert.ok(html.includes('legacy-order-telemetry'));
 assert.ok(app.includes('hud.render(state,hudElements(),resultCache)'));
+assert.ok(app.includes('engine.step(frameMotion.STEP_SECONDS);'));
+assert.ok(!app.includes('engine.step(.12)'));
+
 const hudSandbox={};
 vm.runInNewContext(fs.readFileSync(root+'race-broadcast-hud-v1.js','utf8'),{window:hudSandbox});
 const raceHud=hudSandbox.RaceBroadcastHud;

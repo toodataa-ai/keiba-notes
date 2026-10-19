@@ -209,7 +209,8 @@ function reset(){
 function advanceTo(distance){
  reset();
  let i=0;
- while(engine.state.leader<distance&&!engine.state.finished&&i++<1500)engine.step(.12);
+ while(engine.state.leader<distance&&!engine.state.finished&&i++<1500)
+  engine.step(frameMotion.STEP_SECONDS);
  // Seek is a jump in simulation time. Do NOT interpolate the camera from
  // the starting gate across 900 metres: it leaves every horse off-screen.
  lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;visualRenderTime=null;
