@@ -26,42 +26,66 @@ function build({image,course,guide,projection,geometry}){
    if(!isGreen(x+CLEARANCE*Math.cos(a),y+CLEARANCE*Math.sin(a)))return false;
   }return true;
  }
- const distance=course.distance_m,samples=[],failures=[];
- let prev=null,maxGuideDeviation=0,maxCenterStep=0,minBandWidth=Infinity;
- function crossSection(d){
-  const inner=guide(course,d,0),outer=guide(course,d,14);
-  const dx=outer.x-inner.x,dy=outer.y-inner.y,span=Math.hypot(dx,dy);
+ const distance=course.distance_m,samples=[],failures=[],candidates=[];
+ let maxGuideDeviation=0,maxCenterStep=0,maxCenterStepAt=0,minBandWidth=Infinity;
+ // Candidate safe green bands come directly from source SVG pixels.
+ // A global dynamic program, not per-corner tuning, keeps us on the SAME
+ // ribbon when an inner/outer track visually overlaps or briefly merges.
+ for(let d=0;d<=distance;d++){
+  const inner=guide(course,d,0),outer=guide(course,d,14),
+   dx=outer.x-inner.x,dy=outer.y-inner.y,span=Math.hypot(dx,dy);
   if(!Number.isFinite(span)||span<.5)throw Error('SOURCE_RAIL_DIRECTION_UNKNOWN_'+d);
-  const ux=dx/span,uy=dy/span;
-  const bands=[];let first=null,last=null;
+  const ux=dx/span,uy=dy/span,bands=[];let first=null,last=null;
   for(let i=0;i<=SCAN*4;i++){
    const t=-SCAN+i*STEP,x=inner.x+ux*t,y=inner.y+uy*t;
    if(disc(x,y)){if(first===null)first=t;last=t}
-   else if(first!==null){if(last-first>=MIN_WIDTH)bands.push({low:first,high:last});
-    first=null;last=null;}
+   else if(first!==null){
+    if(last-first>=MIN_WIDTH)bands.push({low:first,high:last});
+    first=null;last=null;
+   }
   }
   if(first!==null&&last-first>=MIN_WIDTH)bands.push({low:first,high:last});
   if(!bands.length)throw Error('SOURCE_TURF_BAND_NOT_FOUND_'+d);
-  const target=span*.44,prevT=prev?.mid??null;
-  // A single common optimizer chooses the nearest source-green band and
-  // follows it continuously. It cannot infer a different course by name.
-  bands.sort((a,b)=>{
-   function cost(c){const mid=(c.low+c.high)/2;
-    return Math.abs(mid-target)*.35+(prevT===null?0:Math.abs(mid-prevT)*1.3);}
-   return cost(a)-cost(b);
-  });
-  const band=bands[0],mid=(band.low+band.high)/2;
-  const center={x:inner.x+ux*mid,y:inner.y+uy*mid};
-  if(prev){
-   const move=Math.hypot(center.x-prev.center.x,center.y-prev.center.y);
-   maxCenterStep=Math.max(maxCenterStep,move);
-  }
-  maxGuideDeviation=Math.max(maxGuideDeviation,Math.abs(mid-target));
-  minBandWidth=Math.min(minBandWidth,band.high-band.low);
-  const output={inner,ux,uy,low:band.low,high:band.high,mid,center,source:d};
-  prev=output;return output;
+  const target=span*.44;
+  candidates.push(bands.map(b=>{
+   const mid=(b.low+b.high)/2;
+   return {inner,ux,uy,low:b.low,high:b.high,mid,
+    target,center:{x:inner.x+ux*mid,y:inner.y+uy*mid},source:d};
+  }));
  }
- for(let d=0;d<=distance;d++)samples.push(crossSection(d));
+ const dp=[],trace=[];
+ for(let d=0;d<candidates.length;d++){
+  const band=candidates[d],costs=[],choices=[];
+  for(const q of band){
+   const imageGuidePenalty=.016*(q.mid-q.target)**2;
+   if(d===0){costs.push(imageGuidePenalty);choices.push(-1);continue;}
+   let best=Infinity,index=-1;
+   for(let i=0;i<candidates[d-1].length;i++){
+    const prev=candidates[d-1][i],move=Math.hypot(
+     q.center.x-prev.center.x,q.center.y-prev.center.y);
+    // Strong preference for a physically continuous green ribbon rather
+    // than jumping to another course when their green strokes approach.
+    const candidate=dp[d-1][i]+move*move*5+imageGuidePenalty;
+    if(candidate<best){best=candidate;index=i}
+   }
+   costs.push(best);choices.push(index);
+  }
+  dp.push(costs);trace.push(choices);
+ }
+ let index=dp.at(-1).indexOf(Math.min(...dp.at(-1)));
+ for(let d=distance;d>=0;d--){
+  samples[d]=candidates[d][index];
+  index=trace[d][index];
+ }
+ for(let d=0;d<=distance;d++){
+  const p=samples[d];
+  maxGuideDeviation=Math.max(maxGuideDeviation,Math.abs(p.mid-p.target));
+  minBandWidth=Math.min(minBandWidth,p.high-p.low);
+  if(d){const q=samples[d-1];
+   const move=Math.hypot(p.center.x-q.center.x,p.center.y-q.center.y);
+   if(move>maxCenterStep){maxCenterStep=move;maxCenterStepAt=d}
+  }
+ }
  const anchors=[0,...course.segments.map(s=>s.to)];
  const geom=geometry.build({distanceM:distance,anchorsM:anchors,
   pointAt:(d,l)=>{const q=samples[Math.round(clamp(d,0,distance))];
@@ -89,7 +113,7 @@ function build({image,course,guide,projection,geometry}){
   if(!disc(p.x,p.y)){bad++;if(failures.length<20)failures.push({d,lane})}
  }
  const report=Object.freeze({id:course.id,checked,badDiscs:bad,
-  maxGuideDeviation,maxCenterStep,minBandWidth,badSamples:failures,
+  maxGuideDeviation,maxCenterStep,maxCenterStepAt,minBandWidth,badSamples:failures,
   sourceUnchanged:true,corridorFromOriginalSvg:true,
   perCourseManualOffsets:0});
  return Object.freeze({point:position,disc,report,geometry:geom});
