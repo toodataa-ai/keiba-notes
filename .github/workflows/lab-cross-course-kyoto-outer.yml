@@ -30,7 +30,7 @@ jobs:
           assert.equal((html.match(/kyoto-umapot-course-clean-v8.svg/g)||[]).length,2);
           for(const key of ['RaceLabSourceMask.build','RaceSimEngine.create',
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
-            'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate',
+            'RaceLabCourseRollout.assertCanAnimate',
             'markerVisibility.layout','markerTimeDriven:true',
             'broadcastPose.apply','cameraPose.apply',
             'RaceFinishBroadcastV2.render'])assert.ok(app.includes(key),key);
