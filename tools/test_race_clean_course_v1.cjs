@@ -157,7 +157,7 @@ assert.ok(sharedSource.includes('immutableSharedEngine:true'));
 assert.ok(!sharedSource.includes('1270'));
 assert.ok(!sharedSource.includes('kyoto'));
 assert.ok(!sharedSource.includes('tokyo'));
-assert.ok(app.includes("get('geometry')==='shared'"));
+assert.ok(app.includes("get('geometry')!=='legacy'"));
 
 
 assert.ok(!app.includes('RaceCleanDistanceCamera'));

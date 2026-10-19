@@ -78,7 +78,9 @@ let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfSta
 let lastGoalFrame=null,curveLensStats=null,curveLensError=null,
  sharedGeometryStats=null,sharedGeometryError=null;
 const CURVE_LENS_ENABLED=new URLSearchParams(location.search).get('lens')!=='off';
-const SHARED_IMAGE_GEOMETRY=new URLSearchParams(location.search).get('geometry')==='shared';
+// LAB v21 default: reusable course-independent arclength projection.
+ // Append ?geometry=legacy to revert instantly; no production change.
+const SHARED_IMAGE_GEOMETRY=new URLSearchParams(location.search).get('geometry')!=='legacy';
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
