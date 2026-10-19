@@ -21,7 +21,7 @@ function build({image,course,guide,projection,geometry,sourceSvgText,sourcePathI
    throw Error('SOURCE_ORIGINAL_PATH_TOPOLOGY_REQUIRED');
  const parsed=new DOMParser().parseFromString(sourceSvgText,'image/svg+xml');
  if(parsed.querySelector('parsererror'))throw Error('SOURCE_SVG_XML_INVALID');
- const root=parsed.documentElement,box=root.getAttribute('viewBox')?.trim().split(/\\s+/).map(Number);
+ const root=parsed.documentElement,box=root.getAttribute('viewBox')?.trim().split(/\s+/).map(Number);
  if(!box||box.length!==4||box.some(x=>!Number.isFinite(x))||box[2]<=0||box[3]<=0)
    throw Error('SOURCE_SVG_VIEWBOX_INVALID');
  const paths=[...parsed.querySelectorAll('path[stroke]')].filter(p=>
@@ -32,8 +32,8 @@ function build({image,course,guide,projection,geometry,sourceSvgText,sourcePathI
   const sourcePath=paths[index];
   if(!sourcePath)throw Error('SOURCE_SVG_PATH_UNAVAILABLE_'+index);
   const transformation=sourcePath.getAttribute('transform')||'matrix(1,0,0,1,0,0)';
-  const found=/matrix\\(([^)]+)\\)/.exec(transformation);
-  const values=found?.[1].split(/[\\s,]+/).map(Number);
+  const found=/matrix\(([^)]+)\)/.exec(transformation);
+  const values=found?.[1].split(/[\s,]+/).map(Number);
   if(!values||values.length!==6||values.some(x=>!Number.isFinite(x)))
    throw Error('SOURCE_SVG_PATH_TRANSFORM_UNSUPPORTED_'+index);
   layerCtx.setTransform(canvas.width/box[2],0,0,canvas.height/box[3],
