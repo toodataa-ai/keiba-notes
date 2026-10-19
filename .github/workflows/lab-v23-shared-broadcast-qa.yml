@@ -75,7 +75,8 @@ jobs:
               count:CleanLab.getState().horses.length,
               times:CleanLab.getState().horses.map(h=>h.finishTime),
               errors:CleanLab.inspect().turfBadDiscs,
-              clock:CleanLab.inspect().broadcastClock
+              clock:CleanLab.inspect().broadcastClock,
+              winnerClock:RaceBroadcastHud.clock(CleanLab.getState().firstFinishTime)
              })""")
              print('HUD_FINISH',engine,width,json.dumps({k:v for k,v in result.items() if k not in ('rows','times')},ensure_ascii=False))
              assert result['count']==17 and len(result['rows'])==17
@@ -85,6 +86,7 @@ jobs:
              assert result['rows'][0][0]=='1' and result['rows'][-1][0]=='17'
              for label,row in [('1着',result['rows'][0]),('2着',result['rows'][1]),('3着',result['rows'][2])]:
               assert label in result['winners'] and row[2] in result['winners']
+             assert result['clock']==result['winnerClock'],'Broadcast clock must freeze at first finish'
              assert result['errors']==0 and not errors,errors
              page.locator('#fullResults').screenshot(path=f'/tmp/lab-hud-artifacts/{engine}-{width}-all-17.png')
              page.locator('#trialMode').select_option('synthetic')

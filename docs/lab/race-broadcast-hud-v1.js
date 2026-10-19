@@ -17,7 +17,9 @@
   return {seconds,lengths:seconds*speed/METRES_PER_LENGTH};
  }
  function render(state,e,cache){
-  e.clock.textContent=clock(state.t);
+  // Stop the broadcast stopwatch on the virtual WINNER crossing,
+  // while keeping every trailing horse finishTime available for results.
+  e.clock.textContent=clock(state.firstFinishTime===null?state.t:state.firstFinishTime);
   e.split.textContent=state.splitTime===null?'—':clock(state.splitTime);
   e.splitLabel.textContent=state.splitDistanceM+'m 通過';
   const placed=finishers(state);

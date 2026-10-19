@@ -184,6 +184,8 @@ const hudSandbox={};
 vm.runInNewContext(fs.readFileSync(root+'race-broadcast-hud-v1.js','utf8'),{window:hudSandbox});
 const raceHud=hudSandbox.RaceBroadcastHud;
 assert.equal(raceHud.clock(60),'1.00.0');
+assert.ok(fs.readFileSync(root+'race-broadcast-hud-v1.js','utf8').includes('state.firstFinishTime===null?state.t:state.firstFinishTime'));
+assert.ok(Number.isFinite(realRace.state.firstFinishTime));
 assert.equal(raceHud.clock(119.98),'2.00.0');
 assert.equal(raceHud.clock(59.94),'0.59.9');
 const sorted=raceHud.finishers(realRace.state);
