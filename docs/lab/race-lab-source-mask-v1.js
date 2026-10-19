@@ -135,25 +135,33 @@ function build({image,course,guide,projection,geometry,sourceSvgText,sourcePathI
  const SOURCE_EDGE_BUFFER=2.0;
  function boundedLow(s){return Math.min(s.low+SOURCE_EDGE_BUFFER,s.high-1)}
  function boundedHigh(s){return Math.max(boundedLow(s)+1,Math.min(s.high,s.low+typicalBandWidth))}
+ // One continuous lateral pose interpolation is reused for BOTH axes
+ // and the distance map. Previously the map rounded d to a whole metre
+ // and its y-axis used a different corridor width; at x10 zoom that
+ // mismatch becomes visible as intermittent camera/marker tremor.
+ function rawSourcePoint(sourceD,lane){
+  const d=clamp(sourceD,0,distance),i=Math.min(distance-1,Math.floor(d)),
+   a=samples[i],b=samples[i+1],t=clamp(d-i,0,1),
+   l=clamp(Number(lane)||0,0,14),
+   low=boundedLow(a)+(boundedLow(b)-boundedLow(a))*t,
+   high=boundedHigh(a)+(boundedHigh(b)-boundedHigh(a))*t,
+   f=projection.fraction((1.8+l*1.65)/27),off=low+(high-low)*f,
+   baseX=a.inner.x+(b.inner.x-a.inner.x)*t,
+   baseY=a.inner.y+(b.inner.y-a.inner.y)*t,
+   ux=a.ux+(b.ux-a.ux)*t,uy=a.uy+(b.uy-a.uy)*t;
+  return {x:baseX+ux*off,y:baseY+uy*off,baseX,baseY,
+   ux,uy,low,high,off,lane:l};
+ }
  const anchors=[0,...course.segments.map(s=>s.to)];
  const geom=geometry.build({distanceM:distance,anchorsM:anchors,
-  pointAt:(d,l)=>{const q=samples[Math.round(clamp(d,0,distance))];
-    const f=projection.fraction((1.8+l*1.65)/27);
-    return {x:q.inner.x+q.ux*(boundedLow(q)+(boundedHigh(q)-boundedLow(q))*f),
-      y:q.inner.y+q.uy*(q.low+(q.high-q.low)*f)};},
+  pointAt:(d,l)=>rawSourcePoint(d,l),
   displayGain:()=>1,enableGlobalOptimization:false});
  function position(d,lane){
   const raceD=clamp(d,0,distance),mapped=geom.sourceDistance(raceD),
-   i=Math.min(distance-1,Math.floor(mapped)),a=samples[i],b=samples[i+1],
-   t=clamp(mapped-i,0,1),l=clamp(Number(lane)||0,0,14);
-  const low=boundedLow(a)+(boundedLow(b)-boundedLow(a))*t,
-   high=boundedHigh(a)+(boundedHigh(b)-boundedHigh(a))*t;
-  const f=projection.fraction((1.8+l*1.65)/27);
-  const off=low+(high-low)*f;
-  const baseX=a.inner.x+(b.inner.x-a.inner.x)*t,
-        baseY=a.inner.y+(b.inner.y-a.inner.y)*t,
-        ux=a.ux+(b.ux-a.ux)*t,uy=a.uy+(b.uy-a.uy)*t;
-  let x=baseX+ux*off,y=baseY+uy*off,corrected=0;
+   raw=rawSourcePoint(mapped,lane);
+  const {baseX,baseY,ux,uy,low,high,off}=raw;
+  const l=raw.lane;
+  let x=raw.x,y=raw.y,corrected=0;
   // Original green-border pixels may rasterize fractionally between two
   // metre samples. Search ONLY toward the interior of the already selected
   // source-derived corridor, never towards another green band. No course ID,
@@ -192,6 +200,7 @@ function build({image,course,guide,projection,geometry,sourceSvgText,sourcePathI
  const report=Object.freeze({id:course.id,checked,badDiscs:bad,
   sourcePathIndices:sourcePathIndices.slice(),strictOriginalPathTopology:true,
   typicalBandWidth,sourceEdgeBuffer:SOURCE_EDGE_BUFFER,
+  sameGeometryForBothAxes:true,continuousDistanceSampling:true,
   maxProjectedStep,maxProjectedStepAt,maxSafeInsetCorrection,
   maxGuideDeviation,maxCenterStep,maxCenterStepAt,minBandWidth,badSamples:failures,
   sourceUnchanged:true,corridorFromOriginalSvg:true,
