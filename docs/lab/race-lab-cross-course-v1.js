@@ -13,6 +13,8 @@ const STEP=RaceFrameInterpolator.STEP_SECONDS;
 let route=null,engine=null,playing=false,last=0,acc=0,prev=null,curr=null;
 let shown=[],camera=null,lastPaint=0,finishElapsed=0,blocked=null;
 const cache={signature:''};
+const markerVisibility=RaceMarkerVisibility.create();
+let visualMetrics=null;
 const colors=[['#fffdf5','#161616'],['#15191f','#fff'],
  ['#d9142f','#fff'],['#164bb8','#fff'],['#ffde30','#171717'],
  ['#1d8c49','#fff'],['#f9811f','#161616'],['#f4a1c5','#161616']];
@@ -39,7 +41,8 @@ function capture(){return RaceFrameInterpolator.capture(engine.state.horses)}
 function reset(){
  engine=RaceSimEngine.create(race,{seed:2026,bias:'neutral'});
  prev=curr=capture();acc=0;last=0;playing=false;camera=null;shown=[];
- finishElapsed=0;cache.signature='';$('resultsBody').replaceChildren();
+ finishElapsed=0;cache.signature='';markerVisibility.reset();visualMetrics=null;
+ $('resultsBody').replaceChildren();
  $('fullResults').hidden=true;$('startBtn').textContent='▶ スタート';draw();
 }
 function fail(reason){
@@ -88,19 +91,32 @@ function draw(){
  const state=engine.state,items=points();shown=items;
  const b=surface('broadcast'),m=surface('overview');
  const leaderD=Math.max(...items.map(h=>h.d));
- const center=route.point(Math.max(0,Math.min(course.distance_m,leaderD-10)),3);
+ const center=route.point(Math.max(0,Math.min(course.distance_m,leaderD-18)),3);
  if(!camera)camera={x:center.x,y:center.y};
  else{camera.x+=(center.x-camera.x)*.16;camera.y+=(center.y-camera.y)*.16}
- const zoom=b.w<540?8.8:9.7,dpr=b.ctx.getTransform().a||1;
+ const zoom=b.w<540?9.75:10.55,dpr=b.ctx.getTransform().a||1;
  const left=Math.round((b.w*.54-camera.x*zoom)*dpr)/dpr;
  const top=Math.round((b.h*.51-camera.y*zoom)*dpr)/dpr;
  $('liveCourseImage').style.transform='translate('+left+'px,'+top+'px) scale('+zoom+')';
- for(const h of items){
-  const x=left+h.x*zoom,y=top+h.y*zoom;
-  if(x>=-18&&x<=b.w+18&&y>=-18&&y<=b.h+18)
-   numbers(b.ctx,h.number,x,y,b.w<540?.78:.84,h.number===state.leadingNo);
-  numbers(m.ctx,h.number,h.x*m.w/620,h.y*m.h/430,.48,h.number===state.leadingNo);
+ const screen=items.map(h=>({...h,x:left+h.x*zoom,y:top+h.y*zoom}));
+ const visible=markerVisibility.layout(screen,{normalAt:h=>{
+  const a=route.point(Math.max(0,h.d-2),h.lane);
+  const z=route.point(Math.min(course.distance_m,h.d+2),h.lane);
+  return{x:-(z.y-a.y),y:z.x-a.x};
+ }});
+ visualMetrics=markerVisibility.metrics();
+ RaceOverviewDistanceLabels.draw({ctx:m.ctx,point:route.point,
+  distance:course.distance_m,width:m.w,height:m.h,interval:200});
+ for(const h of visible){
+  if(Math.abs(h.labelOffset)>4){
+   b.ctx.beginPath();b.ctx.moveTo(h.anchorX,h.anchorY);b.ctx.lineTo(h.x,h.y);
+   b.ctx.strokeStyle='rgba(28,61,43,.7)';b.ctx.lineWidth=1.1;b.ctx.stroke();
+  }
+  if(h.x>=-18&&h.x<=b.w+18&&h.y>=-18&&h.y<=b.h+18)
+   numbers(b.ctx,h.number,h.x,h.y,b.w<540?.78:.84,h.number===state.leadingNo);
  }
+ for(const h of items)numbers(m.ctx,h.number,h.x*m.w/620,h.y*m.h/430,.48,
+  h.number===state.leadingNo);
  if(state.firstFinishTime!==null){
   $('goalCamera').hidden=false;
   RaceCleanGoalView.render({canvas:$('goalCamera'),points:items,
@@ -145,6 +161,8 @@ function setup(){
 }
 window.CrossCoursePilot=Object.freeze({
  state:()=>engine?.state,routeReport:()=>route?.report,
+ visualMetrics:()=>visualMetrics,
+ previewFrame:()=>{if(!engine||blocked)throw Error('LAB_NOT_READY');draw();return visualMetrics},
  // Course-neutral LAB-only check: move the same physical race to a distance
  // for reproducible corner screenshots; this never rewrites race geometry.
  seekTo(distance){
@@ -156,7 +174,8 @@ window.CrossCoursePilot=Object.freeze({
   return engine.state.leader;
  },
  inspect:()=>({courseId,blocked,ready:!!engine,playing,fieldSize:engine?.state.horses.length,
-  source:RaceLabCourseRollout.get(courseId).svg})
+  source:RaceLabCourseRollout.get(courseId).svg,
+ sharedVisualMode:true,visibilityMetrics:visualMetrics})
 });
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);
 else setup();
