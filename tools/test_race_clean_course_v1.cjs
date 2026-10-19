@@ -198,6 +198,9 @@ assert.ok(html.includes('race-frame-interpolator-v1.js?v=20261020-24'));
 assert.ok(html.includes('value="2" selected>2倍（標準）'));
 assert.ok(!html.includes('value="1" selected>1倍'));
 assert.ok(app.includes('frameMotion.interpolate(framePrevious,frameCurrent,alpha)'));
+assert.ok(app.includes('Math.min(.18,(ts-last)/1000)'));
+assert.ok(app.includes('count++<12'));
+
 const frameGlobal={};
 vm.runInNewContext(fs.readFileSync(root+'race-frame-interpolator-v1.js','utf8'),{window:frameGlobal});
 const frame=frameGlobal.RaceFrameInterpolator;

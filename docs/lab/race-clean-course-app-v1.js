@@ -517,12 +517,12 @@ function paint(){
 }
 function tick(ts){
  if(!last)last=ts;
- let delta=Math.min(.06,(ts-last)/1000);last=ts;
+ let delta=Math.min(.18,(ts-last)/1000);last=ts;
  if(playing){
   if(!engine.state.finished){
    acc+=delta*Number($('speed').value);
    let count=0;
-   while(acc>=frameMotion.STEP_SECONDS&&count++<8&&!engine.state.finished){
+   while(acc>=frameMotion.STEP_SECONDS&&count++<12&&!engine.state.finished){
      framePrevious=frameCurrent;engine.step(frameMotion.STEP_SECONDS);
      frameCurrent=captureFrame();acc-=frameMotion.STEP_SECONDS;
     }
