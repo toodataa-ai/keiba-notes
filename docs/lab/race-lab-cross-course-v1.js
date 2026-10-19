@@ -215,7 +215,7 @@ window.CrossCoursePilot=Object.freeze({
  // for reproducible corner screenshots; this never rewrites race geometry.
  seekTo(distance){
   if(!route||!engine||blocked)throw Error('LAB_COURSE_NOT_READY');
-  const requested=Math.max(0,Math.min(course.distance_m-20,Number(distance)||0));
+  const requested=Math.max(0,Math.min(course.distance_m-2,Number(distance)||0));
   playing=false;let i=0;
   while(engine.state.leader<requested&&!engine.state.finished&&i++<2500)engine.step(STEP);
   prev=curr=capture();acc=0;shown=[];camera=null;lastCameraTime=null;
