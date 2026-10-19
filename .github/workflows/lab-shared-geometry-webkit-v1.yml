@@ -1,0 +1,115 @@
+name: LAB v21 shared arclength Safari/WebKit public playback
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-shared-geometry-webkit-v1.yml'
+      - 'docs/lab/race-clean-course-app-v1.js'
+      - 'docs/lab/race-clean-course-v1.html'
+      - 'docs/lab/race-course-image-geometry-v1.js'
+      - 'docs/lab/race-clean-turf-mask-v1.js'
+permissions: {contents: read}
+jobs:
+  safari:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real WebKit engine
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m playwright install --with-deps webkit
+          python3 -m http.server 8765 --directory docs >/tmp/kyoto-shared-webkit-local.log 2>&1 &
+          sleep 2
+      - name: Check local and actual public Pages URL at 3rd bend and finish
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/shared-webkit
+          python3 - <<'PY'
+          import json,time
+          from playwright.sync_api import sync_playwright
+          urls=[
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?geometry=shared&checkpoint=1250&v=21',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?geometry=shared&checkpoint=1250&v=21'
+          ]
+          with sync_playwright() as p:
+           browser=p.webkit.launch(headless=True)
+           for n,url in enumerate(urls):
+            c=browser.new_context(viewport={'width':390,'height':844},
+             device_scale_factor=3,is_mobile=True,has_touch=True,
+             user_agent='Mozilla/5.0 (iPhone; CPU iPhone OS 26_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1',ignore_https_errors=True)
+            page=c.new_page()
+            errors=[]
+            page.on('pageerror',lambda e:errors.append(str(e)))
+            page.on('requestfailed',lambda req:print('WEBKIT_REQUEST_FAILED',req.url,req.failure))
+            try:
+             page.goto(url,wait_until='load',timeout=40000)
+             page.wait_for_function('window.CleanLab?.inspect()?.sharedGeometryEnabled===true',timeout=35000)
+             boot=page.evaluate("""() => {
+              const v=CleanLab.inspect(),t=RaceCleanTurf;
+              return {geometry:v.sharedGeometryEnabled,
+               error:v.sharedGeometryError,
+               stat:v.sharedGeometryStats?.stats,
+               src:v.originalImageSrc,live:v.liveImageSrc,
+               svgLoaded:v.originalLoaded&&v.liveImageLoaded,
+               sourceNaturalSize:v.sourceNaturalSize,
+               horses:v.positions.length,
+               audit:t.audit(5,1.8),
+               anchors:[0,308.7,530,720,1270,1435,1671.6,2000]
+                .map(d=>({d,source:t.sourceDistance(d)}))
+              }
+             }""")
+             print('WEBKIT_GENERIC_BOOT',n,json.dumps(boot,ensure_ascii=False)[:5000])
+             assert boot['geometry'] and boot['error'] is None
+             assert boot['src']==boot['live']=='assets/kyoto-umapot-course-clean-v8.svg'
+             assert boot['svgLoaded'] and boot['horses']==18
+             assert boot['stat']['courseSpecificSlopeOverrides']==0
+             assert boot['audit']['badDiscs']==boot['audit']['badCenters']==0
+             assert all(abs(q['d']-q['source'])<1e-8 for q in boot['anchors'])
+             page.locator('#speed').select_option('4')
+             page.locator('#startBtn').click()
+             page.wait_for_timeout(3000)
+             stage=page.evaluate("""() => ({
+               d:CleanLab.getState().leader,
+               running:CleanLab.frameSample().playing,
+               numbers:CleanLab.frameSample().horses.length,
+               enabled:CleanLab.inspect().sharedGeometryEnabled,
+               greenBad:CleanLab.inspect().turfBadDiscs,
+               source:CleanLab.inspect().originalImageSrc
+             })""")
+             print('WEBKIT_GENERIC_RUNNING',n,json.dumps(stage,ensure_ascii=False))
+             assert stage['d']>1300 and stage['running']
+             assert stage['numbers']==18 and stage['greenBad']==0
+             assert stage['source']==boot['src']
+             page.locator('#broadcastStage').screenshot(path=f'/tmp/shared-webkit/{n}-corner.png')
+             page.evaluate('() => CleanLab.advanceTo(1970)')
+             page.locator('#startBtn').click()
+             page.wait_for_function('window.CleanLab?.inspect()?.finishSequenceDone===true',timeout=25000)
+             finish=page.evaluate("""() => ({
+               done:CleanLab.inspect().finishSequenceDone,
+               goal:CleanLab.inspect().goalBoardVisible,
+               banner:CleanLab.inspect().finishedBannerVisible,
+               podium:document.getElementById('finishPodium')?.textContent,
+               shared:CleanLab.inspect().sharedGeometryEnabled,
+               length:CleanLab.frameSample().horses.length,
+               errors:CleanLab.inspect().sharedGeometryError
+             })""")
+             print('WEBKIT_GENERIC_FINISH',n,json.dumps(finish,ensure_ascii=False))
+             assert all([finish['done'],finish['goal'],finish['banner'],finish['shared']])
+             assert '1着' in finish['podium'] and '3着' in finish['podium']
+             assert finish['length']==18 and finish['errors'] is None
+             assert not errors,errors
+             page.locator('#broadcastStage').screenshot(path=f'/tmp/shared-webkit/{n}-finished.png')
+             print('PASS_SAFARI_PUBLIC_SHARED_ENGINE_ORIGINAL_SVG_ALL_THE_WAY_TO_GOAL',url)
+            finally:
+             c.close()
+           browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-v21-safari-source-unchanged
+          path: /tmp/shared-webkit/*.png
+          if-no-files-found: warn
+          retention-days: 7
