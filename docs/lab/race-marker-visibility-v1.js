@@ -6,7 +6,7 @@
  * Identical simulated time is perfectly idempotent.
  */
 (function(global){'use strict';
-const MAX=18,CLEAR=24,REPLAN_SECONDS=.8,SLEW_PX_PER_RACE_SEC=12;
+const MAX=18,CLEAR=24,REPLAN_SECONDS=2.4,SLEW_PX_PER_RACE_SEC=6;
 const CANDIDATES=Object.freeze([0,-5,5,-9,9,-13,13,-18,18]);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function overlap(pts,distance=CLEAR){
@@ -19,10 +19,10 @@ function overlap(pts,distance=CLEAR){
  return {pairs,penalty:Number(penalty.toFixed(4))};
 }
 function create(){
- const current=new Map(),goals=new Map(),normals=new Map();
+ const current=new Map(),goals=new Map(),normals=new Map(),stableSide=new Map();
  let replanTime=null,lastTime=null,metrics=null,planCount=0;
  function reset(){
-  current.clear();goals.clear();normals.clear();
+  current.clear();goals.clear();normals.clear();stableSide.clear();
   replanTime=null;lastTime=null;metrics=null;planCount=0;
  }
  function layout(points,{normalAt,minimumDistance=CLEAR,timeSeconds}={}){
@@ -64,6 +64,11 @@ function create(){
    for(let pass=0;pass<4;pass++)for(let i=0;i<horses.length;i++){
     let winner=shifts[i],best=evaluate(i,winner);
     for(const candidate of CANDIDATES){
+     const side=stableSide.get(horses[i].number);
+     // A flip between left/right label sides looks like a vibrating
+     // marker even when a frequency-limited solver eases the transition.
+     // Lock the first nonzero label side for this race, not a venue.
+     if(side && candidate*side<0)continue;
      const score=evaluate(i,candidate);
      if(score<best-1e-7){best=score;winner=candidate}
     }
@@ -71,6 +76,8 @@ function create(){
    }
    horses.forEach((h,i)=>{
     goals.set(h.number,shifts[i]);
+    if(!stableSide.has(h.number)&&Math.abs(shifts[i])>3)
+     stableSide.set(h.number,Math.sign(shifts[i]));
     if(!current.has(h.number))current.set(h.number,shifts[i]);
    });
    replanTime=timeSeconds;planCount++;
@@ -88,7 +95,7 @@ function create(){
   metrics={base,after,maxShiftPx:Math.max(0,...result.map(h=>Math.abs(h.labelOffset))),
    displaced:result.filter(h=>Math.abs(h.labelOffset)>2).length,
    solverRuns:planCount,simulatedTime:timeSeconds,
-   motionMode:'fixed-race-time-slew-and-stable-normal',
+   motionMode:'stable-label-side-2.4s-race-time-replan-6px-sec',
    physicalPositionsUnchanged:true};
   return result;
  }
