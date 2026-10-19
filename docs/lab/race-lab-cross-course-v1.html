@@ -31,7 +31,8 @@
 <div class="race-view-grid"><div class="race-broadcast-view"><div class="race-view-label">実況</div>
 <div class="broadcast-stage" id="broadcastStage">
 <img id="liveCourseImage" width="620" height="430" src="assets/kyoto-umapot-course-clean-v8.svg" alt="">
-<canvas id="broadcast"></canvas><canvas id="goalCamera" class="goal-camera" hidden></canvas>
+<canvas id="broadcast"></canvas>
+<canvas id="goalCamera" class="goal-camera" style="opacity:0" aria-label="残り100mで切り替わるゴール前アップ映像" hidden></canvas>
 <div class="broadcast-clock"><strong id="clock">0.00.0</strong>
 <div class="broadcast-split"><span id="splitLabel">600m 通過</span><strong id="splitTime">—</strong></div></div>
 <div id="finishBanner" class="finish-banner" hidden><strong id="finishHeading">ゴール速報</strong><span id="finishPodium"></span></div></div>
@@ -57,6 +58,8 @@
 <script src="race-lab-course-rollout-v1.js?v=20261020-29"></script>
 <script src="race-lab-source-mask-v1.js?v=20261020-29"></script>
 <script src="race-marker-visibility-v1.js?v=20261020-32"></script>
-<script src="race-lab-cross-course-v1.js?v=20261020-32"></script>
+<script src="race-broadcast-pose-filter-v1.js?v=20261020-33"></script>
+<script src="race-finish-broadcast-v2.js?v=20261020-33"></script>
+<script src="race-lab-cross-course-v1.js?v=20261020-33"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
