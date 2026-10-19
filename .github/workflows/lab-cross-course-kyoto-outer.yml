@@ -205,7 +205,7 @@ jobs:
             page.locator('#fullResults').screenshot(path='/tmp/lab-outer-screens/'+name+'-finish.png')
             if name=='chromium':
              wide=browser.new_page(viewport={'width':1100,'height':800})
-             wide.goto('http://127.0.0.1:8801/lab/race-lab-cross-course-v1.html?v=31',wait_until='load')
+             wide.goto('http://127.0.0.1:8801/lab/race-lab-cross-course-v1.html?v=34',wait_until='load')
              wide.wait_for_function("CrossCoursePilot.inspect().ready || CrossCoursePilot.inspect().blocked",timeout=25000)
              layout=wide.evaluate("""() => {
                const a=document.querySelector('.race-broadcast-view').getBoundingClientRect();
