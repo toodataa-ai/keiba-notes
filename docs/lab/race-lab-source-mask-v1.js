@@ -91,19 +91,25 @@ function build({image,course,guide,projection,geometry}){
  // source-ribbon width from the entire route and cap the projection width.
  const widths=samples.map(s=>s.high-s.low).sort((a,b)=>a-b);
  const typicalBandWidth=widths[Math.floor(widths.length/2)];
- function boundedHigh(s){return Math.min(s.high,s.low+typicalBandWidth)}
+ // A uniform margin from the edge of the source-detected safe green band
+ // prevents late frame-only snaps on anti-aliased SVGs. Common to all
+ // courses: the margin equals a marker safety radius, not a corner offset.
+ const SOURCE_EDGE_BUFFER=2.0;
+ function boundedLow(s){return Math.min(s.low+SOURCE_EDGE_BUFFER,s.high-1)}
+ function boundedHigh(s){return Math.max(boundedLow(s)+1,Math.min(s.high,s.low+typicalBandWidth))}
  const anchors=[0,...course.segments.map(s=>s.to)];
  const geom=geometry.build({distanceM:distance,anchorsM:anchors,
   pointAt:(d,l)=>{const q=samples[Math.round(clamp(d,0,distance))];
     const f=projection.fraction((1.8+l*1.65)/27);
-    return {x:q.inner.x+q.ux*(q.low+(boundedHigh(q)-q.low)*f),
+    return {x:q.inner.x+q.ux*(boundedLow(q)+(boundedHigh(q)-boundedLow(q))*f),
       y:q.inner.y+q.uy*(q.low+(q.high-q.low)*f)};},
   displayGain:()=>1,enableGlobalOptimization:false});
  function position(d,lane){
   const raceD=clamp(d,0,distance),mapped=geom.sourceDistance(raceD),
    i=Math.min(distance-1,Math.floor(mapped)),a=samples[i],b=samples[i+1],
    t=clamp(mapped-i,0,1),l=clamp(Number(lane)||0,0,14);
-  const low=a.low+(b.low-a.low)*t,high=boundedHigh(a)+(boundedHigh(b)-boundedHigh(a))*t;
+  const low=boundedLow(a)+(boundedLow(b)-boundedLow(a))*t,
+   high=boundedHigh(a)+(boundedHigh(b)-boundedHigh(a))*t;
   const f=projection.fraction((1.8+l*1.65)/27);
   const off=low+(high-low)*f;
   const baseX=a.inner.x+(b.inner.x-a.inner.x)*t,
@@ -146,7 +152,8 @@ function build({image,course,guide,projection,geometry}){
   if(step>maxProjectedStep){maxProjectedStep=step;maxProjectedStepAt=d}
  }
  const report=Object.freeze({id:course.id,checked,badDiscs:bad,
-  typicalBandWidth,maxProjectedStep,maxProjectedStepAt,maxSafeInsetCorrection,
+  typicalBandWidth,sourceEdgeBuffer:SOURCE_EDGE_BUFFER,
+  maxProjectedStep,maxProjectedStepAt,maxSafeInsetCorrection,
   maxGuideDeviation,maxCenterStep,maxCenterStepAt,minBandWidth,badSamples:failures,
   sourceUnchanged:true,corridorFromOriginalSvg:true,
   perCourseManualOffsets:0});
