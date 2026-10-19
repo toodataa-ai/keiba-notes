@@ -18,7 +18,7 @@ function packCamera({points,distance,width,height=336,turn='右'}){
  // Crop like an actual TV zoom: keep 20-25m of racing pack readable
  // rather than squeezing a whole 215m stretch into one camera image.
  const scale=clamp(width/43,7.2,9.0);
- const fixedGoalX=width*(right?.30:.70),leadX=width*(right?.42:.58);
+ const fixedGoalX=width*(right?.20:.80),leadX=width*(right?.42:.58);
  // Vertical zoom on the actual active lanes, NOT a per-horse lane edit.
  const minLane=Math.min(...points.map(p=>p.lane??0)),
   maxLane=Math.max(...points.map(p=>p.lane??0)),
