@@ -228,7 +228,9 @@ jobs:
              'visible':near['visible'],'boardX':near['goalX']}))
             assert near['cameraMode']=='fixed-finish'
             assert near['visible']>=12
-            assert near['visualSpreadPx']>=110
+            assert near['visualSpreadPx']>=175
+            assert near['laneStep']>=24,near
+            assert near['activeLaneRange'][1]-near['activeLaneRange'][0]<14
             assert near['goalX']>0
             page.locator('#broadcastStage').screenshot(
               path=f'/tmp/lab-outer-screens/{name}-last-9m-real-goal-board.png')
