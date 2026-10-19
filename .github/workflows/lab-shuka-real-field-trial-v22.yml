@@ -1,0 +1,152 @@
+name: LAB 2026 Shuka real starters 17 and independent JRA holdout QA
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-shuka-real-field-trial-v22.yml'
+      - 'docs/lab/race-real-shuka-2026-*'
+      - 'docs/lab/race-clean-course-app-v1.js'
+      - 'docs/lab/race-clean-course-v1.html'
+      - 'docs/lab/race-clean-course-v1.css'
+      - 'tools/test_race_clean_course_v1.cjs'
+permissions: {contents: read}
+jobs:
+  real-jra-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify 17 starters, immutable prestart evidence and synthetic baseline
+        run: |
+          node tools/test_race_clean_course_v1.cjs
+      - name: Prepare Chrome and iPhone WebKit
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m playwright install --with-deps webkit
+          python3 -m http.server 8787 --directory docs >/tmp/shuka-2026-real-trial-http.log 2>&1 &
+          sleep 2
+          mkdir -p /tmp/shuka-real-2026
+      - name: Play real 17-horse LAB against separate JRA benchmark, confirm all 18 synthetic unchanged
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,math,shutil
+          from playwright.sync_api import sync_playwright
+          chrome=shutil.which('google-chrome') or shutil.which('chromium')
+          assert chrome,'Chromium unavailable'
+          with sync_playwright() as p:
+           for browser_name in ('chromium','webkit'):
+            browser=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox']) if browser_name=='chromium' else p.webkit.launch(headless=True)
+            for width in ([390,1024] if browser_name=='chromium' else [390]):
+             context=browser.new_context(viewport={'width':width,'height':844},
+                device_scale_factor=3 if width==390 else 2,is_mobile=(browser_name=='webkit'),
+                has_touch=(browser_name=='webkit'))
+             page=context.new_page()
+             errors=[]
+             page.on('pageerror',lambda e:errors.append(str(e)))
+             page.goto('http://127.0.0.1:8787/lab/race-clean-course-v1.html?trial=shuka2026&checkpoint=1200&v=22',
+               wait_until='load',timeout=45000)
+             page.wait_for_function('window.CleanLab?.inspect()?.sharedGeometryEnabled===true',timeout=40000)
+             boot=page.evaluate("""() => ({
+              trial:CleanLab.trial(),r:CleanLab.inspect(),
+              physical:CleanLab.getState().horses.map(h=>[h.number,h.d,h.lane,h.speed]),
+              resultPanel:document.getElementById('benchmarkPanel').hidden,
+              resultHidden:document.getElementById('benchmarkResults').hidden,
+              selected:document.getElementById('trialMode').value,
+              roster:Array.from(document.querySelectorAll('#horseGrid .horsechip')).map(el=>el.title)
+             })""")
+             print('REAL_SHUKA_PRESTART_BOOT',browser_name,width,json.dumps({
+              'trial':boot['trial'],'real':boot['r']['realPrestartOnly'],
+              'count':len(boot['physical']),'fieldSize':boot['r']['raceFieldSize'],
+              'source':boot['r']['originalImageSrc'],
+              'turfDiscs':boot['r']['turfBadDiscs'],
+              'loadError':boot['r']['turfError'],
+              'geometryError':boot['r']['sharedGeometryError'],
+              'comparePanelVisible':not boot['resultPanel'],
+              'comparisonHiddenUntilClick':boot['resultHidden']
+             },ensure_ascii=False)[:4200])
+             assert not errors,('BOOT_JS_ERRORS',browser_name,width,errors)
+             assert boot['selected']=='shuka2026'
+             assert boot['trial']['prestart'] and boot['trial']['fieldSize']==17
+             assert boot['r']['raceFieldSize']==17 and len(boot['physical'])==17
+             assert len(boot['roster'])==17 and boot['roster'][7].startswith('8番 モンローウォーク')
+             assert boot['r']['originalImageSrc']==boot['r']['liveImageSrc']=='assets/kyoto-umapot-course-clean-v8.svg'
+             assert boot['r']['sharedGeometryEnabled'] and boot['r']['turfBadDiscs']==0
+             assert boot['resultHidden'] and not boot['resultPanel'],('POSTRACE_HOLDOUT_SHOULD_BE_OPTIONAL',browser_name)
+             # Clicking independent holdout MUST NOT step/mutate the real field.
+             pre=page.evaluate('() => CleanLab.getState().horses.map(h=>[h.number,h.d,h.lane,h.speed])')
+             page.locator('#compareBtn').click()
+             result=page.evaluate("""() => ({
+              panel:!document.getElementById('benchmarkResults').hidden,
+              cells:document.querySelectorAll('.benchmark-table tbody tr').length,
+              text:document.getElementById('benchmarkResults').textContent,
+              state:CleanLab.getState().horses.map(h=>[h.number,h.d,h.lane,h.speed])
+             })""")
+             assert result['panel'] and result['cells']==4,('POSTRACE_READOUT_FAILED',browser_name,result)
+             assert pre==result['state'],('OBSERVED_RESULT_MUTATED_SIMULATION',browser_name)
+             assert '57.8' in result['text'] and 'JRA公式' in result['text']
+             assert not errors,('RESULT_COMPARE_JS_ERRORS',browser_name,errors)
+             page.locator('#broadcastStage').screenshot(path=f'/tmp/shuka-real-2026/{browser_name}-{width}-prestart.png')
+             page.locator('#speed').select_option('4')
+             page.locator('#startBtn').click()
+             page.wait_for_timeout(2100)
+             run=page.evaluate("""() => ({
+              d:CleanLab.getState().leader,
+              nums:CleanLab.frameSample().horses.length,
+              count:CleanLab.inspect().raceFieldSize,
+              turf:CleanLab.inspect().turfBadDiscs,
+              moving:CleanLab.frameSample().playing,
+              officialReferenceVisible:!document.getElementById('benchmarkResults').hidden
+             })""")
+             print('REAL_SHUKA_4X_RUNNING',browser_name,width,run)
+             assert run['d']>1240 and run['nums']==17 and run['count']==17
+             assert run['moving'] and run['turf']==0 and run['officialReferenceVisible']
+             # Restart at end and verify fixed GOAL board, actual source unaffected.
+             page.evaluate('() => CleanLab.advanceTo(1950)')
+             page.locator('#speed').select_option('4')
+             page.locator('#startBtn').click()
+             page.wait_for_function('window.CleanLab?.inspect()?.finishSequenceDone===true',timeout=25000)
+             finish=page.evaluate("""() => ({
+              finish:CleanLab.inspect().finishSequenceDone,
+              goal:CleanLab.inspect().goalBoardVisible,
+              podium:document.getElementById('finishPodium').textContent,
+              source:CleanLab.inspect().originalImageSrc,
+              field:CleanLab.inspect().raceFieldSize,
+              nums:CleanLab.frameSample().horses.length
+             })""")
+             assert finish['finish'] and finish['goal']
+             assert finish['field']==17 and finish['nums']==17
+             assert '1着' in finish['podium'] and '3着' in finish['podium']
+             assert finish['source']=='assets/kyoto-umapot-course-clean-v8.svg'
+             print('PASS_REAL_SHUKA_ALL_17_FINISH_GOAL_SOURCE_UNCHANGED',browser_name,width,finish)
+             page.locator('#broadcastStage').screenshot(path=f'/tmp/shuka-real-2026/{browser_name}-{width}-finish.png')
+             # Switch back to exact previous synthetic 18 fixture without reload.
+             page.locator('#trialMode').select_option('synthetic')
+             syn=page.evaluate("""() => ({
+              trial:CleanLab.trial(),count:CleanLab.getState().horses.length,
+              grid:document.querySelectorAll('#horseGrid .horsechip').length,
+              chips:document.querySelectorAll('#runningOrder .position-chip').length,
+              resultHidden:document.getElementById('benchmarkPanel').hidden,
+              source:CleanLab.inspect().originalImageSrc
+             })""")
+             print('BACKWARDS_COMPAT_SYNTHETIC_18',browser_name,width,syn)
+             assert syn['count']==18 and syn['grid']==18 and syn['chips']==18
+             assert syn['trial']['id']=='synthetic' and syn['resultHidden']
+             assert syn['source']=='assets/kyoto-umapot-course-clean-v8.svg'
+             # Switch again to ensure no stale 18th number or old camera.
+             page.locator('#trialMode').select_option('shuka2026')
+             assert page.evaluate('() => CleanLab.getState().horses.length')==17
+             assert page.evaluate("() => document.querySelectorAll('#horseGrid .horsechip').length")==17
+             assert not errors,('JS_ERRORS',browser_name,width,errors)
+             print('PASS_REAL_SHUKA_PRESTART_17_SYNTHETIC_18_LAB_ROUNDTRIP',browser_name,width)
+             context.close()
+            browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shuka-2026-17-real-runners-lab-browser-acceptance
+          path: /tmp/shuka-real-2026/*.png
+          if-no-files-found: warn
+          retention-days: 7
