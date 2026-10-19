@@ -13,7 +13,7 @@ const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
  SLOPE=.44, SMOOTH_RADIUS=19;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
-let grid=null,samples=null,statistics=null,sourceDistanceTable=null;
+let grid=null,samples=null,statistics=null,sourceDistanceTable=null,sharedGeometry=null;
 const ARC_ANCHORS=Object.freeze([0,308.7,530,720,1270,1435,1671.6,2000]);
 // SVG artwork is stylized rather than surveyed. Around 1435m the drawn
 // centreline changes from about 0.76 to 0.50 source px per race metre,
@@ -36,6 +36,7 @@ function discOnTurf(x,y,r=CLEARANCE){
  return true;
 }
 function create(image){
+ sharedGeometry=null;
  if(!image||!image.complete||image.naturalWidth<=0||image.naturalHeight<=0||
     Math.abs(image.naturalWidth/image.naturalHeight-W/H)>.025)
   throw Error('TURF_ORIGINAL_VECTOR_IMAGE_UNAVAILABLE');
@@ -320,6 +321,7 @@ function buildSourceArcMap(){
 }
 function sourceDistance(distance){
  const d=clamp(Number(distance)||0,0,2000);
+ if(sharedGeometry)return sharedGeometry.sourceDistance(d);
  if(!sourceDistanceTable)return d;
  const nodes=sourceDistanceTable.nodes,map=sourceDistanceTable.mapped;
  let lo=0,hi=nodes.length-1;
@@ -331,6 +333,35 @@ function sourceDistance(distance){
  const lower=Math.max(0,lo-1),span=nodes[lo]-nodes[lower];
  const frac=span>0?(d-nodes[lower])/span:0;
  return map[lower]*(1-frac)+map[lo]*frac;
+}
+// LAB v21: attach an independently tested, COURSE-INDEPENDENT geometry
+// model. The legacy hardcoded 3/4-turn blend stays as a reversible control.
+function activateSharedGeometry(model){
+ if(!samples||!model||typeof model.sourceDistance!=='function')
+  throw Error('SHARED_GEOMETRY_NOT_READY');
+ if(Math.abs(model.distanceM-2000)>1e-8)
+  throw Error('SHARED_GEOMETRY_WRONG_RACE_DISTANCE');
+ const before=sharedGeometry;
+ sharedGeometry=model;
+ const originalStats=statistics;
+ try{
+  const auditResult=audit(1,1.8);
+  if(auditResult.badDiscs||auditResult.badCenters||
+     auditResult.maxJump>1.8)
+   throw Error('SHARED_GEOMETRY_TURF_AUDIT_FAILED:'+JSON.stringify({
+     badDiscs:auditResult.badDiscs,badCenters:auditResult.badCenters,
+     maxJump:auditResult.maxJump}));
+  statistics={...originalStats,
+   imageArcRegistration:{...model.stats(),mode:'shared-course-independent'},
+   sharedGeometryGreenVerifiedPoints:auditResult.total,
+   sharedGeometryMaxJump:auditResult.maxJump};
+  return {valid:true,greenVerified:auditResult.total,
+   sourceSvgUnchanged:true,stats:model.stats()};
+ }catch(err){
+  sharedGeometry=before;
+  statistics=originalStats;
+  throw err;
+ }
 }
 // LAB read-only diagnostic: raw position on the UNMODIFIED source image
 // before physical-race-distance reparameterization. Needed to compare
@@ -419,6 +450,7 @@ function trace(from=0,to=2000,step=25){
 }
 global.RaceCleanTurf=Object.freeze({
  create,point,pointAtImageDistance,runners,isGreen,discOnTurf,audit,trace,sourceDistance,
+  activateSharedGeometry,sharedGeometryEnabled:()=>Boolean(sharedGeometry),
   stats:()=>statistics
 });
 })(typeof window!=='undefined'?window:globalThis);

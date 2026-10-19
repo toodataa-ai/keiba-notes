@@ -75,8 +75,10 @@ let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
 const FINISH_SEQUENCE_MS=3200;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
-let lastGoalFrame=null,curveLensStats=null,curveLensError=null;
+let lastGoalFrame=null,curveLensStats=null,curveLensError=null,
+ sharedGeometryStats=null,sharedGeometryError=null;
 const CURVE_LENS_ENABLED=new URLSearchParams(location.search).get('lens')!=='off';
+const SHARED_IMAGE_GEOMETRY=new URLSearchParams(location.search).get('geometry')==='shared';
 const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
@@ -163,6 +165,30 @@ function verifyVectorSource(){
  if(turfReady&&!curveLensStats&&!curveLensError){
   try{curveLensStats=window.RaceCleanCurveCamera.profile(turf);}
   catch(err){curveLensError=String(err);console.error('LAB_CURVE_LENS_CALIBRATION',err);}
+ }
+ if(turfReady&&curveLensStats&&SHARED_IMAGE_GEOMETRY&&
+    !sharedGeometryStats&&!sharedGeometryError){
+  try{
+   // Use the same generic mapper tested independently for Kyoto1400 and
+   // Tokyo2000. Only named physically grounded course landmarks are data.
+   // Pass existing (read-only) camera gain to the global optimizer.
+   const anchors=[0,...model.sections.map(s=>s.to)];
+   const shared=window.RaceCourseImageGeometry.build({
+    distanceM:model.distance,anchorsM:anchors,
+    pointAt:(d,lane)=>turf.pointAtImageDistance(d,lane),
+    displayGain:d=>CURVE_LENS_ENABLED?
+     window.RaceCleanCurveCamera.gain(d):1
+   });
+   const safety=turf.activateSharedGeometry(shared);
+   sharedGeometryStats={...safety,anchors};
+   turfStats=turf.stats();
+   // Source-pixel geometry changed but the image is untouched: rerun the
+   // same source-derived lens profile with the newly mapped course.
+   curveLensStats=window.RaceCleanCurveCamera.profile(turf);
+  }catch(err){
+   sharedGeometryError=String(err);
+   console.error('LAB_GENERIC_IMAGE_GEOMETRY_BLOCKED',err);
+  }
  }
  if(vectorReady)originalError=false;
 }
@@ -453,6 +479,9 @@ window.CleanLab=Object.freeze({
     width:image.naturalWidth,height:image.naturalHeight}:null,
    liveImageSrc:$('liveCourseImage')?.getAttribute('src')||null,
    originalError,vectorReady,turfReady,turfError,turfStats,
+   sharedGeometryRequested:SHARED_IMAGE_GEOMETRY,
+   sharedGeometryEnabled:turf.sharedGeometryEnabled(),
+   sharedGeometryStats,sharedGeometryError,
    cameraLensEnabled:CURVE_LENS_ENABLED,cameraLensReady:Boolean(curveLensStats),
    cameraLensError:curveLensError,cameraLensStats:curveLensStats,
    cameraLensGain:CURVE_LENS_ENABLED&&curveLensStats?
