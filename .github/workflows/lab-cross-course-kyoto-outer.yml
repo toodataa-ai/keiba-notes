@@ -110,6 +110,23 @@ jobs:
             assert result['finish']>0 and result['split']>0
             assert result['rows']==18 and '1着' in result['podium'] and '3着' in result['podium']
             page.locator('#fullResults').screenshot(path='/tmp/lab-outer-screens/'+name+'-finish.png')
+            if name=='chromium':
+             wide=browser.new_page(viewport={'width':1100,'height':800})
+             wide.goto('http://127.0.0.1:8801/lab/race-lab-cross-course-v1.html?v=31',wait_until='load')
+             wide.wait_for_function("CrossCoursePilot.inspect().ready || CrossCoursePilot.inspect().blocked",timeout=25000)
+             layout=wide.evaluate("""() => {
+               const a=document.querySelector('.race-broadcast-view').getBoundingClientRect();
+               const b=document.querySelector('.race-overview-view').getBoundingClientRect();
+               return {leftRight:a.right,rightLeft:b.left,liveWidth:a.width,mapWidth:b.width,
+                 label:document.querySelector('.race-overview-view .status').textContent,
+                 viewGrid:getComputedStyle(document.querySelector('.race-view-grid')).gridTemplateColumns};
+             }""")
+             print('CROSS_COURSE_DESKTOP_LAYOUT',json.dumps(layout))
+             assert abs(layout['leftRight']-layout['rightLeft'])<=2,layout
+             assert layout['liveWidth']>layout['mapWidth'],layout
+             assert '200m' in layout['label'],layout
+             wide.screenshot(path='/tmp/lab-outer-screens/chromium-desktop-v31.png',full_page=True)
+             wide.close()
             browser.close()
           PY
       - uses: actions/upload-artifact@v4
