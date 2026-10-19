@@ -332,6 +332,15 @@ function sourceDistance(distance){
  const frac=span>0?(d-nodes[lower])/span:0;
  return map[lower]*(1-frac)+map[lo]*frac;
 }
+// LAB read-only diagnostic: raw position on the UNMODIFIED source image
+// before physical-race-distance reparameterization. Needed to compare
+// alternative anchor-preserving calibrations without altering race physics.
+function pointAtImageDistance(distance,lane=0){
+ if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
+ const d=clamp(Number(distance)||0,0,2000),a=Math.floor(d),b=Math.ceil(d),t=d-a;
+ const first=positionAt(a,lane),last=positionAt(b,lane);
+ return {x:first.x+(last.x-first.x)*t,y:first.y+(last.y-first.y)*t};
+}
 function point(distance,lane=0){
  if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
  if(distance>2000){
@@ -409,7 +418,7 @@ function trace(from=0,to=2000,step=25){
  return out;
 }
 global.RaceCleanTurf=Object.freeze({
- create,point,runners,isGreen,discOnTurf,audit,trace,sourceDistance,
+ create,point,pointAtImageDistance,runners,isGreen,discOnTurf,audit,trace,sourceDistance,
   stats:()=>statistics
 });
 })(typeof window!=='undefined'?window:globalThis);
