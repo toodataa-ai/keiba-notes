@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id);
 const source='race-course-catalog-v1.json';
 const enabled={
  'kyoto_turf_inner_2000':{status:'基準LAB v26',href:'race-clean-course-v1.html?trial=shuka2026&v=26'},
- 'kyoto_turf_outer_1400':{status:'試走中・未承認',href:'race-lab-cross-course-v1.html?v=38'}
+ 'kyoto_turf_outer_1400':{status:'試走中・未承認',href:'race-lab-cross-course-v1.html?v=39'}
 };
 function courseId(venue,route,distance){
  if(venue.code==='tokyo'&&route.surface==='turf'&&distance===2000)return'tokyo_turf_2000';
