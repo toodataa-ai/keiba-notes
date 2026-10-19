@@ -9,6 +9,9 @@ on:
       - 'docs/lab/race-clean-turf-mask-v1.js'
       - 'docs/lab/race-clean-course-app-v1.js'
       - 'docs/lab/race-clean-course-v1.html'
+      - 'docs/lab/race-clean-course-v1.js'
+      - 'docs/lab/race-clean-curve-camera-v1.js'
+      - 'docs/lab/assets/kyoto-umapot-course-clean-v8.svg'
 permissions: {contents: read}
 jobs:
   qa:
@@ -130,6 +133,67 @@ jobs:
             assert bdata['stats']['stats']['courseSpecificSlopeOverrides']==0
             print('PASS_18_HORSES_PHYSICS_UNCHANGED_SVG_UNCHANGED_ALL_COURSE_SAFETY',width)
            b.close()
+          PY
+      - name: LAB generic geometry independent from the display lens and toggles
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import shutil,math,json
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           browser=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+           for width in (390,1024):
+            values={}
+            for label,params in (
+             ('default',''),
+             ('explicit_shared','&geometry=shared'),
+             ('no_lens','&lens=off'),
+             ('legacy','&geometry=legacy')
+            ):
+             page=browser.new_page(viewport={'width':width,'height':844},device_scale_factor=2)
+             errors=[]
+             page.on('pageerror',lambda e:errors.append(str(e)))
+             page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1300&v=21'+params,wait_until='load')
+             page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=25000)
+             data=page.evaluate("""() => {
+               const v=CleanLab.inspect(),t=RaceCleanTurf;
+               return {
+                svg:[v.originalImageSrc,v.liveImageSrc],
+                geometry:v.sharedGeometryEnabled,
+                error:v.sharedGeometryError,
+                physics:CleanLab.getState().horses.map(h=>[h.number,h.d,h.lane,h.speed]),
+                source:Array.from({length:151},(_,i)=>t.sourceDistance(1225+i)),
+                lanes:[0,2,7,14].flatMap(l=>[1225,1250,1270,1280,1300,1310,1330,1350].map(d=>{
+                 const a=t.point(d,l);return [l,d,a.x,a.y];
+                })),
+                zoom:v.zoom,
+                cameraLensGain:v.cameraLensGain,
+                green:v.turfBadDiscs
+               };
+             }""")
+             assert not errors,(label,errors)
+             assert data['error'] is None and data['green']==0,(width,label,data['error'])
+             assert data['svg']==['assets/kyoto-umapot-course-clean-v8.svg']*2
+             values[label]=data
+             page.close()
+            a,b,c,d=(values[k] for k in ('default','explicit_shared','no_lens','legacy'))
+            assert a['geometry'] and b['geometry'] and c['geometry'] and not d['geometry']
+            assert a['physics']==b['physics']==c['physics']==d['physics'],('RENDER_OPTIONS_CHANGED_RACE_PHYSICS',width)
+            assert a['source']==b['source']==c['source'],('CAMERA_OPTION_CHANGED_COURSE_GEOMETRY',width)
+            assert a['lanes']==b['lanes']==c['lanes'],('CAMERA_OPTION_MOVED_HORSE_RUNNERS',width)
+            assert a['source']!=d['source'],('LEGACY_ROLLBACK_NOT_INDEPENDENT',width)
+            assert abs(c['cameraLensGain']-1)<1e-10
+            assert a['cameraLensGain']>=1.05
+            assert c['zoom']<a['zoom'],('LENS_OFF_FAILED_TO_DISABLE_ZOOM',width)
+            print('PASS_DEFAULT_SHARED_EXPLICIT_SHARED_SAME_POSITIONS_AND_LENS_OFF_ONLY_CAMERA',json.dumps({
+             'width':width,
+             'all18physicalMatched':True,
+             'sharedImagePositionsMatched':True,
+             'legacyDistinctSourceRegistration':True,
+             'svgSourceUnchanged':a['svg'],
+             'zoomNormal':a['zoom'],'zoomLensOff':c['zoom']},ensure_ascii=False))
+           browser.close()
           PY
       - uses: actions/upload-artifact@v4
         if: always()
