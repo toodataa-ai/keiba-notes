@@ -204,6 +204,9 @@ function setup(){
 }
 window.CrossCoursePilot=Object.freeze({
  state:()=>engine?.state,routeReport:()=>route?.report,
+ // Read-only instrumentation for the common source-curve continuity audit.
+ sourcePoint:(d,lane)=>{if(!route)throw Error('LAB_SOURCE_NOT_READY');
+  return route.point(d,lane)},
  visualMetrics:()=>visualMetrics,
  broadcastPoints:()=>lastSmoothedPositions,
  finishView:()=>lastFinishView,
