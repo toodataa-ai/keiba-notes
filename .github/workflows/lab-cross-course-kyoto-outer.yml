@@ -9,6 +9,8 @@ on:
       - "docs/lab/race-lab-source-mask-v1.js"
       - "docs/lab/race-lab-course-rollout-v1.js"
       - "docs/lab/race-marker-visibility-v1.js"
+      - "docs/lab/race-broadcast-pose-filter-v1.js"
+      - "docs/lab/race-finish-broadcast-v2.js"
 permissions: {contents: read}
 jobs:
   source-turf-and-full-playback:
@@ -29,7 +31,9 @@ jobs:
           for(const key of ['RaceLabSourceMask.build','RaceSimEngine.create',
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
             'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate',
-            'markerVisibility.layout','markerTimeDriven:true'])assert.ok(app.includes(key),key);
+            'markerVisibility.layout','markerTimeDriven:true',
+            'broadcastPose.apply','cameraPose.apply',
+            'RaceFinishBroadcastV2.render'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
           assert.ok(mask.includes('corridorFromOriginalSvg:true'), 'Preserve original green-turf source');
@@ -64,6 +68,31 @@ jobs:
            assert.ok(Math.abs(later[i].labelOffset-first[i].labelOffset)<=1.21,
             'Position offsets must be bounded by elapsed simulation time');
           assert.equal(context.RaceMarkerVisibility.paintIdempotent,true);
+          const poseApi={};
+          vm.runInNewContext(fs.readFileSync(dir+'race-broadcast-pose-filter-v1.js','utf8'),
+           {window:poseApi});
+          const pose=poseApi.RaceBroadcastPoseFilter.create();
+          const input=Array.from({length:18},(_,i)=>({number:i+1,x:10+i*.5,y:20+i*.7}));
+          const original=JSON.stringify(input);
+          const poseA=pose.apply(input,{timeSeconds:0,containsDisc:()=>true});
+          for(let i=0;i<30;i++){
+           const same=pose.apply(input,{timeSeconds:0,containsDisc:()=>true});
+           assert.deepEqual(same,poseA,'Source image poses must not change at paused clock');
+          }
+          const moved=input.map(p=>({...p,x:p.x+1.5,y:p.y+.2}));
+          const poseB=pose.apply(moved,{timeSeconds:.06,containsDisc:()=>true});
+          assert.ok(poseB.every((p,i)=>
+            Math.hypot(p.x-moved[i].x,p.y-moved[i].y)<=1.1501),
+           'Smoothing must be bounded by maximum safe physical image offset');
+          assert.equal(JSON.stringify(input),original,'Physical input must not mutate');
+          const finish={};
+          vm.runInNewContext(fs.readFileSync(dir+'race-finish-broadcast-v2.js','utf8'),
+           {window:finish});
+          assert.equal(finish.RaceFinishBroadcastV2.transitionRemainingM,100);
+          assert.equal(finish.RaceFinishBroadcastV2.sourceGeometryIndependent,true);
+          assert.ok(fs.readFileSync(dir+'race-finish-broadcast-v2.js','utf8')
+           .includes("bezierCurveTo"), 'Green white goal arch must be curved');
+          assert.equal(poseApi.RaceBroadcastPoseFilter.courseIndependent,true);
           console.log('PASS_COURSE_COMMON_COMPONENTS_NO_SOURCE_REDRAW');
           JS
       - name: Install Safari and Chrome tools
@@ -103,6 +132,10 @@ jobs:
             assert snapshot['inspection']['sharedVisualMode'] is True
             assert page.evaluate("() => typeof RaceMarkerVisibility.create")== 'function'
             assert page.evaluate("() => RaceMarkerVisibility.paintIdempotent") is True
+            assert page.evaluate("() => RaceBroadcastPoseFilter.courseIndependent") is True
+            assert page.evaluate("() => RaceFinishBroadcastV2.transitionRemainingM")==100
+            assert snapshot['inspection']['finishCameraThreshold']==100
+            assert not snapshot['inspection']['finishCameraActive']
             assert snapshot['inspection']['markerTimeDriven'] is True
             assert not page.evaluate("() => 'RaceOverviewDistanceLabels' in window")
             # Explicit 3C/4C snapshot gate, not just 'green pixels anywhere'.
@@ -124,11 +157,34 @@ jobs:
              print('CROSS_COURSE_LABEL_VISIBILITY',name,metres,json.dumps(visible))
              assert visible['physicalPositionsUnchanged'] is True
              assert visible['maxShiftPx']<=18.01
+             stabilized=page.evaluate("() => CrossCoursePilot.broadcastPoints()")
+             assert len(stabilized)==18
+             assert max((((h['x']-h['rawX'])**2+(h['y']-h['rawY'])**2)**.5)
+              for h in stabilized)<=1.151
              assert visible['after']['penalty'] <= visible['base']['penalty']*1.1+1
              assert page.evaluate("() => document.querySelector('.race-overview-view .status').textContent.includes('距離目盛りなし')")
              page.locator('#broadcastStage').screenshot(
                path=f'/tmp/lab-outer-screens/{name}-outer-{metres}m.png')
             assert page.evaluate("() => CrossCoursePilot.routeReport().sourcePathIndices")==[0]
+            before=page.evaluate("() => CrossCoursePilot.seekTo(1290)")
+            assert before>=1290
+            assert page.evaluate("() => CrossCoursePilot.inspect().finishCameraActive") is False
+            after=page.evaluate("() => CrossCoursePilot.seekTo(1319)")
+            assert after>=1319
+            close=page.evaluate("""() => ({
+             inspect:CrossCoursePilot.inspect(),
+             view:CrossCoursePilot.finishView(),
+             opacity:getComputedStyle(document.querySelector('#goalCamera')).opacity,
+             fontSize:getComputedStyle(document.querySelector('#clock')).fontSize
+            })""")
+            print('CROSS_COURSE_FINISH_CAMERA_100M',name,json.dumps(close,ensure_ascii=False))
+            assert close['inspect']['finishCameraActive'] is True
+            assert close['view']['mode']=='finish-100m-camera'
+            assert close['view']['venueLabel']=='KYOTO'
+            assert float(close['opacity'])>=.99
+            assert close['view']['visible']>=1
+            page.locator('#broadcastStage').screenshot(
+              path=f'/tmp/lab-outer-screens/{name}-last-80m-goal-arch.png')
             page.locator('#resetBtn').click()
             clock_font=page.evaluate("() => getComputedStyle(document.querySelector('#clock')).fontSize")
             assert float(clock_font.replace('px',''))<=22,clock_font
