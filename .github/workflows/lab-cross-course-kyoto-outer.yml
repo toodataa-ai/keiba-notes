@@ -1,0 +1,88 @@
+name: LAB cross-course Kyoto outer 1400 source-mask gate
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/lab-cross-course-kyoto-outer.yml"
+      - "docs/lab/race-lab-cross-course-v1.*"
+      - "docs/lab/race-lab-source-mask-v1.js"
+      - "docs/lab/race-lab-course-rollout-v1.js"
+permissions: {contents: read}
+jobs:
+  source-turf-and-full-playback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static reuse check
+        run: |
+          node - <<'JS'
+          const fs=require('node:fs'),assert=require('node:assert/strict');
+          const dir='docs/lab/';
+          const html=fs.readFileSync(dir+'race-lab-cross-course-v1.html','utf8');
+          const app=fs.readFileSync(dir+'race-lab-cross-course-v1.js','utf8');
+          const mask=fs.readFileSync(dir+'race-lab-source-mask-v1.js','utf8');
+          const rg=fs.readFileSync(dir+'race-lab-course-rollout-v1.js','utf8');
+          assert.equal((html.match(/kyoto-umapot-course-clean-v8.svg/g)||[]).length,2);
+          for(const key of ['RaceLabSourceMask.build','RaceSimEngine.create',
+            'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
+            'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate'])assert.ok(app.includes(key),key);
+          assert.ok(mask.includes("badDiscs:issues.length"));
+          assert.ok(rg.includes("blocked_svg_missing"));
+          console.log('PASS_COURSE_COMMON_COMPONENTS_NO_SOURCE_REDRAW');
+          JS
+      - name: Install Safari and Chrome tools
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m playwright install --with-deps webkit
+          python3 -m http.server 8801 --directory docs >/tmp/lab-outer-server.log 2>&1 &
+          sleep 2
+          mkdir -p /tmp/lab-outer-screens
+      - name: Gate source-turf safety and verify 1400m race
+        run: |
+          python3 - <<'PY'
+          import json,shutil
+          from playwright.sync_api import sync_playwright
+          chrome=shutil.which('google-chrome') or shutil.which('chromium')
+          assert chrome,'CHROME_NOT_FOUND'
+          with sync_playwright() as p:
+           for name in ['chromium','webkit']:
+            browser=(p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox'])
+              if name=='chromium' else p.webkit.launch(headless=True))
+            page=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=3)
+            errors=[];page.on('pageerror',lambda err:errors.append(str(err)))
+            page.goto('http://127.0.0.1:8801/lab/race-lab-cross-course-v1.html?v=1',
+              wait_until='load',timeout=40000)
+            page.wait_for_function("window.CrossCoursePilot && CrossCoursePilot.inspect().ready || CrossCoursePilot.inspect().blocked",
+              timeout=25000)
+            snapshot=page.evaluate("() => ({inspection:CrossCoursePilot.inspect(),route:CrossCoursePilot.routeReport(),speed:document.querySelector('#speed').value})")
+            print('CROSS_COURSE_BOOT',name,json.dumps(snapshot,ensure_ascii=False))
+            assert not errors,errors
+            assert snapshot['inspection']['ready'],snapshot
+            assert not snapshot['inspection']['blocked'],snapshot
+            assert snapshot['route']['badDiscs']==0,snapshot
+            assert snapshot['speed']=='2'
+            page.locator('#broadcastStage').screenshot(path='/tmp/lab-outer-screens/'+name+'-start.png')
+            page.locator('#speed').select_option('4')
+            page.locator('#startBtn').click()
+            page.wait_for_function("CrossCoursePilot.state()?.finished===true",timeout=40000)
+            result=page.evaluate("""() => ({
+             finish:CrossCoursePilot.state().firstFinishTime,
+             split:CrossCoursePilot.state().splitTime,
+             rows:document.querySelectorAll('#resultsBody tr').length,
+             icao:document.querySelector('#clock').textContent,
+             podium:document.querySelector('#finishPodium').textContent
+            })""")
+            print('CROSS_COURSE_FINISH',name,json.dumps(result,ensure_ascii=False))
+            assert result['finish']>0 and result['split']>0
+            assert result['rows']==18 and '1着' in result['podium'] and '3着' in result['podium']
+            page.locator('#fullResults').screenshot(path='/tmp/lab-outer-screens/'+name+'-finish.png')
+            browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cross-course-kyoto-outer-1400
+          path: /tmp/lab-outer-screens
+          retention-days: 7
