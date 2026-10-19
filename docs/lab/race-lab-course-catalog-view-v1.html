@@ -1,0 +1,32 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>JRAシミュレータ コース横展開台帳｜LAB</title>
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261020-26">
+<style>.catalog-top{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.catalog-top strong{display:block;font-size:24px;color:#245036}
+.catalog-top>div{padding:12px;background:#edf3ee;border-radius:8px}
+.catalog-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px;margin:12px 0}
+.venue{padding:13px;border:1px solid #d6dfd8;border-radius:8px;background:white}
+.venue h2{font-size:17px;margin:0 0 8px}.course-row{display:flex;justify-content:space-between;align-items:flex-start;
+ gap:8px;padding:8px 2px;border-bottom:1px solid #ebf0eb;font-size:12px}
+.course-row .details{display:flex;gap:4px;flex-wrap:wrap}
+.course-row a{color:#19543b;font-weight:800}
+.course-row small{color:#758077;display:block;font-size:11px}
+.course-row em{font-style:normal;font-weight:700;font-size:11px;color:#6c776a;white-space:nowrap}
+.catalog-note{font-size:12px;line-height:1.6}
+@media(max-width:540px){.catalog-top{gap:6px}.catalog-top strong{font-size:20px}}
+</style></head><body><header><div class="shell"><a href="race-clean-course-v1.html?trial=shuka2026&v=26">← 京都内2000の基準LAB</a>
+<h1>JRAコース横展開・進捗台帳</h1>
+<p>公式コース仕様の登録と、実際に安全に走行可能なコースを分けて表示します。</p></div></header>
+<main class="shell">
+<div class="tag">共通方式の横展開 ／ LAB・本番未承認</div>
+<div class="catalog-top"><div>登録競馬場<strong id="venuesTotal">—</strong></div>
+<div>距離・経路の組合せ<strong id="routesTotal">—</strong></div>
+<div>基準＋試走対象<strong id="runningTotal">—</strong></div></div>
+<p class="catalog-note">芝・ダート、内外回り、発走位置などが異なる距離を別のコースとして扱います。未検証のコースに古いコース図や偽の走路を当てはめません。</p>
+<div id="catalogGroups" class="catalog-groups">公式コース台帳を読み込んでいます。</div>
+<p class="catalog-note">走行可能判定：元SVG・走路ガイド・コース全域の芝帯内円盤監査・馬番移動の連続性・Chrome/Safariでの完走・実機目視承認。</p>
+<p class="catalog-note">公式寸法と距離の正本はリポジトリの race-course-catalog-v1.json。映像および仮想時計は公式結果ではなく、正式予想や買い目には影響しません。</p>
+</main>
+<script src="race-lab-course-rollout-v1.js?v=20261020-27"></script>
+<script src="race-lab-course-catalog-view-v1.js?v=20261020-27"></script>
+</body></html>
