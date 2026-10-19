@@ -9,7 +9,6 @@ on:
       - "docs/lab/race-lab-source-mask-v1.js"
       - "docs/lab/race-lab-course-rollout-v1.js"
       - "docs/lab/race-marker-visibility-v1.js"
-      - "docs/lab/race-overview-distance-labels-v1.js"
 permissions: {contents: read}
 jobs:
   source-turf-and-full-playback:
@@ -30,13 +29,41 @@ jobs:
           for(const key of ['RaceLabSourceMask.build','RaceSimEngine.create',
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
             'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate',
-            'markerVisibility.layout','RaceOverviewDistanceLabels.draw'])assert.ok(app.includes(key),key);
+            'markerVisibility.layout','markerTimeDriven:true'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
           assert.ok(mask.includes('corridorFromOriginalSvg:true'), 'Preserve original green-turf source');
           assert.ok(mask.includes('new Path2D('), 'Use original source path identity');
           assert.ok(rg.includes('svgGreenPathIndices:[0]'), 'Outer path must be registered');
           assert.ok(rg.includes("blocked_svg_missing"));
+          assert.ok(!html.includes('race-overview-distance-labels-v1.js'),
+           'Unsupported distance labels must not be loaded');
+          assert.ok(!app.includes('RaceOverviewDistanceLabels.draw'),
+           'No distance overlay on source overview');
+          assert.ok(!app.includes('h.anchorX,h.anchorY'),
+           'Never draw branch/twig connector lines on the race numbers');
+          const vm=require('node:vm'),context={};
+          vm.runInNewContext(fs.readFileSync(dir+'race-marker-visibility-v1.js','utf8'),
+           {window:context});
+          const visibility=context.RaceMarkerVisibility.create();
+          const near=Array.from({length:18},(_,i)=>({number:i+1,
+           x:160+(i%6)*8,y:110+Math.floor(i/6)*6}));
+          const norm=()=>({x:0,y:1});
+          const first=visibility.layout(near,{normalAt:norm,timeSeconds:0});
+          const baseline=visibility.metrics();
+          for(let i=0;i<25;i++){
+           const again=visibility.layout(near,{normalAt:norm,timeSeconds:0});
+           assert.deepEqual(again.map(x=>[x.x,x.y,x.labelOffset]),
+            first.map(x=>[x.x,x.y,x.labelOffset]),
+            'Repeated painting at the same virtual time must not move numbers');
+          }
+          assert.equal(visibility.metrics().solverRuns,1);
+          assert.ok(baseline.after.penalty<baseline.base.penalty);
+          const later=visibility.layout(near,{normalAt:norm,timeSeconds:.1});
+          for(let i=0;i<later.length;i++)
+           assert.ok(Math.abs(later[i].labelOffset-first[i].labelOffset)<=1.21,
+            'Position offsets must be bounded by elapsed simulation time');
+          assert.equal(context.RaceMarkerVisibility.paintIdempotent,true);
           console.log('PASS_COURSE_COMMON_COMPONENTS_NO_SOURCE_REDRAW');
           JS
       - name: Install Safari and Chrome tools
@@ -75,20 +102,30 @@ jobs:
             assert snapshot['speed']=='2'
             assert snapshot['inspection']['sharedVisualMode'] is True
             assert page.evaluate("() => typeof RaceMarkerVisibility.create")== 'function'
-            assert page.evaluate("() => RaceOverviewDistanceLabels.courseIndependent") is True
+            assert page.evaluate("() => RaceMarkerVisibility.paintIdempotent") is True
+            assert snapshot['inspection']['markerTimeDriven'] is True
+            assert not page.evaluate("() => 'RaceOverviewDistanceLabels' in window")
             # Explicit 3C/4C snapshot gate, not just 'green pixels anywhere'.
             # It uses the same physical engine and the same outer source stroke.
             for metres in (600,720,850,950):
              reached=page.evaluate("(metres) => CrossCoursePilot.seekTo(metres)",metres)
              assert reached>=metres and not errors,(name,metres,reached,errors)
+             first_preview=page.evaluate("""() => ({
+               metric:CrossCoursePilot.previewFrame(),
+               image:document.querySelector('#liveCourseImage').style.transform
+             })""")
              for _ in range(20):
               page.evaluate("() => CrossCoursePilot.previewFrame()")
              visible=page.evaluate("() => CrossCoursePilot.visualMetrics()")
+             last_transform=page.evaluate("() => document.querySelector('#liveCourseImage').style.transform")
+             assert first_preview['metric']==visible,(name,metres,'PAINT_JITTER')
+             assert last_transform==first_preview['image'],(name,metres,'CAMERA_JITTER')
+             assert visible['solverRuns']==1,(name,metres,'REPLANNED_WITHOUT_TIME')
              print('CROSS_COURSE_LABEL_VISIBILITY',name,metres,json.dumps(visible))
              assert visible['physicalPositionsUnchanged'] is True
              assert visible['maxShiftPx']<=18.01
              assert visible['after']['penalty'] <= visible['base']['penalty']*1.1+1
-             assert page.evaluate("() => document.querySelector('.race-overview-view .status').textContent.includes('200m')")
+             assert page.evaluate("() => document.querySelector('.race-overview-view .status').textContent.includes('距離目盛りなし')")
              page.locator('#broadcastStage').screenshot(
                path=f'/tmp/lab-outer-screens/{name}-outer-{metres}m.png')
             assert page.evaluate("() => CrossCoursePilot.routeReport().sourcePathIndices")==[0]
@@ -124,7 +161,7 @@ jobs:
              print('CROSS_COURSE_DESKTOP_LAYOUT',json.dumps(layout))
              assert abs(layout['leftRight']-layout['rightLeft'])<=2,layout
              assert layout['liveWidth']>layout['mapWidth'],layout
-             assert '200m' in layout['label'],layout
+             assert '距離目盛りなし' in layout['label'],layout
              wide.screenshot(path='/tmp/lab-outer-screens/chromium-desktop-v31.png',full_page=True)
              wide.close()
             browser.close()
