@@ -70,6 +70,15 @@ jobs:
             assert snapshot['route']['sourcePathIndices']==[0],snapshot
             assert snapshot['route']['maxProjectedStep']<=2,snapshot
             assert snapshot['speed']=='2'
+            # Explicit 3C/4C snapshot gate, not just 'green pixels anywhere'.
+            # It uses the same physical engine and the same outer source stroke.
+            for metres in (600,720,850,950):
+             reached=page.evaluate("(metres) => CrossCoursePilot.seekTo(metres)",metres)
+             assert reached>=metres and not errors,(name,metres,reached,errors)
+             page.locator('#broadcastStage').screenshot(
+               path=f'/tmp/lab-outer-screens/{name}-outer-{metres}m.png')
+            assert page.evaluate("() => CrossCoursePilot.routeReport().sourcePathIndices")==[0]
+            page.locator('#resetBtn').click()
             clock_font=page.evaluate("() => getComputedStyle(document.querySelector('#clock')).fontSize")
             assert float(clock_font.replace('px',''))<=22,clock_font
             page.locator('#broadcastStage').screenshot(path='/tmp/lab-outer-screens/'+name+'-start.png')
