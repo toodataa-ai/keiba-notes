@@ -28,7 +28,9 @@ jobs:
           for(const key of ['RaceLabSourceMask.build','RaceSimEngine.create',
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
             'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate'])assert.ok(app.includes(key),key);
-          assert.ok(mask.includes("badDiscs:issues.length"));
+          assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
+          assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
+          assert.ok(mask.includes('corridorFromOriginalSvg:true'), 'Preserve original green-turf source');
           assert.ok(rg.includes("blocked_svg_missing"));
           console.log('PASS_COURSE_COMMON_COMPONENTS_NO_SOURCE_REDRAW');
           JS
