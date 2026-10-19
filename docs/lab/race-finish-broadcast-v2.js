@@ -12,24 +12,31 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
  * This camera uses one truthful metres->px scale and moves its viewpoint;
  * no stretching of individual horses or change to physics gaps.
  */
-function packCamera({points,distance,width,turn='右'}){
+function packCamera({points,distance,width,height=336,turn='右'}){
  const leader=Math.max(...points.map(p=>p.d)),last=Math.min(...points.map(p=>p.d));
  const right=turn==='右',gap=Math.max(0,leader-last);
- const scale=clamp(width/62,5.25,8.5);
- const fixedGoalX=width*(right?.30:.70),leadX=width*(right?.52:.48);
+ // Crop like an actual TV zoom: keep 20-25m of racing pack readable
+ // rather than squeezing a whole 215m stretch into one camera image.
+ const scale=clamp(width/43,7.2,9.0);
+ const fixedGoalX=width*(right?.30:.70),leadX=width*(right?.42:.58);
+ // Vertical zoom on the actual active lanes, NOT a per-horse lane edit.
+ const minLane=Math.min(...points.map(p=>p.lane??0)),
+  maxLane=Math.max(...points.map(p=>p.lane??0)),
+  laneCenter=(minLane+maxLane)/2,
+  laneStep=clamp((height-115)/(maxLane-minLane+1.5),16,30);
  const remaining=distance-leader;
  const natural=leadX+(right?-1:1)*remaining*scale;
  // Once the board reaches its broadcast-safe position it remains fixed;
  // horses keep crossing at the exact distance-proportional screen speed.
  const goalX=right?Math.min(fixedGoalX,natural):Math.max(fixedGoalX,natural);
  return {goalX,leader,last,gap,pxPerMetre:scale,remaining,
+  laneCenter,laneStep,minLane,maxLane,
   cameraMode:Math.abs(goalX-fixedGoalX)<1e-6?'fixed-finish':'tracking-pack'};
 }
 function goalScreenPosition(d,lane,distance,width,height,maxLane,turn='右',camera){
- const view=camera??packCamera({points:[{d}],distance,width,turn});
- const laneStep=Math.min(24,(height-76)/(maxLane+2.2));
+ const view=camera??packCamera({points:[{d,lane}],distance,width,height,turn});
  return {x:view.goalX+(turn==='右'?1:-1)*(distance-d)*view.pxPerMetre,
-  y:height*.51+(lane-maxLane/2)*laneStep};
+  y:height*.59+(lane-view.laneCenter)*view.laneStep};
 }
 function drawGoalBoard(ctx,{x,top,bottom,venueLabel='KYOTO'}){
  // Actual Kyoto finish apparatus has a deep-green/white double arched
@@ -81,9 +88,11 @@ function render({canvas,points,paintNumber,focusedNo,leaderNo,turn='右',distanc
  // Green grandstand side camera with light mowing stripes, visible white
  // inner/outer rails and an accurate linear distance-to-finish axis.
  ctx.fillStyle='#204634';ctx.fillRect(0,0,w,h);
- const laneStep=Math.min(24,(h-76)/(maxLane+2.2));
- const innerY=h*.51-(maxLane/2+1)*laneStep;
- const outerY=h*.51+(maxLane/2+1)*laneStep;
+ const camera=packCamera({points,distance,width:w,height:h,turn});
+ // Entire vertical viewport follows the occupied racing lanes. Both
+ // rail lines are viewport framing guides, not reconstructed source rails.
+ const innerY=Math.max(10,h*.59+(camera.minLane-camera.laneCenter-1.3)*camera.laneStep);
+ const outerY=Math.min(h-10,h*.59+(camera.maxLane-camera.laneCenter+1.3)*camera.laneStep);
  ctx.fillStyle='#72a75e';ctx.fillRect(0,innerY,w,outerY-innerY);
  for(let i=0;i<7;i++){
   ctx.fillStyle=i%2?'rgba(243,253,235,.045)':'rgba(9,65,20,.065)';
@@ -93,7 +102,6 @@ function render({canvas,points,paintNumber,focusedNo,leaderNo,turn='右',distanc
  for(const y of [innerY,outerY]){
   ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
  }
- const camera=packCamera({points,distance,width:w,turn});
  const x=camera.goalX;
  // Thin checkered winning line across all lanes, visible UNDER the horses.
  for(let y=innerY+2,part=0;y<outerY-2;y+=9,part++){
@@ -119,7 +127,8 @@ function render({canvas,points,paintNumber,focusedNo,leaderNo,turn='右',distanc
  return {mode:'finish-100m-camera',goalX:x,visible:markers.length,
   markers,remaining:Math.max(0,camera.remaining),venueLabel,
   physicalSpreadM:camera.gap,visualSpreadPx:camera.gap*camera.pxPerMetre,
-  pxPerMetre:camera.pxPerMetre,cameraMode:camera.cameraMode};
+  pxPerMetre:camera.pxPerMetre,cameraMode:camera.cameraMode,
+  laneStep:camera.laneStep,activeLaneRange:[camera.minLane,camera.maxLane]};
 }
 g.RaceFinishBroadcastV2=Object.freeze({render,goalScreenPosition,drawGoalBoard,
   packCamera,transitionRemainingM:100,sourceGeometryIndependent:true,
