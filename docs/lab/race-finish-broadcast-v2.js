@@ -16,7 +16,7 @@ function drawGoalBoard(ctx,{x,top,bottom,venueLabel='KYOTO'}){
  // Actual Kyoto finish apparatus has a deep-green/white double arched
  // silhouette, with KYOTO on its vertical column and floodlights.
  // Stylization is deterministic, vectorial and scalable.
- const h=Math.max(70,Math.min(155,bottom-top-32)),width=54;
+ const h=Math.max(64,Math.min(88,bottom-top-54)),width=51;
  const y=top+12,cy=y+45;
  ctx.save();
  ctx.shadowColor='rgba(13,40,25,.23)';ctx.shadowBlur=5;ctx.shadowOffsetX=2;
@@ -39,7 +39,7 @@ function drawGoalBoard(ctx,{x,top,bottom,venueLabel='KYOTO'}){
  // Stable timing device and racecourse wordmark: not a JRA trademark copy.
  ctx.fillStyle='#173e32';
  ctx.fillRect(x-4,y+29,8,h-23);
- ctx.fillStyle='#e8f4ec';ctx.font='bold 8px Arial,sans-serif';
+ ctx.fillStyle='#184b3b';ctx.font='bold 8px Arial,sans-serif';
  ctx.textBaseline='middle';ctx.textAlign='center';
  const vertical=String(venueLabel).slice(0,6).split('');
  for(let i=0;i<vertical.length;i++)ctx.fillText(vertical[i],x+width*.48,y+58+i*10);
