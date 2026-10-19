@@ -1,0 +1,44 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>京都外1400m・共通方式LAB</title>
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261020-26">
+<style>.audit{padding:12px;background:#eaf3ec;border-radius:7px}.audit.blocked{background:#fff2e1;color:#804416}
+.pilot-map{position:relative;aspect-ratio:620/430}.pilot-map img,.pilot-map canvas{position:absolute;inset:0;width:100%;height:100%}.pilot-map canvas{background:transparent}</style>
+</head><body><header><div class="shell"><a href="race-clean-course-v1.html?trial=shuka2026&v=26">← 基準版 LAB v26</a>
+<h1>京都芝1400m外回り｜共通方式の横展開</h1>
+<p>うまぽっと原SVGと共通物理を使った検証。画像上の芝帯から外れる場合は再生不可です。</p></div></header>
+<main class="shell"><div class="tag">LAB 横展開第1弾／架空18頭／未承認</div>
+<section class="panel toolbar"><button id="startBtn" class="primary" disabled>▶ スタート</button>
+<button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
+<label>速度<select id="speed"><option value="1">1倍</option><option value="2" selected>2倍（標準）</option><option value="4">4倍</option></select></label></section>
+<p id="sourceAudit" class="audit">原SVGの芝帯を検証中です。</p>
+<section class="panel race-display-panel"><div class="panel-title"><h2>実況 ＋ 全体図</h2><span id="progress">0m / 1400m</span></div>
+<div class="race-view-grid"><div class="race-broadcast-view"><div class="race-view-label">実況</div>
+<div class="broadcast-stage" id="broadcastStage">
+<img id="liveCourseImage" width="620" height="430" src="assets/kyoto-umapot-course-clean-v8.svg" alt="">
+<canvas id="broadcast"></canvas><canvas id="goalCamera" class="goal-camera" hidden></canvas>
+<div class="broadcast-clock"><strong id="clock">0.00.0</strong>
+<div class="broadcast-split"><span id="splitLabel">600m 通過</span><strong id="splitTime">—</strong></div></div>
+<div id="finishBanner" class="finish-banner" hidden><strong id="finishHeading">ゴール速報</strong><span id="finishPodium"></span></div></div>
+<div class="status"><span id="section">スタート前</span><span>共通RaceSimEngine</span></div></div>
+<div class="race-overview-view"><div class="race-view-label">全体図／うまぽっと原SVG</div>
+<div class="pilot-map"><img id="realCourseImage" width="620" height="430" src="assets/kyoto-umapot-course-clean-v8.svg" alt="京都競馬場原図">
+<canvas id="overview"></canvas></div><div class="status"><span>原画像は変更なし</span><span>右回り外1400m</span></div></div></div></section>
+<section class="panel full-results" id="fullResults" hidden><div class="panel-title"><h2>全馬の時計と推定着差</h2></div>
+<div class="full-results-scroll"><table class="finish-times-table"><thead><tr><th>順位</th><th>馬番</th><th>馬名</th><th>タイム</th><th>前馬との差</th><th>1着との差</th></tr></thead>
+<tbody id="resultsBody"></tbody></table></div></section>
+<p class="trial-description">出典：<a href="https://umapot.com/?p=13277">うまぽっと 京都競馬場コース素材</a>。
+実レースを再生するものではなく、JRA予想や買い目には影響しません。</p></main>
+<script src="race-course-geometry-v1.js?v=20261016-40"></script><script src="race-lane-ai-v1.js?v=20261015-25"></script>
+<script src="race-runner-style-v1.js?v=20261015-24"></script><script src="race-ability-model-v1.js?v=20261015-22"></script>
+<script src="race-sim-engine.js?v=20261016-41"></script>
+<script src="race-umapot-overlay-v1.js?v=20261018-49"></script>
+<script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
+<script src="race-course-image-geometry-v1.js?v=20261019-21"></script>
+<script src="race-safe-rail-projection-v1.js?v=20261020-26"></script>
+<script src="race-frame-interpolator-v1.js?v=20261020-24"></script>
+<script src="race-clean-goal-view-v1.js?v=20261019-20"></script>
+<script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
+<script src="race-lab-course-rollout-v1.js?v=20261020-27"></script>
+<script src="race-lab-source-mask-v1.js?v=20261020-27"></script>
+<script src="race-lab-cross-course-v1.js?v=20261020-27"></script>
+</body></html>
