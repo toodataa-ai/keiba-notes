@@ -176,8 +176,10 @@ function verifyVectorSource(){
    const shared=window.RaceCourseImageGeometry.build({
     distanceM:model.distance,anchorsM:anchors,
     pointAt:(d,lane)=>turf.pointAtImageDistance(d,lane),
-    displayGain:d=>CURVE_LENS_ENABLED?
-     window.RaceCleanCurveCamera.gain(d):1
+    // Always fit geometry against the same reference lens, even if the
+    // viewer selects lens=off. Toggling a CAMERA option must never move
+    // horses along the source course illustration.
+    displayGain:d=>window.RaceCleanCurveCamera.gain(d)
    });
    const safety=turf.activateSharedGeometry(shared);
    sharedGeometryStats={...safety,anchors};
