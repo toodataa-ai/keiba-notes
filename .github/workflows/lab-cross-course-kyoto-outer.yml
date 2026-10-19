@@ -8,6 +8,8 @@ on:
       - "docs/lab/race-lab-cross-course-v1.*"
       - "docs/lab/race-lab-source-mask-v1.js"
       - "docs/lab/race-lab-course-rollout-v1.js"
+      - "docs/lab/race-marker-visibility-v1.js"
+      - "docs/lab/race-overview-distance-labels-v1.js"
 permissions: {contents: read}
 jobs:
   source-turf-and-full-playback:
@@ -27,7 +29,8 @@ jobs:
           assert.equal((html.match(/kyoto-umapot-course-clean-v8.svg/g)||[]).length,2);
           for(const key of ['RaceLabSourceMask.build','RaceSimEngine.create',
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
-            'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate'])assert.ok(app.includes(key),key);
+            'RaceCleanGoalView.render','RaceLabCourseRollout.assertCanAnimate',
+            'markerVisibility.layout','RaceOverviewDistanceLabels.draw'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
           assert.ok(mask.includes('corridorFromOriginalSvg:true'), 'Preserve original green-turf source');
@@ -70,11 +73,22 @@ jobs:
             assert snapshot['route']['sourcePathIndices']==[0],snapshot
             assert snapshot['route']['maxProjectedStep']<=2,snapshot
             assert snapshot['speed']=='2'
+            assert snapshot['inspection']['sharedVisualMode'] is True
+            assert page.evaluate("() => typeof RaceMarkerVisibility.create")== 'function'
+            assert page.evaluate("() => RaceOverviewDistanceLabels.courseIndependent") is True
             # Explicit 3C/4C snapshot gate, not just 'green pixels anywhere'.
             # It uses the same physical engine and the same outer source stroke.
             for metres in (600,720,850,950):
              reached=page.evaluate("(metres) => CrossCoursePilot.seekTo(metres)",metres)
              assert reached>=metres and not errors,(name,metres,reached,errors)
+             for _ in range(20):
+              page.evaluate("() => CrossCoursePilot.previewFrame()")
+             visible=page.evaluate("() => CrossCoursePilot.visualMetrics()")
+             print('CROSS_COURSE_LABEL_VISIBILITY',name,metres,json.dumps(visible))
+             assert visible['physicalPositionsUnchanged'] is True
+             assert visible['maxShiftPx']<=18.01
+             assert visible['after']['penalty'] <= visible['base']['penalty']*1.1+1
+             assert page.evaluate("() => document.querySelector('.race-overview-view .status').textContent.includes('200m')")
              page.locator('#broadcastStage').screenshot(
                path=f'/tmp/lab-outer-screens/{name}-outer-{metres}m.png')
             assert page.evaluate("() => CrossCoursePilot.routeReport().sourcePathIndices")==[0]
