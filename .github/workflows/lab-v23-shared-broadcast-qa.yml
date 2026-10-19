@@ -1,0 +1,109 @@
+name: LAB v23 shared live map and all-runner finish HUD
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-v23-shared-broadcast-qa.yml'
+      - 'docs/lab/race-broadcast-hud-v1.js'
+      - 'docs/lab/race-clean-course-app-v1.js'
+      - 'docs/lab/race-clean-course-v1.html'
+      - 'docs/lab/race-clean-course-v1.css'
+permissions: {contents: read}
+jobs:
+  browser-hud:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check reusable clock and untouched race engine contracts
+        run: node tools/test_race_clean_course_v1.cjs
+      - name: Prepare real Chrome and iPhone WebKit
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m playwright install --with-deps webkit
+          python3 -m http.server 8798 --directory docs >/tmp/lab-hud-http.log 2>&1 &
+          sleep 2
+          mkdir -p /tmp/lab-hud-artifacts
+      - name: Verify live map grouping, stopwatch, podium and all 17/18 simulated finishers
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import shutil,re,json
+          from playwright.sync_api import sync_playwright
+          executable=shutil.which('google-chrome') or shutil.which('chromium')
+          assert executable,'Chrome missing'
+          with sync_playwright() as p:
+           for engine in ['chromium','webkit']:
+            browser=(p.chromium.launch(executable_path=executable,headless=True,args=['--no-sandbox'])
+              if engine=='chromium' else p.webkit.launch(headless=True))
+            for width in ([390,1024] if engine=='chromium' else [390]):
+             ctx=browser.new_context(viewport={'width':width,'height':844},device_scale_factor=3 if width==390 else 2)
+             page=ctx.new_page()
+             errors=[]
+             page.on('pageerror',lambda err:errors.append(str(err)))
+             page.goto('http://127.0.0.1:8798/lab/race-clean-course-v1.html?trial=shuka2026&checkpoint=1950&v=23',wait_until='load',timeout=45000)
+             page.wait_for_function('window.CleanLab?.inspect()?.sharedGeometryEnabled===true',timeout=35000)
+             ui=page.evaluate("""() => {
+              const stage=document.querySelector('#broadcastStage').getBoundingClientRect();
+              const hud=document.querySelector('.broadcast-clock').getBoundingClientRect();
+              return {grid:!!document.querySelector('.race-view-grid'),
+               label:document.querySelector('.panel-title h2').textContent,
+               rankHidden:getComputedStyle(document.querySelector('.legacy-order-telemetry')).display==='none',
+               clock:document.querySelector('#clock').textContent,
+               split:document.querySelector('#splitTime').textContent,
+               splitBelow:document.querySelector('#splitTime').getBoundingClientRect().top>document.querySelector('#clock').getBoundingClientRect().top,
+               hudInside:hud.top>=stage.top&&hud.right<=stage.right+1,
+               resultsHidden:document.querySelector('#fullResults').hidden,
+               source:[document.querySelector('#liveCourseImage').getAttribute('src'),
+                 document.querySelector('#realCourseImage').getAttribute('src')],
+               count:CleanLab.getState().horses.length}
+             }""")
+             print('HUD_START',engine,width,json.dumps(ui,ensure_ascii=False))
+             assert ui['grid'] and ui['rankHidden'] and ui['splitBelow'] and ui['hudInside'],ui
+             assert ui['count']==17 and ui['resultsHidden']
+             assert len(set(ui['source']))==1 and ui['source'][0]=='assets/kyoto-umapot-course-clean-v8.svg'
+             assert re.fullmatch(r'\d+\.\d\d\.\d',ui['clock'])
+             assert re.fullmatch(r'\d+\.\d\d\.\d',ui['split'])
+             page.locator('#broadcastStage').screenshot(path=f'/tmp/lab-hud-artifacts/{engine}-{width}-initial.png')
+             page.locator('#speed').select_option('4')
+             page.locator('#startBtn').click()
+             page.wait_for_function('CleanLab.inspect().resultsVisible === true',timeout=30000)
+             result=page.evaluate("""() => ({
+              rows:[...document.querySelectorAll('#resultsBody tr')].map(tr=>[...tr.children].map(td=>td.textContent)),
+              winners:document.querySelector('#finishPodium').textContent,
+              count:CleanLab.getState().horses.length,
+              times:CleanLab.getState().horses.map(h=>h.finishTime),
+              errors:CleanLab.inspect().turfBadDiscs,
+              clock:CleanLab.inspect().broadcastClock
+             })""")
+             print('HUD_FINISH',engine,width,json.dumps({k:v for k,v in result.items() if k not in ('rows','times')},ensure_ascii=False))
+             assert result['count']==17 and len(result['rows'])==17
+             assert all(len(row)==6 for row in result['rows'])
+             assert all(re.fullmatch(r'\d+\.\d\d\.\d',row[3]) for row in result['rows'])
+             assert all(row[4].startswith('約') for row in result['rows'][1:])
+             assert result['rows'][0][0]=='1' and result['rows'][-1][0]=='17'
+             for label,row in [('1着',result['rows'][0]),('2着',result['rows'][1]),('3着',result['rows'][2])]:
+              assert label in result['winners'] and row[2] in result['winners']
+             assert result['errors']==0 and not errors,errors
+             page.locator('#fullResults').screenshot(path=f'/tmp/lab-hud-artifacts/{engine}-{width}-all-17.png')
+             page.locator('#trialMode').select_option('synthetic')
+             assert page.evaluate('CleanLab.getState().horses.length')==18
+             assert page.locator('#fullResults').evaluate('(el)=>el.hidden')
+             page.evaluate('CleanLab.advanceTo(1950)')
+             page.locator('#speed').select_option('4')
+             page.locator('#startBtn').click()
+             page.wait_for_function('CleanLab.inspect().resultsVisible === true',timeout=30000)
+             assert page.locator('#resultsBody tr').count()==18
+             assert not errors,errors
+             print('PASS_SHARED_HUD_REAL_17_SYNTHETIC_18',engine,width)
+             ctx.close()
+            browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lab-v23-combined-broadcast-and-results
+          path: /tmp/lab-hud-artifacts/*.png
+          if-no-files-found: warn
+          retention-days: 7
