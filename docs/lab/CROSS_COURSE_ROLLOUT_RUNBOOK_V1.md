@@ -43,3 +43,9 @@ RaceBroadcastHud、RaceCleanGoalView、RaceSafeRailProjection は流用し、
 
 ## 次の承認ゲート
 Chrome/WebKitの原SVGマスク・全馬完走合格 → スマホ実機で芝帯・内ラチ・馬番の滑らかさの目視 → 京都外1400mを準承認へ移行。東京と他会場はベクター原図を入手・監査後に同じ共通処理を適用。STAGINGと正式予想・本番にはユーザー承認まで一切展開しない。
+
+## 2026-10-20 実ブラウザ試走の起動障害と復旧
+- Chrome real source maskで 715m/最内 lane0 に1件の円盤はみ出しが発生。意図したfail-closedゲートがスタートを無効化。前回はGitHub Actionsのコード表記チェックが古く、実ブラウザまでテストされていなかった。両方修正。
+- source-derived safe corridor全区間に共通2.0元画像pxの境界余白を追加し、補間上に残るsubpixel透過境界は同じ緑帯の内側へ0.25px刻み最大3pxだけ吸収。5m→1m間隔、6レーンで8,406チェック。角・レース別の手修正なし。
+- **実ブラウザ合格**：GitHub Actions #39290203147。Chrome/WebKit 390px双方、8406ポイントで芝帯外0、最悪1m表示移動 Chrome 1.727px / WebKit 1.479px（共通閾値2px以下）。プレイボタンready、架空18頭完走、600m通過、上位3頭の馬番・馬名、全馬時計・着差を確認。元SVG不変更。
+- GitHub Pages #39290200980で公開成功。再キャッシュを避けて試走入口は?v=28に更新し、JSにもv=20261020-28を使用。安全性判定を外して成功させてはいない。
