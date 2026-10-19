@@ -31,6 +31,8 @@ jobs:
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
           assert.ok(mask.includes('corridorFromOriginalSvg:true'), 'Preserve original green-turf source');
+          assert.ok(mask.includes('new Path2D('), 'Use original source path identity');
+          assert.ok(rg.includes('svgGreenPathIndices:[0]'), 'Outer path must be registered');
           assert.ok(rg.includes("blocked_svg_missing"));
           console.log('PASS_COURSE_COMMON_COMPONENTS_NO_SOURCE_REDRAW');
           JS
@@ -64,7 +66,12 @@ jobs:
             assert snapshot['inspection']['ready'],snapshot
             assert not snapshot['inspection']['blocked'],snapshot
             assert snapshot['route']['badDiscs']==0,snapshot
+            assert snapshot['route']['strictOriginalPathTopology'] is True,snapshot
+            assert snapshot['route']['sourcePathIndices']==[0],snapshot
+            assert snapshot['route']['maxProjectedStep']<=2,snapshot
             assert snapshot['speed']=='2'
+            clock_font=page.evaluate("() => getComputedStyle(document.querySelector('#clock')).fontSize")
+            assert float(clock_font.replace('px',''))<=22,clock_font
             page.locator('#broadcastStage').screenshot(path='/tmp/lab-outer-screens/'+name+'-start.png')
             page.locator('#speed').select_option('4')
             page.locator('#startBtn').click()

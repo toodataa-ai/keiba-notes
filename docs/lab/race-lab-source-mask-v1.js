@@ -1,20 +1,58 @@
 /* Shared image-derived green corridor for registered Umapot SVG routes.
- * Select a contiguous GREEN band by following the existing image guide in
- * race-distance order. Never repaint the source or alter RaceSimEngine lanes.
+ * Follow an explicitly identified original SVG path, NOT just any green
+ * turf band. This preserves inner/outer route identity at shared corners. Never repaint the source or alter RaceSimEngine lanes.
  * No venue, corner, or 1400/2000 special-case correction tables.
  */
 (function(g){'use strict';
 const W=620,H=430,R=2,CLEARANCE=1.45,SCAN=60,STEP=.5,MIN_WIDTH=6;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-function build({image,course,guide,projection,geometry}){
+function build({image,course,guide,projection,geometry,sourceSvgText,sourcePathIndices}){
  if(!image?.complete||!image.naturalWidth)throw Error('SOURCE_VECTOR_UNAVAILABLE');
  const canvas=document.createElement('canvas');canvas.width=W*R;canvas.height=H*R;
  const ctx=canvas.getContext('2d',{willReadFrequently:true});
  ctx.drawImage(image,0,0,canvas.width,canvas.height);
  const raw=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+ // A green pixel alone does not establish which course it belongs to.
+ // The course registry specifies *original SVG path identities*, not any
+ // arbitrary screen coordinates or per-corner offsets. Draw the selected
+ // source path into a private offscreen mask; the user-visible SVG is intact.
+ if(typeof sourceSvgText!=='string'||!Array.isArray(sourcePathIndices)||
+    !sourcePathIndices.length||sourcePathIndices.some(x=>!Number.isInteger(x)||x<0))
+   throw Error('SOURCE_ORIGINAL_PATH_TOPOLOGY_REQUIRED');
+ const parsed=new DOMParser().parseFromString(sourceSvgText,'image/svg+xml');
+ if(parsed.querySelector('parsererror'))throw Error('SOURCE_SVG_XML_INVALID');
+ const root=parsed.documentElement,box=root.getAttribute('viewBox')?.trim().split(/\\s+/).map(Number);
+ if(!box||box.length!==4||box.some(x=>!Number.isFinite(x))||box[2]<=0||box[3]<=0)
+   throw Error('SOURCE_SVG_VIEWBOX_INVALID');
+ const paths=[...parsed.querySelectorAll('path[stroke]')].filter(p=>
+   (p.getAttribute('stroke')||'').toLowerCase()==='#00b050');
+ const layer=document.createElement('canvas');layer.width=canvas.width;layer.height=canvas.height;
+ const layerCtx=layer.getContext('2d',{willReadFrequently:true});
+ for(const index of sourcePathIndices){
+  const sourcePath=paths[index];
+  if(!sourcePath)throw Error('SOURCE_SVG_PATH_UNAVAILABLE_'+index);
+  const transformation=sourcePath.getAttribute('transform')||'matrix(1,0,0,1,0,0)';
+  const found=/matrix\\(([^)]+)\\)/.exec(transformation);
+  const values=found?.[1].split(/[\\s,]+/).map(Number);
+  if(!values||values.length!==6||values.some(x=>!Number.isFinite(x)))
+   throw Error('SOURCE_SVG_PATH_TRANSFORM_UNSUPPORTED_'+index);
+  layerCtx.setTransform(canvas.width/box[2],0,0,canvas.height/box[3],
+     -box[0]*canvas.width/box[2],-box[1]*canvas.height/box[3]);
+  layerCtx.transform(...values);
+  layerCtx.lineWidth=Number(sourcePath.getAttribute('stroke-width'));
+  if(!(layerCtx.lineWidth>0))throw Error('SOURCE_SVG_PATH_WIDTH_UNAVAILABLE_'+index);
+  layerCtx.strokeStyle='#00b050';
+  layerCtx.lineCap=sourcePath.getAttribute('stroke-linecap')||'butt';
+  layerCtx.lineJoin=sourcePath.getAttribute('stroke-linejoin')||'miter';
+  layerCtx.stroke(new Path2D(sourcePath.getAttribute('d')));
+ }
+ const selected=layerCtx.getImageData(0,0,layer.width,layer.height).data;
  const green=new Uint8Array(W*H*R*R);
- for(let i=0;i<green.length;i++){const j=i*4,r=raw[j],v=raw[j+1],b=raw[j+2],a=raw[j+3];
-  green[i]=(a>=240&&v>=108&&v>r*1.4&&v>b*1.4)?1:0;
+ for(let i=0;i<green.length;i++){
+  const j=i*4,r=raw[j],v=raw[j+1],b=raw[j+2],a=raw[j+3];
+  const sourceGreen=a>=240&&v>=108&&v>r*1.4&&v>b*1.4;
+  // Intersection with original raster ensures no newly invented turf.
+  green[i]=(sourceGreen&&selected[j+3]>=235)?1:0;
  }
  function isGreen(x,y){
   const i=Math.floor(x*R),j=Math.floor(y*R);
@@ -152,6 +190,7 @@ function build({image,course,guide,projection,geometry}){
   if(step>maxProjectedStep){maxProjectedStep=step;maxProjectedStepAt=d}
  }
  const report=Object.freeze({id:course.id,checked,badDiscs:bad,
+  sourcePathIndices:sourcePathIndices.slice(),strictOriginalPathTopology:true,
   typicalBandWidth,sourceEdgeBuffer:SOURCE_EDGE_BUFFER,
   maxProjectedStep,maxProjectedStepAt,maxSafeInsetCorrection,
   maxGuideDeviation,maxCenterStep,maxCenterStepAt,minBandWidth,badSamples:failures,

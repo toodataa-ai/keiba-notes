@@ -47,15 +47,22 @@ function fail(reason){
  $('sourceAudit').classList.add('blocked');
  $('sourceAudit').textContent='安全ゲートで停止しました: '+blocked;
 }
-function load(){
+async function load(){
  if(blocked)return;
  try{
+  const source=RaceLabCourseRollout.get(courseId);
+  if(!source.svgGreenPathIndices?.length)throw Error('OUTER_PATH_TOPOLOGY_NOT_REGISTERED');
+  const response=await fetch($('realCourseImage').currentSrc,{cache:'no-store'});
+  if(!response.ok)throw Error('ORIGINAL_SVG_FETCH_FAILED_'+response.status);
+  const sourceSvgText=await response.text();
   route=RaceLabSourceMask.build({image:$('realCourseImage'),course,
    guide:RaceUmapotOverlay.legacyPoint,
-   projection:RaceSafeRailProjection,geometry:RaceCourseImageGeometry});
+   projection:RaceSafeRailProjection,geometry:RaceCourseImageGeometry,
+   sourceSvgText,sourcePathIndices:source.svgGreenPathIndices});
   RaceLabCourseRollout.assertCanAnimate(courseId,course,route);
   $('sourceAudit').textContent='原図の芝帯監査 '+route.report.checked+
-   '地点 合格／芝帯外0・最大1m移動'+route.report.maxProjectedStep.toFixed(2)+'px／画像・物理変更なし';
+   '地点 合格／外回り元SVGパス#'+route.report.sourcePathIndices.join(',')+
+   ' 固定・芝帯外0・最大1m移動'+route.report.maxProjectedStep.toFixed(2)+'px／原図不変';
   $('startBtn').disabled=false;reset();
  }catch(e){fail(e)}
 }
