@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "2f56c13d5a58a4c2ce52ba478e060eede4557279",
+  "scan_commit": "e9104e36cb6c089cff484d655e768deb93d9ace1",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "2026-10-19: ユーザーから『3コーナーで隊列が一瞬伸びる』『個別調整では横展開が大変』と指摘あり。1270～1310mで物理隊列29.4→27.69m縮小に対し旧LAB画面の全体幅150.45→194.32px拡大を再現した。複数の1270m専用derivative実験で縮減可能だが、個別slopeハードコードは公式改善として不採用。元SVG背景・RaceSimEngine/RaceLaneAI物理を不変に、各コースの内ラチ/外ラチの原画像線、距離基準点から共通arclength→画像座標を算出する汎用幾何契約へ切り替える。個別補正ゼロ・全区間5m監査・京都1400/京都2000/別コースで共通適用を条件にLAB検証する。docs/lab/REUSABLE_COURSE_GEOMETRY_DESIGN_V1.md参照。LAB v20は保持し、改修完了・本番反映は未承認。",
+      "next_action": "2026-10-19 LAB v21: 京都2000専用の段階的スロープ調整を不採用とし、docs/lab/race-course-image-geometry-v1.js をコース独立の正式LAB共通モジュールとして実装。入力は距離、確定距離基準点、未補正の元画像上パス関数と任意のカメラ倍率だけ。原画像弧長をサンプリング、単調な形状保持Hermite補間を基準として全区間の見かけの伸縮を1つの最適化処理で抑え、固有コーナーの微調整値0。京都2000芝内・京都1400芝外・東京2000芝で同一関数通過、基準点計21点保持（Actions 39195137826 成功）。京都2000にLAB標準導入し、旧実装は ?geometry=legacy で比較復旧可能。ユーザー報告の1270～1310m: 物理隊列29.403→27.688mで縮小しつつ、旧画面150.45→194.32px(+29.15%)→共通方式は152.19→162.11px(+6.52%)へ改善。京都2000で全15レーン×2001m=30,015点芝外0、馬番・元画像・物理レースデータ一致。Chromium 390/1024px (Actions 39195487973), WebKit iPhone相当のローカル/公開Pagesで初期化→3C走行→GOAL板→余走→終了 (Actions 39195652635、39195861432) 合格。本番/ステージング・正式予想・買い目・PDF・京都1400エンジン不変。残課題: コースごとの芝帯内外輪郭の画像抽出はまだ京都2000固有のRaceCleanTurfであり、他場への展開にはその入力アダプターと公式素材の権利・輪郭の検証が必要。iPhone実機目視・ユーザー承認前の本番昇格は禁止。ドキュメント KYOTO_V21_SHARED_COURSE_GEOMETRY_QA.md参照。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
@@ -51,7 +51,8 @@
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg",
         "docs/lab/race-clean-turf-mask-v1.js",
         "docs/lab/race-clean-goal-view-v1.js",
-        "docs/lab/race-clean-curve-camera-v1.js"
+        "docs/lab/race-clean-curve-camera-v1.js",
+        "docs/lab/race-course-image-geometry-v1.js"
       ],
       "production_paths": [],
       "file_blob_shas": {
@@ -74,7 +75,8 @@
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19",
         "docs/lab/race-clean-turf-mask-v1.js": "303f55e76902160d0c206144505f6e8a7b00018a",
         "docs/lab/race-clean-goal-view-v1.js": "7d40736f995730bdce99cad29700b8aaaeb780b8",
-        "docs/lab/race-clean-curve-camera-v1.js": "1056fb436038122aa9085feffc68a90cbd057170"
+        "docs/lab/race-clean-curve-camera-v1.js": "1056fb436038122aa9085feffc68a90cbd057170",
+        "docs/lab/race-course-image-geometry-v1.js": "c9be79fc93db23a9b19c03dd9012bd1c1f2e9e35"
       },
       "latest_source_change_commit": "2f56c13d5a58a4c2ce52ba478e060eede4557279"
     },
