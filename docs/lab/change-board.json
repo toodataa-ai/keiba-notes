@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "950dc470adf787ff7d1772ed941d3ac2a4824d74",
+  "scan_commit": "cabcbc3e57ecfa396f0d856e30ec4d43cafda4e3",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -28,7 +28,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "LAB v20 実装・自動QA合格、iPhone実機での目視承認待ち。18頭の実況馬番を同一径のままスマホscale .68→.78(+14.7%、半径9.18→10.53画面px)、PC .76→.84(+10.5%、半径10.26→11.34px)に拡大、GOALカメラも .73→.81。全体図縮小番号は密集/重なり防止のため.48を維持。4倍速の物理0.08秒刻み表示の前後補間を0.070s、レーン方向の視覚補間を0.21s、カメラ平滑化を0.20sにし、一時停止で表示位置スナップバックしない。途中地点へのseekでは平滑履歴を破棄しスタート時の位置を誤表示しない。SafariのSVG CSS transform と高DPI canvasの画面移動を同じdevice-pixel丸めの均一平行移動で位置合わせ。生のRaceSimEngine距離/レーン/時計/馬券/馬番原図座標/うまぽっとコースSVGは変更しない。Chromium 390px/1024px×23地点で半径/追跡馬同径/芝内/元画像/座標/ピクセル整合、4倍速各158フレームで位置停止0・逆行0・ズーム微変化とゴール余走の受入、Pagesバイト一致・本番無変更、Actions 39176426898 success。WebKit公開URLの再生～GOAL余走/JSエラー0は39176217648 success。Pages deployment 39176425869 success。LABのみ・ステージング/本番は未変更。iPhone実機の見た目と重なりは未承認、承認なし本番反映禁止。",
+      "next_action": "2026-10-19: ユーザーから『3コーナーで隊列が一瞬伸びる』『個別調整では横展開が大変』と指摘あり。1270～1310mで物理隊列29.4→27.69m縮小に対し旧LAB画面の全体幅150.45→194.32px拡大を再現した。複数の1270m専用derivative実験で縮減可能だが、個別slopeハードコードは公式改善として不採用。元SVG背景・RaceSimEngine/RaceLaneAI物理を不変に、各コースの内ラチ/外ラチの原画像線、距離基準点から共通arclength→画像座標を算出する汎用幾何契約へ切り替える。個別補正ゼロ・全区間5m監査・京都1400/京都2000/別コースで共通適用を条件にLAB検証する。docs/lab/REUSABLE_COURSE_GEOMETRY_DESIGN_V1.md参照。LAB v20は保持し、改修完了・本番反映は未承認。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "lab_paths": [
