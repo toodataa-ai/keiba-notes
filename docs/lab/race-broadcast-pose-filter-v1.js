@@ -17,7 +17,7 @@ function create(){
   const out=physicalPoints.map(p=>{
    const prev=byNumber.get(p.number);
    if(!Number.isFinite(p.x)||!Number.isFinite(p.y))throw Error('POSE_NOT_FINITE');
-   if(!prev){byNumber.set(p.number,{x:p.x,y:p.y});return {...p}}
+   if(!prev){byNumber.set(p.number,{x:p.x,y:p.y});return {...p,unfilteredX:p.x,unfilteredY:p.y}}
    let x=prev.x+(p.x-prev.x)*weight,y=prev.y+(p.y-prev.y)*weight;
    const dx=x-p.x,dy=y-p.y,lag=Math.hypot(dx,dy);
    // Important: limit the visible offset from exact physical course. Do not
