@@ -1,7 +1,15 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>京都外1400m・共通方式LAB</title>
 <link rel="stylesheet" href="race-clean-course-v1.css?v=20261020-26">
-<style>.audit{padding:12px;background:#eaf3ec;border-radius:7px}.audit.blocked{background:#fff2e1;color:#804416}
+<style>
+.race-view-grid{grid-template-columns:minmax(0,1.56fr) minmax(0,1fr);gap:0}
+.race-view-label{padding:4px 8px}
+.race-broadcast-view .status,.race-overview-view .status{padding:3px 8px}
+.race-display-panel .broadcast-stage{height:413px}
+@media(max-width:760px){.race-view-grid{grid-template-columns:1fr}
+ .race-display-panel .broadcast-stage{height:336px}
+ .race-broadcast-view .status,.race-overview-view .status{padding:2px 7px}}
+.audit{padding:12px;background:#eaf3ec;border-radius:7px}.audit.blocked{background:#fff2e1;color:#804416}
 .pilot-map{position:relative;aspect-ratio:620/430}.pilot-map img,.pilot-map canvas{position:absolute;inset:0;width:100%;height:100%}.pilot-map canvas{background:transparent}
 /* Compact clock for this pilot; common HUD location and time format retained. */
 .broadcast-clock{min-width:0;right:7px;top:7px;padding:5px 7px;border-radius:6px;box-shadow:none}
@@ -30,7 +38,7 @@
 <div class="status"><span id="section">スタート前</span><span>共通RaceSimEngine</span></div></div>
 <div class="race-overview-view"><div class="race-view-label">全体図／うまぽっと原SVG</div>
 <div class="pilot-map"><img id="realCourseImage" width="620" height="430" src="assets/kyoto-umapot-course-clean-v8.svg" alt="京都競馬場原図">
-<canvas id="overview"></canvas></div><div class="status"><span>原画像は変更なし</span><span>右回り外1400m</span></div></div></div></section>
+<canvas id="overview"></canvas></div><div class="status"><span>スタートから200m刻み</span><span>右回り外1400m</span></div></div></div></section>
 <section class="panel full-results" id="fullResults" hidden><div class="panel-title"><h2>全馬の時計と推定着差</h2></div>
 <div class="full-results-scroll"><table class="finish-times-table"><thead><tr><th>順位</th><th>馬番</th><th>馬名</th><th>タイム</th><th>前馬との差</th><th>1着との差</th></tr></thead>
 <tbody id="resultsBody"></tbody></table></div></section>
@@ -48,6 +56,8 @@
 <script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
 <script src="race-lab-course-rollout-v1.js?v=20261020-29"></script>
 <script src="race-lab-source-mask-v1.js?v=20261020-29"></script>
-<script src="race-lab-cross-course-v1.js?v=20261020-30"></script>
+<script src="race-marker-visibility-v1.js?v=20261020-31"></script>
+<script src="race-overview-distance-labels-v1.js?v=20261020-31"></script>
+<script src="race-lab-cross-course-v1.js?v=20261020-31"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
