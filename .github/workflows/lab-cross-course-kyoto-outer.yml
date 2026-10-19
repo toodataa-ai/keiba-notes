@@ -96,9 +96,9 @@ jobs:
           assert.ok(spread.gap*spread.pxPerMetre>=115,
            '22m physical gap must occupy >=115px on mobile, not compressed to 40px');
           assert.equal(spread.cameraMode,'tracking-pack');
-          const near=finish.RaceFinishBroadcastV2.packCamera({
+          const nearBoard=finish.RaceFinishBroadcastV2.packCamera({
            points:[{d:1395},{d:1373}],distance:1400,width:368,turn:'右'});
-          assert.equal(near.cameraMode,'fixed-finish');
+          assert.equal(nearBoard.cameraMode,'fixed-finish');
           assert.equal(finish.RaceFinishBroadcastV2.physicalGapScaleLinear,true);
           assert.ok(fs.readFileSync(dir+'race-finish-broadcast-v2.js','utf8')
            .includes("bezierCurveTo"), 'Green white goal arch must be curved');
