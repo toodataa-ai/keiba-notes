@@ -1,0 +1,183 @@
+name: LAB third turn source-distance transition calibration experiments
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-kyoto-corner-transition-calibration-probe.yml'
+permissions: {contents: read}
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run local real Chrome against untouched publisher SVG
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/kyoto-3rd-transition-local.log 2>&1 &
+          sleep 2
+          python3 - <<'PY'
+          import shutil,json
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           browser=p.chromium.launch(executable_path=exe,headless=True,args=['--no-sandbox'])
+           page=browser.new_page(viewport={'width':390,'height':900},device_scale_factor=2)
+           err=[]
+           page.on('pageerror',lambda e:err.append(str(e)))
+           page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1270',wait_until='load')
+           page.wait_for_function("() => CleanLab.inspect().turfReady && !!RaceCleanTurf.pointAtImageDistance",timeout=25000)
+           result=page.evaluate("""() => {
+            const turf=RaceCleanTurf,t=RaceCleanCourse,fix=RaceLab18Fixture;
+            const anchors=[0,308.7,530,720,1270,1435,1671.6,2000],end=2000;
+            const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+            const pos=(d,lane=0)=>turf.pointAtImageDistance(d,lane);
+            const arc=new Float64Array(end+1),newMap=new Map();
+            let prev=pos(0,2);
+            for(let i=1;i<=end;i++){
+             const here=pos(i,2);arc[i]=arc[i-1]+Math.hypot(here.x-prev.x,here.y-prev.y);prev=here;
+            }
+            const arcAt=d=>{const i=Math.floor(d),f=d-i;return arc[i]*(1-f)+arc[Math.ceil(d)]*f};
+            const edgeArc=anchors.map(arcAt);
+            const rates=anchors.slice(1).map((d,i)=>(edgeArc[i+1]-edgeArc[i])/(d-anchors[i]));
+            const baseSlopes=anchors.map((d,i)=>i===0?rates[0]:i===7?rates.at(-1):
+             2*rates[i-1]*rates[i]/(rates[i-1]+rates[i]));
+            const interp=(u,len,start,finish,startSlope,endSlope)=>{
+             const q=u/len,q2=q*q,q3=q2*q;
+             return (2*q3-3*q2+1)*start+(q3-2*q2+q)*len*startSlope+
+               (-2*q3+3*q2)*finish+(q3-q2)*len*endSlope;
+            };
+            const fade=t=>{const u=clamp(t,0,1);return u*u*(3-2*u)};
+            const locate=px=>{
+             let lo=0,hi=end;
+             while(lo<hi){const mid=(lo+hi)>>1;if(arc[mid]<px)lo=mid+1;else hi=mid;}
+             const i=clamp(lo-1,0,end-1),gap=arc[i+1]-arc[i];
+             return i+(gap>.00000001?(px-arc[i])/gap:0);
+            };
+            function candidate(s1270,blendStart,blendEnd=45){
+             const slopes=baseSlopes.slice();
+             if(s1270!==null)slopes[4]=s1270;
+             const left=1270,mid=1435,right=1671.6,
+              leftArc=arcAt(left),midArc=arcAt(mid),rightArc=arcAt(right);
+             const lRate=(midArc-leftArc)/(mid-left),
+              rRate=(rightArc-midArc)/(right-mid),midRate=2*lRate*rRate/(lRate+rRate);
+             const map=[];
+             for(let d=0;d<=end;d++){
+              let seg=0;
+              while(seg<anchors.length-2&&d>anchors[seg+1])seg++;
+              const a=anchors[seg],b=anchors[seg+1];
+              const target=interp(d-a,b-a,edgeArc[seg],edgeArc[seg+1],slopes[seg],slopes[seg+1]);
+              let img=locate(target);
+              if(d>left&&d<right&&blendStart!==null){
+               const spTarget=d<=mid?
+                interp(d-left,mid-left,leftArc,midArc,lRate,midRate):
+                interp(d-mid,right-mid,midArc,rightArc,midRate,rRate);
+               const w=fade((d-left)/blendStart)*fade((right-d)/blendEnd);
+               img=img*(1-w)+locate(spTarget)*w;
+              }
+              if(anchors.some(a=>Math.abs(d-a)<1e-8))img=d;
+              map.push(img);
+             }
+             const sourceD=d=>{
+              const x=clamp(d,0,2000),i=Math.floor(x),f=x-i;
+              return map[i]*(1-f)+map[Math.min(2000,i+1)]*f;
+             };
+             return {sourceD,point:(d,lane=0)=>pos(sourceD(d),lane),map};
+            }
+            const sim=RaceSimEngine.create({...fix.entry(),horses:fix.horses()},{seed:2026,bias:'neutral'});
+            const snapshots=[];let nextD=1120,loops=0;
+            while(nextD<=1750&&loops++<2500&&!sim.state.finished){
+             if(sim.state.leader>=nextD){
+              const runners=sim.state.horses.slice().sort((a,b)=>b.d-a.d);
+              snapshots.push({d:nextD,leader:runners[0],last:runners.at(-1),
+               physical:runners[0].d-runners.at(-1).d});
+              nextD+=5;
+             }else sim.step(.08);
+            }
+            const options=[{slope:null,blend:45,name:'ORIGINAL'}];
+            for(const slope of [null,.57,.62,.67,.72,.77]){
+             for(const blend of [null,45,75,100,130,165]){
+              if(slope===null&&blend===45)continue;
+              options.push({slope,blend,name:'s'+(slope??'H')+'_b'+(blend??'off')});
+             }
+            }
+            const results=[];
+            for(const o of options){
+             const projection=candidate(o.slope,o.blend);
+             let maxImageMove=0,minRate=Infinity,maxRate=0;
+             for(let d=0;d<=2000;d++){
+              maxImageMove=Math.max(maxImageMove,Math.abs(projection.sourceD(d)-turf.sourceDistance(d)));
+              if(d){
+               const delta=projection.sourceD(d)-projection.sourceD(d-1);
+               minRate=Math.min(minRate,delta);maxRate=Math.max(maxRate,delta);
+              }
+             }
+             if(minRate<=.13||maxRate>=3)continue;
+             const points=snapshots.map(x=>{
+              const a=projection.point(x.leader.d,x.leader.lane),
+                b=projection.point(x.last.d,x.last.lane);
+              const chord=Math.hypot(a.x-b.x,a.y-b.y),lens=RaceCleanCurveCamera.gain(x.leader.d);
+              return {d:x.d,physical:x.physical,screen:chord*lens*8.8,chord,
+               leaderLane:x.leader.lane,tailLane:x.last.lane};
+             });
+             const idx=distance=>points.findIndex(x=>x.d===distance);
+             const n=i=>points[i],deltaPct=(a,b)=>100*(b-a)/Math.max(1,a);
+             const entry=points.filter(x=>x.d>=1250&&x.d<=1360);
+             const increments=entry.slice(1).map((x,i)=>({
+              from:entry[i].d,to:x.d,
+              screenPct:deltaPct(entry[i].screen,x.screen),
+              physicalPct:deltaPct(entry[i].physical,x.physical)
+             }));
+             const rawMovement=increments.filter(x=>x.screenPct>x.physicalPct+2);
+             const jumpMax=Math.max(...increments.map(x=>x.screenPct)),
+              undesirableMax=Math.max(...increments.map(x=>x.screenPct-x.physicalPct));
+             const off=points.filter(x=>x.d>=1350&&x.d<=1490);
+             const collapse=off.slice(1).map((x,i)=>({
+              d:x.d,over:-deltaPct(off[i].screen,x.screen)+
+                deltaPct(off[i].physical,x.physical)
+             }));
+             const maxCollapse=Math.max(...collapse.map(x=>x.over));
+             const from1270=n(idx(1270)),to1310=n(idx(1310));
+             const ratio=to1310.screen/from1270.screen;
+             const third=points.filter(x=>x.d>=1300&&x.d<=1650);
+             const widthVariation=Math.max(...third.map(x=>x.screen/x.physical))/
+               Math.min(...third.map(x=>x.screen/x.physical));
+             results.push({name:o.name,slope:o.slope,blend:o.blend,
+              beginToEndRatio:ratio,
+              max5mStretch:jumpMax,max5mExcess:undesirableMax,
+              excessIncidents:rawMovement.length,
+              max5mExcessCollapse:maxCollapse,
+              cornerSpreadVariation:widthVariation,
+              maxImageMove,minRate,maxRate,
+              checkpoint:[1270,1280,1290,1300,1310,1400,1435,1440,1450,1460].map(d=>{
+               const q=n(idx(d));return {d,
+                 physical:q.physical,screen:q.screen,
+                 sourceD:projection.sourceD(d)};
+              })
+             });
+            }
+            return {baseSlopes,rates,anchors,
+             physicalAt:[1270,1280,1290,1300,1310,1435,1460].map(d=>{
+              const q=snapshots.find(x=>x.d===d);return {d,physical:q.physical};
+             }),results};
+           }""")
+           assert not err,err
+           print('BASELINE_SOURCE_SVG_SECTION_RATES',json.dumps({'rates':result['rates'],'slopes':result['baseSlopes']},ensure_ascii=False))
+           ranked=sorted(result['results'],key=lambda x:(x['max5mExcess'],x['beginToEndRatio'],x['max5mExcessCollapse']))
+           for x in ranked[:22]:
+            print('CALIBRATED_THIRD_TURN_ALTERNATIVE',json.dumps({
+             'name':x['name'],'ratio1270to1310':round(x['beginToEndRatio'],4),
+             'max5mStretch':round(x['max5mStretch'],3),
+             'max5mExcess':round(x['max5mExcess'],3),
+             'max5mCollapse':round(x['max5mExcessCollapse'],3),
+             'overStretchCount':x['excessIncidents'],
+             'overallVariation':round(x['cornerSpreadVariation'],3),
+             'maxMapShift':round(x['maxImageMove'],2),
+             'minSourceRate':round(x['minRate'],3),'maxSourceRate':round(x['maxRate'],3)},ensure_ascii=False))
+           for name in ['ORIGINAL','s0.67_b100','s0.72_b100','s0.67_b130','s0.72_b130','s0.67_boff','s0.72_boff']:
+            match=next((x for x in result['results'] if x['name']==name),None)
+            if match:print('THIRD_TURN_CANDIDATE_CHECKPOINTS',name,json.dumps(match['checkpoint'],ensure_ascii=False))
+           assert len(result['results'])>=25
+           browser.close()
+          PY
