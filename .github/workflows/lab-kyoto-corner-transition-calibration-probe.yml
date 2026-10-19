@@ -180,9 +180,18 @@ jobs:
              'overallVariation':round(x['cornerSpreadVariation'],3),
              'maxMapShift':round(x['maxImageMove'],2),
              'minSourceRate':round(x['minRate'],3),'maxSourceRate':round(x['maxRate'],3)},ensure_ascii=False))
-           for name in ['ORIGINAL','s0.67_b100','s0.72_b100','s0.67_b130','s0.72_b130','s0.67_boff','s0.72_boff']:
+           for name in ['ORIGINAL','s0.62_boff','s0.62_b100','s0.62_b130','s0.62_b165','s0.67_b100','s0.67_b130']:
             match=next((x for x in result['results'] if x['name']==name),None)
             if match:print('THIRD_TURN_CANDIDATE_CHECKPOINTS',name,json.dumps(match['checkpoint'],ensure_ascii=False))
+           for name in ['ORIGINAL','s0.62_boff','s0.62_b100','s0.62_b130','s0.62_b165']:
+            x=next(z for z in result['results'] if z['name']==name)
+            print('TARGETED_BASELINE_VS_PROPOSED',json.dumps({
+             'name':x['name'],'ratio1270to1310':x['beginToEndRatio'],
+             'max5mStretch':x['max5mStretch'],'max5mExcess':x['max5mExcess'],
+             'max5mExcessCollapse':x['max5mExcessCollapse'],
+             'maxMapShift':x['maxImageMove'],'overStretchCount':x['excessIncidents'],
+             'overallVariation':x['cornerSpreadVariation']
+            },ensure_ascii=False))
            assert len(result['results'])>=25
            browser.close()
           PY
