@@ -672,6 +672,7 @@ function entry(){return {id,demo_mode:'lab_real_prestart_hypothetical',
  date:'2026-10-18',venue:'京都',number:11,race:'第31回秋華賞・実出走馬17頭による仮想展開',
  surface:'芝',turn:'右',distance_m:2000,
  course_id:'kyoto_turf_inner_2000',field_size:17,
+ age_restriction_years:3,sex_restriction:'牝',grade_level:'G1',
  scope:'LAB_REAL_PRESTART_INPUT_NOT_ACTUAL_RACE_REPLAY',
  going:'良',going_observed_at:'2026-10-18T08:19:21.108+09:00',
  source_report:source.snapshot};

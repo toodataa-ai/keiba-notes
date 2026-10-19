@@ -9,7 +9,7 @@
 <p id="labDescription">LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。</p>
 </div></header>
 <main class="shell">
-<div class="tag">LAB v24・1倍速標準／馬番震えの共通補間／未承認</div>
+<div class="tag">LAB v25・標準2倍速／3歳牝馬の共通速度調整／馬番補間／未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
 <label>出走馬<select id="trialMode" aria-label="出走馬データを切り替える">
 <option value="synthetic">架空18頭（従来テスト）</option>
@@ -17,7 +17,7 @@
 </select></label>
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
-<label>速度<select id="speed"><option value="1" selected>1倍（等速）</option><option value="2">2倍（早送り）</option><option value="4">4倍（早送り）</option></select></label>
+<label>速度<select id="speed"><option value="1">1倍（等速）</option><option value="2" selected>2倍（標準）</option><option value="4">4倍（早送り）</option></select></label>
 </section>
 <p class="trial-description" id="trialDescription">架空18頭の比較テスト。</p>
 <section class="panel race-display-panel">
@@ -76,9 +76,10 @@
 <script src="race-lane-ai-v1.js?v=20261015-25"></script>
 <script src="race-runner-style-v1.js?v=20261015-24"></script>
 <script src="race-ability-model-v1.js?v=20261015-22"></script>
-<script src="race-sim-engine.js?v=20261016-41"></script>
+<script src="race-cohort-speed-v1.js?v=20261020-25"></script>
+<script src="race-sim-engine.js?v=20261020-25"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
-<script src="race-real-shuka-2026-fixture-v1.js?v=20261019-22"></script>
+<script src="race-real-shuka-2026-fixture-v1.js?v=20261020-25"></script>
 <script src="race-real-shuka-2026-reference-v1.js?v=20261019-22"></script>
 <script src="race-clean-course-v1.js?v=20261018-14"></script>
 <script src="race-course-image-geometry-v1.js?v=20261019-21"></script>
@@ -87,6 +88,6 @@
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
 <script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
 <script src="race-frame-interpolator-v1.js?v=20261020-24"></script>
-<script src="race-clean-course-app-v1.js?v=20261020-24"></script>
+<script src="race-clean-course-app-v1.js?v=20261020-25"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

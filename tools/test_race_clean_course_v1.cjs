@@ -4,7 +4,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const root='docs/lab/',window={},scripts=[
 'race-course-geometry-v1.js','race-lane-ai-v1.js','race-runner-style-v1.js',
-'race-ability-model-v1.js','race-sim-engine.js','race-lab-18-fixture-v1.js',
+'race-ability-model-v1.js','race-cohort-speed-v1.js','race-sim-engine.js','race-lab-18-fixture-v1.js',
 'race-real-shuka-2026-fixture-v1.js','race-real-shuka-2026-reference-v1.js',
 'race-clean-course-v1.js'];
 for(const file of scripts)vm.runInNewContext(fs.readFileSync(root+file,'utf8'),
@@ -130,6 +130,18 @@ assert.equal(real.entry().course_id,'kyoto_turf_inner_2000');
 assert.equal(real.entry().field_size,17);
 assert.equal(real.entry().distance_m,2000);
 assert.equal(real.entry().going,'良');
+assert.equal(real.entry().age_restriction_years,3);
+assert.equal(real.entry().sex_restriction,'牝');
+const cohort=window.RaceCohortSpeed;
+const cohortSource=fs.readFileSync(root+'race-cohort-speed-v1.js','utf8');
+assert.ok(!cohortSource.includes('kyoto')&&!cohortSource.includes('tokyo')&&!cohortSource.includes('shuka'));
+assert.ok(!cohortSource.includes('winnerTimeSeconds')&&!cohortSource.includes('officialCorners'));
+assert.equal(cohort.resolve(real.entry()).baseCruiseMps,16.65);
+assert.equal(cohort.resolve(entry).baseCruiseMps,17.0);
+assert.equal(cohort.resolve({...real.entry(),distance_m:1400}).baseCruiseMps,17.0);
+assert.equal(cohort.resolve({...real.entry(),age_restriction_years:4}).baseCruiseMps,17.0);
+assert.equal(cohort.resolve({...real.entry(),sex_restriction:'牡'}).baseCruiseMps,17.0);
+assert.equal(cohort.resolve({...real.entry(),venue:'東京',course_id:'tokyo_turf_2000'}).baseCruiseMps,16.65);
 const realHorses=real.horses();
 assert.equal(realHorses.length,17);
 assert.deepEqual(Array.from(realHorses.map(h=>h.number)),Array.from({length:17},(_,i)=>i+1));
@@ -160,13 +172,20 @@ for(let i=0;i<1900&&!realRace.state.finished;i++){
 }
 assert.ok(realRace.state.finished,'REAL_17_RUNNERS_MUST_FINISH');
 assert.equal(realRace.state.horses.filter(h=>h.finishTime!==null).length,17);
+assert.equal(realRace.state.nominalCruiseSpeedMps,16.65);
+assert.equal(sim.state.nominalCruiseSpeedMps,17.0);
+assert.ok(realRace.state.firstFinishTime>=116.5&&realRace.state.firstFinishTime<=119,
+ 'FILLY_RECORD_BREAKING_VIRTUAL_TIME_'+realRace.state.firstFinishTime);
+assert.ok(realRace.state.splitTime>57.5&&realRace.state.splitTime<59.5);
+console.log('PASS_LAB_COHORT_REAL17_RACE_TIME',realRace.state.firstFinishTime,
+ realRace.state.splitTime);
 assert.ok(realPositions>=10);
 console.log('PASS_REAL_2026_SHUKA_17_SEALED_PRESTART_HORSES_NO_OUTCOME_LEAK',realPositions);
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261020-24'));
-assert.ok(html.includes('race-real-shuka-2026-fixture-v1.js?v=20261019-22'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261020-25'));
+assert.ok(html.includes('race-real-shuka-2026-fixture-v1.js?v=20261020-25'));
 assert.ok(html.includes('race-real-shuka-2026-reference-v1.js?v=20261019-22'));
 assert.ok(html.includes('id="trialMode"'));
 assert.ok(html.includes('id="benchmarkPanel"'));
@@ -175,8 +194,8 @@ assert.ok(app.includes('race.field_size'));
 assert.ok(app.includes('function compareWithOfficialResult()'));
 assert.ok(html.includes('race-broadcast-hud-v1.js?v=20261019-23'));
 assert.ok(html.includes('race-frame-interpolator-v1.js?v=20261020-24'));
-assert.ok(html.includes('value="1" selected>1倍（等速）'));
-assert.ok(!html.includes('value="2" selected>2倍'));
+assert.ok(html.includes('value="2" selected>2倍（標準）'));
+assert.ok(!html.includes('value="1" selected>1倍'));
 assert.ok(app.includes('frameMotion.interpolate(framePrevious,frameCurrent,alpha)'));
 const frameGlobal={};
 vm.runInNewContext(fs.readFileSync(root+'race-frame-interpolator-v1.js','utf8'),{window:frameGlobal});
@@ -255,7 +274,8 @@ assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-20'));
 assert.ok(html.includes('id="goalCamera"'));
 const kyoto1400=fs.readFileSync(root+'race-simulator.html','utf8');
 assert.ok(kyoto1400.includes('race-sim-engine.js?v=20261016-41'));
-assert.ok(html.includes('race-sim-engine.js?v=20261016-41'));
+assert.ok(html.includes('race-sim-engine.js?v=20261020-25'));
+assert.ok(html.includes('race-cohort-speed-v1.js?v=20261020-25'));
 assert.ok(kyoto1400.includes('race-lane-ai-v1.js?v=20261015-25'));
 assert.ok(html.includes('race-lane-ai-v1.js?v=20261015-25'));
 const goal=fs.readFileSync(root+'race-clean-goal-view-v1.js','utf8');

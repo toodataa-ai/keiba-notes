@@ -130,7 +130,7 @@ function rebuildFixtureUi(){
   'LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。';
  $('horseGridTitle').textContent=real?'2026年秋華賞・実出走馬17頭':'架空18頭の馬番';
  $('trialDescription').textContent=real?
-  '出走馬・前走位置取り・能力9項目は発走前保存データ。今回の着順や結果ラップは走行計算に使用しません。':
+  '出走馬・前走位置取り・能力9項目は発走前保存データ。3歳牝馬・芝中距離の共通基準速度（暫定）を使用。実際の着順・時計・ラップは走行計算に使用しません。':
   '架空18頭の比較テスト。実レースデータは読み込んでいません。';
  $('benchmarkPanel').hidden=!real;
  $('benchmarkResults').hidden=true;
@@ -607,6 +607,8 @@ window.CleanLab=Object.freeze({
   return {leader:engine.state.leader,positions:points,
  motionModel:MOTION_INTERPOLATION_ENABLED?'fixed-pose-interpolation':'legacy',
  motionAlpha:acc/frameMotion.STEP_SECONDS,
+   nominalSpeedProfile:engine.state.nominalSpeedProfile,
+   nominalCruiseSpeedMps:engine.state.nominalCruiseSpeedMps,
    trialMode,fixtureId:fixture.id,raceFieldSize:race.field_size,
    realPrestartOnly:trialIsReal(),
    originalImageSrc:image?.getAttribute('src')||null,

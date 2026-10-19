@@ -56,14 +56,14 @@ jobs:
               sourceError:CleanLab.inspect().turfError
              })""")
              print('LAB_V24_INITIAL',engine,width,json.dumps(initial,ensure_ascii=False))
-             assert initial['speed']=='1'
+             assert initial['speed']=='2'
              assert initial['motion']=='fixed-pose-interpolation'
              assert initial['field']==17
              assert initial['currentImage']==initial['originalImage']=='assets/kyoto-umapot-course-clean-v8.svg'
              assert not initial['sourceError'] and not errors,errors
              page.locator('#startBtn').click()
              # Sample each browser paint using requestAnimationFrame. Also measure
-             # the virtual clock against MONOTONIC wall time for the 1x default.
+             # the virtual clock against MONOTONIC wall time for the 2x default.
              metrics=page.evaluate("""async () => {
               const history=[];
               return await new Promise(resolve=>{
@@ -91,7 +91,7 @@ jobs:
                'frames':len(d),'max_forward':max(changes),'min_forward':min(changes),
                'source':initial['currentImage']}))
              assert len(d)>=30,('TOO_FEW_PAINT_SAMPLES',len(d))
-             assert 0.65<=rate<=1.25,('CLOCK_RATE_NOT_1X',rate)
+             assert 1.3<=rate<=2.5,('CLOCK_RATE_NOT_2X',rate)
              assert min(changes)>=-1e-5,('JITTER_REVERSE_DISPLACEMENT',min(changes))
              assert max(changes)<2.0,('JITTER_UNBOUNDED_JUMP',max(changes))
              page.locator('#pauseBtn').click()
