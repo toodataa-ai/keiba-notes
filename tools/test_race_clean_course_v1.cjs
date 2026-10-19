@@ -5,6 +5,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const root='docs/lab/',window={},scripts=[
 'race-course-geometry-v1.js','race-lane-ai-v1.js','race-runner-style-v1.js',
 'race-ability-model-v1.js','race-sim-engine.js','race-lab-18-fixture-v1.js',
+'race-real-shuka-2026-fixture-v1.js','race-real-shuka-2026-reference-v1.js',
 'race-clean-course-v1.js'];
 for(const file of scripts)vm.runInNewContext(fs.readFileSync(root+file,'utf8'),
  {window,globalThis:window},{filename:file});
@@ -121,10 +122,60 @@ const contractions=physicalPacks.slice(1).map((p,i)=>({
 console.log('KYOTO1400_SHARED_PHYSICAL_PACK_GAPS',JSON.stringify(physicalPacks));
 console.log('TOP_PHYSICAL_CONTRACTIONS_100M',JSON.stringify(contractions.slice(0,5)));
 assert.ok(physicalPacks.every(x=>Number.isFinite(x.actualFullPackGapM)));
+const real=window.RaceRealShuka2026Fixture;
+const holdout=window.RaceRealShuka2026Reference;
+assert.equal(real.source.prestart,true);
+assert.equal(real.source.horse_count,17);
+assert.equal(real.entry().course_id,'kyoto_turf_inner_2000');
+assert.equal(real.entry().field_size,17);
+assert.equal(real.entry().distance_m,2000);
+assert.equal(real.entry().going,'良');
+const realHorses=real.horses();
+assert.equal(realHorses.length,17);
+assert.deepEqual(Array.from(realHorses.map(h=>h.number)),Array.from({length:17},(_,i)=>i+1));
+assert.equal(realHorses.find(h=>h.number===8).name,'モンローウォーク');
+assert.equal(realHorses.find(h=>h.number===13).name,'ドリームコア');
+assert.equal(realHorses.find(h=>h.number===2).style,'nige');
+assert.equal(realHorses.find(h=>h.number===10).style,'nige');
+assert.ok(realHorses.every(h=>h.factorGrades.length===9));
+assert.ok(realHorses.every(h=>h.styleMeta.source==='pre_race_report_last_run'));
+assert.ok(realHorses.every(h=>Number.isNaN(h.win_pct)));
+assert.ok(realHorses.every(h=>Array.isArray(h.recentRuns)&&h.recentRuns.length===1));
+assert.equal(holdout.independent_reference_only,true);
+assert.equal(holdout.officialCorners.length,4);
+assert.equal(holdout.cumulative200m.length,10);
+assert.ok(!JSON.stringify(realHorses).includes('winnerTimeSeconds'));
+assert.ok(!JSON.stringify(realHorses).includes('officialCorners'));
+const realRace=window.RaceSimEngine.create({...real.entry(),horses:real.horses()},{seed:2026,bias:'neutral'});
+assert.equal(realRace.state.horses.length,17);
+let realPositions=0;
+for(let i=0;i<1900&&!realRace.state.finished;i++){
+ realRace.step(.10);
+ if(i%80===0){
+  const names=realRace.state.horses.map(h=>h.name);
+  assert.ok(names.includes('モンローウォーク'));
+  assert.ok(realRace.state.horses.every(h=>Number.isFinite(h.d)&&Number.isFinite(h.lane)));
+  realPositions++;
+ }
+}
+assert.ok(realRace.state.finished,'REAL_17_RUNNERS_MUST_FINISH');
+assert.equal(realRace.state.horses.filter(h=>h.finishTime!==null).length,17);
+assert.ok(realPositions>=10);
+console.log('PASS_REAL_2026_SHUKA_17_SEALED_PRESTART_HORSES_NO_OUTCOME_LEAK',realPositions);
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-21'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-22'));
+assert.ok(html.includes('race-real-shuka-2026-fixture-v1.js?v=20261019-22'));
+assert.ok(html.includes('race-real-shuka-2026-reference-v1.js?v=20261019-22'));
+assert.ok(html.includes('id="trialMode"'));
+assert.ok(html.includes('id="benchmarkPanel"'));
+assert.ok(app.includes("trialMode=new URLSearchParams(location.search).get('trial')"));
+assert.ok(app.includes('race.field_size'));
+assert.ok(app.includes('function compareWithOfficialResult()'));
+assert.ok(!app.includes('race.finalTop3'));
+assert.ok(!app.includes('engine.state.horses=window.RaceRealShuka2026Reference'));
+
 assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-20'));
 assert.ok(app.includes('const scale=mini?.48:(points.length>=12?(compact?.78:.84):.90)'));
 assert.ok(app.includes('const paintCamera=pixelAlignedCamera(lastCamera,live.ctx)'));
