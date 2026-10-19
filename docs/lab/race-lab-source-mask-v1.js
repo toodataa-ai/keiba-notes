@@ -86,18 +86,24 @@ function build({image,course,guide,projection,geometry}){
    if(move>maxCenterStep){maxCenterStep=move;maxCenterStepAt=d}
   }
  }
+ // Green strokes may MERGE at inner/outer track joins. Never spread the
+ // complete horsefield over the enlarged merged patch: derive a robust
+ // source-ribbon width from the entire route and cap the projection width.
+ const widths=samples.map(s=>s.high-s.low).sort((a,b)=>a-b);
+ const typicalBandWidth=widths[Math.floor(widths.length/2)];
+ function boundedHigh(s){return Math.min(s.high,s.low+typicalBandWidth)}
  const anchors=[0,...course.segments.map(s=>s.to)];
  const geom=geometry.build({distanceM:distance,anchorsM:anchors,
   pointAt:(d,l)=>{const q=samples[Math.round(clamp(d,0,distance))];
     const f=projection.fraction((1.8+l*1.65)/27);
-    return {x:q.inner.x+q.ux*(q.low+(q.high-q.low)*f),
+    return {x:q.inner.x+q.ux*(q.low+(boundedHigh(q)-q.low)*f),
       y:q.inner.y+q.uy*(q.low+(q.high-q.low)*f)};},
   displayGain:()=>1,enableGlobalOptimization:false});
  function position(d,lane){
   const raceD=clamp(d,0,distance),mapped=geom.sourceDistance(raceD),
    i=Math.min(distance-1,Math.floor(mapped)),a=samples[i],b=samples[i+1],
    t=clamp(mapped-i,0,1),l=clamp(Number(lane)||0,0,14);
-  const low=a.low+(b.low-a.low)*t,high=a.high+(b.high-a.high)*t;
+  const low=a.low+(b.low-a.low)*t,high=boundedHigh(a)+(boundedHigh(b)-boundedHigh(a))*t;
   const f=projection.fraction((1.8+l*1.65)/27);
   const off=low+(high-low)*f;
   let x=(a.inner.x+(b.inner.x-a.inner.x)*t)+(a.ux+(b.ux-a.ux)*t)*off,
@@ -107,12 +113,18 @@ function build({image,course,guide,projection,geometry}){
     extra=d-distance;x+=ux*extra/10;y+=uy*extra/10;}
   return {x,y,d,lane:l};
  }
- let checked=0,bad=0;
+ let checked=0,bad=0,maxProjectedStep=0,maxProjectedStepAt=0;
  for(let d=0;d<=distance;d+=5)for(const lane of [0,2,4,8,11,14]){
   const p=position(d,lane);checked++;
   if(!disc(p.x,p.y)){bad++;if(failures.length<20)failures.push({d,lane})}
  }
+ for(let d=1;d<=distance;d++)for(const lane of [0,2,4,8,11,14]){
+  const a=position(d-1,lane),b=position(d,lane);
+  const step=Math.hypot(b.x-a.x,b.y-a.y);
+  if(step>maxProjectedStep){maxProjectedStep=step;maxProjectedStepAt=d}
+ }
  const report=Object.freeze({id:course.id,checked,badDiscs:bad,
+  typicalBandWidth,maxProjectedStep,maxProjectedStepAt,
   maxGuideDeviation,maxCenterStep,maxCenterStepAt,minBandWidth,badSamples:failures,
   sourceUnchanged:true,corridorFromOriginalSvg:true,
   perCourseManualOffsets:0});
