@@ -90,6 +90,16 @@ jobs:
            {window:finish});
           assert.equal(finish.RaceFinishBroadcastV2.transitionRemainingM,100);
           assert.equal(finish.RaceFinishBroadcastV2.sourceGeometryIndependent,true);
+          const spread=finish.RaceFinishBroadcastV2.packCamera({
+           points:[{d:1380},{d:1358}],distance:1400,width:368,turn:'右'});
+          assert.equal(spread.gap,22);
+          assert.ok(spread.gap*spread.pxPerMetre>=115,
+           '22m physical gap must occupy >=115px on mobile, not compressed to 40px');
+          assert.equal(spread.cameraMode,'tracking-pack');
+          const near=finish.RaceFinishBroadcastV2.packCamera({
+           points:[{d:1395},{d:1373}],distance:1400,width:368,turn:'右'});
+          assert.equal(near.cameraMode,'fixed-finish');
+          assert.equal(finish.RaceFinishBroadcastV2.physicalGapScaleLinear,true);
           assert.ok(fs.readFileSync(dir+'race-finish-broadcast-v2.js','utf8')
            .includes("bezierCurveTo"), 'Green white goal arch must be curved');
           assert.equal(poseApi.RaceBroadcastPoseFilter.courseIndependent,true);
@@ -130,6 +140,8 @@ jobs:
             assert snapshot['route']['maxProjectedStep']<=2,snapshot
             assert snapshot['speed']=='2'
             assert snapshot['inspection']['sharedVisualMode'] is True
+            assert snapshot['inspection']['atomicSvgCanvas'] is True
+            assert page.evaluate("() => getComputedStyle(document.querySelector('#liveCourseImage')).visibility")=='hidden'
             assert page.evaluate("() => typeof RaceMarkerVisibility.create")== 'function'
             assert page.evaluate("() => RaceMarkerVisibility.paintIdempotent") is True
             assert page.evaluate("() => RaceBroadcastPoseFilter.courseIndependent") is True
@@ -138,6 +150,25 @@ jobs:
             assert not snapshot['inspection']['finishCameraActive']
             assert snapshot['inspection']['markerTimeDriven'] is True
             assert not page.evaluate("() => 'RaceOverviewDistanceLabels' in window")
+            # Dense source-path sample checks for a sudden fractional-metre
+            # zigzag invisible to the earlier whole-metre validator.
+            curve=page.evaluate("""() => {
+             let maxQuarterStep=0,spikeCount=0,corr=0;
+             for(const lane of [0,2,4,8,11,14]){
+              let prev=CrossCoursePilot.sourcePoint(0,lane);
+              for(let i=1;i<=1400*4;i++){
+               const now=CrossCoursePilot.sourcePoint(i*.25,lane);
+               const step=Math.hypot(now.x-prev.x,now.y-prev.y);
+               maxQuarterStep=Math.max(step,maxQuarterStep);
+               if(step>.5)spikeCount++;
+               if(now.corrected>0)corr++;
+               prev=now;
+              }
+             }
+             return {maxQuarterStep,spikeCount,correctedSamples:corr};
+            }""")
+            print('CROSS_COURSE_QUARTER_METRE',name,json.dumps(curve))
+            assert curve['spikeCount']==0,curve
             # Explicit 3C/4C snapshot gate, not just 'green pixels anywhere'.
             # It uses the same physical engine and the same outer source stroke.
             for metres in (600,720,850,950):
@@ -183,8 +214,24 @@ jobs:
             assert close['view']['venueLabel']=='KYOTO'
             assert float(close['opacity'])>=.99
             assert close['view']['visible']>=1
+            assert close['view']['physicalSpreadM']>12
+            assert close['view']['visualSpreadPx']>=close['view']['physicalSpreadM']*5.25
+            assert close['view']['cameraMode']=='tracking-pack'
             page.locator('#broadcastStage').screenshot(
-              path=f'/tmp/lab-outer-screens/{name}-last-80m-goal-arch.png')
+              path=f'/tmp/lab-outer-screens/{name}-last-80m-pack-tracking.png')
+            reached=page.evaluate("() => CrossCoursePilot.seekTo(1391)")
+            assert reached>=1391,reached
+            near=page.evaluate("() => CrossCoursePilot.finishView()")
+            print('CROSS_COURSE_FINISH_PACK_ZOOM',name,json.dumps({
+             'distance':reached,'cameraMode':near['cameraMode'],
+             'metres':near['physicalSpreadM'],'pixels':near['visualSpreadPx'],
+             'visible':near['visible'],'boardX':near['goalX']}))
+            assert near['cameraMode']=='fixed-finish'
+            assert near['visible']>=12
+            assert near['visualSpreadPx']>=110
+            assert near['goalX']>0
+            page.locator('#broadcastStage').screenshot(
+              path=f'/tmp/lab-outer-screens/{name}-last-9m-real-goal-board.png')
             page.locator('#resetBtn').click()
             clock_font=page.evaluate("() => getComputedStyle(document.querySelector('#clock')).fontSize")
             assert float(clock_font.replace('px',''))<=22,clock_font
