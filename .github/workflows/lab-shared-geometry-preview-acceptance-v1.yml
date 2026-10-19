@@ -1,0 +1,139 @@
+name: LAB v21 generic geometry opt-in, original source unchanged acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-shared-geometry-preview-acceptance-v1.yml'
+      - 'docs/lab/race-course-image-geometry-v1.js'
+      - 'docs/lab/race-clean-turf-mask-v1.js'
+      - 'docs/lab/race-clean-course-app-v1.js'
+      - 'docs/lab/race-clean-course-v1.html'
+permissions: {contents: read}
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create local preview browser
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/lab-shared-geometry-http.log 2>&1 &
+          sleep 2
+      - name: Same 18 runners, unchanged SVG, no white turf, no sudden third bend stretch
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/shared-geometry
+          python3 - <<'PY'
+          import shutil,json,math
+          from playwright.sync_api import sync_playwright
+          exe=shutil.which('google-chrome') or shutil.which('chromium')
+          with sync_playwright() as p:
+           b=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
+           for width in [390,1024]:
+            cases=[]
+            for name in ['legacy','shared']:
+             page=b.new_page(viewport={'width':width,'height':844},device_scale_factor=2)
+             errors=[]
+             page.on('pageerror',lambda e:errors.append(str(e)))
+             url='http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1270&v=21&geometry='+name
+             page.goto(url,wait_until='load',timeout=30000)
+             page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=20000)
+             page.wait_for_timeout(400)
+             data=page.evaluate("""() => {
+              const a=CleanLab.inspect(),engine=CleanLab.getState();
+              const map=RaceCleanTurf;
+              const opts=[0,100,308.7,530,720,900,1200,1270,1300,1310,1435,1671.6,2000];
+              return {requested:a.sharedGeometryRequested,
+               enabled:a.sharedGeometryEnabled,
+               error:a.sharedGeometryError,
+               stats:a.sharedGeometryStats,
+               original:a.originalImageSrc,live:a.liveImageSrc,
+               loaded:a.originalLoaded&&a.liveImageLoaded,
+               state:engine.horses.map(h=>[h.number,h.d,h.lane,h.speed,h.finished]),
+               dots:a.positions.map(h=>[h.number,h.d,h.lane,h.x,h.y]),
+               turfBad:a.turfBadDiscs,
+               audit:map.audit(1,1.8),
+               landmarks:opts.map(d=>({d,source:map.sourceDistance(d)})),
+               sourceSvgCount:document.querySelectorAll('img').length
+              };
+             }""")
+             print('SHARED_PREVIEW_BOOT',width,name,json.dumps({
+              'enabled':data['enabled'],'requested':data['requested'],
+              'error':data['error'],
+              'auditBadDiscs':data['audit']['badDiscs'],
+              'auditBadCenters':data['audit']['badCenters'],
+              'auditMaxJump':data['audit']['maxJump'],
+              'details':data['stats']['stats'] if data['stats'] else None
+             },ensure_ascii=False)[:5000])
+             assert not errors,(name,errors)
+             assert data['loaded'] and data['original']==data['live']=='assets/kyoto-umapot-course-clean-v8.svg'
+             assert data['sourceSvgCount']==2
+             assert data['turfBad']==0
+             assert data['audit']['badDiscs']==0 and data['audit']['badCenters']==0
+             assert data['audit']['maxJump']<1.8
+             assert data['enabled']==(name=='shared'),('GEOMETRY_PREVIEW_MODE_INCORRECT',width,name,data['error'])
+             assert all(abs(t['d']-t['source'])<1e-8 for t in data['landmarks'] if t['d'] in [0,308.7,530,720,1270,1435,1671.6,2000])
+             page.locator('#broadcastStage').screenshot(path=f'/tmp/shared-geometry/{width}-{name}-1270.png')
+             if name=='shared':
+              frames=page.evaluate("""() => {
+               const course=RaceCleanTurf,engine=RaceSimEngine.create(
+                {...RaceLab18Fixture.entry(),horses:RaceLab18Fixture.horses()},
+                {seed:2026,bias:'neutral'});
+               const arr=[],marks=[1270,1280,1300,1310,1400,1435,1460,1672];
+               let idx=0,limit=0;
+               while(idx<marks.length&&limit++<2500&&!engine.state.finished){
+                if(engine.state.leader>=marks[idx]){
+                 const horses=engine.state.horses.slice().sort((a,b)=>b.d-a.d);
+                 const a=horses[0],b=horses.at(-1);
+                 const pa=course.point(a.d,a.lane),pb=course.point(b.d,b.lane);
+                 arr.push({d:marks[idx],realGap:a.d-b.d,
+                  pixelGap:Math.hypot(pa.x-pb.x,pa.y-pb.y)*
+                   RaceCleanCurveCamera.gain(a.d)*8.8});
+                 idx++;
+                }else engine.step(.08);
+               }
+               return arr;
+              }""")
+              data['frame']=frames
+              ratio=frames[3]['pixelGap']/frames[0]['pixelGap']
+              print('SHARED_PREVIEW_ACTUAL_PHYSCIAL_PACK',width,json.dumps({
+               'realGap1270':frames[0]['realGap'],'realGap1310':frames[3]['realGap'],
+               'pictureSpan1270':frames[0]['pixelGap'],
+               'pictureSpan1310':frames[3]['pixelGap'],
+               'ratio':ratio,'frame':frames
+              },ensure_ascii=False))
+              assert ratio<1.13,('EXCESSIVE_3RD_TURN_STRETCH',width,ratio)
+              page.evaluate('() => CleanLab.advanceTo(1350)')
+              page.locator('#speed').select_option('4')
+              page.locator('#startBtn').click()
+              page.wait_for_timeout(2400)
+              moved=page.evaluate("""() => ({
+                d:CleanLab.getState().leader,
+                ready:CleanLab.inspect().sharedGeometryEnabled,
+                image:CleanLab.inspect().originalImageSrc,
+                error:CleanLab.inspect().sharedGeometryError,
+                turf:CleanLab.inspect().turfBadDiscs,
+                count:CleanLab.frameSample().horses.length
+              })""")
+              print('SHARED_PREVIEW_4X_PLAYBACK',width,json.dumps(moved))
+              assert moved['d']>1390 and moved['ready'] and moved['count']==18
+              assert moved['error'] is None and moved['turf']==0
+              page.locator('#broadcastStage').screenshot(path=f'/tmp/shared-geometry/{width}-shared-4x.png')
+             cases.append(data)
+             page.close()
+            a,bdata=cases
+            assert a['state']==bdata['state'],('SHARED_VISUAL_GEOMETRY_MUTATED_PHYSICS',width)
+            assert a['original']==bdata['original']
+            assert bdata['stats']['stats']['courseSpecificSlopeOverrides']==0
+            print('PASS_18_HORSES_PHYSICS_UNCHANGED_SVG_UNCHANGED_ALL_COURSE_SAFETY',width)
+           b.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-v21-preview-source-vs-shared-screen
+          path: /tmp/shared-geometry/*.png
+          if-no-files-found: warn
+          retention-days: 7
