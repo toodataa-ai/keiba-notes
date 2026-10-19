@@ -29,8 +29,8 @@ jobs:
           import time,traceback,json
           from playwright.sync_api import sync_playwright
           addresses=[
-           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1350&v=20',
-           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=1350&v=20'
+           'http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1350&v=20&geometry=legacy',
+           'https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?checkpoint=1350&v=20&geometry=legacy'
           ]
           with sync_playwright() as p:
            b=p.webkit.launch(headless=True)
