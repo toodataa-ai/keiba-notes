@@ -1,0 +1,152 @@
+name: LAB shared image-distance geometry three-course shadow verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-course-image-geometry-reuse-shadow-v1.yml'
+      - 'docs/lab/race-course-image-geometry-v1.js'
+permissions: {contents: read}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser dependencies
+        run: |
+          python3 -m pip install --quiet playwright==1.56.0
+          python3 -m http.server 8765 --directory docs >/tmp/geometry-reuse-http.log 2>&1 &
+          sleep 2
+      - name: Inspect shared arclength projection on Kyoto 2000, Kyoto 1400 and Tokyo 2000
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,math,shutil
+          from playwright.sync_api import sync_playwright
+          executable=shutil.which('google-chrome') or shutil.which('chromium')
+          assert executable
+          with sync_playwright() as p:
+           browser=p.chromium.launch(headless=True,executable_path=executable,args=['--no-sandbox'])
+           page=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=2)
+           errors=[]
+           page.on('pageerror',lambda x:errors.append(str(x)))
+           page.goto('http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1250&v=20',wait_until='load',timeout=45000)
+           page.wait_for_function('window.CleanLab?.inspect()?.turfReady && window.CleanLab?.inspect()?.cameraLensReady',timeout=40000)
+           page.add_script_tag(url='/lab/race-umapot-overlay-v1.js')
+           page.add_script_tag(url='/lab/race-course-image-geometry-v1.js')
+           obj=page.evaluate("""() => {
+            const cases=[
+             {id:'kyoto_turf_inner_2000',
+              distance:2000,
+              anchors:[0,308.7,530,720,1270,1435,1671.6,2000],
+              path:(d,l)=>RaceCleanTurf.pointAtImageDistance(d,l),
+              gain:d=>RaceCleanCurveCamera.gain(d)},
+             ...['kyoto_turf_outer_1400','tokyo_turf_2000'].map(id=>{
+               const course=RaceCourseGeometry.get(id);
+               return {id,distance:course.distance_m,
+                anchors:[...course.segments.map(s=>s.from),course.distance_m],
+                path:(d,l)=>RaceUmapotOverlay.point(course,d,l)}
+             })
+            ];
+            const output=[];
+            let canonical=null;
+            for(const c of cases){
+             const now=performance.now();
+             const model=RaceCourseImageGeometry.build({
+              distanceM:c.distance,anchorsM:c.anchors,pointAt:c.path,
+              displayGain:c.gain,enableGlobalOptimization:true,
+             });
+             const stats=model.stats();
+             const mkPoint=(d,l=2)=>model.point(d,l);
+             const oldPoint=(d,l=2)=>c.id==='kyoto_turf_inner_2000'?
+              RaceCleanTurf.point(d,l):c.path(d,l);
+             const scan=[];
+             for(let d=30;d<=c.distance;d+=5){
+              const a=mkPoint(d),b=mkPoint(d-30);
+              const p=oldPoint(d),q=oldPoint(d-30);
+              const actual=Math.hypot(a.x-b.x,a.y-b.y);
+              const old=Math.hypot(p.x-q.x,p.y-q.y);
+              scan.push({d,old,new:actual,
+               source:model.sourceDistance(d),
+               green:c.id==='kyoto_turf_inner_2000'?
+                RaceCleanTurf.discOnTurf(a.x,a.y,1.8):true});
+             }
+             const ratios=[];
+             for(const pair of [[1270,1310],[1240,1360],[1370,1480],[1600,1750]]){
+              if(pair[1]>c.distance)continue;
+              const a=scan.find(x=>x.d===pair[0]),b=scan.find(x=>x.d===pair[1]);
+              if(a&&b)ratios.push({
+                from:pair[0],to:pair[1],oldRatio:b.old/a.old,newRatio:b.new/a.new});
+             }
+             const out={id:c.id,elapsedMs:performance.now()-now,
+              stats,ratios,offGreen:scan.filter(x=>!x.green).length,
+              fixedAnchors:c.anchors.map(d=>({d,measured:model.sourceDistance(d)})),
+              span30m:scan.filter(x=>[1270,1300,1310,1350,1400,1435,1460].includes(x.d)),
+              previewPointAt1300:c.path(Math.min(c.distance,1300),2)
+             };
+             output.push(out);
+             if(c.id==='kyoto_turf_inner_2000'){
+              // Keep reference to measure actual physical pack for same seed.
+              const sim=RaceSimEngine.create({
+               ...RaceLab18Fixture.entry(),horses:RaceLab18Fixture.horses()
+              },{seed:2026,bias:'neutral'});
+              const pair=[],marks=[1270,1280,1300,1310,1400,1435,1460];
+              let idx=0,limit=0;
+              while(idx<marks.length&&limit++<2500&&!sim.state.finished){
+               if(sim.state.leader>=marks[idx]){
+                const v=sim.state.horses.slice().sort((a,b)=>b.d-a.d);
+                const lead=v[0],last=v.at(-1),real=lead.d-last.d;
+                const o0=RaceCleanTurf.point(lead.d,lead.lane),
+                 o1=RaceCleanTurf.point(last.d,last.lane);
+                const n0=model.point(lead.d,lead.lane),
+                 n1=model.point(last.d,last.lane);
+                const gain=c.gain(lead.d);
+                pair.push({d:marks[idx],physicalGapM:real,
+                 oldPx:Math.hypot(o0.x-o1.x,o0.y-o1.y)*gain*8.8,
+                 newPx:Math.hypot(n0.x-n1.x,n0.y-n1.y)*gain*8.8,
+                 leadLane:lead.lane,tailLane:last.lane});
+                idx++;
+               }else sim.step(.08);
+              }
+              out.physicalPack=pair;
+              out.physicalComparison={
+               actualGapReduction:pair[3].physicalGapM-pair[0].physicalGapM,
+               previousApparentStretch:pair[3].oldPx/pair[0].oldPx,
+               sharedApparentStretch:pair[3].newPx/pair[0].newPx
+              };
+             }
+            }
+            return output;
+           }""")
+           for c in obj:
+            stats=c['stats']
+            print('SHARED_IMAGE_GEOMETRY_COURSE',json.dumps({
+             'id':c['id'],'elapsedMs':round(c['elapsedMs'],1),
+             'anchors':len(stats['anchors']),
+             'sourcePixels':round(stats['sourceArcPixels'],2),
+             'scoreOld':round(stats['baselineScore'],6),
+             'scoreNew':round(stats['optimizedScore'],6),
+             'minMappedRate':round(stats['minSourceAdvancePerM'],3),
+             'maxMappedRate':round(stats['maxSourceAdvancePerM'],3),
+             'maxImageShiftMetres':round(stats['maxPhaseMetres'],2),
+             'optimizedSlopes':stats['globalOptimizedSlopes'],
+             'originalSourceUnchanged':stats['sourceSvgIntact'],
+             'noCourseSlopeOverrides':stats['courseSpecificSlopeOverrides']==0,
+             'ratio30m':c['ratios'],'outOfGreen':c['offGreen'],
+             'landmarks':c['fixedAnchors']
+            },ensure_ascii=False))
+            assert stats['sourceSvgIntact'] and stats['immutableSharedEngine']
+            assert stats['courseSpecificSlopeOverrides']==0
+            assert stats['optimizedScore']<=stats['baselineScore']+1e-8
+            assert stats['minSourceAdvancePerM']>.1
+            assert stats['maxSourceAdvancePerM']<3
+            assert all(abs(x['measured']-x['d'])<1e-8 for x in c['fixedAnchors'])
+            if c['id']=='kyoto_turf_inner_2000':
+             print('SHARED_GEOMETRY_KYOTO_PHYSICAL_PACK',json.dumps(c['physicalPack'],ensure_ascii=False))
+             print('SHARED_GEOMETRY_KYOTO_FIXED_PACK',json.dumps(c['physicalComparison'],ensure_ascii=False))
+             print('SHARED_GEOMETRY_KYOTO_TURF_OUTLIERS',c['offGreen'])
+           assert {x['id'] for x in obj}=={'kyoto_turf_inner_2000','kyoto_turf_outer_1400','tokyo_turf_2000'}
+           assert not errors,errors
+           browser.close()
+          PY
