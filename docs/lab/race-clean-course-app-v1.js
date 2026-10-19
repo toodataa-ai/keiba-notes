@@ -19,6 +19,11 @@ let entries=fixture.horses();
 let race={...fixture.entry(),horses:entries};
 let postraceBenchmarkVisible=false;
 const hud=window.RaceBroadcastHud,resultCache={signature:''};
+const frameMotion=window.RaceFrameInterpolator;
+const MOTION_INTERPOLATION_ENABLED=new URLSearchParams(location.search).get('motion')!=='legacy';
+let framePrevious=null,frameCurrent=null;
+function captureFrame(){return frameMotion.capture(engine.state.horses);}
+
 function hudElements(){return {clock:$('clock'),split:$('splitTime'),splitLabel:$('splitLabel'),banner:$('finishBanner'),heading:$('finishHeading'),podium:$('finishPodium'),results:$('fullResults'),rows:$('resultsBody')}}
 const trialIsReal=()=>trialMode===REAL_TRIAL;
 // Ported faithfully from working Kyoto 1400 RaceSimNumbers.marker.
@@ -193,6 +198,7 @@ function compareWithOfficialResult(){
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
  playing=false;last=0;acc=0;lastCamera=null;lastPaintCamera=null;lastRenderedPoints=[];
+ framePrevious=frameCurrent=captureFrame();
  cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();
  finishSequenceActive=false;finishSequenceElapsedMs=0;finishSequenceDone=false;
  const banner=$('finishBanner');if(banner)banner.hidden=true;
@@ -207,6 +213,7 @@ function advanceTo(distance){
  // Seek is a jump in simulation time. Do NOT interpolate the camera from
  // the starting gate across 900 metres: it leaves every horse off-screen.
  lastCamera=null;lastPaintCamera=null;cameraRenderTime=0;visualRenderTime=null;
+ framePrevious=frameCurrent=captureFrame();acc=0;
  // A seek invalidates every previous rendered pose. Without this reset,
  // a paused view would retain the starting gate although physics advanced.
  lastRenderedPoints=[];visualLaneState.clear();
@@ -353,6 +360,13 @@ function displayPoints(state){
  if(state.finished){
   visualLaneState.clear();visualRenderTime=null;
   return turf.runners(state);
+ }
+ // Two confirmed physical poses are blended, rather than predicting forward
+ // and then snapping towards a newer sample. No independent lane low-pass.
+ if(MOTION_INTERPOLATION_ENABLED&&framePrevious&&frameCurrent){
+  const alpha=acc/frameMotion.STEP_SECONDS;
+  return frameMotion.interpolate(framePrevious,frameCurrent,alpha)
+   .map(p=>({...p,...turf.point(p.d,p.lane)}));
  }
  const fraction=Math.max(0,Math.min(acc,.08));
  const simTime=state.t+fraction;
@@ -507,7 +521,10 @@ function tick(ts){
   if(!engine.state.finished){
    acc+=delta*Number($('speed').value);
    let count=0;
-   while(acc>=.08&&count++<8&&!engine.state.finished){engine.step(.08);acc-=.08}
+   while(acc>=frameMotion.STEP_SECONDS&&count++<8&&!engine.state.finished){
+     framePrevious=frameCurrent;engine.step(frameMotion.STEP_SECONDS);
+     frameCurrent=captureFrame();acc-=frameMotion.STEP_SECONDS;
+    }
   }
   if(engine.state.finished){
    // The physics state is final. Keep the animation alive for a gentle
@@ -525,7 +542,7 @@ function tick(ts){
  requestAnimationFrame(tick);
 }
 function setup(){
- if(!hud||!FIXTURE_REAL||FIXTURE_REAL.horses().length!==17)
+ if(!hud||!frameMotion||!FIXTURE_REAL||FIXTURE_REAL.horses().length!==17)
   throw Error('REAL_SHUKA_PRESTART_FIXTURE_MISSING');
  for(const id of ['realCourseImage','liveCourseImage']){
   const img=$(id);
@@ -575,7 +592,9 @@ window.CleanLab=Object.freeze({
   pixelCamera:lastPaintCamera?{x:lastPaintCamera.x,y:lastPaintCamera.y,
    cx:lastPaintCamera.cx,cy:lastPaintCamera.cy}:null,
   finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
-  horses:lastRenderedPoints.map(p=>({number:p.number,x:p.x,y:p.y,d:p.d,lane:p.lane}))}),
+  horses:lastRenderedPoints.map(p=>({number:p.number,x:p.x,y:p.y,d:p.d,lane:p.lane})),
+ motionModel:MOTION_INTERPOLATION_ENABLED?'fixed-pose-interpolation':'legacy',
+ motionAlpha:acc/frameMotion.STEP_SECONDS}),
  inspect:()=>{
   const points=turfReady?(lastRenderedPoints.length?lastRenderedPoints:
   turf.runners(engine.state)):model.runners(engine.state);
@@ -586,6 +605,8 @@ window.CleanLab=Object.freeze({
   const rect=$('overview').getBoundingClientRect();
   const image=$('realCourseImage');
   return {leader:engine.state.leader,positions:points,
+ motionModel:MOTION_INTERPOLATION_ENABLED?'fixed-pose-interpolation':'legacy',
+ motionAlpha:acc/frameMotion.STEP_SECONDS,
    trialMode,fixtureId:fixture.id,raceFieldSize:race.field_size,
    realPrestartOnly:trialIsReal(),
    originalImageSrc:image?.getAttribute('src')||null,

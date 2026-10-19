@@ -165,7 +165,7 @@ console.log('PASS_REAL_2026_SHUKA_17_SEALED_PRESTART_HORSES_NO_OUTCOME_LEAK',rea
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261019-23'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261020-24'));
 assert.ok(html.includes('race-real-shuka-2026-fixture-v1.js?v=20261019-22'));
 assert.ok(html.includes('race-real-shuka-2026-reference-v1.js?v=20261019-22'));
 assert.ok(html.includes('id="trialMode"'));
@@ -174,6 +174,24 @@ assert.ok(app.includes("trialMode=new URLSearchParams(location.search).get('tria
 assert.ok(app.includes('race.field_size'));
 assert.ok(app.includes('function compareWithOfficialResult()'));
 assert.ok(html.includes('race-broadcast-hud-v1.js?v=20261019-23'));
+assert.ok(html.includes('race-frame-interpolator-v1.js?v=20261020-24'));
+assert.ok(html.includes('value="1" selected>1倍（等速）'));
+assert.ok(!html.includes('value="2" selected>2倍'));
+assert.ok(app.includes('frameMotion.interpolate(framePrevious,frameCurrent,alpha)'));
+const frameGlobal={};
+vm.runInNewContext(fs.readFileSync(root+'race-frame-interpolator-v1.js','utf8'),{window:frameGlobal});
+const frame=frameGlobal.RaceFrameInterpolator;
+const prev=frame.capture([{number:1,d:100,lane:2},{number:2,d:96,lane:4}]);
+const curr=frame.capture([{number:1,d:101.6,lane:2.1},{number:2,d:97.8,lane:3.9}]);
+const next=frame.capture([{number:1,d:103.2,lane:2.2},{number:2,d:99.6,lane:3.8}]);
+for(const alpha of [0,.25,.5,.75,1]){
+ const pose=frame.interpolate(prev,curr,alpha);
+ assert.ok(Math.abs(pose[0].d-(100+1.6*alpha))<1e-8);
+ assert.ok(Math.abs(pose[1].lane-(4-.1*alpha))<1e-8);
+}
+assert.equal(frame.interpolate(prev,curr,1)[0].d,frame.interpolate(curr,next,0)[0].d);
+assert.equal(frame.courseIndependent,true);
+assert.equal(frame.presentationOnly,true);
 assert.ok(html.includes('race-view-grid'));
 assert.ok(html.includes('id="fullResults" hidden'));
 assert.ok(html.includes('id="splitTime"'));
