@@ -33,11 +33,11 @@ jobs:
            b=p.chromium.launch(headless=True,executable_path=exe,args=['--no-sandbox'])
            for width in [390,1024]:
             cases=[]
-            for name in ['legacy','shared']:
+            for name in ['legacy','shared','default']:
              page=b.new_page(viewport={'width':width,'height':844},device_scale_factor=2)
              errors=[]
              page.on('pageerror',lambda e:errors.append(str(e)))
-             url='http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1270&v=21&geometry='+name
+             url='http://127.0.0.1:8765/lab/race-clean-course-v1.html?checkpoint=1270&v=21'+('' if name=='default' else '&geometry='+name)
              page.goto(url,wait_until='load',timeout=30000)
              page.wait_for_function('window.CleanLab?.inspect()?.turfReady===true',timeout=20000)
              page.wait_for_timeout(400)
@@ -73,10 +73,10 @@ jobs:
              assert data['turfBad']==0
              assert data['audit']['badDiscs']==0 and data['audit']['badCenters']==0
              assert data['audit']['maxJump']<1.8
-             assert data['enabled']==(name=='shared'),('GEOMETRY_PREVIEW_MODE_INCORRECT',width,name,data['error'])
+             assert data['enabled']==(name!='legacy'),('GEOMETRY_PREVIEW_MODE_INCORRECT',width,name,data['error'])
              assert all(abs(t['d']-t['source'])<1e-8 for t in data['landmarks'] if t['d'] in [0,308.7,530,720,1270,1435,1671.6,2000])
              page.locator('#broadcastStage').screenshot(path=f'/tmp/shared-geometry/{width}-{name}-1270.png')
-             if name=='shared':
+             if name!='legacy':
               frames=page.evaluate("""() => {
                const course=RaceCleanTurf,engine=RaceSimEngine.create(
                 {...RaceLab18Fixture.entry(),horses:RaceLab18Fixture.horses()},
@@ -123,9 +123,10 @@ jobs:
               page.locator('#broadcastStage').screenshot(path=f'/tmp/shared-geometry/{width}-shared-4x.png')
              cases.append(data)
              page.close()
-            a,bdata=cases
-            assert a['state']==bdata['state'],('SHARED_VISUAL_GEOMETRY_MUTATED_PHYSICS',width)
-            assert a['original']==bdata['original']
+            a,bdata,default=cases
+            assert a['state']==bdata['state']==default['state'],('SHARED_VISUAL_GEOMETRY_MUTATED_PHYSICS',width)
+            assert bdata['dots']==default['dots'],('DEFAULT_NOT_REUSABLE_GEOMETRY',width)
+            assert a['original']==bdata['original']==default['original']
             assert bdata['stats']['stats']['courseSpecificSlopeOverrides']==0
             print('PASS_18_HORSES_PHYSICS_UNCHANGED_SVG_UNCHANGED_ALL_COURSE_SAFETY',width)
            b.close()
