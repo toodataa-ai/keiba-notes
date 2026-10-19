@@ -17,7 +17,7 @@
       "name": "レースシミュレータ",
       "phase": "lab_development",
       "approval": "not_approved",
-      "next_action": "2026-10-19 LAB v21: 京都2000専用の段階的スロープ調整を不採用とし、docs/lab/race-course-image-geometry-v1.js をコース独立の正式LAB共通モジュールとして実装。入力は距離、確定距離基準点、未補正の元画像上パス関数と任意のカメラ倍率だけ。原画像弧長をサンプリング、単調な形状保持Hermite補間を基準として全区間の見かけの伸縮を1つの最適化処理で抑え、固有コーナーの微調整値0。京都2000芝内・京都1400芝外・東京2000芝で同一関数通過、基準点計21点保持（Actions 39195137826 成功）。京都2000にLAB標準導入し、旧実装は ?geometry=legacy で比較復旧可能。ユーザー報告の1270～1310m: 物理隊列29.403→27.688mで縮小しつつ、旧画面150.45→194.32px(+29.15%)→共通方式は152.19→162.11px(+6.52%)へ改善。京都2000で全15レーン×2001m=30,015点芝外0、馬番・元画像・物理レースデータ一致。Chromium 390/1024px (Actions 39195487973), WebKit iPhone相当のローカル/公開Pagesで初期化→3C走行→GOAL板→余走→終了 (Actions 39195652635、39195861432) 合格。本番/ステージング・正式予想・買い目・PDF・京都1400エンジン不変。残課題: コースごとの芝帯内外輪郭の画像抽出はまだ京都2000固有のRaceCleanTurfであり、他場への展開にはその入力アダプターと公式素材の権利・輪郭の検証が必要。iPhone実機目視・ユーザー承認前の本番昇格は禁止。ドキュメント KYOTO_V21_SHARED_COURSE_GEOMETRY_QA.md参照。",
+      "next_action": "2026-10-19 夜：京都2000 LAB v21を共有距離変換エンジンで標準表示。旧方式 geometry=legacy は可逆の比較/復旧用。京都2000/京都1400/東京2000の汎用幾何3コース検証に合格（Actions 39267629511）。最新の表示差分QA（Actions 39267629351）はスマホ390px/PC1024pxで 18頭の物理データ同一、default/geometry=shared/lens=offのSVG上座標同一、倍率だけ変更、geometry=legacy独立復旧に合格。元SVG・馬番/芝帯/正式予想・買い目・レース物理は変更なし。3C先頭〜最後尾の見かけの伸張は旧29.15%から約6.5%へ改善、完全0ではない。継続条件：京都2000 LABの実機目視承認、次いで京都1400/東京2000向けの元画像の芝帯・内外ラチ入力アダプターを検証し、白帯侵入0/原図不変を確認する。未承認の他コース表示、本番やステージングへの反映は禁止。詳細 docs/lab/KYOTO_V21_SHARED_COURSE_GEOMETRY_QA.md。",
       "preview_path": "lab/race-clean-course-v1.html",
       "staging_paths": [],
       "production_paths": [],
@@ -44,7 +44,7 @@
         "docs/lab/race-clean-curve-camera-v1.js",
         "docs/lab/race-course-image-geometry-v1.js"
       ],
-      "shape_alignment": "v21_shared_anchored_arclength_zero_course_slopes_kyoto2000_kyoto1400_tokyo2000_verified_3c_29percent_to_6p5percent_rollback_geometry_legacy_user_approval_pending"
+      "shape_alignment": "v21_shared_default_3course_geometry_pass_39267629511_camera_toggle_source_physics_parity_pass_39267629351_original_svg_unchanged_user_visual_approval_pending"
     },
     {
       "id": "course-catalog",
