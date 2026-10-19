@@ -46,7 +46,7 @@ jobs:
              const values=Array.from(chords).slice(120,1850).sort((a,b)=>a-b);
              const ref=values[Math.floor(values.length*.88)];
              const raw=Array.from(chords,chord=>clamp(ref/chord,1,1.45));
-             for(const radius of [48,75,105]){
+             for(const radius of [0,5,10,15,25,35,48,75]){
               const prefix=new Float64Array(raw.length+1);
               for(let i=0;i<raw.length;i++)prefix[i+1]=prefix[i]+raw[i];
               const smooth=d=>{
@@ -77,7 +77,8 @@ jobs:
               snapshot.push({d:mark,leadD:a.d,tailD:b.d,leaderNumber:a.number,
                rawPhysicalGap:physicsGap,avgLane:meanLane,
                physicalMeanSpeed:runners.reduce((x,h)=>x+h.d,0)/runners.length,
-               sourceChord:chord,sameLaneChord,
+               sourceChord:chord,sameLaneChord,leaderLane:a.lane,tailLane:b.lane,
+               leadSVG:{x:la.x,y:la.y},tailSVG:{x:lb.x,y:lb.y},
                noLensVisibleChord:8.8*chord,
                presentGain:normalGain,
                presentVisibleChord:8.8*chord*normalGain,
@@ -124,9 +125,12 @@ jobs:
             'svgChordPx':round(r['sourceChord'],2),
             'lens':round(r['presentGain'],4),
             'viewSpanPx':round(r['presentVisibleChord'],2),
-            'nolensSpanPx':round(r['noLensVisibleChord'],2)
+            'nolensSpanPx':round(r['noLensVisibleChord'],2),
+            'sameLaneChord':round(r['sameLaneChord'],2),
+            'leadLane':round(r['leaderLane'],2),'tailLane':round(r['tailLane'],2),
+            'leadSVG':r['leadSVG'],'tailSVG':r['tailSVG']
            } for r in d['rows'] if r['d']%10==0 and 1160<=r['d']<=1500],ensure_ascii=False))
-           for entry in sorted(d['summaries'],key=lambda r:(r['overstretches'],r['maxSuddenStretchPct']))[:16]:
+           for entry in sorted(d['summaries'],key=lambda r:(r['overstretches'],r['maxSuddenStretchPct']))[:22]:
             print('CANDIDATE_THIRD_CORNER_STRETCH',json.dumps({
              'key':entry['key'],
              'maxSuddenStretchPct':round(entry['maxSuddenStretchPct'],4),
