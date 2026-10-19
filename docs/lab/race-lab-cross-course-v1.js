@@ -55,7 +55,7 @@ function load(){
    projection:RaceSafeRailProjection,geometry:RaceCourseImageGeometry});
   RaceLabCourseRollout.assertCanAnimate(courseId,course,route);
   $('sourceAudit').textContent='原図の芝帯監査 '+route.report.checked+
-   '地点 合格／芝帯外0／画像・物理変更なし';
+   '地点 合格／芝帯外0・最大1m移動'+route.report.maxProjectedStep.toFixed(2)+'px／画像・物理変更なし';
   $('startBtn').disabled=false;reset();
  }catch(e){fail(e)}
 }
@@ -63,6 +63,15 @@ function points(){
  if(!engine)return[];
  if(playing&&!engine.state.finished)return RaceFrameInterpolator.interpolate(
    prev,curr,acc/STEP).map(h=>({...h,...route.point(h.d,h.lane)}));
+ if(engine.state.finished){
+  // Identical display-only coast used in LAB v26. Physics has ended.
+  const portion=Math.max(0,Math.min(1,finishElapsed/3.2));
+  const coast=6*(1-(1-portion)**3);
+  return engine.state.horses.map(h=>{
+   const d=(h.displayD??h.d)+coast;
+   return {number:h.number,d,lane:h.lane,...route.point(d,h.lane)};
+  });
+ }
  if(shown.length)return shown;
  return engine.state.horses.map(h=>({number:h.number,d:h.displayD??h.d,
   lane:h.lane,...route.point(h.displayD??h.d,h.lane)}));
