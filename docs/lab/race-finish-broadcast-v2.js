@@ -42,7 +42,7 @@ function drawGoalBoard(ctx,{x,top,bottom,venueLabel='KYOTO'}){
  ctx.fillStyle='#184b3b';ctx.font='bold 8px Arial,sans-serif';
  ctx.textBaseline='middle';ctx.textAlign='center';
  const vertical=String(venueLabel).slice(0,6).split('');
- for(let i=0;i<vertical.length;i++)ctx.fillText(vertical[i],x+width*.48,y+58+i*10);
+ for(let i=0;i<vertical.length;i++)ctx.fillText(vertical[i],x+width*.48,y+42+i*9);
  ctx.fillStyle='#172b24';ctx.fillRect(x-3,y-14,6,16);
  for(let row=0;row<2;row++)for(let col=0;col<3;col++){
   ctx.fillStyle='#1d3e35';ctx.fillRect(x-13+col*10,y-30+row*11,7,8);
