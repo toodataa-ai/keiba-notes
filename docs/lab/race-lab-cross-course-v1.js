@@ -116,7 +116,19 @@ function draw(){
  // Snapping to DPR pixel boundaries introduced a 1-pixel stair-step.
  const left=b.w*.54-camera.x*zoom;
  const top=b.h*.51-camera.y*zoom;
- $('liveCourseImage').style.transform='translate('+left+'px,'+top+'px) scale('+zoom+')';
+ // Draw BOTH source SVG and the moving numbers into the same canvas.
+ // Previously the browser composited a separately transformed <img> and
+ // a canvas at different fractional DPR coordinates; Safari sometimes
+ // showed a slight alternating misalignment, even for a stable horse pose.
+ const background=$('liveCourseImage');
+ if(!background.complete||!background.naturalWidth)
+  throw Error('SOURCE_IMAGE_NOT_READY_FOR_ATOMIC_PAINT');
+ background.style.visibility='hidden';
+ background.style.transform='none';
+ b.ctx.save();
+ b.ctx.imageSmoothingEnabled=true;
+ b.ctx.drawImage(background,left,top,620*zoom,430*zoom);
+ b.ctx.restore();
  // Source SVG geometry has 1m samples and tiny subpixel rail repairs.
  // They are harmless in the overview but get amplified 10x in broadcast.
  // Ease only the broadcast projection, with <=1.15 source-pixel drift.
@@ -209,7 +221,8 @@ window.CrossCoursePilot=Object.freeze({
  },
  inspect:()=>({courseId,blocked,ready:!!engine,playing,fieldSize:engine?.state.horses.length,
   source:RaceLabCourseRollout.get(courseId).svg,
- sharedVisualMode:true,markerTimeDriven:true,visualCameraTime:lastCameraTime,
+ sharedVisualMode:true,markerTimeDriven:true,atomicSvgCanvas:true,
+ visualCameraTime:lastCameraTime,
  finishCameraActive:!$('goalCamera').hidden,
  finishCameraThreshold:RaceFinishBroadcastV2.transitionRemainingM,
  broadcastPoseMaxDrift:RaceBroadcastPoseFilter.sourceDeviationCap,
