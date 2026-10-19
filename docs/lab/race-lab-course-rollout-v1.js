@@ -11,7 +11,8 @@ const courses=Object.freeze([
 function get(id){return courses.find(c=>c.id===id)||null}
 function assertCanAnimate(id,profile,route){
  const c=get(id);
- if(!c?.svg||profile?.id!==id||route?.report?.badDiscs!==0)
+ if(!c?.svg||profile?.id!==id||route?.report?.badDiscs!==0||
+  !(route.report.maxProjectedStep>0&&route.report.maxProjectedStep<=2.0))
   throw Error('COURSE_GEOMETRY_UNVERIFIED:'+id);
  return true;
 }
