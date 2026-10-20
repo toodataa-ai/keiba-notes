@@ -7,16 +7,21 @@
 (function(root){'use strict';
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
 const SWITCH_REMAINING_M=60;
-function layout({width,height,turn='右',maxLane=14}){
+function layout({width,height,turn='右',maxLane=14,goalPostSide='inner'}){
  if(!(width>0&&height>0&&maxLane>=1))throw Error('FINISH_FRAME_INVALID');
  const right=turn==='右',boardX=width*(right?.22:.78);
  // At 60m out a typical 20-25m spread fits on a small phone without
  // altering individual runner positions or adjusting zoom mid-race.
  const pixelsPerMetre=clamp((width*.78-18)/(SWITCH_REMAINING_M+25),2.35,7.0);
- const innerRailY=height*.14,outerRailY=height*.88;
+ // Reserve the grass-free stand apron for the arch. The *actual* goal
+ // line crosses the turf; only the structural board stays beyond the rail.
+ const side=goalPostSide==='outer'?'outer':'inner';
+ const innerRailY=height*(side==='inner'?.34:.08);
+ const outerRailY=height*(side==='inner'?.92:.64);
  const laneStep=(outerRailY-innerRailY-28)/maxLane;
  return Object.freeze({width,height,turn,boardX,pixelsPerMetre,
    laneStep,lane0Y:innerRailY+14,innerRailY,outerRailY,maxLane,
+   goalPostSide:side,
    switchRemainingM:SWITCH_REMAINING_M});
 }
 function project(h,{distance,frame}){
@@ -27,7 +32,8 @@ function project(h,{distance,frame}){
   x:frame.boardX+(frame.turn==='右'?1:-1)*remaining*frame.pixelsPerMetre,
   y:frame.lane0Y+clamp(h.lane,0,frame.maxLane)*frame.laneStep};
 }
-function create({venueLabel='KYOTO',turn='右',maxLane=14}={}){
+function create({venueLabel='KYOTO',turn='右',maxLane=14,
+  goalPostSide='inner'}={}){
  let cache=null,backgroundBuilds=0,lastResult=null;
  function drawBackground(ctx,frame){
   const {width:w,height:h,boardX:x,innerRailY:y1,outerRailY:y2}=frame;
@@ -60,11 +66,15 @@ function create({venueLabel='KYOTO',turn='右',maxLane=14}={}){
    ctx.fillStyle=row%2?'#edf8e9':'#173e30';
    ctx.fillRect(x-2,y,4,10);
   }
-  if(!root.RaceFinishBroadcastV2?.drawGoalBoard)
-   throw Error('FINISH_GOAL_ARCH_MISSING');
-  root.RaceFinishBroadcastV2.drawGoalBoard(ctx,{
-   x,top:y1-24,bottom:y1+131,venueLabel
+  if(!root.RaceTracksideFurniture?.goal)
+   throw Error('TRACKSIDE_FINISH_ARCH_MISSING');
+  const goal=root.RaceTracksideFurniture.goal(ctx,{
+   x,innerRailY:y1,outerRailY:y2,height:h,venueLabel,
+   railSide:frame.goalPostSide
   });
+  if(!goal.outsideTurf||frame.goalPostSide==='inner'&&goal.bodyMaxY>=y1||
+   frame.goalPostSide==='outer'&&goal.bodyMinY<=y2)
+   throw Error('FINISH_BOARD_MUST_BE_OUTSIDE_RAIL');
   // Keep top-right clear: the persistent race clock occupies this region.
  }
  function render({canvas,points,distance,paintNumber,focusedNo}){
@@ -74,9 +84,9 @@ function create({venueLabel='KYOTO',turn='右',maxLane=14}={}){
   const rect=canvas.getBoundingClientRect(),w=Math.max(1,rect.width),
    h=Math.max(1,rect.height),dpr=clamp(root.devicePixelRatio||1,1,2.5);
   const cw=Math.round(w*dpr),ch=Math.round(h*dpr);
-  const key=cw+':'+ch+':'+turn+':'+maxLane+':'+venueLabel;
+  const key=cw+':'+ch+':'+turn+':'+maxLane+':'+venueLabel+':'+goalPostSide;
   if(!cache||cache.key!==key){
-   const frame=layout({width:w,height:h,turn,maxLane});
+   const frame=layout({width:w,height:h,turn,maxLane,goalPostSide});
    const bitmap=document.createElement('canvas');
    bitmap.width=cw;bitmap.height=ch;
    const ctx=bitmap.getContext('2d');
@@ -101,6 +111,8 @@ function create({venueLabel='KYOTO',turn='右',maxLane=14}={}){
    backgroundBuilds,boardX:cache.frame.boardX,
    pixelsPerMetre:cache.frame.pixelsPerMetre,
    laneStep:cache.frame.laneStep,backgroundKey:key,
+   innerRailY:cache.frame.innerRailY,outerRailY:cache.frame.outerRailY,
+   boardOutsideRail:true,goalPostSide:cache.frame.goalPostSide,
    remaining:distance-leading,visible:shown.length,
    projected,markers:shown,venueLabel,
    sourceRacePhysicsUnchanged:true,originalSVGUnchanged:true
