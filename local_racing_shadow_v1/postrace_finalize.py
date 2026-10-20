@@ -59,8 +59,13 @@ def refund_sections(text):
     for i, match in enumerate(matches):
         no = int(match.group(1))
         part = body[match.end():matches[i+1].start() if i+1 < len(matches) else len(body)]
+        # Some NAR templates show race-navigation links as well as actual
+        # refund blocks. Only a block containing confirmed single-win money is
+        # evidence; never infer a payout from a navigation label.
+        if not re.search(r"単勝\s*\d{1,2}\s*[\d,]+\s*円", part):
+            continue
         if no in sections:
-            raise ValueError(f"BLOCKED_PAYOUT_PARSE: duplicate official {no}R")
+            raise ValueError(f"BLOCKED_PAYOUT_PARSE: duplicate payable {no}R")
         sections[no] = part
     return sections
 
@@ -242,6 +247,8 @@ def self_test():
     assert not cancellation_numbers(text,"2026-10-20","浦和")
     blocks=refund_sections(text)
     assert set(blocks)=={3,4}
+    fake = text.replace("3R C2", "10R navigation 3R C2")
+    assert set(refund_sections(fake))=={3,4}
     assert confirmed_win_payout(blocks[3],{"finish_order":[{"horse_no":10,"finish_position":1}]}) == [
         {"horse_no":10,"amount_yen_per_100":290}]
     try:
