@@ -18,7 +18,7 @@ function overlap(pts,distance=CLEAR){
  }
  return {pairs,penalty:Number(penalty.toFixed(4))};
 }
-function create(){
+function create({lockAfterFirstPlan=false}={}){
  const current=new Map(),goals=new Map(),normals=new Map(),stableSide=new Map();
  let replanTime=null,lastTime=null,metrics=null,planCount=0;
  function reset(){
@@ -46,7 +46,7 @@ function create(){
    normals.set(p.number,next);
    return {...p,nx:next.x,ny:next.y};
   }).sort((a,b)=>a.number-b.number);
-  if(replanTime===null||timeSeconds-replanTime>=REPLAN_SECONDS){
+  if(replanTime===null||!lockAfterFirstPlan&&timeSeconds-replanTime>=REPLAN_SECONDS){
    const shifts=horses.map(h=>current.get(h.number)??0);
    function evaluate(i,candidate){
     const h=horses[i],x=h.x+h.nx*candidate,y=h.y+h.ny*candidate;
@@ -95,7 +95,8 @@ function create(){
   metrics={base,after,maxShiftPx:Math.max(0,...result.map(h=>Math.abs(h.labelOffset))),
    displaced:result.filter(h=>Math.abs(h.labelOffset)>2).length,
    solverRuns:planCount,simulatedTime:timeSeconds,
-   motionMode:'stable-label-side-2.4s-race-time-replan-6px-sec',
+   motionMode:lockAfterFirstPlan?'locked-per-race-label-targets':'stable-label-side-2.4s-race-time-replan-6px-sec',
+   assignmentsFrozen:lockAfterFirstPlan,
    physicalPositionsUnchanged:true};
   return result;
  }
