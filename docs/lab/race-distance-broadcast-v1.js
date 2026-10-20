@@ -47,7 +47,7 @@ function create({image,route,distance}){
   while(cache.size>CACHE_LIMIT)cache.delete(cache.keys().next().value);
   return off;
  }
- function frame({ctx,width,height,points,leaderD,timeSeconds,paintNumber,leaderNo}){
+ function frame({ctx,width,height,points,leaderD,timeSeconds,paintNumber,leaderNo,labelLayout}){
   if(!Array.isArray(points)||!points.length||!Number.isFinite(timeSeconds))
    throw Error('DISTANCE_BROADCAST_INPUT_INVALID');
   if(lastTime!==null&&timeSeconds<lastTime-1e-7)resetCamera();
@@ -73,19 +73,23 @@ function create({image,route,distance}){
    ctx.save();ctx.translate(screenLeft+T_W,0);ctx.scale(-1,1);
    ctx.drawImage(tile,0,yShift);ctx.restore();
   }
-  const markers=[];
-  for(const p of points){
-   const x=leadX+(leaderD-p.d)*ppm,
-    y=height/2+(p.lane-lastCenter)*L_PX;
-   markers.push({number:p.number,x,y,d:p.d,lane:p.lane});
-   if(x>=-16&&x<=width+16&&y>=-16&&y<=height+16)
-    paintNumber(ctx,p.number,x,y,width<540?.78:.84,p.number===leaderNo);
+  const trueMarkers=points.map(p=>({
+   number:p.number,x:leadX+(leaderD-p.d)*ppm,
+   y:height/2+(p.lane-lastCenter)*L_PX,d:p.d,lane:p.lane
+  }));
+  // Optional race-time-locked *display* offset. It cannot change distance
+  // scale or individual physical horse values.
+  const markers=typeof labelLayout==='function'?labelLayout(trueMarkers):trueMarkers;
+  for(const p of markers){
+   if(p.x>=-16&&p.x<=width+16&&p.y>=-16&&p.y<=height+16)
+    paintNumber(ctx,p.number,p.x,p.y,width<540?.78:.84,p.number===leaderNo);
   }
   ctx.restore();
   const fieldGap=Math.max(...points.map(p=>p.d))-Math.min(...points.map(p=>p.d));
   lastInfo={mode:'source-ribbon-arc-length',fieldGapM:fieldGap,
    fieldGapPx:fieldGap*ppm,ppm,leadX,laneCenter:lastCenter,
    markers,originalSvgSamples:true,sourceGeometryImmutable:true,
+   raceDistancesPreserved:true,
    physicalPositionsUnchanged:true};
   return lastInfo;
  }
