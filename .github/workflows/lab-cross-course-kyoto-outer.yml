@@ -9,6 +9,7 @@ on:
       - "docs/lab/race-lab-source-mask-v1.js"
       - "docs/lab/race-lab-course-rollout-v1.js"
       - "docs/lab/race-marker-visibility-v1.js"
+      - "docs/lab/race-trackside-furniture-v1.js"
       - "docs/lab/race-broadcast-pose-filter-v1.js"
       - "docs/lab/race-finish-broadcast-v2.js"
       - "docs/lab/race-finish-fixed-camera-v1.js"
@@ -35,6 +36,7 @@ jobs:
             'RaceLabCourseRollout.assertCanAnimate',
             'markerVisibility.layout','markerTimeDriven:true',
             'fixedFinish.render','RaceNativeBroadcast.create',
+            'RaceTracksideFurniture.startGate',
             'nativeCamera.frame'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
@@ -70,6 +72,15 @@ jobs:
            assert.ok(Math.abs(later[i].labelOffset-first[i].labelOffset)<=1.21,
             'Position offsets must be bounded by elapsed simulation time');
           assert.equal(context.RaceMarkerVisibility.paintIdempotent,true);
+          const steady=context.RaceMarkerVisibility.create({lockAfterFirstPlan:true});
+          steady.layout(near,{normalAt:norm,timeSeconds:0});
+          const initialLocked=steady.metrics();
+          for(let sec=0.2;sec<=24;sec+=.2)
+           steady.layout(near,{normalAt:norm,timeSeconds:sec});
+          assert.equal(steady.metrics().solverRuns,1,
+           'No further marker assignment after initial formation');
+          assert.equal(steady.metrics().assignmentsFrozen,true);
+          assert.ok(initialLocked.after.penalty<initialLocked.base.penalty);
           const poseApi={};
           vm.runInNewContext(fs.readFileSync(dir+'race-broadcast-pose-filter-v1.js','utf8'),
            {window:poseApi});
@@ -109,6 +120,30 @@ jobs:
           assert.equal(api.backgroundStatic,true);
           assert.equal(api.transitionRemainingM,60);
           assert.equal(api.courseIndependent,true);
+          const furniture={};
+          vm.runInNewContext(fs.readFileSync(dir+'race-trackside-furniture-v1.js','utf8'),
+           {window:furniture});
+          const furnish=furniture.RaceTracksideFurniture;
+          assert.equal(furnish.courseIndependent,true);
+          const ops=['save','restore','beginPath','moveTo','lineTo',
+           'bezierCurveTo','stroke','fillRect','fillText'];
+          const dummy={};ops.forEach(name=>dummy[name]=()=>{});
+          const rail=furnish.goal(dummy,{x:80,innerRailY:114,
+           outerRailY:308,height:336,venueLabel:'KYOTO',railSide:'inner'});
+          assert.ok(rail.outsideTurf);
+          assert.ok(rail.bodyMaxY<rail.innerRailY,
+           'Goal BOARD must sit beyond rail, never in mid turf');
+          const railOuter=furnish.goal(dummy,{x:80,innerRailY:27,
+           outerRailY:215,height:336,venueLabel:'TOKYO',railSide:'outer'});
+          assert.ok(railOuter.outsideTurf&&railOuter.bodyMinY>railOuter.outerRailY);
+          const routePt=(d,l)=>({x:100+d*.2,y:50+l*2});
+          const proj=p=>p;
+          const gate0=furnish.gateGeometry({point:routePt,project:proj});
+          assert.equal(gate0.stalls,18);
+          assert.ok(furnish.startGate(dummy,{point:routePt,project:proj,
+            leaderD:0,overview:false})?.drawn);
+          assert.equal(furnish.startGate(dummy,{point:routePt,project:proj,
+            leaderD:30,overview:false}),null);
           assert.ok(!app.includes('RaceFinishBroadcastV2.render({canvas'),
            'Moving goal camera must never render in LAB fixed finish');
           const imageFrame=api.layout({width:340,height:336,turn:'右'});
@@ -137,6 +172,11 @@ jobs:
           assert.equal(native.RaceNativeBroadcast.courseIndependent,true);
           assert.equal(native.RaceNativeBroadcast.sourceImageUnwarped,true);
           assert.equal(native.RaceNativeBroadcast.physicalPositionsUnchanged,true);
+          assert.ok(fs.readFileSync(dir+'race-native-broadcast-v1.js','utf8')
+             .includes('points.reduce('),'Follow whole field, not changing lead horse');
+          assert.ok(fs.readFileSync(dir+'race-native-broadcast-v1.js','utf8')
+             .includes('constantZoom:true'),'No zoom pumping');
+          assert.ok(app.includes('lockAfterFirstPlan:true'));
           assert.ok(fs.readFileSync(dir+'race-native-broadcast-v1.js','utf8')
            .includes('ctx.drawImage(image,left,top,620*zoom,430*zoom)'),
             'TV must paint complete original SVG without raster strip replacement');
@@ -191,6 +231,10 @@ jobs:
             assert snapshot['inspection']['atomicSvgCanvas'] is True
             assert page.evaluate("() => RaceNativeBroadcast.courseIndependent") is True
             assert snapshot['inspection']['nativeOriginalSvg'] is True
+            assert snapshot['inspection']['startGateShown'] is True
+            assert page.evaluate("() => CrossCoursePilot.startGate().broadcast") is True
+            assert snapshot['inspection']['visibilityMetrics']['assignmentsFrozen'] is True
+            assert snapshot['inspection']['visibilityMetrics']['solverRuns']==1
             assert snapshot['inspection']['ribbonCameraActive'] is False
             assert not page.evaluate("() => 'RaceDistanceBroadcast' in window")
             assert page.evaluate("() => getComputedStyle(document.querySelector('#liveCourseImage')).visibility")=='hidden'
@@ -200,6 +244,7 @@ jobs:
             assert page.evaluate("() => RaceFinishFixedCamera.transitionRemainingM")==60
             assert page.evaluate("() => RaceFinishFixedCamera.backgroundStatic") is True
             assert snapshot['inspection']['finishCameraThreshold']==60
+            assert page.evaluate("() => RaceTracksideFurniture.courseIndependent") is True
             assert not snapshot['inspection']['finishCameraActive']
             assert snapshot['inspection']['markerTimeDriven'] is True
             assert not page.evaluate("() => 'RaceOverviewDistanceLabels' in window")
@@ -251,6 +296,11 @@ jobs:
              assert camera and camera['mode']=='native-original-svg'
              assert camera['unwarpedSourceImage'] is True
              assert camera['physicalPositionsUnchanged'] is True
+             assert camera['cameraTarget']=='all-runners-mean'
+             assert camera['constantZoom'] is True
+             assert visible['assignmentsFrozen'] is True
+             assert visible['solverRuns']==1
+             assert page.evaluate("() => CrossCoursePilot.startGate().overview") is False
              assert camera['truePhysicalGapM']>21
              assert 8.3<=camera['zoom']<=11.01
              # Read the ACTUAL canvas pixels, not the JavaScript mode label.
@@ -302,6 +352,9 @@ jobs:
             assert fixed1['result']['mode']=='fixed-finish-background'
             assert fixed1['result']['backgroundFixed'] is True
             assert fixed1['result']['backgroundBuilds']==1
+            assert fixed1['result']['boardOutsideRail'] is True
+            assert fixed1['result']['goalPostSide']=='inner'
+            assert fixed1['result']['innerRailY']>100
             assert fixed1['result']['visible']>=17
             assert len(fixed1['result']['projected'])==18
             assert .2<=float(fixed1['opacity'])<=1, 'Fixed background crossfades over four metres'
