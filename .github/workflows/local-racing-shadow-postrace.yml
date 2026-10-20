@@ -65,6 +65,13 @@ jobs:
             exit "$code"
           fi
           echo "generator_exit=$code" >> "$GITHUB_OUTPUT"
+      - name: Finalize official cancellations and verify NAR payouts
+        id: finalize
+        env:
+          RACE_DATE: ${{ steps.request.outputs.date }}
+        run: |
+          python local_racing_shadow_v1/postrace_finalize.py --self-test
+          python local_racing_shadow_v1/postrace_finalize.py --date "$RACE_DATE"
       - name: Validate strictly isolated changes before writing
         run: |
           git status --short
@@ -127,5 +134,7 @@ jobs:
           AUDIT_EXIT: ${{ steps.audit.outputs.audit_exit }}
         run: |
           echo "generator_exit=$GENERATOR_EXIT audit_exit=$AUDIT_EXIT"
-          test "$GENERATOR_EXIT" = "0"
+          # Raw generator may exit 2 when an official cancellation has no finish order.
+          # Finalize and independently audit every resolved cancellation and payout.
+          test "$GENERATOR_EXIT" = "0" || test "$GENERATOR_EXIT" = "2"
           test "$AUDIT_EXIT" = "0"
