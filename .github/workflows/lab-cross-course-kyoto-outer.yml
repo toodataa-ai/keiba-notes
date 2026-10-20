@@ -11,6 +11,7 @@ on:
       - "docs/lab/race-marker-visibility-v1.js"
       - "docs/lab/race-broadcast-pose-filter-v1.js"
       - "docs/lab/race-finish-broadcast-v2.js"
+      - "docs/lab/race-finish-fixed-camera-v1.js"
       - "docs/lab/race-native-broadcast-v1.js"
 permissions: {contents: read}
 jobs:
@@ -33,7 +34,7 @@ jobs:
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
             'RaceLabCourseRollout.assertCanAnimate',
             'markerVisibility.layout','markerTimeDriven:true',
-            'RaceFinishBroadcastV2.render','RaceNativeBroadcast.create',
+            'fixedFinish.render','RaceNativeBroadcast.create',
             'nativeCamera.frame'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
@@ -101,6 +102,32 @@ jobs:
            points:[{d:1395},{d:1373}],distance:1400,width:368,turn:'右'});
           assert.equal(nearBoard.cameraMode,'fixed-finish');
           assert.equal(finish.RaceFinishBroadcastV2.physicalGapScaleLinear,true);
+          const fixed={};
+          vm.runInNewContext(fs.readFileSync(dir+'race-finish-fixed-camera-v1.js','utf8'),
+            {window:fixed});
+          const api=fixed.RaceFinishFixedCamera;
+          assert.equal(api.backgroundStatic,true);
+          assert.equal(api.transitionRemainingM,60);
+          assert.equal(api.courseIndependent,true);
+          assert.ok(!app.includes('RaceFinishBroadcastV2.render({canvas'),
+           'Moving goal camera must never render in LAB fixed finish');
+          const imageFrame=api.layout({width:340,height:336,turn:'右'});
+          const p1=api.project({number:1,d:1350,lane:4},
+           {distance:1400,frame:imageFrame});
+          const p2=api.project({number:1,d:1370,lane:4},
+           {distance:1400,frame:imageFrame});
+          assert.ok(Math.abs((p1.x-p2.x)-
+           20*imageFrame.pixelsPerMetre)<.00001,
+           'Fixed image, equal physical metres must have equal screen spacing');
+          assert.equal(p1.y,p2.y,'Horse lane remains fixed');
+          assert.equal(imageFrame.boardX,340*.22,
+           'Finish line is anchored to immutable fixed image');
+          assert.ok(api.project({number:1,d:1340,lane:4},
+            {distance:1400,frame:imageFrame}).x<340,
+            'Leader should be visible at camera switch');
+          assert.ok(api.project({number:18,d:1319,lane:5},
+            {distance:1400,frame:imageFrame}).x<=340,
+            'Rear horse should remain visible when camera begins');
           assert.ok(fs.readFileSync(dir+'race-finish-broadcast-v2.js','utf8')
            .includes("bezierCurveTo"), 'Green white goal arch must be curved');
           assert.equal(poseApi.RaceBroadcastPoseFilter.courseIndependent,true);
@@ -163,8 +190,9 @@ jobs:
             assert page.evaluate("() => typeof RaceMarkerVisibility.create")== 'function'
             assert page.evaluate("() => RaceMarkerVisibility.paintIdempotent") is True
             assert page.evaluate("() => RaceBroadcastPoseFilter.courseIndependent") is True
-            assert page.evaluate("() => RaceFinishBroadcastV2.transitionRemainingM")==100
-            assert snapshot['inspection']['finishCameraThreshold']==100
+            assert page.evaluate("() => RaceFinishFixedCamera.transitionRemainingM")==60
+            assert page.evaluate("() => RaceFinishFixedCamera.backgroundStatic") is True
+            assert snapshot['inspection']['finishCameraThreshold']==60
             assert not snapshot['inspection']['finishCameraActive']
             assert snapshot['inspection']['markerTimeDriven'] is True
             assert not page.evaluate("() => 'RaceOverviewDistanceLabels' in window")
@@ -247,43 +275,61 @@ jobs:
              page.locator('#broadcastStage').screenshot(
                path=f'/tmp/lab-outer-screens/{name}-outer-{metres}m.png')
             assert page.evaluate("() => CrossCoursePilot.routeReport().sourcePathIndices")==[0]
-            before=page.evaluate("() => CrossCoursePilot.seekTo(1290)")
-            assert before>=1290
+            before=page.evaluate("() => CrossCoursePilot.seekTo(1335)")
+            assert before>=1335
             assert page.evaluate("() => CrossCoursePilot.inspect().finishCameraActive") is False
-            after=page.evaluate("() => CrossCoursePilot.seekTo(1319)")
-            assert after>=1319
-            close=page.evaluate("""() => ({
-             inspect:CrossCoursePilot.inspect(),
-             view:CrossCoursePilot.finishView(),
-             opacity:getComputedStyle(document.querySelector('#goalCamera')).opacity,
-             fontSize:getComputedStyle(document.querySelector('#clock')).fontSize
+            after=page.evaluate("() => CrossCoursePilot.seekTo(1343)")
+            assert after>=1343
+            fixed1=page.evaluate("""() => ({
+              info:CrossCoursePilot.inspect(),
+              result:CrossCoursePilot.finishView(),
+              opacity:getComputedStyle(document.querySelector('#goalCamera')).opacity
             })""")
-            print('CROSS_COURSE_FINISH_CAMERA_100M',name,json.dumps(close,ensure_ascii=False))
-            assert close['inspect']['finishCameraActive'] is True
-            assert close['view']['mode']=='finish-100m-camera'
-            assert close['view']['venueLabel']=='KYOTO'
-            assert float(close['opacity'])>=.99
-            assert close['view']['visible']>=1
-            assert close['view']['physicalSpreadM']>12
-            assert close['view']['visualSpreadPx']>=close['view']['physicalSpreadM']*5.25
-            assert close['view']['cameraMode']=='tracking-pack'
+            print('FIXED_FINISH_BEGIN',name,json.dumps({
+              'position':after,'boardX':fixed1['result']['boardX'],
+              'visible':fixed1['result']['visible'],
+              'backgroundBuilds':fixed1['result']['backgroundBuilds']
+            },ensure_ascii=False))
+            assert fixed1['info']['finishCameraActive'] is True
+            assert fixed1['info']['fixedFinishBackground'] is True
+            assert fixed1['result']['mode']=='fixed-finish-background'
+            assert fixed1['result']['backgroundFixed'] is True
+            assert fixed1['result']['backgroundBuilds']==1
+            assert fixed1['result']['visible']>=17
+            assert len(fixed1['result']['projected'])==18
+            assert float(fixed1['opacity'])>=.99
+            # Painting the SAME clock repeatedly must not repaint the backdrop.
+            page.evaluate("() => Array.from({length:20},()=>CrossCoursePilot.previewFrame())")
+            same=page.evaluate("() => CrossCoursePilot.finishView()")
+            assert same['backgroundBuilds']==1
+            assert same['boardX']==fixed1['result']['boardX']
+            assert same['backgroundKey']==fixed1['result']['backgroundKey']
+            assert same['projected']==fixed1['result']['projected']
             page.locator('#broadcastStage').screenshot(
-              path=f'/tmp/lab-outer-screens/{name}-last-80m-pack-tracking.png')
+             path=f'/tmp/lab-outer-screens/{name}-static-finish-57m.png')
+            reached=page.evaluate("() => CrossCoursePilot.seekTo(1370)")
+            assert reached>=1370
+            fixed2=page.evaluate("() => CrossCoursePilot.finishView()")
+            assert fixed2['backgroundBuilds']==1
+            assert fixed2['boardX']==fixed1['result']['boardX']
+            assert fixed2['backgroundKey']==fixed1['result']['backgroundKey']
+            assert fixed2['pixelsPerMetre']==fixed1['result']['pixelsPerMetre']
+            pfirst={p['number']:p for p in fixed1['result']['projected']}
+            for p in fixed2['projected']:
+             assert p['x']<=pfirst[p['number']]['x']+.001
+             assert abs((p['x']-pfirst[p['number']]['x'])+
+              (p['d']-pfirst[p['number']]['d'])*fixed2['pixelsPerMetre'])<.001
+            page.locator('#broadcastStage').screenshot(
+             path=f'/tmp/lab-outer-screens/{name}-static-finish-30m.png')
             reached=page.evaluate("() => CrossCoursePilot.seekTo(1391)")
-            assert reached>=1391,reached
-            near=page.evaluate("() => CrossCoursePilot.finishView()")
-            print('CROSS_COURSE_FINISH_PACK_ZOOM',name,json.dumps({
-             'distance':reached,'cameraMode':near['cameraMode'],
-             'metres':near['physicalSpreadM'],'pixels':near['visualSpreadPx'],
-             'visible':near['visible'],'boardX':near['goalX']}))
-            assert near['cameraMode']=='fixed-finish'
-            assert near['visible']>=12
-            assert near['visualSpreadPx']>=175
-            assert near['laneStep']>=24,near
-            assert near['activeLaneRange'][1]-near['activeLaneRange'][0]<14
-            assert near['goalX']>0
+            assert reached>=1391
+            fixed3=page.evaluate("() => CrossCoursePilot.finishView()")
+            assert fixed3['backgroundBuilds']==1
+            assert fixed3['boardX']==fixed1['result']['boardX']
+            assert fixed3['visible']>=12
+            assert len(fixed3['projected'])==18
             page.locator('#broadcastStage').screenshot(
-              path=f'/tmp/lab-outer-screens/{name}-last-9m-real-goal-board.png')
+             path=f'/tmp/lab-outer-screens/{name}-static-finish-9m.png')
             page.locator('#resetBtn').click()
             clock_font=page.evaluate("() => getComputedStyle(document.querySelector('#clock')).fontSize")
             assert float(clock_font.replace('px',''))<=22,clock_font
