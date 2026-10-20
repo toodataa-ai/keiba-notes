@@ -13,11 +13,12 @@ const STEP=RaceFrameInterpolator.STEP_SECONDS;
 let route=null,nativeCamera=null,engine=null,playing=false,last=0,acc=0,prev=null,curr=null;
 let shown=[],camera=null,lastCameraTime=null,lastPaint=0,finishElapsed=0,blocked=null;
 const cache={signature:''};
-const markerVisibility=RaceMarkerVisibility.create();
+const markerVisibility=RaceMarkerVisibility.create({lockAfterFirstPlan:true});
 const broadcastPose=RaceBroadcastPoseFilter.create();
 const cameraPose=RaceBroadcastPoseFilter.create();
-const fixedFinish=RaceFinishFixedCamera.create({venueLabel:'KYOTO',turn:course.turn,maxLane:14});
+const fixedFinish=RaceFinishFixedCamera.create({venueLabel:'KYOTO',turn:course.turn,maxLane:14,goalPostSide:'inner'});
 let visualMetrics=null,lastFinishView=null,lastSmoothedPositions=[],lastNativeView=null;
+let lastStartGate={overview:false,broadcast:false};
 
 const colors=[['#fffdf5','#161616'],['#15191f','#fff'],
  ['#d9142f','#fff'],['#164bb8','#fff'],['#ffde30','#171717'],
@@ -47,7 +48,8 @@ function reset(){
  prev=curr=capture();acc=0;last=0;playing=false;camera=null;lastCameraTime=null;shown=[];
  finishElapsed=0;cache.signature='';markerVisibility.reset();
  broadcastPose.reset();cameraPose.reset();fixedFinish.reset();visualMetrics=null;lastFinishView=null;
- lastSmoothedPositions=[];lastNativeView=null;nativeCamera?.reset();$('goalCamera').hidden=true;$('goalCamera').style.opacity='0';
+ lastSmoothedPositions=[];lastNativeView=null;
+ lastStartGate={overview:false,broadcast:false};nativeCamera?.reset();$('goalCamera').hidden=true;$('goalCamera').style.opacity='0';
  $('resultsBody').replaceChildren();
  $('fullResults').hidden=true;$('startBtn').textContent='▶ スタート';draw();
 }
@@ -119,6 +121,14 @@ function draw(){
  lastNativeView=nativeCamera.frame({ctx:b.ctx,image:originalSvg,
   points:items,width:b.w,height:b.h,timeSeconds:visualTime,
   paintNumber:numbers,leaderNo:state.leadingNo,
+  decorate:(ctx,{left,top,zoom})=>{
+   const gate=RaceTracksideFurniture.startGate(ctx,{
+    point:route.point,maxLane:14,leaderD,
+    project:p=>({x:left+p.x*zoom,y:top+p.y*zoom}),
+    overview:false,showUntilM:22
+   });
+   lastStartGate.broadcast=!!gate;
+  },
   labelLayout:anchors=>markerVisibility.layout(anchors,{
    timeSeconds:visualTime,
    normalAt:h=>{
@@ -129,6 +139,11 @@ function draw(){
   })
  });
  visualMetrics=markerVisibility.metrics();
+ lastStartGate.overview=!!RaceTracksideFurniture.startGate(m.ctx,{
+  point:route.point,maxLane:14,leaderD,
+  project:p=>({x:p.x*m.w/620,y:p.y*m.h/430}),
+  overview:true,showUntilM:22
+ });
  for(const h of items)numbers(m.ctx,h.number,h.x*m.w/620,h.y*m.h/430,.48,
   h.number===state.leadingNo);
  // The last segment is a real STATIC camera. The goal arch, winning
@@ -195,6 +210,7 @@ window.CrossCoursePilot=Object.freeze({
  nativeCamera:()=>lastNativeView,
  distanceCamera:()=>null,
  finishView:()=>lastFinishView,
+ startGate:()=>({...lastStartGate}),
  previewFrame:()=>{if(!engine||blocked)throw Error('LAB_NOT_READY');draw();return visualMetrics},
  // Course-neutral LAB-only check: move the same physical race to a distance
  // for reproducible corner screenshots; this never rewrites race geometry.
@@ -217,6 +233,8 @@ window.CrossCoursePilot=Object.freeze({
  finishCameraThreshold:RaceFinishFixedCamera.transitionRemainingM,
  fixedFinishBackground:!!lastFinishView?.backgroundFixed,
  fixedFinishBackgroundBuilds:lastFinishView?.backgroundBuilds??0,
+ goalBoardBeyondRail:lastFinishView?.boardOutsideRail??null,
+ startGateShown:lastStartGate.overview,
  broadcastPoseMaxDrift:RaceBroadcastPoseFilter.sourceDeviationCap,
  visibilityMetrics:visualMetrics})
 });
