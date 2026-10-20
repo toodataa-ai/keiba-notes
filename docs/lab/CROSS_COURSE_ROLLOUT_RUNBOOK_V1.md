@@ -132,3 +132,10 @@ v37のChrome実画面を監査したところ、ゴール9m手前では18頭の�
 - Switching starts when the lead horse is within 60m, with a 4m crossfade. Chosen to keep the field visible in a smartphone viewport at a constant distance scale. Pre-60m native original-SVG broadcast remains unchanged.
 - The fixed finish background is a vector illustration based on the established Kyoto-style goal arch, not an official photograph.
 - Chrome and WebKit QA checks fixed goalX, stable bitmap build count, 57m / 30m / 9m remaining views, linear horse-only motion and all 18 finishers. Stage-only LAB; no changes to original source SVG, physics, betting, predictions or production.
+
+## LAB v45（2026-10-21）ゴール板ラチ外／発馬機／震えの共通原因対策
+- **ゴール板の位置**：従来の `race-finish-fixed-camera-v1.js` はゴール板アーチの脚を芝面（内外ラチの間）へ描いていた。今回、共有 `race-trackside-furniture-v1.js` を追加し、競馬場ラチ外に構造物を描く。ゴール線だけは芝の横断線として残す。共通`goalPostSide`（inner/outer）とフレームの内・外ラチ位置を正本とし、outsideTurf監査でラチ外でない構造物をfail-closed。京都外1400はinner側を使用し、サイドエリアにアーチ・柱が完全に収まる構図に変更。ゴール板・背景は一度だけラスタ化した同一ビットマップを使い回す。
+- **スタートゲート**：共有 `RaceTracksideFurniture.startGate` を追加。コース元SVGのガイド `route.point(0,0..14)` からゲートの跨ぎ線を取得し、`route.point(3,7)` で走路接線方向を取得。寸法と回転を絶対座標で手調整しない。実況では18の簡易馬房、全体図では縮小記号＋「発馬機」を表示。先頭が22mを通過すると両方非表示。地形・背景SVGと実際の発走物理は変更しない。
+- **馬番の震え根治方針**：前バージョンには(1)先頭馬/最後方馬の**入れ替わり**をカメラ追跡の目標とする設計、(2)馬群の見かけの広がりを追跡してカメラズームを変動させる設計、(3)馬番重なり回避を2.4仮想秒ごとに再解決する設計が同居。共通 `RaceNativeBroadcast` の追跡目標を全馬の座標平均へ置換し、ズームはviewport幅から計算した固定値へ変更。共通 `RaceMarkerVisibility.create({lockAfterFirstPlan:true})` で初回決定以降は馬番左右配置を変更しない。時間補間と物理走行位置はそのまま。表示上の重なり回避を優先して元の走行位置を動かさない。
+- コースの個別座標調整は**ゼロ**。今回の共通部品は `RaceTracksideFurniture` / `RaceNativeBroadcast` / `RaceMarkerVisibility`。本番予想、JRA結果、全体図うまぽっと原図、RaceSimEngine、正式買い目に改変はなし。
+- ブラウザゲート：元SVG外回りパス#0・1m全8,406地点＋0.25m連続性、Chrome/WebKit、発馬機初期表示・22m超で消滅、アーチ全体がラチ外、定位置ゴール板と18頭完走、時計・着順・人手スクリーンショット確認を実施。iPhone実機での馬番震えの主観評価が残るため、ユーザー承認まではLAB未承認。
