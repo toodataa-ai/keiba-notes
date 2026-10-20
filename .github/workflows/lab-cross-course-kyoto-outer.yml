@@ -297,7 +297,7 @@ jobs:
             assert fixed1['result']['backgroundBuilds']==1
             assert fixed1['result']['visible']>=17
             assert len(fixed1['result']['projected'])==18
-            assert float(fixed1['opacity'])>=.99
+            assert .2<=float(fixed1['opacity'])<=1, 'Fixed background crossfades over four metres'
             # Painting the SAME clock repeatedly must not repaint the backdrop.
             page.evaluate("() => Array.from({length:20},()=>CrossCoursePilot.previewFrame())")
             same=page.evaluate("() => CrossCoursePilot.finishView()")
