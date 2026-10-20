@@ -189,7 +189,8 @@ jobs:
             assert curve['spikeCount']==0,curve
             # Explicit 3C/4C snapshot gate, not just 'green pixels anywhere'.
             # It uses the same physical engine and the same outer source stroke.
-            for metres in (600,720,850,950):
+            # Exact user-supplied regression point: screen at ~992m.
+            for metres in (600,720,850,950,992):
              reached=page.evaluate("(metres) => CrossCoursePilot.seekTo(metres)",metres)
              assert reached>=metres and not errors,(name,metres,reached,errors)
              first_preview=page.evaluate("""() => ({
