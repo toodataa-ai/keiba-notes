@@ -32,9 +32,10 @@ def main(date, retries, delay):
             if {r["race_id"] for r in remote["races"] if r["date"]==date} != expected:
                 raise RuntimeError("Remote manifest race coverage differs")
             for row in records:
-                if row["status"] != "reviewed":
+                if row["status"] not in ("reviewed", "cancelled"):
                     continue
-                for key in ("prediction_path","result_path","review_path"):
+                keys = ("prediction_path","result_path","review_path") if row["status"] == "reviewed" else ("prediction_path","result_path")
+                for key in keys:
                     urlpath = row[key]
                     assert urlpath, f"{row['race_id']} missing {key}"
                     local = (ROOT/urlpath).read_bytes()
@@ -51,6 +52,15 @@ def main(date, retries, delay):
                     live.raise_for_status()
                     if digest(live.content)!=digest(local):
                         raise RuntimeError(f"Remote daily analysis differs: {rel}")
+            for item in loc.get("daily_closure", []):
+                if item["date"] != date:
+                    continue
+                rel=item["path"]
+                local=(ROOT/rel).read_bytes()
+                live=session.get(urljoin(BASE,rel),timeout=25,headers={"Cache-Control":"no-cache"})
+                live.raise_for_status()
+                if digest(live.content)!=digest(local):
+                    raise RuntimeError(f"Remote closure audit differs: {rel}")
             print(json.dumps({"status":"VERIFIED","date":date,"manifest_updated_at":loc["updated_at"],
                   "predictions":len(records),"reviewed":sum(x["status"]=="reviewed" for x in records),
                   "base":BASE},ensure_ascii=False))
