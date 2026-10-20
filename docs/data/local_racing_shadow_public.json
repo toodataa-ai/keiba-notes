@@ -2,7 +2,7 @@
   "schema_version": 1,
   "mode": "local_daily_shadow_public_view",
   "production_effect": false,
-  "updated_at": "2026-10-21T08:30:11+09:00",
+  "updated_at": "2026-10-21T08:49:54+09:00",
   "model_version": "local-daily-shadow-v0.1",
   "notice": "地方競馬Shadowは研究用です。JRA正式予想・正式成績には直接反映しません。発走前predictionは結果確定後も改変しません。",
   "venues": [
@@ -8924,12 +8924,12 @@
       "distance": 1400,
       "class": "Ｃ２四組",
       "scheduled_start_at": "2026-10-20T11:40:00+09:00",
-      "status": "predicted",
+      "status": "cancelled",
       "model_version": "local-daily-shadow-v0.1",
       "information_cutoff_at": "2026-10-20T08:04:52+09:00",
       "proof_commit": "c29336ceead9590ed114482311998a66bb5bb9cc",
       "prediction_path": "data/local-racing-shadow/predictions/2026-10-20/20261020-morioka-01.json",
-      "result_path": null,
+      "result_path": "data/local-racing-shadow/results/2026-10-20/20261020-morioka-01.json",
       "review_path": null,
       "preview": {
         "top_pick": {
@@ -8949,12 +8949,12 @@
       "distance": 1400,
       "class": "Ｃ２三組",
       "scheduled_start_at": "2026-10-20T12:15:00+09:00",
-      "status": "predicted",
+      "status": "cancelled",
       "model_version": "local-daily-shadow-v0.1",
       "information_cutoff_at": "2026-10-20T08:04:52+09:00",
       "proof_commit": "c29336ceead9590ed114482311998a66bb5bb9cc",
       "prediction_path": "data/local-racing-shadow/predictions/2026-10-20/20261020-morioka-02.json",
-      "result_path": null,
+      "result_path": "data/local-racing-shadow/results/2026-10-20/20261020-morioka-02.json",
       "review_path": null,
       "preview": {
         "top_pick": {
@@ -10940,6 +10940,15 @@
       "gap_count": 0,
       "status": "COMPLETE",
       "path": "data/local-racing-shadow/coverage/2026-10-21-all-venues-prerace-run.json"
+    }
+  ],
+  "daily_closure": [
+    {
+      "date": "2026-10-20",
+      "official_cancellation_count": 2,
+      "verified_settlement_count": 46,
+      "status": "SUCCESS",
+      "path": "data/local-racing-shadow/closure/2026-10-20-postrace-closure.json"
     }
   ]
 }
