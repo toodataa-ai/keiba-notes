@@ -10,13 +10,13 @@ const race={...base,id:'outer-1400-hypothetical-18',
  venue:course.venue,field_size:18,horses:original.horses(),
  race:'京都芝1400m外回り・架空18頭'};
 const STEP=RaceFrameInterpolator.STEP_SECONDS;
-let route=null,engine=null,playing=false,last=0,acc=0,prev=null,curr=null;
+let route=null,ribbonCamera=null,engine=null,playing=false,last=0,acc=0,prev=null,curr=null;
 let shown=[],camera=null,lastCameraTime=null,lastPaint=0,finishElapsed=0,blocked=null;
 const cache={signature:''};
 const markerVisibility=RaceMarkerVisibility.create();
 const broadcastPose=RaceBroadcastPoseFilter.create();
 const cameraPose=RaceBroadcastPoseFilter.create();
-let visualMetrics=null,lastFinishView=null,lastSmoothedPositions=[];
+let visualMetrics=null,lastFinishView=null,lastSmoothedPositions=[],lastDistanceView=null;
 
 const colors=[['#fffdf5','#161616'],['#15191f','#fff'],
  ['#d9142f','#fff'],['#164bb8','#fff'],['#ffde30','#171717'],
@@ -46,7 +46,7 @@ function reset(){
  prev=curr=capture();acc=0;last=0;playing=false;camera=null;lastCameraTime=null;shown=[];
  finishElapsed=0;cache.signature='';markerVisibility.reset();
  broadcastPose.reset();cameraPose.reset();visualMetrics=null;lastFinishView=null;
- lastSmoothedPositions=[];$('goalCamera').hidden=true;$('goalCamera').style.opacity='0';
+ lastSmoothedPositions=[];lastDistanceView=null;ribbonCamera?.resetCamera();$('goalCamera').hidden=true;$('goalCamera').style.opacity='0';
  $('resultsBody').replaceChildren();
  $('fullResults').hidden=true;$('startBtn').textContent='▶ スタート';draw();
 }
@@ -68,6 +68,7 @@ async function load(){
    projection:RaceSafeRailProjection,geometry:RaceCourseImageGeometry,
    sourceSvgText,sourcePathIndices:source.svgGreenPathIndices});
   RaceLabCourseRollout.assertCanAnimate(courseId,course,route);
+  ribbonCamera=RaceDistanceBroadcast.create({image:$('realCourseImage'),route,distance:course.distance_m});
   $('sourceAudit').textContent='原図の芝帯監査 '+route.report.checked+
    '地点 合格／外回り元SVGパス#'+route.report.sourcePathIndices.join(',')+
    ' 固定・芝帯外0・最大1m移動'+route.report.maxProjectedStep.toFixed(2)+'px／原図不変';
@@ -100,51 +101,59 @@ function draw(){
  // Repainting, pausing, or a faster display cannot advance their animation.
  const visualTime=state.finished?state.t:
    Math.max(0,state.t-STEP+Math.min(STEP,acc));
- const centerRaw=route.point(Math.max(0,Math.min(course.distance_m,leaderD-18)),3);
- const center=cameraPose.apply([{number:0,x:centerRaw.x,y:centerRaw.y}],
-  {timeSeconds:visualTime,containsDisc:route.disc})[0];
- if(!camera){camera={x:center.x,y:center.y};lastCameraTime=visualTime}
- else{
-  const dt=Math.max(0,Math.min(.3,visualTime-(lastCameraTime??visualTime)));
-  const easing=1-Math.exp(-dt*6);
-  camera.x+=(center.x-camera.x)*easing;
-  camera.y+=(center.y-camera.y)*easing;
-  lastCameraTime=visualTime;
- }
- const zoom=b.w<540?9.75:10.55;
- // Keep image and number positions in the SAME continuous coordinates.
- // Snapping to DPR pixel boundaries introduced a 1-pixel stair-step.
- const left=b.w*.54-camera.x*zoom;
- const top=b.h*.51-camera.y*zoom;
- // Draw BOTH source SVG and the moving numbers into the same canvas.
- // Previously the browser composited a separately transformed <img> and
- // a canvas at different fractional DPR coordinates; Safari sometimes
- // showed a slight alternating misalignment, even for a stable horse pose.
- const background=$('liveCourseImage');
- if(!background.complete||!background.naturalWidth)
-  throw Error('SOURCE_IMAGE_NOT_READY_FOR_ATOMIC_PAINT');
- background.style.visibility='hidden';
- background.style.transform='none';
- b.ctx.save();
- b.ctx.imageSmoothingEnabled=true;
- b.ctx.drawImage(background,left,top,620*zoom,430*zoom);
- b.ctx.restore();
- // Source SVG geometry has 1m samples and tiny subpixel rail repairs.
- // They are harmless in the overview but get amplified 10x in broadcast.
- // Ease only the broadcast projection, with <=1.15 source-pixel drift.
- const stabilized=broadcastPose.apply(items,{timeSeconds:visualTime,
-  containsDisc:route.disc});
- lastSmoothedPositions=stabilized.map(p=>({number:p.number,x:p.x,y:p.y,
-  rawX:p.unfilteredX??p.x,rawY:p.unfilteredY??p.y}));
- const screen=stabilized.map(h=>({...h,x:left+h.x*zoom,y:top+h.y*zoom}));
- const visible=markerVisibility.layout(screen,{timeSeconds:visualTime,normalAt:h=>{
-  const a=route.point(Math.max(0,h.d-2),h.lane);
-  const z=route.point(Math.min(course.distance_m,h.d+2),h.lane);
-  return{x:-(z.y-a.y),y:z.x-a.x};
- }});
- visualMetrics=markerVisibility.metrics();
- for(const h of visible){
-  if(h.x>=-18&&h.x<=b.w+18&&h.y>=-18&&h.y<=b.h+18)
+ // A curved source map naturally foreshortens horses approaching the
+ // home straight. In the last turn, switch to a source-SVG-sampled TV ribbon
+ // whose horizontal axis is ACTUAL race metres and whose vertical axis is
+ // actual lanes. This is a shared camera, not a per-course geometry edit.
+ const straightEntry=course.distance_m-course.straight_m;
+ const equalDistanceStart=Math.max(0,straightEntry-250);
+ const useRibbon=leaderD>=equalDistanceStart;
+ lastDistanceView=null;
+ if(useRibbon){
+  if(!ribbonCamera)throw Error('SOURCE_RIBBON_CAMERA_NOT_READY');
+  // Source pose and physical d/lane are passed through unchanged; label
+  // avoidance can move only the label's vertical DISPLAY position.
+  lastSmoothedPositions=items.map(p=>({number:p.number,x:p.x,y:p.y,
+   rawX:p.x,rawY:p.y}));
+  lastDistanceView=ribbonCamera.frame({ctx:b.ctx,width:b.w,height:b.h,
+   points:items,leaderD,timeSeconds:visualTime,paintNumber:numbers,
+   leaderNo:state.leadingNo,
+   labelLayout:anchors=>markerVisibility.layout(anchors,{
+    timeSeconds:visualTime,normalAt:()=>({x:0,y:1})
+   })});
+  visualMetrics=markerVisibility.metrics();
+ }else{
+  const centerRaw=route.point(Math.max(0,Math.min(course.distance_m,leaderD-18)),3);
+  const center=cameraPose.apply([{number:0,x:centerRaw.x,y:centerRaw.y}],
+    {timeSeconds:visualTime,containsDisc:route.disc})[0];
+  if(!camera){camera={x:center.x,y:center.y};lastCameraTime=visualTime}
+  else{
+   const dt=Math.max(0,Math.min(.3,visualTime-(lastCameraTime??visualTime)));
+   const easing=1-Math.exp(-dt*6);
+   camera.x+=(center.x-camera.x)*easing;
+   camera.y+=(center.y-camera.y)*easing;
+   lastCameraTime=visualTime;
+  }
+  const zoom=b.w<540?9.75:10.55,
+   left=b.w*.54-camera.x*zoom,top=b.h*.51-camera.y*zoom;
+  const background=$('liveCourseImage');
+  if(!background.complete||!background.naturalWidth)
+   throw Error('SOURCE_IMAGE_NOT_READY_FOR_ATOMIC_PAINT');
+  background.style.visibility='hidden';background.style.transform='none';
+  b.ctx.save();b.ctx.imageSmoothingEnabled=true;
+  b.ctx.drawImage(background,left,top,620*zoom,430*zoom);b.ctx.restore();
+  const stabilized=broadcastPose.apply(items,{timeSeconds:visualTime,
+   containsDisc:route.disc});
+  lastSmoothedPositions=stabilized.map(p=>({number:p.number,x:p.x,y:p.y,
+   rawX:p.unfilteredX??p.x,rawY:p.unfilteredY??p.y}));
+  const screen=stabilized.map(h=>({...h,x:left+h.x*zoom,y:top+h.y*zoom}));
+  const visible=markerVisibility.layout(screen,{timeSeconds:visualTime,normalAt:h=>{
+   const a=route.point(Math.max(0,h.d-2),h.lane);
+   const z=route.point(Math.min(course.distance_m,h.d+2),h.lane);
+   return{x:-(z.y-a.y),y:z.x-a.x};
+  }});
+  visualMetrics=markerVisibility.metrics();
+  for(const h of visible)if(h.x>=-18&&h.x<=b.w+18&&h.y>=-18&&h.y<=b.h+18)
    numbers(b.ctx,h.number,h.x,h.y,b.w<540?.78:.84,h.number===state.leadingNo);
  }
  for(const h of items)numbers(m.ctx,h.number,h.x*m.w/620,h.y*m.h/430,.48,
@@ -169,8 +178,8 @@ function draw(){
  }
  RaceBroadcastHud.render(state,elements(),cache);
  $('progress').textContent=Math.round(state.leader)+'m / '+course.distance_m+'m';
- $('section').textContent=state.leader>=course.distance_m-course.straight_m?
-  '最後の直線':'京都芝1400m外回り';
+ $('section').textContent=state.leader>=straightEntry?
+  '最後の直線':useRibbon?'3・4コーナー／距離を保つ実況カメラ':'京都芝1400m外回り';
 }
 function tick(now){
  if(!last)last=now;
@@ -209,6 +218,7 @@ window.CrossCoursePilot=Object.freeze({
   return route.point(d,lane)},
  visualMetrics:()=>visualMetrics,
  broadcastPoints:()=>lastSmoothedPositions,
+ distanceCamera:()=>lastDistanceView,
  finishView:()=>lastFinishView,
  previewFrame:()=>{if(!engine||blocked)throw Error('LAB_NOT_READY');draw();return visualMetrics},
  // Course-neutral LAB-only check: move the same physical race to a distance
@@ -219,12 +229,15 @@ window.CrossCoursePilot=Object.freeze({
   playing=false;let i=0;
   while(engine.state.leader<requested&&!engine.state.finished&&i++<2500)engine.step(STEP);
   prev=curr=capture();acc=0;shown=[];camera=null;lastCameraTime=null;
-  markerVisibility.reset();broadcastPose.reset();cameraPose.reset();draw();
+  markerVisibility.reset();broadcastPose.reset();cameraPose.reset();
+  ribbonCamera?.resetCamera();draw();
   return engine.state.leader;
  },
  inspect:()=>({courseId,blocked,ready:!!engine,playing,fieldSize:engine?.state.horses.length,
   source:RaceLabCourseRollout.get(courseId).svg,
  sharedVisualMode:true,markerTimeDriven:true,atomicSvgCanvas:true,
+ ribbonCameraActive:!!lastDistanceView,
+ ribbonCameraStartM:Math.max(0,course.distance_m-course.straight_m-250),
  visualCameraTime:lastCameraTime,
  finishCameraActive:!$('goalCamera').hidden,
  finishCameraThreshold:RaceFinishBroadcastV2.transitionRemainingM,
