@@ -405,7 +405,17 @@ def run(date, only_id):
                 raise Blocked("BLOCKED_CONFLICT", "Review exists without result")
             if result_path.exists():
                 result = jread(result_path)
-                if review_path.exists():
+                if result.get("status") == "CANCELLED_OFFICIAL":
+                    if review_path.exists():
+                        raise Blocked("BLOCKED_CONFLICT", "Cancelled race unexpectedly has a review")
+                    if (result.get("prediction_sha256") != digest
+                            or result.get("proof_commit") != proof_commit
+                            or result.get("prediction_path") != str(path)
+                            or result.get("finish_order") != []):
+                        raise Blocked("BLOCKED_CONFLICT", "Official cancellation proof mismatch")
+                    entry.update(status="CANCELLED_OFFICIAL", reason="Official race cancellation",
+                                 result_path=str(result_path), review_path=None)
+                elif review_path.exists():
                     validate_existing(p, result, jread(review_path), path, digest, proof_commit)
                     entry.update(status="SKIPPED_VERIFIED", reason=None, result_path=str(result_path),
                                  review_path=str(review_path))
@@ -441,8 +451,9 @@ def run(date, only_id):
                 write_distinct(review_path, review)
                 entry.update(status="COMPLETED", reason=None, result_path=str(result_path),
                              review_path=str(review_path), source_url=url)
-            validated[rid] = {"p": p, "result": result, "review": jread(review_path),
-                              "distance": p.get("distance")}
+            if entry["status"] in ("COMPLETED", "SKIPPED_VERIFIED"):
+                validated[rid] = {"p": p, "result": result, "review": jread(review_path),
+                                  "distance": p.get("distance")}
         except Blocked as ex:
             entry.update(status=ex.state, reason=str(ex))
         except Exception as ex:
