@@ -92,7 +92,8 @@ def main():
             "race_no": p["race_no"], "race_name": p["race_name"],
             "distance": p["distance"], "class": p.get("class"),
             "scheduled_start_at": p["scheduled_start_at"],
-            "status": "reviewed" if review.exists() else "predicted",
+            "status": ("cancelled" if result.exists() and read(result).get("status") == "CANCELLED_OFFICIAL"
+                       else "reviewed" if review.exists() else "predicted"),
             "model_version": p["model_version"],
             "information_cutoff_at": p["information_cutoff_at"],
             "proof_commit": sha,
@@ -113,6 +114,19 @@ def main():
                          "reviewed_races": data.get("reviewed_races", 0),
                          "summary": data.get("summary"), "findings": data.get("findings", []),
                          "path": "data/local-racing-shadow/analysis/" + path.name})
+    # Publish independent official cancellation and payout reconciliation evidence.
+    closures = []
+    for path in sorted((ROOT / "diagnostics").glob("*-postrace-closure.json")):
+        report = read(path)
+        if report.get("status") != "SUCCESS":
+            raise ValueError(f"Invalid closure report: {path}")
+        dest = PUBLIC / "closure" / path.name
+        changed |= write_if_changed(dest, report)
+        closures.append({"date": report["date"],
+                         "official_cancellation_count": report["official_cancellation_count"],
+                         "verified_settlement_count": report["verified_settlement_count"],
+                         "status": report["status"],
+                         "path": "data/local-racing-shadow/closure/" + path.name})
     # Surface coverage gaps even when no legitimate pre-start predictions exist.
     coverage = []
     for path in sorted((ROOT / "diagnostics").glob("*-all-venues-prerace-run.json")):
@@ -131,6 +145,7 @@ def main():
     # Preserve timestamp if nothing changed, so scheduled runs do not cause noise.
     desired = dict(previous)
     desired["daily_coverage"] = coverage
+    desired["daily_closure"] = closures
     desired.update({"races": entries, "daily_analysis": analyses})
     before = dict(previous)
     before.pop("updated_at", None)
