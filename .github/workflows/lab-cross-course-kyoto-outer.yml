@@ -166,7 +166,14 @@ jobs:
               if name=='chromium' else p.webkit.launch(headless=True))
             page=browser.new_page(viewport={'width':390,'height':844},device_scale_factor=3)
             errors=[];page.on('pageerror',lambda err:errors.append(str(err)))
-            page.goto('http://127.0.0.1:8801/lab/race-lab-cross-course-v1.html?v=1',
+            # This QA tests course rendering, not third-party visit analytics.
+            # Mock only that external endpoint; retain all real app JS errors.
+            page.route('**/counterapi.com/**',
+              lambda route: route.fulfill(status=200,
+                content_type='application/json',
+                headers={'access-control-allow-origin':'*'},
+                body='{"value":0,"count":0}'))
+            page.goto('http://127.0.0.1:8801/lab/race-lab-cross-course-v1.html?v=43',
               wait_until='load',timeout=40000)
             page.wait_for_function("window.CrossCoursePilot && CrossCoursePilot.inspect().ready || CrossCoursePilot.inspect().blocked",
               timeout=25000)
