@@ -16,6 +16,7 @@ const cache={signature:''};
 const markerVisibility=RaceMarkerVisibility.create();
 const broadcastPose=RaceBroadcastPoseFilter.create();
 const cameraPose=RaceBroadcastPoseFilter.create();
+const fixedFinish=RaceFinishFixedCamera.create({venueLabel:'KYOTO',turn:course.turn,maxLane:14});
 let visualMetrics=null,lastFinishView=null,lastSmoothedPositions=[],lastNativeView=null;
 
 const colors=[['#fffdf5','#161616'],['#15191f','#fff'],
@@ -45,7 +46,7 @@ function reset(){
  engine=RaceSimEngine.create(race,{seed:2026,bias:'neutral'});
  prev=curr=capture();acc=0;last=0;playing=false;camera=null;lastCameraTime=null;shown=[];
  finishElapsed=0;cache.signature='';markerVisibility.reset();
- broadcastPose.reset();cameraPose.reset();visualMetrics=null;lastFinishView=null;
+ broadcastPose.reset();cameraPose.reset();fixedFinish.reset();visualMetrics=null;lastFinishView=null;
  lastSmoothedPositions=[];lastNativeView=null;nativeCamera?.reset();$('goalCamera').hidden=true;$('goalCamera').style.opacity='0';
  $('resultsBody').replaceChildren();
  $('fullResults').hidden=true;$('startBtn').textContent='▶ スタート';draw();
@@ -130,22 +131,23 @@ function draw(){
  visualMetrics=markerVisibility.metrics();
  for(const h of items)numbers(m.ctx,h.number,h.x*m.w/620,h.y*m.h/430,.48,
   h.number===state.leadingNo);
- // Switch to the shared finish-line close-up as the LEADER enters the
- // final 100m, not when the first runner has already crossed the wire.
- const remaining=course.distance_m-state.leader;
- if(remaining<=RaceFinishBroadcastV2.transitionRemainingM){
+ // The last segment is a real STATIC camera. The goal arch, winning
+ // line, grass and rails are rendered ONCE to a cached bitmap. Individual
+ // horse numbers move over that bitmap strictly by the race engine's d/lane.
+ // Do not track the pack, shift the goal post or rescale during the finish.
+ const leaderPosition=Math.max(...items.map(h=>h.d));
+ const remaining=course.distance_m-leaderPosition;
+ if(remaining<=RaceFinishFixedCamera.transitionRemainingM){
   const finishCanvas=$('goalCamera');
   finishCanvas.hidden=false;
-  // Blend over 8 race metres without changing or redrawing the source map.
-  const blend=Math.max(0,Math.min(1,(100-remaining)/8));
+  const blend=Math.max(0,Math.min(1,
+   (RaceFinishFixedCamera.transitionRemainingM-remaining)/4));
   finishCanvas.style.opacity=String(blend);
-  lastFinishView=RaceFinishBroadcastV2.render({
-   canvas:finishCanvas,points:items,leaderNo:state.leadingNo,
-   focusedNo:state.leadingNo,paintNumber:numbers,
-   turn:course.turn,distance:course.distance_m,maxLane:14,
-   venueLabel:course.venue==='京都'?'KYOTO':'RACE'});
+  lastFinishView=fixedFinish.render({canvas:finishCanvas,points:items,
+   distance:course.distance_m,paintNumber:numbers,focusedNo:state.leadingNo});
  }else{
-  $('goalCamera').hidden=true;$('goalCamera').style.opacity='0';
+  $('goalCamera').hidden=true;
+  $('goalCamera').style.opacity='0';
   lastFinishView=null;
  }
  RaceBroadcastHud.render(state,elements(),cache);
@@ -212,7 +214,9 @@ window.CrossCoursePilot=Object.freeze({
  ribbonCameraActive:false,nativeOriginalSvg:!!lastNativeView,
  visualCameraTime:lastCameraTime,
  finishCameraActive:!$('goalCamera').hidden,
- finishCameraThreshold:RaceFinishBroadcastV2.transitionRemainingM,
+ finishCameraThreshold:RaceFinishFixedCamera.transitionRemainingM,
+ fixedFinishBackground:!!lastFinishView?.backgroundFixed,
+ fixedFinishBackgroundBuilds:lastFinishView?.backgroundBuilds??0,
  broadcastPoseMaxDrift:RaceBroadcastPoseFilter.sourceDeviationCap,
  visibilityMetrics:visualMetrics})
 });
