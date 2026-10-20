@@ -70,8 +70,8 @@ jobs:
         env:
           RACE_DATE: ${{ steps.request.outputs.date }}
         run: |
-          python local_racing_shadow_v1/postrace_finalize.py --self-test
-          python local_racing_shadow_v1/postrace_finalize.py --date "$RACE_DATE"
+          python -B local_racing_shadow_v1/postrace_finalize.py --self-test
+          python -B local_racing_shadow_v1/postrace_finalize.py --date "$RACE_DATE"
       - name: Validate strictly isolated changes before writing
         run: |
           git status --short
