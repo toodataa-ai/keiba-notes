@@ -126,7 +126,8 @@ jobs:
           const furnish=furniture.RaceTracksideFurniture;
           assert.equal(furnish.courseIndependent,true);
           const ops=['save','restore','beginPath','moveTo','lineTo',
-           'bezierCurveTo','stroke','fillRect','fillText'];
+           'bezierCurveTo','stroke','fillRect','fillText',
+           'roundRect','fill'];
           const dummy={};ops.forEach(name=>dummy[name]=()=>{});
           const rail=furnish.goal(dummy,{x:80,innerRailY:114,
            outerRailY:308,height:336,venueLabel:'KYOTO',railSide:'inner'});
