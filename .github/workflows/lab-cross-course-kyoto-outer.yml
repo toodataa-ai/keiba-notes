@@ -315,10 +315,10 @@ jobs:
             assert fixed2['backgroundKey']==fixed1['result']['backgroundKey']
             assert fixed2['pixelsPerMetre']==fixed1['result']['pixelsPerMetre']
             pfirst={p['number']:p for p in fixed1['result']['projected']}
-            for p in fixed2['projected']:
-             assert p['x']<=pfirst[p['number']]['x']+.001
-             assert abs((p['x']-pfirst[p['number']]['x'])+
-              (p['d']-pfirst[p['number']]['d'])*fixed2['pixelsPerMetre'])<.001
+            for runner in fixed2['projected']:
+             assert runner['x']<=pfirst[runner['number']]['x']+.001
+             assert abs((runner['x']-pfirst[runner['number']]['x'])+
+              (runner['d']-pfirst[runner['number']]['d'])*fixed2['pixelsPerMetre'])<.001
             page.locator('#broadcastStage').screenshot(
              path=f'/tmp/lab-outer-screens/{name}-static-finish-30m.png')
             reached=page.evaluate("() => CrossCoursePilot.seekTo(1391)")
