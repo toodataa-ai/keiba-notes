@@ -123,3 +123,12 @@ v37のChrome実画面を監査したところ、ゴール9m手前では18頭の�
 - **検証に元図自体の描画色チェックを追加**：Chrome/WebKit両方の850/950m地点で緑比率95%未満、元SVG 620×430の丸ごと表示かつ旧帯カメラ非ロードを検証する。単色緑画像の横展開を防ぐ。
 - **残課題**：3〜4コーナーの見かけの馬群圧縮は、実際の曲線画像を尊重すれば画角で完全相殺できない。勝手にコースを直線化する代案は無効とし、今後実コース形状を保った表示改善は別LABで研究する。最新方式の最優先条件は**原図への一致**。実機での最終表示確認が済むまでは未承認。
 - JRA正式予想、買い目、結果、race-sim-engine、元SVG・基準内2000は一切変更しない。
+
+
+## LAB v43 (2026-10-21): fixed finish image and horse-only movement
+- At the finish, the previous camera changed goal-post x position and vertical lane framing as the pack moved. This did not satisfy the fixed camera requirement.
+- The new race-finish-fixed-camera-v1.js creates a static offscreen bitmap containing turf, rail, white finish line and Kyoto-inspired green/white arch once per viewport size. At each race tick, that same image is drawn unchanged; only horse number circles move.
+- Every horse has screen x = boardX + direction * (distance - horse.d) * pixelsPerMetre, y = lane0Y + horse.lane * laneStep, using actual RaceSimEngine distances. No camera-follow, no movement of finish post and no race- or course-specific pixel patches.
+- Switching starts when the lead horse is within 60m, with a 4m crossfade. Chosen to keep the field visible in a smartphone viewport at a constant distance scale. Pre-60m native original-SVG broadcast remains unchanged.
+- The fixed finish background is a vector illustration based on the established Kyoto-style goal arch, not an official photograph.
+- Chrome and WebKit QA checks fixed goalX, stable bitmap build count, 57m / 30m / 9m remaining views, linear horse-only motion and all 18 finishers. Stage-only LAB; no changes to original source SVG, physics, betting, predictions or production.
