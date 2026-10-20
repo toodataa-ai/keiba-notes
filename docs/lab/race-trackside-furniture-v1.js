@@ -77,16 +77,20 @@
    ctx.beginPath();ctx.moveTo(x-direction.x*d,y-direction.y*d);
    ctx.lineTo(x+direction.x*d,y+direction.y*d);ctx.stroke();
   }
-  if(overview){
-   // Label is outside the track, so it does not replace the ground-truth
-   // 0m race marker; it exists only when the starting gate is visible.
-   const labelX=mid.x-direction.x*23,labelY=mid.y-direction.y*23;
-   ctx.fillStyle='rgba(244,251,246,.96)';
-   ctx.beginPath();ctx.roundRect(labelX-25,labelY-8,50,16,3);ctx.fill();
-   ctx.strokeStyle='#315a50';ctx.lineWidth=1;ctx.stroke();
-   ctx.fillStyle='#1c503c';ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.font='bold 8px Arial';ctx.fillText('発馬機',labelX,labelY+.5);
-  }
+  // Stalls can be covered by the 18 horse-number circles at t=0.
+  // Identify the real starting apparatus alongside the route, never
+  // inventing a second gate position or changing the runner coordinates.
+  const labelOffset=overview?23:43;
+  const labelX=mid.x-direction.x*labelOffset,
+   labelY=mid.y-direction.y*labelOffset,
+   labelWidth=overview?50:61,labelHeight=overview?16:23;
+  ctx.fillStyle='rgba(244,251,246,.97)';
+  ctx.beginPath();ctx.roundRect(labelX-labelWidth/2,
+   labelY-labelHeight/2,labelWidth,labelHeight,4);ctx.fill();
+  ctx.strokeStyle='#315a50';ctx.lineWidth=overview?1:2;ctx.stroke();
+  ctx.fillStyle='#1c503c';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold '+(overview?'8':'12')+'px Arial,sans-serif';
+  ctx.fillText('発馬機',labelX,labelY+.5);
   ctx.restore();
   return Object.freeze({...geom,drawn:true,overview,leaderD});
  }
