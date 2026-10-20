@@ -5,7 +5,7 @@
  * map remains unchanged. No course-specific XY pixel adjustments.
  */
 (function(g){'use strict';
-const T_W=448,T_H=448,L_PX=20,BASE_LANE=7,CACHE_LIMIT=10;
+const T_W=448,T_H=448,L_PX=20,BASE_LANE=7,CACHE_LIMIT=18;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function create({image,route,distance}){
  if(!image?.naturalWidth||typeof route?.point!=='function'||!(distance>0))
@@ -46,6 +46,13 @@ function create({image,route,distance}){
   cache.set(key,off);
   while(cache.size>CACHE_LIMIT)cache.delete(cache.keys().next().value);
   return off;
+ }
+ function warm({fromD=0,toD=distance,width}){
+  if(!(width>100))throw Error('DISTANCE_CAMERA_VIEWPORT_UNKNOWN');
+  const ppm=pxPerMetre(width),a=Math.floor(fromD*ppm/T_W)-1,
+   z=Math.floor(toD*ppm/T_W)+1;
+  for(let i=a;i<=z;i++)makeTile(i,ppm);
+  return Object.freeze({tiles:z-a+1,ppm,cacheEntries:cache.size});
  }
  function frame({ctx,width,height,points,leaderD,timeSeconds,paintNumber,leaderNo,labelLayout}){
   if(!Array.isArray(points)||!points.length||!Number.isFinite(timeSeconds))
@@ -93,7 +100,7 @@ function create({image,route,distance}){
    physicalPositionsUnchanged:true};
   return lastInfo;
  }
- return Object.freeze({frame,metrics:()=>lastInfo,resetCamera,
+ return Object.freeze({frame,warm,metrics:()=>lastInfo,resetCamera,
   pxPerMetre,format:'original-svg-sampled-ribbon',courseIndependent:true});
 }
 g.RaceDistanceBroadcast=Object.freeze({create,courseIndependent:true,
