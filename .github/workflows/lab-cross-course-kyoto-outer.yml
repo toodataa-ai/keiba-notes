@@ -11,6 +11,7 @@ on:
       - "docs/lab/race-marker-visibility-v1.js"
       - "docs/lab/race-broadcast-pose-filter-v1.js"
       - "docs/lab/race-finish-broadcast-v2.js"
+      - "docs/lab/race-distance-broadcast-v1.js"
 permissions: {contents: read}
 jobs:
   source-turf-and-full-playback:
@@ -33,7 +34,8 @@ jobs:
             'RaceLabCourseRollout.assertCanAnimate',
             'markerVisibility.layout','markerTimeDriven:true',
             'broadcastPose.apply','cameraPose.apply',
-            'RaceFinishBroadcastV2.render'])assert.ok(app.includes(key),key);
+            'RaceFinishBroadcastV2.render','RaceDistanceBroadcast.create',
+            'ribbonCamera.frame'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
           assert.ok(mask.includes('maxProjectedStep'), 'Continuous image-motion audit');
           assert.ok(mask.includes('corridorFromOriginalSvg:true'), 'Preserve original green-turf source');
@@ -103,6 +105,15 @@ jobs:
           assert.ok(fs.readFileSync(dir+'race-finish-broadcast-v2.js','utf8')
            .includes("bezierCurveTo"), 'Green white goal arch must be curved');
           assert.equal(poseApi.RaceBroadcastPoseFilter.courseIndependent,true);
+          const dist={};
+          vm.runInNewContext(fs.readFileSync(dir+'race-distance-broadcast-v1.js','utf8'),
+           {window:dist});
+          assert.equal(dist.RaceDistanceBroadcast.courseIndependent,true);
+          assert.equal(dist.RaceDistanceBroadcast.physicalPositionsUnchanged,true);
+          assert.ok(fs.readFileSync(dir+'race-distance-broadcast-v1.js','utf8')
+            .includes('route.point(d,14)'), 'Use original SVG plus real route');
+          assert.ok(!fs.readFileSync(dir+'race-distance-broadcast-v1.js','utf8')
+            .includes('kyoto_turf_outer_1400'), 'No special course offsets');
           console.log('PASS_COURSE_COMMON_COMPONENTS_NO_SOURCE_REDRAW');
           JS
       - name: Install Safari and Chrome tools
@@ -141,6 +152,9 @@ jobs:
             assert snapshot['speed']=='2'
             assert snapshot['inspection']['sharedVisualMode'] is True
             assert snapshot['inspection']['atomicSvgCanvas'] is True
+            assert page.evaluate("() => RaceDistanceBroadcast.courseIndependent") is True
+            assert snapshot['inspection']['ribbonCameraStartM']>700
+            assert snapshot['inspection']['ribbonCameraStartM']<850
             assert page.evaluate("() => getComputedStyle(document.querySelector('#liveCourseImage')).visibility")=='hidden'
             assert page.evaluate("() => typeof RaceMarkerVisibility.create")== 'function'
             assert page.evaluate("() => RaceMarkerVisibility.paintIdempotent") is True
@@ -193,6 +207,20 @@ jobs:
              assert max((((h['x']-h['rawX'])**2+(h['y']-h['rawY'])**2)**.5)
               for h in stabilized)<=1.151
              assert visible['after']['penalty'] <= visible['base']['penalty']*1.1+1
+             camera=page.evaluate("() => CrossCoursePilot.distanceCamera()")
+             print('CROSS_COURSE_BEND_DISTANCE_CAMERA',name,metres,
+               json.dumps(camera and {k:v for k,v in camera.items() if k!='markers'}))
+             if metres in (850,950):
+              assert camera and camera['mode']=='source-ribbon-arc-length'
+              assert camera['originalSvgSamples'] is True
+              assert camera['physicalPositionsUnchanged'] is True
+              assert camera['fieldGapM']>24
+              assert camera['fieldGapPx']>175
+              assert abs(camera['fieldGapM']*camera['ppm']-camera['fieldGapPx'])<.001
+              marker_x=[p['x'] for p in camera['markers']]
+              assert max(marker_x)-min(marker_x)>170
+             else:
+              assert camera is None,(name,metres,'CAMERA_SWITCHED_TOO_EARLY')
              assert page.evaluate("() => document.querySelector('.race-overview-view .status').textContent.includes('距離目盛りなし')")
              page.locator('#broadcastStage').screenshot(
                path=f'/tmp/lab-outer-screens/{name}-outer-{metres}m.png')
