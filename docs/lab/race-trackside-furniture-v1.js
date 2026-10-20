@@ -64,18 +64,26 @@
    x:mid.x-cross.x*minWidth/2,y:mid.y-cross.y*minWidth/2}:a;
   const p2=geom.width<minWidth?{
    x:mid.x+cross.x*minWidth/2,y:mid.y+cross.y*minWidth/2}:b;
+  // The overhanging gate roof is a few screen pixels BEHIND the
+  // actual start cross-section. This leaves the 18 physical horse circles
+  // at d=0 while making the stalls visible instead of hidden under them.
+  const roofBack=overview?2:19;
+  const roof1={x:p1.x-direction.x*roofBack,y:p1.y-direction.y*roofBack};
+  const roof2={x:p2.x-direction.x*roofBack,y:p2.y-direction.y*roofBack};
   ctx.strokeStyle='#e7f0e8';ctx.lineWidth=overview?3:8;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(roof1.x,roof1.y);ctx.lineTo(roof2.x,roof2.y);ctx.stroke();
   ctx.strokeStyle='#315a50';ctx.lineWidth=overview?1.8:5;
-  ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(roof1.x,roof1.y);ctx.lineTo(roof2.x,roof2.y);ctx.stroke();
   const n=overview?6:18;
   for(let i=0;i<=n;i++){
    const t=i/n,x=p1.x+(p2.x-p1.x)*t,y=p1.y+(p2.y-p1.y)*t;
-   const d=overview?3:8;
    ctx.strokeStyle=i%2?'#d3e4df':'#f7fff6';
    ctx.lineWidth=overview?.9:2.4;
-   ctx.beginPath();ctx.moveTo(x-direction.x*d,y-direction.y*d);
-   ctx.lineTo(x+direction.x*d,y+direction.y*d);ctx.stroke();
+   ctx.beginPath();
+   ctx.moveTo(x-direction.x*roofBack,y-direction.y*roofBack);
+   ctx.lineTo(x+direction.x*(overview?1:3),
+    y+direction.y*(overview?1:3));
+   ctx.stroke();
   }
   // Stalls can be covered by the 18 horse-number circles at t=0.
   // Identify the real starting apparatus alongside the route, never
