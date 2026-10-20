@@ -30,7 +30,12 @@ def audit(date, published):
     assert summary_path.exists() and diag_path.exists(), "Missing summary/diagnostics"
     summary = load(summary_path)
     diagnostics = load(diag_path)
-    verified = {}
+    closure_path = ROOT / "diagnostics" / f"{date}-postrace-closure.json"
+    closure = load(closure_path) if closure_path.exists() else None
+    if closure:
+        assert_equal(closure["status"], "SUCCESS", "Official closure")
+        assert closure["reconciliation"]["complete"], "Incomplete official closure"
+    verified, cancelled = {}, {}
     for pred_path in predictions:
         rid = pred_path.stem
         p = load(pred_path)
@@ -48,7 +53,30 @@ def audit(date, published):
         if not rev_path.exists():
             assert manifest[rid]["status"] != "reviewed", f"{rid}: false published review status"
             assert manifest[rid].get("review_path") is None, f"{rid}: ghost review URL"
-            assert manifest[rid].get("result_path") is None or res_path.exists(), f"{rid}: ghost result URL"
+            if res_path.exists() and load(res_path).get("status") == "CANCELLED_OFFICIAL":
+                result = load(res_path)
+                assert closure and rid in closure["cancelled_races"], f"{rid}: unverified cancellation"
+                assert_equal(result["prediction_sha256"],sha,"Cancellation prediction hash")
+                assert_equal(result["proof_commit"],logs[0],"Cancellation commit proof")
+                assert_equal(result["prediction_path"],str(pred_path),"Cancellation prediction path")
+                assert_equal(result["finish_order"],[],"Cancellation has finish data")
+                assert_equal(result["race_id"],rid,"Cancellation race id")
+                assert_equal(result["status"],"CANCELLED_OFFICIAL","Cancellation status")
+                assert result["source_evidence"]["official_notice"], "Missing NAR notice"
+                assert_equal(manifest[rid]["status"],"cancelled","Published cancellation status")
+                assert_equal(manifest[rid]["result_path"],
+                             "data/local-racing-shadow/results/"+date+"/"+pred_path.name,
+                             "Cancellation public result")
+                assert_equal(closure["cancelled_races"][rid]["prediction_sha256"],sha,
+                             "Cancellation closure prediction hash")
+                if published:
+                    mirror=PUBLIC / res_path.relative_to(ROOT)
+                    assert_equal(mirror.read_bytes(),res_path.read_bytes(),
+                                 f"Published cancellation mismatch: {rid}")
+                cancelled[rid] = result
+            else:
+                assert not res_path.exists(), f"{rid}: unreviewed non-cancellation result exists"
+                assert manifest[rid].get("result_path") is None, f"{rid}: ghost result URL"
             continue
         assert res_path.exists(), f"{rid}: review without result"
         result, review = load(res_path), load(rev_path)
@@ -90,13 +118,48 @@ def audit(date, published):
             for x in (res_path, rev_path):
                 mirror = PUBLIC / x.relative_to(ROOT)
                 assert_equal(mirror.read_bytes(),x.read_bytes(),f"Published mirror mismatch: {rid}")
+        if closure:
+            settlement = closure["verified_payouts"].get(rid)
+            assert settlement and settlement["status"]=="VERIFIED_OFFICIAL_PAYOUT", f"{rid}: payout unverified"
+            assert_equal(settlement["proof_commit"],logs[0],"Payout proof commit")
+            assert_equal(settlement["prediction_sha256"],sha,"Payout prediction hash")
+            assert_equal(settlement["result_sha256"],hashlib.sha256(res_path.read_bytes()).hexdigest(),
+                         "Payout result digest")
+            assert_equal(settlement["review_sha256"],hashlib.sha256(rev_path.read_bytes()).hexdigest(),
+                         "Payout review digest")
+            assert settlement["refund_source_url"].startswith(
+                "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RefundMoneyList?"), "Payout official source"
         verified[rid] = review
     assert_equal(summary["expected_predictions"],len(predictions),"Expected prediction count")
     assert_equal(summary["reviewed_races"],len(verified),"Summary reviewed count")
     assert_equal(set(summary["reconciliation"]["review_ids"]),set(verified),"Summary identity set")
     assert_equal(len(verified),sum(x["status"]=="reviewed" for x in manifest.values()),"Manifest reviewed count")
-    remaining = len(predictions)-len(verified)
+    remaining = len(predictions)-len(verified)-len(cancelled)
     assert_equal(diagnostics["total_unresolved"],remaining,"Diagnostics unresolved")
+    if closure:
+        assert_equal(set(closure["verified_payouts"]),set(verified),"Closure payout coverage")
+        assert_equal(set(closure["cancelled_races"]),set(cancelled),"Closure cancellation coverage")
+        assert_equal(closure["verified_settlement_count"],len(verified),"Closure paid race count")
+        assert_equal(closure["official_cancellation_count"],len(cancelled),"Closure cancelled count")
+        assert_equal(summary.get("cancelled_official"),len(cancelled),"Summary cancelled count")
+        assert_equal(summary.get("settlement_verified"),len(verified),"Summary payout count")
+        assert_equal(set(summary["reconciliation"].get("cancelled_ids",[])),set(cancelled),
+                     "Summary cancelled ids")
+        assert_equal(set(summary["reconciliation"].get("unresolved_ids",[])),
+                     set(manifest)-set(verified)-set(cancelled),"Summary unresolved ids")
+        assert_equal(sum(x["status"]=="cancelled" for x in manifest.values()),
+                     len(cancelled),"Manifest cancelled count")
+        assert_equal(len(verified)+len(cancelled)+remaining,len(predictions),
+                     "Day scope reconciles")
+        if published:
+            evidence_mirror=PUBLIC / "closure" / closure_path.name
+            assert_equal(evidence_mirror.read_bytes(),closure_path.read_bytes(),
+                         "Published official closure evidence")
+            closure_rows=[x for x in public.get("daily_closure",[]) if x["date"]==date]
+            assert_equal(len(closure_rows),1,"Manifest official closure entry")
+            assert_equal(closure_rows[0]["path"],
+                         "data/local-racing-shadow/closure/"+closure_path.name,
+                         "Manifest official closure path")
     if remaining == 0:
         assert_equal(diagnostics["status"],"SUCCESS","Diagnostics completion")
     if published:
