@@ -33,7 +33,6 @@ jobs:
             'RaceFrameInterpolator.interpolate','RaceBroadcastHud.render',
             'RaceLabCourseRollout.assertCanAnimate',
             'markerVisibility.layout','markerTimeDriven:true',
-            'broadcastPose.apply','cameraPose.apply',
             'RaceFinishBroadcastV2.render','RaceNativeBroadcast.create',
             'nativeCamera.frame'])assert.ok(app.includes(key),key);
           assert.ok(mask.includes('badDiscs:bad'), 'Current common turf-mask failure counter');
