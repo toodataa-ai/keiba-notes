@@ -4,7 +4,7 @@
   "prompt": "local_racing_shadow_v1/shadow_review_prompt_v0_2.txt",
   "expected_predictions": 48,
   "completed_or_verified": 46,
-  "total_unresolved": 2,
+  "total_unresolved": 0,
   "races": {
     "20261020-kanazawa-01": {
       "status": "COMPLETED",
@@ -175,16 +175,18 @@
       "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=36&k_raceDate=2026%2F10%2F20&k_raceNo=12"
     },
     "20261020-morioka-01": {
-      "status": "PENDING_OFFICIAL",
-      "reason": "Official result heading not present",
-      "result_path": null,
-      "review_path": null
+      "status": "CANCELLED_OFFICIAL",
+      "reason": "NAR official race cancellation",
+      "result_path": "local_racing_shadow_v1/results/2026-10-20/20261020-morioka-01.json",
+      "review_path": null,
+      "official_source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=10&k_raceDate=2026%2F10%2F20"
     },
     "20261020-morioka-02": {
-      "status": "PENDING_OFFICIAL",
-      "reason": "Official result heading not present",
-      "result_path": null,
-      "review_path": null
+      "status": "CANCELLED_OFFICIAL",
+      "reason": "NAR official race cancellation",
+      "result_path": "local_racing_shadow_v1/results/2026-10-20/20261020-morioka-02.json",
+      "review_path": null,
+      "official_source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=10&k_raceDate=2026%2F10%2F20"
     },
     "20261020-morioka-03": {
       "status": "COMPLETED",
@@ -341,9 +343,8 @@
       "source_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceMarkTable?k_babaCode=18&k_raceDate=2026%2F10%2F20&k_raceNo=12"
     }
   },
-  "retry_only_race_ids": [
-    "20261020-morioka-01",
-    "20261020-morioka-02"
-  ],
-  "status": "PARTIAL"
+  "retry_only_race_ids": [],
+  "status": "SUCCESS",
+  "official_cancelled": 2,
+  "settlement_verified": 46
 }
