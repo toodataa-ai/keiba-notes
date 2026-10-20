@@ -69,6 +69,13 @@ async function load(){
    sourceSvgText,sourcePathIndices:source.svgGreenPathIndices});
   RaceLabCourseRollout.assertCanAnimate(courseId,course,route);
   ribbonCamera=RaceDistanceBroadcast.create({image:$('realCourseImage'),route,distance:course.distance_m});
+  // Cache all source-image strips before enabling Start. Generating new
+  // image tiles during a turn would cause an otherwise avoidable FPS hitch.
+  ribbonCamera.warm({
+   fromD:Math.max(0,course.distance_m-course.straight_m-315),
+   toD:course.distance_m-60,
+   width:$('broadcast').getBoundingClientRect().width
+  });
   $('sourceAudit').textContent='原図の芝帯監査 '+route.report.checked+
    '地点 合格／外回り元SVGパス#'+route.report.sourcePathIndices.join(',')+
    ' 固定・芝帯外0・最大1m移動'+route.report.maxProjectedStep.toFixed(2)+'px／原図不変';
