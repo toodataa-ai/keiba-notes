@@ -65,11 +65,7 @@ function create({venueLabel='KYOTO',turn='右',maxLane=14}={}){
   root.RaceFinishBroadcastV2.drawGoalBoard(ctx,{
    x,top:y1-24,bottom:y1+131,venueLabel
   });
-  ctx.fillStyle='rgba(16,51,35,.9)';
-  ctx.beginPath();ctx.roundRect(w-139,8,131,24,5);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 11px Arial,sans-serif';
-  ctx.textBaseline='middle';ctx.textAlign='center';
-  ctx.fillText('ゴール前・固定カメラ',w-73,20);
+  // Keep top-right clear: the persistent race clock occupies this region.
  }
  function render({canvas,points,distance,paintNumber,focusedNo}){
   if(!canvas||!Array.isArray(points)||!points.length||
