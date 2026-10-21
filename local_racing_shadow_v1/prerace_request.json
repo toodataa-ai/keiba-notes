@@ -2,7 +2,7 @@
   "schema_version": 1,
   "scope": "PRE-RACE",
   "date": "2026-10-22",
-  "request_seq": 12,
+  "request_seq": 13,
   "production_effect": false,
   "official_calendar_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TodayRaceInfoTop",
   "expected_races_by_venue": {
@@ -11,5 +11,5 @@
     "kasamatsu": 12,
     "sonoda": 12
   },
-  "reason": "Manual execution for 2026-10-22 JST: NAR official TodayRaceInfoTop confirms Monbetsu, Urawa, Kasamatsu and Sonoda, 12 races each (48 total). Preserve immutable pre-start snapshots, commit before cutoff, publish proof manifest/mirrors and audit live Pages. Mark expired/unverifiable races as coverage gaps; strict JRA isolation."
+  "reason": "Retry 2026-10-22 pre-race NAR 48-race run after concurrent 2026-10-21 post-race push caused non-fast-forward rejection. Preserve same official 4-venue 12-race-each verified population and immutable pre-start proof; no JRA changes."
 }
