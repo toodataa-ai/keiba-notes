@@ -210,6 +210,15 @@ def parse_official(soup, p):
         # parentheticals was intended for optional readings, not race identity.
         full_official_key = title_key(clean(official_name))
         full_card_key = title_key(clean(p["race_name"]))
+        # In some NAR RaceList headings the race name is hard-truncated at
+        # "3歳", while RaceMarkTable ends with "3歳以上特別". Accept only
+        # that exact, bounded suffix expansion; date/venue/race number,
+        # distance and official horse identity checks remain mandatory.
+        clipped_age_suffix = (
+            len(clean(p["race_name"])) >= 12
+            and clean(p["race_name"]).endswith("3歳")
+            and clean(official_name) == clean(p["race_name"]) + "以上特別"
+        )
         clipped_final_paren = (
             card_name.count("(") == card_name.count(")") + 1
             and (standard_name == card_name + ")"
@@ -217,6 +226,7 @@ def parse_official(soup, p):
         )
         if (standard_name != card_name and
                 not clipped_final_paren and
+                not clipped_age_suffix and
                 (len(card_name) < 6 or card_name not in standard_name) and
                 not verified_short_title(standard_name, card_name)):
             raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
