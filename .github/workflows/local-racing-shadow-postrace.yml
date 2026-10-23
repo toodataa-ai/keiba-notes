@@ -87,7 +87,19 @@ jobs:
           git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; allowed=("local_racing_shadow_v1/results/","local_racing_shadow_v1/reviews/","local_racing_shadow_v1/analysis/","local_racing_shadow_v1/diagnostics/"); assert all(x.startswith(allowed) for x in p), f"Unexpected staged files: {p}"'
           if ! git diff --cached --quiet; then
             git commit -m "Save official local NAR POST-RACE reviews for $RACE_DATE"
-            git push
+            # Unrelated workflows can advance main. Rebase this isolated commit only.
+            # Fail on merge conflicts; never force push or overwrite remote work.
+            pushed=0
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                pushed=1
+                break
+              fi
+              sleep "$attempt"
+            done
+            test "$pushed" -eq 1
           fi
       - name: Audit prediction proof and publish reviewed mirrors and manifest
         run: python local_racing_shadow_v1/publish_audit.py
@@ -114,7 +126,19 @@ jobs:
           git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; allowed=("docs/data/local-racing-shadow/","docs/data/local_racing_shadow_public.json","docs/data/local_racing_shadow_status.json"); assert all(x.startswith(allowed) for x in p), f"Unexpected staged public files: {p}"'
           if ! git diff --cached --quiet; then
             git commit -m "Publish audited local NAR post-race reports for $RACE_DATE"
-            git push
+            # Unrelated workflows can advance main. Rebase this isolated commit only.
+            # Fail on merge conflicts; never force push or overwrite remote work.
+            pushed=0
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                pushed=1
+                break
+              fi
+              sleep "$attempt"
+            done
+            test "$pushed" -eq 1
           fi
       - name: Recheck committed audit after publication
         env:
