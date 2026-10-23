@@ -52,12 +52,12 @@ jobs:
             RECOVERY_PATH="${NEW_REQUESTS[0]}"
             [[ -f "$RECOVERY_PATH" && ! -L "$RECOVERY_PATH" ]] || { echo "::error::Missing recovery request";exit 1; }
             REQUEST_PATH=$(python3 - "$RECOVERY_PATH" <<'PY'
-import json,sys,re
-d=json.load(open(sys.argv[1]))
-p=d.get("original_request_path","")
-assert d.get("scope")=="same-race-prestart-retry" and re.fullmatch(r"e2e_validation/requests/v314/[a-zA-Z0-9_.-]+\.json",p)
-print(p)
-PY
+          import json,sys,re
+          d=json.load(open(sys.argv[1]))
+          p=d.get("original_request_path","")
+          assert d.get("scope")=="same-race-prestart-retry" and re.fullmatch(r"e2e_validation/requests/v314/[a-zA-Z0-9_.-]+\.json",p)
+          print(p)
+          PY
             )
           else
             REQUEST_PATH="$REQUEST_FROM_UI"
