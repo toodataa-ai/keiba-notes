@@ -42,11 +42,19 @@ def cancellation_numbers(text, date, venue):
         if venue not in notice or not re.search(rf"{d.month}\s*/\s*{d.day}", notice):
             continue
         left = notice[:notice.find(m.group(0))]
-        matches = list(re.finditer(r"第\s*(\d{1,2})\s*競走", left))
-        # A cancellation announcement must list the affected race numbers,
-        # not merely a previous day's race or generic site-wide advisory.
-        for match in matches:
-            no = int(match.group(1))
+        # The subject before "は" identifies cancelled races. A later
+        # reference such as "第2競走の競走中止した馬" is the reason for
+        # cancelling 第3競走, NOT a cancellation of 第2競走.
+        subject_pattern = (r"(?P<subject>第\s*\d{1,2}\s*競走"
+                           r"(?:\s*(?:および|及び|ならびに|並びに|、|，|,|・|と)"
+                           r"\s*第\s*\d{1,2}\s*競走)*)"
+                           r"\s*は(?:[、，,\s]|$)")
+        matches = list(re.finditer(subject_pattern, left))
+        if not matches:
+            continue
+        subject = matches[-1].group("subject")
+        for race in re.finditer(r"第\s*(\d{1,2})\s*競走", subject):
+            no = int(race.group(1))
             if 1 <= no <= 12:
                 results[no] = notice.strip()
     return results
@@ -245,6 +253,11 @@ def self_test():
     assert set(cancellation_numbers(text,"2026-10-20","盛岡")) == {1,2}
     assert not cancellation_numbers(text,"2026-10-19","盛岡")
     assert not cancellation_numbers(text,"2026-10-20","浦和")
+    urawa_notice=("地方競馬情報サイト 10/23（金）の浦和競馬第3競走は、"
+                  "第2競走の競走中止した馬および騎手の収容に時間を要したため"
+                  "取り止めとなりました。")
+    assert set(cancellation_numbers(urawa_notice,"2026-10-23","浦和")) == {3}
+    assert not cancellation_numbers(urawa_notice,"2026-10-22","浦和")
     blocks=refund_sections(text)
     assert set(blocks)=={3,4}
     fake = text.replace("3R C2", "10R navigation 3R C2")
