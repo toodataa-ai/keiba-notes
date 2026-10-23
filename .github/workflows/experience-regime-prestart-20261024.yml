@@ -69,8 +69,12 @@ jobs:
           PY
             git add -- "$PLAN"
             git commit -m 'Freeze 2026-10-24 weekly E012 deterministic sample before first race'
-            git pull --rebase origin main
-            git push origin HEAD:main
+            for retry in 1 2 3 4 5 6 7 8;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 8 ]];then echo '::error::Git main changed repeatedly during E012 isolated push';exit 1;fi
+              sleep 2
+            done
           else
             echo 'E012_REUSE_EXISTING_IMMUTABLE_WEEKLY_PLAN'
           fi
@@ -85,8 +89,12 @@ jobs:
           git add -- experience_regime_v1/collection/2026-10-24
           if ! git diff --cached --quiet;then
             git commit -m 'Freeze real 2026-10-24 official JRA lifetime-start observations and gaps'
-            git pull --rebase origin main
-            git push origin HEAD:main
+            for retry in 1 2 3 4 5 6 7 8;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 8 ]];then echo '::error::Git main changed repeatedly during E012 isolated push';exit 1;fi
+              sleep 2
+            done
           fi
           echo "E012_PROOF_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           echo "E012_PROOF_AT=$(git show -s --format=%cI HEAD)" >> "$GITHUB_ENV"
@@ -139,8 +147,12 @@ jobs:
           git add -- experience_regime_v1/collection/2026-10-24/proof_commit_2026-10-24.json docs/data/experience_regime_status.json
           if ! git diff --cached --quiet;then
             git commit -m 'Publish proof-audited 2026-10-24 E012 category-regime counts'
-            git pull --rebase origin main
-            git push origin HEAD:main
+            for retry in 1 2 3 4 5 6 7 8;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 8 ]];then echo '::error::Git main changed repeatedly during E012 isolated push';exit 1;fi
+              sleep 2
+            done
           fi
       - name: Check actual record counts and live GitHub Pages data bytes
         run: |
