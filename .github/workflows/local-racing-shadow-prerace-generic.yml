@@ -69,7 +69,21 @@ jobs:
           git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert all(x.startswith(("docs/data/local-racing-shadow/","docs/data/local_racing_shadow_public.json","docs/data/local_racing_shadow_status.json")) for x in p), p'
           if ! git diff --cached --quiet; then
             git commit -m "Publish audited local NAR Shadow population and coverage"
-            git push
+            # Concurrent local or JRA-safe research commits may advance main.
+            # Rebase this local-only publication commit; fail closed on any conflict.
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                echo "Audited local Shadow publication pushed"
+                break
+              fi
+              if [ "$attempt" -eq 5 ]; then
+                echo "BLOCKED_PUBLISH_PUSH_CONFLICT after 5 attempts" >&2
+                exit 1
+              fi
+              sleep $((attempt * 2))
+            done
           fi
       - name: Confirm committed manifest includes truthful coverage counts
         env:
