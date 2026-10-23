@@ -58,7 +58,21 @@ jobs:
           git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert all(x.startswith(("local_racing_shadow_v1/predictions/","local_racing_shadow_v1/diagnostics/")) for x in p), p'
           if ! git diff --cached --quiet; then
             git commit -m "Freeze official local PRE-RACE Shadow snapshots and full-day coverage"
-            git push
+            # Preserve immutable originals and rebase only this local Shadow commit.
+            # A same-file conflict fails closed rather than overwriting another run.
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                echo "Frozen local Shadow data/diagnostics committed"
+                break
+              fi
+              if [ "$attempt" -eq 5 ]; then
+                echo "BLOCKED_PREDICTION_PUSH_CONFLICT after 5 attempts" >&2
+                exit 1
+              fi
+              sleep $((attempt * 2))
+            done
           fi
       - name: Verify committed proof and publish only local Shadow public artifacts
         run: python local_racing_shadow_v1/publish_audit.py
