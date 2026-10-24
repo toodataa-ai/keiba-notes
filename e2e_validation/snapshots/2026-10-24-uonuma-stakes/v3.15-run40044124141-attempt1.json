@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "purchase_strategy_version": "v3.15",
+  "model_version": "v3.13",
+  "status": "pending_git_proof",
+  "source_race_id": "2026-10-24-uonuma-stakes",
+  "source_prediction_sha256": "9eea8643bd24603b667d40306fb9ca21f952e1933191c438b90a576ea54601a9",
+  "source_prediction_proof": "035b005fb69c91449d638bb74a8c344d9e625a4b",
+  "source_prediction_path": "e2e_validation/predictions/2026-10-24-uonuma-stakes/v3.13-rerun40042447328-attempt1.json",
+  "race_context": {
+    "date": "2026-10-24",
+    "venue": "新潟",
+    "race_no": 11,
+    "race_name": "魚沼ステークス",
+    "start_at": "2026-10-24T15:15:00+09:00",
+    "surface": "芝",
+    "distance_m": 2000,
+    "official_source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0104202604031120261024%2FA2",
+    "official_form_sha256": "05d4b27cb8f1905376dabb23126a24b1c6d8b4c89f316717c9f8ea137680f3a6",
+    "official_going": "良",
+    "going_observed_at": "2026-10-24T08:40:42.598+09:00",
+    "sale_field_size": 12,
+    "place_paid_positions": 3,
+    "offered_types": [
+      "単勝",
+      "複勝",
+      "枠連",
+      "馬連",
+      "馬単",
+      "ワイド",
+      "三連複",
+      "三連単"
+    ]
+  },
+  "step1_fixed_at": "2026-10-24T08:40:42.598+09:00",
+  "source_final_bets_fixed_at": "2026-10-24T00:13:05.862Z",
+  "final_bets_fixed_at": "2026-10-24T00:16:36.344Z",
+  "proof_commit": null,
+  "quote_age_max_seconds": 213.665,
+  "quote_capture_span_seconds": 3.021,
+  "formal_bets": [
+    {
+      "type": "馬単",
+      "selection": [
+        6,
+        2
+      ],
+      "stake_yen": 100,
+      "market_odds": 182.3,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2604040311?ninki=0",
+      "observed_at": "2026-10-24T00:13:05.504+00:00",
+      "quote_verified": true,
+      "market_selection_id": "馬単:[6,2]"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        2,
+        3
+      ],
+      "stake_yen": 100,
+      "market_odds": 97.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2604040311?ninki=0",
+      "observed_at": "2026-10-24T00:13:05.504+00:00",
+      "market_selection_id": "馬単:[2,3]",
+      "quote_verified": true
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        2,
+        6
+      ],
+      "stake_yen": 100,
+      "market_odds": 246.3,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2604040311?ninki=0",
+      "observed_at": "2026-10-24T00:13:05.504+00:00",
+      "market_selection_id": "馬単:[2,6]",
+      "quote_verified": true
+    }
+  ],
+  "regular_commands": [
+    {
+      "type": "馬単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          6,
+          2
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬単:[6,2]"
+      ],
+      "source_strategy_id": "single:馬単:[6,2]",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "6→2"
+    }
+  ],
+  "medium_command": {
+    "row": 4,
+    "category": "中穴",
+    "type": "馬単",
+    "method": "single",
+    "definition": {
+      "selection": [
+        2,
+        3
+      ]
+    },
+    "jra_input": "2→3",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "馬単:[2,3]"
+    ],
+    "minimum_verified_odds": 97.1,
+    "maximum_verified_odds": 97.1,
+    "indicative_minimum_payout_yen": 9710,
+    "model_expected_profit_yen": 55.2201,
+    "pricing_source": "verified-single",
+    "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+  },
+  "large_command": {
+    "row": 5,
+    "category": "大穴",
+    "type": "馬単",
+    "method": "single",
+    "definition": {
+      "selection": [
+        2,
+        6
+      ]
+    },
+    "jra_input": "2→6",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "馬単:[2,6]"
+    ],
+    "minimum_verified_odds": 246.3,
+    "maximum_verified_odds": 246.3,
+    "indicative_minimum_payout_yen": 24630,
+    "model_expected_profit_yen": 132.9362,
+    "pricing_source": "verified-single",
+    "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+  },
+  "total_stake_yen": 300,
+  "purchase_decision": "buy",
+  "command_count": 3,
+  "ticket_count": 3,
+  "purchase_metrics": {
+    "stake_yen": 300,
+    "ticket_count": 3,
+    "command_count": 3,
+    "modeled_expected_net_profit_yen": 267.3583,
+    "modeled_low_expected_net_profit_yen": 314.1907,
+    "modeled_union_hit_probability": 0.0353,
+    "modeled_net_loss_probability": 0.9647
+  },
+  "exacta_coverage_audit": [],
+  "comparison_to_v313": {
+    "expected_profit_yen": -1494.6213,
+    "union_hit_pp": -90.05,
+    "net_loss_pp": 12.42
+  },
+  "risk_disclosure": "3+2 actions may significantly lower union hit probability compared with original 60-ticket source. No guaranteed profit. Original odds and v3.13 score are unchanged.",
+  "selection_method": "bounded priced complete command sets, exact tuple expansion, 0 duplicated tickets, max 6000 yen. Not a proof of global optimum.",
+  "old_original_immutable": true
+}
