@@ -285,16 +285,16 @@ def run(week, dates):
                 pre_runners = {int(x["horse_number"]): x for x in snapshot.get("step1", {}).get("runners", [])}
                 for horse in horses:
                     source = pre_runners.get(horse["horse_number"], {})
-                    for src, dest in (("step1_rank", "step1_rank"), ("rank", "step1_rank"),
+                    for src, field_name in (("step1_rank", "step1_rank"), ("rank", "step1_rank"),
                                       ("predicted_win_probability", "predicted_win_probability"),
                                       ("predicted_top3_probability", "predicted_top3_probability")):
-                        if src in source and dest not in horse:
+                        if src in source and field_name not in horse:
                             value = source[src]
                             if isinstance(value, (float, int)) and not isinstance(value, bool):
-                                if dest == "step1_rank" and value >= 1:
-                                    horse[dest] = value
-                                elif dest != "step1_rank" and 0 <= value <= 1:
-                                    horse[dest] = value
+                                if field_name == "step1_rank" and value >= 1:
+                                    horse[field_name] = value
+                                elif field_name != "step1_rank" and 0 <= value <= 1:
+                                    horse[field_name] = value
                 reviewed = {
                     "schema_version": 1, "race_id": rid, "date": date,
                     "venue": item["venue"], "race_no": item["race_no"],
