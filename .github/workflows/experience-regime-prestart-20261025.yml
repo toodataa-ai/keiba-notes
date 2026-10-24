@@ -1,0 +1,171 @@
+name: E012 JRA 2026-10-25 real prestart observations and Git proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experience_regime_v1/requests/2026-10-25.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: experience-regime-prestart-2026-10-25
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate real JRA official source identifiers and independent sampling tests
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m unittest experience_regime_v1.test_sampling experience_regime_v1.test_model experience_regime_v1.test_prestart_collection_audit_v1
+          python -m py_compile experience_regime_v1/collect_prestart_v1.py experience_regime_v1/publish_progress_v1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from experience_regime_v1.collect_prestart_v1 import official_card_url
+          seeds=[('2026-10-25','東京',1,'09'),('2026-10-25','京都',1,'E7'),('2026-10-25','新潟',1,'80'),('2026-10-25','京都',11,'39')]
+          for date,venue,no,code in seeds:
+              assert official_card_url({'date':date,'venue':venue,'race_no':no}).endswith('%2F'+code)
+          pool=json.loads(Path('experience_regime_v1/collection/2026-10-24/race_pool.json').read_text())
+          assert pool['race_count']==72 and len(pool['races'])==72
+          assert {r['date'] for r in pool['races']}=={'2026-10-24','2026-10-25'}
+          assert len({(r['date'],r['venue'],r['race_no']) for r in pool['races']})==72
+          assert sum(r['official_prediction'] for r in pool['races'])==6
+          assert all(r['official_prediction']==(r['race_no']==11) for r in pool['races'])
+          print('E012_VALIDATED_OFFICIAL_72_RACE_WEEK_AND_9_CARD_IDENTIFIERS')
+          PY
+      - name: Reuse strictly frozen 2026-10-24 weekly sample without post-result re-selection
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          from datetime import datetime
+          from experience_regime_v1.sampling import select_races,load_sampling_policy
+          d=Path('experience_regime_v1/collection/2026-10-24')
+          pool=json.loads((d/'race_pool.json').read_text())
+          plan=json.loads((d/'sample_plan.json').read_text())
+          expected=select_races(pool,load_sampling_policy(Path('experience_regime_v1/config.json')))
+          assert pool['race_count']==72 and len(pool['races'])==72
+          assert plan==expected, 'fixed plan no longer matches sampling policy'
+          assert plan['selected_race_count']==20
+          assert sum(x['date']=='2026-10-25' for x in plan['selected_races'])==11
+          log=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(d/'sample_plan.json')],text=True).strip().splitlines()
+          assert len(log)==1, ('missing or ambiguous initial sample plan commit',log)
+          first_commit,first_time=log[0].split()
+          first_selected=min(datetime.fromisoformat(x['start_at']) for x in plan['selected_races'])
+          assert datetime.fromisoformat(first_time)<first_selected, ('plan first committed too late',first_time,first_selected)
+          print('E012_FROZEN_PLAN_REUSED',first_commit,first_time,'today',11)
+          PY
+      - name: Capture every selected real horse from official JRA cards and verify source evidence
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.collect_prestart_v1 collect --week-id 2026-10-24 --date 2026-10-25
+          python -m experience_regime_v1.collect_prestart_v1 precommit_gate --week-id 2026-10-24 --date 2026-10-25
+      - name: First commit of REAL research snapshots and all unselected coverage gaps
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- experience_regime_v1/collection/2026-10-24
+          if ! git diff --cached --quiet;then
+            git commit -m 'Freeze real 2026-10-25 official JRA lifetime-start observations and gaps'
+            for retry in 1 2 3 4 5 6 7 8;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 8 ]];then echo '::error::Git main changed repeatedly during E012 isolated push';exit 1;fi
+              sleep 2
+            done
+          fi
+          echo "E012_PROOF_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "E012_PROOF_AT=$(git show -s --format=%cI HEAD)" >> "$GITHUB_ENV"
+      - name: Independently verify FIRST Git introduction was before race start
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          from datetime import datetime
+          root=Path('experience_regime_v1/collection/2026-10-24')
+          plan=json.loads((root/'sample_plan.json').read_text())
+          targets=[r for r in plan['selected_races'] if r['date']=='2026-10-25']
+          complete=0
+          for r in targets:
+              rid=r['race_id']
+              p=root/'snapshots'/(rid+'.json')
+              a=root/'audits'/(rid+'.json')
+              if not p.exists():
+                  print('E012_MISSING_SELECTED_RACE',rid)
+                  continue
+              snap=json.loads(p.read_text()); report=json.loads(a.read_text())
+              hist=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(p)],text=True).strip().splitlines()
+              assert len(hist)==1,(rid,'snapshot introduction ambiguous',hist)
+              sha,first_at=hist[0].split()
+              start=datetime.fromisoformat(r['start_at'])
+              assert datetime.fromisoformat(first_at)<start,(rid,'first Git commit after start',first_at)
+              assert datetime.fromisoformat(snap['captured_at'])<start
+              assert datetime.fromisoformat(report['captured_at'])<start
+              assert snap['race_context']['race_category']==r['race_category']
+              assert snap['race_context']['sample_origin']==r['sample_origin']
+              if report['usable_for_e012_shadow']:
+                  assert len(snap['step1']['runners'])==len(snap['experience']['horses'])
+                  for h in snap['experience']['horses'].values():
+                      starts=h['starts_before_race']
+                      assert isinstance(starts,int) and not isinstance(starts,bool) and starts>=0
+                      assert starts==sum(h['career_summary_wsto'])
+                      assert h['regime']==('E0' if starts==0 else 'E1' if starts<=3 else 'E2')
+                      assert h['source_url'].startswith('https://www.jra.go.jp/JRADB/')
+                      assert datetime.fromisoformat(h['observed_at'])<start
+                  complete+=1
+              print('E012_FIRST_INTRODUCTION_VERIFIED',rid,sha,first_at,report['status'])
+          print('E012_REAL_SNAPSHOT_COMPLETENESS',complete,'/',len(targets))
+          PY
+      - name: Commit separate audit proof and only aggregate public research status
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.collect_prestart_v1 proof_audit --week-id 2026-10-24 --date 2026-10-25 --proof-sha "$E012_PROOF_SHA" --commit-at "$E012_PROOF_AT"
+          python experience_regime_v1/publish_progress_v1.py 2026-10-24 2026-10-25
+          git add -- experience_regime_v1/collection/2026-10-24/proof_commit_2026-10-25.json docs/data/experience_regime_status.json
+          if ! git diff --cached --quiet;then
+            git commit -m 'Publish proof-audited 2026-10-25 E012 category-regime counts'
+            for retry in 1 2 3 4 5 6 7 8;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 8 ]];then echo '::error::Git main changed repeatedly during E012 isolated push';exit 1;fi
+              sleep 2
+            done
+          fi
+      - name: Check actual record counts and live GitHub Pages data bytes
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          r=json.load(open('docs/data/experience_regime_status.json'))['collection_runs']['2026-10-25']
+          print('E012_VERIFIED_RESEARCH',r['regimes'])
+          print('E012_COVERAGE_GAPS',r['gap_reasons'])
+          assert not r['production_effect'] and not r['models_automatically_promoted']
+          assert r['population_today']==36
+          assert r['selected_today']==r['prerace_proof_valid_races']==r['complete_evidence_races'], 'Real collection not fully complete; inspect coverage gaps'
+          PY
+          for attempt in $(seq 1 24);do
+            if curl -fLsS --max-time 20 "https://toodataa-ai.github.io/keiba-notes/data/experience_regime_status.json?e012=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-live.json &&
+               cmp -s docs/data/experience_regime_status.json /tmp/e012-live.json &&
+               curl -fLsS --max-time 20 "https://toodataa-ai.github.io/keiba-notes/experience-regime.html?e012=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-live.html &&
+               grep -q 'e012-live-collection' /tmp/e012-live.html;then
+              echo 'E012_LIVE_PUBLIC_PAGES_BYTE_MATCH'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Public research Pages JSON or HTML unavailable/mismatched'
+          exit 1
