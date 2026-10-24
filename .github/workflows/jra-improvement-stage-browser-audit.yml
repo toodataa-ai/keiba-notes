@@ -1,0 +1,35 @@
+name: Verify JRA improvement cycle staging mobile and evidence
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/improvement-cycle.html'
+      - 'docs/staging/improvement-cycle.css'
+      - 'docs/data/jra_improvement_cycle_v1.json'
+      - '.github/scripts/jra-improvement-stage-browser-audit.py'
+      - '.github/workflows/jra-improvement-stage-browser-audit.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  stage-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Install Playwright Python client
+        run: python -m pip install --disable-pip-version-check playwright==1.56.0
+      - name: Check dashboard in real Chrome on mobile and desktop
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --directory docs >/tmp/jra-improvement-server.log 2>&1 &
+          sleep 2
+          python .github/scripts/jra-improvement-stage-browser-audit.py
+      - name: Save stage screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-improvement-stage-qa
+          path: /tmp/jra-improvement-stage-*.png
+          if-no-files-found: ignore
