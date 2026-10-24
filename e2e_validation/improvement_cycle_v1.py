@@ -110,8 +110,10 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
     shared = max(0, int(c.get("strict_shared_cases") or 0))
     minimum = max(1, int(c.get("minimum_strict_shared_cases") or 20))
     # No pairing is reconstructed from distinct races or historic replays.
+    # An old baseline/candidate pair is not a release gate for the CURRENT formal model.
+    pair_is_current = c.get("baseline") == review_status.get("latest_formal_prompt_version")
     comparator_ready = (shared >= minimum and c.get("state") == "ready_for_review"
-                        and not e2e.get("errors"))
+                        and not e2e.get("errors") and pair_is_current)
     proposals = experiments.get("experiments") or []
     # Experiment registry entries are plans; status is never inferred as
     # approved from a self-entered label. Separate human review is required.
@@ -137,6 +139,7 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
                 "paired_strict_cases": shared, "minimum_paired_cases": minimum,
                 "state": c.get("state", "unknown"),
                 "sufficient_for_review": comparator_ready,
+                "pair_matches_current_formal": pair_is_current,
                 "data_quality_note": "異なるレースや過去再現の比較を同一レース実戦比較として数えない",
             },
         },

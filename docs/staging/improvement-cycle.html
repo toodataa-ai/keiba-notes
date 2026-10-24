@@ -51,7 +51,7 @@ async function start(){
  $('strict').textContent=count(d.formal.strict_verified_reviews);
  $('topicCount').textContent=count(d.formal.hypotheses.filter(h=>h.race_observation_count>0).length);
  $('paired').textContent=count(c.paired_strict_cases)+' / '+count(c.minimum_paired_cases);
- $('pairVersions').textContent=(c.baseline||'—')+' → '+(c.candidate||'—');
+ $('pairVersions').textContent=(c.baseline||'—')+' → '+(c.candidate||'—')+(c.pair_matches_current_formal?'':'（旧版の比較設定）');
  $('approval').textContent='自動採用なし';
  $('summary').textContent='現行正式版 '+(d.latest_formal_prompt_version||'—')+'。'+(c.sufficient_for_review?'比較の件数条件に到達。正式採用は別途承認が必要。':'比較可能な実戦データを収集中。改善効果は未確定。');
  d.formal.meetings.forEach(w=>{
@@ -80,7 +80,7 @@ async function start(){
   add(card,'p',s.investigation,'small');
  });
  $('regimeGaps').textContent='発走前研究証拠の不足：'+count(d.research.evidence_gap_count)+'ケース。研究対象の実着順だけでは予測精度を確定できません。正式プロンプトには自動反映しません。';
- $('gate').textContent='同一レース・同一発走前条件の比較 '+count(c.paired_strict_cases)+' / '+count(c.minimum_paired_cases)+'件。'+(c.sufficient_for_review?'比較レビュー条件は到達しましたが、検証・承認は未完了です。':'必要件数と比較証拠が不足しているため採用判断を保留しています。')+' 旧予想の修正や自動昇格は行いません。';
+ $('gate').textContent='同一レース・同一発走前条件の比較 '+count(c.paired_strict_cases)+' / '+count(c.minimum_paired_cases)+'件。'+(c.sufficient_for_review?'比較レビュー条件は到達しましたが、検証・承認は未完了です。':(c.pair_matches_current_formal?'必要件数と比較証拠が不足しているため採用判断を保留しています。':'比較対象が現行正式版と異なる旧版設定です。現行版の事前登録された比較が必要です。'))+' 旧予想の修正や自動昇格は行いません。';
  $('loading').hidden=true;$('main').hidden=false;
 }
 start().catch(e=>{$('loading').textContent='読み込みできません：'+e.message;$('loading').className='warning'});

@@ -38,6 +38,16 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(x["research"]["regimes"][0]["status"],"prediction_evidence_incomplete")
         self.assertFalse(x["gates"]["automated_prompt_change"])
         self.assertFalse(x["research"]["regimes"][0]["ready_for_formal_promotion"])
+    def test_stale_version_pair_not_eligible(self):
+        rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
+            "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
+        e={"entries":[],"errors":[],"comparison":{"baseline":"v3.0","candidate":"v3.1",
+            "strict_shared_cases":25,"minimum_strict_shared_cases":20,
+            "state":"ready_for_review"}}
+        x=build({"races":[]},rs,e,rs["shadow_research"],{"overall":{}},
+                {"topics":[]},{"experiments":[]})
+        self.assertFalse(x["formal"]["comparison"]["pair_matches_current_formal"])
+        self.assertFalse(x["gates"]["formal_candidate_e2e_ready"])
     def test_paired_threshold_does_not_auto_approve(self):
         x=evaluate([],[],[],shared=20)
         self.assertTrue(x["gates"]["formal_candidate_e2e_ready"])
