@@ -133,19 +133,29 @@ function listPair(parent,label,value){
  add(row,'b',label);add(row,'p',value);
 }
 
-function qualifiedPairCount(d){
- const c=d.formal.comparison||{}, registered=d.experiments||[];
- const validTrial=registered.some(x=>x.baseline===d.latest_formal_prompt_version&&
+function activeComparisonTrial(d){
+ const c=d.formal.comparison||{};
+ return (d.experiments||[]).some(x=>x.baseline===d.latest_formal_prompt_version&&
      x.challenger&&x.challenger===c.candidate&&x.id&&x.status!=='rejected');
- return validTrial&&c.pair_matches_current_formal?
-    Math.max(0,Math.floor(Number(c.paired_strict_cases)||0)):0;
+}
+function qualifiedPairCount(d){
+ const c=d.formal.comparison||{};
+ if(!activeComparisonTrial(d)||!c.pair_matches_current_formal)return 0;
+ const paired=Math.max(0,Math.floor(Number(c.paired_strict_cases)||0));
+ if(!paired)return 0;
+ // Only show records that have an audited version-matched and proof-verified
+ // per-week ledger. A raw aggregate with missing original proofs is not progress.
+ const audit=c.weekly_paired_actuals;
+ if(!Array.isArray(audit)||!audit.length)return 0;
+ const audited=audit.reduce((sum,x)=>sum+(Number.isInteger(x.valid_pairs)&&x.valid_pairs>=0?x.valid_pairs:NaN),0);
+ return audited===paired?paired:0;
 }
 function renderFlow(d,pairs,target){
  const exp=d.experiments||[],priority=d.public_roadmap.prioritized_topics||0;
  // Completion of an observation gate is not proof that ALL topics are resolved.
  let current=priority?2:1;
- if(exp.length)current=pairs>=target&&d.formal.comparison.sufficient_for_review?4:3;
- if(d.gates.formal_candidate_e2e_ready&&exp.length)current=4;
+ if(activeComparisonTrial(d))current=pairs>=target&&d.formal.comparison.sufficient_for_review?4:3;
+ if(d.gates.formal_candidate_e2e_ready&&activeComparisonTrial(d))current=4;
  // The dashboard is never an authority to mark A/B/C approval.
  const steps=[...document.querySelectorAll('#roadFlow .flow-step')];
  steps.forEach((el,i)=>{
@@ -157,7 +167,7 @@ function renderFlow(d,pairs,target){
  });
  const labels=['課題の観測を継続中','次は比較実験の事前登録','現在は発走前の新旧比較を蓄積する段階','比較データを審査・監査する段階','承認・正式反映'];
  $('flowPosition').textContent='現在地：ステップ'+current+'「'+labels[current-1]+'」。'+
-    (exp.length?'登録済み実験に基づいて表示。':'正式版を変更する実験はまだ未登録です。');
+    (activeComparisonTrial(d)?'現行版と一致する実験が登録されています。':'現行版の新旧比較実験はまだ未登録です。');
 }
 function safeIsoDay(s){
  return typeof s==='string'&&/^20\d{2}-\d{2}-\d{2}$/.test(s)&&
@@ -189,10 +199,10 @@ function renderComparison(d){
  const unit=add($('pairLarge'),'span','/ '+n(goal)+' レース');
  $('pairProgress').max=goal;$('pairProgress').value=pairs;
  $('pairRemaining').textContent='あと'+n(Math.max(0,goal-pairs))+'レース';
- $('pairState').textContent=d.experiments?.length?(pairs>=goal?'件数条件到達':'新旧比較中／準備中'):'比較実験未登録';
+ $('pairState').textContent=activeComparisonTrial(d)?(pairs>=goal?'件数条件到達':'新旧比較中／準備中'):'比較実験未登録';
  const result=pairedArrivalForecast(d,pairs,goal);
- if(!d.experiments?.length){
-   $('pairEta').textContent='未算出：比較実験の登録前';
+ if(!activeComparisonTrial(d)){
+   $('pairEta').textContent='未算出：現行版の比較実験が未登録';
    $('pairEtaReason').textContent='候補版の登録と同一レース・発走前時点の比較が必要です。現在の正式回顧件数は比較レース数に加算しません。';
  }else if(pairs>=goal){
    $('pairEta').textContent='最低件数に到達';
@@ -324,7 +334,7 @@ async function render(){
  $('paired').textContent=n(projection.pairs)+' / '+n(projection.goal);
  $('formalVersion').textContent=d.latest_formal_prompt_version||'—';
  $('approval').textContent='A/B/C承認まで自動変更なし';
- $('currentStage').textContent=exp.length?'比較実験の検証準備・実施中':'改善仮説から比較実験を設計する段階';
+ $('currentStage').textContent=activeComparisonTrial(d)?'比較実験の検証準備・実施中':'改善仮説から比較実験を設計する段階';
  $('nextAction').textContent=rd.next_checkpoint;
  $('updateTiming').textContent='採用時期は未定。'+rd.evaluation_timing;
  $('summary').textContent='調査するテーマは'+n(themes.length)+'件。うち'+n(rd.prioritized_topics)+'件は複数の完了した開催週で観測されています。ただし、改良した新しいプロンプトが優れている証拠はまだありません。';

@@ -67,6 +67,23 @@ with sync_playwright() as playwright:
         assert info["flowSteps"]==5,(width,info)
         assert info["flowCurrent"]==1,(width,info)
         assert "ステップ2" in info["flowCurrentLabel"],(width,info)
+        strict_proof_guard=page.evaluate("""() => {
+          const base={
+            latest_formal_prompt_version:'v3.13',
+            experiments:[{id:'test',baseline:'v3.13',challenger:'trial',status:'collecting'}],
+            formal:{comparison:{baseline:'v3.13',candidate:'trial',
+              pair_matches_current_formal:true,paired_strict_cases:6,
+              weekly_paired_actuals:[]}}
+          };
+          const no_ledger=qualifiedPairCount(base);
+          base.formal.comparison.weekly_paired_actuals=[
+             {week_start:'2026-11-02',valid_pairs:3},
+             {week_start:'2026-11-09',valid_pairs:3}];
+          const verified=qualifiedPairCount(base);
+          base.formal.comparison.weekly_paired_actuals[1].valid_pairs=2;
+          return {no_ledger,verified,mismatch:qualifiedPairCount(base)};
+        }""")
+        assert strict_proof_guard=={"no_ledger":0,"verified":6,"mismatch":0},(width,strict_proof_guard)
         assert info["pairValue"]==0 and info["pairGoal"]==20,(width,info)
         assert "0" in info["pairActual"] and "20" in info["pairActual"],(width,info)
         assert "未算出" in info["pairEta"],(width,info)
