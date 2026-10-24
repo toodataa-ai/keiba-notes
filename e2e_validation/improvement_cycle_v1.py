@@ -10,6 +10,7 @@ import argparse
 import json
 import re
 import math
+from datetime import date, timedelta
 from collections import defaultdict
 from pathlib import Path
 
@@ -18,6 +19,59 @@ ROOT = Path(__file__).resolve().parents[1]
 def read(path):
     with (ROOT / path).open(encoding="utf-8") as f:
         return json.load(f)
+
+def verified_weekly_pairs(e2e, comparison, current_version, proposals):
+    """Report weeks only when every counted pair has two immutable strict proofs.
+
+    The E2E evaluator owns the pair count. Never reconstruct or inflate it
+    from independent historic/replay cases or from a mismatched candidate.
+    """
+    baseline, candidate = comparison.get("baseline"), comparison.get("candidate")
+    expected = max(0, int(comparison.get("strict_shared_cases") or 0))
+    if not expected or baseline != current_version or not candidate:
+        return []
+    if not any(x.get("baseline") == baseline and x.get("challenger") == candidate
+               and x.get("status") != "rejected" for x in proposals):
+        return []
+    by_race = defaultdict(dict)
+    for item in e2e.get("entries", []):
+        rid, version = item.get("race_id"), item.get("version")
+        proof = item.get("proof") or {}
+        if (rid and version in (baseline, candidate)
+                and item.get("grade") == "prospective_strict"
+                and proof.get("read_from_proof_commit") is True
+                and proof.get("proof_commit")):
+            # Multiple conflicting entries invalidate audit instead of
+            # silently picking the latest.
+            if version in by_race[rid]:
+                return []
+            by_race[rid][version] = item
+    paired_dates = []
+    for pair in by_race.values():
+        if baseline not in pair or candidate not in pair:
+            continue
+        left, right = pair[baseline], pair[candidate]
+        if not left.get("date") or left.get("date") != right.get("date"):
+            return []
+        try:
+            day = date.fromisoformat(left["date"])
+        except (ValueError, TypeError):
+            return []
+        paired_dates.append(day)
+    if len(paired_dates) != expected or not paired_dates:
+        return []
+    first = min(paired_dates) - timedelta(days=min(paired_dates).weekday())
+    last = max(paired_dates) - timedelta(days=max(paired_dates).weekday())
+    counts = defaultdict(int)
+    for day in paired_dates:
+        counts[day - timedelta(days=day.weekday())] += 1
+    weeks = []
+    cursor = first
+    while cursor <= last:
+        weeks.append({"week_start": cursor.isoformat(), "valid_pairs": counts[cursor]})
+        cursor += timedelta(days=7)
+    return weeks
+
 
 def build(registry, review_status, e2e, shadow_status, regime_review, topics, experiments, roadmap=None, research_collection=None):
     roadmap = roadmap or {}
@@ -229,6 +283,9 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
         "prestart_pairing_required": True,
         "auto_approved": False,
     } for exp in proposals]
+    weekly_pairs = verified_weekly_pairs(
+        e2e, c, review_status.get("latest_formal_prompt_version"), proposals
+    )
     return {
         "schema_version": 1,
         "source_policy": "prospective_strict_review_only_for_formal_topics;regime_aggregates_research_only",
@@ -241,6 +298,8 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
             "comparison": {
                 "baseline": c.get("baseline"), "candidate": c.get("candidate"),
                 "paired_strict_cases": shared, "minimum_paired_cases": minimum,
+                "weekly_paired_actuals": weekly_pairs,
+                "weekly_paired_actuals_qualification": "each_pair_grade_a_both_prestart_proof_and_version_matched",
                 "state": c.get("state", "unknown"),
                 "sufficient_for_review": comparator_ready,
                 "pair_matches_current_formal": pair_is_current,

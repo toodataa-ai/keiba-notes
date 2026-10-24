@@ -1,5 +1,5 @@
 import unittest
-from e2e_validation.improvement_cycle_v1 import build
+from e2e_validation.improvement_cycle_v1 import build, verified_weekly_pairs
 
 def mk(rid,week,txt="先行と馬場"):
     return {"id":rid,"scope":"jra-main","status":"reviewed","date":"2026-10-12",
@@ -104,6 +104,26 @@ class CycleTests(unittest.TestCase):
         self.assertIsNone(regimes[0]["next_decision"]["future_eligible_race_count"])
         self.assertEqual(regimes[0]["strict_win_probability_observations"],0)
         self.assertTrue(regimes[0]["next_decision"]["record_level_dedup_and_proof_audit_required"])
+    def test_pair_timeline_requires_same_race_two_versions_and_proof(self):
+        def case(race,version,date,proof=True):
+            return {"race_id":race,"version":version,"date":date,
+                    "grade":"prospective_strict",
+                    "proof":{"proof_commit":"sha" if proof else None,
+                             "read_from_proof_commit":proof}}
+        c={"baseline":"v3.13","candidate":"trial","strict_shared_cases":3}
+        reg=[{"baseline":"v3.13","challenger":"trial","status":"collecting"}]
+        ee={"entries":[case("a","v3.13","2026-11-01"),
+                       case("a","trial","2026-11-01"),
+                       case("b","v3.13","2026-11-08"),
+                       case("b","trial","2026-11-08"),
+                       case("c","v3.13","2026-11-15"),
+                       case("c","trial","2026-11-15")]}
+        actual=verified_weekly_pairs(ee,c,"v3.13",reg)
+        self.assertEqual([x["valid_pairs"] for x in actual],[1,1,1])
+        self.assertEqual(actual[0]["week_start"],"2026-10-26")
+        self.assertEqual(verified_weekly_pairs(ee,c,"v3.12",reg),[])
+        ee["entries"][-1]["proof"]["read_from_proof_commit"]=False
+        self.assertEqual(verified_weekly_pairs(ee,c,"v3.13",reg),[])
     def test_stale_version_pair_not_eligible(self):
         rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
             "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
