@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
 <base href="../"><title>どんな改善を検討中？｜JRA予想研究所</title>
 <link rel="stylesheet" href="staging/stage-indicator.css">
-<link rel="stylesheet" href="staging/improvement-cycle.css?v=2">
+<link rel="stylesheet" href="staging/improvement-cycle.css?v=3">
 </head>
 <body>
 <div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
@@ -35,13 +35,62 @@
 </div>
 <p class="note" id="summary"></p>
 </section>
+
+<section class="section road-section" aria-labelledby="roadTitle">
+<div class="heading"><span>02 / 未来への道順</span><h2 id="roadTitle">改善が正式採用されるまでのロードマップ</h2></div>
+<p class="intro">矢羽の色で現在地を表示します。「20レース到達」は<strong>採用決定</strong>ではなく、検証・承認の審査に進むための最低条件です。</p>
+<ol class="road-flow" id="roadFlow" aria-label="改善サイクルの5つの段階">
+<li class="flow-step" data-step="1"><span class="flow-num">01 <span class="flow-mark"></span></span><strong>課題を観測</strong><small>回顧・E0/E1/E2研究</small></li>
+<li class="flow-step" data-step="2"><span class="flow-num">02 <span class="flow-mark"></span></span><strong>比較実験を登録</strong><small>何を変えるか固定</small></li>
+<li class="flow-step" data-step="3"><span class="flow-num">03 <span class="flow-mark"></span></span><strong>20レース比較</strong><small>同一条件の新旧予想</small></li>
+<li class="flow-step" data-step="4"><span class="flow-num">04 <span class="flow-mark"></span></span><strong>精度と副作用を検証</strong><small>条件別・過剰適合</small></li>
+<li class="flow-step" data-step="5"><span class="flow-num">05 <span class="flow-mark"></span></span><strong>承認・正式反映</strong><small>A/B/C明示承認</small></li>
+</ol>
+<p class="flow-position" id="flowPosition">現在地を読み込み中…</p>
+</section>
+
+<section class="section" aria-labelledby="comparisonTitle">
+<div class="heading"><span>03 / 20レースまでの道のり</span><h2 id="comparisonTitle">いつ20レースに届く？</h2></div>
+<div class="comparison-layout">
+<div class="comparison-card">
+<div class="compare-top"><div><p class="compare-eyebrow">新旧の厳格比較・実績</p><strong id="pairLarge" class="compare-numbers">0 <span>/ 20 レース</span></strong></div><span id="pairState" class="compare-badge">未開始</span></div>
+<progress id="pairProgress" max="20" value="0" aria-label="候補版と現行版の有効な比較レース数"></progress>
+<div class="compare-progress-foot"><span>有効な比較だけカウント</span><strong id="pairRemaining">あと20レース</strong></div>
+<div class="eta-block">
+<p class="eta-caption">実績ペースから予測した20レース到達時期</p>
+<p class="eta-result" id="pairEta">まだ算出できません</p>
+<p id="pairEtaReason" class="fine">候補版の事前登録と、複数週の有効な新旧比較実績が必要です。</p>
+</div>
+</div>
+<div class="compare-next">
+<p class="compare-eyebrow">20レースたまったら、何をする？</p>
+<ol class="after-steps">
+<li><span class="after-num">1</span><div><b>複数指標で性能をチェック</b><small>印の精度・予測確率・期待値・損失リスク</small></div></li>
+<li><span class="after-num">2</span><div><b>偏りや副作用を検証</b><small>芝／ダート・開催週・条件別の安定性</small></div></li>
+<li><span class="after-num">3</span><div><b>A/B/C明示承認へ</b><small>採用・追加検証・不採用を判断。自動反映しない</small></div></li>
+</ol>
+</div>
+</div>
+<div class="simulation" aria-label="仮定の比較ペースによる期間シミュレーション">
+<div><strong>もし毎週これだけ比較できたら？</strong><p class="fine">以下は<strong>実績予測ではなく仮定の所要週数</strong>です。候補版登録後に週あたりの比較数を選べます。</p></div>
+<div class="simulation-control"><label for="scenarioPace">1週間に</label><select id="scenarioPace"><option value="2">2レース</option><option value="3" selected>3レース</option><option value="6">6レース</option></select><strong id="scenarioWeeks">約7開催週</strong></div>
+</div>
+</section>
+
+<section class="section" aria-labelledby="researchGraphTitle">
+<div class="heading"><span>04 / E0・E1・E2の研究</span><h2 id="researchGraphTitle">初期診断まで、あとどのくらい？</h2></div>
+<p class="intro">こちらは<strong>初期研究診断</strong>への進捗です。正式採用に必要な20レース比較とは別のものです。</p>
+<div id="researchChart" class="research-bars"></div>
+<p class="fine">棒は「発走前の予測確率と結果を両方照合できた頭数 ／ 暫定目標30頭」です。右側の「あと約何レース」は過去の観測ペースからの推定で、実績の進捗率ではありません。</p>
+</section>
+
 <section class="section" aria-labelledby="topicsTitle">
-<div class="heading"><span>02 / 検討している改善</span><h2 id="topicsTitle">どこを、どう変えようとしている？</h2></div>
+<div class="heading"><span>05 / 検討している改善</span><h2 id="topicsTitle">どこを、どう変えようとしている？</h2></div>
 <p class="intro">まず「何が課題か」を特定し、次に「こう変えたら良くなるのでは？」という仮説を検証します。以下の改善案は<strong>未採用・未実証</strong>です。<strong>各カードでは、次の段階までの不足数と、正式採用の比較件数を分けて表示します。</strong></p>
 <div id="hypotheses" class="topic-grid"></div>
 </section>
 <section class="section" aria-labelledby="researchTitle">
-<div class="heading"><span>03 / 戦歴別の研究</span><h2 id="researchTitle">E0/E1/E2からは、どんな改善を探している？</h2></div>
+<div class="heading"><span>06 / 戦歴別の研究</span><h2 id="researchTitle">E0/E1/E2からは、どんな改善を探している？</h2></div>
 <p class="intro">「戦歴が少ない馬の評価はどれくらい信頼できる？」が研究テーマです。発走前情報を集めただけでは精度を測れないため、<strong>予想した勝率・3着内確率と実際の結果</strong>が揃ったデータを増やします。研究の「あと約何レース」は、過去の該当馬の出現ペースを使った<strong>推定値</strong>です。</p>
 <div id="regimes" class="research-grid"></div>
 <div class="research-note"><b>研究の最初の判断目安（暫定）</b>
@@ -49,12 +98,12 @@
 <p id="researchGaps"></p></div>
 </section>
 <section class="section" aria-labelledby="milestoneTitle">
-<div class="heading"><span>04 / 今後のマイルストン</span><h2 id="milestoneTitle">何がどれだけ集まったら判断に進む？</h2></div>
+<div class="heading"><span>07 / 今後のマイルストン詳細</span><h2 id="milestoneTitle">何がどれだけ集まったら判断に進む？</h2></div>
 <div id="milestones" class="milestone-list"></div>
 <p class="notice">不足数の見方：回顧でのテーマ言及は「実験計画へ進めるか」の目安。E0/E1/E2の約3〜4レースは「研究の初期診断」の予測であり、採用の必要数ではありません。正式プロンプトの判断には候補版ごとに厳格比較20レース以上が必要です。芝・ダートなどの条件別検証や過剰適合の監査も行います。</p>
 </section>
 <section class="section" aria-labelledby="weeklyTitle">
-<div class="heading"><span>05 / これまでの回顧</span><h2 id="weeklyTitle">開催週ごとの確認状況</h2></div>
+<div class="heading"><span>08 / これまでの回顧</span><h2 id="weeklyTitle">開催週ごとの確認状況</h2></div>
 <p class="intro">毎開催週の対象メインがすべて回顧済みになって初めて週次判定を行います。「現行版維持」は改善の必要がないと証明された意味ではありません。</p>
 <div id="weekly" class="weeks"></div>
 </section>
@@ -83,6 +132,106 @@ function listPair(parent,label,value){
  const row=add(parent,'div',undefined,'detail-row');
  add(row,'b',label);add(row,'p',value);
 }
+
+function qualifiedPairCount(d){
+ const c=d.formal.comparison||{}, registered=d.experiments||[];
+ const validTrial=registered.some(x=>x.baseline===d.latest_formal_prompt_version&&
+     x.challenger&&x.challenger===c.candidate&&x.id&&x.status!=='rejected');
+ return validTrial&&c.pair_matches_current_formal?
+    Math.max(0,Math.floor(Number(c.paired_strict_cases)||0)):0;
+}
+function renderFlow(d,pairs,target){
+ const exp=d.experiments||[],priority=d.public_roadmap.prioritized_topics||0;
+ // Completion of an observation gate is not proof that ALL topics are resolved.
+ let current=priority?2:1;
+ if(exp.length)current=pairs>=target&&d.formal.comparison.sufficient_for_review?4:3;
+ if(d.gates.formal_candidate_e2e_ready&&exp.length)current=4;
+ // The dashboard is never an authority to mark A/B/C approval.
+ const steps=[...document.querySelectorAll('#roadFlow .flow-step')];
+ steps.forEach((el,i)=>{
+   el.classList.remove('is-complete','is-current','is-future');
+   el.classList.add(i+1<current?'is-complete':i+1===current?'is-current':'is-future');
+   el.querySelector('.flow-mark').textContent=i+1<current?'✓':i+1===current?'現在':'';
+   if(i+1===current)el.setAttribute('aria-current','step');
+   else el.removeAttribute('aria-current');
+ });
+ const labels=['課題の観測を継続中','次は比較実験の事前登録','現在は発走前の新旧比較を蓄積する段階','比較データを審査・監査する段階','承認・正式反映'];
+ $('flowPosition').textContent='現在地：ステップ'+current+'「'+labels[current-1]+'」。'+
+    (exp.length?'登録済み実験に基づいて表示。':'正式版を変更する実験はまだ未登録です。');
+}
+function safeIsoDay(s){
+ return typeof s==='string'&&/^20\\d{2}-\\d{2}-\\d{2}$/.test(s)&&
+   Number.isFinite(Date.parse(s+'T00:00:00Z'));
+}
+function pairedArrivalForecast(d,pairs,goal){
+ const c=d.formal.comparison||{},weekly=c.weekly_paired_actuals;
+ // Never infer a future date from the number of reviewed races alone.
+ if(!Array.isArray(weekly)||weekly.length<2)return null;
+ if(!(d.experiments||[]).some(x=>x.baseline===d.latest_formal_prompt_version&&x.challenger===c.candidate))return null;
+ const vals=weekly.filter(x=>safeIsoDay(x.week_start)&&Number.isInteger(x.valid_pairs)&&x.valid_pairs>=0);
+ if(vals.length!==weekly.length||vals.length<2||vals.some((x,i)=>i>0&&x.week_start<=vals[i-1].week_start))return null;
+ const total=vals.reduce((sum,x)=>sum+x.valid_pairs,0);
+ if(total!==pairs)return null; // Independent, verified weekly-pair ledger required.
+ const active=vals.filter(x=>x.valid_pairs>0);
+ if(active.length<2)return null;
+ const rate=total/vals.length;
+ if(!(rate>0))return null;
+ const weeks=Math.ceil(Math.max(0,goal-pairs)/rate);
+ const end=new Date(vals[vals.length-1].week_start+'T00:00:00Z');
+ end.setUTCDate(end.getUTCDate()+7*weeks);
+ const when=end.getUTCFullYear()+'年'+(end.getUTCMonth()+1)+'月'+end.getUTCDate()+'日ごろ';
+ return {rate:rate.toFixed(1),weeks,when};
+}
+function renderComparison(d){
+ const goal=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
+ const pairs=Math.min(goal,qualifiedPairCount(d));
+ $('pairLarge').replaceChildren(document.createTextNode(n(pairs)+' '));
+ const unit=add($('pairLarge'),'span','/ '+n(goal)+' レース');
+ $('pairProgress').max=goal;$('pairProgress').value=pairs;
+ $('pairRemaining').textContent='あと'+n(Math.max(0,goal-pairs))+'レース';
+ $('pairState').textContent=d.experiments?.length?(pairs>=goal?'件数条件到達':'新旧比較中／準備中'):'比較実験未登録';
+ const result=pairedArrivalForecast(d,pairs,goal);
+ if(!d.experiments?.length){
+   $('pairEta').textContent='未算出：比較実験の登録前';
+   $('pairEtaReason').textContent='候補版の登録と同一レース・発走前時点の比較が必要です。現在の正式回顧件数は比較レース数に加算しません。';
+ }else if(pairs>=goal){
+   $('pairEta').textContent='最低件数に到達';
+   $('pairEtaReason').textContent='採用ではありません。評価指標・条件差・過剰適合の検証とA/B/C承認へ進みます。';
+ }else if(result){
+   $('pairEta').textContent='目安：'+result.when;
+   $('pairEtaReason').textContent='直近の有効比較実績から週'+result.rate+'レースと推定。あと約'+result.weeks+'週。予測は保証しません。';
+ }else{
+   $('pairEta').textContent='実績に基づく到達日：まだ算出できません';
+   $('pairEtaReason').textContent='実験の一致確認と、2開催週以上の監査済みペア件数履歴が必要です。予想だけを実行したレースは含めません。';
+ }
+ const selector=$('scenarioPace');
+ const updateScenario=()=>{
+   const pace=Math.max(1,Number(selector.value)||3);
+   const weeks=Math.ceil(Math.max(0,goal-pairs)/pace);
+   $('scenarioWeeks').textContent=weeks?'登録後 約'+weeks+'開催週':'最低件数到達';
+ };
+ selector.addEventListener('change',updateScenario);updateScenario();
+ return {pairs,goal};
+}
+function renderResearchChart(d){
+ const wrap=$('researchChart');
+ (d.research.regimes||[]).forEach(x=>{
+   const target=Math.max(1,Number(x.diagnostic_initial_target?.win_probability_cases)||30);
+   const countValid=Math.min(Number(x.strict_win_probability_observations)||0,
+                             Number(x.strict_top3_probability_observations)||0);
+   const row=add(wrap,'div',undefined,'research-chart-row');
+   const head=add(row,'div',undefined,'research-chart-head');
+   add(head,'strong',x.title);
+   add(head,'span','有効な予測＋結果 '+n(countValid)+' / '+n(target)+'頭');
+   const bar=add(row,'progress');bar.max=target;bar.value=Math.min(target,countValid);
+   bar.setAttribute('aria-label',x.title+' 初期診断データ '+countValid+'/'+target+'頭');
+   const foot=add(row,'div',undefined,'research-chart-foot');
+   const v=x.next_decision||{};
+   add(foot,'span','発走前に取得した馬数：'+n(x.collected_prerace_horse_observations)+'頭（予測精度には未換算）');
+   add(foot,'b',v.additional_races_estimate==null?'見込み未算出':'あと約'+n(v.additional_races_estimate)+'レース〈推定〉');
+ });
+}
+
 function makeTheme(h){
  const card=add($('hypotheses'),'article',undefined,'theme-card');
  const top=add(card,'div',undefined,'theme-head');
@@ -167,9 +316,12 @@ async function render(){
     throw Error('ロードマップの集計データが未更新です');
  const c=d.formal.comparison,rd=d.public_roadmap;
  const themes=d.formal.hypotheses||[],exp=d.experiments||[];
+ const projection=renderComparison(d);
+ renderFlow(d,projection.pairs,projection.goal);
+ renderResearchChart(d);
  $('priorityCount').textContent=n(rd.prioritized_topics)+' / '+n(themes.length)+'テーマ';
  $('trialCount').textContent=n(rd.registered_challenger_count)+'件';
- $('paired').textContent=n(c.pair_matches_current_formal?c.paired_strict_cases:0)+' / '+n(c.minimum_paired_cases);
+ $('paired').textContent=n(projection.pairs)+' / '+n(projection.goal);
  $('formalVersion').textContent=d.latest_formal_prompt_version||'—';
  $('approval').textContent='A/B/C承認まで自動変更なし';
  $('currentStage').textContent=exp.length?'比較実験の検証準備・実施中':'改善仮説から比較実験を設計する段階';
@@ -179,8 +331,8 @@ async function render(){
  themes.forEach(makeTheme);
  (d.research.regimes||[]).forEach(makeStudy);
  $('researchGaps').textContent='注意：正式Grade A側ではE0/E1/E2発走前研究項目が不足しているケースが'+n(d.research.evidence_gap_count)+'件あります。過去の予想を後から補完して合格扱いにしません。';
- const pairCount=c.pair_matches_current_formal?c.paired_strict_cases:0;
- const g=c.minimum_paired_cases||20;
+ const pairCount=projection.pairs;
+ const g=projection.goal;
  makeMilestone('01','課題を見つける','進行中','複数開催週で繰り返された論点を抽出し、なぜ外れたかの調査テーマを作る。',n(rd.prioritized_topics)+'件が優先テーマ',false);
  makeMilestone('02','何を変えるか決め、実験を登録する',exp.length?'登録あり':'次はここ','改善仮説ごとに変更箇所・評価指標・対象条件を決め、発走前に旧版と候補版の比較計画を登録する。',n(exp.length)+'件登録済み',!exp.length);
  makeMilestone('03','発走前に新旧を同条件で比べる',pairCount>=g&&c.pair_matches_current_formal?'件数条件到達':'データ収集中／準備前','1つの候補版につき、同一レース・同一時点の旧版とのGrade A比較が最低20件。実戦予想が15件あっても版間の比較には自動加算しない。',n(pairCount)+' / '+n(g)+'レース（あと'+n(Math.max(0,g-pairCount))+'件）',false);

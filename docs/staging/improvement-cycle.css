@@ -95,3 +95,70 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;paddin
 .research-remaining .remaining-heading{color:#accee7}
 .research-remaining .remaining-figure{color:#fcf8f9}
 @media(max-width:620px){.remaining-figure{font-size:18px}.remaining-box{padding:12px}}
+
+/* Roadmap v3: visual, accessible progress across five real gates */
+.road-flow{list-style:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin:0;padding:0;gap:0}
+.flow-step{--step-bg:#252830;position:relative;min-width:0;min-height:142px;padding:15px 20px 15px 25px;background:var(--step-bg);clip-path:polygon(0 0,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,0 100%,15px 50%);display:flex;flex-direction:column;justify-content:center;gap:5px;margin-left:-6px}
+.flow-step:first-child{margin-left:0;clip-path:polygon(0 0,calc(100% - 15px) 0,100% 50%,calc(100% - 15px) 100%,0 100%)}
+.flow-step.is-complete{--step-bg:#3d383f}
+.flow-step.is-current{--step-bg:#a93b55;color:#fff}
+.flow-step.is-future{--step-bg:#292c34;color:#acb3bd}
+.flow-num{font-size:11px;font-weight:900;letter-spacing:.04em;color:#f6a3b2;min-height:25px}
+.is-current .flow-num{color:#fff}
+.flow-mark{font-size:10px;letter-spacing:0;border:1px solid #aaabb2;border-radius:8px;padding:2px 5px;margin-left:2px}
+.flow-mark:empty{display:none}
+.flow-step strong{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.flow-step small{font-size:11px;line-height:1.6;opacity:.95;overflow-wrap:anywhere}
+.flow-position{padding:12px 15px;margin:11px 0 0;border:1px solid #77495b;border-radius:8px;font-weight:800;background:#2b242d;font-size:12px}
+.comparison-layout{display:grid;grid-template-columns:1.22fr 1fr;gap:14px}
+.comparison-card{border:1px solid #755364;background:#271f29;padding:24px;border-radius:13px}
+.compare-top,.compare-progress-foot{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.compare-eyebrow{font-size:12px;font-weight:900;color:#f0b1bd;margin:0 0 8px}
+.compare-numbers{font-size:52px;font-variant-numeric:tabular-nums;line-height:1.15;display:block}
+.compare-numbers span{font-size:19px;color:#d7bfc8;font-weight:800}
+.compare-badge{border:1px solid #b5798c;border-radius:40px;padding:4px 10px;font-size:11px;font-weight:900;color:#ffced9;max-width:160px;text-align:center}
+.comparison-card progress{height:19px;accent-color:#d7677d;margin:20px 0 6px}
+.compare-progress-foot{font-size:11px;color:#c1bdc7}.compare-progress-foot strong{font-size:12px;color:#ffdae3}
+.eta-block{padding-top:19px;border-top:1px solid #624558;margin-top:22px}
+.eta-caption{font-size:12px;color:#c5b6c1;margin:0 0 6px}
+.eta-result{font-weight:900;font-size:19px;line-height:1.45;margin:5px 0 8px}
+.eta-block .fine{margin:0}
+.compare-next{background:#1d252d;border:1px solid #4a6576;border-radius:13px;padding:22px}
+.after-steps{list-style:none;padding:0;margin:12px 0 0}
+.after-steps li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #344654}
+.after-steps li:last-child{border-bottom:0}
+.after-num{flex:none;display:grid;place-items:center;width:29px;height:29px;border:1px solid #8f9db1;border-radius:50%;font-weight:900;font-size:12px}
+.after-steps b{font-size:13px;display:block}
+.after-steps small{font-size:11px;display:block;color:#bbc4cf;margin-top:3px}
+.simulation{background:#20252c;border:1px solid #495361;border-radius:11px;padding:16px 18px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.simulation strong{font-size:13px}.simulation .fine{margin:4px 0 0}
+.simulation-control{display:flex;gap:9px;align-items:center;flex:none;flex-wrap:wrap}
+.simulation-control label{font-size:12px}
+.simulation-control select{color:#f9f9fa;background:#323b47;border:1px solid #778190;padding:8px 10px;border-radius:6px;min-height:38px;font-size:12px}
+.simulation-control strong{color:#f2b3c4;min-width:124px}
+.research-bars{display:grid;gap:10px}
+.research-chart-row{background:#202a32;border:1px solid #415a6a;padding:15px 20px;border-radius:11px}
+.research-chart-head,.research-chart-foot{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.research-chart-head strong{font-size:14px}
+.research-chart-head span{font-size:12px;color:#d1d9e0}
+.research-chart-row progress{height:13px;accent-color:#71b9d3;margin:11px 0 6px}
+.research-chart-foot span{color:#aebfcc;font-size:11px}
+.research-chart-foot b{color:#acdeed;font-size:12px}
+@media(max-width:900px){
+  .road-flow{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .flow-step{padding:12px 16px 12px 20px;min-height:144px}
+  .flow-step strong{font-size:12px}.flow-step small{font-size:10px}
+}
+@media(max-width:680px){
+  .road-flow{grid-template-columns:1fr;gap:3px}
+  .flow-step,.flow-step:first-child{clip-path:none;margin-left:0;min-height:0;padding:13px 16px;border-radius:9px;display:grid;grid-template-columns:57px minmax(0,1fr);column-gap:11px;row-gap:1px}
+  .flow-num{grid-row:span 2;padding-top:3px}
+  .flow-step.is-current{border-left:4px solid #fff}
+  .flow-step strong{font-size:13px}.flow-step small{font-size:11px}
+  .comparison-layout{grid-template-columns:1fr}
+  .comparison-card,.compare-next{padding:18px}
+  .compare-numbers{font-size:40px}
+  .compare-numbers span{font-size:15px}
+  .simulation{flex-direction:column;align-items:flex-start}
+  .simulation-control{width:100%}
+}
