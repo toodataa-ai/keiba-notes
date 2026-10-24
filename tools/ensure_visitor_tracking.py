@@ -9,6 +9,10 @@ DOCS = ROOT / "docs"
 TRACKER = DOCS / "assets" / "visitor-counter.js"
 VERSION = "20261006-1"
 EXCLUDE = {DOCS / "admin.html"}
+# Read-only prestart forecast HTML is legal/evidentiary source material.
+# Visitor analytics belong on the surrounding public navigation page, not in
+# historical prediction artifacts. Never inject any JS into frozen reports.
+FROZEN_REPORT_DIRS = {DOCS / "reports", DOCS / "full-reports", DOCS / "styled-report-sources"}
 
 
 def script_tag(path: Path) -> str:
@@ -19,7 +23,7 @@ def script_tag(path: Path) -> str:
 def main() -> int:
     changed = []
     for path in sorted(DOCS.rglob("*.html")):
-        if path in EXCLUDE:
+        if path in EXCLUDE or any(directory in path.parents for directory in FROZEN_REPORT_DIRS):
             continue
         text = path.read_text(encoding="utf-8")
         if "visitor-counter.js" in text:
