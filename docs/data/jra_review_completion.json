@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-18T10:13:13.635881+00:00",
+  "generated_at": "2026-10-24T11:38:41.942301+00:00",
   "policy": {
     "formal_grade_a_independent_of_research": true,
     "never_reconstruct_missing_prerace_experience": true,
@@ -11,12 +11,12 @@
   "latest_formal_prompt_version": "v3.13",
   "formal_grade_a": {
     "passed": true,
-    "validated_case_count": 12,
+    "validated_case_count": 15,
     "errors": []
   },
   "shadow_research": {
     "state": "evidence_incomplete",
-    "prerace_evidence_gap_count": 11,
+    "prerace_evidence_gap_count": 14,
     "evidence_gaps": [
       {
         "race_id": "2026-10-10-mimuro-stakes",
@@ -80,6 +80,24 @@
       },
       {
         "race_id": "2026-10-18-shuka-sho",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-24-artemis-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-24-cassiopeia-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-24-uonuma-stakes",
         "version": "v3.13",
         "cause": "race_context.race_category is required",
         "source": "sealed_prediction_missing_prerace_fields"
@@ -190,6 +208,62 @@
       ],
       "weekly_improvement_decision": "no_change",
       "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
+    },
+    {
+      "meeting_id": "2026-10-24-to-2026-10-25",
+      "dates": [
+        "2026-10-24",
+        "2026-10-25"
+      ],
+      "registered_races": 3,
+      "expected_races": 6,
+      "formal_grade_a_review_state": "pending",
+      "races": [
+        {
+          "race_id": "2026-10-24-artemis-stakes",
+          "date": "2026-10-24",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-10-24-cassiopeia-stakes",
+          "date": "2026-10-24",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-10-24-uonuma-stakes",
+          "date": "2026-10-24",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-10-25-kannazuki-stakes",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        },
+        {
+          "race_id": "2026-10-25-kikka-sho",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        },
+        {
+          "race_id": "2026-10-25-lumiere-autumn-dash",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        }
+      ],
+      "weekly_improvement_decision": "not_evaluated",
+      "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
     }
   ]
 }

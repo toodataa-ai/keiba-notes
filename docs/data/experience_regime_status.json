@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "model_version": "e012-shadow-v0.1",
-  "generated_at": "2026-10-18T10:13:13+00:00",
+  "generated_at": "2026-10-24T11:38:41+00:00",
   "mode": "shadow_observation_only",
   "production_effect": false,
   "collection": {
@@ -419,10 +419,10 @@
     },
     "v3.13": {
       "coverage": {
-        "prediction_entries": 8,
+        "prediction_entries": 11,
         "entries_with_experience": 0,
         "missing_experience": 0,
-        "required_entries": 8,
+        "required_entries": 11,
         "required_entries_with_experience": 0,
         "required_missing_experience": 0,
         "coverage_rate": 0.0,
@@ -1257,6 +1257,27 @@
     {
       "case": "e2e_validation/cases/2026-10-18-shuka-sho/case.json",
       "race_id": "2026-10-18-shuka-sho",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-24-artemis-stakes/case.json",
+      "race_id": "2026-10-24-artemis-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-24-cassiopeia-stakes/case.json",
+      "race_id": "2026-10-24-cassiopeia-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-24-uonuma-stakes/case.json",
+      "race_id": "2026-10-24-uonuma-stakes",
       "version": "v3.13",
       "grade": "prospective_strict",
       "error": "race_context.race_category is required"
