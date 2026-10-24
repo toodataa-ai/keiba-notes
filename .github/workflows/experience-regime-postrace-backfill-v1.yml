@@ -93,11 +93,11 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A -- experience_regime_v1/reviews experience_regime_v1/analysis docs/data/experience_regime_review_status.json
+          git add -A -- experience_regime_v1/reviews experience_regime_v1/results experience_regime_v1/analysis docs/data/experience_regime_review_status.json
           python - <<'PY'
           import subprocess
           changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
-          allow=('experience_regime_v1/reviews/','experience_regime_v1/analysis/',
+          allow=('experience_regime_v1/reviews/','experience_regime_v1/analysis/', 'experience_regime_v1/results/',
                  'docs/data/experience_regime_review_status.json')
           assert all(x.startswith(allow) for x in changed),changed
           print('E012_POSTRACE_ISOLATED_STAGED_FILES',len(changed))
@@ -132,6 +132,12 @@ jobs:
           assert not s['production_effect'] and not s['automatic_promotion']
           assert s['selected_races']==expected
           assert s['reviewed_races']+s['pending_races']==expected
+          for rid in s['reviewed_race_ids']:
+              review=json.loads((Path('experience_regime_v1/reviews')/w/(rid+'.json')).read_text())
+              result=json.loads((Path('experience_regime_v1/results')/w/(rid+'.json')).read_text())
+              assert result['official_result_sha256']==review['official_result_sha256']
+              assert result['prerace_proof_commit']==review['prerace_proof_commit']
+              assert len(result['horses'])==len(review['horses'])
           print('E012_POSTRACE_FINAL',s['reviewed_races'],'/',expected,'blockers',len(s['blockers']))
           assert s['pending_races']==0 and not s['blockers'],'See committed research blockers'
           PY

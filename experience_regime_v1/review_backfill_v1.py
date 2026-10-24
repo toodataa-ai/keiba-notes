@@ -195,6 +195,32 @@ def parse_horse_results(soup, snapshot):
     return [rows[int(n)] for n in sorted(rows)]
 
 
+def persist_official_result(week, review):
+    """Derive a separate, immutable-source-linked result record; never change prerace inputs."""
+    record = {
+        "schema_version": 1,
+        "race_id": review["race_id"],
+        "date": review["date"],
+        "race_category": review["race_category"],
+        "source": "JRA official JRADB result and payout confirmation",
+        "official_result_url": review["official_result_url"],
+        "official_result_sha256": review["official_result_sha256"],
+        "result_capture_at": review["result_capture_at"],
+        "prerace_proof_commit": review["prerace_proof_commit"],
+        "prerace_snapshot_sha256": review["prerace_snapshot_sha256"],
+        "no_synthetic_prediction": True,
+        "production_effect": False,
+        "horses": [
+            {key: horse[key] for key in (
+                "horse_number", "horse_name", "started",
+                "finish_position", "finish_status", "actual_win", "actual_top3"
+            )}
+            for horse in review["horses"]
+        ],
+    }
+    return save_if_different(BASE / "results" / week / (review["race_id"] + ".json"), record)
+
+
 def aggregate(reviews):
     groups = defaultdict(list)
     for review in reviews:
@@ -270,6 +296,7 @@ def run(week, dates):
                     reviewed = load(dest)
                     if reviewed["race_id"] != rid or reviewed["prerace_proof_commit"] != proof["proof_commit"]:
                         raise ValueError("existing_result_proof_conflict")
+                    persist_official_result(week, reviewed)
                     reviews.append(reviewed)
                     print("E012_POSTRACE_REUSED", rid, flush=True)
                     continue
@@ -313,6 +340,7 @@ def run(week, dates):
                     "horses": horses,
                 }
                 save_if_different(dest, reviewed)
+                persist_official_result(week, reviewed)
                 reviews.append(reviewed)
                 print("E012_POSTRACE_REVIEWED", rid, "horses", len(horses), "url", result_r.url, flush=True)
             except Exception as exc:
