@@ -82,3 +82,16 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;paddin
 @media(max-width:900px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.research-grid{grid-template-columns:1fr}.study-question{min-height:0}.weeks{grid-template-columns:1fr}.mile{grid-template-columns:46px minmax(0,1fr) 125px}}
 @media(max-width:620px){.wrap{padding:0 14px}.hero{padding-top:53px}.hero-callout{padding:16px}.hero-callout h2{font-size:18px}.topic-grid{grid-template-columns:1fr}.metric{padding:13px}.metric strong{font-size:22px}.mile{grid-template-columns:32px minmax(0,1fr);gap:9px;padding:13px}.mile-index{width:30px;height:30px}.mile-state{grid-column:2;text-align:left;display:flex;gap:10px;flex-wrap:wrap;align-items:center}.mile-state b,.mile-state span{display:inline}.theme-card{padding:16px}nav a{font-size:11px;padding:4px 8px}}
 @media(max-width:380px){.metrics{grid-template-columns:1fr 1fr}.metric strong{font-size:20px}.metric span{font-size:11px}}
+
+/* Milestone deficits: explicit count vs estimated race coverage */
+.remaining-box{margin:15px 0 15px;background:#302831;border:1px solid #a46f82;border-radius:11px;padding:13px 14px}
+.remaining-heading{font-size:12px;font-weight:900;color:#e1a0ac}
+.remaining-figure{font-weight:900;font-size:20px;line-height:1.4;color:#fff;display:block;margin:6px 0;overflow-wrap:anywhere}
+.remaining-note{font-size:12px;color:#eadde4;margin:3px 0 10px;line-height:1.65}
+.remaining-comparison{padding-top:9px;margin:9px 0 3px;border-top:1px solid #66505d;font-size:12px;color:#f9d4dd}
+.remaining-comparison b{font-weight:800}
+.remaining-box .small{margin:4px 0 0;font-size:11px;color:#d3c1ca}
+.research-remaining{background:#282b35;border-color:#647c96;margin-top:12px}
+.research-remaining .remaining-heading{color:#accee7}
+.research-remaining .remaining-figure{color:#fcf8f9}
+@media(max-width:620px){.remaining-figure{font-size:18px}.remaining-box{padding:12px}}

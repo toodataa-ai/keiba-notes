@@ -36,6 +36,8 @@ with sync_playwright() as playwright:
             topics: document.querySelectorAll('#hypotheses article').length,
             regimes: document.querySelectorAll('#regimes article').length,
             researchBars: document.querySelectorAll('#regimes progress').length,
+            researchDeficits: [...document.querySelectorAll('#regimes .remaining-figure')].map(x=>x.textContent),
+            topicDeficits: [...document.querySelectorAll('#hypotheses .remaining-figure')].map(x=>x.textContent),
             milestones: document.querySelectorAll('#milestones article').length,
             adoptionGate: document.querySelector('#milestones').textContent,
             themeQuestions: document.querySelectorAll('#hypotheses .detail-row').length,
@@ -53,6 +55,11 @@ with sync_playwright() as playwright:
         assert info["themeQuestions"]>=2*info["topics"],(width,info)
         assert info["regimes"]==3,(width,info)
         assert info["researchBars"]==6,(width,info)
+        expected_estimates=['あと約'+str(x['next_decision']['additional_races_estimate'])+'レース'
+                            for x in data['research']['regimes']]
+        assert info["researchDeficits"]==expected_estimates,(width,info)
+        assert len(info["topicDeficits"])==len(data['formal']['hypotheses']),(width,info)
+        assert any('あと' in text for text in info['topicDeficits']),(width,info)
         assert info["milestones"]==5,(width,info)
         assert "必要" in info["adoptionGate"] or "20レース" in info["adoptionGate"],(width,info)
         assert "A/B/C" in info["approved"],(width,info)

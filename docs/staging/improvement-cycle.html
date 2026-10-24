@@ -37,12 +37,12 @@
 </section>
 <section class="section" aria-labelledby="topicsTitle">
 <div class="heading"><span>02 / 検討している改善</span><h2 id="topicsTitle">どこを、どう変えようとしている？</h2></div>
-<p class="intro">まず「何が課題か」を特定し、次に「こう変えたら良くなるのでは？」という仮説を検証します。以下の改善案は<strong>未採用・未実証</strong>です。</p>
+<p class="intro">まず「何が課題か」を特定し、次に「こう変えたら良くなるのでは？」という仮説を検証します。以下の改善案は<strong>未採用・未実証</strong>です。<strong>各カードでは、次の段階までの不足数と、正式採用の比較件数を分けて表示します。</strong></p>
 <div id="hypotheses" class="topic-grid"></div>
 </section>
 <section class="section" aria-labelledby="researchTitle">
 <div class="heading"><span>03 / 戦歴別の研究</span><h2 id="researchTitle">E0/E1/E2からは、どんな改善を探している？</h2></div>
-<p class="intro">「戦歴が少ない馬の評価はどれくらい信頼できる？」が研究テーマです。発走前情報を集めただけでは精度を測れないため、<strong>予想した勝率・3着内確率と実際の結果</strong>が揃ったデータを増やします。</p>
+<p class="intro">「戦歴が少ない馬の評価はどれくらい信頼できる？」が研究テーマです。発走前情報を集めただけでは精度を測れないため、<strong>予想した勝率・3着内確率と実際の結果</strong>が揃ったデータを増やします。研究の「あと約何レース」は、過去の該当馬の出現ペースを使った<strong>推定値</strong>です。</p>
 <div id="regimes" class="research-grid"></div>
 <div class="research-note"><b>研究の最初の判断目安（暫定）</b>
 <p>各戦歴群について、勝率・3着内確率それぞれ30頭分以上の結果照合データを蓄積し、少なくとも3レース・2開催週で確認します。これは研究仮説を初期診断するための目安であり、<strong>正式プロンプトの採用基準ではありません。</strong> 同じ馬の予測と結果の突合・発走前証拠の検査も別途必要です。</p>
@@ -51,7 +51,7 @@
 <section class="section" aria-labelledby="milestoneTitle">
 <div class="heading"><span>04 / 今後のマイルストン</span><h2 id="milestoneTitle">何がどれだけ集まったら判断に進む？</h2></div>
 <div id="milestones" class="milestone-list"></div>
-<p class="notice">判断は日付ではなく証拠の充足で行います。20件は最低件数であり、複数開催週や芝・ダートなどの条件ごとに悪化していないか、過剰適合がないかを確認してから承認を検討します。</p>
+<p class="notice">不足数の見方：回顧でのテーマ言及は「実験計画へ進めるか」の目安。E0/E1/E2の約3〜4レースは「研究の初期診断」の予測であり、採用の必要数ではありません。正式プロンプトの判断には候補版ごとに厳格比較20レース以上が必要です。芝・ダートなどの条件別検証や過剰適合の監査も行います。</p>
 </section>
 <section class="section" aria-labelledby="weeklyTitle">
 <div class="heading"><span>05 / これまでの回顧</span><h2 id="weeklyTitle">開催週ごとの確認状況</h2></div>
@@ -89,6 +89,21 @@ function makeTheme(h){
  add(top,'span',statusLabel[h.status]||h.status,'pill '+(h.status==='repeated_in_completed_meetings'?'priority':''));
  add(top,'span','回顧で言及 '+n(h.race_observation_count)+'レース','count');
  add(card,'h3',h.title);
+ const next=h.next_decision||{},screen=next.screening||{},pair=next.formal_comparison||{};
+ const gap=add(card,'div',undefined,'remaining-box');
+ if(screen.ready_to_design_experiment){
+   add(gap,'div','このテーマの整理条件は達成済み','remaining-heading');
+   add(gap,'strong','次は比較実験の設計','remaining-figure');
+   add(gap,'p','候補版を事前登録後、同じレースで新旧を比較する必要があります。','remaining-note');
+ }else{
+   add(gap,'div','比較実験を設計するための追加観測','remaining-heading');
+   add(gap,'strong','あと'+n(screen.remaining_qualifying_race_reviews)+'レース分の有効な回顧','remaining-figure');
+   add(gap,'p','さらに完了済みの開催週があと'+n(screen.remaining_completed_meetings)+'週必要。'
+     +(screen.pending_week_mentions_not_yet_qualifying?'集計待ちの開催週に関連回顧 '+n(screen.pending_week_mentions_not_yet_qualifying)+'件があります。':''),'remaining-note');
+ }
+ const pairNote=add(gap,'p',undefined,'remaining-comparison');
+ add(pairNote,'b','その次：候補版と現行版の厳格比較 '+n(pair.remaining_paired_races||20)+'レース以上');
+ add(gap,'p','比較実験の登録前なので、この必要数は現在の候補での実績ではありません。20件は最低条件で、採用を保証しません。','small');
  const plan=h.public_plan||{};
  listPair(card,'いま確かめたいこと',plan.question||h.investigation);
  listPair(card,'検討している改良案',plan.considering||'これから具体化');
@@ -118,6 +133,13 @@ function makeStudy(x){
  const s=x.public_plan||{};
  const card=add($('regimes'),'article',undefined,'study-card');
  add(card,'h3',x.title);
+ const next=x.next_decision||{};
+ const estimate=add(card,'div',undefined,'remaining-box research-remaining');
+ add(estimate,'div','研究の初期診断に進むまで','remaining-heading');
+ add(estimate,'strong',next.additional_races_estimate==null?'算定材料が不足':'あと約'+n(next.additional_races_estimate)+'レース','remaining-figure');
+ add(estimate,'p','過去の該当馬数から換算した推定。各群で勝率・3着内確率の結果照合がそれぞれあと'+n(next.win_probability_horse_records_remaining)+'頭／'+n(next.top3_probability_horse_records_remaining)+'頭必要です。','remaining-note');
+ if(next.historical_race_count_for_yield)
+    add(estimate,'p','参考：過去'+n(next.historical_race_count_for_yield)+'レースで'+n(next.historical_horse_count_for_yield)+'頭（平均 '+Number(next.horse_observations_per_research_race).toFixed(1)+'頭／レース）。少なくとも'+n(next.minimum_distinct_new_qualifying_races)+'レース・'+n(next.independent_qualifying_weeks_required)+'週の条件も必要。','fine');
  add(card,'p',s.question||'戦歴による誤差の違いを研究中','study-question');
  add(card,'div','発走前に固定した観測馬数 '+n(x.collected_prerace_horse_observations)+'頭','study-samples');
  add(card,'p','過去の研究回顧で実際の結果を確認した延べ '+n(x.cumulative_reviewed_horse_observations)+'頭（複数週）','fine');
