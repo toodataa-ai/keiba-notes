@@ -74,6 +74,12 @@ jobs:
                       raise RuntimeError('Missing '+key+' path for '+race['id'])
                   source = Path(temp) / Path(rel).relative_to('reports' if key=='report' else 'pdfs')
                   target = Path('docs') / rel
+                  # CRITICAL: an existing prestart HTML/PDF is immutable at EVERY
+                  # status (predicted/reviewed). Regeneration may only add new
+                  # versioned files; never overwrite an existing Git-tracked path.
+                  if target.is_file():
+                      print('PRESERVE_FROZEN_JRA_SOURCE', target)
+                      continue
                   if not source.exists():
                       raise RuntimeError('Generated file missing: '+str(source))
                   target.parent.mkdir(parents=True,exist_ok=True)
