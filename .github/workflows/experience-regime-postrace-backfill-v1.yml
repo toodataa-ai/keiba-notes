@@ -1,4 +1,4 @@
-name: Backfill official JRA E012 postrace research reviews
+name: Proof-verified JRA E012 postrace research (generic week)
 on:
   push:
     branches: [main]
@@ -6,15 +6,24 @@ on:
       - 'experience_regime_v1/review_backfill_v1.py'
       - '.github/workflows/experience-regime-postrace-backfill-v1.yml'
   workflow_dispatch:
+    inputs:
+      week_id:
+        description: 'Frozen weekly plan ID (Saturday YYYY-MM-DD)'
+        required: false
+        type: string
+      review_dates:
+        description: 'Space-separated eligible completed race dates (YYYY-MM-DD)'
+        required: false
+        type: string
 permissions:
   contents: write
 concurrency:
-  group: experience-regime-postrace-backfill-v1
+  group: experience-regime-postrace-review
   cancel-in-progress: false
 jobs:
   official-reviews:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,44 +33,122 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install official JRA HTML parser
-        run: python -m pip install -q requests beautifulsoup4
-      - name: Validate immutable collection and create official postrace research rows
+      - name: Install official JRA parser and validate Python/tests
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m py_compile experience_regime_v1/review_backfill_v1.py
+          python -m unittest experience_regime_v1.test_sampling experience_regime_v1.test_model experience_regime_v1.test_prestart_collection_audit_v1
+      - name: Select only the requested due dates from a frozen weekly plan
+        id: selection
+        shell: bash
+        env:
+          REQUEST_WEEK: ${{ inputs.week_id }}
+          REQUEST_DATES: ${{ inputs.review_dates }}
+        run: |
+          set -euo pipefail
+          TODAY="$(TZ=Asia/Tokyo date +%F)"
+          WEEK="${REQUEST_WEEK:-$TODAY}"
+          # Always use the latest Saturday not later than TODAY.
+          if [[ -z "$REQUEST_WEEK" ]]; then
+            DAYS_SINCE_SAT=$(( ( $(TZ=Asia/Tokyo date +%w) + 1 ) % 7 ))
+            WEEK="$(TZ=Asia/Tokyo date -d "$TODAY -$DAYS_SINCE_SAT day" +%F)"
+          fi
+          DATES="${REQUEST_DATES:-$TODAY}"
+          echo "week=$WEEK" >> "$GITHUB_OUTPUT"
+          echo "dates=$DATES" >> "$GITHUB_OUTPUT"
+          export WEEK DATES TODAY
+          python - <<'PY'
+          import os,json,datetime
+          from pathlib import Path
+          week=os.environ['WEEK']
+          dates=os.environ['DATES'].split()
+          today=datetime.date.fromisoformat(os.environ['TODAY'])
+          assert dates and len(dates)==len(set(dates))
+          assert all(datetime.date.fromisoformat(d)<=today for d in dates), "Future race dates are forbidden"
+          p=Path('experience_regime_v1/collection')/week
+          plan=json.loads((p/'sample_plan.json').read_text())
+          assert plan['week_id']==week
+          assert all((p/f'proof_commit_{d}.json').is_file() for d in dates), 'Missing immutable prerace proof'
+          assert all(any(x['date']==d for x in plan['selected_races']) for d in dates)
+          print('E012_REQUEST_FROZEN_PLAN',week,'dates',dates,'selected',
+                sum(x['date'] in dates for x in plan['selected_races']))
+          PY
+      - name: Validate proof and JRA official final results; derive research-only reviews
         id: review
         shell: bash
+        env:
+          WEEK: ${{ steps.selection.outputs.week }}
+          DATES: ${{ steps.selection.outputs.dates }}
         run: |
           set +e
-          python -m experience_regime_v1.review_backfill_v1 --week-id 2026-10-17 --dates 2026-10-17 2026-10-18
+          read -ra DATE_ARGS <<< "$DATES"
+          python -m experience_regime_v1.review_backfill_v1 --week-id "$WEEK" --dates "${DATE_ARGS[@]}"
           rc=$?
           echo "review_exit=$rc" >> "$GITHUB_OUTPUT"
           exit 0
-      - name: Commit only new E012 reviews and independently derived summary
+      - name: Commit only research result, review, daily/weekly analysis and public review status
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- experience_regime_v1/reviews/2026-10-17 docs/data/experience_regime_review_status.json
+          git add -A -- experience_regime_v1/reviews experience_regime_v1/analysis docs/data/experience_regime_review_status.json
+          python - <<'PY'
+          import subprocess
+          changed=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          allow=('experience_regime_v1/reviews/','experience_regime_v1/analysis/',
+                 'docs/data/experience_regime_review_status.json')
+          assert all(x.startswith(allow) for x in changed),changed
+          print('E012_POSTRACE_ISOLATED_STAGED_FILES',len(changed))
+          PY
           if git diff --cached --quiet;then
-            echo NO_E012_REVIEW_CHANGE
+            echo E012_ALREADY_REVIEWED_NO_DUPLICATE_COMMIT
           else
-            git commit -m 'Backfill proof-verified E012 research official results and outcome diagnostics'
-            for i in 1 2 3 4;do
+            git commit -m 'Review proof-verified JRA E012 outcomes (research-only)'
+            for i in 1 2 3 4 5 6;do
               git pull --rebase origin main
               if git push origin HEAD:main;then break;fi
-              if [[ "$i" == 4 ]];then exit 1;fi
+              if [[ "$i" == 6 ]];then exit 1;fi
               sleep 3
             done
           fi
-      - name: Require all 21 selected races reviewed; keep blockers visible if incomplete
+      - name: Assert due-day completion or explicitly fail with recorded blockers
         shell: bash
+        env:
+          WEEK: ${{ steps.selection.outputs.week }}
+          DATES: ${{ steps.selection.outputs.dates }}
         run: |
           python - <<'PY'
-          import json
-          p='docs/data/experience_regime_review_status.json'
-          s=json.load(open(p))
-          assert not s['production_effect']
-          assert s['selected_races']==21,s
-          print("E012_POSTRACE_FINAL", s['reviewed_races'], "/", s['selected_races'], "blockers", s['blockers'])
-          assert s['reviewed_races']==21 and not s['blockers'], "Missing JRA official results; see committed blockers"
+          import os,json
+          from pathlib import Path
+          w=os.environ['WEEK']
+          dates=os.environ['DATES'].split()
+          p=Path('experience_regime_v1/collection')/w/'sample_plan.json'
+          plan=json.loads(p.read_text())
+          s=json.loads(Path('docs/data/experience_regime_review_status.json').read_text())
+          expected=sum(x['date'] in dates for x in plan['selected_races'])
+          assert s['week_id']==w and s['dates']==dates
+          assert not s['production_effect'] and not s['automatic_promotion']
+          assert s['selected_races']==expected
+          assert s['reviewed_races']+s['pending_races']==expected
+          print('E012_POSTRACE_FINAL',s['reviewed_races'],'/',expected,'blockers',len(s['blockers']))
+          assert s['pending_races']==0 and not s['blockers'],'See committed research blockers'
           PY
+      - name: Verify research public JSON and Pages HTML match committed GitHub files
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://toodataa-ai.github.io/keiba-notes"
+          for attempt in $(seq 1 24);do
+            if curl -fLsS --max-time 20 "$BASE/data/experience_regime_review_status.json?postrace=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-review-public.json &&
+               cmp -s docs/data/experience_regime_review_status.json /tmp/e012-review-public.json &&
+               curl -fLsS --max-time 20 "$BASE/experience-regime.html?postrace=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-research-public.html &&
+               cmp -s docs/experience-regime.html /tmp/e012-research-public.html;then
+              echo E012_POSTRACE_PAGES_PUBLIC_BYTE_EQUAL
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Public E012 review status or HTML is stale; see Pages deployment'
+          exit 1

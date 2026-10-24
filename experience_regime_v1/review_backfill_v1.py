@@ -96,6 +96,26 @@ def verify_immutable(week, date, item, proof, snapshot_path, snapshot, audit):
     if proof["proof_commit"] != entry["proof_commit"]:
         raise ValueError("proof_sha_mismatch")
     sha = proof["proof_commit"]
+    committed_at = subprocess.check_output(
+        ["git", "show", "-s", "--format=%cI", sha], cwd=ROOT, text=True
+    ).strip()
+    if datetime.fromisoformat(committed_at) != datetime.fromisoformat(
+        proof["proof_commit_at"].replace("Z", "+00:00")
+    ):
+        raise ValueError("proof_commit_timestamp_conflict")
+    if snapshot["race_context"]["race_category"] != item["race_category"]:
+        raise ValueError("fixed_race_category_mismatch")
+    if snapshot["race_context"]["date"] != date:
+        raise ValueError("fixed_race_date_mismatch")
+    for number, horse in snapshot["experience"]["horses"].items():
+        starts = horse["starts_before_race"]
+        if not isinstance(starts, int) or isinstance(starts, bool) or starts < 0:
+            raise ValueError("invalid_frozen_starts")
+        expected = "E0" if starts == 0 else "E1" if starts <= 3 else "E2"
+        if horse["regime"] != expected or int(number) != horse["horse_number"]:
+            raise ValueError("frozen_regime_or_horse_number_conflict")
+        if starts != sum(horse["career_summary_wsto"]):
+            raise ValueError("frozen_career_total_conflict")
     rel = str(snapshot_path.relative_to(ROOT))
     frozen = subprocess.check_output(["git", "show", sha + ":" + rel], cwd=ROOT)
     present = snapshot_path.read_bytes()
@@ -149,6 +169,8 @@ def parse_horse_results(soup, snapshot):
             raw_number = normalized(number_node.get_text(" ", strip=True))
             if raw_number.isdigit() and int(raw_number) != num:
                 raise ValueError(f"official_result_horse_number_conflict_{num}")
+        if len(words) > 3 and words[2].isdigit() and name in words[3] and int(words[2]) != num:
+            raise ValueError(f"official_result_horse_number_conflict_{num}")
         if num in rows:
             raise ValueError("duplicate_result_horse_" + str(num))
         place_text = words[0]
@@ -174,30 +196,57 @@ def parse_horse_results(soup, snapshot):
 
 
 def aggregate(reviews):
-    group = defaultdict(list)
+    groups = defaultdict(list)
     for review in reviews:
-        cat = review["race_category"]
-        for horse in review["horses"]:
-            if not horse["started"]:
+        category = review["race_category"]
+        for h in review["horses"]:
+            if not h["started"]:
                 continue
-            group[("all", horse["regime"])].append(horse)
-            group[(cat, horse["regime"])].append(horse)
-    def metric(items):
-        return {"horse_observations": len(items),
-                "races": len(set(x["_race_id"] for x in items)),
-                "wins": sum(x["actual_win"] for x in items),
-                "top3": sum(x["actual_top3"] for x in items),
-                "actual_win_rate": round(sum(x["actual_win"] for x in items)/len(items), 6) if items else None,
-                "actual_top3_rate": round(sum(x["actual_top3"] for x in items)/len(items), 6) if items else None,
-                "predicted_win_rate": None, "predicted_top3_rate": None,
-                "win_brier": None, "top3_brier": None,
-                "prediction_accuracy_state": "unavailable_in_frozen_research_snapshots"}
-    output = {"regimes": {}, "categories": {}}
-    for regime in REGIMES:
-        output["regimes"][regime] = metric(group[("all", regime)])
-    for cat in CATEGORIES:
-        output["categories"][cat] = {regime: metric(group[(cat, regime)]) for regime in REGIMES}
-    return output
+            row = dict(h, _race_id=review["race_id"])
+            groups[("all", h["regime"])].append(row)
+            groups[(category, h["regime"])].append(row)
+
+    def metric(rows):
+        n = len(rows)
+        wins = sum(x["actual_win"] for x in rows)
+        top3 = sum(x["actual_top3"] for x in rows)
+        result = {
+            "horse_observations": n, "races": len({x["_race_id"] for x in rows}),
+            "wins": wins, "top3": top3,
+            "actual_win_rate": round(wins/n, 6) if n else None,
+            "actual_top3_rate": round(top3/n, 6) if n else None,
+        }
+        ranks = [x["step1_rank"] for x in rows if "step1_rank" in x]
+        result["step1_rank_observations"] = len(ranks)
+        result["step1_mean_rank"] = round(sum(ranks)/len(ranks), 6) if ranks else None
+        for target, prefix in (("actual_win", "win"), ("actual_top3", "top3")):
+            key = "predicted_" + ("win" if prefix == "win" else "top3") + "_probability"
+            samples = [x for x in rows if key in x]
+            result[prefix + "_prediction_observations"] = len(samples)
+            # Incomplete groups do not receive a deceptively full-group score.
+            if n and len(samples) == n:
+                mean_p = sum(x[key] for x in samples) / n
+                result["predicted_" + prefix + "_rate"] = round(mean_p, 6)
+                result[prefix + "_brier"] = round(
+                    sum((x[key] - x[target])**2 for x in samples)/n, 6)
+                result[prefix + "_calibration_error"] = round(
+                    mean_p - result["actual_" + prefix + "_rate"], 6)
+            else:
+                result["predicted_" + prefix + "_rate"] = None
+                result[prefix + "_brier"] = None
+                result[prefix + "_calibration_error"] = None
+        result["prediction_accuracy_state"] = (
+            "available_from_frozen_snapshot" if n and
+            result["win_prediction_observations"] == n and
+            result["top3_prediction_observations"] == n
+            else "unavailable_or_partial_in_frozen_research_snapshots"
+        )
+        return result
+
+    return {
+        "regimes": {k: metric(groups[("all", k)]) for k in REGIMES},
+        "categories": {c: {k: metric(groups[(c, k)]) for k in REGIMES} for c in CATEGORIES}
+    }
 
 
 def run(week, dates):
@@ -229,7 +278,23 @@ def run(week, dates):
                 result_url = result_link(card, card_url)
                 result_r, soup = get_official(session, result_url)
                 check_identity(soup, snapshot)
+                if "払戻金" not in soup.get_text(" ", strip=True):
+                    raise ValueError("official_payout_not_confirmed")
                 horses = parse_horse_results(soup, snapshot)
+                # Optional controls must actually exist in the immutable snapshot.
+                pre_runners = {int(x["horse_number"]): x for x in snapshot.get("step1", {}).get("runners", [])}
+                for horse in horses:
+                    source = pre_runners.get(horse["horse_number"], {})
+                    for src, dest in (("step1_rank", "step1_rank"), ("rank", "step1_rank"),
+                                      ("predicted_win_probability", "predicted_win_probability"),
+                                      ("predicted_top3_probability", "predicted_top3_probability")):
+                        if src in source and dest not in horse:
+                            value = source[src]
+                            if isinstance(value, (float, int)) and not isinstance(value, bool):
+                                if dest == "step1_rank" and value >= 1:
+                                    horse[dest] = value
+                                elif dest != "step1_rank" and 0 <= value <= 1:
+                                    horse[dest] = value
                 reviewed = {
                     "schema_version": 1, "race_id": rid, "date": date,
                     "venue": item["venue"], "race_no": item["race_no"],
@@ -254,29 +319,83 @@ def run(week, dates):
                 blockers.append({"race_id": rid, "date": date, "reason": str(exc)[:800]})
                 print("E012_POSTRACE_BLOCKER", rid, str(exc)[:800], flush=True)
             time.sleep(0.35)
-    # Add an internal race identifier to rows only in-memory for aggregate calculations.
-    for review in reviews:
-        for horse in review["horses"]:
-            horse["_race_id"] = review["race_id"]
+    # Rebuild daily/weekly analyses only from already recorded, proof-linked reviews.
+    eligible = {x["race_id"]: x for x in plan["selected_races"]}
+    week_reviews = []
+    for file in sorted((BASE / "reviews" / week).glob("*.json")):
+        row = load(file)
+        item = eligible.get(row.get("race_id"))
+        if item is None or row.get("date") != item["date"]:
+            continue
+        date_proof = folder / ("proof_commit_" + item["date"] + ".json")
+        if not date_proof.is_file():
+            continue
+        proof_row = load(date_proof)
+        if row.get("prerace_proof_commit") != proof_row.get("proof_commit"):
+            raise ValueError("stored_weekly_review_proof_mismatch_" + item["race_id"])
+        week_reviews.append(row)
+    week_ids = {x["race_id"] for x in week_reviews}
+    week_metrics = aggregate(week_reviews)
+    daily_summaries = {}
+    for date in sorted({x["date"] for x in plan["selected_races"]}):
+        due = [x for x in plan["selected_races"] if x["date"] == date]
+        day_rows = [r for r in week_reviews if r["date"] == date]
+        day = {
+            "schema_version": 1, "week_id": week, "date": date,
+            "selected_races": len(due), "reviewed_races": len(day_rows),
+            "pending_races": len(due) - len(day_rows),
+            "result_source": "JRA official JRADB", "production_effect": False,
+            "prediction_inputs": "frozen_prestart_snapshots_only",
+            "regimes": aggregate(day_rows)["regimes"],
+            "categories": aggregate(day_rows)["categories"]
+        }
+        daily_summaries[date] = day
+        # Never publish misleading zero-result placeholder analyses for future dates.
+        if day_rows:
+            save_if_different(BASE / "analysis" / week / "daily" / (date + ".json"), day)
+
+    weekly = {
+        "schema_version": 1, "week_id": week, "selected_races": len(eligible),
+        "reviewed_races": len(week_reviews), "pending_races": len(eligible) - len(week_reviews),
+        "pending_not_yet_reviewed": sorted(set(eligible) - week_ids),
+        "completed_dates": sorted({r["date"] for r in week_reviews}),
+        "result_source": "JRA official JRADB",
+        "production_effect": False, "automatic_promotion": False,
+        "prediction_inputs": "frozen_prestart_snapshots_only",
+        "regimes": week_metrics["regimes"], "categories": week_metrics["categories"]
+    }
+    save_if_different(BASE / "analysis" / week / "weekly.json", weekly)
+    status_path = ROOT / "docs/data/experience_regime_review_status.json"
+    history = {}
+    if status_path.exists():
+        previous = load(status_path)
+        history = previous.get("history_by_week", {})
+        if previous.get("week_id") and previous["week_id"] != week:
+            history[previous["week_id"]] = {
+                "dates": previous.get("dates", []),
+                "selected_races": previous.get("selected_races", 0),
+                "reviewed_races": previous.get("reviewed_races", 0),
+                "overall": previous.get("overall", {}),
+                "categories": previous.get("categories", {})
+            }
     summary = aggregate(reviews)
-    for review in reviews:
-        for horse in review["horses"]:
-            horse.pop("_race_id", None)
     selected = [x for x in plan["selected_races"] if x["date"] in dates]
     status = {
-        "schema_version": 1, "model_version": "e012-shadow-v0.1",
+        "schema_version": 2, "model_version": "e012-shadow-v0.1",
         "week_id": week, "dates": dates,
         "selected_races": len(selected), "reviewed_races": len(reviews),
-        "pending_races": len(blockers), "blockers": blockers,
+        "pending_races": len(selected) - len(reviews),
+        "blockers": blockers, "history_by_week": history,
+        "daily": {d: daily_summaries[d] for d in dates},
+        "weekly": weekly,
         "result_source": "JRA official JRADB result pages only",
-        "prerace_proofs_verified": True,
+        "prerace_proofs_verified": len(blockers) == 0,
         "no_undocumented_prediction_accuracy": True,
-        "production_effect": False,
+        "production_effect": False, "automatic_promotion": False,
         "reviewed_race_ids": [r["race_id"] for r in reviews],
-        "overall": summary["regimes"],
-        "categories": summary["categories"],
+        "overall": summary["regimes"], "categories": summary["categories"]
     }
-    save_if_different(ROOT / "docs/data/experience_regime_review_status.json", status)
+    save_if_different(status_path, status)
     print("E012_POSTRACE_TOTAL",len(reviews),"/",len(selected),"blockers",len(blockers),flush=True)
     print("E012_POSTRACE_REGIMES", json.dumps(status["overall"], ensure_ascii=False), flush=True)
     return len(blockers)
@@ -284,8 +403,8 @@ def run(week, dates):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--week-id", default="2026-10-17")
-    ap.add_argument("--dates", nargs="+", default=["2026-10-17", "2026-10-18"])
+    ap.add_argument("--week-id", required=True)
+    ap.add_argument("--dates", nargs="+", required=True)
     args = ap.parse_args()
     return 0 if run(args.week_id, args.dates) == 0 else 2
 
