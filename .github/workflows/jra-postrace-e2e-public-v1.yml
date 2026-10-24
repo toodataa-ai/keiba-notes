@@ -11,6 +11,16 @@ on:
       - 'docs/data/jra_postrace_audit_2026-10-24.json'
       - 'docs/data/jra_postrace_meetings_v1.json'
       - 'e2e_validation/weekly_review_status_v1.py'
+      - 'e2e_validation/improvement_cycle_v1.py'
+      - 'e2e_validation/improvement_topics_v1.json'
+      - 'e2e_validation/improvement_experiments_v1.json'
+      - 'e2e_validation/test_improvement_cycle_v1.py'
+      - 'docs/data/experience_regime_review_status.json'
+      - 'docs/data/races.json'
+      - 'docs/staging/improvement-cycle.html'
+      - 'docs/staging/improvement-cycle.css'
+      - 'docs/staging/index.html'
+      - 'docs/staging/e2e.html'
       - 'e2e_validation/test_weekly_review_status_v1.py'
       - 'e2e_validation/evaluate.py'
       - 'e2e_validation/test_formal_schema_adapter_v313.py'
@@ -66,6 +76,20 @@ jobs:
           python -m unittest experience_regime_v1.test_prestart_collection_audit_v1 -v
           python -m unittest e2e_validation.test_formal_schema_adapter_v313 -v
           python e2e_validation/weekly_review_status_v1.py
+      - name: Build non-promoting JRA plus E0 E1 E2 continuous improvement backlog
+        run: |
+          python -m unittest e2e_validation.test_improvement_cycle_v1 -v
+          python e2e_validation/improvement_cycle_v1.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('docs/data/jra_improvement_cycle_v1.json').read_text())
+          assert x['gates']['automated_prompt_change'] is False
+          assert all(h['ready_for_formal_promotion'] is False for h in x['formal']['hypotheses'])
+          assert all(h['ready_for_formal_promotion'] is False for h in x['research']['regimes'])
+          assert x['formal']['strict_verified_reviews']==json.loads(Path('docs/data/e2e_status.json').read_text())['case_counts']['strict']
+          print('JRA_IMPROVEMENT_AND_E012_HYPOTHESES_VERIFIED')
+          PY
       - name: Publish complete public E2E status and original-source-derived display
         run: |
           python e2e_validation/build_public_data.py
@@ -86,7 +110,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/jra_review_completion.json docs/data/e2e-shadow/
+          git add docs/data/e2e_status.json docs/data/experience_regime_status.json docs/data/e2e_public.json docs/data/jra_review_completion.json docs/data/e2e-shadow/ docs/data/jra_improvement_cycle_v1.json
           if git diff --cached --quiet; then
             echo 'No derived public changes'
           else
@@ -106,7 +130,7 @@ jobs:
           import json
           from pathlib import Path
           reg=json.loads(Path('docs/data/races.json').read_text())
-          paths=['docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json','docs/data/jra_postrace_audit_2026-10-17.json', 'docs/data/jra_postrace_audit_2026-10-18.json','docs/data/jra_postrace_audit_2026-10-24.json', 'docs/data/experience_regime_status.json']
+          paths=['docs/staging/improvement-cycle.html','docs/staging/improvement-cycle.css','docs/data/jra_improvement_cycle_v1.json','docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json','docs/data/jra_postrace_audit_2026-10-17.json', 'docs/data/jra_postrace_audit_2026-10-18.json','docs/data/jra_postrace_audit_2026-10-24.json', 'docs/data/experience_regime_status.json']
           for r in reg['races']:
               if r['date'] in ('2026-10-10','2026-10-11','2026-10-12','2026-10-17','2026-10-18','2026-10-24') and r['scope']=='jra-main' and r['status']=='reviewed':
                   paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json','docs/data/e2e-shadow/results/'+r['id']+'.json'])
