@@ -190,9 +190,28 @@ function topicCard(d,h){
  const ul=add(src,'ul');
  (h.observation_races||[]).forEach(r=>add(ul,'li',r.race_id));
 }
-function studyCard(d,s){
+function verifiedCollection(data){
+ const ids=new Set(),regimes={};
+ Object.values(data.collection_runs||{}).forEach(run=>{
+   const races=run.complete_evidence_race_ids||[];
+   if(!run.proof_commit||!Array.isArray(races)||
+      !Number.isInteger(run.complete_evidence_races)||
+      run.complete_evidence_races<=0||
+      run.complete_evidence_races!==run.prerace_proof_valid_races||
+      races.length!==run.complete_evidence_races)return;
+   races.forEach(id=>{if(id)ids.add(String(id))});
+   Object.entries(run.regimes||{}).forEach(([name,x])=>{
+      if(!regimes[name])regimes[name]={races:0,horses:0};
+      regimes[name].races+=Number(x.races)||0;
+      regimes[name].horses+=Number(x.horse_observations)||0;
+   });
+ });
+ return {raceIds:[...ids].sort(),regimes};
+}
+function studyCard(d,s,collection){
  const card=add($('studyRoadmaps'),'article',undefined,'road-card study-road');
  const next=s.next_decision||{},goal=s.diagnostic_initial_target||{};
+ const aggregate=collection.regimes[(s.id||'').replace('experience_','').toUpperCase()]||{races:0,horses:0};
  const target=Math.max(1,Number(goal.win_probability_cases)||30);
  const valid=Math.min(Number(s.strict_win_probability_observations)||0,Number(s.strict_top3_probability_observations)||0);
  const researchReady=valid>=target&&goal.minimum_data_counts_observed===true&&!goal.needs_record_level_overlap_and_proof_audit;
@@ -208,7 +227,7 @@ function studyCard(d,s){
  const actual=add(card,'div',undefined,'evidence-layout');
  const left=add(actual,'div',undefined,'evidence-actual');
  add(left,'b','収集済みの発走前データ');
- add(left,'strong',fmt(next.historical_race_count_for_yield)+'レース・'+fmt(s.collected_prerace_horse_observations)+'頭分','value');
+ add(left,'strong',fmt(aggregate.races)+'レース・'+fmt(aggregate.horses)+'頭分','value');
  add(left,'small','原本固定した研究観測。複数群に同じレースが現れる場合あり');
  const right=add(actual,'div',undefined,'evidence-confirmed');
  add(right,'b','公式結果まで回顧した実績');
@@ -223,7 +242,11 @@ function studyCard(d,s){
  hint.textContent='次の判断：有効な確率予測データがあと'+fmt(next.win_probability_horse_records_remaining)+'頭分（勝率）、'+fmt(next.top3_probability_horse_records_remaining)+'頭分（3着内）必要です。';
  const timing=add(card,'div',undefined,'timing-row');
  add(timing,'b','初期診断までの概算');
- add(timing,'span','あと約'+fmt(next.additional_races_estimate)+'レース〈推定〉','timing-eta');
+ const remaining=Math.max(0,Number(next.win_probability_horse_records_remaining)||0,Number(next.top3_probability_horse_records_remaining)||0);
+ const minRaces=Math.max(1,Number(next.minimum_distinct_new_qualifying_races)||3);
+ const estimatedRaces=aggregate.horses>0&&aggregate.races>0?
+   Math.max(minRaces,Math.ceil(remaining*aggregate.races/aggregate.horses)):null;
+ add(timing,'span',estimatedRaces===null?'試算不可':'あと約'+fmt(estimatedRaces)+'レース〈推定〉','timing-eta');
  add(timing,'small','過去の群別観測ペースから換算。3レース以上・2週以上の条件と発走前証拠の突合も必要');
  const details=add(card,'details',undefined,'road-details');
  add(details,'summary','どのように改善案につなげる？');
@@ -233,19 +256,21 @@ function studyCard(d,s){
  });
 }
 async function render(){
- const response=await fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'});
- if(!response.ok)throw Error('データ取得HTTP '+response.status);
+ const [response,source]=await Promise.all([
+    fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'}),
+    fetch('data/experience_regime_status.json',{cache:'no-store'})
+ ]);
+ if(!response.ok||!source.ok)throw Error('必要な発走前実績データを取得できません');
  const d=await response.json();
+ const researchSource=await source.json();
+ const collection=verifiedCollection(researchSource);
  if(d.schema_version!==1||!d.formal||!d.research||!d.public_roadmap)throw Error('集計データの形式が違います');
  const studies=d.research.regimes||[],themes=d.formal.hypotheses||[];
- const horseTotal=studies.reduce((n,x)=>n+(Number(x.collected_prerace_horse_observations)||0),0);
- const storedRaceDays=Math.max(0,...studies.map(x=>Number(x.next_decision?.historical_race_count_for_yield)||0));
- // The distinct race count is supplied from the separate research run ledger,
- // not a sum of category-specific counts. If unavailable, avoid inventing it.
- const collectedDates=d.research.collection_verified_race_ids||[];
- const researchRaceCount=Array.isArray(collectedDates)?collectedDates.length:null;
+ const horseTotal=Object.values(collection.regimes).reduce((n,x)=>n+x.horses,0);
+ // Count prestart-verified unique race IDs, never E0+E1+E2 race totals.
+ const researchRaceCount=collection.raceIds.length;
  $('formalReviews').textContent=fmt(d.formal.strict_verified_reviews)+'レース';
- $('researchRaces').textContent=researchRaceCount===null?'集計不可':fmt(researchRaceCount)+'レース';
+ $('researchRaces').textContent=fmt(researchRaceCount)+'レース';
  $('researchHorses').textContent=fmt(horseTotal)+'頭分';
  $('registeredTrials').textContent=fmt(d.experiments?.length||0)+'件';
  $('dataDistinction').textContent='正式回顧の調査テーマと戦歴別研究は別集計。テーマ間・戦歴区分間の重複レースは合計していません。';
@@ -253,7 +278,7 @@ async function render(){
  function updateRoads(){
    $('topicRoadmaps').replaceChildren();$('studyRoadmaps').replaceChildren();
    themes.forEach(x=>topicCard(d,x));
-   studies.forEach(x=>studyCard(d,x));
+   studies.forEach(x=>studyCard(d,x,collection));
  }
  $('scenarioPace').addEventListener('change',updateRoads);
  updateRoads();
