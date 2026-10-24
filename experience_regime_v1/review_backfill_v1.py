@@ -275,6 +275,27 @@ def aggregate(reviews):
     }
 
 
+def regime_rate_differences(metrics):
+    """Observed percentage-point differences only; no significance claims."""
+    pairs = (("E0", "E2"), ("E1", "E2"), ("E0", "E1"))
+    differences = {}
+    for left, right in pairs:
+        a, b = metrics[left], metrics[right]
+        differences[left + "_minus_" + right] = {
+            "actual_win_rate_pp": (
+                round(100 * (a["actual_win_rate"] - b["actual_win_rate"]), 4)
+                if a["actual_win_rate"] is not None and b["actual_win_rate"] is not None else None
+            ),
+            "actual_top3_rate_pp": (
+                round(100 * (a["actual_top3_rate"] - b["actual_top3_rate"]), 4)
+                if a["actual_top3_rate"] is not None and b["actual_top3_rate"] is not None else None
+            ),
+            "interpretation": "descriptive_only_not_statistical_significance"
+        }
+    return differences
+
+
+
 def run(week, dates):
     folder = BASE / "collection" / week
     plan = load(folder / "sample_plan.json")
@@ -375,7 +396,12 @@ def run(week, dates):
             "result_source": "JRA official JRADB", "production_effect": False,
             "prediction_inputs": "frozen_prestart_snapshots_only",
             "regimes": aggregate(day_rows)["regimes"],
-            "categories": aggregate(day_rows)["categories"]
+            "categories": aggregate(day_rows)["categories"],
+            "regime_rate_differences": regime_rate_differences(aggregate(day_rows)["regimes"]),
+            "category_regime_rate_differences": {
+                cat: regime_rate_differences(regimes)
+                for cat, regimes in aggregate(day_rows)["categories"].items()
+            }
         }
         daily_summaries[date] = day
         # Never publish misleading zero-result placeholder analyses for future dates.
@@ -390,7 +416,12 @@ def run(week, dates):
         "result_source": "JRA official JRADB",
         "production_effect": False, "automatic_promotion": False,
         "prediction_inputs": "frozen_prestart_snapshots_only",
-        "regimes": week_metrics["regimes"], "categories": week_metrics["categories"]
+        "regimes": week_metrics["regimes"], "categories": week_metrics["categories"],
+        "regime_rate_differences": regime_rate_differences(week_metrics["regimes"]),
+        "category_regime_rate_differences": {
+            cat: regime_rate_differences(regimes)
+            for cat, regimes in week_metrics["categories"].items()
+        }
     }
     save_if_different(BASE / "analysis" / week / "weekly.json", weekly)
     status_path = ROOT / "docs/data/experience_regime_review_status.json"
