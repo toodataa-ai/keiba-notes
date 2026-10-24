@@ -26,21 +26,38 @@ with sync_playwright() as playwright:
         info=page.evaluate("""() => ({
             vw: innerWidth, scroll: document.documentElement.scrollWidth,
             body: document.body.scrollWidth,
-            strict: document.querySelector('#strict').textContent,
+            strict: document.querySelector('#formalVersion').textContent,
+            priority: document.querySelector('#priorityCount').textContent,
+            registered: document.querySelector('#trialCount').textContent,
             paired: document.querySelector('#paired').textContent,
+            currentStage: document.querySelector('#currentStage').textContent,
+            nextAction: document.querySelector('#nextAction').textContent,
             weeks: document.querySelectorAll('#weekly article').length,
             topics: document.querySelectorAll('#hypotheses article').length,
             regimes: document.querySelectorAll('#regimes article').length,
+            researchBars: document.querySelectorAll('#regimes progress').length,
+            milestones: document.querySelectorAll('#milestones article').length,
+            adoptionGate: document.querySelector('#milestones').textContent,
+            themeQuestions: document.querySelectorAll('#hypotheses .detail-row').length,
             approved: document.querySelector('#approval').textContent,
             links: [...document.querySelectorAll('nav a')].map(x=>x.href),
         })""")
         assert not errors,(width,errors)
         assert info["scroll"]<=width+2 and info["body"]<=width+2,(width,info)
-        assert info["strict"]==str(data["formal"]["strict_verified_reviews"]),(width,info)
+        assert info["strict"]==str(data["latest_formal_prompt_version"]),(width,info)
+        assert info["priority"]==str(data["public_roadmap"]["prioritized_topics"])+" / "+str(len(data["formal"]["hypotheses"]))+"テーマ",(width,info)
+        assert info["registered"]==str(data["public_roadmap"]["registered_challenger_count"])+"件",(width,info)
+        assert info["paired"]=="0 / 20",(width,info)
         assert info["weeks"]==len(data["formal"]["meetings"]),(width,info)
         assert info["topics"]==len(data["formal"]["hypotheses"]),(width,info)
+        assert info["themeQuestions"]>=2*info["topics"],(width,info)
         assert info["regimes"]==3,(width,info)
-        assert info["approved"]=="自動採用なし",(width,info)
+        assert info["researchBars"]==6,(width,info)
+        assert info["milestones"]==5,(width,info)
+        assert "必要" in info["adoptionGate"] or "20レース" in info["adoptionGate"],(width,info)
+        assert "A/B/C" in info["approved"],(width,info)
+        assert "実験" in info["currentStage"],(width,info)
+        assert info["nextAction"],(width,info)
         if width in (320,390,768,1440):
             page.screenshot(path=f"/tmp/jra-improvement-stage-{width}.png",full_page=True)
         print("PASS_IMPROVEMENT_DASHBOARD_REAL_CHROME",width,info["scroll"])
