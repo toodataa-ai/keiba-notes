@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "description": "研究着手の目安は暫定の運用上の目標。正式予想への採用可否を保証する統計的閾値ではない。",
+    "formal_theme_screen": {
+      "minimum_mentions": 3,
+      "minimum_completed_meetings": 2
+    },
+    "research_initial_diagnostic": {
+      "win_probability_with_result_per_group": 30,
+      "top3_probability_with_result_per_group": 30,
+      "minimum_distinct_races": 3,
+      "minimum_separate_weeks": 2,
+      "status": "暫定の初期診断目安。達成後も同じ馬の予測と結果、発走前proofを突合し、研究仮説として評価する"
+    },
+    "formal_comparison": {
+      "minimum_paired_grade_a_per_registered_challenger": 20,
+      "same_race_and_prestart_information": true,
+      "require_current_formal_as_baseline": true,
+      "cross_meeting_and_track_stability_review": true
+    },
+    "no_calendar_eta": true,
+    "never_auto_promote": true,
+    "approval": "A/B/C explicit manual approval"
+  },
+  "themes": {
+    "pace_positioning": {
+      "question": "逃げ・先行が有利な流れと、差しが届く流れを正しく予想・評価できているか？",
+      "considering": "発走前の脚質・ペースS/M/H・隊列想定を使い、展開が変わる場合の評価を比較する案",
+      "data_needed": "発走前に固定した展開予測、脚質・位置取りの根拠、実際の隊列や結果。芝・ダート別に複数週で記録",
+      "success_metric": "◎3着内率・上位印の3着内捕捉・ペース予測誤差。購入選択への影響も確認",
+      "next_step": "どの脚質・条件で外したかを分類し、展開シナリオ比較の実験計画を事前登録"
+    },
+    "track_condition": {
+      "question": "雨・馬場悪化・内外有利の分岐を予想に十分反映できているか？",
+      "considering": "良／稍重／重／不良の確率と芝・ダート別トラックバイアスを独立に検証する案",
+      "data_needed": "発走前の馬場確率・天候根拠・実際の公式馬場・レース結果を芝／ダート別、複数開催週で保存",
+      "success_metric": "馬場確率の校正・予測誤差、印の精度、条件別の性能悪化の有無",
+      "next_step": "馬場の予想と実際のズレを記録できる構造を確認し、芝・ダートに分けた比較条件を定義"
+    },
+    "ticket_portfolio": {
+      "question": "予想の印と購入セットの整合性が取れ、6,000円以内で損失リスクを抑えられているか？",
+      "considering": "同じSTEP1評価と発走前実オッズの下で、8券種・購入構成・資金配分を比較する案",
+      "data_needed": "発走前の固定印、最終買い目、実オッズの時点証拠、購入予算と公式払戻を同じ条件で比較",
+      "success_metric": "的中確率・期待値・回収率・損失確率と買い目整合性。1レースの高額払戻だけで採用しない",
+      "next_step": "同一印・同一実オッズを用いる旧方式対候補方式の比較実験を設計して固定"
+    },
+    "field_experience": {
+      "question": "戦歴の少ない馬を通常の経験馬と同じ確信度で評価していないか？",
+      "considering": "E0/E1/E2の戦歴別に不確実性・評価の重み付けを変える案（正式採用ではなく研究仮説）",
+      "data_needed": "馬ごとの発走前戦歴E0/E1/E2、予測勝率・3着内確率、結果、予想時刻、proof_commit",
+      "success_metric": "戦歴別Brier・log loss・上位印捕捉・確率の校正。新馬と既走馬を混ぜて判断しない",
+      "next_step": "E0/E1/E2それぞれで、発走前の勝率・3着内確率を公式結果と結び付けて取得"
+    }
+  },
+  "research": {
+    "E0": {
+      "question": "初出走馬の能力が過大・過小評価されていないか？",
+      "test": "デビュー前に確定できる調教・血統・馬場などで不確実性を評価",
+      "next": "発走前固定の勝率と3着内確率を馬ごとに記録"
+    },
+    "E1": {
+      "question": "1〜3戦だけで評価を強めすぎていないか？",
+      "test": "少ない戦歴をどの程度信頼するか、経験の増加と予測誤差を比較",
+      "next": "条件・距離・クラス別の戦歴と発走前予測確率を記録"
+    },
+    "E2": {
+      "question": "既走馬を基準として比較したときに、E0/E1だけが特有の誤差を持つか？",
+      "test": "同じ競走条件でE0/E1とE2の評価誤差・確率校正を比較",
+      "next": "比較の基準となるE2の発走前予測確率と結果を記録"
+    }
+  }
+}

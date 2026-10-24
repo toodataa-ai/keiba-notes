@@ -38,6 +38,35 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(x["research"]["regimes"][0]["status"],"prediction_evidence_incomplete")
         self.assertFalse(x["gates"]["automated_prompt_change"])
         self.assertFalse(x["research"]["regimes"][0]["ready_for_formal_promotion"])
+    def test_research_screening_needs_predictions_not_only_outcomes(self):
+        policy={"policy":{"research_initial_diagnostic":{
+            "win_probability_with_result_per_group":30,
+            "top3_probability_with_result_per_group":30,
+            "minimum_distinct_races":3,"minimum_separate_weeks":2}}}
+        rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
+            "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
+        e={"entries":[],"errors":[],"comparison":{"baseline":"v3.0","candidate":"v3.1",
+           "strict_shared_cases":0,"minimum_strict_shared_cases":20,"state":"insufficient_data"}}
+        study={"week_id":"2026-10-24","overall":{"E0":{"horse_observations":500,"races":20,
+           "win_prediction_observations":0,"top3_prediction_observations":0}}}
+        x=build({"races":[]},rs,e,rs["shadow_research"],study,{"topics":[]},
+                {"experiments":[]},policy)
+        r=x["research"]["regimes"][0]
+        self.assertEqual(r["horse_observation_count"],500)
+        self.assertEqual(r["strict_win_probability_observations"],0)
+        self.assertFalse(r["diagnostic_initial_target"]["minimum_data_counts_observed"])
+        self.assertFalse(r["ready_for_formal_promotion"])
+    def test_separate_research_weeks_are_labeled(self):
+        rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
+            "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
+        e={"entries":[],"errors":[],"comparison":{"baseline":"v3.0","candidate":"v3.1"}}
+        study={"week_id":"2026-10-24","overall":{"E1":{"horse_observations":21}},
+               "history_by_week":{"2026-10-17":{"overall":{"E1":{"horse_observations":45}}}}}
+        x=build({"races":[]},rs,e,rs["shadow_research"],study,{"topics":[]},{"experiments":[]})
+        r=x["research"]["regimes"][1]
+        self.assertEqual(r["horse_observation_count"],21)
+        self.assertEqual(r["cumulative_reviewed_horse_observations"],66)
+        self.assertEqual(r["cumulative_weeks_with_observations"],2)
     def test_stale_version_pair_not_eligible(self):
         rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
             "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
