@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "interpretation": "Keyword matching flags topics to investigate. It is not an error attribution or proposed parameter change.",
+  "topics": [
+    {
+      "id": "pace_positioning",
+      "title": "展開・位置取り・先行力",
+      "pattern": "展開|先行|前残り|位置取り|ペース|差し脚",
+      "investigation": "脚質・位置取りと展開分岐を独立した発走前データで再検証"
+    },
+    {
+      "id": "track_condition",
+      "title": "馬場・トラックバイアス",
+      "pattern": "馬場|バイアス|稍重|重馬場|雨",
+      "investigation": "芝・ダートを分離し発走時点の馬場予測と誤差を評価"
+    },
+    {
+      "id": "ticket_portfolio",
+      "title": "購入セット・印との整合性",
+      "pattern": "購入|券種|買い目|組合せ|馬券|期待値|回収",
+      "investigation": "8券種の比較・予算内の購入集合を同一予測で比較"
+    },
+    {
+      "id": "field_experience",
+      "title": "若駒・経験不足",
+      "pattern": "２歳|2歳|戦歴|経験不足|新馬|未勝利",
+      "investigation": "正式レースの誤差をE0/E1/E2研究仮説へ関連付けて検証"
+    }
+  ]
+}
