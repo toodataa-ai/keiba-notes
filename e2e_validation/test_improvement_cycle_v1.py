@@ -67,6 +67,43 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(r["horse_observation_count"],21)
         self.assertEqual(r["cumulative_reviewed_horse_observations"],66)
         self.assertEqual(r["cumulative_weeks_with_observations"],2)
+    def test_topic_screen_counts_only_completed_meetings(self):
+        meetings = [
+            {"meeting_id":"done","formal_grade_a_review_state":"complete",
+             "expected_races":2,"races":[{"race_id":"a"},{"race_id":"b"}]},
+            {"meeting_id":"pending","formal_grade_a_review_state":"pending",
+             "expected_races":1,"races":[{"race_id":"c"}]}]
+        x=evaluate([mk(i,None) for i in ("a","b","c")],["a","b","c"],meetings)
+        h=x["formal"]["hypotheses"][0]
+        self.assertEqual(h["race_observation_count"],3)
+        self.assertEqual(h["next_decision"]["screening"]["qualifying_race_reviews"],2)
+        self.assertEqual(h["next_decision"]["screening"]["remaining_qualifying_race_reviews"],1)
+        self.assertEqual(h["next_decision"]["screening"]["remaining_completed_meetings"],1)
+        self.assertEqual(h["next_decision"]["screening"]["pending_week_mentions_not_yet_qualifying"],1)
+        self.assertFalse(h["next_decision"]["screening"]["ready_to_design_experiment"])
+    def test_race_estimates_are_not_historic_evidence(self):
+        rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
+            "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
+        e={"entries":[],"errors":[],"comparison":{"baseline":"v3.0","candidate":"v3.1"}}
+        runs={"collection_runs":{
+            "one":{"complete_evidence_races":4,"prerace_proof_valid_races":4,
+                   "regimes":{"E0":{"races":1,"horse_observations":16},
+                              "E1":{"races":1,"horse_observations":12},
+                              "E2":{"races":2,"horse_observations":24}}},
+            "two":{"complete_evidence_races":4,"prerace_proof_valid_races":4,
+                   "regimes":{"E0":{"races":1,"horse_observations":14},
+                              "E1":{"races":2,"horse_observations":20},
+                              "E2":{"races":3,"horse_observations":38}}},
+        }}
+        x=build({"races":[]},rs,e,rs["shadow_research"],{"overall":{}},
+                {"topics":[]},{"experiments":[]},None,runs)
+        regimes=x["research"]["regimes"]
+        self.assertEqual(regimes[0]["next_decision"]["additional_races_estimate"],3)
+        self.assertEqual(regimes[1]["next_decision"]["additional_races_estimate"],3)
+        self.assertEqual(regimes[2]["next_decision"]["additional_races_estimate"],3)
+        self.assertIsNone(regimes[0]["next_decision"]["future_eligible_race_count"])
+        self.assertEqual(regimes[0]["strict_win_probability_observations"],0)
+        self.assertTrue(regimes[0]["next_decision"]["record_level_dedup_and_proof_audit_required"])
     def test_stale_version_pair_not_eligible(self):
         rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
             "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}

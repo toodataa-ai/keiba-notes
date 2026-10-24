@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import math
 from collections import defaultdict
 from pathlib import Path
 
@@ -65,6 +66,11 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
         weeks = sorted({r["meeting_id"] for r in linked if r["meeting_id"]})
         complete_weeks = sorted({r["meeting_id"] for r in linked
                                  if r["meeting_id"] in complete_meetings})
+        completed_mentions = sum(r["meeting_id"] in complete_meetings for r in linked)
+        screening = (roadmap.get("policy") or {}).get("formal_theme_screen") or {}
+        screening_mentions = max(1, int(screening.get("minimum_mentions", 3)))
+        screening_weeks = max(1, int(screening.get("minimum_completed_meetings", 2)))
+        topic_screen_met = completed_mentions >= screening_mentions and len(complete_weeks) >= screening_weeks
         story = (roadmap.get("themes") or {}).get(topic["id"]) or {}
         hypotheses.append({
             "id": topic["id"], "source": "formal_jra_review",
@@ -73,9 +79,28 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
             "race_observation_count": len(linked),
             "meeting_observation_count": len(weeks),
             "completed_meetings_with_observation": len(complete_weeks),
+            "completed_meeting_review_mentions": completed_mentions,
+            "next_decision": {
+                "stage": "plan_challenger" if topic_screen_met else "finish_observation_gate",
+                "screening": {
+                    "minimum_qualifying_race_reviews": screening_mentions,
+                    "qualifying_race_reviews": completed_mentions,
+                    "remaining_qualifying_race_reviews": max(0, screening_mentions - completed_mentions),
+                    "minimum_completed_meetings": screening_weeks,
+                    "remaining_completed_meetings": max(0, screening_weeks - len(complete_weeks)),
+                    "pending_week_mentions_not_yet_qualifying": len(linked) - completed_mentions,
+                    "ready_to_design_experiment": topic_screen_met
+                },
+                "formal_comparison": {
+                    "minimum_paired_races_per_registered_challenger": 20,
+                    "remaining_paired_races": 20,
+                    "challenger_not_yet_registered": True,
+                    "minimum_not_promise_of_approval": True
+                }
+            },
             "observation_races": linked,
             "status": ("repeated_in_completed_meetings"
-                       if len(complete_weeks) >= 2 and len(linked) >= 3
+                       if topic_screen_met
                        else "collecting_observations" if linked else "not_observed"),
             "evidence_qualification": "topic_only_not_causal_proof",
             "ready_for_formal_promotion": False,
@@ -112,9 +137,33 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
         collected_horses = sum(int((r.get("regimes") or {}).get(regime, {}).get("horse_observations") or 0)
                                 for r in prerecords.values()
                                 if r.get("complete_evidence_races") == r.get("prerace_proof_valid_races"))
-        # Number of distinct reviewed races across weeks is not safely
-        # available as a deduplicated set from summary counts. We only expose
-        # current-week number and explicitly withhold a cross-week race gate.
+        # Historical verified prestart samples supply a per-regime yield for
+        # a *forecast* of future race needs. This is not qualified scoring
+        # evidence: all currently published probability-score counts are zero.
+        historical_sample_races = 0
+        historical_sample_horses = 0
+        for run in prerecords.values():
+            if (run.get("complete_evidence_races") or 0) <= 0:
+                continue
+            if run.get("complete_evidence_races") != run.get("prerace_proof_valid_races"):
+                continue
+            observed = (run.get("regimes") or {}).get(regime) or {}
+            nr = int(observed.get("races") or 0)
+            nh = int(observed.get("horse_observations") or 0)
+            if nr > 0 and nh > 0:
+                historical_sample_races += nr
+                historical_sample_horses += nh
+        # Per-race numerator/denominator are counts of distinct registered
+        # races from verified collection days. The *future* valid-probability
+        # race-count is unknown; never subtract unqualified historic races.
+        remaining_win = max(0, min_probs - p)
+        remaining_top3 = max(0, min_top3 - q)
+        remaining_horses = max(remaining_win, remaining_top3)
+        projected_additional_races = (
+            max(min_races, math.ceil(remaining_horses * historical_sample_races / historical_sample_horses))
+            if historical_sample_horses and remaining_horses else
+            (min_races if remaining_horses else 0)
+        )
         diagnostic_counts_ready = p >= min_probs and q >= min_top3
         regime_topics.append({
             "id": "experience_" + regime.lower(),
@@ -129,6 +178,24 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
             "collected_prerace_horse_observations": collected_horses,
             "strict_win_probability_observations": p,
             "strict_top3_probability_observations": q,
+            "next_decision": {
+                "type": "initial_research_diagnostic_not_formal_promotion",
+                "win_probability_horse_records_remaining": remaining_win,
+                "top3_probability_horse_records_remaining": remaining_top3,
+                "additional_races_estimate": projected_additional_races,
+                "estimate_qualification": "approximate_not_guaranteed",
+                "historical_race_count_for_yield": historical_sample_races,
+                "historical_horse_count_for_yield": historical_sample_horses,
+                "horse_observations_per_research_race": (
+                    round(historical_sample_horses / historical_sample_races, 2)
+                    if historical_sample_races else None),
+                "minimum_distinct_new_qualifying_races": min_races,
+                "independent_qualifying_weeks_required": min_weeks,
+                "future_eligible_race_count": None,
+                "future_eligible_week_count": None,
+                "record_level_dedup_and_proof_audit_required": True,
+                "caveat": "Past collection was not scored for predictive probabilities. Future race count assumes same eligible horse yield and both outcomes with frozen prestart probabilities."
+            },
             "diagnostic_initial_target": {"win_probability_cases": min_probs,
                                           "top3_probability_cases": min_top3,
                                           "distinct_races": min_races,
