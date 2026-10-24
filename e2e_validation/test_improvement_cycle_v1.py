@@ -124,6 +124,24 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(verified_weekly_pairs(ee,c,"v3.12",reg),[])
         ee["entries"][-1]["proof"]["read_from_proof_commit"]=False
         self.assertEqual(verified_weekly_pairs(ee,c,"v3.13",reg),[])
+    def test_research_unique_races_across_regimes_and_dates(self):
+        rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
+            "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}
+        e={"entries":[],"errors":[],"comparison":{}}
+        study={"overall":{}}
+        runs={"collection_runs":{
+           "a":{"prerace_proof_valid_races":2,"complete_evidence_races":2,
+                "proof_commit":"frozen","complete_evidence_race_ids":["r1","r2"],
+                "regimes":{"E0":{"races":1,"horse_observations":12},"E1":{"races":1,"horse_observations":4}}},
+           "b":{"prerace_proof_valid_races":1,"complete_evidence_races":1,
+                "proof_commit":"frozen","complete_evidence_race_ids":["r3"],
+                "regimes":{"E2":{"races":1,"horse_observations":15}}},
+           "bad":{"prerace_proof_valid_races":0,"complete_evidence_races":1,
+                "proof_commit":"frozen","complete_evidence_race_ids":["r4"]}}}
+        out=build({"races":[]},rs,e,rs["shadow_research"],study,
+                  {"topics":[]},{"experiments":[]},None,runs)
+        self.assertEqual(out["research"]["collection_verified_distinct_races"],3)
+        self.assertEqual(out["research"]["collection_verified_race_ids"],["r1","r2","r3"])
     def test_stale_version_pair_not_eligible(self):
         rs={"latest_formal_prompt_version":"v3.13","formal_grade_a":{"passed":True},
             "meetings":[],"shadow_research":{"prerace_evidence_gap_count":0}}

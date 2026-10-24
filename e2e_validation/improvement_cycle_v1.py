@@ -174,6 +174,16 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
     min_weeks = int(research_policy.get("minimum_separate_weeks", 2))
     prior_weeks = regime_review.get("history_by_week") or {}
     prerecords = (research_collection or {}).get("collection_runs") or {}
+    # A race may contain multiple E0/E1/E2 regimes. Count each verified
+    # original prestart race ID only once; do not sum category-specific races.
+    verified_research_races = sorted({
+        str(rid)
+        for run in prerecords.values()
+        if run.get("complete_evidence_races") == run.get("prerace_proof_valid_races")
+        and run.get("proof_commit")
+        for rid in (run.get("complete_evidence_race_ids") or [])
+        if rid
+    })
     for regime, label in [("E0", "0戦"), ("E1", "1〜3戦"), ("E2", "4戦以上")]:
         v = overall.get(regime) or {}
         n = int(v.get("horse_observations") or 0)
@@ -308,6 +318,8 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
         },
         "research": {
             "source": "E0/E1/E2 research independent of formal Grade A",
+            "collection_verified_race_ids": verified_research_races,
+            "collection_verified_distinct_races": len(verified_research_races),
             "evidence_gap_count": gaps,
             "evidence_gap_race_ids": sorted({str(x.get("race_id")) for x in source_errors if x.get("race_id")}),
             "regimes": regime_topics,
