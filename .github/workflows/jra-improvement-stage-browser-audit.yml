@@ -26,6 +26,31 @@ jobs:
           python3 -m http.server 8765 --directory docs >/tmp/jra-improvement-server.log 2>&1 &
           sleep 2
           python .github/scripts/jra-improvement-stage-browser-audit.py
+      - name: Verify actual deployed stage HTML CSS and roadmap data bytes
+        run: |
+          set -euo pipefail
+          BASE='https://toodataa-ai.github.io/keiba-notes'
+          for attempt in $(seq 1 48); do
+            all_match=1
+            for file in staging/improvement-cycle.html staging/improvement-cycle.css data/jra_improvement_cycle_v1.json; do
+              output=/tmp/jra-improvement-page-byte-check
+              if ! curl -LfsS --connect-timeout 8 --max-time 24 \
+                   -H 'Cache-Control: no-cache' \
+                   "$BASE/$file?audit=${GITHUB_RUN_ID}-$attempt" -o "$output" ||
+                 ! cmp -s "docs/$file" "$output"; then
+                echo "Not yet matching live Pages: $file (attempt $attempt)"
+                all_match=0
+                break
+              fi
+            done
+            if [[ "$all_match" == 1 ]]; then
+              echo "JRA_IMPROVEMENT_STAGE_HTTP_BYTES_VERIFIED"
+              exit 0
+            fi
+            sleep 8
+          done
+          echo "::error::Deployed stage bytes did not match Git"
+          exit 1
       - name: Save stage screenshot evidence
         if: always()
         uses: actions/upload-artifact@v4
