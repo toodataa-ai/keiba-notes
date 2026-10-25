@@ -30,6 +30,7 @@ jobs:
           import fs from 'node:fs';
           import assert from 'node:assert/strict';
           import {buildTodayFreshV316} from './.github/scripts/jra-build-today-fresh-v316.mjs';
+          import {expandStrategy,ticketKey} from './.github/scripts/jra-strategy-engine-v39.mjs';
           for(const [slug,src,base] of [
             ['kikka-sho','v3.13-run40141962432-attempt1.json','v3.15-run40142524663-attempt1-sealed.json'],
             ['kannazuki-stakes','v3.13-run40142225062-attempt1.json','v3.15-run40142746599-attempt1-sealed.json'],
@@ -41,9 +42,29 @@ jobs:
             const originalInputBytes=fs.readFileSync('e2e_validation/inputs/v313/'+race+'.json');
             const source=JSON.parse(sourceBytes),prior=JSON.parse(priorBytes),input=JSON.parse(originalInputBytes);
             const now_iso=new Date(Date.parse(prior.final_bets_fixed_at)+3000).toISOString();
+            // The historical partially priced input is NOT a complete current market.
+            // Assert the complete-catalog blocker, then synthesize only for test.
+            assert.throws(()=>buildTodayFreshV316({source,sourceBytes,prior,priorBytes,
+              originalInput:input,originalInputBytes,
+              freshInput:input,freshBytes:originalInputBytes,now_iso}),/full catalog quotes are incomplete/);
+            const originalQuotes=new Map(input.market_quotes.map(q=>[ticketKey(q.type,q.selection),q]));
+            const baselineQuote=input.market_quotes[0];
+            const all=new Map();
+            for(const st of input.strategies)for(const selection of expandStrategy(st.type,st.strategy_kind,st.definition)){
+              const k=ticketKey(selection.type,selection.selection);
+              const row=originalQuotes.get(k)||{
+                ...baselineQuote,type:selection.type,selection:selection.selection,
+                market_selection_id:k,market_odds:5.0,
+                observed_at:baselineQuote.observed_at
+              };
+              all.set(k,row);
+            }
+            const testFresh={...input,market_quotes:[...all.values()]};
+            console.log('SYNTHETIC_ONLY_FULL_MARKET_TEST',race,
+              'preexisting',input.market_quotes.length,'expanded',all.size);
             const actual=buildTodayFreshV316({source,sourceBytes,prior,priorBytes,
               originalInput:input,originalInputBytes,
-              freshInput:input,freshBytes:originalInputBytes,now_iso});
+              freshInput:testFresh,freshBytes:Buffer.from(JSON.stringify(testFresh)),now_iso});
             const p=actual.plan;
             assert.equal(p.purchase_strategy_version,'v3.16');
             assert.equal(p.status,'pending_git_proof');
