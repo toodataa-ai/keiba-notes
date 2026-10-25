@@ -1,0 +1,50 @@
+name: Validate JRA official clocks and shadow signal v317
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra_clock_v1.py'
+      - '.github/scripts/jra-gather-live-v317.py'
+      - '.github/scripts/test-jra-clock-v317.py'
+      - '.github/workflows/jra-generic-one-shot-v317.yml'
+      - '.github/workflows/validate-jra-clock-v317.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/jra_clock_v1.py'
+      - '.github/scripts/jra-gather-live-v317.py'
+      - '.github/scripts/test-jra-clock-v317.py'
+      - '.github/workflows/jra-generic-one-shot-v317.yml'
+      - '.github/workflows/validate-jra-clock-v317.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax
+        run: python3 -m py_compile .github/scripts/jra_clock_v1.py .github/scripts/jra-gather-live-v317.py .github/scripts/test-jra-clock-v317.py
+      - name: Real source regression and immutable formal grade checks
+        run: python3 .github/scripts/test-jra-clock-v317.py
+      - name: Protect frozen source records
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            BASE=$(git merge-base HEAD "origin/$GITHUB_BASE_REF")
+          else
+            BASE=HEAD^
+          fi
+          git diff --exit-code "$BASE" HEAD -- \
+            .github/scripts/jra-gather-live-v314.py \
+            .github/workflows/jra-generic-one-shot-v314.yml \
+            docs/data/latest_prompt.json \
+            docs/data/races.json \
+            e2e_validation/manifests \
+            e2e_validation/predictions \
+            e2e_validation/snapshots
