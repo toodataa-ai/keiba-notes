@@ -25,6 +25,29 @@ with sync_playwright() as pw:
     chrome=next((shutil.which(x) for x in ("google-chrome","chromium","chromium-browser") if shutil.which(x)),None)
     assert chrome,"Chrome required"
     browser=pw.chromium.launch(headless=True,executable_path=chrome,args=["--no-sandbox"])
+    # The dashboard previously existed but was unreachable through the staging
+    # home "future improvements" card. Verify the actual user navigation and
+    # old-bookmark route, not just the dashboard when opened directly.
+    for entry_width in (390, 1440):
+        entry=browser.new_page(viewport={"width":entry_width,"height":850},
+                               is_mobile=entry_width<500,has_touch=entry_width<500)
+        entry.goto("http://127.0.0.1:8765/staging/index.html",wait_until="load",timeout=25000)
+        call=entry.locator("a.milestone-card")
+        assert call.count()==1,(entry_width,"missing milestone card")
+        assert "マイルストン" in call.inner_text(),(entry_width,call.inner_text())
+        assert call.get_attribute("href")=="staging/improvement-cycle.html"
+        call.click()
+        entry.wait_for_url("**/staging/improvement-cycle.html",timeout=15000)
+        entry.wait_for_function("document.querySelector('#main')?.hidden===false",timeout=15000)
+        assert entry.locator("#topicRoadmaps .road-card").count()==len(d["formal"]["hypotheses"])
+        assert entry.locator("#studyRoadmaps .road-card").count()==3
+        entry.goto("http://127.0.0.1:8765/staging/roadmap.html",wait_until="load",timeout=25000)
+        assert entry.locator("#liveMilestoneHeading").count()==1
+        entry.locator("#live-milestones a[href='staging/improvement-cycle.html']").click()
+        entry.wait_for_url("**/staging/improvement-cycle.html",timeout=15000)
+        assert entry.locator("#roadmapsTitle").is_visible()
+        print("PASS_STAGING_MILESTONE_NAVIGATION",entry_width)
+        entry.close()
     for width in (320,375,390,430,768,1024,1440):
         page=browser.new_page(viewport={"width":width,"height":850},is_mobile=width<=430,has_touch=width<=430)
         errors=[]
