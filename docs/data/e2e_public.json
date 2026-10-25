@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-25T03:07:11.199672+00:00",
+  "generated_at": "2026-10-25T10:51:22.470352+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-10-25T03:07:10.273558+00:00",
+    "generated_at": "2026-10-25T10:51:21.634181+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -40,12 +40,12 @@
     "latest_formal_prompt_version": "v3.13",
     "formal_grade_a": {
       "passed": true,
-      "validated_case_count": 15,
+      "validated_case_count": 18,
       "errors": []
     },
     "shadow_research": {
       "state": "evidence_incomplete",
-      "prerace_evidence_gap_count": 14,
+      "prerace_evidence_gap_count": 17,
       "evidence_gaps": [
         {
           "race_id": "2026-10-10-mimuro-stakes",
@@ -127,6 +127,24 @@
         },
         {
           "race_id": "2026-10-24-uonuma-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-25-kannazuki-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-25-kikka-sho",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-10-25-lumiere-autumn-dash",
           "version": "v3.13",
           "cause": "race_context.race_category is required",
           "source": "sealed_prediction_missing_prerace_fields"
@@ -246,7 +264,7 @@
         ],
         "registered_races": 6,
         "expected_races": 6,
-        "formal_grade_a_review_state": "pending",
+        "formal_grade_a_review_state": "complete",
         "races": [
           {
             "race_id": "2026-10-24-artemis-stakes",
@@ -269,40 +287,193 @@
           {
             "race_id": "2026-10-25-kannazuki-stakes",
             "date": "2026-10-25",
-            "formal_state": "pending",
-            "reasons": [
-              "awaiting_official_result_and_review"
-            ]
+            "formal_state": "complete",
+            "reasons": []
           },
           {
             "race_id": "2026-10-25-kikka-sho",
             "date": "2026-10-25",
-            "formal_state": "pending",
-            "reasons": [
-              "awaiting_official_result_and_review"
-            ]
+            "formal_state": "complete",
+            "reasons": []
           },
           {
             "race_id": "2026-10-25-lumiere-autumn-dash",
             "date": "2026-10-25",
-            "formal_state": "pending",
-            "reasons": [
-              "awaiting_official_result_and_review"
-            ]
+            "formal_state": "complete",
+            "reasons": []
           }
         ],
-        "weekly_improvement_decision": "not_evaluated",
-        "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
+        "weekly_improvement_decision": "no_change",
+        "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
       }
     ]
   },
   "totals": {
-    "prospective_strict_races": 15,
+    "prospective_strict_races": 18,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 15,
-    "prospective_results_joined": 15
+    "prospective_prediction_entries": 18,
+    "prospective_results_joined": 18
   },
   "races": [
+    {
+      "race_id": "2026-10-25-lumiere-autumn-dash",
+      "date": "2026-10-25",
+      "venue": "新潟",
+      "surface": "turf",
+      "race_name": "ルミエールオータムダッシュ",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-25T15:10:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-25-lumiere-autumn-dash/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-25-lumiere-autumn-dash.json",
+      "official_result_at": "2026-10-25T19:05:00+09:00",
+      "official_going": "不良",
+      "finish_order": [
+        9,
+        11,
+        10,
+        14,
+        8,
+        12,
+        1,
+        17,
+        4,
+        2,
+        16,
+        5,
+        7,
+        13,
+        3,
+        6,
+        15
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": null,
+          "information_cutoff_at": null,
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "ルミエールオータムダッシュ",
+          "marks": {},
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [],
+          "proof_commit": "1854c40ed858a931e5795c5dd33199f209700db2",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-25-lumiere-autumn-dash/v3.16-today-run40152045022-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-25-lumiere-autumn-dash/v3.16-today-run40152045022-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-10-25-kikka-sho",
+      "date": "2026-10-25",
+      "venue": "京都",
+      "surface": "turf",
+      "race_name": "菊花賞",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-25T15:40:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-25-kikka-sho/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-25-kikka-sho.json",
+      "official_result_at": "2026-10-25T19:05:00+09:00",
+      "official_going": "良",
+      "finish_order": [
+        9,
+        6,
+        10,
+        12,
+        15,
+        16,
+        14,
+        2,
+        3,
+        5,
+        17,
+        7,
+        1,
+        8,
+        13,
+        18,
+        11,
+        4
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": null,
+          "information_cutoff_at": null,
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "菊花賞",
+          "marks": {},
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [],
+          "proof_commit": "a2c94f3491e316d859c902f6c112bad716ab5c26",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-25-kikka-sho/v3.16-today-run40151755596-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-25-kikka-sho/v3.16-today-run40151755596-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-10-25-kannazuki-stakes",
+      "date": "2026-10-25",
+      "venue": "東京",
+      "surface": "dirt",
+      "race_name": "神無月ステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-10-25T15:20:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-10-25-kannazuki-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-10-25-kannazuki-stakes.json",
+      "official_result_at": "2026-10-25T19:05:00+09:00",
+      "official_going": "稍重",
+      "finish_order": [
+        4,
+        2,
+        5,
+        7,
+        15,
+        12,
+        9,
+        6,
+        3,
+        13,
+        10,
+        1,
+        11,
+        14,
+        8,
+        16
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": null,
+          "information_cutoff_at": null,
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "神無月ステークス",
+          "marks": {},
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [],
+          "proof_commit": "ffaf3ddfc8e404e83b8be0cef1c9f961b3bb9fde",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-10-25-kannazuki-stakes/v3.16-today-run40151803789-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.16-today-run40151803789-attempt1-sealed.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-10-24-uonuma-stakes",
       "date": "2026-10-24",

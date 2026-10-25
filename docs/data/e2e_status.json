@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-24T11:38:40+00:00",
+  "generated_at": "2026-10-25T10:51:20+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 15,
+    "strict": 18,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 15
+    "prediction_entries": 18
   },
   "versions": {
     "v3.12": {
@@ -57,11 +57,11 @@
     },
     "v3.13": {
       "all_non_synthetic": {
-        "cases": 11,
-        "honmei_win_rate": 0.272727,
-        "honmei_top3_rate": 0.636364,
-        "top3_marks_capture_rate": 0.515151,
-        "winner_in_top3_marks_rate": 0.545455,
+        "cases": 14,
+        "honmei_win_rate": 0.285714,
+        "honmei_top3_rate": 0.571429,
+        "top3_marks_capture_rate": 0.52381,
+        "winner_in_top3_marks_rate": 0.571429,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -69,21 +69,21 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 35000,
-        "payout_yen": 30470,
-        "roi_pct": 87.057,
-        "bet_cases": 11,
+        "stake_yen": 39600,
+        "payout_yen": 55630,
+        "roi_pct": 140.48,
+        "bet_cases": 14,
         "probability_cases": {
           "win": 0,
           "top3": 0
         }
       },
       "strict": {
-        "cases": 11,
-        "honmei_win_rate": 0.272727,
-        "honmei_top3_rate": 0.636364,
-        "top3_marks_capture_rate": 0.515151,
-        "winner_in_top3_marks_rate": 0.545455,
+        "cases": 14,
+        "honmei_win_rate": 0.285714,
+        "honmei_top3_rate": 0.571429,
+        "top3_marks_capture_rate": 0.52381,
+        "winner_in_top3_marks_rate": 0.571429,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -91,10 +91,10 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 35000,
-        "payout_yen": 30470,
-        "roi_pct": 87.057,
-        "bet_cases": 11,
+        "stake_yen": 39600,
+        "payout_yen": 55630,
+        "roi_pct": 140.48,
+        "bet_cases": 14,
         "probability_cases": {
           "win": 0,
           "top3": 0
@@ -169,7 +169,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 15
+    "strict_bet_cases": 18
   },
   "errors": [],
   "entries": [
@@ -762,6 +762,126 @@
         "winner_rank": null,
         "winner_mrr": null,
         "stake_yen": 300,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-25-kannazuki-stakes",
+      "date": "2026-10-25",
+      "venue": "東京",
+      "surface": "dirt",
+      "race": "神無月ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.16-today-run40151803789-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "ffaf3ddfc8e404e83b8be0cef1c9f961b3bb9fde",
+        "proof_commit_at": "2026-10-25T01:46:10+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 1,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 700,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-25-kikka-sho",
+      "date": "2026-10-25",
+      "venue": "京都",
+      "surface": "turf",
+      "race": "菊花賞",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-25-kikka-sho/v3.16-today-run40151755596-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "a2c94f3491e316d859c902f6c112bad716ab5c26",
+        "proof_commit_at": "2026-10-25T01:44:36+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 700,
+        "payout_yen": 25160,
+        "roi_pct": 3594.286,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-25-lumiere-autumn-dash",
+      "date": "2026-10-25",
+      "venue": "新潟",
+      "surface": "turf",
+      "race": "ルミエールオータムダッシュ",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-25-lumiere-autumn-dash/v3.16-today-run40152045022-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "1854c40ed858a931e5795c5dd33199f209700db2",
+        "proof_commit_at": "2026-10-25T01:49:09+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 0,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 3200,
         "payout_yen": 0,
         "roi_pct": 0.0,
         "going_log_loss": null,
