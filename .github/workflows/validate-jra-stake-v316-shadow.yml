@@ -1,0 +1,66 @@
+name: JRA v3.16 command-stake SHADOW acceptance and three-race replay
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-stake-optimizer-v316-shadow.mjs'
+      - '.github/scripts/test-jra-stake-v316-shadow.mjs'
+      - '.github/scripts/jra-replay-stake-v316-20261025.mjs'
+      - 'docs/data/jra_stake_optimization_v316_shadow.json'
+      - '.github/workflows/validate-jra-stake-v316-shadow.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v316-stake-shadow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm isolation and no production modification
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const p=JSON.parse(fs.readFileSync('docs/data/jra_stake_optimization_v316_shadow.json'));
+          assert.equal(p.status,'SHADOW_RESEARCH_ONLY_NOT_APPROVED_FOR_PRODUCTION');
+          assert.equal(p.safeguards.deployment.startsWith('none'),true);
+          assert.equal(JSON.parse(fs.readFileSync('docs/data/latest_prompt.json')).version,'v3.13');
+          assert.equal(JSON.parse(fs.readFileSync('docs/data/jra_purchase_command_policy_v315.json')).current_status,'active_purchase_only_formal');
+          console.log('PASS_V316_FORMAL_SEPARATION approved model and publication paths untouched');
+          NODE
+      - name: Synthetic command, odds and proof integrity tests
+        run: node .github/scripts/test-jra-stake-v316-shadow.mjs
+      - name: Replay three immutable October 25 prestart races
+        run: |
+          node .github/scripts/jra-replay-stake-v316-20261025.mjs /tmp/jra-v316-shadow-results
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const r=JSON.parse(fs.readFileSync('/tmp/jra-v316-shadow-results/summary.json'));
+          assert.equal(r.three_races.length,3);
+          for(const x of r.three_races) {
+            assert.equal(x.formal_ticket_count,x.shadow_ticket_count);
+            assert(x.shadow_stake_yen<=6000);
+            assert(x.shadow_stake_yen>=x.formal_stake_yen);
+            assert(x.shadow_stake_yen-x.formal_stake_yen<=600);
+            assert(x.shadow_low_expected_profit_yen>=x.formal_low_expected_profit_yen-1e-7);
+            assert(x.shadow_loss_probability<=x.formal_loss_probability+1e-7);
+            assert.equal(x.hit_probability_unchanged,true);
+            assert.equal(x.audit.formal_purchase_and_published_reports_not_modified,true);
+            assert(x.command_stakes.filter(c=>c.category!=='通常').every(c=>c.unit_stake_yen===100));
+          }
+          console.log('PASS_V316_THREE_RACES safety and baseline parity');
+          NODE
+      - name: Archive SHADOW-only research output (not public)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-v316-20261025-frozen-shadow-results
+          path: /tmp/jra-v316-shadow-results/
+          if-no-files-found: warn
+          retention-days: 30
