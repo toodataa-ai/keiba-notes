@@ -84,6 +84,46 @@ with sync_playwright() as pw:
           })),
           weeks:document.querySelectorAll('#weekly .week').length
         })""")
+        # White cards on pale sections, on a darker page: verify computed
+        # surface separation and visible edges in real Chrome (not CSS text).
+        palette=page.evaluate("""() => {
+          const sty=s=>getComputedStyle(document.querySelector(s));
+          const body=sty('body'),section=sty('.section'),metric=sty('.metric');
+          const topic=sty('.topic-road'),study=sty('.study-road');
+          const week=sty('.week'),decision=sty('.decision-row > div');
+          const channel=rgb => (rgb.match(/\d+(?:\.\d+)?/g)||[]).slice(0,3).map(Number);
+          const delta=(a,b)=>channel(a).reduce((s,v,i)=>s+Math.abs(v-channel(b)[i]),0);
+          const lum=c => {
+            const a=channel(c).map(x=>{let v=x/255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)});
+            return .2126*a[0]+.7152*a[1]+.0722*a[2];
+          };
+          const contrast=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+          return {
+            bg:body.backgroundColor,section:section.backgroundColor,card:topic.backgroundColor,
+            pageSectionDelta:delta(body.backgroundColor,section.backgroundColor),
+            sectionCardDelta:delta(section.backgroundColor,topic.backgroundColor),
+            cardBorderDelta:delta(topic.borderLeftColor,topic.backgroundColor),
+            cardBorderWidth:parseFloat(topic.borderLeftWidth),
+            topicAccent:topic.borderTopColor,studyAccent:study.borderTopColor,
+            topicAccentWidth:parseFloat(topic.borderTopWidth),
+            studyAccentWidth:parseFloat(study.borderTopWidth),
+            metricAccentWidth:parseFloat(metric.borderTopWidth),
+            weekAccentWidth:parseFloat(week.borderLeftWidth),
+            decisionAccentWidth:parseFloat(decision.borderTopWidth),
+            cardTextContrast:contrast(topic.backgroundColor,topic.color),
+            metricTextContrast:contrast(metric.backgroundColor,metric.color)
+          };
+        }""")
+        assert palette['bg']!=palette['section']!=palette['card'],(width,palette)
+        assert palette['pageSectionDelta']>=28,(width,palette)
+        assert palette['sectionCardDelta']>=17,(width,palette)
+        assert palette['cardBorderDelta']>=110,(width,palette)
+        assert palette['cardBorderWidth']>=1.5,(width,palette)
+        assert palette['topicAccent']!=palette['studyAccent'],(width,palette)
+        assert palette['topicAccentWidth']>=4 and palette['studyAccentWidth']>=4,(width,palette)
+        assert palette['metricAccentWidth']>=4 and palette['weekAccentWidth']>=4 and palette['decisionAccentWidth']>=4,(width,palette)
+        assert palette['cardTextContrast']>=7 and palette['metricTextContrast']>=7,(width,palette)
+        print("PASS_STAGING_CARD_CONTRAST",width,palette['cardTextContrast'],palette['cardBorderDelta'])
         assert not errors,(width,errors)
         assert info["scroll"]<=width+2 and info["body"]<=width+2,(width,info)
         assert info["reviews"]==str(d["formal"]["strict_verified_reviews"])+"レース",(width,info)
