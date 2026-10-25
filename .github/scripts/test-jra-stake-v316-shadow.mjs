@@ -28,7 +28,7 @@ function fixture(winOdds=9.0){
   proof_commit:'a'.repeat(40),race_context:race,frame_map:{1:1,2:2,3:3,4:4},
   outcome_distributions:scenario,final_bets_fixed_at:'2030-10-25T09:01:00+09:00',
   purchase_strategy_evaluations:base.map((l,i)=>({
-   strategy_id:'synthetic-'+i,lines:[l]
+   strategy_id:'synthetic-'+i,lines:[structuredClone(l)]
   }))
  };
  const sourceBytes=JSON.stringify(source)+'\n';
@@ -38,7 +38,7 @@ function fixture(winOdds=9.0){
   source_prediction_sha256:crypto.createHash('sha256').update(sourceBytes).digest('hex'),
   source_prediction_proof:source.proof_commit,proof_commit:'b'.repeat(40),
   final_bets_fixed_at:'2030-10-25T09:02:00+09:00',
-  formal_bets:base,regular_commands:[
+  formal_bets:structuredClone(base),regular_commands:[
    command(base[0],'通常',1),command(base[1],'通常',2)
   ],medium_command:{category:'中穴',method:'pass',points:0,stake_yen:0},
   large_command:command(base[2],'大穴',5),
