@@ -86,6 +86,8 @@ def result_link(card, card_url):
 
 def verify_immutable(week, date, item, proof, snapshot_path, snapshot, audit):
     rid = item["race_id"]
+    if proof["week_id"] != week or proof["date"] != date:
+        raise ValueError("prerace_proof_week_or_date_mismatch")
     if snapshot["race_id"] != rid or audit["race_id"] != rid:
         raise ValueError("snapshot / audit race_id mismatch")
     if not audit.get("usable_for_e012_shadow"):
@@ -121,6 +123,20 @@ def verify_immutable(week, date, item, proof, snapshot_path, snapshot, audit):
     present = snapshot_path.read_bytes()
     if frozen != present:
         raise ValueError("prerace_snapshot_changed_since_proof")
+    # The immutable audit and weekly selection were also present in the
+    # prerace proof commit. Check their exact bytes before accepting outcomes.
+    audit_path = snapshot_path.parent.parent / "audits" / snapshot_path.name
+    plan_path = snapshot_path.parent.parent / "sample_plan.json"
+    for evidence_path, error_code in (
+        (audit_path, "prerace_audit_changed_since_proof"),
+        (plan_path, "prerace_sample_plan_changed_since_proof"),
+    ):
+        evidence_rel = str(evidence_path.relative_to(ROOT))
+        evidence_frozen = subprocess.check_output(
+            ["git", "show", sha + ":" + evidence_rel], cwd=ROOT
+        )
+        if evidence_frozen != evidence_path.read_bytes():
+            raise ValueError(error_code)
     t = datetime.fromisoformat(snapshot["race_context"]["start_at"])
     proof_at = datetime.fromisoformat(proof["proof_commit_at"].replace("Z", "+00:00"))
     if not (proof_at < t and datetime.fromisoformat(snapshot["captured_at"]) < t):
