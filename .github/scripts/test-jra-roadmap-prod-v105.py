@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """JRA roadmap v1.05 release acceptance (local Chrome, immutable predictions)."""
 import json
+import shutil
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -26,7 +27,9 @@ assert 'data/jra_improvement_cycle_v1.json' in html
 assert 'data/experience_regime_status.json' in html
 
 with sync_playwright() as pw:
-    browser=pw.chromium.launch(headless=True,args=["--no-sandbox"])
+    chrome=next((shutil.which(x) for x in ("google-chrome","chromium","chromium-browser") if shutil.which(x)),None)
+    assert chrome,"Local Chrome/Chromium required"
+    browser=pw.chromium.launch(headless=True,executable_path=chrome,args=["--no-sandbox"])
     for w in (320,375,390,430,768,1024,1440):
         page=browser.new_page(viewport={"width":w,"height":860},is_mobile=w<=430,has_touch=w<=430)
         errors=[]
