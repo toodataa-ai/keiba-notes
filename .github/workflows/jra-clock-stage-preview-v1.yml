@@ -32,14 +32,17 @@ jobs:
           import json,fitz
           m=json.loads(Path('stage/jra-clock-view/clockview-stage-manifest.json').read_text())
           assert sum(x['clock_change_count'] for x in m['reports'])==31
+          registry=json.loads(Path('docs/data/races.json').read_text())
+          page_map={r['id']:r['full_report_pages'] for r in registry['races']}
           for r in m['reports']:
               p=Path(r['stage_html']).with_suffix('.pdf')
               assert p.is_file() and p.stat().st_size>10000
               pdf=fitz.open(p)
-              assert len(pdf)>=16, (p,len(pdf))
+              assert len(pdf)==page_map[r['race_id']], (p,len(pdf),page_map[r['race_id']])
               content=' '.join(page.get_text() for page in pdf)
               sample=r['clock_changes'][0]['clock']
               assert sample in content,(p,sample)
+              assert all(c['clock'] in content for c in r['clock_changes']),p
               print('STAGE_PDF_OK',r['race_id'],len(pdf),'pages',r['clock_change_count'],'corrections')
           PY
       - uses: actions/upload-artifact@v4
