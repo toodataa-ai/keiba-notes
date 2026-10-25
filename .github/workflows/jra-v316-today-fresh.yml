@@ -55,6 +55,10 @@ jobs:
           print('SOURCE='+source)
           print('ORIGINAL_INPUT=e2e_validation/inputs/v313/'+rid+'.json')
           PY
+          RACE_ID=$(python3 -c 'import json,os;print(json.load(open(os.environ["REQ"]))["race_id"])')
+          PRIOR=$(python3 -c 'import json,sys;print(next(r for r in json.load(open("docs/data/races.json"))["races"] if r["id"]==sys.argv[1])["e2e_prediction"])' "$RACE_ID")
+          SOURCE=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["source_prediction_path"])' "$PRIOR")
+          ORIGINAL_INPUT="e2e_validation/inputs/v313/$RACE_ID.json"
           LABEL="v3.16-today-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
           SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
           PREDICTION="e2e_validation/predictions/$RACE_ID/$LABEL-sealed.json"
