@@ -3,7 +3,7 @@
   "date": "2026-10-25",
   "meeting_id": "2026-10-24-to-2026-10-25",
   "observed_at": "2026-10-25T19:05:00+09:00",
-  "status": "STAGED_OFFICIAL_SETTLEMENTS_GRADE_A_CI_PENDING",
+  "status": "FORMAL_GRADE_A_18_PASS_SHADOW_HISTORY_GATE_BLOCKED_PUBLIC_UNVERIFIED",
   "immutable_forecasts": true,
   "immutable_final_bets": true,
   "original_html_pdf_unchanged": true,
@@ -23,8 +23,8 @@
     "2026-10-25-kikka-sho": "a2c94f3491e316d859c902f6c112bad716ab5c26",
     "2026-10-25-kannazuki-stakes": "ffaf3ddfc8e404e83b8be0cef1c9f961b3bb9fde"
   },
-  "weekly_change_decision": "not_evaluated",
-  "weekly_reason": "Do not evaluate the Oct24-25 meeting until all six Grade A reviews pass, E2E comparator completes and CI/publication confirms; insufficient paired independent evidence means no_change.",
+  "weekly_change_decision": "no_change",
+  "weekly_reason": "On staging all six 2026-10-24/25 JRA mains have official result, settlement, performance, review and 18 validated strict E2E entries. Paired prospective E2E shared cases remain 0 of 20 required. No formal prompt/model change authorized; final public release blocked by the separate immutable Shadow evidence ledger.",
   "manual_approval_rules": "A/B/C retained, automatic promotion forbidden",
   "overfit_control": "Never tune on October 25 outcomes; require independently sealed paired prospective cases, minimum 20; no synthetic history",
   "preserved_versions": true,
@@ -32,11 +32,22 @@
   "shadow_evidence_gaps_are_separate": true,
   "publication_verification": {
     "verified": false,
-    "ci": "pending_pull_request_validation",
+    "ci": "blocked_by_e012_new_gaps",
     "live_github_pages_http_byte_parity": false
   },
   "blockers": [
-    "Current main lacks read-only v3.16 adapter and these reviews; staged GitHub pull request must pass full pinned manifest, strict 18-case Grade A CI and public HTML/PDF HTTP parity before promoting.",
-    "Previous SHA-pinned E0/E1/E2 Shadow research gaps remain separate and must not be imputed."
-  ]
+    "Three newly reviewed 2026-10-25 cases expose new missing frozen prereace E0/E1/E2 Shadow evidence; pinned historical validator refuses any new unknown error, so E2E workflow fails. Never backfill postrace or weaken the validator. Existing gaps must remain audited separately.",
+    "Public Github Pages HTML/PDF/case bytes and postrace publishing action cannot be marked verified until authorized reconciliation and green workflow/deployment."
+  ],
+  "formal_grade_a_evidence": {
+    "pr": "https://github.com/toodataa-ai/keiba-notes/pull/67",
+    "github_actions_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/40184616223",
+    "manifest_sha_gate": "success",
+    "unit_tests": "success",
+    "real_e2e_evaluation_step": "success",
+    "strict_cases": 18,
+    "strict_errors": 0,
+    "new_grade_a_cases": 3,
+    "legacy_strict_preserved": 15
+  }
 }
