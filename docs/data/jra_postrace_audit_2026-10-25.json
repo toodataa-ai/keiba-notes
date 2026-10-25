@@ -49,5 +49,36 @@
     "strict_errors": 0,
     "new_grade_a_cases": 3,
     "legacy_strict_preserved": 15
+  },
+  "prestart_report_pdf_sha_match": {
+    "verified": true,
+    "method": "GitHub Git blob SHA equality between sealed prestart v3.16 publication commit and review branch",
+    "races_verified": 3,
+    "html_verified": 3,
+    "pdf_verified": 3,
+    "original_files_modified": 0,
+    "files": {
+      "2026-10-25-lumiere-autumn-dash": {
+        "html": "37609890b5e3d385cceb8306971b639dd9d70ef7",
+        "pdf": "50f41fcb81de134f393ea5fc4d76f02ffdcc25b2"
+      },
+      "2026-10-25-kikka-sho": {
+        "html": "e76eed5bcbbd3a55458674b6581a343d64109bc2",
+        "pdf": "0691d3f2510663f09ad65c3e260c4f5d911b74f2"
+      },
+      "2026-10-25-kannazuki-stakes": {
+        "html": "ac82e33522fbb2a2c6ac83a55c471d8d8b0efc7b",
+        "pdf": "c52134d1cc0edff26ee1703387be5d8982857f7e"
+      }
+    }
+  },
+  "pdf_layout_guard": {
+    "status": "success",
+    "workflow_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/40184616299",
+    "scope": "PR source HTML/PDF reader contract; not live HTTP verification"
+  },
+  "ui_release_guard": {
+    "status": "success",
+    "workflow_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/40184616288"
   }
 }
