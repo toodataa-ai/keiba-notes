@@ -116,7 +116,29 @@ def main():
         or not all(today.get("policy",{}).get(k) is True for k in
             ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
         raise RuntimeError("2026-10-24 research gaps not separately reviewed and pinned")
-    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"]+extra["entries"]+today["entries"],hash_case)
+    # 2026-10-25 three formal Grade A cases are valid, but E0/E1/E2 race_category
+    # was not present in the immutable prereace records. Record exact original
+    # blob SHAs and errors in a distinct research-only supplement; never alter
+    # any prior ledger or synthesize postrace context.
+    oct25_meta=json.loads((ROOT/"docs/data/jra_current_e2e_ci_supersession_v1.json").read_text(encoding="utf-8")).get("new_reviewed_shadow_gap_ledger_20261025")
+    oct25_rel="e2e_validation/experience_new_gaps_20261025_v1.json"
+    if not isinstance(oct25_meta,dict) or oct25_meta.get("path")!=oct25_rel:
+        raise RuntimeError("missing separately reviewed 2026-10-25 research omissions")
+    oct25_path=ROOT/oct25_rel
+    oct25_sha=subprocess.check_output(["git","hash-object",str(oct25_path)],cwd=ROOT,text=True).strip()
+    if oct25_sha!=oct25_meta.get("git_blob_sha"):
+        raise RuntimeError("2026-10-25 pinned research gap ledger SHA mismatch")
+    oct25=json.loads(oct25_path.read_text(encoding="utf-8"))
+    required_oct25={"2026-10-25-kannazuki-stakes","2026-10-25-kikka-sho","2026-10-25-lumiere-autumn-dash"}
+    if (oct25.get("schema_version")!=1
+        or oct25.get("scope")!="explicitly_reviewed_additional_missing_prerace_shadow_evidence"
+        or {e.get("race_id") for e in oct25.get("entries",[])}!=required_oct25
+        or len(oct25["entries"])!=3
+        or oct25.get("earlier_baseline_path")!=today_rel
+        or not all(oct25.get("policy",{}).get(k) is True for k in
+            ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
+        raise RuntimeError("2026-10-25 missing prereace research evidence not fully reviewed and pinned")
+    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"]+extra["entries"]+today["entries"]+oct25["entries"],hash_case)
     # This is a CI success for no NEW integrity regressions, NOT a claim that
     # research evidence is complete. Existing missing cases remain unusable.
     print("SHADOW_CI_INTEGRITY_PASS:",json.dumps(result,ensure_ascii=False))
