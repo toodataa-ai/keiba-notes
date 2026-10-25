@@ -27,7 +27,7 @@ const key=x=>ticketKey(x.type,x.selection);
 const lossMargin=1e-8;
 const SCENARIOS=['low','central','high'];
 const unique=x=>new Set(x).size===x.length;
-const sum=(xs,f)=>xs.reduce((s,x)=>s+f(x),0);
+const sum=(xs,f)=>xs.reduce((s,x,i)=>s+f(x,i),0);
 
 function validateAndGroup(source,sourceBytes,formal,policy){
  must(source?.prompt_version==='v3.13'&&source?.stage==='formal_prestart',
