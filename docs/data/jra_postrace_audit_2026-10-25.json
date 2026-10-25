@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-25",
+  "meeting_id": "2026-10-24-to-2026-10-25",
+  "observed_at": "2026-10-25T19:05:00+09:00",
+  "status": "STAGED_OFFICIAL_SETTLEMENTS_GRADE_A_CI_PENDING",
+  "immutable_forecasts": true,
+  "immutable_final_bets": true,
+  "original_html_pdf_unchanged": true,
+  "reviewed_races": [
+    "2026-10-25-lumiere-autumn-dash",
+    "2026-10-25-kikka-sho",
+    "2026-10-25-kannazuki-stakes"
+  ],
+  "official_result_urls": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0104202604041120261025%2F8E",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604091120261025%2FF5",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604091120261025%2F17"
+  ],
+  "grade_a_case_expected_new": 3,
+  "case_proof_publication_commits": {
+    "2026-10-25-lumiere-autumn-dash": "1854c40ed858a931e5795c5dd33199f209700db2",
+    "2026-10-25-kikka-sho": "a2c94f3491e316d859c902f6c112bad716ab5c26",
+    "2026-10-25-kannazuki-stakes": "ffaf3ddfc8e404e83b8be0cef1c9f961b3bb9fde"
+  },
+  "weekly_change_decision": "not_evaluated",
+  "weekly_reason": "Do not evaluate the Oct24-25 meeting until all six Grade A reviews pass, E2E comparator completes and CI/publication confirms; insufficient paired independent evidence means no_change.",
+  "manual_approval_rules": "A/B/C retained, automatic promotion forbidden",
+  "overfit_control": "Never tune on October 25 outcomes; require independently sealed paired prospective cases, minimum 20; no synthetic history",
+  "preserved_versions": true,
+  "preserved_inflight_e2e_comparison": true,
+  "shadow_evidence_gaps_are_separate": true,
+  "publication_verification": {
+    "verified": false,
+    "ci": "pending_pull_request_validation",
+    "live_github_pages_http_byte_parity": false
+  },
+  "blockers": [
+    "Current main lacks read-only v3.16 adapter and these reviews; staged GitHub pull request must pass full pinned manifest, strict 18-case Grade A CI and public HTML/PDF HTTP parity before promoting.",
+    "Previous SHA-pinned E0/E1/E2 Shadow research gaps remain separate and must not be imputed."
+  ]
+}
