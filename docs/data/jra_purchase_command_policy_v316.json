@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "policy_version": "v3.16",
+  "effective_date_jst": "2026-10-25",
+  "status": "ACTIVE_FORWARD_ONLY_AFTER_VERIFIED_PRODUCTION_CI",
+  "official_source_model": "v3.13",
+  "prior_formal_purchase": "v3.15",
+  "scope": "STEP2 purchase stake sizing only for future JRA main races and only while prestart",
+  "user_approval": "Explicit production application requested 2026-10-25",
+  "pipeline": ".github/workflows/jra-prerace-formal-stake-v316.yml",
+  "trigger": "Successful completion of new official v3.15 purchase publication workflow; workflow_dispatch manual fallback",
+  "steps": [
+    "Verify original v3.13 prediction SHA and separate original v3.15 Git proof and official current pointer",
+    "Reject after race post or any quote >600 seconds old at new stake freeze; no speculative repricing",
+    "Run independently tested bounded v3.16 100-yen command-uniform stake grid optimizer",
+    "If no qualifying improvement, leave v3.15 formal recommendation canonical; no forced additional investment",
+    "If improvement passes, freeze independent v3.16 snapshot to GitHub before rendering; seal an immutable new Git proof",
+    "Render complete approved reader-v1 A4 PDF using WeasyPrint 68.0 and validate strict approved layout policy",
+    "Change only current prestart canonical record and append journal, preserving all historical sources/reports/proofs",
+    "Check exact public HTTP bytes of registry, history journal, manifest, HTML, PDF"
+  ],
+  "risk_guards": {
+    "max_total_budget_yen": 6000,
+    "per_command_uniform_100_yen_steps": true,
+    "regular_max_unit_yen": 300,
+    "speculative_medium_large_max_unit_yen": 100,
+    "max_extra_total_yen": 600,
+    "max_total_relative_to_baseline": 1.5,
+    "positive_minimum_central_ev_gain_yen": 10,
+    "low_expected_net_profit_never_decreases": true,
+    "central_net_loss_probability_never_increases": true,
+    "low_net_loss_probability_max_increase_pp": 0.5,
+    "full_odds_quote_age_at_v316_freeze_seconds": 600,
+    "full_quote_capture_span_seconds": 180
+  },
+  "constraints": {
+    "historical_source_and_prerace_proofs_immutable": true,
+    "step1_unchanged": true,
+    "ticket_selections_unchanged": true,
+    "purchase_command_count_unchanged": true,
+    "original_CSS_unchanged": true,
+    "JRA_results_unaffected": true,
+    "NAR_unaffected": true,
+    "unmodeled_global_optimum_claim_forbidden": true
+  },
+  "rollback": "Do not rewrite formal v3.16 history; future versions may re-point canonical only under existing prestart proof and publication journal constraints",
+  "open_investigation": "Estimate calibration accuracy and out-of-sample realized outcomes before broadening the +600 yen / 300 yen per-unit caps; do not claim economic certainty."
+}
