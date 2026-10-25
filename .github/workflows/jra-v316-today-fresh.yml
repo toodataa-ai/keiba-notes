@@ -1,0 +1,186 @@
+name: JRA 2026-10-25 three-race fresh v3.16 formal purchase release
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/v316today/*.json'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  fresh-three-main:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Exact request, source, JRA prestart gate, and immutable v3.15 proof
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/test-jra-stake-v316-shadow.mjs
+          node --check .github/scripts/jra-build-today-fresh-v316.mjs
+          python3 -m py_compile .github/scripts/jra-promote-formal-stake-v316.py
+          mapfile -t ADDED < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- e2e_validation/requests/v316today)
+          test "${#ADDED[@]}" -eq 1 || { echo "::error::one request per transaction required";exit 1; }
+          REQ="${ADDED[0]}"
+          [[ "$REQ" == e2e_validation/requests/v316today/2026-10-25-*.json ]] || exit 1
+          export REQ
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json,os,datetime as dt
+          q=json.load(open(os.environ['REQ']))
+          allowed=['2026-10-25-lumiere-autumn-dash','2026-10-25-kikka-sho','2026-10-25-kannazuki-stakes']
+          rid=q['race_id']
+          assert rid in allowed and q.get('policy_version')=='v3.16' and q.get('fresh_eight_types') is True
+          rows=json.load(open('docs/data/races.json'))['races']
+          a=[x for x in rows if x.get('id')==rid and x.get('scope')=='jra-main']
+          assert len(a)==1 and a[0]['purchase_strategy_version']=='v3.15'
+          b=a[0];prior=b['e2e_prediction'];p=json.load(open(prior))
+          assert p['status']=='formal_prestart' and p['proof_commit']==b['proof_commit']
+          source=p['source_prediction_path'];o=json.load(open(source))
+          assert o['stage']=='formal_prestart' and p['source_prediction_proof']==o['proof_commit']
+          start=dt.datetime.fromisoformat(o['race_context']['start_at'])
+          assert dt.datetime.now(dt.timezone.utc)<start,'race has already started'
+          print('RACE_ID='+rid)
+          print('PRIOR='+prior)
+          print('SOURCE='+source)
+          print('ORIGINAL_INPUT=e2e_validation/inputs/v313/'+rid+'.json')
+          PY
+          LABEL="v3.16-today-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
+          SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
+          PREDICTION="e2e_validation/predictions/$RACE_ID/$LABEL-sealed.json"
+          FRESH="e2e_validation/inputs/v316-fresh/$RACE_ID-$LABEL.json"
+          EVIDENCE="e2e_validation/quote-evidence/$RACE_ID/v316-$LABEL"
+          REPORT="docs/reports/$RACE_ID-$LABEL-v316.html"
+          PDF="docs/pdfs/$RACE_ID-$LABEL-v316.pdf"
+          MANIFEST="docs/data/jra-v316-revision-manifest-$RACE_ID-$LABEL.json"
+          for f in "$SNAPSHOT" "$PREDICTION" "$FRESH" "$REPORT" "$PDF" "$MANIFEST";do
+            test ! -e "$f" || { echo "::error::immutable new file exists";exit 1; }
+          done
+          for k in RACE_ID PRIOR SOURCE ORIGINAL_INPUT LABEL SNAPSHOT PREDICTION FRESH EVIDENCE REPORT PDF MANIFEST;do
+            echo "$k=${!k}" >> "$GITHUB_ENV"
+          done
+      - name: Retrieve every exact JRA market candidate odds from primary source (zero inherited)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4 requests beautifulsoup4
+          python3 .github/scripts/jra-odds-full-refresh-v313-exec.py \
+            --refresh-all --input "$ORIGINAL_INPUT" --output "$FRESH" \
+            --evidence-dir "$EVIDENCE" --max-capture-spread-seconds 180
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py \
+            --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+      - name: Re-evaluate locked original selections using current 8-type price evidence
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-build-today-fresh-v316.mjs \
+            --source "$SOURCE" --prior "$PRIOR" --original-input "$ORIGINAL_INPUT" \
+            --fresh "$FRESH" --output "$SNAPSHOT"
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const p=JSON.parse(fs.readFileSync(process.env.SNAPSHOT));
+          assert.equal(p.purchase_strategy_version,'v3.16');
+          assert.equal(p.status,'pending_git_proof');
+          assert.equal(p.proof_commit,null);
+          assert(p.total_stake_yen<=6000);
+          assert(p.full_refresh_odds.all_eight_type_prices_refetched);
+          assert(p.full_refresh_odds.quote_count>=1);
+          console.log('PASS_V316_FRESH_PREPROOF_AUDIT',p.source_race_id,
+            p.total_stake_yen,p.full_refresh_odds.quote_count);
+          NODE
+      - name: Freeze immutable fresh odds, full market evidence and v3.16 purchase to Git
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py \
+            --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$SNAPSHOT" "$FRESH" "$EVIDENCE"
+          python3 - <<'PY'
+          import os,subprocess
+          expected={os.environ[k] for k in ('SNAPSHOT','FRESH')}
+          files=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert expected.issubset(files)
+          assert all(x in expected or x.startswith(os.environ['EVIDENCE']+'/') for x in files)
+          assert any(x.startswith(os.environ['EVIDENCE']+'/') for x in files)
+          PY
+          git commit -m "Freeze Oct 25 fresh eight-type odds and proof-backed v3.16 amount plan"
+          for attempt in 1 2 3 4 5;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then git rebase --abort || true;exit 1;fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" -eq 5 ]];then echo "::error::prestart proof push failed";exit 1;fi
+          done
+          echo "PROOF=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Seal separate proof, render all per-horse A4 PDF and safely repoint current race
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py \
+            --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+          python3 - "$SNAPSHOT" "$PREDICTION" "$PROOF" <<'PY'
+          import json,sys
+          from datetime import datetime,timezone
+          from pathlib import Path
+          a,b,proof=sys.argv[1:]
+          p=json.loads(Path(a).read_text())
+          assert p['status']=='pending_git_proof' and p['proof_commit'] is None
+          assert datetime.now(timezone.utc)<datetime.fromisoformat(p['race_context']['start_at'])
+          p['status']='formal_prestart'
+          p['proof_commit']=proof
+          Path(b).parent.mkdir(parents=True,exist_ok=True)
+          Path(b).write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+          PY
+          python3 .github/scripts/jra-render-formal-stake-v316.py \
+            --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html "$REPORT" --pdf "$PDF" --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 .github/scripts/jra-promote-formal-stake-v316.py \
+            "$PREDICTION" "$SOURCE" "$PRIOR" "$REPORT" "$PDF" "$MANIFEST" "$FRESH"
+      - name: Commit only source-verified formal 2026-10-25 records
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST" docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import os,subprocess
+          exp=set(os.environ[k] for k in ('PREDICTION','REPORT','PDF','MANIFEST'))|{'docs/data/races.json','docs/data/jra_publication_revision_log.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert actual==exp,('missing output or forbidden file changes',actual^exp)
+          PY
+          git commit -m "Publish fresh v3.16 JRA main purchase with exact proof and reader-v1 A4"
+          # Preserve previous Git proof SHA. Merging here is permitted; rebase is NOT.
+          for attempt in 1 2 3 4 5;do
+            git fetch --no-tags origin main
+            if ! git merge --no-edit origin/main;then
+              git merge --abort || true
+              echo "::error::cannot merge canonical registry safely";exit 1
+            fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" -eq 5 ]];then echo "::error::publish retry limit reached";exit 1;fi
+          done
+      - name: Verify all five final user-visible current files byte-for-byte over public HTTP
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 40);do
+            ok=1
+            for file in docs/data/races.json docs/data/jra_publication_revision_log.json "$MANIFEST" "$REPORT" "$PDF";do
+              url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/jra316today-public ||
+                 ! cmp -s "$file" /tmp/jra316today-public;then ok=0;break;fi
+            done
+            if [[ "$ok" -eq 1 ]];then
+              echo "PASS_V316_TODAY_PUBLIC_HTTP_VERIFIED $RACE_ID $LABEL";exit 0
+            fi
+            sleep 12
+          done
+          echo "::error::v3.16 current public file bytes differ";exit 1
