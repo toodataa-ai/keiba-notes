@@ -18926,6 +18926,255 @@
       "html_sha256": "f5d7f3be13f5b0970517d824f6a4a4510c3053e31d74ab00ffc0b187e35453f4",
       "pdf_sha256": "d31c37271f22dfd32e140949bbefe9e584682050d712783917207565056af9a0",
       "user_requested_formal_three_command_policy": true
+    },
+    {
+      "race_id": "2026-10-25-kikka-sho",
+      "promoted_at_utc": "2026-10-25T01:44:36.567348+00:00",
+      "old_canonical": {
+        "id": "2026-10-25-kikka-sho",
+        "date": "2026-10-25",
+        "venue": "京都",
+        "race": "菊花賞",
+        "scope": "jra-main",
+        "prompt_version": "v3.13",
+        "status": "predicted",
+        "source": "jra-live-source-capture-prerace-fixed",
+        "eligible_for_learning": false,
+        "field_size": 18,
+        "report": "reports/2026-10-25-kikka-sho-v3.15-run40142524663-attempt1-v315.html",
+        "pdf": "pdfs/2026-10-25-kikka-sho-v3.15-run40142524663-attempt1-v315.pdf",
+        "pdf_mode": "full",
+        "full_report_pages": 51,
+        "marks": {
+          "win": "8 ロブチェン",
+          "second": "9 ゴーイントゥスカイ",
+          "third": "10 ダノンヒストリー"
+        },
+        "bets": [
+          "馬単 6-9",
+          "馬単 5-6",
+          "馬単 9-6",
+          "単勝 6",
+          "馬単 6-5"
+        ],
+        "purchase_decision": "buy",
+        "purchase_reason_code": "v315_grouped_verified_positive_edge",
+        "total_stake_yen": 500,
+        "final_bets": [
+          {
+            "type": "馬単",
+            "selection": [
+              6,
+              9
+            ],
+            "stake_yen": 100,
+            "market_odds": 408.3,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040911?ninki=0",
+            "observed_at": "2026-10-24T23:19:30.299+00:00",
+            "quote_verified": true,
+            "market_selection_id": "馬単:[6,9]"
+          },
+          {
+            "type": "馬単",
+            "selection": [
+              5,
+              6
+            ],
+            "stake_yen": 100,
+            "market_odds": 429.4,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040911?ninki=0",
+            "observed_at": "2026-10-24T23:19:30.299+00:00",
+            "quote_verified": true,
+            "market_selection_id": "馬単:[5,6]"
+          },
+          {
+            "type": "馬単",
+            "selection": [
+              9,
+              6
+            ],
+            "stake_yen": 100,
+            "market_odds": 333.5,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040911?ninki=0",
+            "observed_at": "2026-10-24T23:19:30.299+00:00",
+            "quote_verified": true,
+            "market_selection_id": "馬単:[9,6]"
+          },
+          {
+            "type": "単勝",
+            "selection": [
+              6
+            ],
+            "stake_yen": 100,
+            "market_odds": 36.8,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608040911?ninki=0",
+            "observed_at": "2026-10-24T23:19:29.893+00:00",
+            "market_selection_id": "単勝:[6]",
+            "quote_verified": true
+          },
+          {
+            "type": "馬単",
+            "selection": [
+              6,
+              5
+            ],
+            "stake_yen": 100,
+            "market_odds": 569.8,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2608040911?ninki=0",
+            "observed_at": "2026-10-24T23:19:30.299+00:00",
+            "market_selection_id": "馬単:[6,5]",
+            "quote_verified": true
+          }
+        ],
+        "final_bets_fixed_at": "2026-10-24T23:23:44.261Z",
+        "step1_fixed_at": "2026-10-25T08:18:37.090+09:00",
+        "e2e_prediction": "e2e_validation/predictions/2026-10-25-kikka-sho/v3.15-run40142524663-attempt1-sealed.json",
+        "proof_commit": "459e20c86f81106470d80fca1abf8fcc097c7100",
+        "purchase_budget_yen": 6000,
+        "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers.",
+        "purchase_strategy_version": "v3.15",
+        "purchase_commands": [
+          {
+            "type": "馬単",
+            "method": "single",
+            "definition": {
+              "selection": [
+                6,
+                9
+              ]
+            },
+            "points": 1,
+            "unit_stake_yen": 100,
+            "stake_yen": 100,
+            "ticket_keys": [
+              "馬単:[6,9]"
+            ],
+            "source_strategy_id": "single:馬単:[6,9]",
+            "row": 1,
+            "category": "通常",
+            "jra_input": "6→9"
+          },
+          {
+            "type": "馬単",
+            "method": "single",
+            "definition": {
+              "selection": [
+                5,
+                6
+              ]
+            },
+            "points": 1,
+            "unit_stake_yen": 100,
+            "stake_yen": 100,
+            "ticket_keys": [
+              "馬単:[5,6]"
+            ],
+            "source_strategy_id": "single:馬単:[5,6]",
+            "row": 2,
+            "category": "通常",
+            "jra_input": "5→6"
+          },
+          {
+            "type": "馬単",
+            "method": "single",
+            "definition": {
+              "selection": [
+                9,
+                6
+              ]
+            },
+            "points": 1,
+            "unit_stake_yen": 100,
+            "stake_yen": 100,
+            "ticket_keys": [
+              "馬単:[9,6]"
+            ],
+            "source_strategy_id": "single:馬単:[9,6]",
+            "row": 3,
+            "category": "通常",
+            "jra_input": "9→6"
+          }
+        ],
+        "medium_command": {
+          "row": 4,
+          "category": "中穴",
+          "type": "単勝",
+          "method": "single",
+          "definition": {
+            "selection": [
+              6
+            ]
+          },
+          "jra_input": "6",
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "単勝:[6]"
+          ],
+          "minimum_verified_odds": 36.8,
+          "maximum_verified_odds": 36.8,
+          "indicative_minimum_payout_yen": 3679,
+          "model_expected_profit_yen": 198.898,
+          "pricing_source": "verified-single",
+          "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+        },
+        "large_command": {
+          "row": 5,
+          "category": "大穴",
+          "type": "馬単",
+          "method": "single",
+          "definition": {
+            "selection": [
+              6,
+              5
+            ]
+          },
+          "jra_input": "6→5",
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "馬単:[6,5]"
+          ],
+          "minimum_verified_odds": 569.8,
+          "maximum_verified_odds": 569.8,
+          "indicative_minimum_payout_yen": 56979,
+          "model_expected_profit_yen": 309.131,
+          "pricing_source": "verified-single",
+          "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+        },
+        "purchase_comparison": {
+          "expected_profit_yen": -3861.5143,
+          "union_hit_pp": -74.75,
+          "net_loss_pp": 15.35
+        },
+        "purchase_risk_metrics": {
+          "stake_yen": 500,
+          "ticket_count": 5,
+          "command_count": 5,
+          "modeled_expected_net_profit_yen": 1115.7721,
+          "modeled_low_expected_net_profit_yen": 1115.7721,
+          "modeled_union_hit_probability": 0.0965,
+          "modeled_net_loss_probability": 0.9035
+        }
+      },
+      "new_canonical": {
+        "prompt_version": "v3.13",
+        "purchase_strategy_version": "v3.16",
+        "report": "reports/2026-10-25-kikka-sho-v3.16-today-run40151755596-attempt1-v316.html",
+        "pdf": "pdfs/2026-10-25-kikka-sho-v3.16-today-run40151755596-attempt1-v316.pdf",
+        "e2e_prediction": "e2e_validation/predictions/2026-10-25-kikka-sho/v3.16-today-run40151755596-attempt1-sealed.json",
+        "proof_commit": "d7af960bbcc1a577c4a4eb00cce07279cd03b362",
+        "final_bets_fixed_at": "2026-10-25T01:44:21.535Z"
+      },
+      "original_v313_preserved": "e2e_validation/predictions/2026-10-25-kikka-sho/v3.13-run40141962432-attempt1.json",
+      "original_v315_preserved": "e2e_validation/predictions/2026-10-25-kikka-sho/v3.15-run40142524663-attempt1-sealed.json",
+      "fresh_quote_input": "e2e_validation/inputs/v316-fresh/2026-10-25-kikka-sho-v3.16-today-run40151755596-attempt1.json",
+      "previous_pdf_preserved": "pdfs/2026-10-25-kikka-sho-v3.15-run40142524663-attempt1-v315.pdf",
+      "html_sha256": "4710cdc704a238dc30580522916bef6405d58f78c9a7051efbcd58323fbf270c",
+      "pdf_sha256": "381ceab2de2ad277421a15c79255ba773a1a24c274efc9462c623c36c8210e44",
+      "approved_forward_only_variable_staking": true
     }
   ]
 }
