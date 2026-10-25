@@ -31,8 +31,6 @@ def recover(past):
         if out.get('time') and out['time']!=found[0]:
             raise ValueError('source clock conflicts with preserved clock')
         out['time']=found[0]
-        out['going_at_run']=found[1]
-        out['clock_provenance']='official_source_excerpt'
     elif out.get('time'):
         if seconds(out['time']) is None: raise ValueError('invalid previously parsed race clock')
     elif out.get('finish') is not None:
