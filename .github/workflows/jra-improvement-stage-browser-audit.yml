@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'docs/staging/improvement-cycle.html'
+      - 'docs/staging/index.html'
+      - 'docs/staging/roadmap.html'
       - 'docs/staging/improvement-cycle.css'
       - 'docs/data/jra_improvement_cycle_v1.json'
       - '.github/scripts/jra-improvement-stage-browser-audit.py'
@@ -32,7 +34,7 @@ jobs:
           BASE='https://toodataa-ai.github.io/keiba-notes'
           for attempt in $(seq 1 48); do
             all_match=1
-            for file in staging/improvement-cycle.html staging/improvement-cycle.css data/jra_improvement_cycle_v1.json; do
+            for file in staging/index.html staging/roadmap.html staging/improvement-cycle.html staging/improvement-cycle.css data/jra_improvement_cycle_v1.json; do
               output=/tmp/jra-improvement-page-byte-check
               if ! curl -LfsS --connect-timeout 8 --max-time 24 \
                    -H 'Cache-Control: no-cache' \
