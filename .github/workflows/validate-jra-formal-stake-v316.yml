@@ -1,0 +1,106 @@
+name: JRA v3.16 formal variable stake release acceptance
+on:
+  pull_request:
+    paths:
+      - '.github/scripts/jra-build-formal-stake-v316.mjs'
+      - '.github/scripts/jra-render-formal-stake-v316.py'
+      - '.github/scripts/jra-promote-formal-stake-v316.py'
+      - '.github/workflows/jra-prerace-formal-stake-v316.yml'
+      - '.github/workflows/validate-jra-formal-stake-v316.yml'
+      - 'docs/data/jra_purchase_command_policy_v316.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Syntax and unmodified historical source contract
+        run: |
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/test-jra-stake-v316-shadow.mjs
+          node --check .github/scripts/jra-build-formal-stake-v316.mjs
+          python3 -m py_compile .github/scripts/jra-render-formal-stake-v316.py .github/scripts/jra-promote-formal-stake-v316.py
+          python3 - <<'PY'
+          import json
+          p=json.load(open('docs/data/jra_purchase_command_policy_v316.json'))
+          assert p['risk_guards']['max_total_budget_yen']==6000
+          assert p['constraints']['step1_unchanged']
+          assert p['constraints']['NAR_unaffected']
+          assert json.load(open('docs/data/latest_prompt.json'))['version']=='v3.13'
+          print('PASS_V316_PRODUCTION_POLICY_GATES')
+          PY
+      - name: Freeze-time sample replay, immutable identity, freshness, and unchanged preservation
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {buildV316FormalPlan} from './.github/scripts/jra-build-formal-stake-v316.mjs';
+          const fixtures=[
+           ['2026-10-25-lumiere-autumn-dash','v3.13-run40141955617-attempt1.json','v3.15-run40142205087-attempt1-sealed.json',false],
+           ['2026-10-25-kikka-sho','v3.13-run40141962432-attempt1.json','v3.15-run40142524663-attempt1-sealed.json',true],
+           ['2026-10-25-kannazuki-stakes','v3.13-run40142225062-attempt1.json','v3.15-run40142746599-attempt1-sealed.json',true]
+          ];
+          for(const [race,sn,bn,changed] of fixtures){
+           const sourceBytes=fs.readFileSync('e2e_validation/predictions/'+race+'/'+sn);
+           const priorBytes=fs.readFileSync('e2e_validation/predictions/'+race+'/'+bn);
+           const source=JSON.parse(sourceBytes),prior=JSON.parse(priorBytes);
+           const originalSource=JSON.stringify(source),originalPrior=JSON.stringify(prior);
+           const now_iso=new Date(Date.parse(prior.final_bets_fixed_at)+20000).toISOString();
+           const args={source,sourceBytes,prior,priorBytes,now_iso};
+           const result=buildV316FormalPlan(args);
+           assert.equal(result.status,changed?'candidate':'no_change',race);
+           if(changed){
+            const p=result.plan;
+            assert.equal(p.purchase_strategy_version,'v3.16');
+            assert.equal(p.status,'pending_git_proof');
+            assert.equal(p.proof_commit,null);
+            assert(p.total_stake_yen>prior.total_stake_yen&&p.total_stake_yen<=6000);
+            assert(p.total_stake_yen-prior.total_stake_yen<=600);
+            assert.deepEqual(p.formal_bets.map(x=>x.market_selection_id),prior.formal_bets.map(x=>x.market_selection_id));
+            assert(p.formal_bets.some(x=>x.stake_yen>100));
+            assert(p.purchase_metrics.modeled_net_loss_probability<=prior.purchase_metrics.modeled_net_loss_probability);
+            const filename=race.includes('kikka')?'/tmp/v316-kikka-pending.json':'/tmp/v316-tokyo-pending.json';
+            p.source_purchase_path='e2e_validation/predictions/'+race+'/'+bn;
+            fs.writeFileSync(filename,JSON.stringify(p,null,2)+'\n');
+           }
+           assert.equal(JSON.stringify(source),originalSource);
+           assert.equal(JSON.stringify(prior),originalPrior);
+           assert.throws(()=>buildV316FormalPlan({...args,now_iso:new Date(Date.parse(now_iso)+800000).toISOString()}),/BLOCKER/);
+           console.log('PASS_V316_FORMAL_FROZEN_REPLAY',race,result.status);
+          }
+          NODE
+      - name: Full A4 Kyoto regression on approved CSS with explicit variable stake display
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 - <<'PY'
+          import json
+          p=json.load(open('/tmp/v316-kikka-pending.json'))
+          p['status']='formal_prestart';p['proof_commit']='f'*40
+          json.dump(p,open('/tmp/v316-kikka-sealed.json','w'),ensure_ascii=False)
+          PY
+          python3 .github/scripts/jra-render-formal-stake-v316.py \
+            --plan /tmp/v316-kikka-sealed.json \
+            --source e2e_validation/predictions/2026-10-25-kikka-sho/v3.13-run40141962432-attempt1.json \
+            --html /tmp/v316-kikka.html --pdf /tmp/v316-kikka.pdf
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html /tmp/v316-kikka.html --pdf /tmp/v316-kikka.pdf \
+            --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 - <<'PY'
+          import fitz
+          doc=fitz.open('/tmp/v316-kikka.pdf')
+          t=''.join(p.get_text() for p in list(doc)[:5])
+          assert '300円' in t,'actual recommended 300-yen stake missing from official PDF'
+          assert len(doc)==51
+          assert 'v3.16' in t
+          print('PASS_V316_FULL_READER_V1_A4',len(doc),'pages; visible 300-yen ticket')
+          PY
