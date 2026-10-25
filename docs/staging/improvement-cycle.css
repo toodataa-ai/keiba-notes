@@ -223,3 +223,30 @@ footer{color:#5e5260}
   .metric{border-width:1.5px;border-top-width:4px}
   .evidence-layout{gap:7px}
 }
+
+
+/* STAGING ONLY — v6 consistent Japanese UI typography.
+   Meiryo UI is available on Windows, not shipped as a web font.
+   On iOS/macOS/Linux select locally installed Japanese UI fallbacks.
+   Form controls (especially the scenario selector) previously used UA fonts. */
+:root{
+  --jra-ui-font:"Meiryo UI","Meiryo","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic","Noto Sans CJK JP",sans-serif;
+}
+html,body,
+button,input,select,option,optgroup,textarea,
+summary,
+.staging-shell-marker{
+  font-family:var(--jra-ui-font);
+}
+body{font-size:14px;line-height:1.75}
+button,input,select,option,optgroup,textarea{font-style:normal;font-variant:normal}
+.scenario-bar select{
+  font-family:var(--jra-ui-font);
+  font-size:12px;
+  font-weight:600;
+  line-height:1.4;
+}
+.road-card,.metric,.week,.decision-row>div,.section,
+.road-card *, .metric *, .week *, .decision-row>div *, .section *{
+  font-family:inherit;
+}
