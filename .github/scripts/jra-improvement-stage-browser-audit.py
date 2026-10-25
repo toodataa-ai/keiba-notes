@@ -124,6 +124,33 @@ with sync_playwright() as pw:
         assert palette['metricAccentWidth']>=4 and palette['weekAccentWidth']>=4 and palette['decisionAccentWidth']>=4,(width,palette)
         assert palette['cardTextContrast']>=7 and palette['metricTextContrast']>=7,(width,palette)
         print("PASS_STAGING_CARD_CONTRAST",width,palette['cardTextContrast'],palette['cardBorderDelta'])
+        # font-family on the body alone is insufficient: native form controls
+        # default to platform UI fonts. Verify the computed priority stack for
+        # static text, dynamically generated cards, all five track stages,
+        # nav/footer, scenario selector and its options at every viewport.
+        typography=page.evaluate("""() => {
+          const selectors=[
+            'html','body','.hero h1','.lead','.hero-callout p',
+            '.section h2','.metric span','.metric strong',
+            '.scenario-bar label','.scenario-bar select','.scenario-bar option',
+            '.legend','.card-head h3','.stage-label',
+            '.topic-road .track-step b','.study-road .track-step b',
+            '.evidence-actual .value','.progress-head b','.timing-eta',
+            '.decision-hint','.road-details summary',
+            '.week strong','.decision-row b','.sources summary',
+            'nav a','footer a','.staging-shell-marker'
+          ];
+          return Object.fromEntries(selectors.map(selector=>{
+            const el=document.querySelector(selector);
+            return [selector,el?getComputedStyle(el).fontFamily:null];
+          }));
+        }""")
+        expected=typography['body'].strip().strip('"').split(',')[0].strip('" ')
+        assert expected=='Meiryo UI',(width,'body',typography)
+        for selector, family in typography.items():
+            assert family and family.replace('"','').startswith('Meiryo UI'),(width,selector,family)
+        assert typography['.scenario-bar select']==typography['body'],(width,typography)
+        print("PASS_STAGING_MEIRYO_PRIORITY",width,len(typography))
         assert not errors,(width,errors)
         assert info["scroll"]<=width+2 and info["body"]<=width+2,(width,info)
         assert info["reviews"]==str(d["formal"]["strict_verified_reviews"])+"レース",(width,info)
