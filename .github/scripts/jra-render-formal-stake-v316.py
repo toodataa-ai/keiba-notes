@@ -19,8 +19,9 @@ def main():
  source=json.loads(source_bytes)
  if plan.get('status')!='formal_prestart' or plan.get('purchase_strategy_version')!='v3.16':
   raise ValueError('separate v3.16 prestart proof required')
- if not plan.get('stake_optimization_audit',{}).get('shadow_proposal_available'):
-  raise ValueError('no positive verified v3.16 amount proposal')
+ if not (plan.get('stake_optimization_audit',{}).get('shadow_proposal_available') or
+         plan.get('full_refresh_odds',{}).get('all_eight_type_prices_refetched') is True):
+  raise ValueError('no positive stake change and no verifiable fresh full-market reprice')
  if not plan.get('source_purchase_sha256') or len(plan.get('source_purchase_proof',''))!=40:
   raise ValueError('missing prior formal v3.15 proof')
  presentation=copy.deepcopy(plan)
