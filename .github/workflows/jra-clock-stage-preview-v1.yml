@@ -31,7 +31,7 @@ jobs:
           from pathlib import Path
           import json,fitz
           m=json.loads(Path('stage/jra-clock-view/clockview-stage-manifest.json').read_text())
-          assert sum(x['clock_change_count'] for x in m['reports'])==30
+          assert sum(x['clock_change_count'] for x in m['reports'])==31
           for r in m['reports']:
               p=Path(r['stage_html']).with_suffix('.pdf')
               assert p.is_file() and p.stat().st_size>10000
