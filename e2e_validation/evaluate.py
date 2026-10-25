@@ -210,6 +210,63 @@ def normalize_v315_for_e2e(repo_root: Path, publication_commit: str, source_publ
     return out
 
 
+def normalize_v316_for_e2e(repo_root: Path, publication_commit: str, source_publication_commit: str, prediction: dict) -> dict:
+    """Read-only Grade A v3.16 stake adapter: v3.13 STEP1, v3.15 selections, v3.16 amounts.
+
+    No historical JSON is modified. Independently SHA-verifies the pre-existing
+    v3.15 original, rejects any v3.16 ticket selection change, and then applies
+    the existing v3.15 strict proof/registry/timestamp checks to final amounts.
+    """
+    if prediction.get("purchase_strategy_version") != "v3.16":
+        return prediction
+    if prediction.get("model_version") != "v3.13":
+        raise ValidationError("v3.16 must retain original v3.13 ability model")
+    prior_path = prediction.get("source_purchase_path")
+    prior_sha = prediction.get("source_purchase_sha256")
+    prior_proof = prediction.get("source_purchase_proof")
+    if not all(isinstance(x, str) and x for x in (prior_path, prior_sha, prior_proof)):
+        raise ValidationError("v3.16 missing prior v3.15 origin and SHA proof")
+    # The source_purchase_proof is the earlier source-evidence commit, not
+    # necessarily the completed v3.15 JSON publication commit.
+    if git_commit_time(repo_root, prior_proof) > parse_dt(prediction["final_bets_fixed_at"]):
+        raise ValidationError("v3.16 references future v3.15 source evidence")
+    prior_bytes = git_text(repo_root, publication_commit, prior_path)
+    if hashlib.sha256(prior_bytes.encode("utf-8")).hexdigest() != prior_sha:
+        raise ValidationError("v3.16 prior v3.15 original SHA256 mismatch")
+    try:
+        prior = json.loads(prior_bytes)
+    except json.JSONDecodeError as exc:
+        raise ValidationError("v3.16 malformed preserved v3.15 original") from exc
+    if (prior.get("purchase_strategy_version") != "v3.15" or
+            prior.get("model_version") != "v3.13" or
+            prior.get("source_race_id") != prediction.get("source_race_id") or
+            prior.get("source_prediction_path") != prediction.get("source_prediction_path") or
+            prior.get("source_prediction_sha256") != prediction.get("source_prediction_sha256") or
+            prior.get("status") != "formal_prestart"):
+        raise ValidationError("v3.16 source purchase/model chain mismatch")
+    old_bets, new_bets = prior.get("formal_bets"), prediction.get("formal_bets")
+    if (not isinstance(old_bets, list) or not isinstance(new_bets, list) or
+            len(old_bets) != len(new_bets) or not old_bets):
+        raise ValidationError("v3.16 changed prior ticket count")
+    for older, newer in zip(old_bets, new_bets):
+        if older.get("type") != newer.get("type") or older.get("selection") != newer.get("selection"):
+            raise ValidationError("v3.16 must not change v3.15 ticket selections or order")
+    if parse_dt(prediction["final_bets_fixed_at"]) < parse_dt(prior["final_bets_fixed_at"]):
+        raise ValidationError("v3.16 purchase sealed earlier than original")
+    projected = dict(prediction)
+    # Existing v3.15 verifier is reused strictly in-memory: v3.13 source SHA,
+    # prestart publication proof, historical registry, every line and stake.
+    projected["purchase_strategy_version"] = "v3.15"
+    out = normalize_v315_for_e2e(repo_root, publication_commit, source_publication_commit, projected)
+    out["purchase_strategy_version"] = "v3.16"
+    out["e2e_projection_note"] = (
+        "Read-only v3.16 formal amounts plus unchanged v3.15 selection set; "
+        "original SHA256-pinned v3.13 STEP1 and strict prereace proof. "
+        "No source/model/bet updates or retrospective recalibration."
+    )
+    return out
+
+
 def load_prediction(
     repo_root: Path,
     spec: dict,
@@ -247,14 +304,16 @@ def load_prediction(
     else:
         prediction = read_json(repo_root / path)
 
-    if grade == "prospective_strict" and prediction.get("purchase_strategy_version") == "v3.15":
-        # This transient key exists only in evaluator memory and never alters
-        # the JSON read from the immutable prestart Git commit.
+    if grade == "prospective_strict" and prediction.get("purchase_strategy_version") in ("v3.15", "v3.16"):
+        # Transient marker exists in evaluator memory only; frozen Git bytes are never edited.
         prediction["_case_prediction_path"] = path
         source_commit = spec.get("source_publication_proof_commit")
         if not source_commit or git_commit_time(repo_root, source_commit) > cutoff:
-            raise ValidationError("v3.15 source prediction publication proof is missing or after cutoff")
-        prediction = normalize_v315_for_e2e(repo_root, spec["proof_commit"], source_commit, prediction)
+            raise ValidationError("v3.15/v3.16 source publication proof missing or after cutoff")
+        if prediction["purchase_strategy_version"] == "v3.16":
+            prediction = normalize_v316_for_e2e(repo_root, spec["proof_commit"], source_commit, prediction)
+        else:
+            prediction = normalize_v315_for_e2e(repo_root, spec["proof_commit"], source_commit, prediction)
 
     if prediction.get("prompt_version") != version:
         raise ValidationError(
