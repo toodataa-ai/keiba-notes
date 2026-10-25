@@ -10,7 +10,7 @@ from pathlib import Path
 from jra_clock_v1 import recover
 
 ROOT=Path(__file__).resolve().parents[2]
-TARGETS={'2026-10-17-hokuriku-stakes':5,'2026-10-25-lumiere-autumn-dash':25}
+TARGETS={'2026-10-12-swan-stakes':1,'2026-10-17-hokuriku-stakes':5,'2026-10-25-lumiere-autumn-dash':25}
 SECTIONS=re.compile(r'(<section class="horse">)(.*?)(</section>)',re.S)
 ROW=re.compile(r'(<tr><td>(\d{4}-\d{2}-\d{2})</td><td>([^<]+)</td><td>(\d{3,4}(?:芝|ダート))</td><td>[^<]*</td><td>([^<]+)</td><td>)(\?)(</td><td>[^<]*</td></tr>)')
 
@@ -29,6 +29,17 @@ def render_one(race,original,output):
             slots[k]=fixed['time']
         mappings[horse['horse_name']]=slots
     applied=[]
+    if race=='2026-10-12-swan-stakes':
+        record=next(h for h in src['step1']['runners'] if h['horse_name']=='ビッグシーザー')
+        past=next(p for p in record['past_performances'] if p.get('date')=='2026-08-02')
+        restored=recover(past)['time']
+        if past.get('time') is not None or restored!='54.2':
+            raise RuntimeError('Swan clock source unexpected')
+        legacy=re.compile(r'(<h1>5番　ビッグシーザー　×</h1>(?:(?!</section>).)*?&#x27;date&#x27;: &#x27;2026-08-02&#x27;(?:(?!</section>).)*?&#x27;time&#x27;: )None',re.S)
+        if len(legacy.findall(html))!=1:
+            raise RuntimeError('Swan legacy evidence slot mismatch')
+        html=legacy.sub(lambda m:m[1]+'&#x27;54.2&#x27;',html,count=1)
+        applied.append({'horse':'ビッグシーザー','date':'2026-08-02','venue':'新潟','course':'1000芝','clock':restored})
     def section_replace(m):
         section=m[2]
         head=re.search(r'<h1>([◎○▲△×])\s+\d+\s+([^<]+)</h1>',section)
@@ -44,9 +55,10 @@ def render_one(race,original,output):
     html=SECTIONS.sub(section_replace,html)
     if len(applied)!=TARGETS[race]:
         raise RuntimeError('clock row count mismatch '+race+' actual='+str(len(applied)))
-    if html.count('<td>?</td>')!=before.decode('utf8').count('<td>?</td>')-len(applied):
+    if race!='2026-10-12-swan-stakes' and html.count('<td>?</td>')!=before.decode('utf8').count('<td>?</td>')-len(applied):
         raise RuntimeError('unexpected unrelated row edit')
     html=html.replace('本日の正式予想｜表紙','本日の正式予想｜表紙（時計補完・閲覧版）',1)
+    html=html.replace('</title>','（時計補完・閲覧版）</title>',1)
     html=html.replace('<body ','<body data-clock-only-correction="v1" ',1)
     output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(html,encoding='utf8')
