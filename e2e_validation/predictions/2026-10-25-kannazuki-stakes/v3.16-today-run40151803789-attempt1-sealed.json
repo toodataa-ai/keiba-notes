@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "purchase_strategy_version": "v3.16",
+  "model_version": "v3.13",
+  "status": "formal_prestart",
+  "source_race_id": "2026-10-25-kannazuki-stakes",
+  "source_prediction_sha256": "fa998756e654445352151e872740913fc87133bf82a26aaae197d0ab03b3b4ae",
+  "source_prediction_proof": "61e0d35f6820577b723cc46d7375071920ed322f",
+  "source_prediction_path": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.13-run40142225062-attempt1.json",
+  "race_context": {
+    "date": "2026-10-25",
+    "venue": "東京",
+    "race_no": 11,
+    "race_name": "神無月ステークス",
+    "start_at": "2026-10-25T15:20:00+09:00",
+    "surface": "ダート",
+    "distance_m": 1400,
+    "official_source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202604091120261025%2F5B",
+    "official_form_sha256": "b2d6bfa9e3c2a85b3e922414472c11e59d973c6a9dcb0e2cc8b2bd549a8eb99e",
+    "official_going": "稍重",
+    "going_observed_at": "2026-10-25T08:24:00.266+09:00",
+    "sale_field_size": 16,
+    "place_paid_positions": 3,
+    "offered_types": [
+      "単勝",
+      "複勝",
+      "枠連",
+      "馬連",
+      "馬単",
+      "ワイド",
+      "三連複",
+      "三連単"
+    ]
+  },
+  "step1_fixed_at": "2026-10-25T08:24:00.266+09:00",
+  "source_final_bets_fixed_at": "2026-10-24T23:24:57.983Z",
+  "final_bets_fixed_at": "2026-10-25T01:45:52.944Z",
+  "proof_commit": "bbafeb69d3fdfbf711edbd952b81184afebc8584",
+  "quote_age_max_seconds": 4.182,
+  "quote_capture_span_seconds": 3.946,
+  "formal_bets": [
+    {
+      "type": "馬単",
+      "selection": [
+        3,
+        16
+      ],
+      "stake_yen": 300,
+      "market_odds": 290.4,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040911?ninki=0",
+      "observed_at": "2026-10-25T01:45:52.457+00:00",
+      "quote_verified": true,
+      "market_selection_id": "馬単:[3,16]"
+    },
+    {
+      "type": "単勝",
+      "selection": [
+        3
+      ],
+      "stake_yen": 100,
+      "market_odds": 23.2,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040911?ninki=0",
+      "observed_at": "2026-10-25T01:45:52.020+00:00",
+      "quote_verified": true,
+      "market_selection_id": "単勝:[3]"
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        3,
+        4
+      ],
+      "stake_yen": 100,
+      "market_odds": 141.2,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040911?ninki=0",
+      "observed_at": "2026-10-25T01:45:52.457+00:00",
+      "quote_verified": true,
+      "market_selection_id": "馬単:[3,4]"
+    },
+    {
+      "type": "馬連",
+      "selection": [
+        3,
+        4
+      ],
+      "stake_yen": 100,
+      "market_odds": 50.9,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040911?ninki=0",
+      "observed_at": "2026-10-25T01:45:52.232+00:00",
+      "market_selection_id": "馬連:[3,4]",
+      "quote_verified": true
+    },
+    {
+      "type": "馬連",
+      "selection": [
+        3,
+        16
+      ],
+      "stake_yen": 100,
+      "market_odds": 118,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040911?ninki=0",
+      "observed_at": "2026-10-25T01:45:52.232+00:00",
+      "market_selection_id": "馬連:[3,16]",
+      "quote_verified": true
+    }
+  ],
+  "regular_commands": [
+    {
+      "type": "単勝",
+      "method": "single",
+      "definition": {
+        "selection": [
+          3
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "単勝:[3]"
+      ],
+      "source_strategy_id": "single:単勝:[3]",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "3"
+    },
+    {
+      "type": "馬単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          3,
+          16
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 300,
+      "stake_yen": 300,
+      "ticket_keys": [
+        "馬単:[3,16]"
+      ],
+      "source_strategy_id": "single:馬単:[3,16]",
+      "row": 2,
+      "category": "通常",
+      "jra_input": "3→16"
+    },
+    {
+      "type": "馬単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          3,
+          4
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬単:[3,4]"
+      ],
+      "source_strategy_id": "single:馬単:[3,4]",
+      "row": 3,
+      "category": "通常",
+      "jra_input": "3→4"
+    }
+  ],
+  "medium_command": {
+    "row": 4,
+    "category": "中穴",
+    "type": "馬連",
+    "method": "single",
+    "definition": {
+      "selection": [
+        3,
+        4
+      ]
+    },
+    "jra_input": "3－4",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "馬連:[3,4]"
+    ],
+    "minimum_verified_odds": 45.9,
+    "maximum_verified_odds": 45.9,
+    "indicative_minimum_payout_yen": 4590,
+    "model_expected_profit_yen": 88.5008,
+    "pricing_source": "verified-single",
+    "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+  },
+  "large_command": {
+    "row": 5,
+    "category": "大穴",
+    "type": "馬連",
+    "method": "single",
+    "definition": {
+      "selection": [
+        3,
+        16
+      ]
+    },
+    "jra_input": "3－16",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "馬連:[3,16]"
+    ],
+    "minimum_verified_odds": 108.5,
+    "maximum_verified_odds": 108.5,
+    "indicative_minimum_payout_yen": 10850,
+    "model_expected_profit_yen": 153.3305,
+    "pricing_source": "verified-single",
+    "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+  },
+  "total_stake_yen": 700,
+  "purchase_decision": "buy",
+  "command_count": 5,
+  "ticket_count": 5,
+  "purchase_metrics": {
+    "stake_yen": 700,
+    "ticket_count": 5,
+    "command_count": 5,
+    "modeled_expected_net_profit_yen": 1332.7133,
+    "modeled_low_expected_net_profit_yen": 1572.4063,
+    "modeled_union_hit_probability": 0.1392,
+    "modeled_net_loss_probability": 0.8608,
+    "modeled_low_net_loss_probability": 0.8504
+  },
+  "exacta_coverage_audit": [],
+  "comparison_to_v313": {
+    "expected_profit_yen": -3488.308,
+    "union_hit_pp": -74.43,
+    "net_loss_pp": 3.41
+  },
+  "risk_disclosure": "Expected profits derive from an uncalibrated prereace outcome model and observed odds, not guaranteed real payouts. The original v3.15 stake and odds records remain immutable.",
+  "selection_method": "v3.16 original selections preserved; all eight-type source prices independently refetched and audited; bounded purchase-command capital allocation",
+  "old_original_immutable": true,
+  "source_purchase_version": "v3.15",
+  "source_purchase_proof": "4821a94cd2a87ae849a14f4fe5f418acea77cae8",
+  "source_purchase_sha256": "bdb2852df7f78800b3082db66ad2a7186f116597fd30f94c1ec138e40eaff412",
+  "source_purchase_path": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.15-run40142746599-attempt1-sealed.json",
+  "stake_optimization_audit": {
+    "version": "v3.16-shadow-v1",
+    "race_id": "2026-10-25-kannazuki-stakes",
+    "activated": false,
+    "shadow_proposal_available": true,
+    "reason": "bounded_risk_eligible_stake_reallocation",
+    "baseline": {
+      "stake_yen": 500,
+      "scenarios": {
+        "low": {
+          "expected_net_profit_yen": 1005.5858,
+          "loss_probability": 0.8504,
+          "union_hit_probability": 0.1496,
+          "full_loss_probability": 0.8504
+        },
+        "central": {
+          "expected_net_profit_yen": 851.6985,
+          "loss_probability": 0.8608,
+          "union_hit_probability": 0.1392,
+          "full_loss_probability": 0.8608
+        },
+        "high": {
+          "expected_net_profit_yen": 670.6795,
+          "loss_probability": 0.8734,
+          "union_hit_probability": 0.1266,
+          "full_loss_probability": 0.8734
+        }
+      }
+    },
+    "candidate": {
+      "stake_yen": 700,
+      "scenarios": {
+        "low": {
+          "expected_net_profit_yen": 1572.4063,
+          "loss_probability": 0.8504,
+          "union_hit_probability": 0.1496,
+          "full_loss_probability": 0.8504
+        },
+        "central": {
+          "expected_net_profit_yen": 1332.7133,
+          "loss_probability": 0.8608,
+          "union_hit_probability": 0.1392,
+          "full_loss_probability": 0.8608
+        },
+        "high": {
+          "expected_net_profit_yen": 1051.4364,
+          "loss_probability": 0.8734,
+          "union_hit_probability": 0.1266,
+          "full_loss_probability": 0.8734
+        }
+      }
+    },
+    "delta": {
+      "investment_yen": 200,
+      "central_expected_profit_yen": 481.0148,
+      "low_expected_profit_yen": 566.8205,
+      "central_loss_probability_pp": 0
+    },
+    "commands": [
+      {
+        "category": "通常",
+        "type": "単勝",
+        "method": "single",
+        "jra_input": "3",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "単勝:[3]"
+        ],
+        "original_unit_stake_yen": 100,
+        "original_stake_yen": 100
+      },
+      {
+        "category": "通常",
+        "type": "馬単",
+        "method": "single",
+        "jra_input": "3→16",
+        "points": 1,
+        "unit_stake_yen": 300,
+        "stake_yen": 300,
+        "ticket_keys": [
+          "馬単:[3,16]"
+        ],
+        "original_unit_stake_yen": 100,
+        "original_stake_yen": 100
+      },
+      {
+        "category": "通常",
+        "type": "馬単",
+        "method": "single",
+        "jra_input": "3→4",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[3,4]"
+        ],
+        "original_unit_stake_yen": 100,
+        "original_stake_yen": 100
+      },
+      {
+        "category": "中穴",
+        "type": "馬連",
+        "method": "single",
+        "jra_input": "3－4",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "馬連:[3,4]"
+        ],
+        "original_unit_stake_yen": 100,
+        "original_stake_yen": 100
+      },
+      {
+        "category": "大穴",
+        "type": "馬連",
+        "method": "single",
+        "jra_input": "3－16",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "馬連:[3,16]"
+        ],
+        "original_unit_stake_yen": 100,
+        "original_stake_yen": 100
+      }
+    ],
+    "proposed_lines": [
+      {
+        "type": "単勝",
+        "selection": [
+          3
+        ],
+        "stake_yen": 100,
+        "market_odds": 23.2,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040911?ninki=0",
+        "observed_at": "2026-10-25T01:45:52.020+00:00",
+        "quote_verified": true,
+        "market_selection_id": "単勝:[3]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          3,
+          16
+        ],
+        "stake_yen": 300,
+        "market_odds": 290.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040911?ninki=0",
+        "observed_at": "2026-10-25T01:45:52.457+00:00",
+        "quote_verified": true,
+        "market_selection_id": "馬単:[3,16]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          3,
+          4
+        ],
+        "stake_yen": 100,
+        "market_odds": 141.2,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040911?ninki=0",
+        "observed_at": "2026-10-25T01:45:52.457+00:00",
+        "quote_verified": true,
+        "market_selection_id": "馬単:[3,4]"
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          3,
+          4
+        ],
+        "stake_yen": 100,
+        "market_odds": 50.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040911?ninki=0",
+        "observed_at": "2026-10-25T01:45:52.232+00:00",
+        "market_selection_id": "馬連:[3,4]",
+        "quote_verified": true
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          3,
+          16
+        ],
+        "stake_yen": 100,
+        "market_odds": 118,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040911?ninki=0",
+        "observed_at": "2026-10-25T01:45:52.232+00:00",
+        "market_selection_id": "馬連:[3,16]",
+        "quote_verified": true
+      }
+    ],
+    "audit": {
+      "combinations_considered": 10,
+      "qualified_combinations": 9,
+      "unchanged_ticket_set": true,
+      "unchanged_purchase_command_count": true,
+      "unchanged_hit_probability": true,
+      "speculation_stays_at_100_yen": true,
+      "modeled_probabilities_not_calibrated": true,
+      "formal_purchase_and_published_reports_not_modified": true,
+      "exhaustive_only_within_frozen_selection_and_bounded_stake_grid": true
+    },
+    "source_prediction_sha256": "fb329ad64bdd53d0b4200c7c1eb2c78e06a6bebd07c4741d123f4893ba8f3a86",
+    "source_proof_commit": "61e0d35f6820577b723cc46d7375071920ed322f",
+    "formal_proof_commit": "4821a94cd2a87ae849a14f4fe5f418acea77cae8",
+    "formal_unchanged": true,
+    "publication_allowed": false,
+    "original_v315_stake_yen": 500,
+    "actual_fresh_price_baseline": true,
+    "temporary_quotation_replay_sha256": "fb329ad64bdd53d0b4200c7c1eb2c78e06a6bebd07c4741d123f4893ba8f3a86"
+  },
+  "full_refresh_odds": {
+    "input_source_sha256": "1029c448bae5f784387265bde092ac2d5285b5b861042ffe6ed330cf568f0c9c",
+    "fresh_input_sha256": "c3ce3decff382192a0fefd0c21856fde085a68fcafcaa1160332d6c43a6133a5",
+    "fresh_input_path": "e2e_validation/inputs/v316-fresh/2026-10-25-kannazuki-stakes-v3.16-today-run40151803789-attempt1.json",
+    "checked_candidate_keys": 171,
+    "quote_count": 171,
+    "repriced_source_lines": 360,
+    "refreshed_after_v315": true,
+    "original_v315_source_sha256": "fa998756e654445352151e872740913fc87133bf82a26aaae197d0ab03b3b4ae",
+    "earliest_quote_at": "2026-10-25T01:45:48.762Z",
+    "latest_quote_at": "2026-10-25T01:45:52.708Z",
+    "reference_frozen_v315_at": "2026-10-24T23:27:21.185Z",
+    "all_eight_type_prices_refetched": true,
+    "never_inherited_old_formal_price": true
+  }
+}

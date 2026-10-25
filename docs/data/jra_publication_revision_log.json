@@ -19175,6 +19175,255 @@
       "html_sha256": "4710cdc704a238dc30580522916bef6405d58f78c9a7051efbcd58323fbf270c",
       "pdf_sha256": "381ceab2de2ad277421a15c79255ba773a1a24c274efc9462c623c36c8210e44",
       "approved_forward_only_variable_staking": true
+    },
+    {
+      "race_id": "2026-10-25-kannazuki-stakes",
+      "promoted_at_utc": "2026-10-25T01:46:09.929480+00:00",
+      "old_canonical": {
+        "id": "2026-10-25-kannazuki-stakes",
+        "date": "2026-10-25",
+        "venue": "東京",
+        "race": "神無月ステークス",
+        "scope": "jra-main",
+        "prompt_version": "v3.13",
+        "status": "predicted",
+        "source": "jra-live-source-capture-prerace-fixed",
+        "eligible_for_learning": false,
+        "field_size": 16,
+        "report": "reports/2026-10-25-kannazuki-stakes-v3.15-run40142746599-attempt1-v315.html",
+        "pdf": "pdfs/2026-10-25-kannazuki-stakes-v3.15-run40142746599-attempt1-v315.pdf",
+        "pdf_mode": "full",
+        "full_report_pages": 48,
+        "marks": {
+          "win": "4 ベルジュロネット",
+          "second": "2 メリディアンスター",
+          "third": "3 バトゥーキ"
+        },
+        "bets": [
+          "馬単 3-16",
+          "単勝 3",
+          "馬単 3-4",
+          "馬連 3-4",
+          "馬連 3-16"
+        ],
+        "purchase_decision": "buy",
+        "purchase_reason_code": "v315_grouped_verified_positive_edge",
+        "total_stake_yen": 500,
+        "final_bets": [
+          {
+            "type": "馬単",
+            "selection": [
+              3,
+              16
+            ],
+            "stake_yen": 100,
+            "market_odds": 210.9,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040911?ninki=0",
+            "observed_at": "2026-10-24T23:24:28.805+00:00",
+            "quote_verified": true,
+            "market_selection_id": "馬単:[3,16]"
+          },
+          {
+            "type": "単勝",
+            "selection": [
+              3
+            ],
+            "stake_yen": 100,
+            "market_odds": 21.4,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605040911?ninki=0",
+            "observed_at": "2026-10-24T23:24:28.522+00:00",
+            "quote_verified": true,
+            "market_selection_id": "単勝:[3]"
+          },
+          {
+            "type": "馬単",
+            "selection": [
+              3,
+              4
+            ],
+            "stake_yen": 100,
+            "market_odds": 113.8,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605040911?ninki=0",
+            "observed_at": "2026-10-24T23:24:28.805+00:00",
+            "quote_verified": true,
+            "market_selection_id": "馬単:[3,4]"
+          },
+          {
+            "type": "馬連",
+            "selection": [
+              3,
+              4
+            ],
+            "stake_yen": 100,
+            "market_odds": 45.9,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040911?ninki=0",
+            "observed_at": "2026-10-24T23:24:28.661+00:00",
+            "market_selection_id": "馬連:[3,4]",
+            "quote_verified": true
+          },
+          {
+            "type": "馬連",
+            "selection": [
+              3,
+              16
+            ],
+            "stake_yen": 100,
+            "market_odds": 108.5,
+            "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605040911?ninki=0",
+            "observed_at": "2026-10-24T23:24:28.661+00:00",
+            "market_selection_id": "馬連:[3,16]",
+            "quote_verified": true
+          }
+        ],
+        "final_bets_fixed_at": "2026-10-24T23:27:21.185Z",
+        "step1_fixed_at": "2026-10-25T08:24:00.266+09:00",
+        "e2e_prediction": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.15-run40142746599-attempt1-sealed.json",
+        "proof_commit": "4821a94cd2a87ae849a14f4fe5f418acea77cae8",
+        "purchase_budget_yen": 6000,
+        "note": "Frozen official-prerace JSON + JRA primary form and separately verified Sportnavi odds. Model is not historically calibrated; bets represent recommendations, not actual wagers.",
+        "purchase_strategy_version": "v3.15",
+        "purchase_commands": [
+          {
+            "type": "単勝",
+            "method": "single",
+            "definition": {
+              "selection": [
+                3
+              ]
+            },
+            "points": 1,
+            "unit_stake_yen": 100,
+            "stake_yen": 100,
+            "ticket_keys": [
+              "単勝:[3]"
+            ],
+            "source_strategy_id": "single:単勝:[3]",
+            "row": 1,
+            "category": "通常",
+            "jra_input": "3"
+          },
+          {
+            "type": "馬単",
+            "method": "single",
+            "definition": {
+              "selection": [
+                3,
+                16
+              ]
+            },
+            "points": 1,
+            "unit_stake_yen": 100,
+            "stake_yen": 100,
+            "ticket_keys": [
+              "馬単:[3,16]"
+            ],
+            "source_strategy_id": "single:馬単:[3,16]",
+            "row": 2,
+            "category": "通常",
+            "jra_input": "3→16"
+          },
+          {
+            "type": "馬単",
+            "method": "single",
+            "definition": {
+              "selection": [
+                3,
+                4
+              ]
+            },
+            "points": 1,
+            "unit_stake_yen": 100,
+            "stake_yen": 100,
+            "ticket_keys": [
+              "馬単:[3,4]"
+            ],
+            "source_strategy_id": "single:馬単:[3,4]",
+            "row": 3,
+            "category": "通常",
+            "jra_input": "3→4"
+          }
+        ],
+        "medium_command": {
+          "row": 4,
+          "category": "中穴",
+          "type": "馬連",
+          "method": "single",
+          "definition": {
+            "selection": [
+              3,
+              4
+            ]
+          },
+          "jra_input": "3－4",
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "馬連:[3,4]"
+          ],
+          "minimum_verified_odds": 45.9,
+          "maximum_verified_odds": 45.9,
+          "indicative_minimum_payout_yen": 4590,
+          "model_expected_profit_yen": 88.5008,
+          "pricing_source": "verified-single",
+          "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+        },
+        "large_command": {
+          "row": 5,
+          "category": "大穴",
+          "type": "馬連",
+          "method": "single",
+          "definition": {
+            "selection": [
+              3,
+              16
+            ]
+          },
+          "jra_input": "3－16",
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "馬連:[3,16]"
+          ],
+          "minimum_verified_odds": 108.5,
+          "maximum_verified_odds": 108.5,
+          "indicative_minimum_payout_yen": 10850,
+          "model_expected_profit_yen": 153.3305,
+          "pricing_source": "verified-single",
+          "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+        },
+        "purchase_comparison": {
+          "expected_profit_yen": -3488.308,
+          "union_hit_pp": -74.43,
+          "net_loss_pp": 3.41
+        },
+        "purchase_risk_metrics": {
+          "stake_yen": 500,
+          "ticket_count": 5,
+          "command_count": 5,
+          "modeled_expected_net_profit_yen": 642.3135,
+          "modeled_low_expected_net_profit_yen": 771.0816,
+          "modeled_union_hit_probability": 0.1392,
+          "modeled_net_loss_probability": 0.8608
+        }
+      },
+      "new_canonical": {
+        "prompt_version": "v3.13",
+        "purchase_strategy_version": "v3.16",
+        "report": "reports/2026-10-25-kannazuki-stakes-v3.16-today-run40151803789-attempt1-v316.html",
+        "pdf": "pdfs/2026-10-25-kannazuki-stakes-v3.16-today-run40151803789-attempt1-v316.pdf",
+        "e2e_prediction": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.16-today-run40151803789-attempt1-sealed.json",
+        "proof_commit": "bbafeb69d3fdfbf711edbd952b81184afebc8584",
+        "final_bets_fixed_at": "2026-10-25T01:45:52.944Z"
+      },
+      "original_v313_preserved": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.13-run40142225062-attempt1.json",
+      "original_v315_preserved": "e2e_validation/predictions/2026-10-25-kannazuki-stakes/v3.15-run40142746599-attempt1-sealed.json",
+      "fresh_quote_input": "e2e_validation/inputs/v316-fresh/2026-10-25-kannazuki-stakes-v3.16-today-run40151803789-attempt1.json",
+      "previous_pdf_preserved": "pdfs/2026-10-25-kannazuki-stakes-v3.15-run40142746599-attempt1-v315.pdf",
+      "html_sha256": "d2706ca6788c7d84ff6e079fa273823b0857b674a41013b96f37fefe5c7473bb",
+      "pdf_sha256": "b3f87df7a8fb2b046bd044c0f6d156fe2793402797e9722428fb5693f8a2e327",
+      "approved_forward_only_variable_staking": true
     }
   ]
 }
