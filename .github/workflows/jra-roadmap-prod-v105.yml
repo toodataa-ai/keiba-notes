@@ -1,0 +1,92 @@
+name: JRA roadmap v1.05 production release acceptance
+on:
+  pull_request:
+    paths:
+      - 'docs/index.html'
+      - 'docs/roadmap.html'
+      - 'docs/improvement-cycle.html'
+      - 'docs/assets/improvement-cycle.css'
+      - '.github/scripts/test-jra-roadmap-prod-v105.py'
+      - '.github/workflows/jra-roadmap-prod-v105.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/index.html'
+      - 'docs/roadmap.html'
+      - 'docs/improvement-cycle.html'
+      - 'docs/assets/improvement-cycle.css'
+      - '.github/scripts/test-jra-roadmap-prod-v105.py'
+      - '.github/workflows/jra-roadmap-prod-v105.yml'
+permissions: {contents: read}
+jobs:
+  production-ui-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify that the approved release cannot modify sealed JRA source or research
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]];then
+            BASE=$(git merge-base HEAD "origin/$GITHUB_BASE_REF")
+          else
+            BASE="$GITHUB_SHA^"
+          fi
+          python3 - "$BASE" <<'PY'
+          import subprocess,sys
+          old=sys.argv[1]
+          actual=set(subprocess.check_output(['git','diff','--name-only',old,'HEAD'],text=True).splitlines())
+          allowed={
+            'docs/index.html','docs/roadmap.html',
+            'docs/improvement-cycle.html','docs/assets/improvement-cycle.css',
+            '.github/scripts/test-jra-roadmap-prod-v105.py',
+            '.github/workflows/jra-roadmap-prod-v105.yml'}
+          assert actual and actual<=allowed,("Unexpected release scope",sorted(actual-allowed))
+          print('PASS_UI_ONLY_NO_PREDICTION_REPORT_RESULT_PROOF_OR_DATA_CHANGE',sorted(actual))
+          PY
+      - name: Browser-test actual generated dashboard on 7 screen sizes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -q playwright==1.56.0
+          python3 -m py_compile .github/scripts/test-jra-roadmap-prod-v105.py
+          python3 -m http.server 8765 --directory docs >/tmp/jra-prod-roadmap-server.log 2>&1 &
+          sleep 2
+          python3 .github/scripts/test-jra-roadmap-prod-v105.py
+      - name: Verify real public Pages file contents against approved release
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='https://toodataa-ai.github.io/keiba-notes'
+          for attempt in $(seq 1 52);do
+            all_match=1
+            for file in index.html roadmap.html improvement-cycle.html assets/improvement-cycle.css;do
+              if ! curl -LfsS --connect-timeout 8 --max-time 25 \
+                 -H 'Cache-Control: no-cache' \
+                 "$ROOT/$file?release=$GITHUB_SHA-$attempt" -o /tmp/jra-roadmap-v105-remote ||
+                 ! cmp -s "docs/$file" /tmp/jra-roadmap-v105-remote;then
+                all_match=0
+                break
+              fi
+            done
+            if [[ "$all_match" == 1 ]];then
+              echo 'PASS_JRA_V105_FOUR_PRODUCTION_FILES_HTTP_BYTE_MATCH'
+              exit 0
+            fi
+            sleep 8
+          done
+          echo '::error::Production HTML and CSS not yet synchronized with the tested source'
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jra-roadmap-v105-release-evidence
+          path: /tmp/jra-roadmap-prod-preview-*.png
+          if-no-files-found: ignore

@@ -1,0 +1,252 @@
+:root{color-scheme:dark;--bg:#121319;--panel:#1d2027;--border:#3a414e;--muted:#c2c5ce;--rose:#e47691;--cyan:#85cada}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#f6f6f8;font:14px/1.75 "Meiryo UI",Meiryo,system-ui,sans-serif}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+a{color:#ffb0c3}
+.hero{padding:52px 0 28px;border-bottom:1px solid var(--border)}
+nav{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:30px}
+nav a{border:1px solid #575d67;border-radius:22px;padding:6px 11px;color:#eee;text-decoration:none;font-size:12px}
+.eyebrow{font-weight:900;font-size:11px;color:#f7a0b4;letter-spacing:.17em;margin:0 0 7px}
+h1{font-size:clamp(27px,5vw,40px);line-height:1.4;margin:0}
+.lead{font-size:15px;line-height:1.85;max-width:930px;color:#d7dbe2}
+.lead strong{color:#fff}
+.hero-callout{background:#fff7f9;border-left:5px solid #b53450;padding:18px 22px;border-radius:12px;color:#25222b;margin-top:24px}
+.hero-callout b{font-size:13px;color:#982f46}
+.hero-callout p{font-weight:850;font-size:16px;margin:5px 0 7px}
+.hero-callout small{font-size:12px;color:#5c5056}
+.section{padding-top:34px}
+.section-name{font-size:12px;font-weight:850;color:#eda0b1;margin-bottom:3px}
+h2{font-size:clamp(19px,3vw,24px);line-height:1.45;margin:0 0 17px}
+.intro{color:#d1d4dd;margin:0 0 19px;font-size:13px}
+.intro strong{color:#fff}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.metric{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:15px;min-width:0}
+.metric span{display:block;font-size:12px;min-height:36px;color:#d1d4e0}
+.metric strong{font-size:24px;display:block;line-height:1.4;margin:8px 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.metric small,.small-note{font-size:12px;color:#b9bfca}
+.small-note{margin:12px 0}
+.scenario-bar{border-radius:11px;background:#27242f;border:1px solid #6a4d5f;display:flex;justify-content:space-between;align-items:center;gap:13px;padding:15px 17px}
+.scenario-bar b{display:block;font-size:13px}
+.scenario-bar small{display:block;color:#c2b9c3;font-size:11px}
+.scenario-bar label{white-space:nowrap;color:#f8d6df;font-size:12px}
+.scenario-bar select{background:#3b3341;border:1px solid #9a7f95;color:#fff;border-radius:7px;padding:9px;min-height:39px;font-size:12px}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin:12px 0 18px;color:#c9cbd2;font-size:11px}
+.legend span{display:flex;gap:6px;align-items:center}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.legend-done{background:#57545d}
+.legend-now{background:#b44564}
+.legend-future{background:#30343e;border:1px solid #5b626d}
+.roadmaps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.road-card{background:var(--panel);border:1px solid #444857;border-radius:13px;padding:18px 19px;min-width:0}
+.card-head{display:flex;justify-content:space-between;gap:9px;align-items:start;flex-wrap:wrap}
+.card-kicker{display:block;color:#e6a3b3;font-size:11px;font-weight:900}
+.study-road .card-kicker{color:#a1d9e8}
+.card-head h3{font-size:18px;margin:2px 0 12px;line-height:1.4}
+.stage-label{background:#442932;border:1px solid #a74c64;border-radius:50px;padding:3px 9px;font-size:11px;font-weight:850;color:#ffd5df}
+.study-road .stage-label{background:#273941;border-color:#5c99ab;color:#c0e8f2}
+.mini-track{list-style:none;padding:0;margin:4px 0 18px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0}
+.track-step{background:#292d36;position:relative;min-height:86px;padding:10px 9px 8px 17px;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%,10px 50%);margin-left:-5px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.track-step:first-child{clip-path:polygon(0 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,0 100%);margin-left:0}
+.track-step.is-done{background:#504952;color:#f4e1e6}
+.track-step.is-current{background:#ac3b5a;color:#fff}
+.study-road .track-step.is-current{background:#2e8296}
+.track-step.is-future{color:#b0b8c2}
+.track-kicker{font-size:10px;font-weight:900;color:#ffd6e1}
+.track-step.is-future .track-kicker{color:#b3b7c1}
+.track-step b{font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+.evidence-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.evidence-actual,.evidence-confirmed{border:1px solid #5c4b59;background:#302832;border-radius:9px;padding:11px;min-width:0}
+.evidence-confirmed{background:#2a3039;border-color:#485b6d}
+.evidence-layout b{display:block;color:#ffd2de;font-size:11px}
+.study-road .evidence-layout b{color:#b8e5f0}
+.evidence-layout .value{display:block;font-size:21px;line-height:1.35;margin:6px 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.evidence-layout small{display:block;color:#bdc4cd;line-height:1.55;font-size:10.5px}
+.progress-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:13px}
+.data-progress{min-width:0;padding:10px 12px;border:1px solid #46505c;border-radius:9px;background:#272b34}
+.progress-head{display:flex;flex-wrap:wrap;gap:3px;justify-content:space-between;font-size:11px;line-height:1.5}
+.progress-head b{font-variant-numeric:tabular-nums;white-space:nowrap;color:#f9d6df}
+progress{width:100%;height:10px;display:block;margin:8px 0 1px;accent-color:#c75c76}
+.study-road progress{accent-color:#61aec4}
+.comparison-mini{margin-top:9px}
+.comparison-mini .data-progress{background:#292633;border-color:#574453}
+.decision-hint{margin:11px 0 0;padding:10px 13px;background:#332632;border-left:3px solid #d66a83;border-radius:4px;font-size:12px;color:#ffdae5;font-weight:800}
+.study-road .decision-hint{background:#23323d;border-color:#64bed3;color:#c4edf5}
+.timing-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 8px;padding:10px 0 0;font-size:12px}
+.timing-row b{color:#e9b6c4}
+.study-road .timing-row b{color:#b0dce9}
+.timing-eta{font-weight:900;text-align:right;color:#fff}
+.timing-row small{grid-column:1 / -1;font-size:11px;color:#c2c5d0}
+.road-details{border-top:1px solid #444b58;margin-top:13px;padding-top:9px}
+summary{cursor:pointer;color:#f6b8c9;font-size:12px;font-weight:900}
+.road-details>.details-pair{margin-top:9px;padding-left:11px;border-left:2px solid #966278}
+.details-pair b{display:block;color:#f1b1c4;font-size:11px}
+.details-pair span{display:block;color:#e5e7ee;font-size:12px}
+.road-details ul{font-size:11px;color:#b6bdc8;padding-left:24px;overflow-wrap:anywhere}
+.study-road summary,.study-road .details-pair b{color:#a6dfea}
+.warning-note{background:#342a2c;border:1px solid #805d60;color:#edc5c8;border-radius:9px;padding:12px 15px;font-size:12px;margin:14px 0 0}
+.weeks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.week{background:var(--panel);border:1px solid var(--border);padding:15px;border-radius:10px;display:flex;flex-direction:column;gap:4px}
+.week b{font-size:12px}.week strong{font-size:19px}
+.week .fine{color:#d7adb8;font-size:12px}.week progress{height:8px}
+.decision-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.decision-row div{background:#262b35;border:1px solid var(--border);padding:14px;border-radius:10px}
+.decision-row b{font-size:13px;color:#f2b1c2}
+.decision-row p{font-size:12px;color:#d2d5de}
+.sources{border:1px solid var(--border);border-radius:11px;padding:17px;margin-top:32px;color:#cdd1d9;font-size:12px}
+.sources p{margin:9px 0}
+.error-block{background:#442832;color:#ffd7e1;border-radius:8px;padding:18px}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:11px;padding:42px 0 60px;color:#aeb3c1;font-size:12px}
+@media(max-width:1000px){.roadmaps{grid-template-columns:1fr}}
+@media(max-width:770px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.weeks{grid-template-columns:1fr}.decision-row{grid-template-columns:1fr}.scenario-bar{align-items:stretch;flex-direction:column}}
+@media(max-width:550px){
+.wrap{padding:0 14px}.hero{padding:55px 0 21px}.hero-callout{padding:13px}.metric{padding:11px}.metric strong{font-size:20px}.metric span{font-size:11px}
+.road-card{padding:13px}.mini-track{grid-template-columns:1fr;gap:4px}
+.track-step,.track-step:first-child{clip-path:none;margin-left:0;min-height:0;border-radius:7px;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:9px;padding:7px 12px}
+.track-step .track-kicker{min-width:44px}.track-step b{font-size:12px}
+.evidence-layout{grid-template-columns:1fr 1fr}.evidence-layout .value{font-size:18px}
+.progress-pair{grid-template-columns:1fr}.timing-row{grid-template-columns:1fr}.timing-eta{text-align:left}
+.card-head h3{font-size:17px}
+}
+
+/* STAGING ONLY — v5 layered-contrast facelift, 2026-10-25.
+   Separate page / section / card surfaces. Existing structure, bars, proof gates
+   and production presentation are intentionally untouched. */
+:root{
+  color-scheme:light;
+  --bg:#eae1e6;
+  --panel:#ffffff;
+  --border:#bbaab5;
+  --muted:#534954;
+  --rose:#952947;
+  --cyan:#176b80;
+  --ink:#25202b;
+  --section:#f7f2f5;
+  --outline:#b9a7b4;
+  --soft-shadow:0 6px 17px rgba(43,25,39,.105),0 1px 3px rgba(43,25,39,.075);
+}
+body{background:var(--bg);color:var(--ink)}
+a{color:#8c2846}
+a:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #b63560;outline-offset:3px}
+.hero{border-bottom:2px solid #c9b6c2;padding-bottom:30px}
+nav a{border-color:#bfaeb9;background:#fff;color:#493340;font-weight:750;box-shadow:0 1px 3px rgba(43,25,39,.08)}
+nav a:hover{border-color:#a52e4e;background:#fff6f9}
+.eyebrow,.section-name{color:#8b2541}
+.lead,.intro{color:#514853}
+.lead strong,.intro strong{color:#24202a}
+.hero-callout{background:#fff;border:1.5px solid #c9a9b8;border-left:5px solid #a42b50;box-shadow:var(--soft-shadow)}
+.hero-callout b{color:#852a45}
+.hero-callout small{color:#564955}
+.section{
+  background:var(--section);
+  border:1.5px solid #cfbec9;
+  border-radius:20px;
+  box-shadow:0 2px 8px rgba(39,20,35,.045);
+  margin-top:23px;
+  padding:25px 23px 27px;
+}
+.section-name{letter-spacing:.03em}
+.metric,.road-card,.week,.decision-row>div,.sources{
+  background:#fff;
+  border:2px solid var(--outline);
+  box-shadow:var(--soft-shadow);
+  color:var(--ink);
+}
+.metric{border-top:4px solid #a52a4b}
+.metric span{color:#504550}
+.metric strong{color:#261b2a}
+.metric small,.small-note{color:#615661}
+.scenario-bar{background:#fff;border:1.5px solid #bea7b6;box-shadow:0 2px 7px rgba(43,25,39,.065)}
+.scenario-bar b{color:#3d2c39}
+.scenario-bar small{color:#655663}
+.scenario-bar label{color:#773b53;font-weight:750}
+.scenario-bar select{color:#2c2230;border:1.5px solid #9f7e91;background:#fff}
+.legend{color:#554b55}
+.legend-done{background:#a79aa6}
+.legend-now{background:#a52c50}
+.legend-future{background:#e9e4ea;border:1.5px solid #a99ba8}
+.road-card{border-radius:16px;border-top:5px solid #a42b50;padding:18px 19px 20px}
+.topic-road{border-top-color:#a42b50}
+.study-road{border-top-color:#187d93}
+.road-card:hover{border-color:#998390;border-top-color:#952947;box-shadow:0 9px 21px rgba(43,25,39,.15)}
+.study-road:hover{border-top-color:#187d93}
+.card-kicker{color:#893451}
+.study-road .card-kicker{color:#14647a}
+.card-head h3{color:#211e29}
+.stage-label{background:#fff0f5;color:#872743;border-color:#b84c6c}
+.study-road .stage-label{background:#e5f5f8;border-color:#4a9aae;color:#15596b}
+.track-step{background:#ebe6ec;color:#463b47}
+.track-step.is-done{background:#ded4db;color:#443140}
+.track-step.is-current{background:#a32b50;color:#fff}
+.study-road .track-step.is-current{background:#18778b;color:#fff}
+.track-step.is-future{color:#4d4450}
+.track-kicker{color:#753d53}
+.track-step.is-current .track-kicker{color:#fff1f5}
+.study-road .track-step.is-current .track-kicker{color:#e8fbff}
+.track-step.is-future .track-kicker{color:#756a75}
+.evidence-actual,.evidence-confirmed{background:#fff4f7;border:1.5px solid #d3aebb;color:#241d27}
+.evidence-confirmed{background:#f0f6f9;border-color:#acc7d1}
+.evidence-layout b{color:#87334c}
+.study-road .evidence-layout b{color:#155f71}
+.evidence-layout .value{color:#211d27}
+.evidence-layout small{color:#605762}
+.data-progress{border:1.5px solid #d0c2cb;background:#faf8fa}
+.progress-head{color:#4d4250}
+.progress-head b{color:#7b2946}
+progress{accent-color:#b43a5f}
+.study-road progress{accent-color:#167d92}
+.comparison-mini .data-progress{background:#f4f0f6;border-color:#cec2d1}
+.decision-hint{background:#fff1f5;border-left:4px solid #ad3b5e;color:#692641}
+.study-road .decision-hint{background:#e7f6f9;border-color:#198099;color:#175e73}
+.timing-row b{color:#793449}
+.study-road .timing-row b{color:#146679}
+.timing-eta{color:#271e29}
+.timing-row small{color:#5e5360}
+.road-details{border-top-color:#d1c3cc}
+summary{color:#832947}
+.road-details>.details-pair{border-left-color:#b28298}
+.details-pair b{color:#823350}
+.details-pair span{color:#3f3540}
+.road-details ul{color:#534856}
+.study-road summary,.study-road .details-pair b{color:#176d81}
+.warning-note{background:#fff4f3;border:1.5px solid #c9999b;color:#703a3d}
+.week{border-left:5px solid #67798c;border-radius:13px}
+.week .fine{color:#694a61}
+.decision-row>div{border-radius:12px;border-top:4px solid #9a566f}
+.decision-row b{color:#87334e}
+.decision-row p{color:#524753}
+.sources{border-radius:14px;color:#514651}
+.error-block{background:#fff0f2;border:1.5px solid #b85a70;color:#75283e}
+footer{color:#5e5260}
+@media(max-width:550px){
+  .section{margin-top:16px;padding:17px 12px 20px;border-radius:15px}
+  .road-card{padding:13px 12px 16px}
+  .metric{border-width:1.5px;border-top-width:4px}
+  .evidence-layout{gap:7px}
+}
+
+
+/* STAGING ONLY — v6 consistent Japanese UI typography.
+   Meiryo UI is available on Windows, not shipped as a web font.
+   On iOS/macOS/Linux select locally installed Japanese UI fallbacks.
+   Form controls (especially the scenario selector) previously used UA fonts. */
+:root{
+  --jra-ui-font:"Meiryo UI","Meiryo","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic","Noto Sans CJK JP",sans-serif;
+}
+html,body,
+button,input,select,option,optgroup,textarea,
+summary,
+.staging-shell-marker{
+  font-family:var(--jra-ui-font);
+}
+body{font-size:14px;line-height:1.75}
+button,input,select,option,optgroup,textarea{font-style:normal;font-variant:normal}
+.scenario-bar select{
+  font-family:var(--jra-ui-font);
+  font-size:12px;
+  font-weight:600;
+  line-height:1.4;
+}
+.road-card,.metric,.week,.decision-row>div,.section,
+.road-card *, .metric *, .week *, .decision-row>div *, .section *{
+  font-family:inherit;
+}
