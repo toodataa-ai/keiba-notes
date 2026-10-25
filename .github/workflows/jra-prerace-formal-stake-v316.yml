@@ -1,0 +1,173 @@
+name: JRA official v3.16 variable-stake prestart post-v3.15 promotion
+on:
+  workflow_run:
+    workflows:
+      - JRA formal v3.15 PURCHASE 3 actions + mid/large, fully audited prestart replacement
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      race_id:
+        description: 'Race ID currently published as v3.15, before race start'
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  purchase-stake-v316:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify pinned v3.13 model and v3.16 stake-only gates
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/test-jra-stake-v316-shadow.mjs
+          node --check .github/scripts/jra-build-formal-stake-v316.mjs
+          python3 -m py_compile .github/scripts/jra-render-formal-stake-v316.py .github/scripts/jra-promote-formal-stake-v316.py
+          python3 - <<'PY'
+          import json
+          p=json.load(open('docs/data/jra_purchase_command_policy_v316.json'))
+          assert p['status']=='ACTIVE_FORWARD_ONLY_AFTER_VERIFIED_PRODUCTION_CI'
+          assert p['risk_guards']['max_total_budget_yen']==6000
+          assert json.load(open('docs/data/latest_prompt.json'))['version']=='v3.13'
+          print('PASS_V316_APPROVED_FORWARD_ONLY_POLICY')
+          PY
+      - name: Identify exactly one still-current v3.15 predecessor
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          SOURCE_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          MANUAL_RACE: ${{ inputs.race_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json,os,re
+          races=json.load(open('docs/data/races.json'))['races']
+          if os.environ.get('EVENT_NAME')=='workflow_run':
+           suffix=f"v3.15-run{os.environ['SOURCE_RUN_ID']}-attempt{os.environ['SOURCE_RUN_ATTEMPT']}-sealed.json"
+           selected=[r for r in races if r.get('scope')=='jra-main' and r.get('purchase_strategy_version')=='v3.15'
+                     and r.get('e2e_prediction','').endswith('/'+suffix)]
+          else:
+           rid=os.environ.get('MANUAL_RACE','')
+           assert re.fullmatch(r'20[0-9]{2}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+',rid)
+           selected=[r for r in races if r.get('id')==rid and r.get('scope')=='jra-main'
+                     and r.get('purchase_strategy_version')=='v3.15']
+          assert len(selected)==1,'exactly one current v3.15 formal publication required'
+          r=selected[0];rid=r['id'];prior=r['e2e_prediction']
+          b=json.load(open(prior));source=b['source_prediction_path'];s=json.load(open(source))
+          assert b['proof_commit']==r['proof_commit'] and b['source_prediction_proof']==s['proof_commit']
+          assert b['source_race_id']==rid and s['race_id']==rid
+          print('RACE_ID='+rid);print('SOURCE='+source);print('PRIOR='+prior)
+          PY
+          LABEL="v3.16-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
+          SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
+          PREDICTION="e2e_validation/predictions/$RACE_ID/$LABEL-sealed.json"
+          REPORT="docs/reports/$RACE_ID-$LABEL-v316.html"
+          PDF="docs/pdfs/$RACE_ID-$LABEL-v316.pdf"
+          MANIFEST="docs/data/jra-v316-revision-manifest-$RACE_ID-$LABEL.json"
+          for f in "$SNAPSHOT" "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST"; do
+            test ! -e "$f" || { echo "::error::immutable output collision";exit 1; }
+          done
+          for k in RACE_ID SOURCE PRIOR LABEL SNAPSHOT PREDICTION REPORT PDF MANIFEST;do
+            echo "$k=${!k}" >> "$GITHUB_ENV"
+          done
+      - name: Evaluate new prestart amount using current fresh verified odds
+        run: |
+          set -euo pipefail
+          set +e
+          node .github/scripts/jra-build-formal-stake-v316.mjs --source "$SOURCE" --prior "$PRIOR" --output "$SNAPSHOT"
+          rc=$?
+          set -e
+          if [[ "$rc" -eq 20 ]];then
+            echo "NO_CHANGE=yes" >> "$GITHUB_ENV"
+            echo "PASS_V316_KEEP_ORIGINAL_V315 $RACE_ID"
+            exit 0
+          fi
+          test "$rc" -eq 0 || { echo "::error::v3.16 stale odds or stake guard failed"; exit "$rc"; }
+          test -f "$SNAPSHOT"
+      - name: Freeze independent Git v3.16 recommendation before release
+        if: env.NO_CHANGE != 'yes'
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$SNAPSHOT"
+          test "$(git diff --cached --name-only)" = "$SNAPSHOT"
+          git commit -m "Freeze independent v3.16 prestart stake proof"
+          for attempt in 1 2 3 4 5;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then git rebase --abort || true;exit 1;fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" -eq 5 ]];then exit 1;fi
+          done
+          echo "PROOF=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Seal, render 68.0 approved reader A4, and strictly promote
+        if: env.NO_CHANGE != 'yes'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 - "$SNAPSHOT" "$PREDICTION" "$PROOF" <<'PY'
+          import json,sys
+          from datetime import datetime,timezone
+          from pathlib import Path
+          a,b,proof=sys.argv[1:]
+          p=json.loads(Path(a).read_text())
+          assert p['status']=='pending_git_proof' and p['proof_commit'] is None
+          assert datetime.now(timezone.utc)<datetime.fromisoformat(p['race_context']['start_at'])
+          p['status']='formal_prestart';p['proof_commit']=proof
+          Path(b).parent.mkdir(parents=True,exist_ok=True)
+          Path(b).write_text(json.dumps(p,ensure_ascii=False,indent=2)+'\n')
+          PY
+          python3 .github/scripts/jra-render-formal-stake-v316.py \
+            --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html "$REPORT" --pdf "$PDF" --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 .github/scripts/jra-promote-formal-stake-v316.py \
+            "$PREDICTION" "$SOURCE" "$PRIOR" "$REPORT" "$PDF" "$MANIFEST"
+      - name: Commit only new proof, full A4 and prestart canonical journal
+        if: env.NO_CHANGE != 'yes'
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$MANIFEST" docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import os,subprocess
+          expected=set(os.environ[x] for x in ('PREDICTION','REPORT','PDF','MANIFEST'))|{'docs/data/races.json','docs/data/jra_publication_revision_log.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert expected==actual,('forbidden files or partial publication',expected^actual)
+          PY
+          git commit -m "Publish verified v3.16 improved stakes preserving immutable v3.15 source"
+          for attempt in 1 2 3 4 5;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then git rebase --abort || true;exit 1;fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" -eq 5 ]];then exit 1;fi
+          done
+      - name: Verify complete official GitHub Pages HTTP byte identity
+        if: env.NO_CHANGE != 'yes'
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 32);do
+            ok=1
+            for f in docs/data/races.json docs/data/jra_publication_revision_log.json "$MANIFEST" "$REPORT" "$PDF";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o /tmp/v316-public ||
+                 ! cmp -s "$f" /tmp/v316-public;then ok=0;break;fi
+            done
+            if [[ "$ok" -eq 1 ]];then
+              echo "PASS_FORMAL_V316_PUBLIC_BYTES_VERIFIED $RACE_ID $LABEL";exit 0
+            fi
+            sleep 12
+          done
+          echo "::error::Published new v3.16 report differs from public HTTP";exit 1
