@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+
+<title>改善テーマ別ロードマップ｜JRA予想精度向上研究所</title>
+
+<link rel="stylesheet" href="assets/improvement-cycle.css?v=20261025-1">
+</head>
+<body>
+
+<div class="wrap">
+<header class="hero">
+<nav aria-label="ページ移動"><a href="index.html">← トップページ</a><a href="roadmap.html">改善の考え方・履歴</a><a href="e2e.html">正式比較の詳細</a><a href="experience-regime.html">戦歴別研究</a></nav>
+<p class="eyebrow">JRA IMPROVEMENT ROADMAP</p>
+<h1>改善テーマごとの<br>現在地と、次の一手</h1>
+<p class="lead">予想の改善は、展開・馬場・買い目・若駒でそれぞれ進捗が異なります。<strong>すでに集めたデータ</strong>と、<strong>新しい予想方式が優れていると判断できるデータ</strong>を分けて公開しています。</p>
+<div class="hero-callout">
+<b>いまの全体状況</b>
+<p id="topConclusion">正式回顧と戦歴研究のデータを確認しています。</p>
+<small>「20レースたまったら自動採用」ではありません。最低20件の同条件比較後に精度・副作用を検証し、明示承認します。</small>
+</div>
+</header>
+<main>
+<div id="loading" role="status">集計データを読み込み中…</div>
+<div id="main" hidden>
+<section class="section" aria-labelledby="collectedTitle">
+<div class="section-name">01 / すでに集めたデータ</div>
+<h2 id="collectedTitle">実績はゼロではありません</h2>
+<div class="metrics">
+<div class="metric"><span>正式JRA回顧</span><strong id="formalReviews">—</strong><small>発走前証拠を検証済み</small></div>
+<div class="metric"><span>E0/E1/E2研究・発走前収集</span><strong id="researchRaces">—</strong><small>異なるレースの合計／重複なし</small></div>
+<div class="metric"><span>研究で収集した馬データ</span><strong id="researchHorses">—</strong><small>延べ件数（区分別合計）</small></div>
+<div class="metric"><span>改善比較実験の事前登録</span><strong id="registeredTrials">—</strong><small>まだ旧版・新版の比較前</small></div>
+</div>
+<p class="small-note" id="dataDistinction">データ種類によって活用できる段階が異なります。</p>
+</section>
+<section class="section" aria-labelledby="roadmapsTitle">
+<div class="section-name">02 / 改善テーマごとのロードマップ</div>
+<h2 id="roadmapsTitle">どの改善が、どこまで進んでいる？</h2>
+<p class="intro">各テーマごとに矢羽の現在地と実績を表示しています。回顧のテーマ抽出は「なぜそうなったか」の証明ではなく、改善候補を選ぶための観測です。</p>
+<div class="scenario-bar">
+<div><b>仮に週あたり何レース比較できたら？</b><small>候補版登録後の所要週数を各テーマに表示します。これは実績からの到達日予測ではありません。</small></div>
+<label for="scenarioPace">毎週 <select id="scenarioPace"><option value="2">2レース</option><option value="3" selected>3レース</option><option value="6">6レース</option></select></label>
+</div>
+<div class="legend"><span><i class="legend-done"></i>観測条件を通過</span><span><i class="legend-now"></i>現在の工程</span><span><i class="legend-future"></i>今後の工程</span></div>
+<div id="topicRoadmaps" class="roadmaps"></div>
+</section>
+<section class="section" aria-labelledby="experienceTitle">
+<div class="section-name">03 / 戦歴別研究・テーマごとのロードマップ</div>
+<h2 id="experienceTitle">E0・E1・E2はどこまで進んでいる？</h2>
+<p class="intro">研究には既存の発走前固定データがあります。ただし勝率・3着内確率と結果を突合できるデータがないと、「予測が正しかったか」は評価できません。既存の収集・回顧は消さず、別の成果として表示します。</p>
+<div id="studyRoadmaps" class="roadmaps"></div>
+<p class="warning-note" id="researchGaps"></p>
+</section>
+<section class="section" aria-labelledby="weekTitle">
+<div class="section-name">04 / 開催週別の正式回顧</div>
+<h2 id="weekTitle">回顧の完了状況</h2>
+<p class="intro">未完了の開催週にある観測は、その週が完了するまで「実験設計に進む条件」として確定計上しません。</p>
+<div id="weekly" class="weeks"></div>
+</section>
+<section class="section">
+<div class="section-name">05 / 20レース到達後の判断</div>
+<h2>十分に集まったら、何をする？</h2>
+<div class="decision-row">
+<div><b>① 性能を比較</b><p>◎・印・勝率予測・3着内確率・回収率・損失リスクを比較</p></div>
+<div><b>② 偏りを監査</b><p>別の開催週、芝／ダート、条件別、過剰適合を検証</p></div>
+<div><b>③ 人が承認</b><p>採用／追加検証／不採用をA/B/Cルールで決定。自動採用はしない</p></div>
+</div>
+<p class="small-note">研究初期診断の「30頭分」と、正式モデルの「最低20レースの新旧比較」は別々の条件です。現行の正式版・発走前予想・買い目原本・既存PDFは変更しません。</p>
+</section>
+<details class="sources">
+<summary>集計元・判断条件を確認する</summary>
+<p>テーマ別観測レースは同一レースが複数テーマに重複するため合計しません。E0/E1/E2のレースも区分間で重複があります。発走前研究データと新旧比較の実績を合算せず、予想の結果を見た後のデータ補完もしません。</p>
+<p><a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/data/jra_improvement_cycle_v1.json" target="_blank" rel="noopener noreferrer">改善進捗データ</a> ／ <a href="https://github.com/toodataa-ai/keiba-notes/blob/main/e2e_validation/improvement_roadmap_v1.json" target="_blank" rel="noopener noreferrer">マイルストン基準</a> ／ <a href="e2e.html">E2E監査</a></p>
+</details>
+</div>
+</main>
+<footer><a href="index.html">← ステージングトップに戻る</a><span>既存の正式予想・買い目・PDF原本は変更しません</span></footer>
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.max(0,Number(n)||0).toLocaleString('ja-JP');
+function add(parent,tag,value,cls){
+ const el=document.createElement(tag);
+ if(cls)el.className=cls;
+ if(value!==undefined)el.textContent=String(value);
+ parent.appendChild(el);
+ return el;
+}
+function pairForTopic(d,ids){
+ const c=d.formal.comparison||{},src=d.experiments||[];
+ const active=src.find(x=>x.id&&x.baseline===d.latest_formal_prompt_version&&
+    x.challenger===c.candidate&&x.status!=='rejected'&&
+    (x.hypothesis_ids||[]).some(id=>ids.includes(id)));
+ if(!active||!c.pair_matches_current_formal)return {count:0,registered:false};
+ const raw=Math.max(0,Math.floor(Number(c.paired_strict_cases)||0));
+ const weekly=c.weekly_paired_actuals;
+ if(!Array.isArray(weekly)||!weekly.length) return {count:0,registered:true};
+ const valid=weekly.every(x=>typeof x.week_start==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.week_start)&&Number.isInteger(x.valid_pairs)&&x.valid_pairs>=0);
+ const sum=valid?weekly.reduce((acc,x)=>acc+x.valid_pairs,0):-1;
+ return {count:sum===raw?raw:0,registered:true};
+}
+function phaseTrack(root,stages,current){
+ const list=add(root,'ol',undefined,'mini-track');
+ stages.forEach((label,index)=>{
+   const item=add(list,'li',undefined,'track-step '+(index<current?'is-done':index===current?'is-current':'is-future'));
+   add(item,'small',index<current?'完了':index===current?'現在':'これから','track-kicker');
+   add(item,'b',label);
+   if(index===current)item.setAttribute('aria-current','step');
+ });
+}
+function progress(root,value,goal,label,cls){
+ const wrap=add(root,'div',undefined,'data-progress '+(cls||''));
+ const upper=add(wrap,'div',undefined,'progress-head');
+ add(upper,'span',label);
+ add(upper,'b',fmt(value)+' / '+fmt(goal));
+ const p=add(wrap,'progress');
+ p.max=Math.max(1,goal);p.value=Math.min(goal,Math.max(0,value));
+ p.setAttribute('aria-label',label+' '+value+'/'+goal);
+ return p;
+}
+function forecastForTopic(d,topicIds,paired){
+ const c=d.formal.comparison||{},weekly=c.weekly_paired_actuals;
+ if(!paired.registered||!Array.isArray(weekly)||weekly.length<2)return null;
+ if(!weekly.every(x=>/^\d{4}-\d{2}-\d{2}$/.test(x.week_start)&&Number.isInteger(x.valid_pairs)&&x.valid_pairs>=0))return null;
+ if(weekly.some((x,i)=>i>0&&x.week_start<=weekly[i-1].week_start))return null;
+ const total=weekly.reduce((n,x)=>n+x.valid_pairs,0);
+ if(total!==paired.count||weekly.filter(x=>x.valid_pairs>0).length<2)return null;
+ const target=Math.max(1,Number(c.minimum_paired_cases)||20);
+ const mean=total/weekly.length;
+ const weeks=Math.ceil(Math.max(0,target-total)/mean);
+ const dte=new Date(weekly[weekly.length-1].week_start+'T00:00:00Z');
+ if(Number.isNaN(dte.getTime()))return null;
+ dte.setUTCDate(dte.getUTCDate()+weeks*7);
+ return {date:dte.getUTCFullYear()+'年'+(dte.getUTCMonth()+1)+'月'+dte.getUTCDate()+'日ごろ',weeks};
+}
+function topicCard(d,h){
+ const card=add($('topicRoadmaps'),'article',undefined,'road-card topic-road');
+ const screen=h.next_decision?.screening||{},eligible=!!screen.ready_to_design_experiment;
+ const paired=pairForTopic(d,[h.id]);
+ const target=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
+ const compareReady=paired.registered&&paired.count>=target&&d.formal.comparison.sufficient_for_review;
+ const current=eligible?(paired.registered?(compareReady?3:2):1):0;
+ const header=add(card,'div',undefined,'card-head');
+ const titles=add(header,'div');
+ add(titles,'small','正式JRA回顧からの改善仮説','card-kicker');
+ add(titles,'h3',h.title);
+ add(header,'span',current===0?'課題観測中':current===1?'実験設計の段階':current===2?'新旧比較中':'比較結果の審査段階','stage-label');
+ phaseTrack(card,['論点の観測','改善案を事前登録','新旧20件比較','精度・副作用を検証','承認・反映'],current);
+ const data=add(card,'div',undefined,'evidence-layout');
+ const observed=add(data,'div',undefined,'evidence-actual');
+ add(observed,'b','これまでの収集実績');
+ add(observed,'strong',fmt(h.race_observation_count)+'レース','value');
+ add(observed,'small','該当する調査テーマが回顧に登場したレース（同じレースはテーマ間で重複）');
+ const verified=add(data,'div',undefined,'evidence-confirmed');
+ add(verified,'b','完了済み開催週の観測');
+ add(verified,'strong',fmt(screen.qualifying_race_reviews)+'件・'+fmt(h.completed_meetings_with_observation)+'開催週','value');
+ add(verified,'small','未完了週の'+fmt(screen.pending_week_mentions_not_yet_qualifying)+'件は整理条件の確定に未計上');
+ const bars=add(card,'div',undefined,'progress-pair');
+ progress(bars,screen.qualifying_race_reviews||0,screen.minimum_qualifying_race_reviews||3,'改善案設計に進む観測条件');
+ progress(bars,h.completed_meetings_with_observation||0,screen.minimum_completed_meetings||2,'複数開催週で確認');
+ const compareBox=add(card,'div',undefined,'comparison-mini');
+ progress(compareBox,paired.count,target,'このテーマの候補版と現行版の厳格比較','compare-progress');
+ const hint=add(card,'p',undefined,'decision-hint');
+ if(!eligible){
+   hint.textContent='次の判断：完了週に基づく有効回顧があと'+fmt(screen.remaining_qualifying_race_reviews)+'件、完了済み開催週があと'+fmt(screen.remaining_completed_meetings)+'週必要です。';
+ }else if(!paired.registered){
+   hint.textContent='次の判断：観測の整理条件はクリア。これから変更する評価項目と候補版を事前登録します。';
+ }else if(compareReady){
+   hint.textContent='次の判断：最低比較件数は達成。精度・副作用の監査後、A/B/C承認に進みます。';
+ }else{
+   hint.textContent='次の判断：厳格な新旧比較があと'+fmt(Math.max(0,target-paired.count))+'レース必要です。';
+ }
+ const arrival=forecastForTopic(d,[h.id],paired);
+ const timing=add(card,'div',undefined,'timing-row');
+ add(timing,'b','20件到達見込み');
+ const eta=add(timing,'span',arrival?'実績から推定：'+arrival.date:'実績からは未算出','timing-eta');
+ const pace=Math.max(1,Number($('scenarioPace').value)||3);
+ add(timing,'small',paired.registered?'週'+pace+'件なら約'+Math.ceil(Math.max(0,target-paired.count)/pace)+'開催週（仮定）':'候補版登録後に週'+pace+'件なら約'+Math.ceil(target/pace)+'開催週（仮定）');
+ const desc=add(card,'details',undefined,'road-details');
+ add(desc,'summary','改善案と検証方法を確認');
+ const detail=h.public_plan||{};
+ const pairs=[['検討していること',detail.question||h.investigation],['変更案',detail.considering||'今後具体化'],['次に用意するデータ',detail.data_needed||'発走前根拠'],['判断する指標',detail.success_metric||'比較条件を定義'],['次の作業',detail.next_step||'候補版登録']];
+ pairs.forEach(([name,value])=>{const item=add(desc,'div',undefined,'details-pair');add(item,'b',name);add(item,'span',value)});
+ const src=add(desc,'details');
+ add(src,'summary','証拠レースIDを見る');
+ const ul=add(src,'ul');
+ (h.observation_races||[]).forEach(r=>add(ul,'li',r.race_id));
+}
+function verifiedCollection(data){
+ const ids=new Set(),regimes={};
+ Object.values(data.collection_runs||{}).forEach(run=>{
+   const races=run.complete_evidence_race_ids||[];
+   if(!run.proof_commit||!Array.isArray(races)||
+      !Number.isInteger(run.complete_evidence_races)||
+      run.complete_evidence_races<=0||
+      run.complete_evidence_races!==run.prerace_proof_valid_races||
+      races.length!==run.complete_evidence_races)return;
+   races.forEach(id=>{if(id)ids.add(String(id))});
+   Object.entries(run.regimes||{}).forEach(([name,x])=>{
+      if(!regimes[name])regimes[name]={races:0,horses:0};
+      regimes[name].races+=Number(x.races)||0;
+      regimes[name].horses+=Number(x.horse_observations)||0;
+   });
+ });
+ return {raceIds:[...ids].sort(),regimes};
+}
+function studyCard(d,s,collection){
+ const card=add($('studyRoadmaps'),'article',undefined,'road-card study-road');
+ const next=s.next_decision||{},goal=s.diagnostic_initial_target||{};
+ const aggregate=collection.regimes[(s.id||'').replace('experience_','').toUpperCase()]||{races:0,horses:0};
+ const target=Math.max(1,Number(goal.win_probability_cases)||30);
+ const valid=Math.min(Number(s.strict_win_probability_observations)||0,Number(s.strict_top3_probability_observations)||0);
+ const researchReady=valid>=target&&goal.minimum_data_counts_observed===true&&!goal.needs_record_level_overlap_and_proof_audit;
+ const paired=pairForTopic(d,[s.id,'field_experience']);
+ const pairTarget=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
+ const current=researchReady?(paired.registered?(paired.count>=pairTarget?4:3):2):1;
+ const header=add(card,'div',undefined,'card-head');
+ const titles=add(header,'div');
+ add(titles,'small','戦歴別の発走前Shadow研究','card-kicker');
+ add(titles,'h3',s.title);
+ add(header,'span',researchReady?'比較検討へ':'予測精度の証拠を収集中','stage-label');
+ phaseTrack(card,['観測を蓄積','確率と結果を照合','初期研究診断','新旧20件比較','正式採用の審査'],current);
+ const actual=add(card,'div',undefined,'evidence-layout');
+ const left=add(actual,'div',undefined,'evidence-actual');
+ add(left,'b','収集済みの発走前データ');
+ add(left,'strong',fmt(aggregate.races)+'レース・'+fmt(aggregate.horses)+'頭分','value');
+ add(left,'small','原本固定した研究観測。複数群に同じレースが現れる場合あり');
+ const right=add(actual,'div',undefined,'evidence-confirmed');
+ add(right,'b','公式結果まで回顧した実績');
+ add(right,'strong',fmt(s.cumulative_reviewed_horse_observations)+'頭分・'+fmt(s.cumulative_weeks_with_observations)+'週','value');
+ add(right,'small','着順データはあるが、確率予測の正しさはまだ判定できません');
+ const rows=add(card,'div',undefined,'progress-pair');
+ progress(rows,s.strict_win_probability_observations,target,'勝率の発走前予測＋結果の照合','research-prob');
+ progress(rows,s.strict_top3_probability_observations,goal.top3_probability_cases||30,'3着内確率の発走前予測＋結果の照合','research-prob');
+ const mini=add(card,'div',undefined,'comparison-mini');
+ progress(mini,paired.count,pairTarget,'この研究に関連する候補版の厳格比較');
+ const hint=add(card,'p',undefined,'decision-hint');
+ hint.textContent='次の判断：有効な確率予測データがあと'+fmt(next.win_probability_horse_records_remaining)+'頭分（勝率）、'+fmt(next.top3_probability_horse_records_remaining)+'頭分（3着内）必要です。';
+ const timing=add(card,'div',undefined,'timing-row');
+ add(timing,'b','初期診断までの概算');
+ const remaining=Math.max(0,Number(next.win_probability_horse_records_remaining)||0,Number(next.top3_probability_horse_records_remaining)||0);
+ const minRaces=Math.max(1,Number(next.minimum_distinct_new_qualifying_races)||3);
+ const estimatedRaces=aggregate.horses>0&&aggregate.races>0?
+   Math.max(minRaces,Math.ceil(remaining*aggregate.races/aggregate.horses)):null;
+ add(timing,'span',estimatedRaces===null?'試算不可':'あと約'+fmt(estimatedRaces)+'レース〈推定〉','timing-eta');
+ add(timing,'small','過去の群別観測ペースから換算。3レース以上・2週以上の条件と発走前証拠の突合も必要');
+ const details=add(card,'details',undefined,'road-details');
+ add(details,'summary','どのように改善案につなげる？');
+ const plan=s.public_plan||{};
+ [['調べたいこと',plan.question||s.investigation],['調査方法',plan.test||'精度・確率校正を比較'],['次にすること',plan.next||'発走前予測確率を記録']].forEach(([k,v])=>{
+   const line=add(details,'div',undefined,'details-pair');add(line,'b',k);add(line,'span',v);
+ });
+}
+async function render(){
+ const [response,source]=await Promise.all([
+    fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'}),
+    fetch('data/experience_regime_status.json',{cache:'no-store'})
+ ]);
+ if(!response.ok||!source.ok)throw Error('必要な発走前実績データを取得できません');
+ const d=await response.json();
+ const researchSource=await source.json();
+ const collection=verifiedCollection(researchSource);
+ if(d.schema_version!==1||!d.formal||!d.research||!d.public_roadmap)throw Error('集計データの形式が違います');
+ const studies=d.research.regimes||[],themes=d.formal.hypotheses||[];
+ const horseTotal=Object.values(collection.regimes).reduce((n,x)=>n+x.horses,0);
+ // Count prestart-verified unique race IDs, never E0+E1+E2 race totals.
+ const researchRaceCount=collection.raceIds.length;
+ $('formalReviews').textContent=fmt(d.formal.strict_verified_reviews)+'レース';
+ $('researchRaces').textContent=fmt(researchRaceCount)+'レース';
+ $('researchHorses').textContent=fmt(horseTotal)+'頭分';
+ $('registeredTrials').textContent=fmt(d.experiments?.length||0)+'件';
+ $('dataDistinction').textContent='正式回顧の調査テーマと戦歴別研究は別集計。テーマ間・戦歴区分間の重複レースは合計していません。';
+ $('topConclusion').textContent='正式回顧 '+fmt(d.formal.strict_verified_reviews)+'レース、戦歴研究 '+fmt(researchRaceCount)+'レース・延べ'+fmt(horseTotal)+'頭分を収集。改善テーマごとに次の条件と比較の不足数を確認できます。';
+ function updateRoads(){
+   $('topicRoadmaps').replaceChildren();$('studyRoadmaps').replaceChildren();
+   themes.forEach(x=>topicCard(d,x));
+   studies.forEach(x=>studyCard(d,x,collection));
+ }
+ $('scenarioPace').addEventListener('change',updateRoads);
+ updateRoads();
+ $('researchGaps').textContent='注意：戦歴研究の発走前情報が正式Grade A側で不足している '+fmt(d.research.evidence_gap_count)+'ケースは、過去の予想を後から修正して合格扱いにしません。正式予想への自動昇格もしません。';
+ const labels={no_change:'現行版を維持',not_evaluated:'回顧が揃っておらず保留',pending_A_B_C_approval:'承認待ち'};
+ (d.formal.meetings||[]).forEach(w=>{
+   const row=add($('weekly'),'article',undefined,'week');
+   add(row,'b',(w.dates||[]).join('・'));
+   add(row,'strong',fmt(w.reviewed)+' / '+fmt(w.expected)+'レース');
+   const p=add(row,'progress');p.value=w.reviewed;p.max=Math.max(1,w.expected);
+   add(row,'span',labels[w.formal_improvement_decision]||w.formal_improvement_decision,'fine');
+ });
+ $('loading').hidden=true;$('main').hidden=false;
+}
+render().catch(e=>{$('loading').className='error-block';$('loading').textContent='表示できません：'+e.message});
+</script>
+<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+</body>
+</html>
