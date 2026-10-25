@@ -68,7 +68,7 @@ jobs:
             const p=actual.plan;
             assert.equal(p.purchase_strategy_version,'v3.16');
             assert.equal(p.status,'pending_git_proof');
-            assert.equal(p.full_refresh_odds.quote_count,input.market_quotes.length);
+            assert.equal(p.full_refresh_odds.quote_count,testFresh.market_quotes.length);
             assert.equal(p.source_prediction_sha256,prior.source_prediction_sha256);
             assert.equal(p.source_purchase_proof,prior.proof_commit);
             assert(p.total_stake_yen>=prior.total_stake_yen&&p.total_stake_yen<=6000);
