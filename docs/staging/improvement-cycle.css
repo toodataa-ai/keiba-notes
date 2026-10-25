@@ -107,3 +107,119 @@ footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:11px;paddin
 .progress-pair{grid-template-columns:1fr}.timing-row{grid-template-columns:1fr}.timing-eta{text-align:left}
 .card-head h3{font-size:17px}
 }
+
+/* STAGING ONLY — v5 layered-contrast facelift, 2026-10-25.
+   Separate page / section / card surfaces. Existing structure, bars, proof gates
+   and production presentation are intentionally untouched. */
+:root{
+  color-scheme:light;
+  --bg:#eae1e6;
+  --panel:#ffffff;
+  --border:#bbaab5;
+  --muted:#534954;
+  --rose:#952947;
+  --cyan:#176b80;
+  --ink:#25202b;
+  --section:#f7f2f5;
+  --outline:#b9a7b4;
+  --soft-shadow:0 6px 17px rgba(43,25,39,.105),0 1px 3px rgba(43,25,39,.075);
+}
+body{background:var(--bg);color:var(--ink)}
+a{color:#8c2846}
+a:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid #b63560;outline-offset:3px}
+.hero{border-bottom:2px solid #c9b6c2;padding-bottom:30px}
+nav a{border-color:#bfaeb9;background:#fff;color:#493340;font-weight:750;box-shadow:0 1px 3px rgba(43,25,39,.08)}
+nav a:hover{border-color:#a52e4e;background:#fff6f9}
+.eyebrow,.section-name{color:#8b2541}
+.lead,.intro{color:#514853}
+.lead strong,.intro strong{color:#24202a}
+.hero-callout{background:#fff;border:1.5px solid #c9a9b8;border-left:5px solid #a42b50;box-shadow:var(--soft-shadow)}
+.hero-callout b{color:#852a45}
+.hero-callout small{color:#564955}
+.section{
+  background:var(--section);
+  border:1.5px solid #cfbec9;
+  border-radius:20px;
+  box-shadow:0 2px 8px rgba(39,20,35,.045);
+  margin-top:23px;
+  padding:25px 23px 27px;
+}
+.section-name{letter-spacing:.03em}
+.metric,.road-card,.week,.decision-row>div,.sources{
+  background:#fff;
+  border:2px solid var(--outline);
+  box-shadow:var(--soft-shadow);
+  color:var(--ink);
+}
+.metric{border-top:4px solid #a52a4b}
+.metric span{color:#504550}
+.metric strong{color:#261b2a}
+.metric small,.small-note{color:#615661}
+.scenario-bar{background:#fff;border:1.5px solid #bea7b6;box-shadow:0 2px 7px rgba(43,25,39,.065)}
+.scenario-bar b{color:#3d2c39}
+.scenario-bar small{color:#655663}
+.scenario-bar label{color:#773b53;font-weight:750}
+.scenario-bar select{color:#2c2230;border:1.5px solid #9f7e91;background:#fff}
+.legend{color:#554b55}
+.legend-done{background:#a79aa6}
+.legend-now{background:#a52c50}
+.legend-future{background:#e9e4ea;border:1.5px solid #a99ba8}
+.road-card{border-radius:16px;border-top:5px solid #a42b50;padding:18px 19px 20px}
+.topic-road{border-top-color:#a42b50}
+.study-road{border-top-color:#187d93}
+.road-card:hover{border-color:#998390;border-top-color:#952947;box-shadow:0 9px 21px rgba(43,25,39,.15)}
+.study-road:hover{border-top-color:#187d93}
+.card-kicker{color:#893451}
+.study-road .card-kicker{color:#14647a}
+.card-head h3{color:#211e29}
+.stage-label{background:#fff0f5;color:#872743;border-color:#b84c6c}
+.study-road .stage-label{background:#e5f5f8;border-color:#4a9aae;color:#15596b}
+.track-step{background:#ebe6ec;color:#463b47}
+.track-step.is-done{background:#ded4db;color:#443140}
+.track-step.is-current{background:#a32b50;color:#fff}
+.study-road .track-step.is-current{background:#18778b;color:#fff}
+.track-step.is-future{color:#4d4450}
+.track-kicker{color:#753d53}
+.track-step.is-current .track-kicker{color:#fff1f5}
+.study-road .track-step.is-current .track-kicker{color:#e8fbff}
+.track-step.is-future .track-kicker{color:#756a75}
+.evidence-actual,.evidence-confirmed{background:#fff4f7;border:1.5px solid #d3aebb;color:#241d27}
+.evidence-confirmed{background:#f0f6f9;border-color:#acc7d1}
+.evidence-layout b{color:#87334c}
+.study-road .evidence-layout b{color:#155f71}
+.evidence-layout .value{color:#211d27}
+.evidence-layout small{color:#605762}
+.data-progress{border:1.5px solid #d0c2cb;background:#faf8fa}
+.progress-head{color:#4d4250}
+.progress-head b{color:#7b2946}
+progress{accent-color:#b43a5f}
+.study-road progress{accent-color:#167d92}
+.comparison-mini .data-progress{background:#f4f0f6;border-color:#cec2d1}
+.decision-hint{background:#fff1f5;border-left:4px solid #ad3b5e;color:#692641}
+.study-road .decision-hint{background:#e7f6f9;border-color:#198099;color:#175e73}
+.timing-row b{color:#793449}
+.study-road .timing-row b{color:#146679}
+.timing-eta{color:#271e29}
+.timing-row small{color:#5e5360}
+.road-details{border-top-color:#d1c3cc}
+summary{color:#832947}
+.road-details>.details-pair{border-left-color:#b28298}
+.details-pair b{color:#823350}
+.details-pair span{color:#3f3540}
+.road-details ul{color:#534856}
+.study-road summary,.study-road .details-pair b{color:#176d81}
+.warning-note{background:#fff4f3;border:1.5px solid #c9999b;color:#703a3d}
+.week{border-left:5px solid #67798c;border-radius:13px}
+.week .fine{color:#694a61}
+.decision-row>div{border-radius:12px;border-top:4px solid #9a566f}
+.decision-row b{color:#87334e}
+.decision-row p{color:#524753}
+.sources{border-radius:14px;color:#514651}
+.error-block{background:#fff0f2;border:1.5px solid #b85a70;color:#75283e}
+footer{color:#5e5260}
+@media(max-width:550px){
+  .section{margin-top:16px;padding:17px 12px 20px;border-radius:15px}
+  .road-card{padding:13px 12px 16px}
+  .metric{border-width:1.5px;border-top-width:4px}
+  .evidence-layout{gap:7px}
+}
