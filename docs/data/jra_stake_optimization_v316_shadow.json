@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "proposal_version": "v3.16-shadow-v1",
+  "created_date_jst": "2026-10-25",
+  "status": "SHADOW_RESEARCH_ONLY_NOT_APPROVED_FOR_PRODUCTION",
+  "problem": "v3.15 uses exactly 100 yen per ticket for all JRA main race purchase commands; 100 yen is the minimum JRA unit, not generally the optimal capital allocation.",
+  "scope": "STEP2 variable-stake research after the existing v3.15 frozen purchase set; no STEP1/marks, actual quotes, selection or operation-count changes.",
+  "objective": "Maximize modeled CENTRAL expected net profit among bounded JRA purchase-command-level 100-yen stake grids, subject to low-scenario profit and modeled net-loss-probability gates. No claim of globally optimal ticket selection or model calibration.",
+  "safeguards": {
+    "original_immutable": true,
+    "no_use_of_postrace_information": true,
+    "models": [
+      "v3.13 SHA-pinned prereace joint finish outcome distributions",
+      "v3.15 published purchase commands and quotes"
+    ],
+    "proof_chain": "v3.13 prediction SHA256+Git proof must match sealed v3.15 source SHA256+proof; recompute exact v3.15 published baseline portfolio statistics",
+    "purchased_ticket_identity": "no deletion, substitution or new tickets; duplicate-free verified official odds only",
+    "purchase_command_limit": "same maximum 3 regular and optional one medium + one large",
+    "stake_size": "100-yen increments per entire purchase command, uniform across expanded combination tickets",
+    "side_ticket_handling": "both speculative 中穴 and 大穴 remain 100 yen, no staking up",
+    "budget_total_yen": 6000,
+    "max_regular_per_line_yen": 300,
+    "max_added_total_exposure_yen": 600,
+    "max_total_outlay_ratio_to_baseline": 1.5,
+    "baseline_central_net_loss_probability": "may not increase",
+    "baseline_low_net_loss_probability": "may increase by at most 0.5 percentage points",
+    "baseline_low_scenario_expected_net_profit": "may not decrease",
+    "minimum_candidate_gain_expected_net_profit_yen": 10,
+    "no_forced_purchase": true,
+    "unspent_money": "left unspent when no candidate passes safety gates",
+    "deployment": "none: no change to canonical races.json or formal request, prediction, HTML, PDF, Git proof or public site"
+  },
+  "benchmark": {
+    "frozen_races_jst": "2026-10-25",
+    "venue_main_races": [
+      "Niigata 11R",
+      "Kyoto 11R",
+      "Tokyo 11R"
+    ],
+    "runner": ".github/scripts/jra-replay-stake-v316-20261025.mjs",
+    "tests": ".github/scripts/test-jra-stake-v316-shadow.mjs",
+    "optimizer": ".github/scripts/jra-stake-optimizer-v316-shadow.mjs",
+    "future_milestones": [
+      "Run synthetic invariant and proof-chain tests and three frozen prestart replay comparisons, logging stake, central/low EV, central/low loss probability, hit probability and exact JRA purchase command unit prices.",
+      "Independently validate replays on multiple previous JRA weeks; evaluate calibration error and how results change with lower/upper outcome-scenario probabilities.",
+      "Assess out-of-sample realized performance only after races finish, without using results to rewrite prestart predictions or shadow stakes.",
+      "Propose formal promotion only after safety and regression gates pass, with user approval for affected purchase-policy changes. Retain historical versions unchanged."
+    ],
+    "formal_promotion_requires": "explicit follow-up approval and new versioned implementation after multi-week study; do not silently activate the candidate",
+    "insufficient_evidence": "one day / three races are a smoke test, not evidence that the staking policy consistently performs better"
+  }
+}
