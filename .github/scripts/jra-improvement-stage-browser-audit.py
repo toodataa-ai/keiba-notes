@@ -36,6 +36,7 @@ with sync_playwright() as pw:
         assert call.count()==1,(entry_width,"missing milestone card")
         assert "マイルストン" in call.inner_text(),(entry_width,call.inner_text())
         assert call.get_attribute("href")=="staging/improvement-cycle.html"
+        entry.screenshot(path=f"/tmp/jra-improvement-stage-home-{entry_width}.png",full_page=True)
         call.click()
         entry.wait_for_url("**/staging/improvement-cycle.html",timeout=15000)
         entry.wait_for_function("document.querySelector('#main')?.hidden===false",timeout=15000)
@@ -43,6 +44,7 @@ with sync_playwright() as pw:
         assert entry.locator("#studyRoadmaps .road-card").count()==3
         entry.goto("http://127.0.0.1:8765/staging/roadmap.html",wait_until="load",timeout=25000)
         assert entry.locator("#liveMilestoneHeading").count()==1
+        entry.screenshot(path=f"/tmp/jra-improvement-stage-legacy-roadmap-{entry_width}.png",full_page=False)
         entry.locator("#live-milestones a[href='staging/improvement-cycle.html']").click()
         entry.wait_for_url("**/staging/improvement-cycle.html",timeout=15000)
         assert entry.locator("#roadmapsTitle").is_visible()
