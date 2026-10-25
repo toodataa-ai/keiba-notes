@@ -48,7 +48,8 @@ jobs:
               sample=r['clock_changes'][0]['clock']
               assert sample in content,(p,sample)
               assert all(c['clock'] in content for c in r['clock_changes']),p
-              assert '予想' in content,('Japanese PDF glyph extraction failed',p)
+              expected_names={'2026-10-12-swan-stakes':'スワンステークス', '2026-10-17-hokuriku-stakes':'北陸ステークス', '2026-10-25-lumiere-autumn-dash':'ルミエールオータムダッシュ'}
+              assert expected_names[r['race_id']] in ''.join(content.split()),('Japanese PDF glyph extraction failed',p)
               print('STAGE_PDF_OK',r['race_id'],len(pdf),'pages',r['clock_change_count'],'corrections')
           PY
       - uses: actions/upload-artifact@v4
