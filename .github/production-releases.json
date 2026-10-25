@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.04-20261013",
-  "current_public_version": "1.04",
+  "current_public_release": "release/jra-site-v1.05-20261025",
+  "current_public_version": "1.05",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -75,6 +75,27 @@
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
       "staging_identity_not_in_production": true
+    },
+    {
+      "release_id": "release/jra-site-v1.05-20261025",
+      "branch": "release/jra-site-v1.05-20261025",
+      "commit_sha": "5a965e994667b0454ac71a1c2cd5f023e0917f64",
+      "deployed_at": "2026-10-25T12:54:20+09:00",
+      "workflow_run_id": 40159893108,
+      "validation_workflow_run_id": 40159883137,
+      "public_version": "1.05",
+      "note": "2026-10-25ユーザー明示承認済み。改善テーマ別ロードマップを本番公開。背景・セクション・カードの境界とアクセント色を改善し、Meiryo UIを全表示要素で優先。トップとブラッシュアップ思想ページからの導線を整備。Chrome 7画面幅・矢羽・数値・原本不変・公開HTML/CSS 4ファイルのHTTPバイト一致を検証。発走前予想、印、買い目、実オッズ、回顧、証拠、PDF、正式データは不変。",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/roadmap.html",
+        "docs/improvement-cycle.html",
+        "docs/assets/improvement-cycle.css"
+      ],
+      "public_http_files_verified": 4
     }
   ]
 }
