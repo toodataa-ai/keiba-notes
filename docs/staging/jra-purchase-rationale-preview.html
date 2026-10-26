@@ -30,67 +30,127 @@ td:last-child,th:last-child{text-align:right}
 .error{padding:12px;background:#fff4ee;color:#873e16;border:1px solid #eac0a7}
 @media(max-width:620px){main{margin-top:12px}.paper{padding:20px 15px;min-height:unset}h1{font-size:22px}.stat b{font-size:14px}.stat{padding:8px}.column{padding:12px}.stat small{font-size:10px}}
 @media print{@page{size:A4 portrait;margin:12mm 13mm 13mm}body{background:white}header,.controls,.notice{display:none}.paper{border:0;box-shadow:none;min-height:0;padding:0;max-width:none}main{margin:0;padding:0}.column{break-inside:avoid}}
+
+.compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}
+.compare>div{background:#fff;border:1px solid #dacbd1;border-radius:6px;padding:8px 9px;min-width:0}
+.compare small{display:block;font-size:10px;color:#6e4452}
+.compare strong{display:block;font-size:19px;color:#74223e;font-variant-numeric:tabular-nums}
+.highlight{background:#fff;border-radius:8px;padding:10px 12px;margin:10px 0;border:1px solid #ead8de}
+.highlight b{font-size:15px;color:#74223e}.highlight p{margin:5px 0 0}
+.description{margin:7px 0;font-size:13px}
+table td:nth-child(2){word-break:break-word}
+.positive{color:#8b2340;font-weight:800}
+.secondary-note{color:#576373;font-size:11px}
+@media(max-width:620px){.compare strong{font-size:16px}.compare>div{padding:7px 6px}table{font-size:11px}th,td{padding:5px 3px}}
+
 </style>
 </head>
 <body>
 <header><strong>JRA 買い目の判断理由・妙味解説</strong><span>STAGING / 表示案・未承認</span></header>
 <main>
 <div class="controls"><label for="race">表示するレース：</label><select id="race"><option>公開データを確認中…</option></select></div>
-<p class="notice">現在公開中の発走前固定データをもとにしたコラムのプレビューです。結果・払戻・回顧情報は生成に使用しません。正式HTML・PDFや買い目は変更していません。</p>
+<p class="notice">正式に固定した買い目・馬名・能力根拠とモデル確率から期待値を再計算したプレビューです。結果・払戻・回顧は参照しません。正式HTML・PDF・買い目は不変です。</p>
 <section class="paper" id="paper"><p>読み込み中…</p></section>
 </main>
 <script>
 (function(){
 "use strict";
-var raceSelect=document.getElementById("race"),paper=document.getElementById("paper"),rows=[];
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function yen(n){return Number(n).toLocaleString("ja-JP")+"円"}
-function odds(n){return Number(n).toLocaleString("ja-JP",{maximumFractionDigits:1})+"倍"}
-function percent(n){return (Number(n)*100).toFixed(1)+"%"}
-function line(t){return t.type+" "+(t.selection||[]).join(t.type==="馬単"||t.type==="三連単"?"→":"－")}
-function valid(r){return r&&r.scope==="jra-main"&&r.purchase_decision==="buy"&&Array.isArray(r.final_bets)&&r.final_bets.length>0&&/^[a-f0-9]{40}$/.test(r.proof_commit||"")&&r.e2e_prediction&&r.purchase_risk_metrics&&r.date}
+const raceSelect=document.getElementById("race");
+const paper=document.getElementById("paper");
+const evidenceFile="jra-bet-rationale-evidence-v2.json";
+const cap=12;
+let rows=[],records={};
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const yen=n=>Math.round(Number(n)).toLocaleString("ja-JP")+"円";
+const odds=n=>Number(n).toLocaleString("ja-JP",{maximumFractionDigits:1})+"倍";
+const pct=(v,d=2)=>(Number(v)*100).toFixed(d)+"%";
+const typeJoin=t=>t.type==="馬単"||t.type==="三連単"?" → ":" － ";
+const finite=n=>typeof n==="number"&&Number.isFinite(n);
+const key=t=>String(t.type)+":"+JSON.stringify(t.selection||[]);
+const ratio=n=>Number(n).toFixed(2)+"倍";
+function error(message){paper.innerHTML='<p class="error">'+esc(message)+'</p>';}
+function jstDate(iso){if(!iso)return"不明";let d=new Date(iso);return Number.isNaN(d.getTime())?"不明":d.toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});}
 function render(r){
-var bets=r.final_bets,invest=bets.reduce(function(s,t){return s+Number(t.stake_yen||0)},0);
-var risk=r.purchase_risk_metrics||{};
-if(invest!==Number(risk.stake_yen)||bets.some(function(b){return !b.quote_verified||!Array.isArray(b.selection)||!b.selection.length||!Number.isFinite(Number(b.stake_yen))})){
- paper.innerHTML='<p class="error">表示を中止しました。発走前の固定買い目・購入金額・実測オッズの監査条件を満たしていません。</p>';return;
+ const evidence=records[r.id];
+ if(!evidence || evidence.purchase_proof!==r.proof_commit || evidence.purchase_version!==r.purchase_strategy_version){
+  error("発走前固定原本との対応が確認できないため、数値解説は表示できません。");return;
+ }
+ const bets=r.final_bets||[], modelLines=evidence.tickets||[];
+ const total=bets.reduce((sum,b)=>sum+Number(b.stake_yen||0),0);
+ const base=r.purchase_risk_metrics||{};
+ const isMatch=bets.length===modelLines.length && bets.every((b,i)=>key(b)===key(modelLines[i])&&b.quote_verified===true&&Number.isInteger(b.stake_yen)&&b.stake_yen>0);
+ if(!isMatch||total!==Number(base.stake_yen)){error("正式買い目・オッズ証跡・金額の一致検証に失敗したため解説を停止しました。");return;}
+ const horseMap=new Map((evidence.horse_profiles||[]).map(h=>[Number(h.horse_number),h]));
+ const h=n=>horseMap.get(Number(n))||null;
+ const person=n=>{const x=h(n);return x?x.horse_number+"番 "+x.horse_name:n+"番（馬名未確認）";};
+ const marked=n=>{const x=h(n);return x?x.mark+x.horse_number+" "+x.horse_name+"（"+x.overall_grade+"）":person(n);};
+ const ticketName=t=>(t.selection||[]).map(person).join(typeJoin(t));
+ const modelBets=bets.map((b,i)=>{
+  const item=modelLines[i],p=item?.probability_scenarios?.central;
+  const price=finite(b.market_odds)&&b.market_odds>0?b.market_odds:null;
+  const supported=finite(p)&&p>=0&&p<=1&&price!==null;
+  return {b,p,price,supported,threshold:supported?1/price:null,edge:supported?p*price:null,ev:supported?b.stake_yen*(p*price-1):null};
+ });
+ const usable=modelBets.filter(v=>v.supported).sort((a,b)=>b.b.stake_yen-a.b.stake_yen||b.ev-a.ev);
+ if(!usable.length){error("組番単位の確率と実測オッズが揃っていないため、期待値を数値表示できません。");return;}
+ const main=usable[0],mb=main.b,head=h(mb.selection[0]),second=mb.selection.length>1?h(mb.selection[1]):null;
+ const bestWin=modelBets.find(x=>x.b.type==="単勝"&&x.b.selection[0]===mb.selection[0]&&x.supported)||
+   modelBets.find(x=>x.b.type==="単勝"&&x.supported);
+ const topHorse=(evidence.horse_profiles||[]).find(x=>x.mark==="◎");
+ const topLine=topHorse?"◎"+topHorse.horse_number+"番 "+topHorse.horse_name+"（"+topHorse.overall_grade+"／モデル勝率"+pct(topHorse.win_probability,1)+"）":"◎の評価データなし";
+ const pMain=pct(main.p,main.p<0.01?3:2),pBreak=pct(main.threshold,main.threshold<0.01?3:2);
+ const spread=main.edge.toFixed(2), expected=yen(main.ev);
+ const oddsTime=jstDate(mb.observed_at);
+ const contentRisk=finite(base.modeled_net_loss_probability)?pct(base.modeled_net_loss_probability,1):"未評価";
+ const contentHit=finite(base.modeled_union_hit_probability)?pct(base.modeled_union_hit_probability,1):"未評価";
+ const formalProfit=finite(base.modeled_expected_net_profit_yen)?yen(base.modeled_expected_net_profit_yen):"未評価";
+ const rowsHtml=modelBets.slice(0,8).map(x=>{
+  const b=x.b;return '<tr><td>'+esc(b.type)+'</td><td>'+esc(ticketName(b))+'</td><td>'+esc(Array.isArray(b.market_odds)?b.market_odds.join("〜")+"倍":finite(b.market_odds)?odds(b.market_odds):"未評価")+'</td><td>'+esc(yen(b.stake_yen))+'</td></tr>';
+ }).join("");
+ const extra=bets.length>8?'<p class="secondary-note">一覧は先頭8点を抜粋。残り'+(bets.length-8)+'点を含む全買い目は正式レポートを参照してください。</p>':"";
+ const boughtNum=bets.filter(b=>b.selection.includes(mb.selection[0])).length;
+ const headline='<div class="highlight"><b>'+esc(mb.type+" "+ticketName(mb))+'</b>'+
+  '<p>発走前実測オッズ <strong>'+esc(odds(main.price))+'</strong> に対し、モデル推定的中率は <strong>'+esc(pMain)+'</strong>。'+
+  '損益分岐点 '+esc(pBreak)+' と比較すると <strong>'+esc(spread)+'倍</strong> の確率評価。'+
+  esc(yen(mb.stake_yen))+'購入時のモデル期待純利益は <strong class="positive">'+esc((main.ev>=0?"+":"")+expected)+'</strong> です。</p></div>';
+ const profile=head?(head.horse_name+"はSTEP1で"+head.mark+"・総合"+head.overall_grade+"。"+(head.evidence_summary||"個別実績の根拠は未記録")+"。"):"";
+ const teammate=second?(second.horse_name+"は"+second.mark+"・総合"+second.overall_grade+"。"+(second.evidence_summary||"個別実績の根拠は未記録")+"。"):"";
+ const singleWin=bestWin?'<dt>単勝でも確認できる評価差</dt><dd>'+esc(person(bestWin.b.selection[0]))+'の単勝'+esc(odds(bestWin.price))+'は損益分岐勝率'+esc(pct(bestWin.threshold))+'。固定モデル勝率'+esc(pct(bestWin.p))+'との比較は'+esc(ratio(bestWin.edge))+'で、100円当たりの推定期待純利益は'+esc((bestWin.p*bestWin.price-1>=0?"+":"")+yen(100*(bestWin.p*bestWin.price-1)))+'。高配当というだけではなく、モデル勝率が必要勝率を上回るかを判断材料としています。</dd>':"";
+ const stakeReason=main.b.stake_yen>100?
+  esc(mb.type+" "+ticketName(mb))+'には'+esc(yen(main.b.stake_yen))+'を配分。1点100円からの増額は固定された購入セットの金額であり、全点を一律に増額していません。':
+  '上記の買い目を含む採用組番について、発走前に固定された投資金額をそのまま表示しています。';
+ const why='<dl>'+
+  '<dt>① 能力の裏づけ｜馬名と実績</dt><dd>能力評価で最上位は'+esc(topLine)+'。一方、主力の'+esc(ticketName(mb))+'は必ずしも◎中心ではありません。'+esc(profile)+' '+esc(teammate)+'能力と人気を独立に評価するため、印と購入順位が異なる場合があります。</dd>'+
+  '<dt>② 妙味の数値根拠｜単なる高配当との違い</dt><dd>'+esc(ticketName(mb))+'が的中するモデル推定確率は'+esc(pMain)+'。'+esc(odds(main.price))+'で元本回収するために必要な確率'+esc(pBreak)+'を上回るため、現行の未校正モデルでは割安と判定されます。'+esc(yen(mb.stake_yen))+'の期待純利益は'+esc((main.ev>=0?"+":"")+yen(main.ev))+'。この推定は的中保証ではありません。</dd>'+
+  singleWin+
+  '<dt>③ 買い方と金額の意図</dt><dd>'+stakeReason+' 全'+bets.length+'点のうち'+esc(person(mb.selection[0]))+'を含む買い目は'+boughtNum+'点。購入総額は'+esc(yen(total))+'、セット全体のモデル期待純利益は'+esc(formalProfit)+'ですが、買い目同士の同時的中・資金損失も含めて評価が必要です。</dd>'+
+  '<dt>④ 想定が外れるリスク</dt><dd>本線'+esc(ticketName(mb))+'のモデル上の不的中確率は'+esc(pct(1-main.p,1))+'。セット全体でも推定的中確率'+esc(contentHit)+'に対し、実損確率は'+esc(contentRisk)+'です。未経験距離・前走の凡走・馬場や展開の不確実性などがあり、見積もった確率自体がずれるおそれがあります。</dd>'+
+  '</dl>';
+ paper.innerHTML='<div class="kicker">JRA 買い目の判断理由｜発走前固定データのみ</div>'+
+ '<h1>'+esc(r.venue)+" "+esc(r.race)+'</h1><div class="meta">'+esc(r.date)+' ／ 正式買い目 '+esc(r.purchase_strategy_version)+' ／ 購入額と確率の証拠を照合済み</div>'+
+ '<div class="statrow"><div class="stat"><small>購入額</small><b>'+yen(total)+'</b></div><div class="stat"><small>セット的中確率（推定）</small><b>'+esc(contentHit)+'</b></div><div class="stat"><small>実損確率（推定）</small><b>'+esc(contentRisk)+'</b></div></div>'+
+ '<h2>正式な買い目（馬名・馬番併記）</h2>'+
+ '<table><thead><tr><th>券種</th><th>馬番・馬名</th><th>オッズ</th><th>金額</th></tr></thead><tbody>'+rowsHtml+'</tbody></table>'+extra+
+ '<aside class="column"><h2>AIの馬券戦略・妙味解説</h2>'+headline+
+ '<div class="compare"><div><small>モデル推定的中率</small><strong>'+esc(pMain)+'</strong></div><div><small>損益分岐の的中率</small><strong>'+esc(pBreak)+'</strong></div><div><small>モデル上の妙味倍率</small><strong>'+esc(spread)+'倍</strong></div></div>'+
+ why+'</aside>'+
+ '<p class="footnote">数値の出典：GitHub発走前固定STEP1に基づく未校正の確率モデルと、正式買い目に記録された実測オッズ（上記主力の取得時刻：'+esc(oddsTime)+' JST）。モデル期待純利益＝購入金額×（モデル的中確率×オッズ－1）。損益分岐確率＝1÷オッズ。推定値は利益・的中を保証しません。結果・払戻・回顧情報は一切使用していません。</p>'+
+ '<p class="link"><a href="../'+encodeURI(r.report)+'" target="_blank" rel="noopener">正式な全買い目と全頭診断レポートを確認する</a></p>';
 }
-var bought=bets.filter(function(b){return b.market_odds!=null&&Number.isFinite(Number(b.market_odds))&&Number(b.market_odds)>0});
-var main=bets.slice().sort(function(a,b){return b.stake_yen-a.stake_yen})[0];
-var leadNo=main.selection[0];
-var nameMap=r.marks||{};
-var marks=["◎","○","▲"].map(function(sym,i){return sym+String(nameMap[["win","second","third"][i]]||"—")}).join(" ／ ");
-var topBuy=bets.filter(function(b){return b.selection.includes(leadNo)}).length;
-var big=bought.slice().sort(function(a,b){return Number(b.market_odds)-Number(a.market_odds)})[0];
-var statHtml='<div class="statrow">'+
-'<div class="stat"><small>購入予定額</small><b>'+yen(invest)+'</b></div>'+
-'<div class="stat"><small>推定・1点以上の的中確率</small><b>'+(risk.modeled_union_hit_probability==null?"未評価":percent(risk.modeled_union_hit_probability))+'</b></div>'+
-'<div class="stat"><small>推定・実損確率</small><b>'+(risk.modeled_net_loss_probability==null?"未評価":percent(risk.modeled_net_loss_probability))+'</b></div></div>';
-var preview=bets.slice(0,8).map(function(b){return '<tr><td>'+esc(b.type)+'</td><td>'+esc(b.selection.join(b.type==="馬単"||b.type==="三連単"?"→":"－"))+'</td><td>'+(b.market_odds==null?"未評価":esc(odds(b.market_odds)))+'</td><td>'+yen(b.stake_yen)+'</td></tr>'}).join("");
-var remaining=bets.length>8?'<p class="footnote">残り'+(bets.length-8)+'点の正式な組番と購入金額は既存レポートに掲載しています。省略分を購入対象外とは扱いません。</p>':"";
-var highOdds=big?line(big)+"（確認オッズ "+odds(big.market_odds)+"）":"実測価格が確認できる買い目なし";
-var allocation=invest&&main.stake_yen>100?"最も厚く配分したのは"+line(main)+"の"+yen(main.stake_yen)+"。他の採用買い目と差をつけています。":"買い目ごとの配分は原則100円で、検証条件を満たさない増額はしていません。";
-var profit=risk.modeled_expected_net_profit_yen==null?"未評価":yen(risk.modeled_expected_net_profit_yen);
-var riskText=risk.modeled_net_loss_probability==null?"損失確率は未評価です。":"モデル上の実損確率は"+percent(risk.modeled_net_loss_probability)+"。";
-var report=r.report?'<p class="link"><a href="../'+encodeURI(r.report)+'" target="_blank" rel="noopener">既存の正式な買い目・全頭診断レポートを見る</a></p>':"";
-paper.innerHTML='<div class="kicker">JRA 正式購入セット／判断理由表示案</div>'+
-'<h1>'+esc(r.venue)+' '+esc(r.race)+'</h1><div class="meta">'+esc(r.date)+'　発走前固定買い目を使用／事後結果は参照しない</div>'+
-statHtml+'<h2>買い目（正式な固定データ）</h2>'+
-'<table><thead><tr><th>券種</th><th>馬番</th><th>実測オッズ</th><th>購入額</th></tr></thead><tbody>'+preview+'</tbody></table>'+remaining+
-'<aside class="column"><h2>AIの馬券戦略・妙味解説</h2><dl>'+
-'<dt>能力評価と購入判断</dt><dd>STEP1の上位評価は '+esc(marks)+'。印は実オッズで変更していません。一方、購入額が最大の買い目は'+esc(line(main))+'です。能力順位と購入順位は同じとは限らず、STEP2ではオッズと期待値を別途比較しています。</dd>'+
-'<dt>どこに妙味を見たか</dt><dd>採用した組番のうち、実測オッズが最も高いのは'+esc(highOdds)+'。ただし高配当だけで妙味があるとは断定せず、正式な採否は確率モデルと市場価格の比較結果に従います。購入セット全体のモデル期待純利益は'+esc(profit)+'です（未校正の推定値）。</dd>'+
-'<dt>買い方・資金配分</dt><dd>'+esc(allocation)+' '+leadNo+'番を含む買い目は全'+bets.length+'点中'+topBuy+'点です。総額'+yen(invest)+'に抑え、券種・点数・配分のバランスを判断しました。</dd>'+
-'<dt>今回のリスク</dt><dd>'+esc(riskText)+' 特定の馬に購入が集中した場合、その馬が崩れる展開に弱くなります。発走前オッズは変動し、推定的中確率・期待利益は保証値ではありません。</dd>'+
-'</dl></aside>'+
-'<p class="footnote">編集ルール：発走前にGitHubで固定された組番・オッズ・購入額・STEP1印と購入セット指標だけを要約。個別の馬券に確率根拠がない場合は「割安」「プラス期待値」と断言しない。結果を見て文章や買い目を後付け変更しない。</p>'+report;
-}
-fetch("../data/races.json",{cache:"no-store"}).then(function(res){if(!res.ok)throw Error("HTTP "+res.status);return res.json()}).then(function(doc){
- rows=(doc.races||[]).filter(valid).sort(function(a,b){return b.date.localeCompare(a.date)||String(a.id).localeCompare(String(b.id))}).slice(0,12);
- if(!rows.length)throw Error("対象の発走前固定データが見つかりません");
- raceSelect.innerHTML=rows.map(function(r,i){return '<option value="'+i+'">'+esc(r.date+" "+r.venue+" "+r.race)+'</option>'}).join("");
- raceSelect.addEventListener("change",function(){render(rows[Number(raceSelect.value)])});render(rows[0]);
-}).catch(function(err){paper.innerHTML='<p class="error">データを読み込めませんでした：'+esc(err.message)+'</p>';raceSelect.innerHTML='<option>表示不可</option>'});
+Promise.all([
+ fetch("../data/races.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("レースデータ HTTP "+r.status);return r.json()}),
+ fetch(evidenceFile,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("根拠データ HTTP "+r.status);return r.json()})
+]).then(([doc,evidence])=>{
+ if(evidence.schema_version!==2||!evidence.records)throw Error("根拠データ形式が一致しません");
+ records=evidence.records;
+ rows=(doc.races||[]).filter(r=>r.scope==="jra-main"&&r.purchase_decision==="buy"&&Array.isArray(r.final_bets)&&r.final_bets.length>0&&r.purchase_risk_metrics&&records[r.id]&&records[r.id].purchase_proof===r.proof_commit).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id)).slice(0,cap);
+ if(!rows.length)throw Error("照合済みの発走前買い目が見つかりません");
+ raceSelect.innerHTML=rows.map((r,i)=>'<option value="'+i+'">'+esc(r.date+" "+r.venue+" "+r.race)+'</option>').join("");
+ const initial=Math.max(0,rows.findIndex(r=>r.id==="2026-10-25-kikka-sho"));
+ raceSelect.value=String(initial);
+ raceSelect.addEventListener("change",()=>render(rows[Number(raceSelect.value)]));
+ render(rows[initial]);
+}).catch(e=>{error("根拠データを読み込めません："+e.message);raceSelect.innerHTML='<option>表示不可</option>'});
 })();
 </script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
