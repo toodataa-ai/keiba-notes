@@ -129,7 +129,7 @@ function render(r){
 
  // Display-only wrapper. The original report is an independent, unchanged
  // HTML resource. We never clone, replace, or mutate its purchase table or DOM.
- if(!/^reports\/[a-zA-Z0-9/_-]+\.html$/.test(r.report||"")){
+ if(!/^reports\/[a-zA-Z0-9/_.-]+\.html$/.test(r.report||"") || r.report.includes("..") || r.report.includes("//")){
    error("正式レポートの参照先を確認できません。");return;
  }
  const unchangedReport="../"+encodeURI(r.report);
