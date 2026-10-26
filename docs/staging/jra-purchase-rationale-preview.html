@@ -113,8 +113,8 @@ function render(r){
   '<p>発走前実測オッズ <strong>'+esc(odds(main.price))+'</strong> に対し、モデル推定的中率は <strong>'+esc(pMain)+'</strong>。'+
   '損益分岐点 '+esc(pBreak)+' と比較すると <strong>'+esc(spread)+'倍</strong> の確率評価。'+
   esc(yen(mb.stake_yen))+'購入時のモデル期待純利益は <strong class="positive">'+esc((main.ev>=0?"+":"")+expected)+'</strong> です。</p></div>';
- const profile=head?(head.horse_name+"はSTEP1で"+head.mark+"・総合"+head.overall_grade+"。"+(head.evidence_summary||"個別実績の根拠は未記録")+"。"):"";
- const teammate=second?(second.horse_name+"は"+second.mark+"・総合"+second.overall_grade+"。"+(second.evidence_summary||"個別実績の根拠は未記録")+"。"):"";
+ const profile=head?(head.horse_name+"はSTEP1で"+head.mark+"・総合"+head.overall_grade+"。"+(head.evidence_summary||"個別実績の根拠は未記録").replace(/。+$/,"")+"。"):"";
+ const teammate=second?(second.horse_name+"は"+second.mark+"・総合"+second.overall_grade+"。"+(second.evidence_summary||"個別実績の根拠は未記録").replace(/。+$/,"")+"。"):"";
  const singleWin=bestWin?'<dt>単勝でも確認できる評価差</dt><dd>'+esc(person(bestWin.b.selection[0]))+'の単勝'+esc(odds(bestWin.price))+'は損益分岐勝率'+esc(pct(bestWin.threshold))+'。固定モデル勝率'+esc(pct(bestWin.p))+'との比較は'+esc(ratio(bestWin.edge))+'で、100円当たりの推定期待純利益は'+esc((bestWin.p*bestWin.price-1>=0?"+":"")+yen(100*(bestWin.p*bestWin.price-1)))+'。高配当というだけではなく、モデル勝率が必要勝率を上回るかを判断材料としています。</dd>':"";
  const stakeReason=main.b.stake_yen>100?
   esc(mb.type+" "+ticketName(mb))+'には'+esc(yen(main.b.stake_yen))+'を配分。1点100円からの増額は固定された購入セットの金額であり、全点を一律に増額していません。':
@@ -124,7 +124,7 @@ function render(r){
   '<dt>② 妙味の数値根拠｜単なる高配当との違い</dt><dd>'+esc(ticketName(mb))+'が的中するモデル推定確率は'+esc(pMain)+'。'+esc(odds(main.price))+'で元本回収するために必要な確率'+esc(pBreak)+'を上回るため、現行の未校正モデルでは割安と判定されます。'+esc(yen(mb.stake_yen))+'の期待純利益は'+esc((main.ev>=0?"+":"")+yen(main.ev))+'。この推定は的中保証ではありません。</dd>'+
   singleWin+
   '<dt>③ 買い方と金額の意図</dt><dd>'+stakeReason+' 全'+bets.length+'点のうち'+esc(person(mb.selection[0]))+'を含む買い目は'+boughtNum+'点。購入総額は'+esc(yen(total))+'、セット全体のモデル期待純利益は'+esc(formalProfit)+'ですが、買い目同士の同時的中・資金損失も含めて評価が必要です。</dd>'+
-  '<dt>④ 想定が外れるリスク</dt><dd>本線'+esc(ticketName(mb))+'のモデル上の不的中確率は'+esc(pct(1-main.p,1))+'。セット全体でも推定的中確率'+esc(contentHit)+'に対し、実損確率は'+esc(contentRisk)+'です。未経験距離・前走の凡走・馬場や展開の不確実性などがあり、見積もった確率自体がずれるおそれがあります。</dd>'+
+  '<dt>④ 想定が外れるリスク</dt><dd>本線'+esc(ticketName(mb))+'のモデル上の不的中確率は'+esc(pct(1-main.p,1))+'。セット全体でも推定的中確率'+esc(contentHit)+'に対し、実損確率は'+esc(contentRisk)+'です。各馬の実績の再現性や馬場・展開の不確実性があり、未校正モデルの見積もった確率自体がずれるおそれがあります。</dd>'+
   '</dl>';
  paper.innerHTML='<div class="kicker">JRA 買い目の判断理由｜発走前固定データのみ</div>'+
  '<h1>'+esc(r.venue)+" "+esc(r.race)+'</h1><div class="meta">'+esc(r.date)+' ／ 正式買い目 '+esc(r.purchase_strategy_version)+' ／ 購入額と確率の証拠を照合済み</div>'+
