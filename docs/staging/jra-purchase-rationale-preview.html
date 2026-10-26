@@ -43,13 +43,17 @@ table td:nth-child(2){word-break:break-word}
 .secondary-note{color:#576373;font-size:11px}
 @media(max-width:620px){.compare strong{font-size:16px}.compare>div{padding:7px 6px}table{font-size:11px}th,td{padding:5px 3px}}
 
+
+#sealed-report-original{width:100%;display:block;box-sizing:border-box;height:410px;background:#fff;border:2px solid #bcc6d3;border-radius:8px}
+#sealed-report-original:focus{outline:2px solid #8b2e4d}
+@media(max-width:620px){#sealed-report-original{height:330px}}
 </style>
 </head>
 <body>
 <header><strong>JRA 買い目の判断理由・妙味解説</strong><span>STAGING / 表示案・未承認</span></header>
 <main>
 <div class="controls"><label for="race">表示するレース：</label><select id="race"><option>公開データを確認中…</option></select></div>
-<p class="notice">正式に固定した買い目・馬名・能力根拠とモデル確率から期待値を再計算したプレビューです。結果・払戻・回顧は参照しません。正式HTML・PDF・買い目は不変です。</p>
+<p class="notice">既存の正式レポートを直接表示し、その下に解説コラムだけを追加しています。買い目表・予想・結果・回顧・回収率・PDFの原本は変更しません。</p>
 <section class="paper" id="paper"><p>読み込み中…</p></section>
 </main>
 <script>
@@ -104,10 +108,6 @@ function render(r){
  const contentRisk=finite(base.modeled_net_loss_probability)?pct(base.modeled_net_loss_probability,1):"未評価";
  const contentHit=finite(base.modeled_union_hit_probability)?pct(base.modeled_union_hit_probability,1):"未評価";
  const formalProfit=finite(base.modeled_expected_net_profit_yen)?yen(base.modeled_expected_net_profit_yen):"未評価";
- const rowsHtml=modelBets.slice(0,8).map(x=>{
-  const b=x.b;return '<tr><td>'+esc(b.type)+'</td><td>'+esc(ticketName(b))+'</td><td>'+esc(Array.isArray(b.market_odds)?b.market_odds.join("〜")+"倍":finite(b.market_odds)?odds(b.market_odds):"未評価")+'</td><td>'+esc(yen(b.stake_yen))+'</td></tr>';
- }).join("");
- const extra=bets.length>8?'<p class="secondary-note">一覧は先頭8点を抜粋。残り'+(bets.length-8)+'点を含む全買い目は正式レポートを参照してください。</p>':"";
  const boughtNum=bets.filter(b=>b.selection.includes(mb.selection[0])).length;
  const headline='<div class="highlight"><b>'+esc(mb.type+" "+ticketName(mb))+'</b>'+
   '<p>発走前実測オッズ <strong>'+esc(odds(main.price))+'</strong> に対し、モデル推定的中率は <strong>'+esc(pMain)+'</strong>。'+
@@ -126,16 +126,26 @@ function render(r){
   '<dt>③ 買い方と金額の意図</dt><dd>'+stakeReason+' 全'+bets.length+'点のうち'+esc(person(mb.selection[0]))+'を含む買い目は'+boughtNum+'点。購入総額は'+esc(yen(total))+'、セット全体のモデル期待純利益は'+esc(formalProfit)+'ですが、買い目同士の同時的中・資金損失も含めて評価が必要です。</dd>'+
   '<dt>④ 想定が外れるリスク</dt><dd>本線'+esc(ticketName(mb))+'のモデル上の不的中確率は'+esc(pct(1-main.p,1))+'。セット全体でも推定的中確率'+esc(contentHit)+'に対し、実損確率は'+esc(contentRisk)+'です。各馬の実績の再現性や馬場・展開の不確実性があり、未校正モデルの見積もった確率自体がずれるおそれがあります。</dd>'+
   '</dl>';
- paper.innerHTML='<div class="kicker">JRA 買い目の判断理由｜発走前固定データのみ</div>'+
- '<h1>'+esc(r.venue)+" "+esc(r.race)+'</h1><div class="meta">'+esc(r.date)+' ／ 正式買い目 '+esc(r.purchase_strategy_version)+' ／ 購入額と確率の証拠を照合済み</div>'+
- '<div class="statrow"><div class="stat"><small>購入額</small><b>'+yen(total)+'</b></div><div class="stat"><small>セット的中確率（推定）</small><b>'+esc(contentHit)+'</b></div><div class="stat"><small>実損確率（推定）</small><b>'+esc(contentRisk)+'</b></div></div>'+
- '<h2>正式な買い目（馬名・馬番併記）</h2>'+
- '<table><thead><tr><th>券種</th><th>馬番・馬名</th><th>オッズ</th><th>金額</th></tr></thead><tbody>'+rowsHtml+'</tbody></table>'+extra+
- '<aside class="column"><h2>AIの馬券戦略・妙味解説</h2>'+headline+
+
+ // Display-only wrapper. The original report is an independent, unchanged
+ // HTML resource. We never clone, replace, or mutate its purchase table or DOM.
+ if(!/^reports\/[a-zA-Z0-9/_-]+\.html$/.test(r.report||"")){
+   error("正式レポートの参照先を確認できません。");return;
+ }
+ const unchangedReport="../"+encodeURI(r.report);
+ paper.innerHTML=
+ '<div class="kicker">JRA 買い目コラム追加（表示レイヤー限定）</div>'+
+ '<h1>'+esc(r.venue)+" "+esc(r.race)+'</h1>'+
+ '<p class="meta">'+esc(r.date)+' ／ 予想・買い目・結果・回顧・回収率の正本は一切変更しません。</p>'+
+ '<h2>既存の正式レポート（原本をそのまま表示）</h2>'+
+ '<p class="secondary-note">次の枠内は、既存の正式HTMLを直接読み込んでいます。買い目一覧や指標の再生成・転記・計算し直しはしていません。枠内はスクロールできます。</p>'+
+ '<iframe id="sealed-report-original" title="正式予想レポート原本（変更なし）" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" src="'+unchangedReport+'"></iframe>'+
+ '<p class="link"><a href="'+unchangedReport+'" target="_blank" rel="noopener">元の正式レポートを直接開いて確認</a></p>'+
+ '<aside class="column"><h2>AIの馬券戦略・妙味解説（新規コラム）</h2>'+headline+
  '<div class="compare"><div><small>モデル推定的中率</small><strong>'+esc(pMain)+'</strong></div><div><small>損益分岐の的中率</small><strong>'+esc(pBreak)+'</strong></div><div><small>モデル上の妙味倍率</small><strong>'+esc(spread)+'倍</strong></div></div>'+
  why+'</aside>'+
- '<p class="footnote">数値の出典：GitHub発走前固定STEP1に基づく未校正の確率モデルと、正式買い目に記録された実測オッズ（上記主力の取得時刻：'+esc(oddsTime)+' JST）。モデル期待純利益＝購入金額×（モデル的中確率×オッズ－1）。損益分岐確率＝1÷オッズ。推定値は利益・的中を保証しません。結果・払戻・回顧情報は一切使用していません。</p>'+
- '<p class="link"><a href="../'+encodeURI(r.report)+'" target="_blank" rel="noopener">正式な全買い目と全頭診断レポートを確認する</a></p>';
+ '<p class="footnote">追加したのはコラムの表示だけです。計算根拠は発走前固定STEP1に基づく未校正モデルと当時の正式な実測オッズ（主力の取得時刻：'+esc(oddsTime)+' JST）。損益分岐確率＝1÷オッズ、モデル期待純利益＝購入額×（推定的中確率×オッズ－1）。モデル値は予測精度や利益を保証しません。結果・回顧・的中・回収率データを生成には使用しません。</p>';
+
 }
 Promise.all([
  fetch("../data/races.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("レースデータ HTTP "+r.status);return r.json()}),
