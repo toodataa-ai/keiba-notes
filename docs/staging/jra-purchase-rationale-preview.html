@@ -110,7 +110,7 @@ function render(r){
  const formalProfit=finite(base.modeled_expected_net_profit_yen)?yen(base.modeled_expected_net_profit_yen):"未評価";
  const boughtNum=bets.filter(b=>b.selection.includes(mb.selection[0])).length;
  const headline='<div class="highlight"><b>'+esc(mb.type+" "+ticketName(mb))+'</b>'+
-  '<p>発走前実測オッズ <strong>'+esc(odds(main.price))+'</strong> に対し、モデル推定的中率は <strong>'+esc(pMain)+'</strong>。'+
+  '<p><strong>'+esc(oddsTime)+'（JST）に取得した中間オッズ '+esc(odds(main.price))+'</strong> に対し、モデル推定的中率は <strong>'+esc(pMain)+'</strong>。'+
   '損益分岐点 '+esc(pBreak)+' と比較すると <strong>'+esc(spread)+'倍</strong> の確率評価。'+
   esc(yen(mb.stake_yen))+'購入時のモデル期待純利益は <strong class="positive">'+esc((main.ev>=0?"+":"")+expected)+'</strong> です。</p></div>';
  const profile=head?(head.horse_name+"はSTEP1で"+head.mark+"・総合"+head.overall_grade+"。"+(head.evidence_summary||"個別実績の根拠は未記録").replace(/。+$/,"")+"。"):"";
@@ -144,7 +144,7 @@ function render(r){
  '<aside class="column"><h2>AIの馬券戦略・妙味解説（新規コラム）</h2>'+headline+
  '<div class="compare"><div><small>モデル推定的中率</small><strong>'+esc(pMain)+'</strong></div><div><small>損益分岐の的中率</small><strong>'+esc(pBreak)+'</strong></div><div><small>モデル上の妙味倍率</small><strong>'+esc(spread)+'倍</strong></div></div>'+
  why+'</aside>'+
- '<p class="footnote">追加したのはコラムの表示だけです。計算根拠は発走前固定STEP1に基づく未校正モデルと当時の正式な実測オッズ（主力の取得時刻：'+esc(oddsTime)+' JST）。損益分岐確率＝1÷オッズ、モデル期待純利益＝購入額×（推定的中確率×オッズ－1）。モデル値は予測精度や利益を保証しません。結果・回顧・的中・回収率データを生成には使用しません。</p>';
+ '<p class="footnote">追加したのはコラムの表示だけです。計算根拠は発走前固定STEP1に基づく未校正モデルと当時の正式な実測オッズ（主力の取得時刻：'+esc(oddsTime)+' JST）。損益分岐確率＝1÷オッズ、モデル期待純利益＝購入額×（推定的中確率×オッズ－1）。取得時刻はサイトのオッズ最終更新時刻を示すものではなく、発走直前・確定オッズでもありません。時間経過に伴うオッズ変動で期待値は大きく変化します。モデル値は予測精度や利益を保証しません。結果・回顧・的中・回収率データを生成には使用しません。</p>';
 
 }
 Promise.all([
