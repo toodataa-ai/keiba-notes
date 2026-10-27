@@ -4,6 +4,27 @@
 <title>JRA予想ロジックの見取り図｜検証版</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f2f3f6;color:#242a39;font-family:"Meiryo UI","Meiryo","Yu Gothic",sans-serif;line-height:1.65;font-size:14px}h1,h2,h3,p{margin-top:0}a{color:#214c88}header{background:#182236;color:#fff;padding:19px 16px 23px}header .in,main{max-width:940px;margin:auto}header a{color:#e7edf8}h1{font-size:25px;margin:9px 0 6px}header p{color:#d5dce8;margin:0;font-size:13px}.stage{display:inline-block;color:#fff;background:#803c49;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:bold}main{padding:21px 14px 54px}.panel{background:#fff;border:1px solid #d9dee5;border-radius:14px;padding:18px 19px;margin:0 0 18px}.panel h2{font-size:20px;margin-bottom:9px}.panel h3{font-size:15px;margin-bottom:8px}.sub{color:#626d80;font-size:12px}.diagram{display:grid;gap:10px}.box{background:#f6f7fa;border:1px solid #d8dfe8;border-radius:10px;padding:12px 14px;text-align:center}.box b{display:block;font-size:15px}.box small{display:block;color:#5b6880;margin-top:4px}.step{font-weight:bold;color:#485c78;text-align:center;font-size:20px;line-height:1}.split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.blue{background:#eef3fa;border-color:#adc3df}.rose{background:#f9eef0;border-color:#e4b9c2}.black{background:#242e42;color:white}.black small{color:#d0d9eb}.factor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.factor{background:#fbfbfc;border:1px solid #d9dee5;border-radius:10px;min-width:0;overflow:hidden}.factor summary{cursor:pointer;display:flex;justify-content:space-between;gap:9px;align-items:center;padding:12px;list-style:none}.factor summary::-webkit-details-marker{display:none}.factor summary:after{content:'⌄';font-size:19px;color:#66738b}.factor[open] summary:after{content:'⌃'}.factor-name{display:flex;align-items:center;gap:8px;min-width:0}.number{font-size:19px;color:#a02a41}.weight{font-size:10.5px;background:#edf0f5;color:#3e4e68;border-radius:20px;padding:4px 7px;white-space:nowrap}.inside{padding:0 13px 12px;border-top:1px solid #e5e8ee}.inside p{font-size:12.5px;margin:5px 0 9px}.mini-label{font-weight:bold;color:#823a50;margin-top:10px;font-size:11px}.notice{padding:12px 14px;background:#f8f3e9;border-left:4px solid #bc9950;border-radius:6px;font-size:12.5px}.pill{display:inline-block;padding:2px 8px;border-radius:20px;background:#ecf1f9;color:#304c7a;font-size:11px;font-weight:bold}.rows{display:grid;gap:8px}.rowcard{padding:12px;border-radius:9px;border:1px solid #dce2e9;background:#fcfdff}.rowcard b{font-size:14px}.rowcard p{margin:4px 0 0;font-size:12px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:570px;font-size:12px}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #e5e7ed;padding:9px}th{background:#f3f5f8}.linkbar{display:flex;gap:10px;flex-wrap:wrap}.linkbar a{padding:6px 11px;border-radius:8px;border:1px solid #bac7d8;text-decoration:none;font-size:12px}footer{color:#5c6574;font-size:11px}.footnote{font-size:11px;color:#596679;border-top:1px solid #d8dfe8;padding-top:8px;margin-top:12px}@media(max-width:650px){h1{font-size:22px}.panel{padding:15px 12px}.split{grid-template-columns:1fr}.factor-grid{grid-template-columns:1fr}.factor summary{padding:11px}.weight{font-size:10px}.panel h2{font-size:18px}}@media print{header{background:#fff;color:#000}.stage,.linkbar{display:none}.factor{break-inside:avoid}.factor .inside{display:block}body{background:white}.panel{break-inside:avoid}}
+
+/* Interactive horse evaluation radar — visual preview only, never a rating model */
+.radar-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0}
+.radar-tools label{font-weight:800;font-size:12px;color:#354256;display:block}
+.radar-tools select{width:100%;margin-top:5px;padding:10px 11px;border:1px solid #becadd;border-radius:9px;background:#fff;color:#242a39;font:inherit}
+.radar-swatch{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.radar-a{background:#316bb6}.radar-b{background:#d64d67}
+.radar-layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:14px;align-items:center}
+#horse-radar{width:100%;height:auto;display:block;margin:0 auto;max-width:640px}
+#horse-radar text{font-family:"Meiryo UI","Meiryo",sans-serif}
+.radar-side{background:#f8fafc;border:1px solid #dce3ed;border-radius:10px;padding:13px}
+.radar-side h3{margin:0 0 10px;font-size:14px}
+.radar-key{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px 8px;font-size:11px;align-items:center}
+.radar-key b{font-size:12px}
+.radar-key .ra{text-align:center;color:#25518b;font-weight:800}
+.radar-key .rb{text-align:center;color:#a82e4c;font-weight:800}
+.radar-key .row-label{color:#5a6372}
+.radar-caption{font-size:12px;color:#49546a;margin:11px 0 0;padding:11px 12px;border-left:3px solid #9cabc0;background:#f5f7fa}
+.radar-note{margin:8px 0 0;font-size:12px;color:#606d7c}
+@media(max-width:730px){.radar-layout{grid-template-columns:1fr}.radar-side{margin-top:2px}.radar-key{grid-template-columns:70px 1fr 1fr}.radar-tools{gap:8px}.radar-tools select{font-size:12px}.radar-caption{font-size:11px}}
+
 </style></head>
 <body><header><div class="in"><a href="results.html">← ステージングの成績画面へ戻る</a><p style="margin-top:10px"><span class="stage">STAGING・説明案（未承認）</span></p><h1>JRA予想ロジックの見取り図</h1><p>①〜⑨に何の情報を使い、どこで判断し、何がまだ検証中なのか。</p></div></header>
 <main>
@@ -18,6 +39,19 @@
 <div class="step">↓</div><div class="box black"><b>ピーク能力 × 現在値 × 再現信頼度 → A+/A/B+/B/B-/C と ◎○▲△×</b><small>9項目の単純平均は禁止。印を発走前に固定</small></div>
 <div class="step">↓</div><div class="box rose"><b>STEP2：実オッズ・8券種・候補の比較</b><small>的中確率 × 個別オッズ、複数買いの損失確率と期待利益、予算、購入方式の制約</small></div>
 <div class="step">↓</div><div class="box black"><b>採用した馬券 ＋ 不採用理由を保存</b><small>正式な発走前原本を固定。結果で後から差し替えない</small></div></div></section>
+<section class="panel" id="grade-radar">
+<h2>9軸レーダーチャートで馬を比較</h2>
+<p class="sub">2026年10月25日・菊花賞の<strong>発走前に固定された①〜⑨の評価</strong>をそのまま可視化した検証例です。2頭を重ねて比較できます。</p>
+<div class="radar-tools">
+<label for="radar-horse-a"><span class="radar-swatch radar-a"></span>比較する馬A<select id="radar-horse-a" aria-label="レーダーチャートで表示する1頭目"></select></label>
+<label for="radar-horse-b"><span class="radar-swatch radar-b"></span>比較する馬B<select id="radar-horse-b" aria-label="レーダーチャートで表示する2頭目"></select></label>
+</div>
+<div class="radar-layout"><svg id="horse-radar" viewBox="0 0 640 580" role="img" aria-labelledby="radar-svg-title radar-svg-desc">
+<title id="radar-svg-title">JRA①〜⑨評価のレーダーチャート</title><desc id="radar-svg-desc">選択した2頭の出走前固定評価をA+からCの6段階で比較します。重要度の重み付けを表すものではありません。</desc>
+</svg><aside class="radar-side"><h3>評価の内訳（A+〜C）</h3><div id="radar-grade-legend" class="radar-key" aria-live="polite"><span>読み込み中…</span></div></aside></div>
+<p class="radar-caption"><strong>読み方：</strong>外側に近いほどその項目の評価が高いことを示します。A+・A・B+・B・B-・Cに便宜上1〜6の<strong>等間隔を割り当てた表示</strong>であり、勝率・配点・寄与率ではありません。面積で馬の優劣や期待値を判定しません。</p>
+<p class="radar-note">このレースの原本では⑦調教が全頭B-、⑧騎手が全頭Bなど、ほぼ差が付いていない軸があります。評価の限界もそのまま表示します。タイムインデックスの値を後から補ったり、過去の予想印や買い目を変更したりはしません。</p>
+</section>
 <section class="panel"><h2>①〜⑨の入力と重視度</h2><p class="sub">項目を開くと、実際に見ている情報と判断目的が表示されます。</p><div class="factor-grid">
 <details class="factor"><summary><span class="factor-name"><b class="number">①</b><b>斤量</b></span><span class="weight">やや強め</span></summary>
 <div class="inside"><div class="mini-label">使う情報</div><p>今回と前走の負担重量、同斤量での実績、3歳対古馬、脚質と斤量の組合せ</p><div class="mini-label">何を評価する？</div><p>斤量の変化が今回の再現性にどう響くか</p><div class="mini-label">重視度の扱い</div><p>やや強めと明記。具体的な点数係数は未定義。</p></div></details>
@@ -79,4 +113,63 @@
 </div><div class="linkbar" style="margin-top:14px"><a href="results.html">ステージングの結果一覧へ戻る</a><a href="../競馬予想_完全版プロンプト_v3.0.txt">ルール原文（v3.0）</a></div></section>
 <footer>参照：GitHub keiba-notes 正式v3.0 TIME-01〜09／CORE-02／RATE-01、2026年10月25日の発走前固定予想・買い目・回顧。すべて閲覧・説明専用。</footer>
 </main>  <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
+<script>
+(function(){
+"use strict";
+// Data copied exclusively from sealed v3.13 prereace STEP1; never derived from results or odds.
+const horses=[{"n":1,"name":"エムズビギン","mark":"△","grade":"B","values":["B","B","A","B+","B","B","B-","B","B"]},{"n":2,"name":"コンジェスタス","mark":"△","grade":"B+","values":["B","B","A","B+","B","B","B-","B","B+"]},{"n":3,"name":"アウダーシア","mark":"△","grade":"B+","values":["B","B+","A","B+","B","B","B-","B","B+"]},{"n":4,"name":"ショウナンガルフ","mark":"×","grade":"C","values":["B","B","B","B+","B","B","B-","B","C"]},{"n":5,"name":"ジャスティンシカゴ","mark":"△","grade":"A","values":["B","B+","A","B+","B","B","B-","B","A"]},{"n":6,"name":"バステール","mark":"△","grade":"A","values":["B","B","A","B+","B","B","B-","B","A"]},{"n":7,"name":"ラージアンサンブル","mark":"×","grade":"B","values":["B","B","A","B+","B","B","B-","B","B"]},{"n":8,"name":"ロブチェン","mark":"◎","grade":"A+","values":["B","B+","A","B+","B","B","B-","B","A+"]},{"n":9,"name":"ゴーイントゥスカイ","mark":"○","grade":"A","values":["B","B","A","B+","B","B","B-","B","A"]},{"n":10,"name":"ダノンヒストリー","mark":"▲","grade":"A","values":["B","B+","A","B+","B","B","B-","B","A"]},{"n":11,"name":"アスクエジンバラ","mark":"△","grade":"B+","values":["B","B","A","B+","B","B","B-","B","B+"]},{"n":12,"name":"サノノグレーター","mark":"△","grade":"B","values":["B","B","A","B+","B","B","B-","B","B"]},{"n":13,"name":"キンググローリー","mark":"△","grade":"B","values":["B","B+","A","B+","B","B","B-","B","B"]},{"n":14,"name":"マジョレルブルー","mark":"△","grade":"B+","values":["B","B+","A","B+","B","B","B-","B","B+"]},{"n":15,"name":"シートゥサミット","mark":"△","grade":"B+","values":["B","B+","A","B+","B","B","B-","B","B+"]},{"n":16,"name":"ショウナンハヤナミ","mark":"×","grade":"B-","values":["B","B","A","B+","B","B","B-","B","B-"]},{"n":17,"name":"チャリングクロス","mark":"△","grade":"B","values":["B","B","A","B+","B","B","B-","B","B"]},{"n":18,"name":"ナリタエスペランサ","mark":"×","grade":"B","values":["B","B","A","B+","B","B","B-","B","B"]}];
+const labels=["①斤量","②展開","③馬場","④ローテ","⑤コース","⑥血統","⑦調教","⑧騎手","⑨基礎能力"];
+const value={"C":1,"B-":2,"B":3,"B+":4,"A":5,"A+":6};
+const svg=document.getElementById("horse-radar");
+const selA=document.getElementById("radar-horse-a");
+const selB=document.getElementById("radar-horse-b");
+const legend=document.getElementById("radar-grade-legend");
+const NS="http://www.w3.org/2000/svg";
+if(!svg||!selA||!selB||!legend)return;
+const center={x:320,y:276},R=183;
+const pos=(i,r)=>{const a=-Math.PI/2+(2*Math.PI*i/9);return [center.x+Math.cos(a)*r,center.y+Math.sin(a)*r];};
+function svgEl(tag,attrs,parent=svg){
+ const node=document.createElementNS(NS,tag);
+ for(const [key,val] of Object.entries(attrs))node.setAttribute(key,String(val));
+ parent.appendChild(node);return node;
+}
+const grid=svgEl("g",{"aria-hidden":"true"});
+for(let grade=1;grade<=6;grade++){
+ const points=labels.map((_,i)=>pos(i,R*grade/6).map(x=>x.toFixed(1)).join(",")).join(" ");
+ svgEl("polygon",{points,fill:"none",stroke:grade===6?"#a8b6c9":"#dce3ec","stroke-width":grade===6?1.6:1},grid);
+}
+labels.forEach((label,i)=>{
+ const end=pos(i,R);
+ svgEl("line",{x1:center.x,y1:center.y,x2:end[0],y2:end[1],stroke:"#dce3ec","stroke-width":"1"},grid);
+ const txtPos=pos(i,R+49);
+ const anchor=txtPos[0]<center.x-28?"end":txtPos[0]>center.x+28?"start":"middle";
+ const t=svgEl("text",{x:txtPos[0],y:txtPos[1],fill:"#354256","font-size":"14","font-weight":"700","text-anchor":anchor,"dominant-baseline":"middle"},grid);t.textContent=label;
+});
+const plots=svgEl("g",{"aria-hidden":"true"});
+const rowLabels=labels.map(l=>l.replace(/^.{1,2}/u,""));
+const esc=(x)=>String(x).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+function draw(){
+ const a=horses.find(h=>String(h.n)===selA.value)||horses.find(h=>h.n===8);
+ const b=horses.find(h=>String(h.n)===selB.value)||null;
+ while(plots.firstChild)plots.removeChild(plots.firstChild);
+ function polygon(h,color,fill,strokeDash){
+  if(!h)return;
+  const points=h.values.map((g,i)=>pos(i,R*value[g]/6).map(x=>x.toFixed(1)).join(",")).join(" ");
+  svgEl("polygon",{points,fill,"fill-opacity":"0.13",stroke:color,"stroke-width":"3","stroke-linejoin":"round",...(strokeDash?{"stroke-dasharray":"7 4"}:{})},plots);
+  h.values.forEach((g,i)=>{const [x,y]=pos(i,R*value[g]/6);svgEl("circle",{cx:x,cy:y,r:"4",fill:color,stroke:"#fff","stroke-width":"1"},plots);});
+ }
+ polygon(a,"#316bb6","#316bb6",false);
+ if(b)polygon(b,"#d64d67","#d64d67",true);
+ let out='<span class="row-label">評価項目</span><span class="ra">'+esc(a.n+" "+a.name)+'</span><span class="rb">'+(b?esc(b.n+" "+b.name):"比較なし")+'</span>';
+ labels.forEach((label,i)=>out+='<span class="row-label">'+esc(label)+'</span><b class="ra">'+esc(a.values[i])+'</b><b class="rb">'+(b?esc(b.values[i]):"—")+'</b>');
+ legend.innerHTML=out;
+ svg.setAttribute("aria-label",a.name+"と"+(b?b.name:"比較対象なし")+"の①〜⑨評価");
+}
+const options=horses.map(h=>'<option value="'+h.n+'">'+esc(h.mark+" "+h.n+" "+h.name+"（総合"+h.grade+"）")+'</option>').join("");
+selA.innerHTML=options;
+selB.innerHTML='<option value="">比較なし</option>'+options;
+selA.value="8";selB.value="9";
+selA.addEventListener("change",draw);selB.addEventListener("change",draw);draw();
+})();
+</script>
 </body></html>
