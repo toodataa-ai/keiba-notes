@@ -15,6 +15,69 @@
 .simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
 @media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
 </style>
+<style id="model-importance-integrated-v1">
+
+/* STAGING display-only: consolidate role-weight map and input notes in chapter 02. */
+#axes .model-importance{margin:23px 0 24px}
+#axes .model-importance h3,#axes .model-factor-heading{margin:0 0 6px;font-size:19px;line-height:1.45;letter-spacing:-.01em;color:#253045}
+#axes .model-importance-caption,#axes .model-factor-lead{margin:0 0 14px;color:#667085;font-size:13px;line-height:1.65}
+#axes .model-weight-map{display:grid;gap:10px}
+#axes .model-weight-row{display:grid;grid-template-columns:155px minmax(0,1fr);border:1px solid #d8dee8;border-radius:13px;overflow:hidden;background:#fff}
+#axes .model-weight-head{padding:14px 12px;display:flex;justify-content:center;flex-direction:column;gap:3px;border-right:1px solid #d8dee8}
+#axes .model-weight-head strong{font-size:14px;line-height:1.4}
+#axes .model-weight-head small{font-size:11px;opacity:.84}
+#axes .model-weight-body{padding:12px 14px}
+#axes .model-weight-pills{display:flex;gap:7px;flex-wrap:wrap}
+#axes .model-weight-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border:1px solid #d4dce8;border-radius:8px;font-size:12px;font-weight:800;background:#f7f8fa;color:#253045}
+#axes .model-weight-pill b{font-size:16px}
+#axes .model-weight-body p{margin:8px 0 0;font-size:12px;color:#536074;line-height:1.6}
+#axes .model-weight-core{border-color:#cc889a}
+#axes .model-weight-core .model-weight-head{background:#a72c48;color:#fff;border-right-color:#a72c48}
+#axes .model-weight-core .model-weight-pill{background:#fff2f5;border-color:#ebc4cd;color:#862440}
+#axes .model-weight-emphasis .model-weight-head{background:#ffe6c5;color:#875019;border-right-color:#efc597}
+#axes .model-weight-emphasis .model-weight-pill{background:#fff7ed;border-color:#e9d1b3;color:#855019}
+#axes .model-weight-variable .model-weight-head{background:#e5effb;color:#335b88;border-right-color:#cfdfef}
+#axes .model-weight-variable .model-weight-pill{background:#f4f8fe;border-color:#d1dfee;color:#315c8c}
+#axes .model-weight-support .model-weight-head{background:#eff1f4;color:#535e70;border-right-color:#d9dfe6}
+#axes .model-weight-support .model-weight-pill{background:#f8f9fa;border-color:#dce1e7;color:#4d5a6e}
+#axes .model-weight-caution{margin:13px 0 0;border:1px dashed #bbc7d8;border-radius:10px;padding:12px 13px;background:#f8f9fc;color:#4c5b70;font-size:12px;line-height:1.75}
+#axes .model-weight-caution strong{color:#25354a}
+#axes .model-factor-heading{margin-top:26px;padding-top:19px;border-top:1px solid #e1e5ec}
+#axes .model-factor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0 20px}
+#axes .model-factor{background:#fcfcfd;border:1px solid #d9dee6;border-radius:11px;min-width:0;overflow:hidden}
+#axes .model-factor summary{cursor:pointer;list-style:none;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+#axes .model-factor summary::-webkit-details-marker{display:none}
+#axes .model-factor summary::after{content:"⌄";color:#627187;font-size:18px;flex:0 0 auto}
+#axes .model-factor[open] summary::after{content:"⌃"}
+#axes .model-factor-title{display:flex;align-items:center;gap:8px;min-width:0}
+#axes .model-factor-title b{font-size:20px;color:#a12a46;flex:0 0 auto}
+#axes .model-factor-title strong{font-size:13px;line-height:1.4}
+#axes .model-factor-weight{background:#eef0f4;border-radius:999px;padding:4px 8px;color:#45536b;font-size:10px;font-weight:800;white-space:nowrap}
+#axes .model-factor-inner{padding:10px 13px 13px;border-top:1px solid #e7eaf0}
+#axes .model-factor-inner p{font-size:12px;color:#455268;margin:0 0 9px;line-height:1.75}
+#axes .model-factor-inner p:last-child{margin-bottom:0}
+#axes .model-factor-inner strong{color:#263c5b}
+#axes .model-factor-core .model-factor-weight{background:#f8e5ea;color:#922c46}
+#axes .model-factor-emphasis .model-factor-weight{background:#fff0dc;color:#8f4f16}
+#axes .model-factor-variable .model-factor-weight{background:#eaf2fe;color:#315d90}
+#axes .model-factor-support .model-factor-weight{background:#eef0f2;color:#5c6877}
+#axes .model-link-note{padding:13px 15px;border-radius:12px;background:#f5f7fa;border:1px solid #e2e7ed;font-size:13px;line-height:1.7}
+#axes .model-link-note a{font-weight:800;color:#a12c46;text-underline-offset:3px}
+@media(max-width:720px){
+#axes .model-weight-row{grid-template-columns:1fr}
+#axes .model-weight-head{padding:10px 13px;border-right:0;border-bottom:1px solid #d8dee8;flex-direction:row;justify-content:flex-start;align-items:center;gap:12px}
+#axes .model-weight-core .model-weight-head{border-right:0;border-bottom-color:#a72c48}
+#axes .model-weight-emphasis .model-weight-head{border-right:0;border-bottom-color:#efc597}
+#axes .model-weight-variable .model-weight-head{border-right:0;border-bottom-color:#cfdfef}
+#axes .model-weight-support .model-weight-head{border-right:0;border-bottom-color:#d9dfe6}
+#axes .model-weight-body{padding:11px 12px}
+#axes .model-weight-pills{gap:6px}
+#axes .model-weight-pill{font-size:11px;padding:5px 7px}
+#axes .model-factor-grid{grid-template-columns:1fr}
+#axes .model-factor summary{padding:11px}
+}
+
+</style>
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body>
@@ -39,7 +102,7 @@
     <h2 id="tocTitle">このページの読み方</h2>
     <p class="toc-note">競馬以外の統計・AI・開発用語は、初出で短く説明します。分からない言葉は <a href="#glossary">用語集</a> から引けます。</p>
     <div class="toc-grid">
-      <a href="#philosophy">01　強さと買いやすさを分ける</a><a href="#axes">02　①〜⑨を分解して見る</a>
+      <a href="#philosophy">01　強さと買いやすさを分ける</a><a href="#axes">02　①〜⑨の重視度と使う情報</a>
       <a href="#track">03　馬場は「良・稍重」だけではない</a><a href="#time">04　時計をそのまま比べない</a>
       <a href="#aci">05　33秒台を盲信しない ACI</a><a href="#repro">06　「ムラ馬」を心理で決めつけない</a>
       <a href="#uncertainty">07　展開と不確実性を扱う</a><a href="#betting">08　強い馬と買う馬を分ける</a>
@@ -61,19 +124,53 @@
   </section>
 
   <section class="chapter anchor" id="axes">
-    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>一頭の馬を、①〜⑨に分解する</h2><p class="chapter-lead">「なんとなく強そう」を禁止するための分解です。ただし単純平均もしません。</p></div></div>
-    <div class="axis-grid">
-      <div class="axis"><strong>① 斤量</strong><span>前走比、同斤量実績、世代差、牡牝差、脚質との相互作用。</span></div>
-      <div class="axis"><strong>② ペース・展開</strong><span>逃げ意思、ハナ競合、隊列、S/M/M-H/H、今回の脚の使い方。</span></div>
-      <div class="axis"><strong>③ 馬場・バイアス</strong><span>発走時馬場、時計速度、位置取り、進路を分離して評価。</span></div>
-      <div class="axis"><strong>④ ローテーション</strong><span>間隔、休み明け、消耗、距離変更、相手強化、遠征。</span></div>
-      <div class="axis"><strong>⑤ コース適性</strong><span>右左、坂、直線、コーナー、内外回り、枠と脚質。</span></div>
-      <div class="axis"><strong>⑥ 血統</strong><span>距離・馬場・瞬発力・持続力の補助証拠。実戦実績を優先。</span></div>
-      <div class="axis"><strong>⑦ 調教</strong><span>最終追い、1週前、ラップ、負荷、乗り込み、好走時比較。</span></div>
-      <div class="axis"><strong>⑧ 騎手</strong><span>格言だけでなく競馬場・走路・距離・脚質・馬質補正後成績。</span></div>
-      <div class="axis"><strong>⑨ 基礎能力</strong><span>クラス、相手、時計、再現性、不利耐性、今回条件外でも通用する強さ。</span></div>
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>一頭の馬を、①〜⑨に分解する</h2><p class="chapter-lead">何をどの程度重視するのか。まず「役割」を図で確認し、その下で使うデータを見られます。</p></div></div>
+
+    <div class="model-importance" id="relative-importance">
+      <h3>①〜⑨の重視のされ方</h3>
+      <p class="model-importance-caption">色は役割を区別するためのものです。赤が能力評価の中核、オレンジがルール上やや強め、青が条件依存、グレーが補助情報を示します。</p>
+      <div class="model-weight-map" role="group" aria-label="JRA STEP1の①〜⑨の重視のされ方">
+<div class="model-weight-row model-weight-core"><div class="model-weight-head"><strong>能力の中核</strong><small>基礎的な強さ</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>⑨</b> 基礎能力・クラス</span></div><p>地力・直接実績・補正時計を中心に能力の土台を評価</p></div></div>
+<div class="model-weight-row model-weight-emphasis"><div class="model-weight-head"><strong>やや強め</strong><small>ルールに明記</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>①</b> 斤量</span></div><p>前走からの負担重量差など、今回の再現性に注目</p></div></div>
+<div class="model-weight-row model-weight-variable"><div class="model-weight-head"><strong>条件によって変動</strong><small>一律の優先順位なし</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>②</b> 展開</span><span class="model-weight-pill"><b>③</b> 馬場</span><span class="model-weight-pill"><b>④</b> ローテ</span><span class="model-weight-pill"><b>⑤</b> コース</span><span class="model-weight-pill"><b>⑧</b> 騎手</span></div><p>雨・距離・ハナ争い・休養などで重要性が大きく変わる</p></div></div>
+<div class="model-weight-row model-weight-support"><div class="model-weight-head"><strong>補助的な根拠</strong><small>実戦実績を優先</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>②</b> 血統</span><span class="model-weight-pill"><b>③</b> 調教</span></div><p>未経験条件や現在の仕上がりを補足する</p></div></div>
+      </div>
+      <p class="model-weight-caution"><strong>これは配点表ではありません。</strong> 正式ルールに①〜⑨の固定係数や割合はなく、色や配置も「⑨が①の何倍」などの数値を意味しません。②③④⑤⑧は条件次第で決定的な材料になり得ます。</p>
     </div>
-    <p>大切なのは、9項目を「各11.1%」で足すことではありません。例えば道悪の消耗戦なら③馬場と②展開の意味が増し、純粋な能力比較では⑨が中心になります。<strong>条件によって証拠の意味が変わる</strong>ため、単純平均は禁止しています。</p>
+
+    <h3 class="model-factor-heading">①〜⑨は何のデータを見ている？</h3>
+    <p class="model-factor-lead">各項目を開くと、具体的な入力情報と評価への反映が確認できます。</p>
+    <div class="model-factor-grid">
+<details class="model-factor model-factor-emphasis" id="model-factor-01">
+<summary><span class="model-factor-title"><b>①</b><strong>斤量</strong></span><span class="model-factor-weight">やや強め</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>今回斤量、前走比、好走時の斤量、3歳と古馬の負担差、脚質や馬場との組み合わせ。</p><p><strong>評価への反映：</strong>斤量差が今回の能力の再現性にどう影響するかを確認します。前走比+2kg以上などの負担増も、ピーク能力そのものを消す理由にはしません。</p></div></details>
+<details class="model-factor model-factor-variable" id="model-factor-02">
+<summary><span class="model-factor-title"><b>②</b><strong>ペース・展開</strong></span><span class="model-factor-weight">条件で変動</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>逃げたい馬の数、ハナ争い、想定隊列、前半ラップ、スロー〜ハイペースの分岐。</p><p><strong>評価への反映：</strong>想定した展開で持ち味を発揮できるか。逃げ馬が多いだけでハイペースと決めません。</p></div></details>
+<details class="model-factor model-factor-variable" id="model-factor-03">
+<summary><span class="model-factor-title"><b>③</b><strong>馬場・バイアス</strong></span><span class="model-factor-weight">条件で変動</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>発走時の良・稍重・重・不良の確率、含水率、当日時計速度、位置取り・進路の有利不利。</p><p><strong>評価への反映：</strong>今回の馬場で過去の能力を再現できるか。時計速度と前・差し有利は別に判断します。</p></div></details>
+<details class="model-factor model-factor-variable" id="model-factor-04">
+<summary><span class="model-factor-title"><b>④</b><strong>ローテーション</strong></span><span class="model-factor-weight">条件で変動</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>レース間隔、休み明け、叩き何走目、距離変更、前走消耗、遠征、相手強化。</p><p><strong>評価への反映：</strong>状態や条件の変化を確認。主に現在値と再現信頼度へ反映します。</p></div></details>
+<details class="model-factor model-factor-variable" id="model-factor-05">
+<summary><span class="model-factor-title"><b>⑤</b><strong>コース適性</strong></span><span class="model-factor-weight">条件で変動</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>同場・同距離での直接実績、右左回り、坂、直線長、コーナー、枠と脚質の関係。</p><p><strong>評価への反映：</strong>今回のコースで能力を発揮できるか。初コースは未知であり、不適性と決めません。</p></div></details>
+<details class="model-factor model-factor-support" id="model-factor-06">
+<summary><span class="model-factor-title"><b>⑥</b><strong>血統</strong></span><span class="model-factor-weight">補助材料</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>父・母父などの系統からみた距離、芝・ダート、馬場、瞬発力、持続力。</p><p><strong>評価への反映：</strong>未経験条件を補足します。実戦の同条件成績を優先し、血統だけで最上位評価にしません。</p></div></details>
+<details class="model-factor model-factor-support" id="model-factor-07">
+<summary><span class="model-factor-title"><b>⑦</b><strong>調教</strong></span><span class="model-factor-weight">補助材料</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>最終追い、1週前の時計・ラップ、併せ馬、負荷、本数、過去好走時との比較。</p><p><strong>評価への反映：</strong>現在の仕上がりと再現信頼度の補助情報。調教だけでピーク能力を上書きしません。</p></div></details>
+<details class="model-factor model-factor-variable" id="model-factor-08">
+<summary><span class="model-factor-title"><b>⑧</b><strong>騎手</strong></span><span class="model-factor-weight">条件で変動</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>今回の競馬場・走路・距離・枠・脚質での実績、継続騎乗、条件付き騎手格言。</p><p><strong>評価への反映：</strong>今回の馬・コースとの相性を確認。有名騎手という理由だけで加点しません。</p></div></details>
+<details class="model-factor model-factor-core" id="model-factor-09">
+<summary><span class="model-factor-title"><b>⑨</b><strong>基礎能力・クラス</strong></span><span class="model-factor-weight">能力評価の中核</span></summary>
+<div class="model-factor-inner"><p><strong>使うデータ：</strong>対戦相手とクラス、着差、レース内容、補正した走破時計・上がり、直近3〜6走の再現性。</p><p><strong>評価への反映：</strong>そもそもどれだけ強い馬なのか。今回の適性とは切り分け、過去の1回の自己ベストに依存しません。</p></div></details>
+    </div>
+
+    <div class="model-link-note">例えば道悪の消耗戦なら②展開・③馬場の重要性が増し、芝直線1000mなら⑤コースと進路が重要になります。一方、全頭の能力の土台は⑨で確認します。<strong>9項目を単純平均することはありません。</strong> <a href="#time">時計の補正とTime Indexの詳しい説明は04章へ</a>。</div>
   </section>
 
   <section class="chapter anchor" id="track">
