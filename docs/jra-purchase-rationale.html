@@ -156,8 +156,15 @@ function render(r){
   '.stage-rationale dd{font-size:10pt;margin:0 0 7px;line-height:1.5;overflow-wrap:anywhere}',
   '.stage-rationale-note{font-size:8.5pt;color:#555;margin:8px 0 0}',
   '@media(max-width:640px){.stage-rationale{padding:0;margin-top:8px}.stage-rationale-metrics{line-height:1.8}}',
-  '@media print{.stage-rationale{break-inside:avoid}}'
+  '.rationale-race-nav{background:#e9ecf0;color:#263143;padding:9px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:9px;border-bottom:1px solid #c7c7c7;font:13px "Meiryo UI","Meiryo",sans-serif}',
+  '.rationale-race-nav select{font:inherit;padding:7px 9px;max-width:100%;border:1px solid #aab4c2;border-radius:6px;background:#fff}',
+  '@media print{.stage-rationale{break-inside:avoid}.rationale-race-nav{display:none}}'
  ].join("\n")+'</style>';
+ const raceNav='<nav class="rationale-race-nav" aria-label="レース切替">'+
+  '<label for="rationale-race-select">表示するレース：</label>'+
+  '<select id="rationale-race-select">'+
+  rows.map(x=>'<option value="'+esc(x.id)+'"'+(x.id===r.id?' selected':'')+'>'+esc(x.date+" "+x.venue+" "+x.race)+'</option>').join("")+
+  '</select></nav>';
  fetch(unchangedReport,{cache:"no-store"}).then(response=>{
   if(!response.ok)throw Error("正式レポートを取得できません：HTTP "+response.status);
   return response.text();
@@ -177,14 +184,22 @@ function render(r){
    throw Error("原本の買い目表を安全に特定できません");
   const insertAt=source.indexOf(match[0])+match[0].length;
   const reportWithColumn=source.slice(0,insertAt)+column+source.slice(insertAt);
-  const full=reportWithColumn.replace("</head>",columnStyle+"</head>");
-  if(full.replace(columnStyle,"").replace(column,"")!==source)
+  const bodyOpen=reportWithColumn.match(/<body\b[^>]*>/);
+  if(!bodyOpen)throw Error("正式レポートの本文を確認できません");
+  const withNav=reportWithColumn.replace(bodyOpen[0],bodyOpen[0]+raceNav);
+  const full=withNav.replace("</head>",columnStyle+"</head>");
+  if(full.replace(columnStyle,"").replace(raceNav,"").replace(column,"")!==source)
    throw Error("買い目表・予想原文の不変性検査に失敗しました");
   // The fetched report's original HTML is byte-for-byte preserved apart from
   // the two additive presentation fragments. The canonical file is untouched.
   document.open();
   document.write(full);
   document.close();
+  const sel=document.getElementById("rationale-race-select");
+  if(!sel)throw Error("レース切替の表示に失敗しました");
+  sel.addEventListener("change",()=>{
+   if(rows.some(x=>x.id===sel.value))window.location.search="?race_id="+encodeURIComponent(sel.value);
+  });
  }).catch(err=>{
   paper.innerHTML='<p class="error">コラムの表示を検証できません：'+esc(err.message||err)+'</p>'+
    '<p class="link"><a href="'+unchangedReport+'">正式レポートを開く（原本は変更なし）</a></p>';
