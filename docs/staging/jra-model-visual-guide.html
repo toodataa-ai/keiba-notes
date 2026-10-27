@@ -25,8 +25,52 @@
 .radar-note{margin:8px 0 0;font-size:12px;color:#606d7c}
 @media(max-width:730px){.radar-layout{grid-template-columns:1fr}.radar-side{margin-top:2px}.radar-key{grid-template-columns:70px 1fr 1fr}.radar-tools{gap:8px}.radar-tools select{font-size:12px}.radar-caption{font-size:11px}}
 
+
+/* Qualitative relative importance map: categories, explicitly NOT coefficients. */
+.priority-title{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+.priority-title h2{margin:0}.priority-flag{background:#e9eff9;border:1px solid #bac9df;border-radius:6px;padding:2px 7px;color:#334a70;font-size:10px;font-weight:800}
+.priority-lead{color:#526178;font-size:12px;margin:0 0 15px}
+.importance-map{display:grid;gap:10px;margin:13px 0 15px}
+.importance-track{display:grid;grid-template-columns:120px minmax(0,1fr);gap:0;border:1px solid #d6dee8;border-radius:12px;overflow:hidden;background:#fff}
+.importance-kind{padding:14px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px;background:#eaf1fc;border-right:1px solid #ccd8ea}
+.importance-kind strong{font-size:13px;color:#2b4d7d}.importance-kind small{font-size:10px;font-weight:750;color:#53688b}
+.importance-track.strong .importance-kind{background:#f9e9ed;border-right-color:#e7bbc4}
+.importance-track.strong .importance-kind strong{color:#932941}
+.importance-track.variable .importance-kind{background:#f2f0fd;border-right-color:#d6cfee}
+.importance-track.variable .importance-kind strong{color:#584581}
+.importance-track.support .importance-kind{background:#eff3f2;border-right-color:#cbd9d4}
+.importance-track.support .importance-kind strong{color:#3d685d}
+.importance-main{padding:11px 13px;min-width:0}
+.importance-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.importance-token{display:inline-flex;gap:4px;align-items:center;padding:5px 9px;border:1px solid #c9d5e5;border-radius:7px;background:#f7f9fd;color:#233c5f;font-size:12px;font-weight:850;white-space:nowrap}
+.importance-token b{color:#a12b45;font-size:16px}
+.importance-track.strong .importance-token{background:#fff7f8;border-color:#ebd3d8}
+.importance-track.variable .importance-token{background:#f8f7fe;border-color:#ded8ee}
+.importance-track.support .importance-token{background:#f7faf9;border-color:#d2e1db}
+.importance-desc{margin:7px 0 0;color:#4b566b;font-size:11px;line-height:1.55}
+.priority-notice{background:#f8f9fc;border:1px dashed #bcc9d8;border-radius:9px;padding:12px 13px;font-size:11.5px;color:#465269}
+.priority-example{margin-top:13px;padding:11px 13px;border-left:3px solid #b98e47;background:#fbf8f1;font-size:11.5px;line-height:1.65}
+.priority-example strong{color:#754b12}
+.radar-disclosure{margin:0 0 18px;border:1px solid #dce2ea;border-radius:12px;background:#fff}
+.radar-disclosure>summary{cursor:pointer;padding:14px 17px;font-size:14px;font-weight:850;list-style:none;color:#34415a}
+.radar-disclosure>summary::after{content:"＋";float:right;color:#5c6d85}
+.radar-disclosure[open]>summary::after{content:"−"}
+.radar-disclosure>summary::-webkit-details-marker{display:none}
+.radar-disclosure .panel{border:0;margin:0;background:transparent;padding-top:4px}
+@media(max-width:640px){
+.importance-track{grid-template-columns:1fr}
+.importance-kind{flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;border-right:0;border-bottom:1px solid #ccd8ea;padding:8px 12px}
+.importance-track.strong .importance-kind{border-right:0;border-bottom-color:#e7bbc4}
+.importance-track.variable .importance-kind{border-right:0;border-bottom-color:#d6cfee}
+.importance-track.support .importance-kind{border-right:0;border-bottom-color:#cbd9d4}
+.importance-main{padding:10px 12px}
+.importance-items{gap:5px}
+.importance-token{padding:4px 7px;font-size:11px}
+.importance-desc{font-size:10.5px}
+.priority-lead{font-size:11.5px}
+}
 </style></head>
-<body><header><div class="in"><a href="results.html">← ステージングの成績画面へ戻る</a><p style="margin-top:10px"><span class="stage">STAGING・説明案（未承認）</span></p><h1>JRA予想ロジックの見取り図</h1><p>①〜⑨に何の情報を使い、どこで判断し、何がまだ検証中なのか。</p></div></header>
+<body><header><div class="in"><a href="results.html">← ステージングの成績画面へ戻る</a><p style="margin-top:10px"><span class="stage">STAGING・説明案（未承認）</span></p><h1>JRA予想ロジックの見取り図</h1><p>①〜⑨の重視のされ方・入力情報・タイム指数の役割をわかりやすく整理します。</p></div></header>
 <main>
 <section class="panel"><h2>予想ができるまで</h2><div class="diagram">
 <div class="box"><b>発走前の客観的な情報を集める</b><small>出馬表・過去成績・馬場・斤量・脚質・調教・騎手など／結果とオッズは使わない</small></div>
@@ -39,18 +83,27 @@
 <div class="step">↓</div><div class="box black"><b>ピーク能力 × 現在値 × 再現信頼度 → A+/A/B+/B/B-/C と ◎○▲△×</b><small>9項目の単純平均は禁止。印を発走前に固定</small></div>
 <div class="step">↓</div><div class="box rose"><b>STEP2：実オッズ・8券種・候補の比較</b><small>的中確率 × 個別オッズ、複数買いの損失確率と期待利益、予算、購入方式の制約</small></div>
 <div class="step">↓</div><div class="box black"><b>採用した馬券 ＋ 不採用理由を保存</b><small>正式な発走前原本を固定。結果で後から差し替えない</small></div></div></section>
-<section class="panel" id="grade-radar">
-<h2>9軸レーダーチャートで馬を比較</h2>
-<p class="sub">2026年10月25日・菊花賞の<strong>発走前に固定された①〜⑨の評価</strong>をそのまま可視化した検証例です。2頭を重ねて比較できます。</p>
-<div class="radar-tools">
-<label for="radar-horse-a"><span class="radar-swatch radar-a"></span>比較する馬A<select id="radar-horse-a" aria-label="レーダーチャートで表示する1頭目"></select></label>
-<label for="radar-horse-b"><span class="radar-swatch radar-b"></span>比較する馬B<select id="radar-horse-b" aria-label="レーダーチャートで表示する2頭目"></select></label>
+<section class="panel" id="relative-importance">
+<div class="priority-title"><h2>①〜⑨は、どれくらい重視する？</h2><span class="priority-flag">数値配点ではなく判断上の位置づけ</span></div>
+<p class="priority-lead">項目ごとの<strong>役割と重視のされ方</strong>を、正式ルールに沿ってまとめた図です。比較する馬のA〜C評価とは別の情報です。</p>
+<div class="importance-map" role="group" aria-label="①から⑨の予想判断における定性的な位置づけ">
+<div class="importance-track core">
+<div class="importance-kind"><strong>能力評価の中核</strong><small>基礎的な強さを確認</small></div>
+<div class="importance-main"><div class="importance-items"><span class="importance-token"><b>⑨</b>基礎能力・クラス</span></div><p class="importance-desc">相手関係・レース内容・補正した走破時計・高水準の再現性。能力の土台を把握し、今回適性とは分けて評価します。</p></div></div>
+<div class="importance-track strong">
+<div class="importance-kind"><strong>やや強めに評価</strong><small>正式ルールに明記</small></div>
+<div class="importance-main"><div class="importance-items"><span class="importance-token"><b>①</b>斤量</span></div><p class="importance-desc">今回の斤量、前走比、好走時の負担重量、年齢差や脚質との組み合わせ。特に能力の再現性に影響します。</p></div></div>
+<div class="importance-track variable">
+<div class="importance-kind"><strong>条件で重要度が変動</strong><small>固定順位なし</small></div>
+<div class="importance-main"><div class="importance-items">
+<span class="importance-token"><b>②</b>展開</span><span class="importance-token"><b>③</b>馬場</span><span class="importance-token"><b>④</b>ローテ</span><span class="importance-token"><b>⑤</b>コース</span><span class="importance-token"><b>⑧</b>騎手</span></div>
+<p class="importance-desc">雨・道悪、距離・コース形状、逃げ争い、休養・乗替わりなどによって決定的な材料にもなります。「条件依存＝軽視」ではありません。</p></div></div>
+<div class="importance-track support">
+<div class="importance-kind"><strong>補助的な根拠</strong><small>実戦の証拠を優先</small></div>
+<div class="importance-main"><div class="importance-items"><span class="importance-token"><b>⑥</b>血統</span><span class="importance-token"><b>⑦</b>調教</span></div><p class="importance-desc">⑥は実際の走りを優先して補足し、⑦は現在の仕上がり・再現信頼度を中心に判断。補助材料だけで過去のピーク能力を上書きしません。</p></div></div>
 </div>
-<div class="radar-layout"><svg id="horse-radar" viewBox="0 0 640 580" role="img" aria-labelledby="radar-svg-title radar-svg-desc">
-<title id="radar-svg-title">JRA①〜⑨評価のレーダーチャート</title><desc id="radar-svg-desc">選択した2頭の出走前固定評価をA+からCの6段階で比較します。重要度の重み付けを表すものではありません。</desc>
-</svg><aside class="radar-side"><h3>評価の内訳（A+〜C）</h3><div id="radar-grade-legend" class="radar-key" aria-live="polite"><span>読み込み中…</span></div></aside></div>
-<p class="radar-caption"><strong>読み方：</strong>外側に近いほどその項目の評価が高いことを示します。A+・A・B+・B・B-・Cに便宜上1〜6の<strong>等間隔を割り当てた表示</strong>であり、勝率・配点・寄与率ではありません。面積で馬の優劣や期待値を判定しません。</p>
-<p class="radar-note">このレースの原本では⑦調教が全頭B-、⑧騎手が全頭Bなど、ほぼ差が付いていない軸があります。評価の限界もそのまま表示します。タイムインデックスの値を後から補ったり、過去の予想印や買い目を変更したりはしません。</p>
+<div class="priority-notice"><strong>ここが大切：</strong>4つの枠は「重視のタイプ」を示しており、<strong>⑨＞①＞②〜⑤・⑧＞⑥・⑦という配点順位ではありません。</strong> 正式ルールには①〜⑨の固定ウェイト（％・係数）がなく、条件依存の各項目を一律の割合では表せません。</div>
+<div class="priority-example"><strong>条件によって判断が変わる例：</strong>雨で馬場が悪化するなら③の再評価、新潟直線1000mなら②展開・⑤コースや進路の適性、長距離なら⑨持続力・⑤距離適性が大事になります。これは確認すべき項目の例であり、自動的に配点が変更される仕組みではありません。</div>
 </section>
 <section class="panel"><h2>①〜⑨の入力と重視度</h2><p class="sub">項目を開くと、実際に見ている情報と判断目的が表示されます。</p><div class="factor-grid">
 <details class="factor"><summary><span class="factor-name"><b class="number">①</b><b>斤量</b></span><span class="weight">やや強め</span></summary>
@@ -79,6 +132,19 @@
 
 <details class="factor"><summary><span class="factor-name"><b class="number">⑨</b><b>基礎能力・クラス</b></span><span class="weight">能力評価の中核</span></summary>
 <div class="inside"><div class="mini-label">使う情報</div><p>対戦相手、重賞・OP実績、着差、着順の中身、補正した走破時計・上がり、近走の高水準再現性</p><div class="mini-label">何を評価する？</div><p>そもそもどれだけ速く強く走れるか</p><div class="mini-label">重視度の扱い</div><p>最速1走だけでなくピーク・2番手・近走3〜6走を見る。</p></div></details></div><p class="notice" style="margin-top:15px"><b>重みの見せ方について：</b>正式ルールで強さが言葉として明記されているのは、①斤量の「やや強め」などです。各項目の固定配点や数値係数は確認できず、<b>「①20%・⑨30%」のような数字を捏造して表示しません。</b> 数値配分を採用するには、別途モデル検証・承認が必要です。</p></section>
+<details class="radar-disclosure"><summary>参考：各馬の9項目評価を比較する（前回のレーダーチャート）</summary><section class="panel" id="grade-radar">
+<h2>9軸レーダーチャートで馬を比較</h2>
+<p class="sub">2026年10月25日・菊花賞の<strong>発走前に固定された①〜⑨の評価</strong>をそのまま可視化した検証例です。2頭を重ねて比較できます。</p>
+<div class="radar-tools">
+<label for="radar-horse-a"><span class="radar-swatch radar-a"></span>比較する馬A<select id="radar-horse-a" aria-label="レーダーチャートで表示する1頭目"></select></label>
+<label for="radar-horse-b"><span class="radar-swatch radar-b"></span>比較する馬B<select id="radar-horse-b" aria-label="レーダーチャートで表示する2頭目"></select></label>
+</div>
+<div class="radar-layout"><svg id="horse-radar" viewBox="0 0 640 580" role="img" aria-labelledby="radar-svg-title radar-svg-desc">
+<title id="radar-svg-title">JRA①〜⑨評価のレーダーチャート</title><desc id="radar-svg-desc">選択した2頭の出走前固定評価をA+からCの6段階で比較します。重要度の重み付けを表すものではありません。</desc>
+</svg><aside class="radar-side"><h3>評価の内訳（A+〜C）</h3><div id="radar-grade-legend" class="radar-key" aria-live="polite"><span>読み込み中…</span></div></aside></div>
+<p class="radar-caption"><strong>読み方：</strong>外側に近いほどその項目の評価が高いことを示します。A+・A・B+・B・B-・Cに便宜上1〜6の<strong>等間隔を割り当てた表示</strong>であり、勝率・配点・寄与率ではありません。面積で馬の優劣や期待値を判定しません。</p>
+<p class="radar-note">このレースの原本では⑦調教が全頭B-、⑧騎手が全頭Bなど、ほぼ差が付いていない軸があります。評価の限界もそのまま表示します。タイムインデックスの値を後から補ったり、過去の予想印や買い目を変更したりはしません。</p>
+</section></details>
 <section class="panel"><h2>タイムインデックスはどこに効く？</h2>
 <div class="diagram"><div class="box blue"><b>過去走の時計を比較可能な条件にそろえる</b><small>競馬場・走路・距離・馬場速度・斤量・ペース・クラス・近走・再現性</small></div><div class="step">↓</div><div class="split">
 <div class="box"><b>⑨ 速さの能力</b><small>補正時計と複数走の再現性</small></div>
