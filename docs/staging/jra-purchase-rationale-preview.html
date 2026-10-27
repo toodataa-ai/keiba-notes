@@ -212,7 +212,10 @@ Promise.all([
  rows=(doc.races||[]).filter(r=>r.scope==="jra-main"&&r.purchase_decision==="buy"&&Array.isArray(r.final_bets)&&r.final_bets.length>0&&r.purchase_risk_metrics&&records[r.id]&&records[r.id].purchase_proof===r.proof_commit).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id)).slice(0,cap);
  if(!rows.length)throw Error("照合済みの発走前買い目が見つかりません");
  raceSelect.innerHTML=rows.map((r,i)=>'<option value="'+i+'">'+esc(r.date+" "+r.venue+" "+r.race)+'</option>').join("");
- const initial=Math.max(0,rows.findIndex(r=>r.id==="2026-10-25-kikka-sho"));
+ const requested=new URLSearchParams(window.location.search).get("race_id");
+ const selected=requested?rows.findIndex(r=>r.id===requested):-1;
+ if(requested&&selected<0)throw Error("このレースの発走前証拠に対応するコラムは未整備です。元の結果画面から正式レポートを確認してください");
+ const initial=selected>=0?selected:Math.max(0,rows.findIndex(r=>r.id==="2026-10-25-kikka-sho"));
  raceSelect.value=String(initial);
  raceSelect.addEventListener("change",()=>render(rows[Number(raceSelect.value)]));
  render(rows[initial]);
