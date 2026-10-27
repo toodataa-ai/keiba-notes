@@ -32,21 +32,31 @@
 .priority-lead{color:#526178;font-size:12px;margin:0 0 15px}
 .importance-map{display:grid;gap:10px;margin:13px 0 15px}
 .importance-track{display:grid;grid-template-columns:120px minmax(0,1fr);gap:0;border:1px solid #d6dee8;border-radius:12px;overflow:hidden;background:#fff}
-.importance-kind{padding:14px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px;background:#eaf1fc;border-right:1px solid #ccd8ea}
-.importance-kind strong{font-size:13px;color:#2b4d7d}.importance-kind small{font-size:10px;font-weight:750;color:#53688b}
-.importance-track.strong .importance-kind{background:#f9e9ed;border-right-color:#e7bbc4}
-.importance-track.strong .importance-kind strong{color:#932941}
-.importance-track.variable .importance-kind{background:#f2f0fd;border-right-color:#d6cfee}
-.importance-track.variable .importance-kind strong{color:#584581}
-.importance-track.support .importance-kind{background:#eff3f2;border-right-color:#cbd9d4}
-.importance-track.support .importance-kind strong{color:#3d685d}
+.importance-kind{padding:14px 12px;display:flex;flex-direction:column;justify-content:center;gap:3px;background:#f0f3f7;border-right:1px solid #d5dbe4}
+.importance-kind strong{font-size:13px;color:#39485e}.importance-kind small{font-size:10px;font-weight:750;color:#5f6c7e}
+.importance-track.core{border-color:#b76578}
+.importance-track.core .importance-kind{background:#ae2c48;border-right-color:#ae2c48}
+.importance-track.core .importance-kind strong{color:#fff}
+.importance-track.core .importance-kind small{color:#ffe4eb}
+.importance-track.core .importance-token{background:#fff1f4;border-color:#e7b3c0;color:#74233c}
+.importance-track.core .importance-token b{color:#a32242}
+.importance-track.strong .importance-kind{background:#ffe4bf;border-right-color:#ebbb83}
+.importance-track.strong .importance-kind strong{color:#8f4a15}
+.importance-track.strong .importance-kind small{color:#805a2e}
+.importance-track.variable .importance-kind{background:#e5eefb;border-right-color:#c4d6ec}
+.importance-track.variable .importance-kind strong{color:#315e95}
+.importance-track.support .importance-kind{background:#eff1f4;border-right-color:#d5dbe2}
+.importance-track.support .importance-kind strong{color:#536073}
 .importance-main{padding:11px 13px;min-width:0}
 .importance-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .importance-token{display:inline-flex;gap:4px;align-items:center;padding:5px 9px;border:1px solid #c9d5e5;border-radius:7px;background:#f7f9fd;color:#233c5f;font-size:12px;font-weight:850;white-space:nowrap}
-.importance-token b{color:#a12b45;font-size:16px}
-.importance-track.strong .importance-token{background:#fff7f8;border-color:#ebd3d8}
-.importance-track.variable .importance-token{background:#f8f7fe;border-color:#ded8ee}
-.importance-track.support .importance-token{background:#f7faf9;border-color:#d2e1db}
+.importance-token b{color:#34475f;font-size:16px}
+.importance-track.strong .importance-token{background:#fff6e9;border-color:#efd1a9;color:#704015}
+.importance-track.strong .importance-token b{color:#b6621b}
+.importance-track.variable .importance-token{background:#f5f9ff;border-color:#d1deed;color:#315379}
+.importance-track.variable .importance-token b{color:#396ca3}
+.importance-track.support .importance-token{background:#f7f8fa;border-color:#dce1e7;color:#4c596a}
+.importance-track.support .importance-token b{color:#687487}
 .importance-desc{margin:7px 0 0;color:#4b566b;font-size:11px;line-height:1.55}
 .priority-notice{background:#f8f9fc;border:1px dashed #bcc9d8;border-radius:9px;padding:12px 13px;font-size:11.5px;color:#465269}
 .priority-example{margin-top:13px;padding:11px 13px;border-left:3px solid #b98e47;background:#fbf8f1;font-size:11.5px;line-height:1.65}
@@ -59,10 +69,11 @@
 .radar-disclosure .panel{border:0;margin:0;background:transparent;padding-top:4px}
 @media(max-width:640px){
 .importance-track{grid-template-columns:1fr}
-.importance-kind{flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;border-right:0;border-bottom:1px solid #ccd8ea;padding:8px 12px}
-.importance-track.strong .importance-kind{border-right:0;border-bottom-color:#e7bbc4}
-.importance-track.variable .importance-kind{border-right:0;border-bottom-color:#d6cfee}
-.importance-track.support .importance-kind{border-right:0;border-bottom-color:#cbd9d4}
+.importance-kind{flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;border-right:0;border-bottom:1px solid #d5dbe4;padding:8px 12px}
+.importance-track.core .importance-kind{border-right:0;border-bottom:1px solid #ae2c48}
+.importance-track.strong .importance-kind{border-right:0;border-bottom-color:#ebbb83}
+.importance-track.variable .importance-kind{border-right:0;border-bottom-color:#c4d6ec}
+.importance-track.support .importance-kind{border-right:0;border-bottom-color:#d5dbe2}
 .importance-main{padding:10px 12px}
 .importance-items{gap:5px}
 .importance-token{padding:4px 7px;font-size:11px}
@@ -85,7 +96,7 @@
 <div class="step">↓</div><div class="box rose"><b>STEP2：実オッズ・8券種・候補の比較</b><small>的中確率 × 個別オッズ、複数買いの損失確率と期待利益、予算、購入方式の制約</small></div>
 <div class="step">↓</div><div class="box black"><b>採用した馬券 ＋ 不採用理由を保存</b><small>正式な発走前原本を固定。結果で後から差し替えない</small></div></div></section>
 <section class="panel" id="relative-importance"><h2>①〜⑨の入力と重視度</h2><p class="sub">まず下の図で重視のされ方を確認。詳しい入力項目は、その下の①〜⑨を開いて確認できます。</p><div class="priority-title"><h3 style="margin:0;font-size:16px">①〜⑨は、どれくらい重視する？</h3><span class="priority-flag">数値配点ではなく判断上の位置づけ</span></div>
-<p class="priority-lead">項目ごとの<strong>役割と重視のされ方</strong>を、正式ルールに沿ってまとめた図です。比較する馬のA〜C評価とは別の情報です。</p>
+<p class="priority-lead"><strong>赤＝能力の中核、オレンジ＝やや強め、青＝条件依存、グレー＝補助</strong>という役割別の配色です。各馬のA〜C評価とは別の情報です。</p>
 <div class="importance-map" role="group" aria-label="①から⑨の予想判断における定性的な位置づけ">
 <div class="importance-track core">
 <div class="importance-kind"><strong>能力評価の中核</strong><small>基礎的な強さを確認</small></div>
