@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JRA 予想レポート｜買い目の判断理由</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#e9ecf0;color:#263143;font-family:"Meiryo UI","Meiryo","Yu Gothic",sans-serif;line-height:1.55}
+header{background:#19243a;color:white;padding:13px 18px}header strong{font-size:17px}header span{font-size:11px;margin-left:12px;color:#d6dfed}
+main{max-width:930px;margin:22px auto;padding:0 12px 32px}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}
+select{font:inherit;padding:9px 12px;border-radius:8px;max-width:100%;border:1px solid #aab4c2;background:#fff}
+.notice{font-size:12px;color:#5d6b7d;margin:6px 0 14px}
+.paper{background:#fff;border:1px solid #ced5df;box-shadow:0 7px 24px #22344a1c;min-height:860px;padding:28px 35px;margin:auto;max-width:800px}
+.kicker{color:#a32e49;font-size:12px;font-weight:800;letter-spacing:.03em}
+h1{font-size:25px;margin:5px 0 5px}h2{font-size:17px;margin:20px 0 8px;border-bottom:1px solid #c9d0d9;padding-bottom:4px}
+.meta{font-size:12px;color:#637182}.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}
+.stat{border:1px solid #d6dde6;border-radius:9px;padding:10px;background:#f8fafc}
+.stat b{display:block;font-size:17px;font-variant-numeric:tabular-nums}.stat small{font-size:11px;color:#5d6b7d}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid #d9dfe7;padding:6px;text-align:left;vertical-align:top}th{background:#f0f3f6;font-size:12px}
+td:last-child,th:last-child{text-align:right}
+.column{margin-top:12px;padding:13px 16px 14px;background:#fbf8f5;border-left:4px solid #9b4059}
+.column h2{border:none;margin:0 0 7px;padding:0;color:#74223e;font-size:17px}
+.column dl{margin:0}.column dt{font-size:12px;font-weight:bold;color:#74223e;margin:9px 0 1px}
+.column dd{font-size:13px;margin:0;line-height:1.55}
+.footnote{font-size:11px;color:#59687b;margin-top:12px}
+.link{font-size:12px;margin-top:9px}
+.link a{color:#275b98}
+.error{padding:12px;background:#fff4ee;color:#873e16;border:1px solid #eac0a7}
+@media(max-width:620px){main{margin-top:12px}.paper{padding:20px 15px;min-height:unset}h1{font-size:22px}.stat b{font-size:14px}.stat{padding:8px}.column{padding:12px}.stat small{font-size:10px}}
+@media print{@page{size:A4 portrait;margin:12mm 13mm 13mm}body{background:white}header,.controls,.notice{display:none}.paper{border:0;box-shadow:none;min-height:0;padding:0;max-width:none}main{margin:0;padding:0}.column{break-inside:avoid}}
+
+.compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}
+.compare>div{background:#fff;border:1px solid #dacbd1;border-radius:6px;padding:8px 9px;min-width:0}
+.compare small{display:block;font-size:10px;color:#6e4452}
+.compare strong{display:block;font-size:19px;color:#74223e;font-variant-numeric:tabular-nums}
+.highlight{background:#fff;border-radius:8px;padding:10px 12px;margin:10px 0;border:1px solid #ead8de}
+.highlight b{font-size:15px;color:#74223e}.highlight p{margin:5px 0 0}
+.description{margin:7px 0;font-size:13px}
+table td:nth-child(2){word-break:break-word}
+.positive{color:#8b2340;font-weight:800}
+.secondary-note{color:#576373;font-size:11px}
+@media(max-width:620px){.compare strong{font-size:16px}.compare>div{padding:7px 6px}table{font-size:11px}th,td{padding:5px 3px}}
+
+
+#sealed-report-original{width:100%;display:block;box-sizing:border-box;height:min(83vh,860px);min-height:510px;background:#fff;border:1px solid #c7c7c7;border-radius:3px;overflow:auto}
+#sealed-report-original:focus{outline:2px solid #8b2e4d}
+@media(max-width:620px){#sealed-report-original{height:77vh;min-height:460px}}
+</style>
+</head>
+<body>
+<header><strong>JRA 予想レポート｜買い目と解説</strong></header>
+<main>
+<div class="controls"><label for="race">表示するレース：</label><select id="race"><option>公開データを確認中…</option></select></div>
+<p class="notice">正式な予想レポートの買い目表直後に判断理由を表示します。予想・買い目・結果・回顧・回収率・PDFの原本は変更していません。</p>
+<section class="paper" id="paper"><p>読み込み中…</p></section>
+</main>
+<script>
+(function(){
+"use strict";
+const raceSelect=document.getElementById("race");
+const paper=document.getElementById("paper");
+const evidenceFile="assets/jra-bet-rationale-evidence-v2.json";
+const cap=12;
+let rows=[],records={};
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const yen=n=>Math.round(Number(n)).toLocaleString("ja-JP")+"円";
+const odds=n=>Number(n).toLocaleString("ja-JP",{maximumFractionDigits:1})+"倍";
+const pct=(v,d=2)=>(Number(v)*100).toFixed(d)+"%";
+const typeJoin=t=>t.type==="馬単"||t.type==="三連単"?" → ":" － ";
+const finite=n=>typeof n==="number"&&Number.isFinite(n);
+const key=t=>String(t.type)+":"+JSON.stringify(t.selection||[]);
+const ratio=n=>Number(n).toFixed(2)+"倍";
+function error(message){paper.innerHTML='<p class="error">'+esc(message)+'</p>';}
+function jstDate(iso){if(!iso)return"不明";let d=new Date(iso);return Number.isNaN(d.getTime())?"不明":d.toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});}
+function render(r){
+ const evidence=records[r.id];
+ if(!evidence || evidence.purchase_proof!==r.proof_commit || evidence.purchase_version!==r.purchase_strategy_version){
+  error("発走前固定原本との対応が確認できないため、数値解説は表示できません。");return;
+ }
+ const bets=r.final_bets||[], modelLines=evidence.tickets||[];
+ const total=bets.reduce((sum,b)=>sum+Number(b.stake_yen||0),0);
+ const base=r.purchase_risk_metrics||{};
+ const isMatch=bets.length===modelLines.length && bets.every((b,i)=>key(b)===key(modelLines[i])&&b.quote_verified===true&&Number.isInteger(b.stake_yen)&&b.stake_yen>0);
+ if(!isMatch||total!==Number(base.stake_yen)){error("正式買い目・オッズ証跡・金額の一致検証に失敗したため解説を停止しました。");return;}
+ const horseMap=new Map((evidence.horse_profiles||[]).map(h=>[Number(h.horse_number),h]));
+ const h=n=>horseMap.get(Number(n))||null;
+ const person=n=>{const x=h(n);return x?x.horse_number+"番 "+x.horse_name:n+"番（馬名未確認）";};
+ const marked=n=>{const x=h(n);return x?x.mark+x.horse_number+" "+x.horse_name+"（"+x.overall_grade+"）":person(n);};
+ const ticketName=t=>(t.selection||[]).map(person).join(typeJoin(t));
+ const modelBets=bets.map((b,i)=>{
+  const item=modelLines[i],p=item?.probability_scenarios?.central;
+  const price=finite(b.market_odds)&&b.market_odds>0?b.market_odds:null;
+  const supported=finite(p)&&p>=0&&p<=1&&price!==null;
+  return {b,p,price,supported,threshold:supported?1/price:null,edge:supported?p*price:null,ev:supported?b.stake_yen*(p*price-1):null};
+ });
+ const usable=modelBets.filter(v=>v.supported).sort((a,b)=>b.b.stake_yen-a.b.stake_yen||b.ev-a.ev);
+ if(!usable.length){error("組番単位の確率と実測オッズが揃っていないため、期待値を数値表示できません。");return;}
+ const main=usable[0],mb=main.b,head=h(mb.selection[0]),second=mb.selection.length>1?h(mb.selection[1]):null;
+ const bestWin=modelBets.find(x=>x.b.type==="単勝"&&x.b.selection[0]===mb.selection[0]&&x.supported)||
+   modelBets.find(x=>x.b.type==="単勝"&&x.supported);
+ const topHorse=(evidence.horse_profiles||[]).find(x=>x.mark==="◎");
+ const topLine=topHorse?"◎"+topHorse.horse_number+"番 "+topHorse.horse_name+"（"+topHorse.overall_grade+"／モデル勝率"+pct(topHorse.win_probability,1)+"）":"◎の評価データなし";
+ const pMain=pct(main.p,main.p<0.01?3:2),pBreak=pct(main.threshold,main.threshold<0.01?3:2);
+ const spread=main.edge.toFixed(2), expected=yen(main.ev);
+ const oddsTime=jstDate(mb.observed_at);
+ const contentRisk=finite(base.modeled_net_loss_probability)?pct(base.modeled_net_loss_probability,1):"未評価";
+ const contentHit=finite(base.modeled_union_hit_probability)?pct(base.modeled_union_hit_probability,1):"未評価";
+ const formalProfit=finite(base.modeled_expected_net_profit_yen)?yen(base.modeled_expected_net_profit_yen):"未評価";
+ const boughtNum=bets.filter(b=>b.selection.includes(mb.selection[0])).length;
+ const headline='<div class="highlight"><b>'+esc(mb.type+" "+ticketName(mb))+'</b>'+
+  '<p><strong>'+esc(oddsTime)+'（JST）に取得した中間オッズ '+esc(odds(main.price))+'</strong> に対し、モデル推定的中率は <strong>'+esc(pMain)+'</strong>。'+
+  '損益分岐点 '+esc(pBreak)+' と比較すると <strong>'+esc(spread)+'倍</strong> の確率評価。'+
+  esc(yen(mb.stake_yen))+'購入時のモデル期待純利益は <strong class="positive">'+esc((main.ev>=0?"+":"")+expected)+'</strong> です。</p></div>';
+ const profile=head?(head.horse_name+"はSTEP1で"+head.mark+"・総合"+head.overall_grade+"。"+(head.evidence_summary||"個別実績の根拠は未記録").replace(/。+$/,"")+"。"):"";
+ const teammate=second?(second.horse_name+"は"+second.mark+"・総合"+second.overall_grade+"。"+(second.evidence_summary||"個別実績の根拠は未記録").replace(/。+$/,"")+"。"):"";
+ const singleWin=bestWin?'<dt>単勝でも確認できる評価差</dt><dd>'+esc(person(bestWin.b.selection[0]))+'の単勝'+esc(odds(bestWin.price))+'は損益分岐勝率'+esc(pct(bestWin.threshold))+'。固定モデル勝率'+esc(pct(bestWin.p))+'との比較は'+esc(ratio(bestWin.edge))+'で、100円当たりの推定期待純利益は'+esc((bestWin.p*bestWin.price-1>=0?"+":"")+yen(100*(bestWin.p*bestWin.price-1)))+'。高配当というだけではなく、モデル勝率が必要勝率を上回るかを判断材料としています。</dd>':"";
+ const stakeReason=main.b.stake_yen>100?
+  esc(mb.type+" "+ticketName(mb))+'には'+esc(yen(main.b.stake_yen))+'を配分。1点100円からの増額は固定された購入セットの金額であり、全点を一律に増額していません。':
+  '上記の買い目を含む採用組番について、発走前に固定された投資金額をそのまま表示しています。';
+ const why='<dl>'+
+  '<dt>① 能力の裏づけ｜馬名と実績</dt><dd>能力評価で最上位は'+esc(topLine)+'。一方、主力の'+esc(ticketName(mb))+'は必ずしも◎中心ではありません。'+esc(profile)+' '+esc(teammate)+'能力と人気を独立に評価するため、印と購入順位が異なる場合があります。</dd>'+
+  '<dt>② 妙味の数値根拠｜単なる高配当との違い</dt><dd>'+esc(ticketName(mb))+'が的中するモデル推定確率は'+esc(pMain)+'。'+esc(odds(main.price))+'で元本回収するために必要な確率'+esc(pBreak)+'を上回るため、現行の未校正モデルでは割安と判定されます。'+esc(yen(mb.stake_yen))+'の期待純利益は'+esc((main.ev>=0?"+":"")+yen(main.ev))+'。この推定は的中保証ではありません。</dd>'+
+  singleWin+
+  '<dt>③ 買い方と金額の意図</dt><dd>'+stakeReason+' 全'+bets.length+'点のうち'+esc(person(mb.selection[0]))+'を含む買い目は'+boughtNum+'点。購入総額は'+esc(yen(total))+'、セット全体のモデル期待純利益は'+esc(formalProfit)+'ですが、買い目同士の同時的中・資金損失も含めて評価が必要です。</dd>'+
+  '<dt>④ 想定が外れるリスク</dt><dd>本線'+esc(ticketName(mb))+'のモデル上の不的中確率は'+esc(pct(1-main.p,1))+'。セット全体でも推定的中確率'+esc(contentHit)+'に対し、実損確率は'+esc(contentRisk)+'です。各馬の実績の再現性や馬場・展開の不確実性があり、未校正モデルの見積もった確率自体がずれるおそれがあります。</dd>'+
+  '</dl>';
+
+ // Only the embedded report DOM gets one added column after the actual
+ // purchase table. Canonical report bytes, tables, results and PDFs stay intact.
+ if(!/^reports\/[a-zA-Z0-9/_.-]+\.html$/.test(r.report||"") || r.report.includes("..") || r.report.includes("//")){
+  error("正式レポートの参照先を確認できません。");return;
+ }
+ const unchangedReport=encodeURI(r.report);
+ paper.innerHTML=
+  '<h2 class="preview-caption">正式予想レポート</h2>'+
+  '<p class="secondary-note">原本の「購入操作とJRA入力馬番」の直後にコラムを表示します。枠内をスクロールして確認してください。</p>'+
+  '<iframe id="sealed-report-original" title="正式予想と買い目直後のコラム" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>'+
+  '<p id="column-insertion-status" class="secondary-note" role="status">買い目の直後にコラムを配置しています…</p>'+
+  '<p class="link"><a href="'+unchangedReport+'" target="_blank" rel="noopener">元の正式レポート（変更なし）を直接開く</a></p>';
+ const frame=paper.querySelector("#sealed-report-original");
+ const status=paper.querySelector("#column-insertion-status");
+ frame.addEventListener("load",()=>{
+  if(!frame.isConnected)return;
+  try{
+   const doc=frame.contentDocument;
+   if(!doc?.body?.matches('body[data-full-report="true"]'))
+    throw Error("正式な全頭診断レポートを読み込めません");
+   const first=doc.querySelector("section.page");
+   const heading=Array.from(first?.children||[]).find(n=>n.tagName==="H3"&&n.textContent.trim()==="購入操作とJRA入力馬番");
+   const purchaseTable=heading?.nextElementSibling;
+   if(!purchaseTable || purchaseTable.tagName!=="TABLE" || !purchaseTable.classList.contains("table"))
+    throw Error("買い目表の指定位置が一致しません");
+   if(!first.querySelector("h1")?.textContent.includes(r.race))
+    throw Error("レース名が原本と一致しません");
+   const allTables=Array.from(doc.querySelectorAll("table"));
+   const beforeTables=allTables.map(t=>t.outerHTML);
+   if(doc.querySelector("[data-stage-rationale]"))throw Error("二重挿入を検出しました");
+   const style=doc.createElement("style");
+   style.setAttribute("data-stage-rationale-style","");
+   style.textContent=[
+    ".stage-rationale{margin:10px 0;padding:10px 12px;border:1px solid #c7c7c7;background:#fafafa;color:inherit;font-family:inherit;line-height:1.48}",
+    ".stage-rationale h3{margin:3px 0 9px}",
+    ".stage-rationale .highlight{border-left:3px solid #333;padding:8px 10px;background:#f2f2f2;margin:8px 0}",
+    ".stage-rationale .highlight b{font-size:11.5pt}",
+    ".stage-rationale .highlight p{margin:5px 0 0;font-size:10.5pt}",
+    ".stage-rationale .positive{font-weight:800}",
+    ".stage-rationale .compare{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}",
+    ".stage-rationale .compare>div{flex:1 1 110px;border:1px solid #c4c4c4;padding:6px 7px;min-width:0;background:#fff}",
+    ".stage-rationale .compare small{display:block;font-size:8.5pt;color:#555}",
+    ".stage-rationale .compare strong{display:block;font-size:12pt;font-weight:800;overflow-wrap:anywhere}",
+    ".stage-rationale dl{margin:8px 0 0}",
+    ".stage-rationale dt{font-size:10pt;font-weight:800;margin:10px 0 3px;border-bottom:1px solid #ddd}",
+    ".stage-rationale dd{font-size:10pt;margin:0 0 6px;line-height:1.52;overflow-wrap:anywhere}",
+    ".stage-rationale .note{font-size:8.5pt;color:#555;border-top:1px solid #ddd;padding-top:6px;margin-top:8px}",
+    "@media(max-width:620px){.stage-rationale{padding:8px}.stage-rationale .compare>div{flex-basis:85px;padding:5px}.stage-rationale .compare strong{font-size:11pt}}",
+    "@media print{.stage-rationale{break-inside:avoid}}"
+   ].join("\n");
+   const column=doc.createElement("div");
+   column.className="sheetbox stage-rationale";
+   column.setAttribute("data-stage-rationale","v3");
+   column.setAttribute("aria-label","AIの馬券戦略・妙味解説");
+   column.innerHTML=
+    '<h3>AIの馬券戦略・妙味解説</h3>'+headline+
+    '<div class="compare"><div><small>モデル推定的中率</small><strong>'+esc(pMain)+'</strong></div>'+
+    '<div><small>損益分岐の的中率</small><strong>'+esc(pBreak)+'</strong></div>'+
+    '<div><small>モデル上の妙味倍率</small><strong>'+esc(spread)+'倍</strong></div></div>'+
+    why+
+    '<p class="note">発走前の中間オッズを用いた未校正モデルの参考値です。取得時刻：'+esc(oddsTime)+' JST。発走直前・確定オッズではありません。結果・回顧・回収率には影響しません。</p>';
+   doc.head.append(style);
+   purchaseTable.insertAdjacentElement("afterend",column);
+   if(purchaseTable.nextElementSibling!==column ||
+      allTables.length!==doc.querySelectorAll("table").length ||
+      !allTables.every((t,i)=>t.outerHTML===beforeTables[i]))
+    throw Error("元の買い目表・その他の表の不変性検査に失敗しました");
+   status.textContent="買い目直後への差し込みと、正式レポート内の表が不変であることを確認済みです。";
+  }catch(err){
+   status.textContent="コラムの表示を検証できません（正式な予想原本は変更なし）："+String(err.message||err);
+   status.className="error";
+  }
+ });
+ frame.src=unchangedReport;
+
+}
+Promise.all([
+ fetch("data/races.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("レースデータ HTTP "+r.status);return r.json()}),
+ fetch(evidenceFile,{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("根拠データ HTTP "+r.status);return r.json()})
+]).then(([doc,evidence])=>{
+ if(evidence.schema_version!==2||!evidence.records)throw Error("根拠データ形式が一致しません");
+ records=evidence.records;
+ rows=(doc.races||[]).filter(r=>r.scope==="jra-main"&&r.purchase_decision==="buy"&&Array.isArray(r.final_bets)&&r.final_bets.length>0&&r.purchase_risk_metrics&&records[r.id]&&records[r.id].purchase_proof===r.proof_commit).sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id)).slice(0,cap);
+ if(!rows.length)throw Error("照合済みの発走前買い目が見つかりません");
+ raceSelect.innerHTML=rows.map((r,i)=>'<option value="'+i+'">'+esc(r.date+" "+r.venue+" "+r.race)+'</option>').join("");
+ const requested=new URLSearchParams(window.location.search).get("race_id");
+ const selected=requested?rows.findIndex(r=>r.id===requested):-1;
+ if(requested&&selected<0)throw Error("このレースの発走前証拠に対応するコラムは未整備です。元の結果画面から正式レポートを確認してください");
+ const initial=selected>=0?selected:Math.max(0,rows.findIndex(r=>r.id==="2026-10-25-kikka-sho"));
+ raceSelect.value=String(initial);
+ raceSelect.addEventListener("change",()=>render(rows[Number(raceSelect.value)]));
+ render(rows[initial]);
+}).catch(e=>{error("根拠データを読み込めません："+e.message);raceSelect.innerHTML='<option>表示不可</option>'});
+})();
+</script>
+  <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+</body>
+</html>
