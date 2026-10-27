@@ -1,1 +1,81 @@
-<!doctype html><html lang="ja"><meta charset="utf-8"><title>JRA評価ロジックの見取り図（ステージング）</title><main><h1>JRAの予想ロジック</h1><p>これは検証用ページです。正式データを変更しません。</p></main></html>
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>JRA予想ロジックの見取り図｜検証版</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f2f3f6;color:#242a39;font-family:"Meiryo UI","Meiryo","Yu Gothic",sans-serif;line-height:1.65;font-size:14px}h1,h2,h3,p{margin-top:0}a{color:#214c88}header{background:#182236;color:#fff;padding:19px 16px 23px}header .in,main{max-width:940px;margin:auto}header a{color:#e7edf8}h1{font-size:25px;margin:9px 0 6px}header p{color:#d5dce8;margin:0;font-size:13px}.stage{display:inline-block;color:#fff;background:#803c49;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:bold}main{padding:21px 14px 54px}.panel{background:#fff;border:1px solid #d9dee5;border-radius:14px;padding:18px 19px;margin:0 0 18px}.panel h2{font-size:20px;margin-bottom:9px}.panel h3{font-size:15px;margin-bottom:8px}.sub{color:#626d80;font-size:12px}.diagram{display:grid;gap:10px}.box{background:#f6f7fa;border:1px solid #d8dfe8;border-radius:10px;padding:12px 14px;text-align:center}.box b{display:block;font-size:15px}.box small{display:block;color:#5b6880;margin-top:4px}.step{font-weight:bold;color:#485c78;text-align:center;font-size:20px;line-height:1}.split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.blue{background:#eef3fa;border-color:#adc3df}.rose{background:#f9eef0;border-color:#e4b9c2}.black{background:#242e42;color:white}.black small{color:#d0d9eb}.factor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.factor{background:#fbfbfc;border:1px solid #d9dee5;border-radius:10px;min-width:0;overflow:hidden}.factor summary{cursor:pointer;display:flex;justify-content:space-between;gap:9px;align-items:center;padding:12px;list-style:none}.factor summary::-webkit-details-marker{display:none}.factor summary:after{content:'⌄';font-size:19px;color:#66738b}.factor[open] summary:after{content:'⌃'}.factor-name{display:flex;align-items:center;gap:8px;min-width:0}.number{font-size:19px;color:#a02a41}.weight{font-size:10.5px;background:#edf0f5;color:#3e4e68;border-radius:20px;padding:4px 7px;white-space:nowrap}.inside{padding:0 13px 12px;border-top:1px solid #e5e8ee}.inside p{font-size:12.5px;margin:5px 0 9px}.mini-label{font-weight:bold;color:#823a50;margin-top:10px;font-size:11px}.notice{padding:12px 14px;background:#f8f3e9;border-left:4px solid #bc9950;border-radius:6px;font-size:12.5px}.pill{display:inline-block;padding:2px 8px;border-radius:20px;background:#ecf1f9;color:#304c7a;font-size:11px;font-weight:bold}.rows{display:grid;gap:8px}.rowcard{padding:12px;border-radius:9px;border:1px solid #dce2e9;background:#fcfdff}.rowcard b{font-size:14px}.rowcard p{margin:4px 0 0;font-size:12px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:570px;font-size:12px}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #e5e7ed;padding:9px}th{background:#f3f5f8}.linkbar{display:flex;gap:10px;flex-wrap:wrap}.linkbar a{padding:6px 11px;border-radius:8px;border:1px solid #bac7d8;text-decoration:none;font-size:12px}footer{color:#5c6574;font-size:11px}.footnote{font-size:11px;color:#596679;border-top:1px solid #d8dfe8;padding-top:8px;margin-top:12px}@media(max-width:650px){h1{font-size:22px}.panel{padding:15px 12px}.split{grid-template-columns:1fr}.factor-grid{grid-template-columns:1fr}.factor summary{padding:11px}.weight{font-size:10px}.panel h2{font-size:18px}}@media print{header{background:#fff;color:#000}.stage,.linkbar{display:none}.factor{break-inside:avoid}.factor .inside{display:block}body{background:white}.panel{break-inside:avoid}}
+</style></head>
+<body><header><div class="in"><a href="results.html">← ステージングの成績画面へ戻る</a><p style="margin-top:10px"><span class="stage">STAGING・説明案（未承認）</span></p><h1>JRA予想ロジックの見取り図</h1><p>①〜⑨に何の情報を使い、どこで判断し、何がまだ検証中なのか。</p></div></header>
+<main>
+<section class="panel"><h2>予想ができるまで</h2><div class="diagram">
+<div class="box"><b>発走前の客観的な情報を集める</b><small>出馬表・過去成績・馬場・斤量・脚質・調教・騎手など／結果とオッズは使わない</small></div>
+<div class="step">↓</div><div class="split">
+<div class="box blue"><b>同条件の直接実績</b><small>競馬場・距離・馬場・クラスを比較</small></div>
+<div class="box blue"><b>類似条件 Time Index</b><small>走破時計を条件で補正。第10項目ではない</small></div>
+<div class="box blue"><b>今回の馬場と展開</b><small>良〜不良の確率と隊列を想定</small></div>
+</div><div class="step">↓</div>
+<div class="box"><b>STEP1：①〜⑨の能力・適性評価</b><small>③馬場・⑤コース・⑨基礎能力へTime Indexをそれぞれ別の意味で参照。重複加点はしない</small></div>
+<div class="step">↓</div><div class="box black"><b>ピーク能力 × 現在値 × 再現信頼度 → A+/A/B+/B/B-/C と ◎○▲△×</b><small>9項目の単純平均は禁止。印を発走前に固定</small></div>
+<div class="step">↓</div><div class="box rose"><b>STEP2：実オッズ・8券種・候補の比較</b><small>的中確率 × 個別オッズ、複数買いの損失確率と期待利益、予算、購入方式の制約</small></div>
+<div class="step">↓</div><div class="box black"><b>採用した馬券 ＋ 不採用理由を保存</b><small>正式な発走前原本を固定。結果で後から差し替えない</small></div></div></section>
+<section class="panel"><h2>①〜⑨の入力と重視度</h2><p class="sub">項目を開くと、実際に見ている情報と判断目的が表示されます。</p><div class="factor-grid">
+<details class="factor"><summary><span class="factor-name"><b class="number">①</b><b>斤量</b></span><span class="weight">やや強め</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>今回と前走の負担重量、同斤量での実績、3歳対古馬、脚質と斤量の組合せ</p><div class="mini-label">何を評価する？</div><p>斤量の変化が今回の再現性にどう響くか</p><div class="mini-label">重視度の扱い</div><p>やや強めと明記。具体的な点数係数は未定義。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">②</b><b>ペース・展開</b></span><span class="weight">状況依存</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>脚質、逃げ意思、位置取り、前半ラップ、ハナ争いと隊列</p><div class="mini-label">何を評価する？</div><p>想定する展開で持ち味を発揮できるか</p><div class="mini-label">重視度の扱い</div><p>固定係数なし。前半ラップの偽精度を禁止。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">③</b><b>馬場・トラックバイアス</b></span><span class="weight">状況依存</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>良〜不良の確率、含水率、クッション値、降水量、当日時計速度、内外の走路状態</p><div class="mini-label">何を評価する？</div><p>今回の馬場で能力を再現できるか</p><div class="mini-label">重視度の扱い</div><p>タイム補正は⑤⑨と重複加点禁止。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">④</b><b>ローテーション</b></span><span class="weight">状況依存</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>中何週、休み明け、叩き、距離変更、遠征、前走の消耗と相手関係</p><div class="mini-label">何を評価する？</div><p>調子・疲労・条件変化が現在値にどう影響するか</p><div class="mini-label">重視度の扱い</div><p>原則、ピーク能力より再現信頼度で調整。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">⑤</b><b>コース適性</b></span><span class="weight">状況依存</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>競馬場、同場同距離の直接実績、左右回り、坂、直線長、枠と進路、類似コースの実績</p><div class="mini-label">何を評価する？</div><p>今回のコースで過去能力を発揮できるか</p><div class="mini-label">重視度の扱い</div><p>過去の好走時計は⑨の基礎能力と別意味で扱う。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">⑥</b><b>血統</b></span><span class="weight">補助的</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>父母系・母父、芝ダート、距離、湿潤、高速・低速馬場、瞬発力・持続力</p><div class="mini-label">何を評価する？</div><p>未経験条件の適性を補足する</p><div class="mini-label">重視度の扱い</div><p>実戦の直接証拠を優先。血統のみでA+は付けない。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">⑦</b><b>調教</b></span><span class="weight">補助的</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>最終追い・1週前時計、終いのラップ、併せ馬、調教負荷と乗り込み</p><div class="mini-label">何を評価する？</div><p>現時点の仕上がりを補助判断</p><div class="mini-label">重視度の扱い</div><p>調教だけでピーク能力を上書きしない。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">⑧</b><b>騎手</b></span><span class="weight">状況依存</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>今回場・距離・枠・脚質での実績、継続騎乗、条件付き騎手格言</p><div class="mini-label">何を評価する？</div><p>騎手が今回の条件に合うか</p><div class="mini-label">重視度の扱い</div><p>有名だから加点、人気だけで判断は禁止。</p></div></details>
+
+<details class="factor"><summary><span class="factor-name"><b class="number">⑨</b><b>基礎能力・クラス</b></span><span class="weight">能力評価の中核</span></summary>
+<div class="inside"><div class="mini-label">使う情報</div><p>対戦相手、重賞・OP実績、着差、着順の中身、補正した走破時計・上がり、近走の高水準再現性</p><div class="mini-label">何を評価する？</div><p>そもそもどれだけ速く強く走れるか</p><div class="mini-label">重視度の扱い</div><p>最速1走だけでなくピーク・2番手・近走3〜6走を見る。</p></div></details></div><p class="notice" style="margin-top:15px"><b>重みの見せ方について：</b>正式ルールで強さが言葉として明記されているのは、①斤量の「やや強め」などです。各項目の固定配点や数値係数は確認できず、<b>「①20%・⑨30%」のような数字を捏造して表示しません。</b> 数値配分を採用するには、別途モデル検証・承認が必要です。</p></section>
+<section class="panel"><h2>タイムインデックスはどこに効く？</h2>
+<div class="diagram"><div class="box blue"><b>過去走の時計を比較可能な条件にそろえる</b><small>競馬場・走路・距離・馬場速度・斤量・ペース・クラス・近走・再現性</small></div><div class="step">↓</div><div class="split">
+<div class="box"><b>⑨ 速さの能力</b><small>補正時計と複数走の再現性</small></div>
+<div class="box"><b>⑤ コース適性</b><small>同コース・似た距離での適合度</small></div>
+<div class="box"><b>③ 馬場適性</b><small>今回の馬場質での再現性</small></div>
+</div><div class="step">↓</div><div class="box black"><b>総合評価への説明可能な反映</b><small>同じ時計を複数項目に加算しない。既存の①〜⑨を置き換えない</small></div></div>
+<h3 style="margin-top:17px">次回以降の保存・監査案</h3><div class="rows">
+<div class="rowcard"><b>1. 近似条件の過去走を全頭で保存</b><p>ベスト・2番手・直近の代表走、時計、馬場、斤量、ラップ、出典URLを確認する</p></div>
+<div class="rowcard"><b>2. 比較根拠と補正方法を記録</b><p>Time IndexのA+〜C、使用した条件補正、信頼度、資料不足なら「未算出」を保存する。数値化するなら先に計算式を固定する</p></div>
+<div class="rowcard"><b>3. ③⑤⑨への使い分けを明示</b><p>同じ時計で複数加点しないこと、ピーク・現在値・再現信頼度のどれを動かしたかを確認</p></div>
+<div class="rowcard"><b>4. 発走前に証跡を固定</b><p>保存値と元データのSHA、時刻、発走前判定を監査。過去予想と最終買い目は書き換えない</p></div>
+</div><p class="sub" style="margin-top:12px">このページは仕様提案段階です。計算式・自動保存・CIゲートの本番適用は未実施。正式な予想モデルの重みは変更していません。</p>
+</section>
+<section class="panel"><h2>今回の回顧から見える改善候補</h2><h3>菊花賞（2026年10月25日）</h3>
+<div class="tablewrap"><table><thead><tr><th>単勝の候補</th><th>発走前モデル勝率</th><th>当時のオッズ</th><th>モデル期待回収率</th><th>正式購入</th></tr></thead><tbody>
+<tr><td>5 ジャスティンシカゴ</td><td>8.12%</td><td>13.0倍</td><td>105.6%</td><td>単勝なし／馬単の一部に採用</td></tr>
+<tr><td>9 ゴーイントゥスカイ</td><td>9.10%</td><td>11.2倍</td><td>101.9%</td><td>単勝なし／馬単9→6に採用</td></tr>
+<tr><td>6 バステール</td><td>8.12%</td><td>36.8倍</td><td>298.9%</td><td>単勝と馬単に採用</td></tr>
+</tbody></table></div>
+<p class="sub">モデルの確率は未校正。掲載オッズは朝の保存値で、発走直前・最終オッズを意味しません。</p>
+<p>ジャスティンシカゴは5→6、6→5という馬単に含まれています。単勝が選ばれなかったのは、最終買い目を3つの通常購入＋中穴＋大穴の5件に絞ったため。ただし「単勝を1点追加した際のセット全体の期待値とリスク差」がユーザーに追える形では残っておらず、次回から不採用候補の比較根拠を表示することを検証します。</p>
+<h3 style="margin-top:15px">ルミエールオータムダッシュ（同日・新潟直線1000m）</h3><div class="rows">
+<div class="rowcard"><b>結果と予想のズレ</b><p>勝馬9モズナナスターは△・総合Bで、稍重の同コース3着の直接実績あり。しかし最終の32点に9が1件も含まれませんでした。◎14は3着同着、○11は2着でした。</p></div>
+<div class="rowcard"><b>馬場の変化</b><p>朝の稍重から、当日公式結果では不良。良馬場の標準時計や過去の高速時計をそのまま比較しない仕組みが重要です。</p></div>
+<div class="rowcard"><b>直線1000mの特有条件</b><p>枠と通る進路（内外）、外ラチ側の当日馬場差、序盤200mの加速、トップスピードの持続、ラスト300mの減速、50〜57kgの斤量差を独立検証する候補です。</p></div>
+<div class="rowcard"><b>馬券の構造</b><p>三連複20点＋枠連10点ほか2点。BOX中心で勝ち馬を含む候補を一切買わない構造があり、「高評価だが未採用」への説明監査が必要です。</p></div></div>
+<p class="footnote">「9番を買うべきだった」「外枠を増点すべきだった」という結論は結果からは決めません。事前固定データを用いた複数開催・馬場別のShadow比較を経て判断します。</p></section>
+<section class="panel"><h2>どこまで実装済み？</h2><div class="rows">
+<div class="rowcard"><b>表示案：ステージング</b><p>関係図、①〜⑨の入力項目、重視度の不明点、2レースの論点を公開原本を変えずに閲覧できます。</p></div>
+<div class="rowcard"><b>タイム指数の発走前監査：仕様検証待ち</b><p>項目別の保存・監査・重複防止を、次回実行用の別バージョンに実装する必要があります。自動反映済みとは表示しません。</p></div>
+<div class="rowcard"><b>直線1000mと買い目不採用説明：研究候補</b><p>別サンプルで比較し、モデル改善候補に昇格させるか決めます。単発の結果で正式ロジックを変えません。</p></div>
+</div><div class="linkbar" style="margin-top:14px"><a href="results.html">ステージングの結果一覧へ戻る</a><a href="../競馬予想_完全版プロンプト_v3.0.txt">ルール原文（v3.0）</a></div></section>
+<footer>参照：GitHub keiba-notes 正式v3.0 TIME-01〜09／CORE-02／RATE-01、2026年10月25日の発走前固定予想・買い目・回顧。すべて閲覧・説明専用。</footer>
+</main></body></html>
