@@ -1,0 +1,289 @@
+name: JRA generic v3.17 intake, v3.13 frozen STEP1 and fresh-odds audited publication
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/v317/*.json'
+  workflow_dispatch:
+    inputs:
+      request_path:
+        description: 'One immutable prereace request (e2e_validation/requests/v317/*.json)'
+        type: string
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: jra-v313-prestart-proof
+  cancel-in-progress: false
+jobs:
+  prestart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assemble race-specific audited input without changing any STEP1 rules
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUEST_FROM_UI: ${{ inputs.request_path }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            mapfile -t NEW_REQUESTS < <(git diff --diff-filter=A --name-only "$BEFORE_SHA" "$AFTER_SHA" -- e2e_validation/requests/v317)
+            if [[ ${#NEW_REQUESTS[@]} -ne 1 ]]; then
+              echo "::error::One immutable JRA request per commit is required";exit 1
+            fi
+            REQUEST_PATH="${NEW_REQUESTS[0]}"
+          else
+            REQUEST_PATH="$REQUEST_FROM_UI"
+          fi
+          case "$REQUEST_PATH" in e2e_validation/requests/v317/*.json) ;; *) echo "::error::Unsafe request path";exit 1;; esac
+          [[ -f "$REQUEST_PATH" && ! -L "$REQUEST_PATH" ]] || { echo "::error::Request missing";exit 1; }
+          python3 -m pip install -q requests beautifulsoup4
+          python3 .github/scripts/jra-gather-live-v317.py --request "$REQUEST_PATH"
+          INPUT_PATH=$(python3 - "$REQUEST_PATH" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          print('e2e_validation/inputs/v313/'+r['race']['slug']+'.json')
+          PY
+          )
+          [[ -f "$INPUT_PATH" ]] || { echo "::error::Audited input was not generated";exit 1; }
+          echo "INPUT_PATH=$INPUT_PATH" >> "$GITHUB_ENV"
+          echo "REQUEST_PATH=$REQUEST_PATH" >> "$GITHUB_ENV"
+      - name: Run v3.13 balanced optimisation, history and regression CI
+        run: |
+          node .github/scripts/test-jra-balanced-v311.mjs
+          node .github/scripts/test-jra-purchase-audit-v312.mjs
+          python3 -m py_compile .github/scripts/jra-odds-recovery-v312.py .github/scripts/jra-render-live-v313.py .github/scripts/validate-jra-pdf-content-v313.py
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/validate-prompt-history.mjs
+          node .github/scripts/test-jra-v313-formal-real.mjs
+          node .github/scripts/test-jra-portfolio-v311.mjs
+          node .github/scripts/test-jra-strategy-v39.mjs
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+      - name: Validate path and reserve immutable snapshot names
+        env:
+          INPUT_PATH: ${{ env.INPUT_PATH }}
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          ATTEMPT: ${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # v3.17 intake generated exactly one new, unsaved input from a single audited request.
+          [[ -n "$INPUT_PATH" ]] || { echo "::error::No valid generated input";exit 1; }
+          case "$INPUT_PATH" in e2e_validation/inputs/v313/*.json) ;; *) echo "::error::Input must be a new audited v3.13 prereace JSON under e2e_validation/inputs/v313/"; exit 1;; esac
+          if [[ "$INPUT_PATH" == *..* ]] || [[ ! -f "$INPUT_PATH" ]] || [[ -L "$INPUT_PATH" ]]; then
+            echo "::error::Unsafe or missing race input"; exit 1
+          fi
+          RACE_ID=$(node -e "const o=require('./'+process.argv[1]);if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+$/.test(o.race_id||''))process.exit(1);console.log(o.race_id)" "$INPUT_PATH")
+          REL="v3.13-run${RUN_ID}-attempt${ATTEMPT}.json"
+          SNAPSHOT="e2e_validation/snapshots/${RACE_ID}/${REL}"
+          PREDICTION="e2e_validation/predictions/${RACE_ID}/${REL}"
+          REPORT="docs/reports/$RACE_ID.html"
+          PDF="docs/pdfs/$RACE_ID.pdf"
+          if [[ -e "$REPORT" || -e "$PDF" ]];then echo "::error::Prior official report/PDF exists; cannot overwrite";exit 1;fi
+          python3 - "$RACE_ID" <<'PY'
+          import json,sys
+          from pathlib import Path
+          registry=json.loads(Path('docs/data/races.json').read_text())
+          if any(r['id']==sys.argv[1] for r in registry['races']):raise SystemExit('BLOCKER: race already published')
+          PY
+          if [[ -e "$SNAPSHOT" || -e "$PREDICTION" ]]; then
+            echo "::error::Immutable snapshot/prediction path already occupied"; exit 1
+          fi
+          {
+            echo "RACE_ID=$RACE_ID"
+            echo "INPUT_PATH=$INPUT_PATH"
+            echo "SNAPSHOT=$SNAPSHOT"
+            echo "PREDICTION=$PREDICTION"
+            echo "REPORT=$REPORT"
+            echo "PDF=$PDF"
+            echo "JRA_SET_RESEARCH=docs/data/jra-set-preference/$RACE_ID.json"
+          } >> "$GITHUB_ENV"
+      - name: Archive pre-race E0/E1/E2 source-evidence completeness separately from official STEP1
+        run: |
+          set -euo pipefail
+          SHADOW_EVIDENCE="e2e_validation/shadow-collection-audits/$RACE_ID/v3.13-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}.json"
+          python3 experience_regime_v1/prestart_collection_audit_v1.py --input "$INPUT_PATH" --output "$SHADOW_EVIDENCE"
+          echo "SHADOW_EVIDENCE=$SHADOW_EVIDENCE" >> "$GITHUB_ENV"
+          echo 'Missing evidence blocks Shadow research, not the immutable official JRA betting prediction.'
+      - name: Resolve exact live odds using only source-advertised forms
+        env:
+          RACE_INPUT: ${{ env.INPUT_PATH }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          RACE_ID=$(node -e "console.log(require('./'+process.argv[1]).race_id)" "$RACE_INPUT")
+          REPAIRED="e2e_validation/inputs/v313-recovered/${RACE_ID}-run${RUN_ID}.json"
+          EVIDENCE="e2e_validation/quote-evidence/${RACE_ID}/v313-repair-run${RUN_ID}"
+          python3 -m pip install -q requests beautifulsoup4
+          python3 .github/scripts/jra-odds-full-refresh-v313-exec.py --refresh-all \
+            --input "$RACE_INPUT" --output "$REPAIRED" --evidence-dir "$EVIDENCE" --max-capture-spread-seconds 180
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py --input "$REPAIRED" --fresh-seconds 600 --max-spread-seconds 180
+          echo "RECOVERED_INPUT=$REPAIRED" >> "$GITHUB_ENV"
+          echo "RECOVERED_EVIDENCE=$EVIDENCE" >> "$GITHUB_ENV"
+      - name: Install exactly approved JRA PDF renderer
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Generate and audit the complete unsealed betting snapshot
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-prestart-pipeline-v313.mjs --input "$RECOVERED_INPUT" --output "$SNAPSHOT"
+          node -e "const p=require('./'+process.argv[1]);if(p.stage!=='pending_git_proof'||p.proof_commit!==null||p.prompt_version!=='v3.13')process.exit(1)" "$SNAPSHOT"
+      - name: Adaptively paginate every selected/rejected candidate and verify PDF before freezing
+        run: |
+          set -euo pipefail
+          python3 - "$SNAPSHOT" /tmp/jra-v311-layout-only.json <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]));d['stage']='formal_prestart';d['proof_commit']='a'*40
+          with open(sys.argv[2],'w') as f:json.dump(d,f,ensure_ascii=False)
+          PY
+          set +e
+          VALIDATED=0
+          # Each retry uses smaller rows per A4 page. Total pages are unrestricted.
+          for ROWS in 14:12:14:6 12:10:14:6 10:9:14:6 10:8:14:6 10:7:14:6 8:5:10:4 6:4:8:3 4:3:6:2 2:2:4:1 1:1:2:1; do
+            IFS=: read -r SELECTED_ROWS REJECTED_ROWS AUDIT_ROWS COVER_BETS <<< "$ROWS"
+            echo "Rendering candidate rows/page selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
+            JRA_SELECTED_ROWS_PER_PAGE="$SELECTED_ROWS" JRA_REJECTED_ROWS_PER_PAGE="$REJECTED_ROWS" JRA_AUDIT_ROWS_PER_PAGE="$AUDIT_ROWS" \
+              python3 .github/scripts/jra-render-live-v313.py /tmp/jra-v311-layout-only.json "$REPORT" &&
+             JRA_COVER_BETS_PER_TYPE="$COVER_BETS" python3 .github/scripts/jra-pdf-presentation-overlay-v2.py "$REPORT" --prediction /tmp/jra-v311-layout-only.json &&
+            python3 -m weasyprint "$REPORT" /tmp/jra-v311-layout-only.pdf &&
+            python3 .github/scripts/validate-jra-pdf-content-v313.py \
+              --html "$REPORT" --pdf /tmp/jra-v311-layout-only.pdf --prediction /tmp/jra-v311-layout-only.json
+            if [[ $? -eq 0 ]]; then
+              VALIDATED=1; echo "SUCCESS chosen pagination: selected=$SELECTED_ROWS excluded=$REJECTED_ROWS"
+              echo "JRA_SELECTED_ROWS_PER_PAGE=$SELECTED_ROWS" >> "$GITHUB_ENV"
+              echo "JRA_REJECTED_ROWS_PER_PAGE=$REJECTED_ROWS" >> "$GITHUB_ENV"
+               echo "JRA_AUDIT_ROWS_PER_PAGE=$AUDIT_ROWS" >> "$GITHUB_ENV"
+              echo "JRA_COVER_BETS_PER_TYPE=$COVER_BETS" >> "$GITHUB_ENV"
+              break
+            fi
+          done
+          if [[ $VALIDATED -ne 1 ]]; then echo "::error::All per-page density variants failed detailed PDF audit"; exit 1; fi
+          set -e
+      - name: Freeze snapshot in a real Git commit before race start
+        # Snapshot, evidence and every candidate quote are revalidated before proof.
+        
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py --input "$RECOVERED_INPUT" --fresh-seconds 600 --max-spread-seconds 180
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Persist original request-derived input and all source quote evidence in the proof.
+          git add -- "$INPUT_PATH" "$SNAPSHOT" "$RECOVERED_INPUT" "e2e_validation/quote-evidence/$RACE_ID" "$SHADOW_EVIDENCE" "e2e_validation/clock-shadow-v1/$RACE_ID.json"
+          if [[ -d "$RECOVERED_EVIDENCE" ]] && find "$RECOVERED_EVIDENCE" -type f -print -quit | grep -q .; then git add -- "$RECOVERED_EVIDENCE"; fi
+          git commit -m "Freeze JRA v3.17 generic intake and complete v3.13 prestart market evidence"
+          # Preserve newer main changes from independently scheduled NAR, website,
+          # and parallel JRA requests. Race-scoped commits may be rebased only if
+          # git can reconcile cleanly, never force-push or rewrite prior proofs.
+          for push_attempt in 1 2 3; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Unmergeable concurrent publication; no force push"
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [[ "$push_attempt" -eq 3 ]]; then
+              echo "::error::Concurrent write race exhausted retries; no data overwritten"
+              exit 1
+            fi
+          done
+          PROOF=$(git rev-parse HEAD)
+          echo "PROOF=$PROOF" >> "$GITHUB_ENV"
+          echo "Recorded immutable prereace snapshot $SNAPSHOT in $PROOF"
+      - name: Seal final prediction with existing Git proof
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py --input "$RECOVERED_INPUT" --fresh-seconds 600 --max-spread-seconds 180
+          node .github/scripts/jra-prestart-pipeline-v313.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
+          node .github/scripts/validate-jra-portfolio-v313.mjs "$PREDICTION"
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+      - name: Audit entire purchasable sets against the unchanged sealed formal ticket portfolio
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-set-preference-v1.mjs --input "$PREDICTION" --output "$JRA_SET_RESEARCH"
+          node - "$JRA_SET_RESEARCH" "$PROOF" <<'JS'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(d.status!=='shadow_comparison_only'||d.formal_bets_selection_unchanged!==true||
+             d.formal_proof_commit!==process.argv[3]||d.comparison.proposed.total_stake_yen>6000)
+             process.exit(1);
+          console.log('JRA_COMPLETE_PURCHASE_SETS_COMPARED_BUT_FINAL_BETS_UNCHANGED',d.race_id);
+          JS
+      - name: Generate final PDF from immutable proof, validate every page and append public registry
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-render-live-v313.py "$PREDICTION" "$REPORT"
+           python3 .github/scripts/jra-pdf-presentation-overlay-v2.py "$REPORT" --prediction "$PREDICTION"
+          python -m weasyprint "$REPORT" "$PDF"
+          python3 .github/scripts/validate-jra-pdf-content-v313.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
+          python3 .github/scripts/jra-publish-live-v313.py "$PREDICTION"
+      - name: Commit only new prediction PDF HTML and appended race registry
+        run: |
+          set -euo pipefail
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$JRA_SET_RESEARCH" docs/data/races.json
+          python3 - "$PREDICTION" "$REPORT" "$PDF" "$JRA_SET_RESEARCH" <<'PY'
+          import subprocess,sys
+          expected=set(sys.argv[1:])|{'docs/data/races.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          if actual!=expected:raise SystemExit('BLOCKER: unexpected historical file changes: '+str(actual^expected))
+          PY
+          git commit -m "Publish validated v3.13 full JRA original prediction HTML PDF and public registry"
+          # Preserve newer main changes from independently scheduled NAR, website,
+          # and parallel JRA requests. Race-scoped commits may be rebased only if
+          # git can reconcile cleanly, never force-push or rewrite prior proofs.
+          for push_attempt in 1 2 3; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Unmergeable concurrent publication; no force push"
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [[ "$push_attempt" -eq 3 ]]; then
+              echo "::error::Concurrent write race exhausted retries; no data overwritten"
+              exit 1
+            fi
+          done
+          echo "JRA_V313_COMMITTED_AWAITING_PUBLIC_HTTP_VERIFICATION $RACE_ID proof=$PROOF"
+      - name: Independently compare deployed website HTML PDF and public race registry
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 24); do
+            OK=1
+            for FILE in docs/data/races.json "$REPORT" "$PDF" "$JRA_SET_RESEARCH"; do
+              URL="https://toodataa-ai.github.io/keiba-notes/${FILE#docs/}"
+              if ! curl -LfsS --max-time 20 "$URL" -o "/tmp/jra-v313-http-$(basename "$FILE")" ||
+                ! cmp -s "$FILE" "/tmp/jra-v313-http-$(basename "$FILE")"; then
+                OK=0;break
+              fi
+            done
+            if [[ "$OK" == 1 ]]; then
+              echo "JRA_V313_NEW_RACE_FULL_PUBLIC_HTTP_VERIFIED $RACE_ID $PROOF"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo '::error::GitHub files committed but real public HTML/PDF/registry publication not verified'
+          exit 1
