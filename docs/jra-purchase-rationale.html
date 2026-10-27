@@ -43,9 +43,7 @@ table td:nth-child(2){word-break:break-word}
 @media(max-width:620px){.compare strong{font-size:16px}.compare>div{padding:7px 6px}table{font-size:11px}th,td{padding:5px 3px}}
 
 
-#sealed-report-original{width:100%;display:block;box-sizing:border-box;height:min(83vh,860px);min-height:510px;background:#fff;border:1px solid #c7c7c7;border-radius:3px;overflow:auto}
-#sealed-report-original:focus{outline:2px solid #8b2e4d}
-@media(max-width:620px){#sealed-report-original{height:77vh;min-height:460px}}
+
 </style>
 </head>
 <body>
@@ -132,74 +130,65 @@ function render(r){
   error("正式レポートの参照先を確認できません。");return;
  }
  const unchangedReport=encodeURI(r.report);
- paper.innerHTML=
-  '<h2 class="preview-caption">正式予想レポート</h2>'+
-  '<p class="secondary-note">原本の「購入操作とJRA入力馬番」の直後にコラムを表示します。枠内をスクロールして確認してください。</p>'+
-  '<iframe id="sealed-report-original" title="正式予想と買い目直後のコラム" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>'+
-  '<p id="column-insertion-status" class="secondary-note" role="status">買い目の直後にコラムを配置しています…</p>'+
-  '<p class="link"><a href="'+unchangedReport+'" target="_blank" rel="noopener">元の正式レポート（変更なし）を直接開く</a></p>';
- const frame=paper.querySelector("#sealed-report-original");
- const status=paper.querySelector("#column-insertion-status");
- frame.addEventListener("load",()=>{
-  if(!frame.isConnected)return;
-  try{
-   const doc=frame.contentDocument;
-   if(!doc?.body?.matches('body[data-full-report="true"]'))
-    throw Error("正式な全頭診断レポートを読み込めません");
-   const first=doc.querySelector("section.page");
-   const heading=Array.from(first?.children||[]).find(n=>n.tagName==="H3"&&n.textContent.trim()==="購入操作とJRA入力馬番");
-   const purchaseTable=heading?.nextElementSibling;
-   if(!purchaseTable || purchaseTable.tagName!=="TABLE" || !purchaseTable.classList.contains("table"))
-    throw Error("買い目表の指定位置が一致しません");
-   if(!first.querySelector("h1")?.textContent.includes(r.race))
-    throw Error("レース名が原本と一致しません");
-   const allTables=Array.from(doc.querySelectorAll("table"));
-   const beforeTables=allTables.map(t=>t.outerHTML);
-   if(doc.querySelector("[data-stage-rationale]"))throw Error("二重挿入を検出しました");
-   const style=doc.createElement("style");
-   style.setAttribute("data-stage-rationale-style","");
-   style.textContent=[
-    ".stage-rationale{margin:10px 0;padding:10px 12px;border:1px solid #c7c7c7;background:#fafafa;color:inherit;font-family:inherit;line-height:1.48}",
-    ".stage-rationale h3{margin:3px 0 9px}",
-    ".stage-rationale .highlight{border-left:3px solid #333;padding:8px 10px;background:#f2f2f2;margin:8px 0}",
-    ".stage-rationale .highlight b{font-size:11.5pt}",
-    ".stage-rationale .highlight p{margin:5px 0 0;font-size:10.5pt}",
-    ".stage-rationale .positive{font-weight:800}",
-    ".stage-rationale .compare{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}",
-    ".stage-rationale .compare>div{flex:1 1 110px;border:1px solid #c4c4c4;padding:6px 7px;min-width:0;background:#fff}",
-    ".stage-rationale .compare small{display:block;font-size:8.5pt;color:#555}",
-    ".stage-rationale .compare strong{display:block;font-size:12pt;font-weight:800;overflow-wrap:anywhere}",
-    ".stage-rationale dl{margin:8px 0 0}",
-    ".stage-rationale dt{font-size:10pt;font-weight:800;margin:10px 0 3px;border-bottom:1px solid #ddd}",
-    ".stage-rationale dd{font-size:10pt;margin:0 0 6px;line-height:1.52;overflow-wrap:anywhere}",
-    ".stage-rationale .note{font-size:8.5pt;color:#555;border-top:1px solid #ddd;padding-top:6px;margin-top:8px}",
-    "@media(max-width:620px){.stage-rationale{padding:8px}.stage-rationale .compare>div{flex-basis:85px;padding:5px}.stage-rationale .compare strong{font-size:11pt}}",
-    "@media print{.stage-rationale{break-inside:avoid}}"
-   ].join("\n");
-   const column=doc.createElement("div");
-   column.className="sheetbox stage-rationale";
-   column.setAttribute("data-stage-rationale","v3");
-   column.setAttribute("aria-label","AIの馬券戦略・妙味解説");
-   column.innerHTML=
-    '<h3>AIの馬券戦略・妙味解説</h3>'+headline+
-    '<div class="compare"><div><small>モデル推定的中率</small><strong>'+esc(pMain)+'</strong></div>'+
-    '<div><small>損益分岐の的中率</small><strong>'+esc(pBreak)+'</strong></div>'+
-    '<div><small>モデル上の妙味倍率</small><strong>'+esc(spread)+'倍</strong></div></div>'+
-    why+
-    '<p class="note">発走前の中間オッズを用いた未校正モデルの参考値です。取得時刻：'+esc(oddsTime)+' JST。発走直前・確定オッズではありません。結果・回顧・回収率には影響しません。</p>';
-   doc.head.append(style);
-   purchaseTable.insertAdjacentElement("afterend",column);
-   if(purchaseTable.nextElementSibling!==column ||
-      allTables.length!==doc.querySelectorAll("table").length ||
-      !allTables.every((t,i)=>t.outerHTML===beforeTables[i]))
-    throw Error("元の買い目表・その他の表の不変性検査に失敗しました");
-   status.textContent="買い目直後への差し込みと、正式レポート内の表が不変であることを確認済みです。";
-  }catch(err){
-   status.textContent="コラムの表示を検証できません（正式な予想原本は変更なし）："+String(err.message||err);
-   status.className="error";
-  }
+ // Read the sealed official report as text for display only, then
+ // insert only two extra strings: a scoped stylesheet and the commentary.
+ // Render the complete original page in the top-level document, so the mobile
+ // browser has exactly one natural page scrollbar (no iframe or outer card).
+ const column=
+  '<section class="stage-rationale" data-stage-rationale="v4" aria-label="AIの馬券戦略・妙味解説">'+
+  '<h3>AIの馬券戦略・妙味解説</h3>'+
+  headline+
+  '<p class="stage-rationale-metrics">モデル推定的中率 <strong>'+esc(pMain)+'</strong>　／　損益分岐の的中率 <strong>'+esc(pBreak)+'</strong>　／　モデル上の妙味倍率 <strong>'+esc(spread)+'倍</strong></p>'+
+  why+
+  '<p class="stage-rationale-note">発走前の中間オッズを用いた未校正モデルの参考値です。取得時刻：'+esc(oddsTime)+' JST。発走直前・確定オッズではありません。予想・結果・回顧・回収率の原本は変更しません。</p>'+
+  '</section>';
+ const columnStyle='<style id="stage-rationale-only-style">'+[
+  '.stage-rationale{margin:9px 0 14px;padding:2px 0 5px;background:transparent;border:0;color:inherit;font-family:inherit;line-height:1.5}',
+  '.stage-rationale h3{margin:10px 0 8px;font-size:12.5pt}',
+  '.stage-rationale .highlight{padding:0;margin:0 0 8px;background:transparent;border:0}',
+  '.stage-rationale .highlight b{font-size:11.5pt}',
+  '.stage-rationale .highlight p{margin:4px 0 8px;font-size:10.5pt}',
+  '.stage-rationale .positive{font-weight:800}',
+  '.stage-rationale-metrics{font-size:9.5pt;margin:5px 0 9px;border-bottom:1px solid #aaa;padding-bottom:8px}',
+  '.stage-rationale-metrics strong{font-weight:800;font-size:10.5pt}',
+  '.stage-rationale dl{margin:0}',
+  '.stage-rationale dt{font-size:10.5pt;font-weight:800;margin:10px 0 3px}',
+  '.stage-rationale dd{font-size:10pt;margin:0 0 7px;line-height:1.5;overflow-wrap:anywhere}',
+  '.stage-rationale-note{font-size:8.5pt;color:#555;margin:8px 0 0}',
+  '@media(max-width:640px){.stage-rationale{padding:0;margin-top:8px}.stage-rationale-metrics{line-height:1.8}}',
+  '@media print{.stage-rationale{break-inside:avoid}}'
+ ].join("\n")+'</style>';
+ fetch(unchangedReport,{cache:"no-store"}).then(response=>{
+  if(!response.ok)throw Error("正式レポートを取得できません：HTTP "+response.status);
+  return response.text();
+ }).then(source=>{
+  if(!source.includes('<body data-full-report="true"') || !source.includes("</head>"))
+   throw Error("正式なレポートの形式を確認できません");
+  if(source.includes('data-stage-rationale='))throw Error("解説の重複を検出しました");
+  const parsed=new DOMParser().parseFromString(source,"text/html");
+  const first=parsed.querySelector("section.page");
+  const heading=Array.from(first?.children||[]).find(node=>node.tagName==="H3"&&node.textContent.trim()==="購入操作とJRA入力馬番");
+  const purchaseTable=heading?.nextElementSibling;
+  if(!first?.querySelector("h1")?.textContent.includes(r.race) ||
+     !purchaseTable || purchaseTable.tagName!=="TABLE" || !purchaseTable.classList.contains("table"))
+   throw Error("買い目表の位置・レース名が一致しません");
+  const match=source.match(/<h3>購入操作とJRA入力馬番<\/h3><table class="table dense">[\s\S]*?<\/table>/);
+  if(!match || source.split('<h3>購入操作とJRA入力馬番</h3>').length!==2)
+   throw Error("原本の買い目表を安全に特定できません");
+  const insertAt=source.indexOf(match[0])+match[0].length;
+  const reportWithColumn=source.slice(0,insertAt)+column+source.slice(insertAt);
+  const full=reportWithColumn.replace("</head>",columnStyle+"</head>");
+  if(full.replace(columnStyle,"").replace(column,"")!==source)
+   throw Error("買い目表・予想原文の不変性検査に失敗しました");
+  // The fetched report's original HTML is byte-for-byte preserved apart from
+  // the two additive presentation fragments. The canonical file is untouched.
+  document.open();
+  document.write(full);
+  document.close();
+ }).catch(err=>{
+  paper.innerHTML='<p class="error">コラムの表示を検証できません：'+esc(err.message||err)+'</p>'+
+   '<p class="link"><a href="'+unchangedReport+'">正式レポートを開く（原本は変更なし）</a></p>';
  });
- frame.src=unchangedReport;
 
 }
 Promise.all([
