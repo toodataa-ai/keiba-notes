@@ -61,13 +61,12 @@ def main():
     official={}
     errors={}
     group_keys=sorted({(r["date"],r["venue"]) for r in targets})
-    code_by_label={v:k for k,v in CODES.items()}
     for date,label in group_keys:
         key=date+" / "+label
-        if label not in code_by_label:
+        if label not in CODES:
             errors[key]="Unknown enabled NAR venue"; continue
         try:
-            soup,url=http_html("RefundMoneyList",{"k_babaCode":code_by_label[label],
+            soup,url=http_html("RefundMoneyList",{"k_babaCode":CODES[label],
                                                     "k_raceDate":date.replace("-","/")})
             page_identity(soup,date,"帯広" if label=="帯広ば" else label)
             sections=refund_sections(soup.get_text(" ",strip=True))
