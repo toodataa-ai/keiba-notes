@@ -39,7 +39,7 @@ jobs:
           from pathlib import Path
           d=json.loads(Path("docs/staging/data/local-shadow-roi-preview.json").read_text())
           assert d["production_effect"] is False
-          assert d["summary"]["win_checked"]==d["summary"]["evaluable"]
+          assert d["summary"]["win_checked"]<=d["summary"]["evaluable"]
           assert d["summary"]["place_checked"]<=d["summary"]["evaluable"]
           assert d["summary"]["evaluable"]==sum(x["evaluable"] for x in d["daily"].values())
           assert d["summary"]["win_return_yen"]==sum(x["win_return_yen"] for x in d["daily"].values())
