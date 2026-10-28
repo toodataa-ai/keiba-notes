@@ -1,0 +1,86 @@
+name: Local Shadow cumulative win-place ROI staging preview
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/data/local_racing_shadow_public.json'
+      - 'local_racing_shadow_v1/cumulative_roi_preview.py'
+      - '.github/workflows/local-shadow-cumulative-roi-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: local-shadow-roi-preview
+  cancel-in-progress: false
+jobs:
+  staging-roi-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official-NAR read-only parser dependencies
+        run: python -m pip install requests beautifulsoup4
+      - name: Test the ROI calculation and NAR place parser
+        run: python -B local_racing_shadow_v1/cumulative_roi_preview.py --self-test
+      - name: Build staging-only recovery report from immutable official NAR evidence
+        run: python -B local_racing_shadow_v1/cumulative_roi_preview.py
+      - name: Validate all modifications are preview JSON only
+        run: |
+          git diff --exit-code -- local_racing_shadow_v1/predictions local_racing_shadow_v1/results local_racing_shadow_v1/reviews docs/data
+          git status --porcelain --untracked-files=all | sed 's/^...//' | python -c 'import sys; f=[x.strip() for x in sys.stdin if x.strip()]; assert all(x=="docs/staging/data/local-shadow-roi-preview.json" for x in f),f"Unexpected file changes: {f}"'
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("docs/staging/data/local-shadow-roi-preview.json").read_text())
+          assert d["production_effect"] is False
+          assert d["summary"]["win_checked"]==d["summary"]["evaluable"]
+          assert d["summary"]["place_checked"]<=d["summary"]["evaluable"]
+          assert d["summary"]["evaluable"]==sum(x["evaluable"] for x in d["daily"].values())
+          assert d["summary"]["win_return_yen"]==sum(x["win_return_yen"] for x in d["daily"].values())
+          assert d["summary"]["place_return_yen"]==sum(x["place_return_yen"] for x in d["daily"].values())
+          print("PASS: ROI denominator, stake, official proof and staging-only guards")
+          PY
+      - name: Commit isolated staging ROI summary only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/staging/data/local-shadow-roi-preview.json
+          if ! git diff --cached --quiet; then
+            git commit -m "stage: publish auditable NAR Shadow theoretical win/place ROI"
+            pushed=0
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then pushed=1; break; fi
+              sleep "$attempt"
+            done
+            test "$pushed" -eq 1
+          fi
+      - name: Verify deployed staging ROI JSON against committed data
+        run: |
+          python - <<'PY'
+          import json, time, requests
+          from pathlib import Path
+          u="https://toodataa-ai.github.io/keiba-notes/staging/data/local-shadow-roi-preview.json"
+          expected=json.loads(Path("docs/staging/data/local-shadow-roi-preview.json").read_text())
+          for attempt in range(15):
+              try:
+                  r=requests.get(u,headers={"Cache-Control":"no-cache"},params={"audit":str(time.time())},timeout=15)
+                  r.raise_for_status()
+                  live=r.json()
+                  assert live==expected,"Live Pages JSON differs from committed preview"
+                  print(json.dumps({"status":"VERIFIED","source":u,"win_roi_pct":live["summary"]["win_roi_pct"],
+                                    "place_roi_pct":live["summary"]["place_roi_pct"],"place_coverage":live["summary"]["place_checked"]},
+                                   ensure_ascii=False))
+                  break
+              except Exception as e:
+                  print(f"COMMITTED_NOT_PUBLISHED attempt={attempt+1}/15: {e}")
+                  if attempt==14:raise
+                  time.sleep(8)
+          PY
