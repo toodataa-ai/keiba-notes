@@ -29,6 +29,10 @@
     .cum-panel h3{margin:0 0 9px;font-size:15px}.cum-panel p{margin:7px 0;font-size:11px;color:#627087}
     .cum-chart{width:100%;max-height:245px}.cum-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#435066}
     .cum-legend span:before{content:"";display:inline-block;width:13px;height:3px;vertical-align:middle;margin-right:6px;background:var(--line)}
+
+    .roi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .roi-status{font-size:12px;color:#59667a;line-height:1.7;margin:4px 0 13px}
+    @media(max-width:480px){.roi-grid{grid-template-columns:1fr}}
     .cum-scroll{max-height:290px;overflow:auto}.cum-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12px}
     .cum-table th,.cum-table td{padding:8px 5px;border-bottom:1px solid #e5e9ee;text-align:right;white-space:nowrap}
     .cum-table th{color:#59667a;font-size:11px}.cum-table th:first-child,.cum-table td:first-child{text-align:left}
@@ -78,6 +82,14 @@
       <div class="cum-card"><small>回顧済みレース</small><strong id="cumReviewed">—</strong><span id="cumReviewedDetail">集計中…</span></div>
       <div class="cum-card"><small>発走前予想を固定</small><strong id="cumFrozen">—</strong><span id="cumFrozenDetail">集計中…</span></div>
     </div>
+
+    <h3 style="font-size:16px;margin:20px 0 5px">仮想購入した場合の累積回収率</h3>
+    <p class="cum-info">すべての評価対象レースで「発走前予想1位を各券種100円ずつ」購入したと仮定した結果です。実際の馬券購入実績ではありません。</p>
+    <div class="cum-grid roi-grid" aria-live="polite">
+      <div class="cum-card primary"><small>単勝・累積回収率</small><strong id="roiWin">—</strong><span id="roiWinDetail">公式払戻との照合待ち</span></div>
+      <div class="cum-card secondary"><small>複勝・累積回収率</small><strong id="roiPlace">—</strong><span id="roiPlaceDetail">公式払戻との照合待ち</span></div>
+    </div>
+    <p class="roi-status" id="roiStatus">NAR公式払戻を使用した追加集計を確認中です。未確認レースを払戻0円にはしません。</p>
     <p class="cum-info" id="cumStatus" role="status">公開済み日次分析を照合しています。</p>
     <div class="cum-panels">
       <div class="cum-panel"><h3>累積的中率の推移</h3><div class="cum-legend"><span style="--line:#b52d43">予想1位の1着率</span><span style="--line:#245b99">予想1位の3着内率</span></div><div id="cumTrend" class="empty">読み込み中…</div><p>各日終了時点の累積値。日単独の的中率ではありません。</p></div>
@@ -237,6 +249,43 @@ async function cumRenderVenues(days, expected){
     $('cumVenue').innerHTML='<table class="cum-table"><thead><tr><th scope="col">競馬場</th><th scope="col">回顧</th><th scope="col">評価</th><th scope="col">1着率</th><th scope="col">3着内</th></tr></thead><tbody>'+body+'</tbody><tfoot><tr><td>合計</td><td>'+expected.reviewed+'</td><td>'+expected.evaluable+'</td><td>'+esc(cumPercent(expected.top_pick_wins,expected.evaluable))+'</td><td>'+esc(cumPercent(expected.top_pick_top3,expected.evaluable))+'</td></tr></tfoot></table>';
   }catch(e){$('cumVenue').className='empty';$('cumVenue').textContent='場別の集計を検証できませんでした。公開データを再読み込みしてください。';console.warn('Local Shadow cumulative venue audit:',e)}
 }
+
+async function loadRecovery(){
+  try{
+    const d=await fetchJson('staging/data/local-shadow-roi-preview.json');
+    if(!d||d.scope!=='staging_only_theoretical_100yen_each_top_pick'||d.production_effect!==false)
+      throw new Error('ROI研究データの分離条件が不正');
+    if(d.source_manifest_updated_at!==manifest.updated_at||
+       d.source_manifest_total_races!==manifest.races.length||
+       d.source_manifest_reviewed!==manifest.races.filter(r=>r.status==='reviewed').length)
+      throw new Error('公開manifestの更新に対して回収率データの再集計待ち');
+    const s=d.summary;
+    if(!s||s.win_checked!==s.evaluable||s.place_checked>s.evaluable||
+       !Number.isFinite(s.win_roi_pct)||!Number.isFinite(s.win_return_yen)||
+       !Number.isFinite(s.place_return_yen))throw new Error('払戻根拠の件数不整合');
+    const money=v=>Number(v).toLocaleString('ja-JP')+'円';
+    $('roiWin').textContent=s.win_roi_pct.toFixed(1)+'%';
+    $('roiWinDetail').textContent='投資 '+money(s.win_checked*100)+' ／ 払戻 '+money(s.win_return_yen)+' （'+s.win_checked+'件）';
+    if(s.place_checked>0&&Number.isFinite(s.place_roi_pct)){
+      $('roiPlace').textContent=s.place_roi_pct.toFixed(1)+'%';
+      $('roiPlaceDetail').textContent='投資 '+money(s.place_checked*100)+' ／ 払戻 '+money(s.place_return_yen)+' （'+s.place_checked+'件）';
+    }else{
+      $('roiPlace').textContent='未集計';
+      $('roiPlaceDetail').textContent='検証済みの複勝払戻がありません';
+    }
+    const full=s.place_checked===s.evaluable;
+    $('roiStatus').textContent=full?
+      '単勝・複勝とも公式払戻を確認済み（'+s.evaluable+'件）。全日程・競馬場を通算しています。':
+      '複勝の払戻確認済み '+s.place_checked+' / '+s.evaluable+'件。複勝回収率は確認済み分のみの暫定値です（未確認分を0円としません）。';
+  }catch(e){
+    $('roiWin').textContent='集計待ち';$('roiPlace').textContent='集計待ち';
+    $('roiWinDetail').textContent='確認済みデータを準備中';
+    $('roiPlaceDetail').textContent='公式払戻の確認待ち';
+    $('roiStatus').textContent='独立した払戻集計の検証または公開更新待ちです。既存の着順成績は変更しません。';
+    console.warn('ROI preview unavailable:',e);
+  }
+}
+
 function renderCumulative(){
   const days=(manifest.daily_analysis||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   const r=manifest.races||[];
@@ -274,7 +323,7 @@ function renderAnalysis(){
     return `<div class="analysis-item"><h3>${esc(x.date||'')} ${esc(x.venue||x.scope||'全対象場')}</h3><p>${overview}</p><p>回顧登録：${esc(x.reviewed_races??'—')}レース ／ 特記事項：${esc(findings||'未登録')}</p></div>`;
   }).join('');
 }
-async function load(){try{const [s,m]=await Promise.all([fetchJson('data/local_racing_shadow_status.json'),fetchJson('data/local_racing_shadow_public.json')]);manifest=m||manifest;const t=s?.totals||{};const venues=Object.values(s?.venues||{}).filter(v=>v.enabled);$('venueCount').textContent=venues.length;$('observed').textContent=t.pre_race_snapshots??t.races_observed??0;$('observed2').textContent=t.races_observed??0;$('joined').textContent=t.results_joined??0;$('joined2').textContent=t.results_joined??0;$('candidates2').textContent=t.transfer_candidates??0;$('latestFinding').innerHTML='<b>最新finding：</b>'+esc(s?.latest_finding||'観測開始前です。');populateFilters();renderList();renderAnalysis();try{renderCumulative()}catch(e){$('cumStatus').textContent='累積成績の整合性を確認できませんでした。公開データを確認してください。';console.warn(e)}}catch(e){$('raceList').innerHTML='<div class="empty">公開manifestの読み込みに失敗しました。</div>';$('analysisList').innerHTML='<div class="empty">分析データを読み込めませんでした。</div>';for(const id of ['observed','observed2','joined','joined2','candidates2'])$(id).textContent='—'}}
+async function load(){try{const [s,m]=await Promise.all([fetchJson('data/local_racing_shadow_status.json'),fetchJson('data/local_racing_shadow_public.json')]);manifest=m||manifest;const t=s?.totals||{};const venues=Object.values(s?.venues||{}).filter(v=>v.enabled);$('venueCount').textContent=venues.length;$('observed').textContent=t.pre_race_snapshots??t.races_observed??0;$('observed2').textContent=t.races_observed??0;$('joined').textContent=t.results_joined??0;$('joined2').textContent=t.results_joined??0;$('candidates2').textContent=t.transfer_candidates??0;$('latestFinding').innerHTML='<b>最新finding：</b>'+esc(s?.latest_finding||'観測開始前です。');populateFilters();renderList();renderAnalysis();try{renderCumulative();void loadRecovery()}catch(e){$('cumStatus').textContent='累積成績の整合性を確認できませんでした。公開データを確認してください。';console.warn(e)}}catch(e){$('raceList').innerHTML='<div class="empty">公開manifestの読み込みに失敗しました。</div>';$('analysisList').innerHTML='<div class="empty">分析データを読み込めませんでした。</div>';for(const id of ['observed','observed2','joined','joined2','candidates2'])$(id).textContent='—'}}
 ['dateFilter','venueFilter','stateFilter'].forEach(id=>$(id).addEventListener('change',renderList));load();
 </script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
