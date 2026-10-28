@@ -16,7 +16,7 @@
     .shadow-race-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}.shadow-race h3{margin:0;font-size:17px}.shadow-meta{margin-top:4px;color:#647085;font-size:12px}.shadow-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.shadow-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eef2f6;color:#435066;font-size:11px;font-weight:800}.shadow-badge.pre{background:#eaf2ff;color:#245b99}.shadow-badge.review{background:#eaf7f1;color:#167a52}.shadow-badge.proof{background:#fff3d6;color:#8a620d}.shadow-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.shadow-summary>div{background:#f7f9fb;border-radius:9px;padding:9px 10px}.shadow-summary small{display:block;color:#647085;font-size:10px;font-weight:700}.shadow-summary strong{display:block;margin-top:3px;font-size:13px}.shadow-open{border:0;border-radius:9px;padding:9px 12px;background:#172033;color:#fff;font-weight:800;cursor:pointer}
     .shadow-detail{margin-top:14px;border-top:1px solid #e5e9ee;padding-top:14px}.shadow-detail[hidden]{display:none}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail-card{border:1px solid #e2e7ed;border-radius:12px;padding:13px;background:#fafbfc}.detail-card h4{margin:0 0 8px;font-size:14px}.rank-table{width:100%;border-collapse:collapse;font-size:12px}.rank-table th,.rank-table td{padding:7px 5px;border-bottom:1px solid #e6e9ed;text-align:left}.rank-table th{color:#647085}.json-note{font-size:11px;color:#647085;word-break:break-all}.review-text{white-space:pre-wrap;font-size:13px}.review-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.review-stats>div{padding:9px;background:#f0f5f8;border-radius:8px;min-width:0;overflow-wrap:anywhere}.review-stats small{display:block;font-size:10px;color:#647085}.review-stats strong{display:block;font-size:12px;margin-top:4px}.review-verdict{font-size:13px;line-height:1.7}.review-subtitle{font-size:13px;margin:15px 0 7px}.review-caption{font-size:12px;line-height:1.75;overflow-wrap:anywhere}.review-source{font-size:12px;margin:10px 0}.review-source a{color:#245b99;text-decoration:underline}@media(max-width:430px){.review-stats{grid-template-columns:1fr}}.empty{padding:18px;border:1px dashed #cbd3dc;border-radius:12px;color:#647085;text-align:center;background:#fafbfc}
 
-    /* Local Shadow cumulative-performance preview (staging only). */
+    /* Local Shadow cumulative-performance production. */
     .cum-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
     .cum-card{min-width:0;padding:16px 14px;background:#fff;border:1px solid #dfe4ea;border-radius:13px;box-shadow:0 2px 9px rgba(17,32,52,.04)}
     .cum-card small{display:block;font-size:11px;color:#637086;font-weight:800}
@@ -95,7 +95,7 @@
       <div class="cum-panel"><h3>累積的中率の推移</h3><div class="cum-legend"><span style="--line:#b52d43">予想1位の1着率</span><span style="--line:#245b99">予想1位の3着内率</span></div><div id="cumTrend" class="empty">読み込み中…</div><p>各日終了時点の累積値。日単独の的中率ではありません。</p></div>
       <div class="cum-panel"><h3>競馬場別の累積成績</h3><div id="cumVenue" class="empty">競馬場別の公式回顧を集計中…</div><p>率は競馬場ごとの評価対象数を分母に計算。場ごとに頭数・レース条件が異なるため単純な優劣とは限りません。</p></div>
     </div>
-    <p class="cum-info">※ 勝率・3着内率は、公式結果で着順評価が可能なレースだけを分母に使用します。取消・評価保留・未回顧は不的中に算入しません。Shadowは実際の購入を伴わないため回収率は表示しません。JRA正式成績には含めません。</p>
+    <p class="cum-info">※ 勝率・3着内率は、公式結果で着順評価が可能なレースだけを分母に使用します。取消・評価保留・未回顧は不的中に算入しません。回収率は予想1位を100円ずつ購入したと仮定した参考値で、実際の購入・収支ではありません。JRA正式成績には含めません。</p>
   </section>
 
   <section class="chapter">
@@ -252,8 +252,8 @@ async function cumRenderVenues(days, expected){
 
 async function loadRecovery(){
   try{
-    const d=await fetchJson('staging/data/local-shadow-roi-preview.json');
-    if(!d||d.scope!=='staging_only_theoretical_100yen_each_top_pick'||d.production_effect!==false)
+    const d=await fetchJson('data/local_shadow_roi.json');
+    if(!d||d.scope!=='theoretical_100yen_each_top_pick'||d.production_effect!==false)
       throw new Error('ROI研究データの分離条件が不正');
     if(d.source_manifest_updated_at!==manifest.updated_at||
        d.source_manifest_total_races!==manifest.races.length||
