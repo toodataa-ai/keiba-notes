@@ -260,12 +260,17 @@ async function loadRecovery(){
        d.source_manifest_reviewed!==manifest.races.filter(r=>r.status==='reviewed').length)
       throw new Error('公開manifestの更新に対して回収率データの再集計待ち');
     const s=d.summary;
-    if(!s||s.win_checked!==s.evaluable||s.place_checked>s.evaluable||
+    if(!s||s.win_checked>s.evaluable||s.place_checked>s.evaluable||
        !Number.isFinite(s.win_roi_pct)||!Number.isFinite(s.win_return_yen)||
        !Number.isFinite(s.place_return_yen))throw new Error('払戻根拠の件数不整合');
     const money=v=>Number(v).toLocaleString('ja-JP')+'円';
-    $('roiWin').textContent=s.win_roi_pct.toFixed(1)+'%';
-    $('roiWinDetail').textContent='投資 '+money(s.win_checked*100)+' ／ 払戻 '+money(s.win_return_yen)+' （'+s.win_checked+'件）';
+    if(s.win_checked>0&&Number.isFinite(s.win_roi_pct)){
+      $('roiWin').textContent=s.win_roi_pct.toFixed(1)+'%';
+      $('roiWinDetail').textContent='投資 '+money(s.win_checked*100)+' ／ 払戻 '+money(s.win_return_yen)+' （'+s.win_checked+'件）';
+    }else{
+      $('roiWin').textContent='未集計';
+      $('roiWinDetail').textContent='検証済みの単勝払戻がありません';
+    }
     if(s.place_checked>0&&Number.isFinite(s.place_roi_pct)){
       $('roiPlace').textContent=s.place_roi_pct.toFixed(1)+'%';
       $('roiPlaceDetail').textContent='投資 '+money(s.place_checked*100)+' ／ 払戻 '+money(s.place_return_yen)+' （'+s.place_checked+'件）';
@@ -273,10 +278,10 @@ async function loadRecovery(){
       $('roiPlace').textContent='未集計';
       $('roiPlaceDetail').textContent='検証済みの複勝払戻がありません';
     }
-    const full=s.place_checked===s.evaluable;
+    const full=s.place_checked===s.evaluable&&s.win_checked===s.evaluable;
     $('roiStatus').textContent=full?
       '単勝・複勝とも公式払戻を確認済み（'+s.evaluable+'件）。全日程・競馬場を通算しています。':
-      '複勝の払戻確認済み '+s.place_checked+' / '+s.evaluable+'件。複勝回収率は確認済み分のみの暫定値です（未確認分を0円としません）。';
+      '単勝 '+s.win_checked+'件、複勝 '+s.place_checked+'件／評価対象 '+s.evaluable+'件。回収率は確認済み分のみの暫定値です（未確認分を0円としません）。';
   }catch(e){
     $('roiWin').textContent='集計待ち';$('roiPlace').textContent='集計待ち';
     $('roiWinDetail').textContent='確認済みデータを準備中';
