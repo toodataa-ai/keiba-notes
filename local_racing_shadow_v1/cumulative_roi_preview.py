@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Independent staging-only NAR Shadow theoretical win/place ROI backfill.
+"""Audited NAR Shadow theoretical win/place ROI publisher.
 
 Reads immutable predictions, results, reviews and official settlement closure.
-Writes ONLY docs/staging/data/local-shadow-roi-preview.json.
-Never changes a prediction, result, review, JRA file or public production data.
+Writes ONLY independent staging and production ROI aggregate JSON files.
+Never changes a prediction, result, review, JRA file or model output.
 """
 from __future__ import annotations
 import argparse
@@ -20,6 +20,7 @@ from postrace_finalize import page_identity, refund_sections, confirmed_win_payo
 
 MANIFEST=Path("docs/data/local_racing_shadow_public.json")
 OUTPUT=Path("docs/staging/data/local-shadow-roi-preview.json")
+PRODUCTION_OUTPUT=Path("docs/data/local_shadow_roi.json")
 BET=100
 JST=timezone(timedelta(hours=9))
 
@@ -193,16 +194,19 @@ def main():
       "exclusions":"Non-evaluable races, non-runners, official cancellations and unreviewed forecasts excluded. No loss assumed for missing official refund data.",
       "status":"VERIFIED" if not unknown and not unknown_win else "PARTIAL_OFFICIAL_PAYOUT",
     }
-    OUTPUT.parent.mkdir(parents=True,exist_ok=True)
-    content=json.dumps(report,ensure_ascii=False,indent=2)+"\n"
-    if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8")!=content:
-        OUTPUT.write_text(content,encoding="utf-8")
+    production={**report, "scope":"theoretical_100yen_each_top_pick"}
+    for path, payload in ((OUTPUT,report),(PRODUCTION_OUTPUT,production)):
+        path.parent.mkdir(parents=True,exist_ok=True)
+        content=json.dumps(payload,ensure_ascii=False,indent=2)+"\n"
+        if not path.exists() or path.read_text(encoding="utf-8")!=content:
+            path.write_text(content,encoding="utf-8")
     print(json.dumps({"status":report["status"],"win_roi_pct":report["summary"]["win_roi_pct"],
                       "place_roi_pct":report["summary"]["place_roi_pct"],
                       "win_checked":all_totals["win_checked"],
                       "place_checked":all_totals["place_checked"],
                       "eligible":all_totals["evaluable"],
-                      "unknown_place":len(unknown),"unknown_win":len(unknown_win),"output":str(OUTPUT)},ensure_ascii=False))
+                      "unknown_place":len(unknown),"unknown_win":len(unknown_win),
+                      "staging_output":str(OUTPUT),"production_output":str(PRODUCTION_OUTPUT)},ensure_ascii=False))
     return 0
 
 def selftest():

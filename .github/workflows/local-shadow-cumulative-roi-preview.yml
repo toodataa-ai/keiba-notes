@@ -1,4 +1,4 @@
-name: Local Shadow cumulative win-place ROI staging preview
+name: Local Shadow cumulative win and place ROI publication
 on:
   push:
     branches: [main]
@@ -10,77 +10,126 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: local-shadow-roi-preview
+  group: local-shadow-roi-publication
   cancel-in-progress: false
 jobs:
-  staging-roi-only:
+  audit-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 23
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout immutable NAR evidence
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install official-NAR read-only parser dependencies
+      - name: Install isolated NAR official parser
         run: python -m pip install requests beautifulsoup4
-      - name: Test the ROI calculation and NAR place parser
+      - name: Verify 100-yen ticket return calculations and payout parsing
         run: python -B local_racing_shadow_v1/cumulative_roi_preview.py --self-test
-      - name: Build staging-only recovery report from immutable official NAR evidence
+      - name: Reconcile all committed NAR predictions, reviews and official refunds
         run: python -B local_racing_shadow_v1/cumulative_roi_preview.py
-      - name: Validate all modifications are preview JSON only
+      - name: Audit source identities, 100-yen denominators and exactly two allowed outputs
         run: |
-          git diff --exit-code -- local_racing_shadow_v1/predictions local_racing_shadow_v1/results local_racing_shadow_v1/reviews docs/data
-          git status --porcelain --untracked-files=all | sed 's/^...//' | python -c 'import sys; f=[x.strip() for x in sys.stdin if x.strip()]; assert all(x=="docs/staging/data/local-shadow-roi-preview.json" for x in f),f"Unexpected file changes: {f}"'
+          git diff --exit-code -- local_racing_shadow_v1/predictions local_racing_shadow_v1/results local_racing_shadow_v1/reviews docs/data/local-racing-shadow docs/data/local_racing_shadow_public.json
+          git status --porcelain --untracked-files=all | sed 's/^...//' | python -c 'import sys; f=[x.strip() for x in sys.stdin if x.strip()]; allowed={"docs/staging/data/local-shadow-roi-preview.json","docs/data/local_shadow_roi.json"}; assert set(f)<=allowed,f"Unexpected file changes: {f}"'
           python - <<'PY'
           import json
           from pathlib import Path
-          d=json.loads(Path("docs/staging/data/local-shadow-roi-preview.json").read_text())
-          assert d["production_effect"] is False
-          assert d["summary"]["win_checked"]<=d["summary"]["evaluable"]
-          assert d["summary"]["place_checked"]<=d["summary"]["evaluable"]
-          assert d["summary"]["evaluable"]==sum(x["evaluable"] for x in d["daily"].values())
-          assert d["summary"]["win_return_yen"]==sum(x["win_return_yen"] for x in d["daily"].values())
-          assert d["summary"]["place_return_yen"]==sum(x["place_return_yen"] for x in d["daily"].values())
-          print("PASS: ROI denominator, stake, official proof and staging-only guards")
+          st=json.loads(Path("docs/staging/data/local-shadow-roi-preview.json").read_text())
+          p=json.loads(Path("docs/data/local_shadow_roi.json").read_text())
+          m=json.loads(Path("docs/data/local_racing_shadow_public.json").read_text())
+          assert st["scope"]=="staging_only_theoretical_100yen_each_top_pick"
+          assert p["scope"]=="theoretical_100yen_each_top_pick"
+          assert p["production_effect"] is False
+          assert st["summary"]==p["summary"] and st["by_venue"]==p["by_venue"] and st["daily"]==p["daily"]
+          assert p["source_manifest_updated_at"]==m["updated_at"]
+          assert p["source_manifest_total_races"]==len(m["races"])
+          assert p["source_manifest_reviewed"]==sum(x["status"]=="reviewed" for x in m["races"])
+          s=p["summary"]
+          assert s["reviewed"]==p["source_manifest_reviewed"]
+          assert 0<=s["win_checked"]<=s["evaluable"]<=s["reviewed"]
+          assert 0<=s["place_checked"]<=s["evaluable"]
+          for key in ("reviewed","evaluable","win_checked","place_checked","win_return_yen","place_return_yen"):
+              assert s[key]==sum(day[key] for day in p["daily"].values()),key
+              assert s[key]==sum(day[key] for day in p["by_venue"].values()),key
+          for typ in ("win","place"):
+              n=s[typ+"_checked"]; earned=s[typ+"_return_yen"]
+              assert (round(earned/(n*100)*100,2) if n else None)==s[typ+"_roi_pct"]
+          assert len(p["win_unverified_races"])==s["evaluable"]-s["win_checked"]
+          assert len(p["place_unverified_races"])==s["evaluable"]-s["place_checked"]
+          print("PASS: NAR-only evidence, identity, denominators and dual-output integrity")
           PY
-      - name: Commit isolated staging ROI summary only
+      - name: Existing NAR public UI regression tests
+        run: |
+          node local_racing_shadow_v1/test_public_ui.cjs
+          node - <<'JS'
+          const fs=require('fs'),vm=require('vm'),assert=require('assert');
+          const x=fs.readFileSync('docs/local-racing-shadow.html','utf8');
+          const s=x.match(/<script>\s*([\s\S]*?)<\/script>/)?.[1];
+          assert(s);new vm.Script(s);
+          for(const id of ['cumulativePerformance','cumWinRate','cumTop3Rate','roiWin','roiPlace','cumTrend','cumVenue']){
+            assert(x.includes('id="'+id+'"'),'Missing UI feature '+id);
+          }
+          assert(x.includes("fetchJson('data/local_shadow_roi.json')"),'Missing production ROI data source');
+          assert(!x.includes('data-stage="preview"')&&!x.includes('staging-shell-marker'),'Staging leakage');
+          console.log('PASS: production cumulative UI syntax and original review compatibility');
+          JS
+      - name: Commit only independent NAR aggregate outputs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/staging/data/local-shadow-roi-preview.json
+          git add docs/staging/data/local-shadow-roi-preview.json docs/data/local_shadow_roi.json
+          git diff --cached --name-only | python -c 'import sys; f=[x.strip() for x in sys.stdin if x.strip()]; assert set(f)<={"docs/staging/data/local-shadow-roi-preview.json","docs/data/local_shadow_roi.json"},f'
           if ! git diff --cached --quiet; then
-            git commit -m "stage: publish auditable NAR Shadow theoretical win/place ROI"
+            git commit -m "Publish audited NAR Shadow cumulative win/place ROI"
             pushed=0
             for attempt in 1 2 3 4 5; do
               git fetch origin main
               git rebase origin/main
+              python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("docs/data/local_shadow_roi.json").read_text())
+          m=json.loads(Path("docs/data/local_racing_shadow_public.json").read_text())
+          assert p["source_manifest_updated_at"]==m["updated_at"],"BLOCKED_STALE_ROI_SOURCE: manifest advanced during computation"
+          PY
               if git push origin HEAD:main; then pushed=1; break; fi
               sleep "$attempt"
             done
             test "$pushed" -eq 1
           fi
-      - name: Verify deployed staging ROI JSON against committed data
+      - name: Verify deployed HTML and both live GitHub Pages JSONs
         run: |
           python - <<'PY'
-          import json, time, requests
+          import json, time, requests, hashlib
           from pathlib import Path
-          u="https://toodataa-ai.github.io/keiba-notes/staging/data/local-shadow-roi-preview.json"
-          expected=json.loads(Path("docs/staging/data/local-shadow-roi-preview.json").read_text())
-          for attempt in range(15):
+          base="https://toodataa-ai.github.io/keiba-notes/"
+          files={
+            "staging/data/local-shadow-roi-preview.json":"docs/staging/data/local-shadow-roi-preview.json",
+            "data/local_shadow_roi.json":"docs/data/local_shadow_roi.json",
+            "local-racing-shadow.html":"docs/local-racing-shadow.html",
+          }
+          expected={path:Path(local).read_bytes() for path,local in files.items()}
+          for attempt in range(18):
               try:
-                  r=requests.get(u,headers={"Cache-Control":"no-cache"},params={"audit":str(time.time())},timeout=15)
-                  r.raise_for_status()
-                  live=r.json()
-                  assert live==expected,"Live Pages JSON differs from committed preview"
-                  print(json.dumps({"status":"VERIFIED","source":u,"win_roi_pct":live["summary"]["win_roi_pct"],
-                                    "place_roi_pct":live["summary"]["place_roi_pct"],"place_coverage":live["summary"]["place_checked"]},
-                                   ensure_ascii=False))
+                  for remote,blob in expected.items():
+                      r=requests.get(base+remote,headers={"Cache-Control":"no-cache"},
+                                     params={"audit":str(time.time())},timeout=16)
+                      r.raise_for_status()
+                      assert r.content==blob,"Live Pages file differs from current commit: "+remote
+                  data=json.loads(expected["data/local_shadow_roi.json"])
+                  print(json.dumps({"status":"VERIFIED_LIVE_PRODUCTION",
+                                    "site":base+"local-racing-shadow.html",
+                                    "win_roi_pct":data["summary"]["win_roi_pct"],
+                                    "place_roi_pct":data["summary"]["place_roi_pct"],
+                                    "win_checked":data["summary"]["win_checked"],
+                                    "place_checked":data["summary"]["place_checked"]},ensure_ascii=False))
                   break
               except Exception as e:
-                  print(f"COMMITTED_NOT_PUBLISHED attempt={attempt+1}/15: {e}")
-                  if attempt==14:raise
+                  print(f"COMMITTED_NOT_PUBLISHED attempt={attempt+1}/18: {e}")
+                  if attempt==17: raise
                   time.sleep(8)
           PY
