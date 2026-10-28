@@ -14,6 +14,30 @@
     .shadow-list{display:grid;gap:12px}.shadow-race{background:#fff;border:1px solid #dfe4ea;border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(17,32,52,.05)}
     .shadow-race-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}.shadow-race h3{margin:0;font-size:17px}.shadow-meta{margin-top:4px;color:#647085;font-size:12px}.shadow-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.shadow-badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#eef2f6;color:#435066;font-size:11px;font-weight:800}.shadow-badge.pre{background:#eaf2ff;color:#245b99}.shadow-badge.review{background:#eaf7f1;color:#167a52}.shadow-badge.proof{background:#fff3d6;color:#8a620d}.shadow-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.shadow-summary>div{background:#f7f9fb;border-radius:9px;padding:9px 10px}.shadow-summary small{display:block;color:#647085;font-size:10px;font-weight:700}.shadow-summary strong{display:block;margin-top:3px;font-size:13px}.shadow-open{border:0;border-radius:9px;padding:9px 12px;background:#172033;color:#fff;font-weight:800;cursor:pointer}
     .shadow-detail{margin-top:14px;border-top:1px solid #e5e9ee;padding-top:14px}.shadow-detail[hidden]{display:none}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail-card{border:1px solid #e2e7ed;border-radius:12px;padding:13px;background:#fafbfc}.detail-card h4{margin:0 0 8px;font-size:14px}.rank-table{width:100%;border-collapse:collapse;font-size:12px}.rank-table th,.rank-table td{padding:7px 5px;border-bottom:1px solid #e6e9ed;text-align:left}.rank-table th{color:#647085}.json-note{font-size:11px;color:#647085;word-break:break-all}.review-text{white-space:pre-wrap;font-size:13px}.review-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.review-stats>div{padding:9px;background:#f0f5f8;border-radius:8px;min-width:0;overflow-wrap:anywhere}.review-stats small{display:block;font-size:10px;color:#647085}.review-stats strong{display:block;font-size:12px;margin-top:4px}.review-verdict{font-size:13px;line-height:1.7}.review-subtitle{font-size:13px;margin:15px 0 7px}.review-caption{font-size:12px;line-height:1.75;overflow-wrap:anywhere}.review-source{font-size:12px;margin:10px 0}.review-source a{color:#245b99;text-decoration:underline}@media(max-width:430px){.review-stats{grid-template-columns:1fr}}.empty{padding:18px;border:1px dashed #cbd3dc;border-radius:12px;color:#647085;text-align:center;background:#fafbfc}
+
+    /* Local Shadow cumulative-performance production. */
+    .cum-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+    .cum-card{min-width:0;padding:16px 14px;background:#fff;border:1px solid #dfe4ea;border-radius:13px;box-shadow:0 2px 9px rgba(17,32,52,.04)}
+    .cum-card small{display:block;font-size:11px;color:#637086;font-weight:800}
+    .cum-card strong{display:block;margin:7px 0 3px;font-size:27px;line-height:1.1;font-weight:900;font-variant-numeric:tabular-nums;color:#172033}
+    .cum-card span{display:block;color:#59667a;font-size:11px;line-height:1.6}
+    .cum-card.primary{border-top:4px solid #b52d43}.cum-card.secondary{border-top:4px solid #245b99}
+    .cum-info{font-size:12px;line-height:1.7;color:#5c687b;margin:8px 0 15px}
+    .cum-panels{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;margin-top:17px}
+    .cum-panel{min-width:0;border:1px solid #dfe4ea;border-radius:13px;background:#fff;padding:15px}
+    .cum-panel h3{margin:0 0 9px;font-size:15px}.cum-panel p{margin:7px 0;font-size:11px;color:#627087}
+    .cum-chart{width:100%;max-height:245px}.cum-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:#435066}
+    .cum-legend span:before{content:"";display:inline-block;width:13px;height:3px;vertical-align:middle;margin-right:6px;background:var(--line)}
+
+    .roi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .roi-status{font-size:12px;color:#59667a;line-height:1.7;margin:4px 0 13px}
+    @media(max-width:480px){.roi-grid{grid-template-columns:1fr}}
+    .cum-scroll{max-height:290px;overflow:auto}.cum-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12px}
+    .cum-table th,.cum-table td{padding:8px 5px;border-bottom:1px solid #e5e9ee;text-align:right;white-space:nowrap}
+    .cum-table th{color:#59667a;font-size:11px}.cum-table th:first-child,.cum-table td:first-child{text-align:left}
+    .cum-table tfoot{font-weight:900;background:#f2f5f8}
+    @media(max-width:900px){.cum-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cum-panels{grid-template-columns:1fr}}
+    @media(max-width:430px){.cum-card{padding:13px 10px}.cum-card strong{font-size:23px}.cum-panel{padding:11px}.cum-table{font-size:11px}}
     .analysis-list{display:grid;gap:10px}.analysis-item{background:#fff;border:1px solid #dfe4ea;border-radius:12px;padding:12px 14px}.analysis-item h3{margin:0 0 5px;font-size:15px}.analysis-item p{margin:4px 0;font-size:12px;color:#566174}
     @media(max-width:760px){.shadow-race-head{display:block}.shadow-badges{justify-content:flex-start;margin-top:8px}.shadow-summary{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.shadow-toolbar{display:grid;grid-template-columns:1fr 1fr}.shadow-toolbar select{min-width:0;width:100%}}
   </style>
@@ -31,11 +55,11 @@
     <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
       <h1>地方競馬も、<br>発走前予測を残して検証する。</h1>
-      <p class="hero-deck">大井・川崎・船橋・浦和・園田・名古屋を対象に、発走前のShadow predictionを固定し、結果確定後に別ファイルで照合・回顧します。JRA正式予想とは分離した研究レイヤーです。</p>
+      <p class="hero-deck">設定済みの全国15競馬場を対象に、発走前のShadow predictionを固定し、結果確定後に別ファイルで照合・回顧します。JRA正式予想とは分離した研究レイヤーです。</p>
       <div class="hero-thesis"><strong>個別Shadow予測も公開します。</strong> 発走前snapshot・information cutoff・proof・回顧を同じ画面で確認でき、結果を見て予想を書き換えないことを監査できます。</div>
       <div class="status-strip" aria-label="現在地">
         <div class="status-card"><small>運用</small><strong>研究中</strong><span>JRA productionへ直接影響なし</span></div>
-        <div class="status-card"><small>対象場</small><strong id="venueCount">6</strong><span>南関4場＋園田＋名古屋</span></div>
+        <div class="status-card"><small>対象場</small><strong id="venueCount">—</strong><span>NAR対象場（設定）</span></div>
         <div class="status-card"><small>SNAPSHOTS</small><strong id="observed">確認中…</strong><span>発走前固定済み</span></div>
         <div class="status-card"><small>REVIEWS</small><strong id="joined">確認中…</strong><span>結果照合・回顧済み</span></div>
       </div>
@@ -45,6 +69,31 @@
 
 <main class="wrap article">
   <div class="shadow-notice"><b>SHADOW表示について：</b>ここに表示する順位・評価は地方競馬の研究用発走前予測です。JRA正式予想の◎○▲・買い目・成績とは別管理で、地方の係数や結果をJRAへ直接流し込みません。</div>
+
+
+  <section class="chapter" id="cumulativePerformance" aria-labelledby="cumHeading">
+    <div class="chapter-head"><div class="chapter-no">累積</div><div><h2 id="cumHeading">地方競馬Shadow 累積予想成績</h2><p class="chapter-lead">発走前に固定した予想と公式結果を照合した、研究用の累積実績です。回顧が増えると自動更新します。</p></div></div>
+    <div class="cum-grid" aria-live="polite">
+      <div class="cum-card primary"><small>予想1位の1着率</small><strong id="cumWinRate">—</strong><span id="cumWinDetail">集計中…</span></div>
+      <div class="cum-card secondary"><small>予想1位の3着内率</small><strong id="cumTop3Rate">—</strong><span id="cumTop3Detail">集計中…</span></div>
+      <div class="cum-card"><small>回顧済みレース</small><strong id="cumReviewed">—</strong><span id="cumReviewedDetail">集計中…</span></div>
+      <div class="cum-card"><small>発走前予想を固定</small><strong id="cumFrozen">—</strong><span id="cumFrozenDetail">集計中…</span></div>
+    </div>
+
+    <h3 style="font-size:16px;margin:20px 0 5px">仮想購入した場合の累積回収率</h3>
+    <p class="cum-info">すべての評価対象レースで「発走前予想1位を各券種100円ずつ」購入したと仮定した結果です。実際の馬券購入実績ではありません。</p>
+    <div class="cum-grid roi-grid" aria-live="polite">
+      <div class="cum-card primary"><small>単勝・累積回収率</small><strong id="roiWin">—</strong><span id="roiWinDetail">公式払戻との照合待ち</span></div>
+      <div class="cum-card secondary"><small>複勝・累積回収率</small><strong id="roiPlace">—</strong><span id="roiPlaceDetail">公式払戻との照合待ち</span></div>
+    </div>
+    <p class="roi-status" id="roiStatus">NAR公式払戻を使用した追加集計を確認中です。未確認レースを払戻0円にはしません。</p>
+    <p class="cum-info" id="cumStatus" role="status">公開済み日次分析を照合しています。</p>
+    <div class="cum-panels">
+      <div class="cum-panel"><h3>累積的中率の推移</h3><div class="cum-legend"><span style="--line:#b52d43">予想1位の1着率</span><span style="--line:#245b99">予想1位の3着内率</span></div><div id="cumTrend" class="empty">読み込み中…</div><p>各日終了時点の累積値。日単独の的中率ではありません。</p></div>
+      <div class="cum-panel"><h3>競馬場別の累積成績</h3><div id="cumVenue" class="empty">競馬場別の公式回顧を集計中…</div><p>率は競馬場ごとの評価対象数を分母に計算。場ごとに頭数・レース条件が異なるため単純な優劣とは限りません。</p></div>
+    </div>
+    <p class="cum-info">※ 勝率・3着内率は、公式結果で着順評価が可能なレースだけを分母に使用します。取消・評価保留・未回顧は不的中に算入しません。回収率は予想1位を100円ずつ購入したと仮定した参考値で、実際の購入・収支ではありません。JRA正式成績には含めません。</p>
+  </section>
 
   <section class="chapter">
     <div class="chapter-head"><div class="chapter-no">01</div><div><h2>発走前Shadow予測</h2><p class="chapter-lead">発走前に固定した予測とproofを、レース単位で確認できます。</p></div></div>
@@ -149,6 +198,122 @@ async function openDetail(r,btn){
   }catch(e){box.innerHTML=`<div class="empty">詳細データの読み込みまたは照合に失敗しました。<br>${esc(e)}</div>`}
 }
 
+
+function cumPercent(wins,count){return count>0?(wins/count*100).toFixed(1)+'%':'—'}
+function cumValidSummary(s){return s&&['reviewed','evaluable','top_pick_wins','top_pick_top3'].every(k=>Number.isInteger(s[k])&&s[k]>=0)&&s.evaluable<=s.reviewed&&s.top_pick_wins<=s.top_pick_top3&&s.top_pick_top3<=s.evaluable}
+function cumRenderTrend(points){
+  if(!points.length){$('cumTrend').innerHTML='<div class="empty">集計データがありません。</div>';return}
+  const W=620,H=230,L=37,R=12,T=15,B=35,x=i=>L+(W-L-R)*(points.length===1?.5:i/(points.length-1)),y=n=>T+(H-T-B)*(1-n);
+  const path=field=>points.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(v[field]).toFixed(1)).join(' ');
+  const ticks=[0,.25,.5,.75,1].map(v=>'<line x1="'+L+'" y1="'+y(v)+'" x2="'+(W-R)+'" y2="'+y(v)+'" stroke="#e6ebf0"/><text x="'+(L-7)+'" y="'+(y(v)+4)+'" text-anchor="end" fill="#637086" font-size="11">'+Math.round(v*100)+'%</text>').join('');
+  const first=esc(points[0].date),last=esc(points[points.length-1].date);
+  $('cumTrend').className='';
+  $('cumTrend').innerHTML='<svg class="cum-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="累積の1着率と3着内率の推移">'+ticks+
+    '<path d="'+path('win')+'" fill="none" stroke="#b52d43" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<path d="'+path('top3')+'" fill="none" stroke="#245b99" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'+
+    '<circle cx="'+x(points.length-1)+'" cy="'+y(points[points.length-1].win)+'" r="4" fill="#b52d43"/>'+
+    '<circle cx="'+x(points.length-1)+'" cy="'+y(points[points.length-1].top3)+'" r="4" fill="#245b99"/>'+
+    '<text x="'+L+'" y="'+(H-10)+'" fill="#637086" font-size="11">'+first+'</text>'+
+    '<text x="'+(W-R)+'" y="'+(H-10)+'" text-anchor="end" fill="#637086" font-size="11">'+last+'</text></svg>';
+}
+async function cumRenderVenues(days, expected){
+  try{
+    // Daily summaries are canonical public artifacts. Do not infer scores from unreviewed races.
+    const sources=await Promise.all(days.map(async d=>{
+      if(typeof d.path!=='string'||!/^data\/local-racing-shadow\/analysis\/\d{4}-\d{2}-\d{2}-summary\.json$/.test(d.path))throw new Error('分析ファイルへの参照が不正です');
+      const a=await fetchJson(d.path);
+      if(a.date!==d.date||!cumValidSummary(a.summary)||!a.by_venue)throw new Error('日別の公式集計が不整合です');
+      for(const key of ['reviewed','evaluable','top_pick_wins','top_pick_top3'])if(a.summary[key]!==d.summary[key])throw new Error('日次manifestと分析ファイルが一致しません');
+      const subtotal={reviewed:0,evaluable:0,top_pick_wins:0,top_pick_top3:0};
+      for(const s of Object.values(a.by_venue)){
+        if(!cumValidSummary(s))throw new Error('競馬場別の評価件数が不正です');
+        for(const key of Object.keys(subtotal))subtotal[key]+=s[key];
+      }
+      for(const key of Object.keys(subtotal))if(subtotal[key]!==a.summary[key])throw new Error('場別データの合計が一致しません');
+      return a.by_venue;
+    }));
+    const venue={};for(const data of sources)for(const [name,s] of Object.entries(data)){
+      const p=venue[name]||(venue[name]={reviewed:0,evaluable:0,top_pick_wins:0,top_pick_top3:0});
+      for(const key of Object.keys(p))p[key]+=s[key];
+    }
+    for(const key of Object.keys(expected)){
+      const total=Object.values(venue).reduce((n,s)=>n+s[key],0);
+      if(total!==expected[key])throw new Error('累積場別値と全体値が不一致');
+    }
+    const rows=Object.entries(venue).sort((a,b)=>b[1].reviewed-a[1].reviewed||a[0].localeCompare(b[0],'ja'));
+    const body=rows.map(([name,s])=>'<tr><td>'+esc(name)+'</td><td>'+s.reviewed+'</td><td>'+s.evaluable+'</td><td>'+esc(cumPercent(s.top_pick_wins,s.evaluable))+'</td><td>'+esc(cumPercent(s.top_pick_top3,s.evaluable))+'</td></tr>').join('');
+    $('cumVenue').className='cum-scroll';
+    $('cumVenue').innerHTML='<table class="cum-table"><thead><tr><th scope="col">競馬場</th><th scope="col">回顧</th><th scope="col">評価</th><th scope="col">1着率</th><th scope="col">3着内</th></tr></thead><tbody>'+body+'</tbody><tfoot><tr><td>合計</td><td>'+expected.reviewed+'</td><td>'+expected.evaluable+'</td><td>'+esc(cumPercent(expected.top_pick_wins,expected.evaluable))+'</td><td>'+esc(cumPercent(expected.top_pick_top3,expected.evaluable))+'</td></tr></tfoot></table>';
+  }catch(e){$('cumVenue').className='empty';$('cumVenue').textContent='場別の集計を検証できませんでした。公開データを再読み込みしてください。';console.warn('Local Shadow cumulative venue audit:',e)}
+}
+
+async function loadRecovery(){
+  try{
+    const d=await fetchJson('data/local_shadow_roi.json');
+    if(!d||d.scope!=='theoretical_100yen_each_top_pick'||d.production_effect!==false)
+      throw new Error('ROI研究データの分離条件が不正');
+    if(d.source_manifest_updated_at!==manifest.updated_at||
+       d.source_manifest_total_races!==manifest.races.length||
+       d.source_manifest_reviewed!==manifest.races.filter(r=>r.status==='reviewed').length)
+      throw new Error('公開manifestの更新に対して回収率データの再集計待ち');
+    const s=d.summary;
+    if(!s||s.win_checked>s.evaluable||s.place_checked>s.evaluable||
+       !Number.isFinite(s.win_roi_pct)||!Number.isFinite(s.win_return_yen)||
+       !Number.isFinite(s.place_return_yen))throw new Error('払戻根拠の件数不整合');
+    const money=v=>Number(v).toLocaleString('ja-JP')+'円';
+    if(s.win_checked>0&&Number.isFinite(s.win_roi_pct)){
+      $('roiWin').textContent=s.win_roi_pct.toFixed(1)+'%';
+      $('roiWinDetail').textContent='投資 '+money(s.win_checked*100)+' ／ 払戻 '+money(s.win_return_yen)+' （'+s.win_checked+'件）';
+    }else{
+      $('roiWin').textContent='未集計';
+      $('roiWinDetail').textContent='検証済みの単勝払戻がありません';
+    }
+    if(s.place_checked>0&&Number.isFinite(s.place_roi_pct)){
+      $('roiPlace').textContent=s.place_roi_pct.toFixed(1)+'%';
+      $('roiPlaceDetail').textContent='投資 '+money(s.place_checked*100)+' ／ 払戻 '+money(s.place_return_yen)+' （'+s.place_checked+'件）';
+    }else{
+      $('roiPlace').textContent='未集計';
+      $('roiPlaceDetail').textContent='検証済みの複勝払戻がありません';
+    }
+    const full=s.place_checked===s.evaluable&&s.win_checked===s.evaluable;
+    $('roiStatus').textContent=full?
+      '単勝・複勝とも公式払戻を確認済み（'+s.evaluable+'件）。全日程・競馬場を通算しています。':
+      '単勝 '+s.win_checked+'件、複勝 '+s.place_checked+'件／評価対象 '+s.evaluable+'件。回収率は確認済み分のみの暫定値です（未確認分を0円としません）。';
+  }catch(e){
+    $('roiWin').textContent='集計待ち';$('roiPlace').textContent='集計待ち';
+    $('roiWinDetail').textContent='確認済みデータを準備中';
+    $('roiPlaceDetail').textContent='公式払戻の確認待ち';
+    $('roiStatus').textContent='独立した払戻集計の検証または公開更新待ちです。既存の着順成績は変更しません。';
+    console.warn('ROI preview unavailable:',e);
+  }
+}
+
+function renderCumulative(){
+  const days=(manifest.daily_analysis||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const r=manifest.races||[];
+  const counts={reviewed:0,evaluable:0,top_pick_wins:0,top_pick_top3:0};
+  if(!days.length||new Set(days.map(x=>x.date)).size!==days.length||days.some(x=>!cumValidSummary(x.summary)))throw new Error('日次分析がありません、または不整合です');
+  const progress=[];for(const d of days){
+    for(const key of Object.keys(counts))counts[key]+=d.summary[key];
+    progress.push({date:d.date,win:counts.evaluable?counts.top_pick_wins/counts.evaluable:0,top3:counts.evaluable?counts.top_pick_top3/counts.evaluable:0});
+  }
+  const listed=r.filter(x=>x.status==='reviewed').length;
+  const cancelled=r.filter(x=>x.status==='cancelled').length;
+  const missing=r.filter(x=>x.status==='predicted').length;
+  if(counts.reviewed!==listed||listed+missing+cancelled!==r.length)throw new Error('公開manifestと累積レビュー数が一致しません');
+  $('cumWinRate').textContent=cumPercent(counts.top_pick_wins,counts.evaluable);
+  $('cumTop3Rate').textContent=cumPercent(counts.top_pick_top3,counts.evaluable);
+  $('cumWinDetail').textContent=counts.top_pick_wins+' / '+counts.evaluable+'レース';
+  $('cumTop3Detail').textContent=counts.top_pick_top3+' / '+counts.evaluable+'レース';
+  $('cumReviewed').textContent=counts.reviewed.toLocaleString('ja-JP');
+  $('cumReviewedDetail').textContent=days.length+'日分 ／ 評価対象'+counts.evaluable+'件';
+  $('cumFrozen').textContent=r.length.toLocaleString('ja-JP');
+  $('cumFrozenDetail').textContent='未回顧'+missing+'件 ／ 取消'+cancelled+'件';
+  $('cumStatus').textContent='集計期間：'+days[0].date+'〜'+days[days.length-1].date+'（JST） ／ 公開manifestと日次分析の件数を照合済み。';
+  cumRenderTrend(progress);
+  void cumRenderVenues(days,counts);
+}
+
 function renderAnalysis(){
   const xs=manifest.daily_analysis||[];
   if(!xs.length){$('analysisList').innerHTML='<div class="empty">日次分析はまだありません。結果・回顧が蓄積されるとここに表示されます。</div>';return}
@@ -160,7 +325,7 @@ function renderAnalysis(){
     return `<div class="analysis-item"><h3>${esc(x.date||'')} ${esc(x.venue||x.scope||'全対象場')}</h3><p>${overview}</p><p>回顧登録：${esc(x.reviewed_races??'—')}レース ／ 特記事項：${esc(findings||'未登録')}</p></div>`;
   }).join('');
 }
-async function load(){try{const [s,m]=await Promise.all([fetchJson('data/local_racing_shadow_status.json'),fetchJson('data/local_racing_shadow_public.json')]);manifest=m||manifest;const t=s?.totals||{};const venues=Object.values(s?.venues||{}).filter(v=>v.enabled);$('venueCount').textContent=venues.length;$('observed').textContent=t.pre_race_snapshots??t.races_observed??0;$('observed2').textContent=t.races_observed??0;$('joined').textContent=t.results_joined??0;$('joined2').textContent=t.results_joined??0;$('candidates2').textContent=t.transfer_candidates??0;$('latestFinding').innerHTML='<b>最新finding：</b>'+esc(s?.latest_finding||'観測開始前です。');populateFilters();renderList();renderAnalysis()}catch(e){$('raceList').innerHTML='<div class="empty">公開manifestの読み込みに失敗しました。</div>';$('analysisList').innerHTML='<div class="empty">分析データを読み込めませんでした。</div>';for(const id of ['observed','observed2','joined','joined2','candidates2'])$(id).textContent='—'}}
+async function load(){try{const [s,m]=await Promise.all([fetchJson('data/local_racing_shadow_status.json'),fetchJson('data/local_racing_shadow_public.json')]);manifest=m||manifest;const t=s?.totals||{};const venues=Object.values(s?.venues||{}).filter(v=>v.enabled);$('venueCount').textContent=venues.length;$('observed').textContent=t.pre_race_snapshots??t.races_observed??0;$('observed2').textContent=t.races_observed??0;$('joined').textContent=t.results_joined??0;$('joined2').textContent=t.results_joined??0;$('candidates2').textContent=t.transfer_candidates??0;$('latestFinding').innerHTML='<b>最新finding：</b>'+esc(s?.latest_finding||'観測開始前です。');populateFilters();renderList();renderAnalysis();try{renderCumulative();void loadRecovery()}catch(e){$('cumStatus').textContent='累積成績の整合性を確認できませんでした。公開データを確認してください。';console.warn(e)}}catch(e){$('raceList').innerHTML='<div class="empty">公開manifestの読み込みに失敗しました。</div>';$('analysisList').innerHTML='<div class="empty">分析データを読み込めませんでした。</div>';for(const id of ['observed','observed2','joined','joined2','candidates2'])$(id).textContent='—'}}
 ['dateFilter','venueFilter','stateFilter'].forEach(id=>$(id).addEventListener('change',renderList));load();
 </script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
