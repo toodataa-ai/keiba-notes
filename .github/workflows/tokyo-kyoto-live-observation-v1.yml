@@ -1,0 +1,54 @@
+name: Tokyo Kyoto live moisture research snapshot
+
+on:
+  pull_request:
+    paths:
+      - 'baba_models_v2/jra_live_baba_snapshot_v1.py'
+      - 'baba_models_v2/test_jra_live_baba_snapshot_v1.py'
+      - '.github/workflows/tokyo-kyoto-live-observation-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser dependencies
+        run: python -m pip install --disable-pip-version-check pytest requests beautifulsoup4
+      - name: Test strict same-day source parsing
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_jra_live_baba_snapshot_v1.py
+      - name: Capture only current calendar day JRA page if published
+        continue-on-error: true
+        run: |
+          python baba_models_v2/jra_live_baba_snapshot_v1.py --output tmp/live_baba/snapshot.json
+      - name: Explain missing or stale publication
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('tmp/live_baba/snapshot.json')
+          if not p.exists():
+              print('No snapshot artifact; JRA fetch error (not silently substituted)')
+          else:
+              d=json.loads(p.read_text(encoding='utf-8'))
+              print('Research date:', d['target_date_jst'])
+              print('Current-day source pages captured:', ', '.join(d['tracks']) or 'none')
+              print('Source blockers:', json.dumps(d['blockers'], ensure_ascii=False))
+              assert d['production_routing'] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tokyo-kyoto-live-moisture-research
+          path: tmp/live_baba/snapshot.json
+          if-no-files-found: warn
+          retention-days: 30

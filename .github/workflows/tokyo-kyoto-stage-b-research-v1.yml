@@ -1,0 +1,51 @@
+name: Tokyo Kyoto Stage B research guard
+
+on:
+  pull_request:
+    paths:
+      - 'baba_models_v2/stage_b_tokyo_kyoto_v1.py'
+      - 'baba_models_v2/stage_b_label_inventory_v1.py'
+      - 'baba_models_v2/test_stage_b_tokyo_kyoto_v1.py'
+      - '.github/workflows/tokyo-kyoto-stage-b-research-v1.yml'
+      - 'baba_models_v2/stage_b_challenger_v1.py'
+      - 'baba_models_v2/test_stage_b_challenger_v1.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stage-b-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Run timing, four-model and anti-promotion tests
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_stage_b_tokyo_kyoto_v1.py test_stage_b_challenger_v1.py test_smoke.py
+      - name: Inventory JRA result evidence WITHOUT invented start times
+        run: |
+          python baba_models_v2/stage_b_label_inventory_v1.py \
+            --races docs/data/races.json \
+            --output tmp/stage_b_tokyo_kyoto/official_label_worklist.csv \
+            --audit tmp/stage_b_tokyo_kyoto/source_audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('tmp/stage_b_tokyo_kyoto/source_audit.json')
+          a=json.loads(p.read_text(encoding='utf-8'))
+          assert a['status']=='source_inventory_not_stage_b_validation'
+          assert a['replay_ready_rows']==0
+          assert a['surface_and_official_post_time_unverified']==a['candidate_rows']
+          print('Research source inventory is not a validated or production-ready Stage B dataset')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokyo-kyoto-stage-b-official-label-worklist
+          path: tmp/stage_b_tokyo_kyoto
+          retention-days: 30
