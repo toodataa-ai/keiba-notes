@@ -43,7 +43,7 @@
       td.colSpan=3;tr.append(td);target.append(tr);return;
     }
     const history=rows.map(row=>{
-      if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(row.day))throw Error('履歴の日付が不正です');
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(row.day))throw Error('履歴の日付が不正です');
       return {day:row.day,pv:pageViews(row.counts),sessions:sum(row.counts,['session_start'])};
     }).sort((a,b)=>b.day.localeCompare(a.day));
     const max=Math.max(1,...history.map(r=>r.pv));
@@ -77,7 +77,7 @@
     if(stats.status==='fulfilled'){
       try{
         const d=stats.value;
-        if(d.site!=='keiba-notes'||d.schema_version!==1||!/^\\d{4}-\\d{2}-\\d{2}$/.test(d.day_jst))throw Error('別サイトの集計が混在しています');
+        if(d.site!=='keiba-notes'||d.schema_version!==1||!/^\d{4}-\d{2}-\d{2}$/.test(d.day_jst))throw Error('別サイトの集計が混在しています');
         byId('pvToday').textContent=fmt(pageViews(d.today));
         byId('pvTotal').textContent=fmt(pageViews(d.totals));
         byId('sessionToday').textContent=fmt(sum(d.today,['session_start']));
