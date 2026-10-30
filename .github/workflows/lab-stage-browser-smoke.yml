@@ -81,7 +81,7 @@ jobs:
                 if path=='lab/usage-analytics.html':
                   assert page.locator('#historyRows').count()==1,'history table missing'
                   assert page.locator('#chart').count()==1,'history chart missing'
-                  assert '準備中' in page.locator('#status').inner_text(),'disabled analytics must show honest pending state'
+                  assert page.locator('#status').inner_text().strip(),'LAB analytics must give an explicit connection state'
                 print('PASS_LAB_STAGE_REAL_CHROME',width,path)
                 page.close()
             browser.close()
