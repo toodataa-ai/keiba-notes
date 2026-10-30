@@ -6,6 +6,15 @@ on:
       - 'docs/data/local_racing_shadow_public.json'
       - 'local_racing_shadow_v1/cumulative_roi_preview.py'
       - '.github/workflows/local-shadow-cumulative-roi-preview.yml'
+  # Bot commits made by the POST-RACE workflow use GITHUB_TOKEN; they do not
+  # trigger ordinary push workflows. React to completed runs explicitly.
+  workflow_run:
+    workflows: ['Local Racing Shadow POST-RACE (NAR)']
+    types: [completed]
+    branches: [main]
+  # Catch missed/failed downstream deliveries after the JST morning review.
+  schedule:
+    - cron: '27 1 * * *'  # 10:27 JST
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,6 +23,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   audit-and-publish:
+    # Only accept completions from this repository's own main branch.
+    # Failed/partial POST-RACE runs also need ROI reconciliation if the
+    # immutable public manifest advanced before a later audit step failed.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 23
     steps:
