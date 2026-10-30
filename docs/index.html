@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>AIによる競馬予想精度向上研究所</title>
+<title>AIによる競馬予想研究所</title>
 <link rel="stylesheet" href="assets/style.css?v=20261006-red1"><link rel="stylesheet" href="assets/brand.css?v=20261006-labseal4">
 <style>
 .lab-signature{display:flex;align-items:center;gap:10px;margin:0 0 12px;color:#d7d8dd;font-size:12px;font-weight:700;line-height:1.4}.lab-signature::before{content:"";flex:0 0 auto;width:24px;height:2px;border-radius:999px;background:#c61d31;box-shadow:0 0 10px rgba(198,29,49,.28)}.lab-signature-name{letter-spacing:.025em}.lab-signature-cycle{display:inline-flex;align-items:center;gap:6px;padding-left:10px;border-left:1px solid rgba(255,255,255,.16);color:#92959e;font-size:10px;font-weight:700;letter-spacing:.035em}.lab-signature-cycle b{color:#c61d31;font-weight:900}
@@ -19,7 +19,7 @@
 }
 .hero>.wrap{position:relative;z-index:1}
 .hero .lab-signature{justify-content:center;text-align:center}
-.hero .brand-title.brand-lockup{justify-content:center;margin:7px auto 5px!important}
+.hero .brand-title.brand-lockup{justify-content:center;margin:7px auto 5px!important;transform:translateX(-12px)}
 .hero .brand-subtitle,.hero .lead{text-align:center;margin-left:auto;margin-right:auto}
 .hero .portal{margin-left:auto;margin-right:auto}
 .hero .photo-credit{text-align:center;margin-top:16px;font-size:10px;color:#9ca1ac}
@@ -33,15 +33,34 @@
 }
 @media(max-width:420px){
  .hero::before{height:410px;background-position:center 38%}
- .hero .brand-title.brand-lockup{gap:3px}
+ .hero .brand-title.brand-lockup{gap:3px;transform:translateX(-8px)}
 }
 
+/* Approved production title legibility: larger type and a continuous underline. */
+.hero .brand-title.brand-lockup{
+  font-size:clamp(30px,4vw,42px)!important;
+  padding-right:0!important;
+}
+.hero .brand-title.brand-lockup::after{
+  left:0;
+  right:0;
+  height:3px;
+  background:#c61d31;
+  transform:none;
+  opacity:1;
+}
+@media(max-width:760px){
+  .hero .brand-title.brand-lockup{font-size:clamp(20px,5.9vw,26px)!important}
+}
+@media(max-width:420px){
+  .hero .brand-title.brand-lockup{font-size:clamp(19px,5.7vw,23px)!important}
+}
 </style>
 </head>
 <body>
 <header class="hero"><div class="wrap">
 <div class="lab-signature" aria-label="AI Racing Prediction Research Lab / Predict, Validate, Improve"><span class="lab-signature-name">AI Racing Prediction Research Lab</span><span class="lab-signature-cycle">Predict <b>→</b> Validate <b>→</b> Improve</span></div>
-<h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想精度向上研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想精度向上</span><span class="brand-lab"><span class="brand-lab-ja brand-lab-seal" aria-hidden="true"><span>研</span><span>究</span><span>所</span><span class="brand-lab-mark"></span></span></span></h1>
+<h1 class="brand-title brand-lockup" aria-label="AIによる競馬予想研究所"><span class="brand-track" aria-hidden="true"></span><span class="brand-ai-prefix">AIによる</span><span class="brand-word">競馬予想研究所</span></h1>
 <p class="brand-subtitle">AIで予想し、検証し、改善する。予測精度を育て続ける。</p>
 <p class="lead">JRAメインレースを対象に、AIで予想・検証・回顧を行い、結果と誤差を次のロジック改善へ反映します。</p>
 <div class="portal">
