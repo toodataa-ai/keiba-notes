@@ -49,7 +49,7 @@ def parse_official(html: str, track: str, *, expected_date: str, retrieved_at_js
         text,
     )
     if not heading:
-        raise ValueError("cannot verify official track/date heading")
+        raise ValueError(f"cannot verify official track/date heading (visible text preview: {text[:180]!r})")
     source_date = f"{int(heading[1]):04d}-{int(heading[2]):02d}-{int(heading[3]):02d}"
     if source_date != expected_date:
         raise ValueError(f"stale JRA page: page={source_date} expected={expected_date}")
