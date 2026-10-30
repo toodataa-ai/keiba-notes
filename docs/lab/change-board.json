@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "b6e0bfbec7f948936b8e79db2d771e82ff5ee75b",
+  "scan_commit": "fcd067e94485b83a3ea790d7ad08ebccbb205a31",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -16,9 +16,9 @@
   },
   "counts": {
     "lab_development": 3,
-    "lab_evaluation": 2,
+    "lab_evaluation": 1,
     "needs_review": 2,
-    "staging_review": 0,
+    "staging_review": 1,
     "released": 1,
     "reference_only": 1
   },
@@ -233,11 +233,19 @@
     {
       "id": "keiba-anonymous-usage",
       "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
-      "phase": "lab_evaluation",
-      "approval": "not_approved",
-      "next_action": "イベントサイトの既存Cloudflare Workerの/keiba専用APIと新規keiba_site_event_countsテーブルを検証済み（Worker run 41068124076）。イベントサイトの元のカウンターと過去日別履歴は非減少、既存データ変更なし。競馬LAB画面はこのAPIを読むが記録しない。本番PV計測は未開始。LAB実URLのスマホ/PCを検証後、ユーザー承認でLAB→STAGING、その後別途本番承認。イベントサイトmainのWorker正本への選択反映が必要で、将来の既存Worker再デプロイによる/keiba消失を防ぐ。",
+      "phase": "staging_review",
+      "approval": "pending_production_approval",
+      "next_action": "LABの競馬専用/keiba集計APIをステージングのトップ下部カウンターと閲覧推移画面へ昇格。ステージングのUIは読み取り専用で本番PVの計測POSTは未開始。既存のproduction docs/index.html・admin・予想回顧データは不変。ステージング表示と実ブラウザ/HTTP検証後、ユーザーによる本番リリースの明示承認でのみ本番UIと計測開始を別途実施。",
       "preview_path": "lab/usage-analytics.html",
-      "staging_paths": [],
+      "staging_paths": [
+        "docs/staging/index.html",
+        "docs/staging/usage-summary.js",
+        "docs/staging/usage-summary.css",
+        "docs/staging/usage-analytics.html",
+        "docs/staging/usage-analytics.js",
+        "docs/staging/usage-analytics.css",
+        "docs/staging/usage-analytics-config.json"
+      ],
       "lab_paths": [
         "docs/lab/usage-analytics.html",
         "docs/lab/usage-analytics.css",
@@ -259,9 +267,16 @@
         "docs/lab/analytics/worker.mjs": "4cef90f264fe948e07291012542ea8c6560156d5",
         "docs/lab/analytics/schema.sql": "ed33aacf0b29e768b69887a6a381f8acc107b8c6",
         "docs/lab/analytics/wrangler.example.toml": "06900b2259bd4c3b95b9f1560fcbc10dd9cb62eb",
-        "docs/lab/analytics/worker.test.mjs": "5bf7ee44f7c57033099fe036c78706c59b8d98a4"
+        "docs/lab/analytics/worker.test.mjs": "5bf7ee44f7c57033099fe036c78706c59b8d98a4",
+        "docs/staging/index.html": "4b4a3634a06e82f23d3fb890d801a67860424021",
+        "docs/staging/usage-summary.js": "fca4cde780fc51ac77876a79be9108dbd7062e6d",
+        "docs/staging/usage-summary.css": "dbadf56527858f0308c6542c17ee73b417e634e4",
+        "docs/staging/usage-analytics.html": "81cbf09eeb116a1de1588f1176bae59faf677705",
+        "docs/staging/usage-analytics.js": "c35f2bee09ac235a1506a29826e43e2f29b4e294",
+        "docs/staging/usage-analytics.css": "882d975e5e7cbd2afb52c4bf95be4a23076d2978",
+        "docs/staging/usage-analytics-config.json": "f786e9405a5da59e26bdd662be02c8ff0c5e6fd9"
       },
-      "latest_source_change_commit": "b6e0bfbec7f948936b8e79db2d771e82ff5ee75b"
+      "latest_source_change_commit": "b18222d04a7cea650350f84fc6b48c787cc4266d"
     }
   ],
   "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB hosts live experiment copies; legacy staging paths redirect for compatibility."
