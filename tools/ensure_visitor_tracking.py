@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 TRACKER = DOCS / "assets" / "visitor-counter.js"
 VERSION = "20261006-1"
-EXCLUDE = {DOCS / "admin.html"}
+EXCLUDE = {DOCS / "admin.html", DOCS / "staging" / "admin.html"}
 # Read-only prestart forecast HTML is legal/evidentiary source material.
 # Visitor analytics belong on the surrounding public navigation page, not in
 # historical prediction artifacts. Never inject any JS into frozen reports.
