@@ -101,7 +101,7 @@ def decode_jra_html(payload: bytes, declared_encoding: str | None) -> str:
             decoded = payload.decode(enc, errors="strict")
         except (UnicodeError, LookupError):
             continue
-        if "馬場" in decoded and "含水率" in decoded:
+        if "含水率" in decoded and ("東京競馬" in decoded or "京都競馬" in decoded):
             return decoded
     raise ValueError("could not decode verified JRA Japanese source content")
 
