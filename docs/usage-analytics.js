@@ -231,7 +231,7 @@
   byId('refresh').addEventListener('click',refresh);
   (async()=>{
     try{
-      cfg=await getJson('usage-analytics-config.json');
+      cfg=await getJson('assets/site-usage-config.json');
       if(cfg.schema_version!==1||cfg.site!=='keiba-notes')throw Error('接続設定が不正です');
     }catch(e){status('設定を読み込めません：'+e.message,true)}
     await refresh();
