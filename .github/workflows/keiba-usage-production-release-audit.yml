@@ -92,8 +92,14 @@ jobs:
                   page.on('pageerror',lambda e:errors.append(str(e)))
                   page.on('response',lambda r:collection.append((r.status,r.url)) if '/keiba/collect' in r.url else None)
                   page.goto(root+'index.html?usage-production-audit='+str(width),wait_until='domcontentloaded',timeout=60000)
-                  page.wait_for_function("() => /^\\d+$/.test(document.querySelector('#siteUsageTotal')?.textContent.trim().replaceAll(',',''))",timeout=26000)
-                  page.wait_for_timeout(1800)
+                  page.wait_for_timeout(8000)
+                  print('AUDIT_HOME_DIAGNOSTIC',width,
+                    'today',page.locator('#siteUsageToday').inner_text(),
+                    'total',page.locator('#siteUsageTotal').inner_text(),
+                    'notice',page.locator('#siteUsageNote').inner_text(),
+                    'post_responses',collection,
+                    'errors',errors)
+                  assert page.locator('#siteUsageTotal').inner_text().replace(',','').isdigit(),'Production counter not numeric'
                   assert page.locator('#siteUsageToday').inner_text().replace(',','').isdigit()
                   assert page.locator('a[href="usage-analytics.html"]').count()==1
                   assert collection and any(status==200 for status,url in collection),('No successful PV POST',collection)
