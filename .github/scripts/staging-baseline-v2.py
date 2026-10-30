@@ -40,10 +40,10 @@ def render(prod):
     if 'id="siteUsageToday"' in out:
         n=out.count('<section class="site-usage"')
         assert n==1, 'Expected exactly one production usage widget'
-        out,count=re.subn(r'<section class="site-usage"[^>]*>.*?</section>\\n?', '',out,count=1,flags=re.S)
+        out,count=re.subn(r'<section class="site-usage"[^>]*>.*?</section>\n?', '',out,count=1,flags=re.S)
         assert count==1, 'Unable to isolate production usage widget from stage'
-        out=out.replace('<link rel="stylesheet" href="assets/usage-summary.css?v=20261031-1">\\n','',1)
-        out=out.replace('<script src="assets/usage-summary.js?v=20261031-1" defer></script>\\n','',1)
+        out=out.replace('<link rel="stylesheet" href="assets/usage-summary.css?v=20261031-1">\n','',1)
+        out=out.replace('<script src="assets/usage-summary.js?v=20261031-1" defer></script>\n','',1)
         assert 'id="siteUsageToday"' not in out, 'Production counter leaked into stage'
     # Approved LAB -> STAGING promotion: keep the production top-page
     # template unchanged and add only stage analytics teaser + dedicated assets.
