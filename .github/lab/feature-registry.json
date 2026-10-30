@@ -157,11 +157,19 @@
     {
       "id": "keiba-anonymous-usage",
       "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
-      "phase": "lab_evaluation",
-      "approval": "not_approved",
-      "next_action": "イベントサイトの既存Cloudflare Workerの/keiba専用APIと新規keiba_site_event_countsテーブルを検証済み（Worker run 41068124076）。イベントサイトの元のカウンターと過去日別履歴は非減少、既存データ変更なし。競馬LAB画面はこのAPIを読むが記録しない。本番PV計測は未開始。LAB実URLのスマホ/PCを検証後、ユーザー承認でLAB→STAGING、その後別途本番承認。イベントサイトmainのWorker正本への選択反映が必要で、将来の既存Worker再デプロイによる/keiba消失を防ぐ。",
+      "phase": "staging_review",
+      "approval": "pending_production_approval",
+      "next_action": "LABの競馬専用/keiba集計APIをステージングのトップ下部カウンターと閲覧推移画面へ昇格。ステージングのUIは読み取り専用で本番PVの計測POSTは未開始。既存のproduction docs/index.html・admin・予想回顧データは不変。ステージング表示と実ブラウザ/HTTP検証後、ユーザーによる本番リリースの明示承認でのみ本番UIと計測開始を別途実施。",
       "preview_path": "lab/usage-analytics.html",
-      "staging_paths": [],
+      "staging_paths": [
+        "docs/staging/index.html",
+        "docs/staging/usage-summary.js",
+        "docs/staging/usage-summary.css",
+        "docs/staging/usage-analytics.html",
+        "docs/staging/usage-analytics.js",
+        "docs/staging/usage-analytics.css",
+        "docs/staging/usage-analytics-config.json"
+      ],
       "production_paths": [],
       "lab_paths": [
         "docs/lab/usage-analytics.html",
