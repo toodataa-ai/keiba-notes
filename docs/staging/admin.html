@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <base href="../">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>管理者画面 | AIによる競馬予想研究所</title>
+  <style>
+    :root{--bg:#f3f3f4;--card:#fff;--ink:#19191d;--muted:#6d6e75;--line:#e1e1e4;--red:#c61d31;--dark:#111116;--ok:#167a52}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Meiryo UI",Meiryo,"Yu Gothic UI",sans-serif;line-height:1.65}.wrap{width:min(960px,calc(100% - 28px));margin:auto}
+    header{background:linear-gradient(135deg,#0d0d10,#211116);color:#fff;border-bottom:4px solid var(--red);padding:28px 0 24px}header p{margin:4px 0 0;color:#c8c8ce;font-size:13px}h1{margin:0;font-size:clamp(22px,4vw,32px)}
+    main{padding:26px 0 60px}.eyebrow{margin:0 0 5px;color:var(--red);font-size:11px;font-weight:900;letter-spacing:.13em}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 3px 18px rgba(13,13,16,.05)}.label{color:var(--muted);font-size:13px;font-weight:700}.value{margin-top:4px;font-size:clamp(38px,8vw,64px);font-weight:900;letter-spacing:-.04em;line-height:1.05}.unit{font-size:14px;color:var(--muted);margin-left:5px}.meta{margin-top:10px;color:var(--muted);font-size:12px}.panel{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.status{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:999px;background:#f0f0f2;color:#555;font-size:12px;font-weight:800}.status.ok{background:#eaf7f1;color:var(--ok)}.dot{width:7px;height:7px;border-radius:50%;background:currentColor}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.button{appearance:none;border:0;border-radius:10px;background:var(--dark);color:#fff;padding:10px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}.button:disabled{opacity:.5;cursor:wait}.note{margin:14px 0 0;padding:13px 15px;border-left:4px solid var(--red);background:#fff5f6;border-radius:0 10px 10px 0;color:#5e4a50;font-size:12px}.back{display:inline-block;margin-top:18px;color:#8f1726;text-decoration:none;font-weight:800;font-size:13px}
+    @media(max-width:620px){.grid{grid-template-columns:1fr}.card{padding:18px}.value{font-size:48px}}
+  .stage-label{position:fixed;z-index:20;top:10px;right:12px;border-radius:8px;padding:6px 10px;background:#925023;color:#fff;font-weight:900;font-size:12px;box-shadow:0 2px 8px #0003}.status.warn{background:#fff3e6;color:#984e08}.health{margin-top:4px;color:#777;min-height:1.4em;font-size:12px}.technical{font-family:ui-monospace,monospace;font-size:11px;word-break:break-word;color:#676970;margin-top:8px}
+  </style>
+</head>
+<body>
+<div class="stage-label">STAGING 検証中</div>
+<header><div class="wrap"><p class="eyebrow">ADMIN / VISITOR ANALYTICS</p><h1>管理者画面</h1><p>AIによる競馬予想研究所 — 来訪状況</p></div></header>
+<main class="wrap">
+  <div class="grid">
+    <section class="card"><div class="label">本日の来訪者</div><div><span class="value" id="today">—</span><span class="unit">人</span></div><div class="meta"><span id="todayDate">—</span>（日本時間 0:00〜現在）<div id="todayHealth" class="health">取得中</div></div></section>
+    <section class="card"><div class="label">累積来訪者</div><div><span class="value" id="total">—</span><span class="unit">人</span></div><div class="meta">計測開始以降の推定ユニーク来訪者<div id="totalHealth" class="health">取得中</div></div></section>
+  </div>
+  <section class="panel">
+    <div class="row"><div><span class="status" id="status"><span class="dot"></span><span id="statusText">取得中</span></span><div class="meta" id="updated">—</div><div class="technical" id="diagnostic" aria-live="polite">外部集計APIへの接続状況を確認しています。</div></div><button class="button" id="refresh" type="button">更新</button></div>
+    <p class="note">同じ人が複数ページを見ても重複しにくい「推定ユニーク来訪者」として表示します。カウント基盤はCounter APIを利用し、当サイト独自には氏名・メールアドレス等の個人情報を保存しません。静的なGitHub Pagesのため、この画面は認証付き管理画面ではなく、URLを知っている人は閲覧できます。</p>
+  </section>
+  <a class="back" href="staging/index.html">← サイトへ戻る</a>
+</main>
+<script>
+(() => {
+  'use strict';
+  const API='https://counterapi.com/api';
+  const NS='toodataa-ai-keiba-notes', ACTION='visit';
+  const $=id=>document.getElementById(id);
+  const dateParts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const p=Object.fromEntries(dateParts.map(v=>[v.type,v.value]));
+  const day=p.year+'-'+p.month+'-'+p.day;
+  $('todayDate').textContent=day;
+  const countText=n=>Number(n).toLocaleString('ja-JP');
+  async function read(key){
+    const url=API+'/'+encodeURIComponent(NS)+'/'+encodeURIComponent(ACTION)+'/'+encodeURIComponent(key)
+      +'?readOnly=true&unique=true&_='+Date.now();
+    const ctl=new AbortController();
+    const timeout=setTimeout(()=>ctl.abort(),8000);
+    try{
+      const response=await fetch(url,{cache:'no-store',credentials:'omit',signal:ctl.signal});
+      if(!response.ok)throw new Error('HTTP '+response.status);
+      const data=await response.json();
+      if(!data||typeof data.value!=='number'||!Number.isFinite(data.value)||data.value<0)
+        throw new Error('APIの数値形式が不正');
+      return data.value;
+    }catch(error){
+      if(error.name==='AbortError')throw new Error('応答タイムアウト');
+      if(error instanceof TypeError)throw new Error('ネットワーク／CORSエラー');
+      throw error;
+    }finally{clearTimeout(timeout);}
+  }
+  async function load(){
+    const button=$('refresh');button.disabled=true;
+    $('statusText').textContent='確認中';
+    $('status').classList.remove('ok','warn');
+    const [today,total]=await Promise.allSettled([read('day-'+day),read('all-time')]);
+    const results=[{id:'today',health:'todayHealth',name:'本日',data:today},
+                   {id:'total',health:'totalHealth',name:'累積',data:total}];
+    const failures=[];
+    for(const r of results){
+      if(r.data.status==='fulfilled'){
+        $(r.id).textContent=countText(r.data.value);
+        $(r.health).textContent='取得成功';
+      }else{
+        $(r.health).textContent='取得できませんでした';
+        if($(r.id).textContent==='—')$(r.id).textContent='—';
+        failures.push(r.name+'：'+(r.data.reason?.message||'不明なエラー'));
+      }
+    }
+    if(failures.length===0){
+      $('statusText').textContent='正常';$('status').classList.add('ok');
+      $('diagnostic').textContent='CounterAPIから本日・累積の両方を取得できました。';
+    }else{
+      $('statusText').textContent=failures.length===2?'外部集計API取得不可':'一部取得不可';
+      $('status').classList.add('warn');
+      $('diagnostic').textContent='外部集計サービスの状態：'+failures.join(' ／ ')+'。取得できなかった値を0人として表示していません。';
+    }
+    $('updated').textContent='確認日時：'+new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',dateStyle:'medium',timeStyle:'medium'}).format(new Date());
+    button.disabled=false;
+  }
+  $('refresh').addEventListener('click',load);
+  load();
+})();
+</script>
+</body>
+</html>
