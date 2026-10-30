@@ -35,6 +35,12 @@ def render(prod):
         if plain in PAGES: return 'href='+quote+'staging/'+plain+hashpart+(sep+tail if sep else '')+quote
         return match.group(0)
     out=re.sub(r'href=(["\x27])([^"\x27]+)\1',fix,out)
+    # Stage-only cache key for the common week script: publication wording
+    # may differ by staging policy, while production HTML stays unchanged.
+    if 'id="weekSchedule"' in out:
+        out,count=re.subn(r'(<script src="assets/week\\.js\\?v=[^"]+)("></script>)',
+                          lambda m:m.group(1)+'-stage-morning-preview1'+m.group(2),out,count=1)
+        assert count==1,'Missing unique week.js tag for preview'
     assert out.count('staging-shell-marker" role="status"')==1
     assert 'data-stage="preview"' in out and 'noindex,nofollow' in out
     return out
