@@ -150,6 +150,14 @@ jobs:
                   page.wait_for_function("() => document.querySelector('#chart .trend-empty') && document.querySelector('#historyStatus').textContent.includes('0日分')",timeout=20000)
                   assert page.locator('#chart svg.trend-chart-svg').count()==0
                   assert '未計測' in page.locator('#chart .trend-empty').inner_text()
+                  page.locator('#previewExample').click()
+                  assert page.locator('#sampleFlag').is_visible(), 'Demo must be clearly marked as hypothetical'
+                  assert page.locator('#chart svg.trend-chart-svg .trend-point').count()==6
+                  assert page.locator('#chart svg.trend-chart-svg polyline.trend-line').count()==2
+                  assert '表示サンプル' in page.locator('#historyStatus').inner_text()
+                  page.locator('#returnLive').click()
+                  page.wait_for_function("() => document.querySelector('#chart .trend-empty') && document.querySelector('#previewExample:not([hidden])')",timeout=20000)
+                  assert not page.locator('#sampleFlag').is_visible(), 'Demo must not remain on actual history'
                   assert not errors,errors
                   assert not any('/keiba/collect' in u for u in posts),'Synthetic preview must never collect'
                   dim=page.evaluate("({width:innerWidth,scroll:document.documentElement.scrollWidth})")
