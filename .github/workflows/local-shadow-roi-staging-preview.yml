@@ -1,0 +1,132 @@
+name: Local Shadow ROI staging-only reconciliation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/local-racing-shadow.html'
+      - '.github/workflows/local-shadow-roi-staging-preview.yml'
+  workflow_run:
+    workflows: ['Local Racing Shadow POST-RACE (NAR)']
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: '17 1 * * *' # 10:17 JST, catch missed post-race delivery
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: local-shadow-roi-staging-preview
+  cancel-in-progress: false
+jobs:
+  staging-preview:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 26
+    steps:
+      - name: Checkout proof-preserving local Shadow evidence
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install isolated NAR official source parser
+        run: python -m pip install requests beautifulsoup4
+      - name: Verify payout parser and 100-yen denominators
+        run: python -B local_racing_shadow_v1/cumulative_roi_preview.py --self-test
+      - name: Compute latest staging ROI from official NAR payouts
+        run: python -B local_racing_shadow_v1/cumulative_roi_preview.py
+      - name: Drop generated production candidate; staging-only guard
+        run: |
+          git restore -- docs/data/local_shadow_roi.json
+          git diff --exit-code -- docs/data/local_shadow_roi.json docs/data/local_racing_shadow_public.json local_racing_shadow_v1/predictions local_racing_shadow_v1/results local_racing_shadow_v1/reviews
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('docs/staging/data/local-shadow-roi-preview.json').read_text())
+          m=json.loads(Path('docs/data/local_racing_shadow_public.json').read_text())
+          assert s['scope']=='staging_only_theoretical_100yen_each_top_pick'
+          assert s['production_effect'] is False
+          assert s['source_manifest_updated_at']==m['updated_at']
+          assert s['source_manifest_total_races']==len(m['races'])
+          assert s['source_manifest_reviewed']==sum(r['status']=='reviewed' for r in m['races'])
+          n=s['summary']
+          assert n['reviewed']==s['source_manifest_reviewed']
+          assert 0<=n['win_checked']<=n['evaluable']<=n['reviewed']
+          assert 0<=n['place_checked']<=n['evaluable']
+          for k in ('reviewed','evaluable','win_checked','win_return_yen','place_checked','place_return_yen'):
+              assert n[k]==sum(d[k] for d in s['daily'].values()),k
+              assert n[k]==sum(d[k] for d in s['by_venue'].values()),k
+          for typ in ('win','place'):
+              checked=n[typ+'_checked']
+              got=round(n[typ+'_return_yen']/(100*checked)*100,2) if checked else None
+              assert got==n[typ+'_roi_pct'],typ
+          print('PASS: isolated staging ROI, current manifest, official-payout accounting')
+          PY
+          node - <<'JS'
+          const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
+          const h=fs.readFileSync('docs/staging/local-racing-shadow.html','utf8');
+          assert(h.includes("fetchJson('staging/data/local-shadow-roi-preview.json')"));
+          assert(!h.includes("fetchJson('data/local_shadow_roi.json')"));
+          const script=h.match(/<script>\s*([\s\S]*?)<\/script>/)?.[1];
+          assert(script);new vm.Script(script);
+          console.log('PASS: staging UI uses independent preview, valid JS');
+          JS
+          git status --short
+          git status --porcelain --untracked-files=all | sed 's/^...//' | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert set(p)<={"docs/staging/data/local-shadow-roi-preview.json"},p'
+      - name: Publish only staging preview (no JRA, production or prediction writes)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/staging/data/local-shadow-roi-preview.json
+          git diff --cached --name-only | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert set(p)<={"docs/staging/data/local-shadow-roi-preview.json"},p'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update staging-only NAR official win/place ROI preview'
+            pushed=0
+            for attempt in 1 2 3 4 5; do
+              git fetch origin main
+              git rebase origin/main
+              python - <<'PY'
+          import json
+          from pathlib import Path
+          s=json.loads(Path('docs/staging/data/local-shadow-roi-preview.json').read_text())
+          m=json.loads(Path('docs/data/local_racing_shadow_public.json').read_text())
+          assert s['source_manifest_updated_at']==m['updated_at'], 'Manifest changed during staging ROI audit'
+          PY
+              if git push origin HEAD:main; then pushed=1; break; fi
+              sleep "$attempt"
+            done
+            test "$pushed" -eq 1
+          fi
+      - name: Verify live staging JSON, HTML and unchanged production data
+        run: |
+          python - <<'PY'
+          import requests,time,json
+          from pathlib import Path
+          base='https://toodataa-ai.github.io/keiba-notes/'
+          expected={
+              'staging/data/local-shadow-roi-preview.json':Path('docs/staging/data/local-shadow-roi-preview.json').read_bytes(),
+              'staging/local-racing-shadow.html':Path('docs/staging/local-racing-shadow.html').read_bytes(),
+          }
+          for attempt in range(18):
+              try:
+                  for remote, blob in expected.items():
+                      r=requests.get(base+remote, params={'audit':str(time.time())},timeout=15,
+                                     headers={'Cache-Control':'no-cache'})
+                      r.raise_for_status()
+                      assert r.content==blob,'Pages delay: '+remote
+                  stage=json.loads(expected['staging/data/local-shadow-roi-preview.json'])
+                  live=requests.get(base+'data/local_shadow_roi.json',params={'audit':str(time.time())},timeout=15).json()
+                  prod=json.loads(Path('docs/data/local_shadow_roi.json').read_text())
+                  assert live==prod,'Production ROI was unexpectedly changed'
+                  print(json.dumps({'status':'VERIFIED_STAGING_ONLY','win_roi_pct':stage['summary']['win_roi_pct'],
+                                    'place_roi_pct':stage['summary']['place_roi_pct'],
+                                    'win_checked':stage['summary']['win_checked'],
+                                    'place_checked':stage['summary']['place_checked']},ensure_ascii=False))
+                  break
+              except Exception as e:
+                  print(f'STAGING_PAGES_WAIT {attempt+1}/18: {e}')
+                  if attempt==17: raise
+                  time.sleep(8)
+          PY
