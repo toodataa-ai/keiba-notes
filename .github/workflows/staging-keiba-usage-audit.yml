@@ -149,7 +149,7 @@ jobs:
                   page.locator('#period').select_option('7')
                   page.wait_for_function("() => document.querySelector('#chart .trend-empty') && document.querySelector('#historyStatus').textContent.includes('0日分')",timeout=20000)
                   assert page.locator('#chart svg.trend-chart-svg').count()==0
-                  assert '未計測' in page.locator('#chart .trend-empty').inner_text()
+                  assert '計測開始前を0件とは扱いません' in page.locator('#chart .trend-empty').inner_text()
                   page.locator('#previewExample').click()
                   assert page.locator('#sampleFlag').is_visible(), 'Demo must be clearly marked as hypothetical'
                   assert page.locator('#chart svg.trend-chart-svg .trend-point').count()==6
