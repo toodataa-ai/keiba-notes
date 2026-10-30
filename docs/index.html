@@ -56,6 +56,7 @@
   .hero .brand-title.brand-lockup{font-size:clamp(19px,5.7vw,23px)!important}
 }
 </style>
+<link rel="stylesheet" href="assets/usage-summary.css?v=20261031-1">
 </head>
 <body>
 <header class="hero"><div class="wrap">
@@ -89,6 +90,7 @@
 </div>
 <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
 <p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.03</small></p>
+<section class="site-usage" aria-labelledby="stageUsageTitle"><div class="site-usage-top"><strong id="stageUsageTitle" class="site-usage-title">サイト利用状況</strong><div class="site-usage-values"><span class="site-usage-value">今日のPV <b id="siteUsageToday" aria-live="polite">—</b></span><span class="site-usage-value">累計PV <b id="siteUsageTotal" aria-live="polite">—</b></span><a href="usage-analytics.html">過去の閲覧推移を見る</a></div></div><p class="site-usage-notice" id="siteUsageNote" role="status">競馬専用の実測データを確認中…</p></section>
 <p class="photo-credit">背景写真：<a href="https://commons.wikimedia.org/wiki/File:Racing_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Racing (Unsplash)／CC0</a>（海外の競馬場で撮影）</p>
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
@@ -111,5 +113,6 @@ fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)thro
  }
 }).catch(()=>{document.getElementById('releaseHistoryList').textContent='履歴の取得に失敗しました。'});
 </script>
-<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+<script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+<script src="assets/usage-summary.js?v=20261031-1" defer></script>
 </body></html>
