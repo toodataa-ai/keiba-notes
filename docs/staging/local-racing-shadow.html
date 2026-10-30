@@ -252,13 +252,15 @@ async function cumRenderVenues(days, expected){
 
 async function loadRecovery(){
   try{
-    const d=await fetchJson('data/local_shadow_roi.json');
-    if(!d||d.scope!=='theoretical_100yen_each_top_pick'||d.production_effect!==false)
+    const d=await fetchJson('staging/data/local-shadow-roi-preview.json');
+    if(!d||d.scope!=='staging_only_theoretical_100yen_each_top_pick'||d.production_effect!==false)
       throw new Error('ROI研究データの分離条件が不正');
-    if(d.source_manifest_updated_at!==manifest.updated_at||
-       d.source_manifest_total_races!==manifest.races.length||
-       d.source_manifest_reviewed!==manifest.races.filter(r=>r.status==='reviewed').length)
-      throw new Error('公開manifestの更新に対して回収率データの再集計待ち');
+    const current=d.source_manifest_updated_at===manifest.updated_at&&
+       d.source_manifest_total_races===manifest.races.length&&
+       d.source_manifest_reviewed===manifest.races.filter(r=>r.status==='reviewed').length;
+    if(d.source_manifest_total_races>manifest.races.length||
+       d.source_manifest_reviewed>manifest.races.filter(r=>r.status==='reviewed').length)
+      throw new Error('ROI集計の母集団が公開データより新しく、照合できません');
     const s=d.summary;
     if(!s||s.win_checked>s.evaluable||s.place_checked>s.evaluable||
        !Number.isFinite(s.win_roi_pct)||!Number.isFinite(s.win_return_yen)||
@@ -279,9 +281,17 @@ async function loadRecovery(){
       $('roiPlaceDetail').textContent='検証済みの複勝払戻がありません';
     }
     const full=s.place_checked===s.evaluable&&s.win_checked===s.evaluable;
-    $('roiStatus').textContent=full?
-      '単勝・複勝とも公式払戻を確認済み（'+s.evaluable+'件）。全日程・競馬場を通算しています。':
-      '単勝 '+s.win_checked+'件、複勝 '+s.place_checked+'件／評価対象 '+s.evaluable+'件。回収率は確認済み分のみの暫定値です（未確認分を0円としません）。';
+    const lag=manifest.races.filter(r=>r.status==='reviewed').length-d.source_manifest_reviewed;
+    const asof='（'+d.ending_date+'までの公式払戻検証値）';
+    if(!current){
+      $('roiWinDetail').textContent += ' ／ 旧集計 '+asof;
+      $('roiPlaceDetail').textContent += ' ／ 旧集計 '+asof;
+      $('roiStatus').textContent='ステージング再集計待ち：'+asof+'。現時点の回顧との差 '+lag+'レース。上の率は最新686件の回収率ではありません。';
+    }else{
+      $('roiStatus').textContent=full?
+        '単勝・複勝とも公式払戻を確認済み（'+s.evaluable+'件）。全日程・競馬場を通算しています。':
+        '単勝 '+s.win_checked+'件、複勝 '+s.place_checked+'件／評価対象 '+s.evaluable+'件。回収率は確認済み分のみの暫定値です（未確認分を0円としません）。';
+    }
   }catch(e){
     $('roiWin').textContent='集計待ち';$('roiPlace').textContent='集計待ち';
     $('roiWinDetail').textContent='確認済みデータを準備中';
