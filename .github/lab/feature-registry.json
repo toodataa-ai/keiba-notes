@@ -157,9 +157,9 @@
     {
       "id": "keiba-anonymous-usage",
       "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
-      "phase": "staging_review",
-      "approval": "pending_production_approval",
-      "next_action": "LABの競馬専用/keiba集計APIをステージングのトップ下部カウンターと閲覧推移画面へ昇格。ステージングのUIは読み取り専用で本番PVの計測POSTは未開始。既存のproduction docs/index.html・admin・予想回顧データは不変。ステージング表示と実ブラウザ/HTTP検証後、ユーザーによる本番リリースの明示承認でのみ本番UIと計測開始を別途実施。",
+      "phase": "production_released",
+      "approval": "approved_by_user",
+      "next_action": "2026-10-31 JST ユーザーの本番リリース承認により、トップに今日/累計PV、日別折れ線(7/30/90/365日)、実測開始の匿名PV・セッション概数の収集を正式公開。Cloudflare /keiba別テーブル使用、旧CounterAPI送信を停止。実ブラウザ390px/1200pxでPV POST各HTTP 200と日別線・端末横スクロールなしを確認（Actions 41079882530）、Pagesデプロイ 41079881621 成功。計測前の歴史は復元不可でサンプルは明確表示。本番予想・回顧等のGit tree SHA不変。継続：蓄積した日別件数の監視、旧admin.htmlの導線再編は別件。",
       "preview_path": "lab/usage-analytics.html",
       "staging_paths": [
         "docs/staging/index.html",
@@ -170,7 +170,16 @@
         "docs/staging/usage-analytics.css",
         "docs/staging/usage-analytics-config.json"
       ],
-      "production_paths": [],
+      "production_paths": [
+        "docs/index.html",
+        "docs/usage-analytics.html",
+        "docs/usage-analytics.js",
+        "docs/usage-analytics.css",
+        "docs/assets/usage-summary.js",
+        "docs/assets/usage-summary.css",
+        "docs/assets/visitor-counter.js",
+        "docs/assets/site-usage-config.json"
+      ],
       "lab_paths": [
         "docs/lab/usage-analytics.html",
         "docs/lab/usage-analytics.css",
