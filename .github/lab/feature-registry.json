@@ -157,9 +157,9 @@
     {
       "id": "keiba-anonymous-usage",
       "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
-      "phase": "lab_development",
+      "phase": "lab_evaluation",
       "approval": "not_approved",
-      "next_action": "LABで閲覧カウンター・7/30/90/365日履歴UIと独立Worker/D1のコードを用意。専用Cloudflare Worker/D1は未接続・未デプロイ、実データ収集は未開始。DBを競馬専用に作成して/collect・/stats・/historyを検証するまで数字を表示しない。本番のCounterAPI計測・JRA/NAR公式データは変更禁止。LAB動作検証→別途ステージング移行承認→本番リリース承認の順で対応。",
+      "next_action": "イベントサイトの既存Cloudflare Workerの/keiba専用APIと新規keiba_site_event_countsテーブルを検証済み（Worker run 41068124076）。イベントサイトの元のカウンターと過去日別履歴は非減少、既存データ変更なし。競馬LAB画面はこのAPIを読むが記録しない。本番PV計測は未開始。LAB実URLのスマホ/PCを検証後、ユーザー承認でLAB→STAGING、その後別途本番承認。イベントサイトmainのWorker正本への選択反映が必要で、将来の既存Worker再デプロイによる/keiba消失を防ぐ。",
       "preview_path": "lab/usage-analytics.html",
       "staging_paths": [],
       "production_paths": [],
