@@ -37,6 +37,25 @@
  .hero .brand-title.brand-lockup{gap:3px;transform:translateX(-8px)}
 }
 
+/* Stage-only title legibility: larger type and a continuous underline. */
+.hero .brand-title.brand-lockup{
+  font-size:clamp(30px,4vw,42px)!important;
+  padding-right:0!important;
+}
+.hero .brand-title.brand-lockup::after{
+  left:0;
+  right:0;
+  height:3px;
+  background:#c61d31;
+  transform:none;
+  opacity:1;
+}
+@media(max-width:760px){
+  .hero .brand-title.brand-lockup{font-size:clamp(20px,5.9vw,26px)!important}
+}
+@media(max-width:420px){
+  .hero .brand-title.brand-lockup{font-size:clamp(19px,5.7vw,23px)!important}
+}
 </style>
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
