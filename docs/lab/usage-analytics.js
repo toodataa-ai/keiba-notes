@@ -10,6 +10,7 @@
     byId('status').className='status'+(error?' error':' ok');
   };
   let cfg=null;
+  let requestSerial=0;
   function sum(p,keys){
     if(!p||typeof p!=='object')throw Error('集計データの形式が不正です');
     return keys.reduce((total,k)=>{
@@ -26,10 +27,12 @@
     }finally{clearTimeout(t)}
   }
   const pageViews=c=>sum(c,EVENT_NAMES);
-  function reset(){
-    for(const id of ['pvToday','pvTotal','sessionToday','sessionTotal'])byId(id).textContent='—';
+  function clearHistory(){
     byId('historyRows').replaceChildren();
     byId('chart').replaceChildren();
+  }
+  function clearCounters(){
+    for(const id of ['pvToday','pvTotal','sessionToday','sessionTotal'])byId(id).textContent='—';
   }
   function make(tag,cls,value){
     const e=document.createElement(tag);if(cls)e.className=cls;
@@ -61,9 +64,12 @@
     }
   }
   async function refresh(){
+    const serial=++requestSerial;
     byId('refresh').disabled=true;
-    reset();
+    clearHistory();
+    byId('historyStatus').textContent='履歴を取得中です…';
     if(!cfg?.enabled||!/^https:\/\//.test(cfg?.endpoint||'')){
+      clearCounters();
       status('競馬専用の集計APIは接続準備中です。既存の人数や過去の閲覧記録を推測して表示しません。',true);
       byId('historyStatus').textContent='Cloudflare Worker／D1接続・動作検証後に利用できます。';
       byId('refresh').disabled=false;return;
@@ -74,6 +80,7 @@
     const [stats,history]=await Promise.allSettled([
       getJson(endpoint+'/stats'),getJson(endpoint+'/history?days='+encodeURIComponent(days))
     ]);
+    if(serial!==requestSerial)return;
     if(stats.status==='fulfilled'){
       try{
         const d=stats.value;
@@ -83,8 +90,8 @@
         byId('sessionToday').textContent=fmt(sum(d.today,['session_start']));
         byId('sessionTotal').textContent=fmt(sum(d.totals,['session_start']));
         status('公式の集計APIに接続済み（'+d.day_jst+' 日本時間）');
-      }catch(e){status('集計データの検証に失敗しました：'+e.message,true)}
-    }else status('カウンター取得失敗：'+stats.reason?.message,true);
+      }catch(e){clearCounters();status('集計データの検証に失敗しました：'+e.message,true)}
+    }else {clearCounters();status('カウンター取得失敗：'+stats.reason?.message,true)}
     if(history.status==='fulfilled'){
       try{
         const data=history.value;
