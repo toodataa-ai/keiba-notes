@@ -1,0 +1,70 @@
+name: Tokyo Kyoto Stage B 2026 retrospective evidence
+
+on:
+  pull_request:
+    paths:
+      - 'baba_models_v2/collect_stage_b_2026_v1.py'
+      - 'baba_models_v2/evidence/tokyo_kyoto_2026_10_official_labels.csv'
+      - 'baba_models_v2/stage_b_tokyo_kyoto_v1.py'
+      - '.github/workflows/tokyo-kyoto-stage-b-2026-retrospective.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install JRA/JMA official-data parsers
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf pytest
+      - name: Validate 2026 official result label schema and source set
+        run: |
+          python - <<'PY'
+          import csv
+          from collections import Counter
+          from pathlib import Path
+          f=Path('baba_models_v2/evidence/tokyo_kyoto_2026_10_official_labels.csv')
+          rows=list(csv.DictReader(f.open(encoding='utf-8')))
+          assert len(rows)==16
+          assert len({r['race_id'] for r in rows})==16
+          assert Counter(r['track']+'_'+r['surface'] for r in rows)=={
+            'tokyo_turf':6,'tokyo_dirt':2,'kyoto_turf':5,'kyoto_dirt':3}
+          assert sum(bool(r['verified_at_jst']) for r in rows)==14
+          assert all(r['post_time_jst'] and r['official_result_url'].startswith('https://') for r in rows)
+          print('Official result labels: 16 verified field mappings; 14 have original result-verification timestamps')
+          PY
+      - name: Retrieve 2026 JRA morning observations and JMA hourly records
+        run: |
+          python baba_models_v2/collect_stage_b_2026_v1.py \
+            --labels baba_models_v2/evidence/tokyo_kyoto_2026_10_official_labels.csv \
+            --outdir tmp/stage_b_2026
+      - name: Retrospective research-only 4-class evaluation
+        run: |
+          python baba_models_v2/stage_b_tokyo_kyoto_v1.py \
+            --labels baba_models_v2/evidence/tokyo_kyoto_2026_10_official_labels.csv \
+            --observations tmp/stage_b_2026/jra_morning.csv \
+            --weather tmp/stage_b_2026/jma_hourly.csv \
+            --output tmp/stage_b_2026/replay.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('tmp/stage_b_2026/replay.json').read_text(encoding='utf-8'))
+          assert p['production_router_changed'] is False
+          assert p['audit']['historical_publication_availability_verified'] is False
+          assert p['audit']['formal_promotion_eligible'] is False
+          assert all(not m['stage_b_candidate'] for m in p['models'].values())
+          print('Research replay restricted: '+str(p['audit']['accepted_races'])+' source-complete races, never formally promoted')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tokyo-kyoto-stage-b-2026-source-and-replay
+          path: tmp/stage_b_2026
+          if-no-files-found: warn
+          retention-days: 30
