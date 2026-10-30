@@ -1,0 +1,47 @@
+name: LAB keiba anonymous site usage dashboard checks
+on:
+  push:
+    paths:
+      - 'docs/lab/usage-analytics*'
+      - 'docs/lab/usage-tracker.js'
+      - 'docs/lab/analytics/**'
+      - '.github/workflows/lab-keiba-usage-analytics-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Javascript syntax and Worker anonymous aggregation
+        run: |
+          node --check docs/lab/usage-analytics.js
+          node --check docs/lab/usage-tracker.js
+          node --check docs/lab/analytics/worker.mjs
+          node --test docs/lab/analytics/worker.test.mjs
+      - name: Enforce LAB environment and zero fabricated data
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('docs/lab')
+          html=(root/'usage-analytics.html').read_text(encoding='utf-8')
+          js=(root/'usage-analytics.js').read_text(encoding='utf-8')
+          tracker=(root/'usage-tracker.js').read_text(encoding='utf-8')
+          cfg=json.loads((root/'usage-analytics-config.json').read_text())
+          assert 'data-stage="lab"' in html and 'noindex,nofollow' in html
+          assert 'id="historyRows"' in html and 'id="chart"' in html
+          assert all('value="'+x+'"' in html for x in ('7','30','90','365'))
+          assert cfg['enabled'] is False and cfg['endpoint']=='' and cfg['site']=='keiba-notes'
+          assert '取得できません' in js or '推測して表示しません' in js
+          assert "PAGES,pathname" in tracker and "sessionStorage" in tracker
+          assert "location.origin!=='https://toodataa-ai.github.io'" in tracker
+          assert 'https://counterapi.com' not in js and 'https://counterapi.com' not in tracker
+          assert not (Path('docs/data/site-usage-config.json').exists()),'Production config must be absent until approval'
+          print('PASS: LAB-only, no live tracking, no invented usage history')
+          PY
