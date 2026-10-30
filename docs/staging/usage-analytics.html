@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-store">
 <title>サイト利用状況・過去閲覧推移（ステージング）｜AIによる競馬予想研究所</title>
 <link rel="stylesheet" href="usage-analytics.css?v=1">
-<script src="usage-analytics.js?v=1" defer></script>
+<script src="usage-analytics.js?v=2-line-trend" defer></script>
 </head>
 <body>
 <header class="hero"><div class="wrap">
@@ -24,11 +24,12 @@
 <article class="stat"><h2>累計セッション目安</h2><strong id="sessionTotal">—</strong><small>人数・ユニーク来訪者とは異なります</small></article>
 </section>
 <section class="panel" aria-labelledby="historyTitle">
-<div class="panel-head"><div><h2 id="historyTitle">過去の閲覧推移</h2><p>実測できた日だけを表示。未計測日を0件に置き換えません。</p></div>
+<div class="panel-head"><div><h2 id="historyTitle">過去の閲覧推移</h2><p>日付ごとのPV増減を折れ線で表示します。未計測日の数値は補完しません。</p></div>
 <div class="filters"><label for="period">対象期間</label><select id="period"><option value="7">7日</option><option value="30" selected>30日</option><option value="90">90日</option><option value="365">365日</option></select><button type="button" id="refresh">更新</button></div></div>
 <p id="historyStatus" class="fine">履歴を確認しています…</p>
-<div id="chart" class="chart" role="img" aria-label="日別ページ表示数の横棒グラフ"></div>
-<div class="legend"><span class="square"></span> ページ表示数（PV）</div>
+<div id="chart" class="chart" aria-label="PVの時系列グラフ"></div>
+<p id="chartDetail" class="chart-detail" role="status" aria-live="polite">日別データを確認しています…</p>
+<div class="legend"><span class="square"></span> ページ表示数（PV）　横軸：日付（JST）／縦軸：PV</div>
 <div class="tablewrap"><table><thead><tr><th>日付（JST）</th><th>表示数</th><th>セッション目安</th></tr></thead><tbody id="historyRows"><tr><td colspan="3">集計待ち</td></tr></tbody></table></div>
 </section>
 <section class="panel info"><h2>計測ルールと注意</h2>
