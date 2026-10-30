@@ -38,7 +38,7 @@ def render(prod):
     # Stage-only cache key for the common week script: publication wording
     # may differ by staging policy, while production HTML stays unchanged.
     if 'id="weekSchedule"' in out:
-        out,count=re.subn(r'(<script src="assets/week\\.js\\?v=[^"]+)("></script>)',
+        out,count=re.subn(r'(<script src="assets/week\.js\?v=[^"]+)("></script>)',
                           lambda m:m.group(1)+'-stage-morning-preview1'+m.group(2),out,count=1)
         assert count==1,'Missing unique week.js tag for preview'
     assert out.count('staging-shell-marker" role="status"')==1
