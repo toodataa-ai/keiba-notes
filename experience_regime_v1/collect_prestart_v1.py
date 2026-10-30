@@ -31,8 +31,8 @@ SEEDS = {
     # Verified directly against six 2026-10-24 and 2026-10-25 JRA official racecards.
     "2026-10-24": {"東京": (1, 0xD9), "京都": (1, 0xB7), "新潟": (1, 0x50)},
     "2026-10-25": {"東京": (1, 0x09), "京都": (1, 0xE7), "新潟": (1, 0x80)},
-    # Verified against JRA PC 2026-10-31 1R official cards (Tokyo /74, Kyoto /DF).
-    "2026-10-31": {"東京": (1, 0x74), "京都": (1, 0xDF)},
+    # Verified against JRA PC 2026-10-31 JRA PC 1R official cards (Tokyo /74, Kyoto /52; NOT mobile /DF).
+    "2026-10-31": {"東京": (1, 0x74), "京都": (1, 0x52)},
     # Verified against JRA PC 2026-11-01 1R official cards (Tokyo /54, Kyoto /32).
     "2026-11-01": {"東京": (1, 0x54), "京都": (1, 0x32)},
 }
@@ -179,7 +179,16 @@ def collect(week_id,date):
              "fixed_plan_today_races":len([x for x in all_today if x["race_id"] in selected]),
              "stats":dict(stats),"category_regime_verified_horses":{k:dict(v) for k,v in by_cat.items()},
              "coverage_gaps":gaps,"production_effect":False}
-    save_new(week_dir/("coverage_gap_"+date+".json"),summary)
+    gap_path=week_dir/("coverage_gap_"+date+".json")
+    # Coverage is a current-state report, unlike immutable prediction snapshots.
+    # Preserve failed attempt details in the next report and in Git history.
+    if gap_path.exists():
+        prior=json.loads(gap_path.read_text(encoding="utf-8"))
+        history=prior.get("previous_attempts",[])
+        history.append({"generated_at":prior.get("generated_at"),"stats":prior.get("stats"),
+                        "coverage_gaps":prior.get("coverage_gaps")})
+        summary["previous_attempts"]=history
+    gap_path.write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("E012_COLLECTION_SUMMARY",json.dumps(summary,ensure_ascii=False),flush=True)
 
 def precommit_gate(week_id,date):
@@ -209,29 +218,45 @@ def precommit_gate(week_id,date):
     print("E012_PRECOMMIT_GATE",len(targets),"pruned",len(rejected),flush=True)
 
 def proof_audit(week_id,date,proof_sha,commit_at):
+    import subprocess
     week_dir=ROOT/"experience_regime_v1"/"collection"/week_id
-    committed=datetime.fromisoformat(commit_at.replace("Z","+00:00"))
     snapshots=list((week_dir/"snapshots").glob(date+"-*.json")) if (week_dir/"snapshots").exists() else []
     details=[];totals=Counter()
     for path in sorted(snapshots):
-        p=json.loads(path.read_text())
+        p=json.loads(path.read_text(encoding="utf-8"))
         start=datetime.fromisoformat(p["race_context"]["start_at"])
         captured=datetime.fromisoformat(p["captured_at"])
-        ok=captured<start and committed<start
+        rel=str(path.relative_to(ROOT))
+        hist=subprocess.check_output(["git","log","--diff-filter=A","--reverse",
+                                     "--format=%H %cI","--",rel],cwd=ROOT,text=True).strip().splitlines()
+        if len(hist)!=1:
+            raise ValueError("first Git introduction missing or ambiguous for "+p["race_id"])
+        first_sha,first_time=hist[0].split()
+        first_at=datetime.fromisoformat(first_time)
+        ok=captured<start and first_at<start
         regimes=Counter(v.get("regime") for v in p["experience"]["horses"].values() if v.get("regime") in ("E0","E1","E2"))
         if ok:
             for key,n in regimes.items():
                 totals[key+"_horses"]+=n
                 totals[key+"_races"]+=1
-        else:totals["invalid_timing_races"]+=1
-        details.append({"race_id":p["race_id"],"proof_commit":proof_sha,"proof_commit_at":commit_at,
+        else:
+            totals["invalid_timing_races"]+=1
+        details.append({"race_id":p["race_id"],"proof_commit":first_sha,"proof_commit_at":first_time,
                         "captured_at":p["captured_at"],"start_at":p["race_context"]["start_at"],
                         "proof_prestart_valid":ok,"regime_counts":dict(regimes)})
-    report={"schema_version":1,"week_id":week_id,"date":date,"generated_at":jst_now().isoformat(),
-            "proof_commit":proof_sha,"proof_commit_at":commit_at,"totals":dict(totals),
-            "races":details,"production_effect":False}
     path=week_dir/("proof_commit_"+date+".json")
-    save_new(path,report)
+    previous=[]
+    if path.exists():
+        former=json.loads(path.read_text(encoding="utf-8"))
+        previous=former.get("previous_proof_reports",[])
+        previous.append({"generated_at":former.get("generated_at"),"proof_commit":former.get("proof_commit"),
+                         "races":former.get("races",[])})
+    report={"schema_version":2,"week_id":week_id,"date":date,"generated_at":jst_now().isoformat(),
+            "proof_commit":proof_sha,"proof_commit_at":commit_at,"totals":dict(totals),
+            "races":details,"previous_proof_reports":previous,"production_effect":False}
+    # Proof report can be updated with additive *new* race evidence; original
+    # first-introduction SHA/time is preserved for each immutable snapshot.
+    path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("E012_GIT_PROOF",json.dumps(report,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
