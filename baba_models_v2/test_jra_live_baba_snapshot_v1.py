@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from jra_live_baba_snapshot_v1 import parse_official, SOURCES
+from jra_live_baba_snapshot_v1 import parse_official, SOURCES, decode_jra_html
 
 JST = ZoneInfo("Asia/Tokyo")
 
@@ -54,3 +54,19 @@ def test_no_implicit_measurement_from_missing_table():
     with pytest.raises(ValueError, match="values absent"):
         parse_official(html, "tokyo", expected_date="2026-10-30",
                        retrieved_at_jst="2026-10-30T08:10:00+09:00", source_url=SOURCES["tokyo"])
+
+
+def test_shift_jis_legacy_jra_page_is_decoded_safely():
+    original = fixture("tokyo", "2026-10-30")
+    source = original.encode("cp932")
+    decoded = decode_jra_html(source, "ISO-8859-1")
+    assert decoded == original
+    out = parse_official(decoded, "tokyo", expected_date="2026-10-30",
+                         retrieved_at_jst="2026-10-30T09:00:00+09:00",
+                         source_url=SOURCES["tokyo"])
+    assert out["moisture_percent"]["turf_corner"] == 16.9
+
+
+def test_decode_rejects_corrupted_bytes():
+    with pytest.raises(ValueError, match="decode"):
+        decode_jra_html(b"\x80\xff\xfe", None)
