@@ -79,6 +79,8 @@ jobs:
                   for value in ('7','90','365'):
                       page.locator('#period').select_option(value)
                       page.wait_for_function("(v) => document.querySelector('#historyStatus')?.textContent.includes('実測記録') && document.querySelector('#period')?.value===v",arg=value,timeout=18000)
+                      assert page.locator('#pvTotal').inner_text().strip().replace(',','').isdigit(),'Counters disappeared during history switch'
+                      assert '公式の集計APIに接続済み' in page.locator('#status').inner_text()
                   print('PASS_LIVE_LAB_ANALYTICS_REAL_CHROME',width,'PV',page.locator('#pvTotal').inner_text())
                   page.close()
               browser.close()
