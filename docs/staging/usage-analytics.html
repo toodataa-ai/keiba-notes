@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>サイト利用状況・過去閲覧推移（ステージング）｜AIによる競馬予想研究所</title>
+<link rel="stylesheet" href="usage-analytics.css?v=1">
+<script src="usage-analytics.js?v=1" defer></script>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<span class="stage-tag">STAGING・確認用</span>
+<a class="back" href="index.html">← 競馬サイト</a>
+<h1>サイト利用状況</h1><p>今日・累計・過去の日別閲覧推移を確認するための検証画面です。</p>
+</div></header>
+<main class="wrap">
+<p id="status" class="status" role="status">集計先を確認しています…</p>
+<section aria-label="閲覧カウンター" class="grid">
+<article class="stat"><h2>今日のページ表示</h2><strong id="pvToday">—</strong><small>PV・日本時間</small></article>
+<article class="stat"><h2>累計ページ表示</h2><strong id="pvTotal">—</strong><small>計測開始以降のPV</small></article>
+<article class="stat"><h2>今日のセッション目安</h2><strong id="sessionToday">—</strong><small>同一タブ・同じ日の重複を軽減</small></article>
+<article class="stat"><h2>累計セッション目安</h2><strong id="sessionTotal">—</strong><small>人数・ユニーク来訪者とは異なります</small></article>
+</section>
+<section class="panel" aria-labelledby="historyTitle">
+<div class="panel-head"><div><h2 id="historyTitle">過去の閲覧推移</h2><p>実測できた日だけを表示。未計測日を0件に置き換えません。</p></div>
+<div class="filters"><label for="period">対象期間</label><select id="period"><option value="7">7日</option><option value="30" selected>30日</option><option value="90">90日</option><option value="365">365日</option></select><button type="button" id="refresh">更新</button></div></div>
+<p id="historyStatus" class="fine">履歴を確認しています…</p>
+<div id="chart" class="chart" role="img" aria-label="日別ページ表示数の横棒グラフ"></div>
+<div class="legend"><span class="square"></span> ページ表示数（PV）</div>
+<div class="tablewrap"><table><thead><tr><th>日付（JST）</th><th>表示数</th><th>セッション目安</th></tr></thead><tbody id="historyRows"><tr><td colspan="3">集計待ち</td></tr></tbody></table></div>
+</section>
+<section class="panel info"><h2>計測ルールと注意</h2>
+<p>「ページ表示」は対象ページの表示回数です。同じ人が複数回見ればその回数分増えます。「セッション目安」はタブ単位で同じ日に最初に閲覧した回数であり、実際の人数ではありません。</p>
+<p>イベントサイトと同じCloudflare基盤を使い、別の集計テーブルで数値を分離しています。氏名・IP・メールアドレス・検索語・個別訪問履歴・Cookie・端末IDは集計先に保存しません。ステージングとLABの閲覧は本番の数字へ加えません。</p>
+<p>API障害時は数値を「—」と表示します。既存のCounterAPIの履歴を後から復元したり、未収集期間をゼロ件にしたりしません。</p>
+</section>
+<p class="foot">これはステージング確認用の画面です。閲覧しても競馬の集計回数は増えません。本番でのアクセス計測はまだ開始しておらず、反映には別途承認が必要です。</p>
+</main>
+  </body></html>
