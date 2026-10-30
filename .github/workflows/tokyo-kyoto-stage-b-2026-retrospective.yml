@@ -7,6 +7,7 @@ on:
       - 'baba_models_v2/evidence/tokyo_kyoto_2026_10_official_labels.csv'
       - 'baba_models_v2/stage_b_tokyo_kyoto_v1.py'
       - '.github/workflows/tokyo-kyoto-stage-b-2026-retrospective.yml'
+      - 'baba_models_v2/stage_b_challenger_v1.py'
   workflow_dispatch:
 
 permissions:
@@ -60,6 +61,18 @@ jobs:
           assert p['audit']['formal_promotion_eligible'] is False
           assert all(not m['stage_b_candidate'] for m in p['models'].values())
           print('Research replay restricted: '+str(p['audit']['accepted_races'])+' source-complete races, never formally promoted')
+          PY
+      - name: Try year-forward challenger on eligible historical labels
+        run: |
+          python baba_models_v2/stage_b_challenger_v1.py \
+            --replay tmp/stage_b_2026/replay.json \
+            --output tmp/stage_b_2026/challenger.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('tmp/stage_b_2026/challenger.json').read_text())
+          assert x['promotion_allowed'] is False
+          assert all(not m['ready_for_production'] for m in x['models'].values())
           PY
       - uses: actions/upload-artifact@v4
         if: always()
