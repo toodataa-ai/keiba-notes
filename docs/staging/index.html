@@ -58,7 +58,7 @@
 }
 </style>
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
-</head>
+<link rel="stylesheet" href="staging/usage-summary.css?v=20261030-1">\n</head>
 <body>
 <div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
 <header class="hero"><div class="wrap">
@@ -92,7 +92,7 @@
 </div>
 <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
 <p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="staging/release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.03</small></p>
-<p class="photo-credit">背景写真：<a href="https://commons.wikimedia.org/wiki/File:Racing_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Racing (Unsplash)／CC0</a>（海外の競馬場で撮影）</p>
+<section class="stage-usage" aria-labelledby="stageUsageTitle"><div class="stage-usage-top"><strong id="stageUsageTitle" class="stage-usage-title">サイト利用状況</strong><div class="stage-usage-values"><span class="stage-usage-value">今日のPV <b id="stageUsageToday" aria-live="polite">—</b></span><span class="stage-usage-value">累計PV <b id="stageUsageTotal" aria-live="polite">—</b></span><a href="staging/usage-analytics.html">過去の閲覧推移を見る</a></div></div><p class="stage-usage-notice" id="stageUsageNote" role="status">競馬専用の実測データを確認中…</p></section>\n<p class="photo-credit">背景写真：<a href="https://commons.wikimedia.org/wiki/File:Racing_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Racing (Unsplash)／CC0</a>（海外の競馬場で撮影）</p>
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
 <script>
@@ -115,4 +115,4 @@ fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)thro
 }).catch(()=>{document.getElementById('releaseHistoryList').textContent='履歴の取得に失敗しました。'});
 </script>
 <script src="assets/visitor-counter.js?v=20261006-1" defer></script>
-</body></html>
+<script src="staging/usage-summary.js?v=20261030-1" defer></script>\n</body></html>
