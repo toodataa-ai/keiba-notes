@@ -44,7 +44,7 @@ def parse_official(html: str, track: str, *, expected_date: str, retrieved_at_js
     # JRA live heading includes the exact measured calendar date:
     # 第4回東京競馬第10日前日(2026年10月30日(金曜))
     heading = re.search(
-        rf"第\d+回\s*{JA_NAME[track]}競馬.{0,80}?"
+        rf"第\d+回\s*{JA_NAME[track]}競馬.{{0,80}}?"
         rf"\(?\s*(20\d\d)年\s*(\d{{1,2}})月\s*(\d{{1,2}})日",
         text,
     )
