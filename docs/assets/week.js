@@ -67,7 +67,9 @@ function estimateHtml(day,publishedCount,policy){
   let title;
   if(day.date>today)title=`AI予想 公開予定：${niceDate(day.date,day.weekday)} ${label}`;
   else if(day.date===today&&clock<start)title=`AI予想 公開予定：本日 ${label}`;
-  else if(day.date===today&&clock<end)title=`AI予想を順次公開中：${label}が目安です`;
+  else if(day.date===today&&clock<end)title=label==='午前中めど'
+    ? (publishedCount?`AI予想を順次公開中：${label}`:`AI予想 公開予定：本日 ${label}`)
+    : `AI予想を順次公開中：${label}が目安です`;
   else if(day.date===today)title='AI予想を順次公開中';
   else title='未公開のAI予想があります';
   const progress=publishedCount?`現在 ${publishedCount}/${total}レース公開済み。`:'';
@@ -101,11 +103,15 @@ function selectNextBlock(days,rows){
   const scheduleRoot=document.getElementById('weekSchedule');
   const period=document.getElementById('weekPeriod');
   const scheduleTitle=document.getElementById('scheduleTitle');
+  // Staging is allowed to preview public notice wording without changing production policy.
+  const policyPath=document.documentElement.dataset.stage==='preview'
+    ? 'staging/data/prediction_publication_policy.json'
+    : 'data/prediction_publication_policy.json';
   try{
     const [raceRes,scheduleRes,policyRes,parallelRes]=await Promise.all([
       fetch('data/races.json',{cache:'no-store'}),
       fetch('data/upcoming_schedule.json',{cache:'no-store'}),
-      fetch('data/prediction_publication_policy.json',{cache:'no-store'}),
+      fetch(policyPath,{cache:'no-store'}),
       fetch('data/jra-v311-parallel-2026-10-11.json',{cache:'no-store'}).catch(()=>null)
     ]);
     const db=await raceRes.json();
@@ -129,7 +135,8 @@ function selectNextBlock(days,rows){
     }else if(days.length){
       const first=days[0];
       const label=policy?.publish_window?.label||'8:00〜9:00頃';
-      root.innerHTML=`<div class="publish-estimate"><strong>次回のAI予想はまだ公開前です</strong><small>${esc(`${niceDate(first.date,first.weekday)} ${label}を目安に順次公開します。`)}${esc(policy?.note?' '+policy.note:'')}</small></div>`;
+      const when=label==='午前中めど'?'午前中を目安に':`${label}を目安に`;
+      root.innerHTML=`<div class="publish-estimate"><strong>次回のAI予想はまだ公開前です</strong><small>${esc(`${niceDate(first.date,first.weekday)} ${when}順次公開します。`)}${esc(policy?.note?' '+policy.note:'')}</small></div>`;
     }else{
       root.innerHTML='<p class="muted">次回の対象レース予定はまだ登録されていません。</p>';
     }
