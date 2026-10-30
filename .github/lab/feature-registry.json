@@ -153,6 +153,27 @@
         "docs/experience-regime.html"
       ],
       "lab_paths": []
+    },
+    {
+      "id": "keiba-anonymous-usage",
+      "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "LABで閲覧カウンター・7/30/90/365日履歴UIと独立Worker/D1のコードを用意。専用Cloudflare Worker/D1は未接続・未デプロイ、実データ収集は未開始。DBを競馬専用に作成して/collect・/stats・/historyを検証するまで数字を表示しない。本番のCounterAPI計測・JRA/NAR公式データは変更禁止。LAB動作検証→別途ステージング移行承認→本番リリース承認の順で対応。",
+      "preview_path": "lab/usage-analytics.html",
+      "staging_paths": [],
+      "production_paths": [],
+      "lab_paths": [
+        "docs/lab/usage-analytics.html",
+        "docs/lab/usage-analytics.css",
+        "docs/lab/usage-analytics.js",
+        "docs/lab/usage-analytics-config.json",
+        "docs/lab/usage-tracker.js",
+        "docs/lab/analytics/worker.mjs",
+        "docs/lab/analytics/schema.sql",
+        "docs/lab/analytics/wrangler.example.toml",
+        "docs/lab/analytics/worker.test.mjs"
+      ]
     }
   ]
 }
