@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "enabled": false,
-  "endpoint": "",
+  "enabled": true,
+  "endpoint": "https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba",
   "site": "keiba-notes",
   "data_start_at": null,
-  "notice": "競馬サイト専用Cloudflare Worker/D1の接続前です。表示値を推測・補完しません。"
+  "notice": "イベントサイトと同じWorkerの別テーブルから閲覧数を取得します。LABでは参照のみ。本番のPV記録は未開始です。"
 }
