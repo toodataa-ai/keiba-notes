@@ -46,6 +46,9 @@ jobs:
           for venue in {r['venue'] for r in pool['races'] if r['date']==day}:
               url=official_card_url({'date':day,'venue':venue,'race_no':1})
               assert url.startswith('https://www.jra.go.jp/JRADB/')
+              known={'2026-10-31':{'東京':'74','京都':'52'},'2026-11-01':{'東京':'54','京都':'32'}}
+              if day in known and venue in known[day]:
+                  assert url.endswith('%2F'+known[day][venue]),(day,venue,'incorrect JRA PC checksum',url)
               print('E012_VERIFIED_CARD_SEED',day,venue,url)
           for value in ('date','week_id'):
               with open(os.environ['GITHUB_ENV'],'a') as f:f.write('E012_'+value.upper()+'='+request[value]+'\n')
