@@ -2,18 +2,27 @@
   "schema_version": 1,
   "week_id": "2026-10-31",
   "date": "2026-10-31",
-  "generated_at": "2026-10-31T08:02:51.553134+09:00",
+  "generated_at": "2026-10-31T08:04:12.001673+09:00",
   "population_today_count": 24,
   "fixed_plan_total_races": 16,
   "fixed_plan_today_races": 4,
   "stats": {
-    "new_snapshots": 1,
-    "verified_E2_horses": 16,
-    "selected_race_collection_errors": 3
+    "immutable_snapshot_reused": 1,
+    "new_snapshots": 3,
+    "verified_E1_horses": 21,
+    "verified_E2_horses": 16
   },
   "category_regime_verified_horses": {
-    "open_listed": {
-      "E2": 16
+    "maiden": {
+      "E1": 7,
+      "E2": 1
+    },
+    "graded": {
+      "E1": 11
+    },
+    "class_1": {
+      "E2": 15,
+      "E1": 3
     }
   },
   "coverage_gaps": [
@@ -136,25 +145,157 @@
       "race_no": 12,
       "venue": "東京",
       "reason": "not_selected_by_fixed_weekly_plan"
-    },
-    {
-      "race_id": "2026-10-31-kyoto-03",
-      "start_at": "2026-10-31T11:05:00+09:00",
-      "reason": "source_capture_failed",
-      "detail": "official card identity mismatch: venue=True, race=False, date=False"
-    },
-    {
-      "race_id": "2026-10-31-kyoto-11",
-      "start_at": "2026-10-31T15:45:00+09:00",
-      "reason": "source_capture_failed",
-      "detail": "official card identity mismatch: venue=True, race=False, date=False"
-    },
-    {
-      "race_id": "2026-10-31-kyoto-12",
-      "start_at": "2026-10-31T16:25:00+09:00",
-      "reason": "source_capture_failed",
-      "detail": "official card identity mismatch: venue=True, race=False, date=False"
     }
   ],
-  "production_effect": false
+  "production_effect": false,
+  "previous_attempts": [
+    {
+      "generated_at": "2026-10-31T08:02:51.553134+09:00",
+      "stats": {
+        "new_snapshots": 1,
+        "verified_E2_horses": 16,
+        "selected_race_collection_errors": 3
+      },
+      "coverage_gaps": [
+        {
+          "race_id": "2026-10-31-tokyo-01",
+          "race_no": 1,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-01",
+          "race_no": 1,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-02",
+          "race_no": 2,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-02",
+          "race_no": 2,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-03",
+          "race_no": 3,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-04",
+          "race_no": 4,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-04",
+          "race_no": 4,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-05",
+          "race_no": 5,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-05",
+          "race_no": 5,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-06",
+          "race_no": 6,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-06",
+          "race_no": 6,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-07",
+          "race_no": 7,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-07",
+          "race_no": 7,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-08",
+          "race_no": 8,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-08",
+          "race_no": 8,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-09",
+          "race_no": 9,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-09",
+          "race_no": 9,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-10",
+          "race_no": 10,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-10",
+          "race_no": 10,
+          "venue": "京都",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-tokyo-12",
+          "race_no": 12,
+          "venue": "東京",
+          "reason": "not_selected_by_fixed_weekly_plan"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-03",
+          "start_at": "2026-10-31T11:05:00+09:00",
+          "reason": "source_capture_failed",
+          "detail": "official card identity mismatch: venue=True, race=False, date=False"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-11",
+          "start_at": "2026-10-31T15:45:00+09:00",
+          "reason": "source_capture_failed",
+          "detail": "official card identity mismatch: venue=True, race=False, date=False"
+        },
+        {
+          "race_id": "2026-10-31-kyoto-12",
+          "start_at": "2026-10-31T16:25:00+09:00",
+          "reason": "source_capture_failed",
+          "detail": "official card identity mismatch: venue=True, race=False, date=False"
+        }
+      ]
+    }
+  ]
 }
