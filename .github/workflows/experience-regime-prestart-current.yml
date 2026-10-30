@@ -1,0 +1,200 @@
+name: E012 JRA reusable strict prereace research collector
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experience_regime_v1/requests/run-current.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: e012-prestart-strict-current
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate strict research-only prerequisites
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m unittest experience_regime_v1.test_sampling experience_regime_v1.test_model experience_regime_v1.test_prestart_collection_audit_v1
+          python -m py_compile experience_regime_v1/collect_prestart_v1.py experience_regime_v1/publish_progress_v1.py
+          python - <<'PY'
+          import json,os
+          from datetime import date,datetime
+          from pathlib import Path
+          from experience_regime_v1.collect_prestart_v1 import official_card_url
+          request=json.loads(Path('experience_regime_v1/requests/run-current.json').read_text())
+          week=request['week_id']; day=request['date']
+          assert date.fromisoformat(week)<=date.fromisoformat(day)
+          assert (date.fromisoformat(day)-date.fromisoformat(week)).days<=6
+          root=Path('experience_regime_v1/collection')/week
+          pool=json.loads((root/'race_pool.json').read_text())
+          assert pool['week_id']==week and pool['race_count']==len(pool['races'])
+          assert len({x['race_id'] for x in pool['races']})==len(pool['races'])
+          assert len([r for r in pool['races'] if r['date']==day])>=1
+          for venue in {r['venue'] for r in pool['races'] if r['date']==day}:
+              url=official_card_url({'date':day,'venue':venue,'race_no':1})
+              assert url.startswith('https://www.jra.go.jp/JRADB/')
+              print('E012_VERIFIED_CARD_SEED',day,venue,url)
+          for value in ('date','week_id'):
+              with open(os.environ['GITHUB_ENV'],'a') as f:f.write('E012_'+value.upper()+'='+request[value]+'\n')
+          print('E012_OFFICIAL_POOL',len(pool['races']),'TODAY',day)
+          PY
+      - name: Freeze deterministic weekly sample before any selected start
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          WEEKDIR="experience_regime_v1/collection/$E012_WEEK_ID"
+          if [[ ! -f "$WEEKDIR/sample_plan.json" ]];then
+            python experience_regime_v1/sampling.py --pool "$WEEKDIR/race_pool.json" --output "$WEEKDIR/sample_plan.json" >/tmp/e012_plan.log
+            python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          from experience_regime_v1.sampling import select_races,load_sampling_policy
+          p=Path('experience_regime_v1/collection')/os.environ['E012_WEEK_ID']
+          pool=json.loads((p/'race_pool.json').read_text())
+          plan=json.loads((p/'sample_plan.json').read_text())
+          assert plan==select_races(pool,load_sampling_policy(Path('experience_regime_v1/config.json')))
+          now=datetime.now(ZoneInfo('Asia/Tokyo'))
+          starts=[datetime.fromisoformat(r['start_at']) for r in plan['selected_races']]
+          assert starts and now<min(starts), 'No retroactive weekly selection after first sampled start'
+          assert all(r['sample_origin']=='official_prediction' for r in plan['selected_races'] if r['official_prediction'])
+          print('E012_WEEKLY_FIXED_PLAN',plan['selected_race_count'],plan['category_summary'])
+          PY
+            git add -- "$WEEKDIR/sample_plan.json"
+            git commit -m "Freeze immutable E012 $E012_WEEK_ID weekly stratified sample"
+            for retry in 1 2 3 4 5;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 5 ]];then exit 1;fi
+              sleep 2
+            done
+          else
+            echo E012_REUSE_IMMUTABLE_PLAN
+          fi
+          python - <<'PY'
+          import os,json,subprocess
+          from pathlib import Path
+          from datetime import datetime
+          from experience_regime_v1.sampling import select_races,load_sampling_policy
+          p=Path('experience_regime_v1/collection')/os.environ['E012_WEEK_ID']
+          pool=json.loads((p/'race_pool.json').read_text()); plan=json.loads((p/'sample_plan.json').read_text())
+          assert plan==select_races(pool,load_sampling_policy(Path('experience_regime_v1/config.json')))
+          lines=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(p/'sample_plan.json')],text=True).strip().splitlines()
+          assert len(lines)==1,('non-immutable or uncommitted plan',lines)
+          first_sha,first_at=lines[0].split()
+          assert datetime.fromisoformat(first_at)<min(datetime.fromisoformat(x['start_at']) for x in plan['selected_races'])
+          print('E012_FIRST_PLAN_PROOF',first_sha,first_at)
+          PY
+      - name: Capture official lifetime records and audit before starts
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.collect_prestart_v1 collect --week-id "$E012_WEEK_ID" --date "$E012_DATE"
+          python -m experience_regime_v1.collect_prestart_v1 precommit_gate --week-id "$E012_WEEK_ID" --date "$E012_DATE"
+      - name: Commit only new original research evidence and coverage gaps
+        run: |
+          set -euo pipefail
+          git add -- "experience_regime_v1/collection/$E012_WEEK_ID"
+          if ! git diff --cached --quiet;then
+            git commit -m "Freeze real E012 $E012_DATE prereace observations and coverage gaps"
+            for retry in 1 2 3 4 5;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 5 ]];then exit 1;fi
+              sleep 2
+            done
+          fi
+          echo "E012_PROOF_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "E012_PROOF_AT=$(git show -s --format=%cI HEAD)" >> "$GITHUB_ENV"
+      - name: Verify Git FIRST introduction and frozen source evidence
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          from datetime import datetime
+          p=Path('experience_regime_v1/collection')/os.environ['E012_WEEK_ID']
+          plan=json.loads((p/'sample_plan.json').read_text())
+          today=[r for r in plan['selected_races'] if r['date']==os.environ['E012_DATE']]
+          verified=0
+          for r in today:
+              rid=r['race_id']; s=p/'snapshots'/(rid+'.json'); a=p/'audits'/(rid+'.json')
+              if not s.exists():
+                  print('E012_UNCOLLECTED_SELECTED_RACE',rid)
+                  continue
+              assert a.exists(),('audit missing',rid)
+              snap=json.loads(s.read_text());audit=json.loads(a.read_text())
+              history=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(s)],text=True).strip().splitlines()
+              assert len(history)==1,(rid,'initial-introduction ambiguous',history)
+              sha,first_time=history[0].split()
+              start=datetime.fromisoformat(r['start_at'])
+              assert datetime.fromisoformat(first_time)<start,(rid,'first commit after start',sha,first_time)
+              assert datetime.fromisoformat(snap['captured_at'])<start
+              assert datetime.fromisoformat(audit['captured_at'])<start
+              assert snap['race_context']['sample_origin']==r['sample_origin']
+              assert snap['race_context']['race_category']==r['race_category']
+              assert len(snap['step1']['runners'])==len(snap['experience']['horses'])
+              for h in snap['experience']['horses'].values():
+                  if h['starts_before_race'] is None:continue
+                  assert sum(h['career_summary_wsto'])==h['starts_before_race']
+                  assert h['regime']==('E0' if h['starts_before_race']==0 else 'E1' if h['starts_before_race']<=3 else 'E2')
+                  assert h['source_url'].startswith('https://www.jra.go.jp/JRADB/')
+                  assert datetime.fromisoformat(h['observed_at'])<start
+              if audit['usable_for_e012_shadow']:verified+=1
+              print('E012_FIRST_GIT_PROOF',rid,sha,first_time,'complete',audit['usable_for_e012_shadow'])
+          print('E012_ACTUALLY_COMPLETE_RACES',verified,'/',len(today))
+          PY
+      - name: Publish research-only aggregate progress and proof report
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.collect_prestart_v1 proof_audit --week-id "$E012_WEEK_ID" --date "$E012_DATE" --proof-sha "$E012_PROOF_SHA" --commit-at "$E012_PROOF_AT"
+          python experience_regime_v1/publish_progress_v1.py "$E012_WEEK_ID" "$E012_DATE"
+          git add -- "experience_regime_v1/collection/$E012_WEEK_ID/proof_commit_$E012_DATE.json" docs/data/experience_regime_status.json
+          if ! git diff --cached --quiet;then
+            git commit -m "Publish proof-audited E012 $E012_DATE research-only counts"
+            for retry in 1 2 3 4 5;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$retry" == 5 ]];then exit 1;fi
+              sleep 2
+            done
+          fi
+      - name: Public GitHub Pages and actual collection audit
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          run=json.loads(Path('docs/data/experience_regime_status.json').read_text())['collection_runs'][os.environ['E012_DATE']]
+          print('E012_FINAL_POPULATION',run['population_today'],'SELECTED',run['selected_today'])
+          print('E012_VERIFIED_REGIMES',run['regimes'])
+          print('E012_GAPS',run['gap_reasons'])
+          assert not run['production_effect'] and not run['models_automatically_promoted']
+          assert run['selected_today']==run['prerace_proof_valid_races']==run['complete_evidence_races'], 'Incomplete real research; do not report collected'
+          PY
+          for attempt in $(seq 1 18);do
+            if curl -fLsS --max-time 16 "https://toodataa-ai.github.io/keiba-notes/data/experience_regime_status.json?e012=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-status-live.json &&
+              cmp -s docs/data/experience_regime_status.json /tmp/e012-status-live.json &&
+              curl -fLsS --max-time 16 "https://toodataa-ai.github.io/keiba-notes/experience-regime.html?e012=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-page-live.html &&
+              grep -q 'e012-live-collection' /tmp/e012-page-live.html;then
+              echo E012_PUBLIC_PAGES_EXACT_BYTE_MATCH
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::E012 public Pages or collection incomplete; inspect facts above"
+          exit 1
