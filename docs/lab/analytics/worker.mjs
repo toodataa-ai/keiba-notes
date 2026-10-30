@@ -72,7 +72,7 @@ export default {async fetch(request,env){
         'WHERE day>=?1 AND day<=?2 ORDER BY day DESC,event').bind(start,end).all();
       const days=new Map();
       for(const x of result.results||[]){
-        if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(x.day)||x.day<start||x.day>end||
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(x.day)||x.day<start||x.day>end||
           !EVENT_SET.has(x.event)||!Number.isSafeInteger(Number(x.count))||Number(x.count)<0)continue;
         if(!days.has(x.day))days.set(x.day,Object.fromEntries(EVENTS.map(e=>[e,0])));
         days.get(x.day)[x.event]+=Number(x.count);
