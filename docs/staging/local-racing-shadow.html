@@ -331,6 +331,6 @@ function renderAnalysis(){
 async function load(){try{const [s,m]=await Promise.all([fetchJson('data/local_racing_shadow_status.json'),fetchJson('data/local_racing_shadow_public.json')]);manifest=m||manifest;const t=s?.totals||{};const venues=Object.values(s?.venues||{}).filter(v=>v.enabled);$('venueCount').textContent=venues.length;$('observed').textContent=t.pre_race_snapshots??t.races_observed??0;$('observed2').textContent=t.races_observed??0;$('joined').textContent=t.results_joined??0;$('joined2').textContent=t.results_joined??0;$('candidates2').textContent=t.transfer_candidates??0;$('latestFinding').innerHTML='<b>最新finding：</b>'+esc(s?.latest_finding||'観測開始前です。');populateFilters();renderList();renderAnalysis();try{renderCumulative();void loadRecovery()}catch(e){$('cumStatus').textContent='累積成績の整合性を確認できませんでした。公開データを確認してください。';console.warn(e)}}catch(e){$('raceList').innerHTML='<div class="empty">公開manifestの読み込みに失敗しました。</div>';$('analysisList').innerHTML='<div class="empty">分析データを読み込めませんでした。</div>';for(const id of ['observed','observed2','joined','joined2','candidates2'])$(id).textContent='—'}}
 ['dateFilter','venueFilter','stateFilter'].forEach(id=>$(id).addEventListener('change',renderList));load();
 </script>
-<script src="assets/visitor-counter.js?v=20261006-1" defer></script>
+<script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body>
 </html>
