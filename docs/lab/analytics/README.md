@@ -1,6 +1,14 @@
 # 競馬サイト専用の匿名アクセス集計（LAB）
 
-## 接続テスト結果・実行手順（2026-10-30）
+## 2026-10-30 新方式：既存イベントWorkerを共用し、テーブルとURLで隔離（検証済み）
+- **新規Cloudflareトークン不要**。既存Worker `tokyo-family-events-metrics` に新しい `/keiba/` APIを追加し、同じD1の **別テーブル `keiba_site_event_counts`** を初回アクセス時に `CREATE TABLE IF NOT EXISTS` で作成。
+- イベントサイトのテーブル `event_counts` と `/collect`, `/stats`, `/history` は維持。GitHub Actions [#41068124076](https://github.com/toodataa-ai/tokyo-family-events-ai/actions/runs/41068124076) において、元Workerソースのバイト一致、旧新のNodeテスト、公開前後のイベント累計および20日分の日別集計が減っていないこと、競馬用APIの7/30/90/365日応答を確認済み。
+- **イベントサイトの一時ブランチ** `infra/keiba-anon-metrics-20261030` に改修ソースを保持。イベントサイトの `main/production/data-production` のHTMLや既存イベントデータは変更しない。ただし、既存Workerの稼働コードは競馬API追加版へ更新済み。今後元のWorkerコードを再デプロイすると、競馬APIが消えるため、イベント側の正式ソースへの選択反映・運用整合は別途必要。
+- **LAB画面専用の接続**：`docs/lab/usage-analytics-config.json` が `https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba` を参照。LABページは閲覧のみで `/keiba/collect` へのPOSTはしない。
+- **本番の競馬サイト計測は未開始**。本番 `docs/admin.html`、`docs/assets/visitor-counter.js`、正式な予想・回顧は未変更。過去の旧CounterAPI履歴を新しいテーブルに移行したと誤表示しない。
+- 以下の「専用Worker・専用D1を新設する手順」は、現在は採用しない**旧案**として残す。
+
+## 旧案：別Workerと別D1を新規作成する場合（採用しない）
 - 競馬リポジトリのCloudflare認証情報 `CLOUDFLARE_API_TOKEN` と `CLOUDFLARE_ACCOUNT_ID` は未登録（GitHub Actions run 41064827173）。
 - イベントサイトの認証情報は使用できるが、競馬用の新規Worker設定取得で **HTTP 403**。既存Worker専用の権限とみられるため、イベント側の権限・DBを変更せず停止（隔離ブランチ上の run 41065551387）。
 - 競馬用Cloudflareトークンを作成する。**対象Cloudflareアカウントを限定**し、Workers productの **Admin（新規Worker作成）** と **D1 Edit（新規DB作成・スキーマ初期化）** を付与。イベントサイトのWorker単体に限定したトークンでは新規Workerを作成できない。
