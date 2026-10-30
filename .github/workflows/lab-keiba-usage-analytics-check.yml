@@ -37,7 +37,9 @@ jobs:
           assert 'data-stage="lab"' in html and 'noindex,nofollow' in html
           assert 'id="historyRows"' in html and 'id="chart"' in html
           assert all('value="'+x+'"' in html for x in ('7','30','90','365'))
-          assert cfg['enabled'] is False and cfg['endpoint']=='' and cfg['site']=='keiba-notes'
+          assert cfg['site']=='keiba-notes'
+          known='https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba'
+          assert (cfg['enabled'] is False and cfg['endpoint']=='') or (cfg['enabled'] is True and cfg['endpoint']==known), 'Endpoint must be specifically /keiba; event-site /stats is forbidden'
           assert '取得できません' in js or '推測して表示しません' in js
           assert "PAGES,pathname" in tracker and "sessionStorage" in tracker
           assert "location.origin!=='https://toodataa-ai.github.io'" in tracker
