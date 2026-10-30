@@ -188,7 +188,46 @@
     }else byId('historyStatus').textContent='履歴取得失敗：'+history.reason?.message;
     byId('refresh').disabled=false;
   }
-  byId('period').addEventListener('change',refresh);
+  // Staging-only demo. Never send synthetic numbers to the backend.
+  // A visible warning makes sample data unambiguous and it is never persisted.
+  const example=byId('previewExample');
+  const backToActual=byId('returnLive');
+  const sampleFlag=byId('sampleFlag');
+  const exampleOff=()=>{
+    if(!example)return;
+    example.hidden=false;
+    backToActual.hidden=true;
+    sampleFlag.hidden=true;
+  };
+  if(example){
+    example.addEventListener('click',()=>{
+      ++requestSerial;
+      byId('refresh').disabled=false;
+      const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',
+        year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+      const get=t=>parts.find(p=>p.type===t)?.value;
+      const today=[get('year'),get('month'),get('day')].join('-');
+      const end=utcDay(today);
+      const hypothetical=[8,14,11,null,23,19,27];
+      const rows=hypothetical.map((pv,i)=>{
+        if(pv===null)return null;
+        const day=new Date(end-(6-i)*DAY_MS).toISOString().slice(0,10);
+        const counts=Object.fromEntries(EVENT_NAMES.map(name=>[name,0]));
+        counts.page_home=pv;
+        counts.session_start=Math.max(1,Math.round(pv/3));
+        return {day,counts};
+      }).filter(Boolean);
+      byId('period').value='7';
+      renderHistory(rows,7,today);
+      example.hidden=true;
+      backToActual.hidden=false;
+      sampleFlag.hidden=false;
+      byId('historyStatus').textContent='表示サンプル：仮の7日間のデータ（実際のアクセス数ではありません）';
+      byId('chartDetail').textContent='表示サンプルです。点をタップすると仮の数値を確認できます。欠測日の線は途切れています。';
+    });
+    backToActual.addEventListener('click',()=>{exampleOff();refresh();});
+  }
+  byId('period').addEventListener('change',()=>{exampleOff();refresh();});
   byId('refresh').addEventListener('click',refresh);
   (async()=>{
     try{
