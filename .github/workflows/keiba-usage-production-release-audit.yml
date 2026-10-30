@@ -1,0 +1,119 @@
+name: Production keiba daily usage counters and trend release audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/keiba-usage-production-release-audit.yml'
+      - 'docs/index.html'
+      - 'docs/usage-analytics*'
+      - 'docs/assets/usage-summary*'
+      - 'docs/assets/visitor-counter.js'
+      - 'docs/assets/site-usage-config.json'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify immutable protected trees and production/staging boundaries
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,urllib.request
+          from pathlib import Path
+          from urllib.parse import quote
+          import subprocess
+          def sha(path):
+              return subprocess.check_output(['git','rev-parse','HEAD:'+path],text=True).strip()
+          before={
+              'docs/data':'eded496e95ed6ab7a2faa5d2688c49e576d4de69',
+              'docs/reports':'62875072ece684428abdb138658b8ae4ebc0befd',
+              'docs/pdfs':'266382030dd82e8451ac8cae46d45ab22f776189',
+              'e2e_validation':'3053f517a9ae560478496af6aaf108515015edc4',
+              'local_racing_shadow_v1':'a9dd001b0cb51f34678f915ae259fe7a45950487'
+          }
+          for path,prior in before.items():
+              assert sha(path)==prior, 'Protected tree changed: '+path
+          home=Path('docs/index.html').read_text()
+          stage=Path('docs/staging/index.html').read_text()
+          history=Path('docs/usage-analytics.html').read_text()
+          tracker=Path('docs/assets/visitor-counter.js').read_text()
+          config=json.loads(Path('docs/assets/site-usage-config.json').read_text())
+          assert 'id="siteUsageToday"' in home and 'id="siteUsageTotal"' in home
+          assert 'href="usage-analytics.html"' in home
+          assert 'id="stageUsageToday"' not in home and 'noindex' not in history
+          assert 'id="stageUsageToday"' in stage and 'id="siteUsageToday"' not in stage
+          assert 'data-stage="preview"' not in history and 'STAGING・確認用' not in history
+          assert 'id="chartDetail"' in history and 'id="previewExample"' in history
+          assert 'counterapi.com' not in tracker and 'page_home' in tracker
+          assert config['site']=='keiba-notes' and config['enabled'] is True
+          assert config['endpoint']=='https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba'
+          assert 'visitor-counter.js' not in history
+          print('PASS_PROTECTED_DATA_TREES_UNCHANGED_AND_PRODUCTION_SCOPE')
+          PY
+          node --check docs/assets/visitor-counter.js
+          node --check docs/assets/usage-summary.js
+          node --check docs/usage-analytics.js
+          python3 .github/scripts/staging-baseline-v2.py --check
+      - name: Verify latest deployed HTML JS CSS config bytes
+        run: |
+          set -euo pipefail
+          origin='https://toodataa-ai.github.io/keiba-notes'
+          for attempt in $(seq 1 30);do
+            ok=1
+            for file in index.html usage-analytics.html usage-analytics.js usage-analytics.css assets/visitor-counter.js assets/usage-summary.js assets/usage-summary.css assets/site-usage-config.json;do
+              if ! curl -fLsS --max-time 18 "$origin/$file?release-check=$GITHUB_RUN_ID-$attempt" -o /tmp/keiba-live-release;then ok=0;break;fi
+              if ! cmp -s "docs/$file" /tmp/keiba-live-release;then ok=0;break;fi
+            done
+            if [[ "$ok" -eq 1 ]];then echo PASS_PRODUCTION_8_ASSETS_LIVE_BYTE_PARITY;exit 0;fi
+            sleep 9
+          done
+          echo '::error::Production source and live bytes differ'
+          exit 1
+      - name: Verify LIVE browsing triggers new keiba POST and preserves trend display
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          python3 - <<'PY'
+          import shutil,time
+          from playwright.sync_api import sync_playwright
+          chrome=next((x for x in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if x),None)
+          assert chrome,'Chromium not found'
+          root='https://toodataa-ai.github.io/keiba-notes/'
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox'])
+              for width in (390,1200):
+                  page=browser.new_page(viewport={'width':width,'height':900})
+                  errors=[]
+                  collection=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.on('response',lambda r:collection.append((r.status,r.url)) if '/keiba/collect' in r.url else None)
+                  page.goto(root+'index.html?usage-production-audit='+str(width),wait_until='domcontentloaded',timeout=60000)
+                  page.wait_for_function("() => /^\\d+$/.test(document.querySelector('#siteUsageTotal')?.textContent.trim().replaceAll(',',''))",timeout=26000)
+                  page.wait_for_timeout(1800)
+                  assert page.locator('#siteUsageToday').inner_text().replace(',','').isdigit()
+                  assert page.locator('a[href="usage-analytics.html"]').count()==1
+                  assert collection and any(status==200 for status,url in collection),('No successful PV POST',collection)
+                  assert all('/keiba/collect' in url for _,url in collection)
+                  assert not errors,('Home Javascript errors',errors)
+                  dim=page.evaluate("({w:innerWidth,s:document.documentElement.scrollWidth})")
+                  assert dim['s']<=dim['w']+3,dim
+                  page.goto(root+'usage-analytics.html?usage-production-audit='+str(width),wait_until='domcontentloaded',timeout=55000)
+                  page.wait_for_function("() => document.querySelector('#status')?.textContent.includes('公式の集計APIに接続済み')",timeout=26000)
+                  page.locator('#period').select_option('7')
+                  page.wait_for_function("() => document.querySelector('#historyStatus')?.textContent.includes('実測記録')",timeout=26000)
+                  assert page.locator('#pvTotal').inner_text().replace(',','').isdigit()
+                  assert page.locator('#chart svg.trend-chart-svg').count()==1,('Live PV should now be recorded')
+                  assert page.locator('#chart .trend-point').count()>=1
+                  assert 'STAGING' not in page.locator('body').inner_text()
+                  assert not errors,('History Javascript errors',errors)
+                  dim=page.evaluate("({w:innerWidth,s:document.documentElement.scrollWidth})")
+                  assert dim['s']<=dim['w']+3,dim
+                  print('PASS_LIVE_PRODUCTION_KEIBA_COUNT_AND_LINE_TREND',width,
+                        'total',page.locator('#pvTotal').inner_text(),'successful_POST',sum(status==200 for status,_ in collection))
+                  page.close()
+              browser.close()
+          PY
