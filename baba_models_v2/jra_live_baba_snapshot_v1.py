@@ -83,6 +83,29 @@ def parse_official(html: str, track: str, *, expected_date: str, retrieved_at_js
     }
 
 
+
+def decode_jra_html(payload: bytes, declared_encoding: str | None) -> str:
+    """Official page can use CP932 despite an absent/incorrect HTTP charset.
+
+    Never use a permissive replacement decoder: a mangled date or percentage
+    must fail, not be converted into something that looks authoritative.
+    """
+    candidates = []
+    if declared_encoding and declared_encoding.lower().replace("_", "-") not in {
+        "iso-8859-1", "latin-1", "latin1", "ascii"
+    }:
+        candidates.append(declared_encoding)
+    candidates.extend(("cp932", "utf-8"))
+    for enc in dict.fromkeys(candidates):
+        try:
+            decoded = payload.decode(enc, errors="strict")
+        except (UnicodeError, LookupError):
+            continue
+        if "馬場" in decoded and "含水率" in decoded:
+            return decoded
+    raise ValueError("could not decode verified JRA Japanese source content")
+
+
 def capture(track: str, *, now: datetime | None = None) -> dict:
     if track not in SOURCES:
         raise ValueError("unsupported track")
@@ -95,8 +118,11 @@ def capture(track: str, *, now: datetime | None = None) -> dict:
         "User-Agent": "keiba-notes-StageB-research/1.0"
     })
     response.raise_for_status()
-    snapshot = parse_official(response.text, track, expected_date=now.date().isoformat(),
+    html = decode_jra_html(response.content, response.encoding)
+    snapshot = parse_official(html, track, expected_date=now.date().isoformat(),
                               retrieved_at_jst=now.isoformat(timespec="seconds"), source_url=SOURCES[track])
+    snapshot["source_sha256"] = hashlib.sha256(response.content).hexdigest()
+    snapshot["source_sha256_representation"] = "raw_http_response_bytes"
     snapshot["http_last_modified"] = response.headers.get("Last-Modified")
     snapshot["http_etag"] = response.headers.get("ETag")
     return snapshot
