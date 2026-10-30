@@ -38,30 +38,115 @@
     const e=document.createElement(tag);if(cls)e.className=cls;
     if(value!==undefined)e.textContent=String(value);return e;
   }
-  function renderHistory(rows){
-    const target=byId('historyRows'),chart=byId('chart');
-    target.replaceChildren();chart.replaceChildren();
-    if(!rows.length){
-      const tr=make('tr');const td=make('td','', '記録がある日がありません（計測開始後に表示）');
-      td.colSpan=3;tr.append(td);target.append(tr);return;
+  const DAY_MS=86400000;
+  const NS='http://www.w3.org/2000/svg';
+  function utcDay(day){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(day))throw Error('履歴の日付が不正です');
+    const value=Date.parse(day+'T00:00:00Z');
+    if(!Number.isFinite(value)||new Date(value).toISOString().slice(0,10)!==day)
+      throw Error('無効な日付です');
+    return value;
+  }
+  function svgNode(tag,attrs={},label){
+    const el=document.createElementNS(NS,tag);
+    for(const [name,value] of Object.entries(attrs))el.setAttribute(name,String(value));
+    if(label!==undefined)el.textContent=label;
+    return el;
+  }
+  function renderHistory(rows,days,endDay){
+    const table=byId('historyRows'),chart=byId('chart'),detail=byId('chartDetail');
+    table.replaceChildren();chart.replaceChildren();
+    detail.textContent='点をタップすると日付とPVを確認できます。';
+    const end=utcDay(endDay),start=end-(days-1)*DAY_MS;
+    const seen=new Set();
+    const entries=rows.map(row=>{
+      const day=utcDay(row.day);
+      if(day<start||day>end||seen.has(day))throw Error('履歴に期間外または重複した日付があります');
+      seen.add(day);
+      return {day:row.day,time:day,pv:pageViews(row.counts),sessions:sum(row.counts,['session_start'])};
+    }).sort((a,b)=>a.time-b.time);
+    if(!entries.length){
+      const tr=make('tr');
+      const td=make('td','','この期間には、記録された日別データがありません。');
+      td.colSpan=3;tr.append(td);table.append(tr);
+      chart.append(make('p','trend-empty','この期間はまだ計測データがありません。計測開始前を0件とは扱いません。'));
+      detail.textContent='計測が開始されると、日別の変化を折れ線で表示します。';
+      return;
     }
-    const history=rows.map(row=>{
-      if(!/^\d{4}-\d{2}-\d{2}$/.test(row.day))throw Error('履歴の日付が不正です');
-      return {day:row.day,pv:pageViews(row.counts),sessions:sum(row.counts,['session_start'])};
-    }).sort((a,b)=>b.day.localeCompare(a.day));
-    const max=Math.max(1,...history.map(r=>r.pv));
-    for(const row of history){
-      const tr=make('tr');for(const value of [row.day,fmt(row.pv),fmt(row.sessions)])tr.append(make('td','',value));
-      target.append(tr);
-      const line=make('div','chart-row');
-      const day=make('span','',row.day.slice(5));
-      const track=make('div','bar-track'),bar=make('div','bar');
-      bar.style.width=(row.pv/max*100).toFixed(1)+'%';
-      bar.title=row.day+'：'+row.pv+'PV';
-      track.append(bar);
-      line.append(day,track,make('span','num',fmt(row.pv)));
-      chart.append(line);
+    for(const item of [...entries].reverse()){
+      const tr=make('tr');
+      for(const cell of [item.day,fmt(item.pv),fmt(item.sessions)])
+        tr.append(make('td','',cell));
+      table.append(tr);
     }
+    // Dates use calendar spacing. Missing dates remain blank, not zero.
+    // Draw line segments only between consecutive days with actual records.
+    const width=860,height=286,left=56,right=22,top=24,bottom=50;
+    const plotWidth=width-left-right,plotHeight=height-top-bottom;
+    const high=Math.max(...entries.map(r=>r.pv));
+    const step=Math.max(1,Math.ceil(Math.max(1,high)/4));
+    const ceiling=step*4;
+    const xFor=time=>left+(days===1?1:(time-start)/((days-1)*DAY_MS))*plotWidth;
+    const yFor=pv=>top+plotHeight*(1-pv/ceiling);
+    const svg=svgNode('svg',{
+      viewBox:'0 0 '+width+' '+height,role:'img',class:'trend-chart-svg',
+      'aria-label':'日付を横軸、PVを縦軸にした閲覧数の推移。実測日だけを点で示し、未計測の区間は線を引きません。'
+    });
+    const title=svgNode('title',{},'日別PVの折れ線グラフ');
+    const description=svgNode('desc',{},'横軸は日本時間の日付、縦軸は閲覧回数です。未計測日を0回としていません。詳細は表にも掲載しています。');
+    svg.append(title,description);
+    for(let i=0;i<=4;i++){
+      const value=step*i,y=yFor(value);
+      svg.append(svgNode('line',{x1:left,x2:width-right,y1:y,y2:y,class:'trend-grid'}));
+      svg.append(svgNode('text',{x:left-11,y:y+4,class:'trend-y-label','text-anchor':'end'},String(value)));
+    }
+    for(let i=0;i<=4;i++){
+      const day=start+Math.round((days-1)*i/4)*DAY_MS;
+      const label=new Date(day).toISOString().slice(5,10).replace('-','/');
+      const x=xFor(day);
+      svg.append(svgNode('line',{x1:x,x2:x,y1:top,y2:top+plotHeight,class:'trend-vertical'}));
+      svg.append(svgNode('text',{x,y:height-20,class:'trend-x-label','text-anchor':'middle'},label));
+    }
+    svg.append(svgNode('text',{x:12,y:13,class:'trend-axis-title'},'PV'));
+    svg.append(svgNode('text',{x:width-right,y:height-4,class:'trend-axis-title','text-anchor':'end'},'日付（JST）'));
+    let segment=[];
+    const drawSegment=()=>{
+      if(segment.length>=2){
+        svg.append(svgNode('polyline',{
+          points:segment.map(v=>xFor(v.time).toFixed(2)+','+yFor(v.pv).toFixed(2)).join(' '),
+          class:'trend-line'
+        }));
+      }
+      segment=[];
+    };
+    for(const item of entries){
+      if(segment.length && item.time-segment[segment.length-1].time!==DAY_MS)drawSegment();
+      segment.push(item);
+    }
+    drawSegment();
+    for(const item of entries){
+      const circle=svgNode('circle',{
+        cx:xFor(item.time).toFixed(2),cy:yFor(item.pv).toFixed(2),
+        r:6,class:'trend-point',tabindex:0,role:'button',
+        'aria-label':item.day+'：'+fmt(item.pv)+' PV、セッション目安 '+fmt(item.sessions)
+      });
+      circle.append(svgNode('title',{},item.day+'：'+fmt(item.pv)+' PV'));
+      const select=()=>{
+        detail.textContent=item.day+'：'+fmt(item.pv)+' PV／セッション目安 '+fmt(item.sessions);
+        for(const node of svg.querySelectorAll('.trend-point'))node.classList.remove('selected');
+        circle.classList.add('selected');
+      };
+      circle.addEventListener('click',select);
+      circle.addEventListener('focus',select);
+      circle.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();select();}
+      });
+      svg.append(circle);
+    }
+    chart.append(svg);
+    if(entries.length===1)detail.textContent='現在は1日分の記録です。点を表示しています。2日以上蓄積すると折れ線になります。';
+    else if(entries.some((e,i)=>i>0&&e.time-entries[i-1].time!==DAY_MS))
+      detail.textContent='未計測の日付は線をつながず、空白として表示しています。点をタップすると日別の数値を確認できます。';
   }
   async function refresh(){
     const serial=++requestSerial;
@@ -97,7 +182,7 @@
         const data=history.value;
         if(data.site!=='keiba-notes'||data.schema_version!==1||data.days!==Number(days)||!Array.isArray(data.rows))
           throw Error('履歴形式が正しくありません');
-        renderHistory(data.rows);
+        renderHistory(data.rows,Number(days),data.day_jst);
         byId('historyStatus').textContent=data.recorded_days+'日分の実測記録を表示。記録開始前の日付は復元できません。';
       }catch(e){byId('historyStatus').textContent='履歴データを検証できません：'+e.message}
     }else byId('historyStatus').textContent='履歴取得失敗：'+history.reason?.message;
