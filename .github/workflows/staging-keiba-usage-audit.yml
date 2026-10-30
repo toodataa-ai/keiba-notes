@@ -1,0 +1,102 @@
+name: Stage-only keiba visitor counters and history live browser audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/staging-keiba-usage-audit.yml'
+      - 'docs/staging/index.html'
+      - 'docs/staging/usage-analytics*'
+      - 'docs/staging/usage-summary*'
+      - '.github/scripts/staging-baseline-v2.py'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  stage-usage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Validate canonical UI mirror and immutable production files
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/staging-baseline-v2.py --check
+          test -f docs/staging/usage-analytics.html
+          node --check docs/staging/usage-summary.js
+          node --check docs/staging/usage-analytics.js
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          stage=Path('docs/staging/index.html').read_text()
+          prod=Path('docs/index.html').read_text()
+          history=Path('docs/staging/usage-analytics.html').read_text()
+          cfg=json.loads(Path('docs/staging/usage-analytics-config.json').read_text())
+          assert 'id="stageUsageToday"' in stage and 'id="stageUsageTotal"' in stage
+          assert 'href="staging/usage-analytics.html"' in stage
+          assert 'staging/usage-summary.js' in stage
+          assert 'id="stageUsageToday"' not in prod and 'staging/usage-summary' not in prod
+          assert 'data-stage="preview"' in history and 'LAB・未公開機能' not in history
+          assert 'visitor-counter.js' not in history
+          assert cfg['site']=='keiba-notes' and cfg['enabled'] is True
+          assert cfg['endpoint']=='https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba'
+          assert not Path('docs/data/site-usage-config.json').exists()
+          print('PASS_STAGE_ONLY_PRODUCTION_NOT_TOUCHED')
+          PY
+      - name: Verify public HTTP bytes for all newly staged resources
+        run: |
+          set -euo pipefail
+          origin=https://toodataa-ai.github.io/keiba-notes
+          for attempt in $(seq 1 25); do
+            passed=1
+            for file in index.html usage-analytics.html usage-analytics.js usage-analytics.css usage-analytics-config.json usage-summary.js usage-summary.css;do
+              if ! curl -LfsS --max-time 20 "$origin/staging/$file?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/keiba-stage-http;then passed=0;break;fi
+              if ! cmp -s "docs/staging/$file" /tmp/keiba-stage-http;then passed=0;break;fi
+            done
+            if [[ "$passed" == 1 ]];then echo PASS_STAGE_SEVEN_RESOURCES_HTTP_BYTE_PARITY;exit 0;fi
+            sleep 9
+          done
+          echo "::error::Stage public content differs from GitHub source";exit 1
+      - name: Verify smartphone and desktop with real Chrome (read-only)
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          python3 - <<'PY'
+          import shutil
+          from playwright.sync_api import sync_playwright
+          binary=next((v for v in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if v),None)
+          assert binary,'Chrome unavailable'
+          origin='https://toodataa-ai.github.io/keiba-notes/staging/'
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=binary,headless=True,args=['--no-sandbox'])
+              for width in (390,1200):
+                  page=browser.new_page(viewport={'width':width,'height':900})
+                  page_errors=[]
+                  requests=[]
+                  page.on('pageerror',lambda e:page_errors.append(str(e)))
+                  page.on('request',lambda req:requests.append((req.method,req.url)) if req.method=='POST' else None)
+                  page.goto(origin+'index.html?stage-usage-audit='+str(width),wait_until='domcontentloaded',timeout=55000)
+                  page.wait_for_function("() => document.querySelector('#stageUsageToday')?.textContent.trim().replaceAll(',','').match(/^\\d+$/)",timeout=22000)
+                  assert page.locator('#stageUsageTotal').inner_text().replace(',','').isdigit()
+                  assert page.locator('a[href="staging/usage-analytics.html"]').count()==1
+                  assert 'STAGING' in page.locator('.staging-shell-marker').inner_text()
+                  assert page.locator('h1.brand-title').count()==1
+                  dim=page.evaluate("({width:innerWidth,scroll:document.documentElement.scrollWidth})")
+                  assert dim['scroll']<=dim['width']+3,('overflow',width,dim)
+                  assert not page_errors,('stage home JS errors',page_errors)
+                  assert all('/keiba/collect' not in url for _,url in requests),'Stage must never record analytics'
+                  page.goto(origin+'usage-analytics.html?stage-usage-audit='+str(width),wait_until='domcontentloaded',timeout=55000)
+                  page.wait_for_function("() => document.querySelector('#status')?.textContent.includes('公式の集計APIに接続済み')",timeout=22000)
+                  assert page.locator('#pvTotal').inner_text().replace(',','').isdigit()
+                  for interval in ('7','90','365'):
+                      page.locator('#period').select_option(interval)
+                      page.wait_for_function("(x) => document.querySelector('#period')?.value===x && document.querySelector('#historyStatus')?.textContent.includes('実測記録')",arg=interval,timeout=20000)
+                  assert page.locator('#pvTotal').inner_text().replace(',','').isdigit()
+                  assert page.locator('a.back').get_attribute('href')=='index.html'
+                  assert not page_errors,('stage history JS errors',page_errors)
+                  assert all('/keiba/collect' not in url for _,url in requests),'History must be read-only'
+                  dim=page.evaluate("({width:innerWidth,scroll:document.documentElement.scrollWidth})")
+                  assert dim['scroll']<=dim['width']+3,('overflow',width,dim)
+                  print('PASS_STAGE_LIVE_CHROME_USAGE',width,page.locator('#pvTotal').inner_text())
+                  page.close()
+              browser.close()
+          PY
