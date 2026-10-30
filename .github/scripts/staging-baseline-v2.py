@@ -35,6 +35,16 @@ def render(prod):
         if plain in PAGES: return 'href='+quote+'staging/'+plain+hashpart+(sep+tail if sep else '')+quote
         return match.group(0)
     out=re.sub(r'href=(["\x27])([^"\x27]+)\1',fix,out)
+    # Production has the approved visitor widget now. Replace it with the
+    # stage's existing READ-ONLY preview instead of rendering duplicate counts.
+    if 'id="siteUsageToday"' in out:
+        n=out.count('<section class="site-usage"')
+        assert n==1, 'Expected exactly one production usage widget'
+        out,count=re.subn(r'<section class="site-usage"[^>]*>.*?</section>\\n?', '',out,count=1,flags=re.S)
+        assert count==1, 'Unable to isolate production usage widget from stage'
+        out=out.replace('<link rel="stylesheet" href="assets/usage-summary.css?v=20261031-1">\\n','',1)
+        out=out.replace('<script src="assets/usage-summary.js?v=20261031-1" defer></script>\\n','',1)
+        assert 'id="siteUsageToday"' not in out, 'Production counter leaked into stage'
     # Approved LAB -> STAGING promotion: keep the production top-page
     # template unchanged and add only stage analytics teaser + dedicated assets.
     # This must remain in the canonical renderer or the mirror overwrites it.
