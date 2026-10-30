@@ -100,3 +100,61 @@ jobs:
                   page.close()
               browser.close()
           PY
+
+      - name: Test line chart with synthetic browser-only fixtures (never write DB)
+        run: |
+          python3 - <<'PY'
+          import json,shutil
+          from urllib.parse import urlparse,parse_qs
+          from playwright.sync_api import sync_playwright
+          chrome=next((x for x in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if x),None)
+          assert chrome
+          root='https://toodataa-ai.github.io/keiba-notes/staging/usage-analytics.html'
+          keys=('page_home','page_this_week','page_results','page_schedule','page_methodology','page_research','page_other','session_start')
+          def counts(pv,session):
+              out=dict.fromkeys(keys,0)
+              out['page_home']=pv
+              out['session_start']=session
+              return out
+          rows=[
+              {'day':'2026-10-26','counts':counts(4,1)},
+              {'day':'2026-10-27','counts':counts(7,2)},
+              {'day':'2026-10-29','counts':counts(3,1)}
+          ]
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox'])
+              for width in (390,1200):
+                  page=browser.new_page(viewport={'width':width,'height':900})
+                  errors=[]
+                  posts=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  page.on('request',lambda r: posts.append(r.url) if r.method=='POST' else None)
+                  def mock(route):
+                      days=int(parse_qs(urlparse(route.request.url).query).get('days',['30'])[0])
+                      payload={'schema_version':1,'site':'keiba-notes','day_jst':'2026-10-30',
+                               'days':days,'recorded_days':len(rows) if days==30 else 0,
+                               'rows':rows if days==30 else []}
+                      route.fulfill(status=200,content_type='application/json',
+                                    headers={'Access-Control-Allow-Origin':'https://toodataa-ai.github.io'},
+                                    body=json.dumps(payload))
+                  page.route(lambda url:'/keiba/history?days=' in url,mock)
+                  page.goto(root+'?line-test='+str(width),wait_until='domcontentloaded',timeout=55000)
+                  page.wait_for_function("() => document.querySelectorAll('#chart svg.trend-chart-svg .trend-point').length===3",timeout=20000)
+                  assert page.locator('#chart svg.trend-chart-svg').count()==1
+                  assert page.locator('#chart svg.trend-chart-svg polyline.trend-line').count()==1,'Must break line across unrecorded days'
+                  assert page.locator('#historyRows tr').count()==3
+                  assert '未計測の日付は線をつながず' in page.locator('#chartDetail').inner_text()
+                  page.locator('.trend-point').nth(1).click()
+                  assert '2026-10-27：7 PV' in page.locator('#chartDetail').inner_text()
+                  page.locator('#period').select_option('7')
+                  page.wait_for_function("() => document.querySelector('#chart .trend-empty') && document.querySelector('#historyStatus').textContent.includes('0日分')",timeout=20000)
+                  assert page.locator('#chart svg.trend-chart-svg').count()==0
+                  assert '未計測' in page.locator('#chart .trend-empty').inner_text()
+                  assert not errors,errors
+                  assert not any('/keiba/collect' in u for u in posts),'Synthetic preview must never collect'
+                  dim=page.evaluate("({width:innerWidth,scroll:document.documentElement.scrollWidth})")
+                  assert dim['scroll']<=dim['width']+3,('Page overflows',width,dim)
+                  print('PASS_STAGE_LINE_CHART_GAPPED_DATES_TOOLTIP_EMPTY_AND_MOBILE',width)
+                  page.close()
+              browser.close()
+          PY
