@@ -1,0 +1,85 @@
+name: Verify live keiba LAB analytics on GitHub Pages and shared Worker (read only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lab-keiba-live-usage-ui-audit.yml'
+      - 'docs/lab/usage-analytics*'
+permissions: {contents: read}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Check site config and public API with strict site identity (no writes)
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,time
+          from pathlib import Path
+          cfg=json.loads(Path('docs/lab/usage-analytics-config.json').read_text())
+          url='https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba'
+          assert cfg['site']=='keiba-notes' and cfg['enabled'] is True and cfg['endpoint']==url
+          assert not Path('docs/data/site-usage-config.json').exists()
+          for api in ('/stats','/history?days=7','/history?days=30','/history?days=90','/history?days=365'):
+              req=urllib.request.Request(url+api,headers={'Origin':'https://toodataa-ai.github.io','User-Agent':'Mozilla/5.0'})
+              with urllib.request.urlopen(req,timeout=24) as r:
+                  assert r.status==200
+                  assert r.headers.get('Access-Control-Allow-Origin')=='https://toodataa-ai.github.io'
+                  data=json.load(r)
+                  assert data['site']=='keiba-notes' and data['schema_version']==1
+                  if api=='/stats':
+                      assert all(isinstance(n,int) and n>=0 for n in data['today'].values())
+                      assert all(isinstance(n,int) and n>=0 for n in data['totals'].values())
+                  else:
+                      assert isinstance(data['rows'],list)
+              print('PASS_LIVE_KEIBA_READ_ONLY_API',api)
+          PY
+      - name: Verify latest public LAB HTML and JSON bytes match GitHub
+        run: |
+          set -euo pipefail
+          base="https://toodataa-ai.github.io/keiba-notes/lab"
+          for attempt in $(seq 1 30); do
+            ok=1
+            for path in usage-analytics.html usage-analytics.js usage-analytics-config.json; do
+              if ! curl --retry 2 --retry-delay 2 -LfsS --max-time 18 "$base/$path?audit=$GITHUB_RUN_ID-$attempt" -o /tmp/keiba-lab-live; then ok=0;break;fi
+              if ! cmp -s "docs/lab/$path" /tmp/keiba-lab-live; then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]]; then echo PASS_LIVE_PUBLIC_LAB_BYTE_PARITY;exit 0;fi
+            sleep 8
+          done
+          echo "::error::GitHub Pages LAB bytes not current"
+          exit 1
+      - name: Check phone and desktop with real Chromium on the LIVE origin
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright==1.56.0
+          python3 - <<'PY'
+          import shutil
+          from playwright.sync_api import sync_playwright
+          chrome=next((x for x in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if x),None)
+          assert chrome, 'Chromium not available'
+          url='https://toodataa-ai.github.io/keiba-notes/lab/usage-analytics.html'
+          with sync_playwright() as p:
+              browser=p.chromium.launch(executable_path=chrome,headless=True,args=['--no-sandbox'])
+              for width in (390,1200):
+                  page=browser.new_page(viewport={'width':width,'height':900})
+                  errors=[]
+                  page.on('pageerror',lambda e: errors.append(str(e)))
+                  page.goto(url+'?ui-audit='+str(width),wait_until='domcontentloaded',timeout=60000)
+                  page.wait_for_function("() => document.getElementById('status')?.textContent.includes('公式の集計APIに接続済み')",timeout=20000)
+                  assert not errors,errors
+                  assert page.locator('#pvTotal').inner_text().strip().replace(',','').isdigit(),'Missing real PV count'
+                  assert page.locator('#pvToday').inner_text().strip().replace(',','').isdigit(),'Missing today PV'
+                  assert page.locator('#sessionTotal').inner_text().strip().replace(',','').isdigit(),'Missing session count'
+                  assert page.locator('#historyStatus').inner_text().find('実測記録')>=0
+                  dim=page.evaluate("({width: innerWidth, scroll: document.documentElement.scrollWidth})")
+                  assert dim['scroll']<=dim['width']+3,dim
+                  for value in ('7','90','365'):
+                      page.locator('#period').select_option(value)
+                      page.wait_for_function("(v) => document.querySelector('#historyStatus')?.textContent.includes('実測記録') && document.querySelector('#period')?.value===v",value,timeout=18000)
+                  print('PASS_LIVE_LAB_ANALYTICS_REAL_CHROME',width,'PV',page.locator('#pvTotal').inner_text())
+                  page.close()
+              browser.close()
+          PY
