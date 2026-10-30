@@ -35,6 +35,27 @@ def render(prod):
         if plain in PAGES: return 'href='+quote+'staging/'+plain+hashpart+(sep+tail if sep else '')+quote
         return match.group(0)
     out=re.sub(r'href=(["\x27])([^"\x27]+)\1',fix,out)
+    # Approved LAB -> STAGING promotion: keep the production top-page
+    # template unchanged and add only stage analytics teaser + dedicated assets.
+    # This must remain in the canonical renderer or the mirror overwrites it.
+    if 'id="mainTitle"' in out and '<p class="photo-credit">' in out:
+        preview=(
+            '<section class="stage-usage" aria-labelledby="stageUsageTitle">'
+            '<div class="stage-usage-top"><strong id="stageUsageTitle" class="stage-usage-title">サイト利用状況</strong>'
+            '<div class="stage-usage-values">'
+            '<span class="stage-usage-value">今日のPV <b id="stageUsageToday" aria-live="polite">—</b></span>'
+            '<span class="stage-usage-value">累計PV <b id="stageUsageTotal" aria-live="polite">—</b></span>'
+            '<a href="staging/usage-analytics.html">過去の閲覧推移を見る</a>'
+            '</div></div><p class="stage-usage-notice" id="stageUsageNote" role="status">'
+            '競馬専用の実測データを確認中…</p></section>\\n'
+        )
+        assert out.count('<p class="photo-credit">')==1
+        out=out.replace('<p class="photo-credit">',preview+'<p class="photo-credit">',1)
+        out=out.replace('</head>',
+            '<link rel="stylesheet" href="staging/usage-summary.css?v=20261030-1">\\n</head>',1)
+        out=out.replace('</body>',
+            '<script src="staging/usage-summary.js?v=20261030-1" defer></script>\\n</body>',1)
+        assert out.count('id="stageUsageToday"')==1 and out.count('id="stageUsageTotal"')==1
     # Stage-only cache key for the common week script: publication wording
     # may differ by staging policy, while production HTML stays unchanged.
     if 'id="weekSchedule"' in out:
