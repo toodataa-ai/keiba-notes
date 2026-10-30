@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "ce368da731a868fe247ba28fc8ce88ba2d6fcdf9",
+  "scan_commit": "55120565992ffdd8782a7661aa93b25c37c160c8",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -15,7 +15,7 @@
     "release_process": "approved UI paths allowlist + diff review + preserve protected tree SHA + real Pages HTTP parity"
   },
   "counts": {
-    "lab_development": 3,
+    "lab_development": 4,
     "lab_evaluation": 1,
     "needs_review": 2,
     "staging_review": 0,
@@ -229,6 +229,39 @@
         "docs/experience-regime.html": "55ed485d8a1b0da5afecde2adbeb99e10d768156"
       },
       "latest_source_change_commit": "179717648884b2dedb1921b0ede0ba7834e8047a"
+    },
+    {
+      "id": "keiba-anonymous-usage",
+      "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "LABで閲覧カウンター・7/30/90/365日履歴UIと独立Worker/D1のコードを用意。専用Cloudflare Worker/D1は未接続・未デプロイ、実データ収集は未開始。DBを競馬専用に作成して/collect・/stats・/historyを検証するまで数字を表示しない。本番のCounterAPI計測・JRA/NAR公式データは変更禁止。LAB動作検証→別途ステージング移行承認→本番リリース承認の順で対応。",
+      "preview_path": "lab/usage-analytics.html",
+      "staging_paths": [],
+      "lab_paths": [
+        "docs/lab/usage-analytics.html",
+        "docs/lab/usage-analytics.css",
+        "docs/lab/usage-analytics.js",
+        "docs/lab/usage-analytics-config.json",
+        "docs/lab/usage-tracker.js",
+        "docs/lab/analytics/worker.mjs",
+        "docs/lab/analytics/schema.sql",
+        "docs/lab/analytics/wrangler.example.toml",
+        "docs/lab/analytics/worker.test.mjs"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/lab/usage-analytics.html": "8aebd95572a74461762dc2cdbff53217f6f9961c",
+        "docs/lab/usage-analytics.css": "882d975e5e7cbd2afb52c4bf95be4a23076d2978",
+        "docs/lab/usage-analytics.js": "28b66b57b855538a3d636b04af6281c30d55c1ba",
+        "docs/lab/usage-analytics-config.json": "77cffc8e7311d58329b92bd50ddb6a50d41b4cb9",
+        "docs/lab/usage-tracker.js": "f95033018df30dd3291b471a959efc6655c228e0",
+        "docs/lab/analytics/worker.mjs": "4cef90f264fe948e07291012542ea8c6560156d5",
+        "docs/lab/analytics/schema.sql": "ed33aacf0b29e768b69887a6a381f8acc107b8c6",
+        "docs/lab/analytics/wrangler.example.toml": "06900b2259bd4c3b95b9f1560fcbc10dd9cb62eb",
+        "docs/lab/analytics/worker.test.mjs": "5bf7ee44f7c57033099fe036c78706c59b8d98a4"
+      },
+      "latest_source_change_commit": "ec2b4ea6837ab2ea4657d04816f11b55fe3e97d8"
     }
   ],
   "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB hosts live experiment copies; legacy staging paths redirect for compatibility."
