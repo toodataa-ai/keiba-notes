@@ -37,6 +37,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import shutil
+          import json
           from playwright.sync_api import sync_playwright
           chrome=next((f for f in (shutil.which('google-chrome'),shutil.which('chromium'),shutil.which('chromium-browser')) if f),None)
           assert chrome
@@ -44,7 +45,8 @@ jobs:
             'lab/index.html','lab/race-simulator.html?demo=shuka-one',
             'lab/race-course-catalog.html','lab/weekend-main-course-review.html',
             'lab/purchase-preview.html','lab/this-week-preview.html',
-            'lab/results-preview.html','lab/jra-v315-20261012/index.html']
+            'lab/results-preview.html','lab/jra-v315-20261012/index.html',
+            'lab/usage-analytics.html'
           stage=['staging/index.html','staging/this-week.html','staging/results.html','staging/experience-regime.html']
           redirects={
             'staging/race-simulator.html?demo=shuka-one':'/lab/race-simulator.html',
@@ -52,6 +54,7 @@ jobs:
             'staging/weekend-main-course-review.html':'/lab/weekend-main-course-review.html',
             'staging/purchase-preview.html':'/lab/purchase-preview.html'
           }
+          expected_features=len(json.loads(Path('docs/lab/change-board.json').read_text())['features'])
           with sync_playwright() as p:
             browser=p.chromium.launch(headless=True,executable_path=chrome,args=['--no-sandbox'])
             for width in (390,1024):
@@ -74,9 +77,13 @@ jobs:
                 if path=='lab/race-simulator.html?demo=shuka-one':
                   assert page.locator('#tokyoCourseOverlay').count()==1,'real map overlay lost'
                 if path=='lab/index.html':
-                  assert page.locator('#featureList article.item').count()==8,'feature registry lost'
+                  assert page.locator('#featureList article.item').count()==expected_features,'feature registry lost'
+                if path=='lab/usage-analytics.html':
+                  assert page.locator('#historyRows').count()==1,'history table missing'
+                  assert page.locator('#chart').count()==1,'history chart missing'
+                  assert '準備中' in page.locator('#status').inner_text(),'disabled analytics must show honest pending state'
                 print('PASS_LAB_STAGE_REAL_CHROME',width,path)
                 page.close()
             browser.close()
-          print('PASS_LAB_EIGHT_PAGES_FOUR_STAGING_PAGES_FOUR_LEGACY_REDIRECTS_2_VIEWPORTS')
+          print('PASS_LAB_FEATURE_COUNT',expected_features,'STAGING_BASELINE_AND_ANALYTICS_PREVIEW_2_VIEWPORTS')
           PY
