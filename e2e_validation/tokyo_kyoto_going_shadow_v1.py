@@ -54,12 +54,12 @@ def capture(payload: dict, *, now: datetime | None = None) -> dict:
     weather = payload["weather"]
     weather_until = utc(weather["observed_through_at"])
     instant = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    if not (measured <= weather_until <= cutoff <= instant < start):
+    if not (measured <= cutoff and weather_until <= cutoff <= instant < start):
         raise ValueError("data/cutoff/run must precede official start; no postrace fill")
     for key in ("jra_moisture_source_url",):
         if not str(payload.get(key, "")).startswith("https://www.jra.go.jp/"):
             raise ValueError("official JRA moisture source URL required")
-    if not str(weather.get("source_url", "")).startswith("https://www.data.jma.go.jp/"):
+    if not str(weather.get("source_url", "")).startswith(("https://www.data.jma.go.jp/", "https://www.jma.go.jp/")):
         raise ValueError("official JMA weather source URL required")
     moisture = finite_number(payload["morning_moisture"], "morning_moisture")
     if moisture < 0:
