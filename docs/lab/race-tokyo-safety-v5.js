@@ -4,7 +4,7 @@ function interval(a,b,limit){const v=b-a;if(Math.abs(v)<1e-14)return Math.abs(a)
  const x=(-limit-a)/v,y=(limit-a)/v,lo=Math.max(0,Math.min(x,y)),hi=Math.min(1,Math.max(x,y));return hi>lo?[lo,hi]:null;}
 function overlap(a,b,c,d){const fore=interval(a.d-c.d,b.d-d.d,2.55-1e-6),side=interval((a.lane-c.lane)*1.65,(b.lane-d.lane)*1.65,.8-1e-6);
  return fore&&side&&Math.min(fore[1],side[1])>Math.max(fore[0],side[0]);}
-const pose=sim=>sim.state.horses.map(h=>({number:h.number,d:h.displayD,lane:h.lane,finished:h.finished,finishTime:h.finishTime,name:h.name,runoffSpeed:14.2}));
+const pose=sim=>sim.state.horses.map(h=>({number:h.number,d:h.displayD,lane:h.lane,finished:h.finished,finishTime:h.finishTime,name:h.name,runoffSpeed:h.runoffSpeed}));
 async function run(session,seed,{yieldEvery=40}={}){
  const data={...g.RaceTokyo2000.race({motion:'bounded-lateral-v4'}),labTokyoSourceModel:'source-linked-v5'};
  const sim=g.RaceSimEngine.create(data,{seed,bias:'neutral',labTokyoSourceSession:session});
