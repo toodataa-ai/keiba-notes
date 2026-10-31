@@ -81,7 +81,14 @@ def confirmed_win_payout(section, result):
     """Confirm a real, positive single-win payout belonging to the official winner."""
     winners = [int(x["horse_no"]) for x in result["finish_order"]
                if x["finish_position"] == 1]
-    matches = re.findall(r"単勝\s*(\d{1,2})\s*([\d,]+)\s*円", section)
+    # NAR reports dead-heat single-win payouts as continuation rows:
+    # "単勝 6 180円 3人気 10 120円 1人気 複勝 ...".
+    # Extract ONLY the strictly bounded single-win block; the following
+    # 複勝/他券種 refunds must never be mistaken for winner payouts.
+    win_block = re.search(r"単勝\s+(.*?)(?=\s+複勝\s+)", section, re.S)
+    if win_block is None:
+        raise ValueError("BLOCKED_PAYOUT: missing confirmed single-win block")
+    matches = re.findall(r"(?<!\d)(\d{1,2})\s+([\d,]+)\s*円", win_block.group(1))
     if not winners or len(matches) != len(winners):
         raise ValueError("BLOCKED_PAYOUT: missing payout or unsupported dead heat")
     payout_winners = [int(x[0]) for x in matches]
@@ -269,6 +276,21 @@ def self_test():
         raise AssertionError("Mismatch was not rejected")
     except ValueError as e:
         assert str(e).startswith("BLOCKED_PAYOUT_JOIN")
+    # 2026-10-31 Saga 9R: official first-place dead heat (6 and 10),
+    # with the second single-win payout on an unlabelled continuation row.
+    dead_heat = "9R 着順 1 6 A 1 10 B 単勝 6 180円 3人気 10 120円 1人気 複勝 6 120円"
+    assert confirmed_win_payout(dead_heat, {"finish_order":[
+        {"horse_no":6,"finish_position":1},
+        {"horse_no":10,"finish_position":1}]}) == [
+        {"horse_no":6,"amount_yen_per_100":180},
+        {"horse_no":10,"amount_yen_per_100":120}]
+    # A missing second official refund remains blocked even for a dead heat.
+    try:
+        confirmed_win_payout("単勝 6 180円 複勝 6 120円", {"finish_order":[
+            {"horse_no":6,"finish_position":1},{"horse_no":10,"finish_position":1}]})
+        raise AssertionError("Incomplete dead-heat payout was accepted")
+    except ValueError as e:
+        assert str(e).startswith("BLOCKED_PAYOUT")
     print("PASS: cancellation, date/venue guard, refund sections, payout join self-tests")
 
 if __name__ == "__main__":
