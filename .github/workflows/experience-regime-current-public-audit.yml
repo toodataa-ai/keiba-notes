@@ -1,0 +1,113 @@
+name: E012 current-week immutable research and Pages audit (read-only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/experience-regime-current-public-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Independently audit actual immutable observations and first Git introductions
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,subprocess
+          from collections import Counter
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          root=Path('experience_regime_v1')
+          req=json.loads((root/'requests/run-current.json').read_text())
+          today=datetime.now(ZoneInfo('Asia/Tokyo')).date().isoformat()
+          assert req['date']==today and req['mode']=='prospective_strict', ('not current prospective request',req['date'],today)
+          week=req['week_id']; p=root/'collection'/week
+          pool=json.loads((p/'race_pool.json').read_text())
+          plan=json.loads((p/'sample_plan.json').read_text())
+          proof=json.loads((p/('proof_commit_'+today+'.json')).read_text())
+          status=json.loads(Path('docs/data/experience_regime_status.json').read_text())['collection_runs'][today]
+          assert pool['race_count']==len(pool['races'])==plan['population_races']==status['population_week']
+          assert len([r for r in pool['races'] if r['date']==today])==status['population_today']
+          selected=[r for r in plan['selected_races'] if r['date']==today]
+          assert len(selected)==status['selected_today']==status['complete_evidence_races']==status['prerace_proof_valid_races']
+          assert len(proof['races'])==len(selected)>0
+          assert status['collection_failures']==0 and status['production_effect'] is False and status['models_automatically_promoted'] is False
+          assert status['planned_exclusions']==status['population_today']-len(selected)
+          def commit_first(path):
+              lines=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(path)],text=True).strip().splitlines()
+              assert len(lines)==1, ('non-unique first introduction',str(path),lines)
+              sha,stamp=lines[0].split()
+              original=subprocess.check_output(['git','show',sha+':'+str(path)])
+              assert original==path.read_bytes(),('immutable file was modified',str(path))
+              return sha,datetime.fromisoformat(stamp)
+          plan_sha,plan_at=commit_first(p/'sample_plan.json')
+          assert plan_at < min(datetime.fromisoformat(r['start_at']) for r in plan['selected_races'])
+          proof_rows={r['race_id']:r for r in proof['races']}
+          counts=Counter();race_sets={k:set() for k in ('E0','E1','E2')};cats={}
+          for item in selected:
+              rid=item['race_id'];start=datetime.fromisoformat(item['start_at'])
+              snap=p/'snapshots'/(rid+'.json');audit_path=p/'audits'/(rid+'.json')
+              sha,first_at=commit_first(snap)
+              _,audit_first_at=commit_first(audit_path)
+              assert first_at<start and audit_first_at<start
+              assert sha==proof_rows[rid]['proof_commit'] and proof_rows[rid]['proof_prestart_valid']
+              obj=json.loads(snap.read_text());aud=json.loads(audit_path.read_text())
+              assert aud['usable_for_e012_shadow'] and not aud['missing_prerace_evidence']
+              assert aud['source_input_sha256']==hashlib.sha256(snap.read_bytes()).hexdigest()
+              assert datetime.fromisoformat(obj['captured_at'])<start
+              assert item['sample_origin']==obj['race_context']['sample_origin']
+              assert item['race_category']==obj['race_context']['race_category']
+              horses=obj['experience']['horses']
+              field={str(x['horse_number']) for x in obj['step1']['runners']}
+              assert field==set(horses),('horse roster mismatch',rid)
+              assert len(horses)==aud['required_horse_count']
+              for h in horses.values():
+                  n=h['starts_before_race']
+                  assert type(n) is int and n>=0 and n==sum(h['career_summary_wsto'])
+                  reg='E0' if n==0 else 'E1' if n<=3 else 'E2'
+                  assert reg==h['regime']
+                  assert h['source_url'].startswith('https://www.jra.go.jp/JRADB/')
+                  assert datetime.fromisoformat(h['observed_at'])<start
+                  counts[reg]+=1;race_sets[reg].add(rid)
+                  key=item['race_category'];cats.setdefault(key,Counter())[reg]+=1
+          for k in ('E0','E1','E2'):
+              assert status['regimes'][k]['horse_observations']==counts[k]
+              assert status['regimes'][k]['races']==len(race_sets[k])
+          for k,v in cats.items():
+              assert status['category_regime_verified_horses'][k]==dict(v)
+          assert proof['proof_commit']==status['proof_commit']
+          print('E012_READONLY_PROOF_AUDIT_OK',week,today,'plan',plan_sha,'races',len(selected),'horses',sum(counts.values()),dict(counts))
+          step1=json.loads(Path('docs/data/experience_regime_step1_status.json').read_text())
+          assert step1['date']==today and step1['selected_races']==len(selected)
+          print('E012_STEP1_SEPARATE_STATUS',step1['step1_frozen_races'],'/',len(selected),'MISSING',len(step1['missing_step1']))
+          if step1['step1_frozen_races']==0:
+              print('::warning::STEP1 remains INCOMPLETE: no genuine formal predictions frozen. Public audit success is not STEP1 success.')
+          PY
+      - name: Confirm published research status, STEP1 status and HTML are byte-identical
+        run: |
+          set -euo pipefail
+          BASE=https://toodataa-ai.github.io/keiba-notes
+          for attempt in $(seq 1 36);do
+            if curl -fLsS --max-time 20 "$BASE/data/experience_regime_status.json?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-live-status.json &&
+               cmp -s docs/data/experience_regime_status.json /tmp/e012-live-status.json &&
+               curl -fLsS --max-time 20 "$BASE/data/experience_regime_step1_status.json?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-live-step1.json &&
+               cmp -s docs/data/experience_regime_step1_status.json /tmp/e012-live-step1.json &&
+               curl -fLsS --max-time 20 "$BASE/experience-regime.html?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-live-page.html &&
+               cmp -s docs/experience-regime.html /tmp/e012-live-page.html &&
+               grep -q 'e012-live-collection' /tmp/e012-live-page.html;then
+              echo E012_CURRENT_RESEARCH_PAGE_AND_BOTH_STATUSES_PUBLIC_BYTE_IDENTICAL
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::E012 live Pages not byte-identical to all three tracked files"
+          exit 1
