@@ -226,9 +226,12 @@
         "docs/lab/race-clean-tokyo-2000-app-v1.js",
         "docs/lab/race-tokyo-2000-v1.js",
         "docs/lab/race-tokyo-ability90-v1.js",
-        "docs/lab/TOKYO_2000_QA_V1.md"
+        "docs/lab/TOKYO_2000_QA_V1.md",
+        "docs/lab/race-tokyo-source-audit-v2.js",
+        "docs/lab/race-tokyo-source-inspector-v2.js",
+        "docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md"
       ],
-      "next_action": "原PPTX取得・ベクター構造確認済み。公開用素材の利用条件、原図と走路の照合、全地点安全監査・再生QA未完了。走行は無条件ロック。能力90の独立アダプターのみ実装。京都・共通エンジン不変。STAGING/本番昇格禁止。目視未承認。"
+      "next_action": "原PPTXは再配布せずローカルだけで原図・走路候補を静止照合。発走目印の90度group回転、左回りの内側法線、東京maxLane16を検証。13地点×18頭・原図画素1299699点/画面の検査を実施。候補境界は未承認、共通エンジンの旧幾何metricsとは未統合。走行は無条件ロック。物理整合・複数seed衝突・1/2/4倍実時間QA・目視完了まで走行解除禁止。京都・STAGING・本番・正式データ不変。"
     }
   ]
 }

@@ -13,7 +13,7 @@ function race(){return {...g.RaceLab18Fixture.entry(),id:'lab-tokyo-2000-synthet
  horses:g.RaceLab18Fixture.horses({abilityScale:'90-v1'})};}
 // Separate broadcast orientation: camera right-to-left need not equal map turn.
 const camera=Object.freeze({cutRemainingM:80,spanM:100,screenTurn:'右',courseTurn:'左'});
-function goalPosition(d,lane,width,height,maxLane=14){
+function goalPosition(d,lane,width,height,maxLane=16){
  return g.RaceCleanGoalView.goalScreenPosition(d,lane,2000,width,height,maxLane,camera.screenTurn,1,camera.spanM);
 }
 function create(){assertCanAnimate(); /* No hidden query-string bypass or engine construction. */}
