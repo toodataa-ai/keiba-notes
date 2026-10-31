@@ -96,6 +96,32 @@ def main() -> int:
         if old_object.returncode or old_object.stdout.strip() != exception["original_blob_sha"]:
             raise RuntimeError("original E2E CI Git history unavailable: "+component_path)
 
+    # Draft runtime preparation: four old workflow ENTRYPOINTS now call the
+    # existing current-E2E auditor. Frozen validators and every original manifest
+    # remain untouched. Exact old and new workflow blobs are independently pinned.
+    operations = json.loads((repo_root / 'shadow_lab/ci/legacy-workflow-bridge.json').read_text())
+    operation_paths = {'.github/workflows/'+name for name in (
+        'validate-jra-balanced-v311.yml', 'validate-jra-portfolio-v310.yml',
+        'validate-jra-strategy-v39.yml', 'validate-jra-strategy-v38.yml')}
+    operation_overrides = {x['path']:x for x in operations['replacements']}
+    if (operations.get('scope') != 'four_legacy_workflow_entrypoints_only' or
+            operations.get('no_manifest_or_prediction_changes') is not True or
+            set(operation_overrides) != operation_paths or len(operations['replacements']) != 4):
+        raise RuntimeError('unexpected legacy workflow entrypoint supersession')
+    for src, item in operation_overrides.items():
+        if git_hash_object(repo_root, src) != item['current_blob_sha']:
+            raise RuntimeError('unreviewed current workflow mutation: '+src)
+        original = subprocess.check_output(['git','rev-parse',operations['historical_anchor_commit']+':'+src],cwd=repo_root,text=True).strip()
+        if original != item['prior_blob_sha']:
+            raise RuntimeError('historical workflow source not preserved: '+src)
+        pinned = {c['git_blob_sha'] for p in manifest_dir.glob('*.json')
+                  for c in json.loads(p.read_text()).get('components',[]) if c['path']==src}
+        if pinned != set(item['manifest_blob_shas']):
+            raise RuntimeError('legacy workflow manifest pins changed: '+src)
+        for sha in pinned:
+            if subprocess.check_output(['git','cat-file','-t',sha],cwd=repo_root,text=True).strip() != 'blob':
+                raise RuntimeError('original workflow blob unavailable: '+src)
+
     for path in sorted(manifest_dir.glob("*.json")):
         manifest = json.loads(path.read_text(encoding="utf-8"))
         version = manifest.get("prompt_version")
@@ -104,6 +130,10 @@ def main() -> int:
             component_path = component["path"]
             expected = component["git_blob_sha"]
             actual = git_hash_object(repo_root, component_path)
+            operation_override = operation_overrides.get(component_path)
+            if (operation_override and expected in operation_override['manifest_blob_shas'] and
+                    actual == operation_override['current_blob_sha']):
+                continue
             exception = accepted.get(component_path)
             if actual != expected and exception and version in ("v3.11", "v3.12", "v3.13"):
                 is_expected = (expected == exception["historical_blob_sha"] and
