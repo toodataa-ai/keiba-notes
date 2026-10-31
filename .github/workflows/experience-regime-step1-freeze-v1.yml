@@ -32,6 +32,7 @@ jobs:
       - name: Validate capture implementation and test guards
         run: |
           set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
           python -m py_compile experience_regime_v1/step1_capture_v1.py
           python -m py_compile experience_regime_v1/review_backfill_v1.py
           python -m unittest experience_regime_v1.test_step1_capture_v1 experience_regime_v1.test_review_step1_v1 experience_regime_v1.test_model experience_regime_v1.test_prestart_collection_audit_v1
