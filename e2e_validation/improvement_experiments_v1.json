@@ -11,6 +11,59 @@
     "no_backfilling_before_race": true,
     "record_approved_versions_in_prompt_history": true
   },
-  "experiments": [],
-  "note": "No challenger trial is registered. Observed themes and unpaired Grade A reviews are not trial wins."
+  "experiments": [
+    {
+      "id": "track_condition_tokyo_kyoto_20261101_v1",
+      "title": "東京・京都 馬場状態・トラックバイアス前向きShadow比較",
+      "hypothesis_ids": [
+        "track_condition"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13-tokyo-kyoto-track-condition-shadow-v0.1",
+      "status": "design",
+      "design_status": "candidate STEP1 injection and prestart evidence publisher not yet implemented",
+      "scope": {
+        "venues": [
+          "tokyo",
+          "kyoto"
+        ],
+        "surfaces": [
+          "turf",
+          "dirt"
+        ],
+        "race_scope": "JRA main races on selected venues; predeclared, not selected by result"
+      },
+      "fixed_change": "STEP1 factor ③ track/going assessment only; other ①②④〜⑨ weights and STEP2 remain identical to baseline. Candidate full-race output is required before any strict pair counts.",
+      "candidate_model": {
+        "stage_a": "baba_models_v2/model_registry.json (Tokyo/Kyoto stage_a candidate, morning moisture only)",
+        "stage_b": "baba_models_v2/predict.py (pilot, condition_probs_operational; NOT validated)",
+        "feature_cutoff": "same prestart cutoff for both versions; no observations first available after cutoff"
+      },
+      "prestart_pairing": {
+        "minimum_valid_pairs": 20,
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "grade": "prospective_strict",
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "going_multiclass_log_loss",
+        "going_brier_score",
+        "honmei_top3_rate",
+        "top3_marks_capture_rate"
+      ],
+      "safety_metrics": [
+        "turf_vs_dirt_degradation",
+        "tokyo_vs_kyoto_degradation",
+        "wet_vs_dry_degradation",
+        "roi_pct_secondary_not_decisive"
+      ],
+      "release_gate": "A/B/C explicit manual approval only; stage B validation and full STEP1 shadow required; never auto promote",
+      "valid_pairs_count": 0,
+      "notes": "This design record is not an activated trial. No strict paired result can be credited until a runnable candidate and independent before-start proof are reviewed."
+    }
+  ],
+  "note": "Tokyo/Kyoto track-condition trial is in design only. Registration does not imply runner readiness or new/old paired evidence."
 }
