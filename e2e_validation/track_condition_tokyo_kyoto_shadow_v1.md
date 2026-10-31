@@ -26,6 +26,31 @@
 - 回顧からの論点抽出は因果証明ではない。後付けで採用レースや仮説を変更しない。
 - A/B/Cの明示承認と馬場モデルCandidate→ValidatedのクラスC承認が必要。自動昇格禁止。
 
+
+## Stage B Pilotの発走前サイドカー（本PRで追加）
+`e2e_validation/tokyo_kyoto_going_shadow_v1.py` は**実行可能なPilot観測用ツール**。
+公式発走前時刻、JRA朝含水率、JMA観測の出典とカットオフ、気象値を入力して
+既存 `baba_models_v2/predict.py` の良/稍重/重/不良確率を生成する。
+
+```bash
+python e2e_validation/tokyo_kyoto_going_shadow_v1.py \
+  --input /tmp/jra-track-condition-prestart-input.json \
+  --output /tmp/jra-track-condition-prestart-sidecar.json
+```
+
+入力JSONの必須項目：`schema_version=1`, `race_id`, `track`（tokyo/kyoto）,
+`surface`（turf/dirt）, `scheduled_start_at`, `information_cutoff_at`,
+`morning_moisture_observed_at`, `morning_moisture`, `jra_moisture_source_url`,
+`weather`（`observed_through_at`, `source_url`, `rain_after_measurement_mm`,
+`hours_since_last_rain`, `temperature_c`, `wind_mps`, `sunshine_hours`,
+`elapsed_hours_since_measurement`）。時刻はTZ付きISO8601。
+
+**制約：** URLの形式は確認するが、公式配信実体・取得時刻・値の真正性そのものは
+別途検証を要する。前走時点のデータ供給やGit proof commitの発行は未実装。
+出力に `counts_toward_formal_new_old_pairs=false` を必ず記載し、
+STEP1全頭予想や厳格な二重proofではないことを明示する。
+結果を参照して再生成することは禁止。
+
 ## 作業の順番
 1. この設計・ルールと候補の差分をレビュー（現在のPR）。
 2. 次のPRでStage B入力・公式ラベル評価・候補STEP1への注入と発走前証拠発行を実装する。
