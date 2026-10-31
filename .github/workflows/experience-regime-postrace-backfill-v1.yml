@@ -1,10 +1,6 @@
 name: Proof-verified JRA E012 postrace research (generic week)
+# No automatic prestart postrace on code changes; request only after results are final.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'experience_regime_v1/review_backfill_v1.py'
-      - '.github/workflows/experience-regime-postrace-backfill-v1.yml'
   workflow_dispatch:
     inputs:
       week_id:
