@@ -1,4 +1,6 @@
 import unittest
+import json
+from pathlib import Path
 from experience_regime_v1.step1_capture_v1 import check_runners
 
 class TestStrictStep1Capture(unittest.TestCase):
@@ -9,6 +11,24 @@ class TestStrictStep1Capture(unittest.TestCase):
                       "factor_grades":["A"]*9,"mark": mark, "win_probability":p}
                       for i,mark,p in ((1,"◎",0.5),(2,"○",0.3),(3,"▲",0.2))]}
         return source, {"experience": {"horses": horses}}
+
+    def test_existing_oct31_real_formal_source_contract(self):
+        root=Path(__file__).resolve().parents[1]
+        cases=[
+            ("2026-10-31-tokyo-11","2026-10-31-perseus-stakes",
+             "v3.13-run41142182394-attempt1.json"),
+            ("2026-10-31-kyoto-11","2026-10-31-fantasy-stakes",
+             "v3.13-run41143212430-attempt1.json"),
+        ]
+        for research,formal,name in cases:
+            with self.subTest(research=research):
+                frozen=json.loads((root/"experience_regime_v1"/"collection"/
+                  "2026-10-31"/"snapshots"/(research+".json")).read_text())
+                source=json.loads((root/"e2e_validation"/"predictions"/
+                  formal/name).read_text())
+                rows=check_runners(source,frozen)
+                self.assertEqual(len(rows),len(frozen["experience"]["horses"]))
+                self.assertTrue(all(len(r["factor_grades"])==9 for r in rows))
 
     def test_valid_copies_only_actual_probabilities(self):
         source,frozen=self.example()
