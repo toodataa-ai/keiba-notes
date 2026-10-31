@@ -5,11 +5,17 @@ on:
       - 'docs/lab/*tokyo*'
       - 'docs/lab/TOKYO_2000_QA_V1.md'
       - 'tools/test_race_tokyo_2000*'
+      - 'tools/test_race_tokyo_source*'
+      - 'tools/audit_tokyo_2000*'
+      - 'docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md'
       - '.github/workflows/lab-tokyo-2000-v1.yml'
   pull_request:
     paths:
       - 'docs/lab/*tokyo*'
       - 'tools/test_race_tokyo_2000*'
+      - 'tools/test_race_tokyo_source*'
+      - 'tools/audit_tokyo_2000*'
+      - 'docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md'
       - '.github/workflows/lab-tokyo-2000-v1.yml'
   workflow_dispatch:
 permissions:
@@ -26,7 +32,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Tokyo isolation and numerical audit
-        run: node tools/test_race_tokyo_2000_v1.cjs
+        run: |
+          node tools/test_race_tokyo_2000_v1.cjs
+          node tools/test_race_tokyo_source_math_v2.cjs
       - name: Existing Kyoto regression
         run: |
           node tools/test_race_clean_ability90_v1.cjs
@@ -42,3 +50,47 @@ jobs:
         with:
           name: tokyo-2000-blocked-page-comparison
           path: artifacts/tokyo-2000/
+
+  local-original-source-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install local conversion and browser tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice-impress poppler-utils
+          python -m pip install playwright==1.58.0
+          python -m playwright install --with-deps chromium
+      - name: Fetch publisher original for ephemeral local inspection only
+        run: |
+          curl --fail --location --retry 2 --max-time 90 -o /tmp/tokyo-source.zip https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse.zip
+          python - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          raw=Path('/tmp/tokyo-source.zip').read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=='7d969fe98a739bcc22d752ca0b97bbbed812dc0be39456f8ae3dc11ff8f5ef62'
+          with zipfile.ZipFile('/tmp/tokyo-source.zip') as z:
+              files=[n for n in z.namelist() if n.endswith('.pptx')]
+              assert len(files)==1
+              Path('/tmp/tokyo-source.pptx').write_bytes(z.read(files[0]))
+          PY
+      - name: Local source geometry and static inspection
+        run: |
+          python tools/audit_tokyo_2000_source_v2.py --pptx /tmp/tokyo-source.pptx --out /tmp/tokyo-source-audit
+          node tools/audit_tokyo_2000_run_v2.cjs /tmp/tokyo-source-audit/audit-local.json
+          python tools/test_race_tokyo_source_browser_v2.py --source-dir /tmp/tokyo-source-audit
+      - name: Collect only non-source numerical summaries
+        run: |
+          mkdir -p artifacts/tokyo-source-summary
+          cp /tmp/tokyo-source-audit/numeric-audit.json artifacts/tokyo-source-summary/
+          cp /tmp/tokyo-source-audit/browser-audit.json artifacts/tokyo-source-summary/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tokyo-source-audit-numerical-summary-only
+          path: artifacts/tokyo-source-summary/

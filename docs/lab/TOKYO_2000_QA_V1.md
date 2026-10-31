@@ -50,3 +50,7 @@
 - Actions `LAB Tokyo 2000 preparation gate` は同じテストと静止比較画面をartifactへ保存する。CI成功は走路承認を意味しない。
 
 公開URL/Actionsの実結果は作業報告で別途記録。承認状態は引き続き `not_approved`。
+
+## 続報：原図の静止照合
+
+[ローカル原図照合v2](TOKYO_2000_SOURCE_AUDIT_V2.md)で原素材を再配布しない照合手順と13地点×18頭の静止検査を追加。物理profileとの統合・走行QAは未完了のため、初版の走行ロックと未承認状態は継続する。
