@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "scope": "explicitly_reviewed_additional_missing_prerace_shadow_evidence",
+  "reviewed_on": "2026-10-31",
+  "source_audit": "docs/data/jra_postrace_audit_2026-10-31.json",
+  "earlier_baseline_path": "e2e_validation/experience_new_gaps_20261025_v1.json",
+  "entries": [
+    {
+      "case": "e2e_validation/cases/2026-10-31-fantasy-stakes/case.json",
+      "sha": "f7794b082e5a67c83fb40036cf8ce8b6133b0a83",
+      "race_id": "2026-10-31-fantasy-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-10-31-perseus-stakes/case.json",
+      "sha": "6b0fed90bffda160c5eb6dfd6e82141ee178c4c0",
+      "race_id": "2026-10-31-perseus-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    }
+  ],
+  "policy": {
+    "case_git_blob_sha_required": true,
+    "exact_error_set_required": true,
+    "do_not_backfill_postrace": true,
+    "formal_grade_a_independent": true,
+    "shadow_promotion_blocked": true
+  },
+  "note": "Only independently disclosed and SHA-pinned omissions in original prestart E0/E1/E2 race_category. No postrace reconstruction, no alteration of official Grade A settlement or frozen predictions."
+}

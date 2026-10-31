@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-31",
+  "meeting_id": "2026-10-31-to-2026-11-01",
+  "observed_at": "2026-10-31T20:00:00+09:00",
+  "status": "OFFICIAL_RESULTS_SETTLED_GRADE_A_VALIDATION_PENDING_PUBLICATION_UNVERIFIED",
+  "immutable_forecasts": true,
+  "immutable_final_bets": true,
+  "original_html_pdf_unchanged": true,
+  "reviewed_races": [
+    "2026-10-31-perseus-stakes",
+    "2026-10-31-fantasy-stakes"
+  ],
+  "official_result_urls": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604101120261031%2F82",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202604101120261031%2F60"
+  ],
+  "grade_a_case_expected_new": 2,
+  "case_publication_proof_commits": {
+    "2026-10-31-perseus-stakes": "d876c410d696d165b9b8f8d2c4a8796f0ccaa2ee",
+    "2026-10-31-fantasy-stakes": "cd40797fec3fc5b5c40db5b34e7dda60611e8767"
+  },
+  "weekly_change_decision": "not_evaluated",
+  "weekly_reason": "Sunday 2026-11-01 Tokyo and Kyoto JRA mains have not been reviewed, so this meeting cannot enter A/B/C or no_change evaluation.",
+  "manual_approval_rules": "A/B/C approvals retained, automatic promotion forbidden",
+  "overfit_control": "No weights or bets tuned based on Oct31 outcome; original historical proof retained, >=20 paired prospective cases required for comparison.",
+  "preserved_versions": true,
+  "preserved_inflight_e2e_comparison": true,
+  "publication_verification": {
+    "verified": false,
+    "ci": "strict_e2e_case_evaluation_passed; research_gap_Sha_ledger_fixes_in_review; PDF_reader_pass; existing_UI_guard_fails",
+    "live_github_pages_http_byte_parity": false
+  },
+  "blockers": [
+    "Separate UI release registry guard fails on original pre-existing mismatch between .github/production-releases.json and docs/data/production-releases.json; this review does not change either UI registry.",
+    "Review PR must be validated and merged before new data can be considered published; no live HTTP byte parity verified.",
+    "Sunday 2026-11-01 JRA main races pending before weekly improvement."
+  ],
+  "source_checks": [
+    {
+      "race_id": "2026-10-31-perseus-stakes",
+      "purchase_publication_proof_commit": "d876c410d696d165b9b8f8d2c4a8796f0ccaa2ee",
+      "source_publication_proof_commit": "940dead17847b73562e4d4d8f002a1168370324b",
+      "prediction_blob_sha": "56651d3cc22d320d94f947e39b7ed945033a2398",
+      "prerace_bet_count": 41,
+      "immutable_bets_reconciled": true
+    },
+    {
+      "race_id": "2026-10-31-fantasy-stakes",
+      "purchase_publication_proof_commit": "cd40797fec3fc5b5c40db5b34e7dda60611e8767",
+      "source_publication_proof_commit": "832caf2d8d425aa26401216ed0f052de51ff7cd1",
+      "prediction_blob_sha": "5eae62c73d33e479dfa6548e9e524cb2e3c22fac",
+      "prerace_bet_count": 2,
+      "immutable_bets_reconciled": true
+    }
+  ],
+  "shadow_integrity": {
+    "status": "sha_pinned_missing_prerace_research_fields_not_promotable",
+    "formal_grade_a_independent": true,
+    "new_2026_10_31_missing_prerace_cases": 2,
+    "new_gap_ledger_path": "e2e_validation/experience_new_gaps_20261031_v1.json",
+    "new_gap_ledger_git_blob_sha": "8c9c68960ad5dc29934da22fe3176cea52914d3d",
+    "prior_gap_ledgers_unchanged": true,
+    "never_backfill_postrace": true
+  }
+}
