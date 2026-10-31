@@ -17,8 +17,9 @@ assert.throws(()=>build({...blueprint,edges:[blueprint.edges[0],{...blueprint.ed
 assert.throws(()=>route.position(201));assert.throws(()=>route.position(50,2));
 const loop={id:'loop',edges:[edge('out','x','y',a,b),edge('back','y','x',b,a)]};
 assert.equal(build(loop,{blueprintId:'loop',distanceM:400,edgeIds:['out','back','out','back']}).distanceM,400);
-vm.runInContext(read('docs/lab/shared-course/kyoto-compat-v1.js'),context);
+for(const name of ['definitions-v1','validator-v1','kyoto-compat-v1'])vm.runInContext(read('docs/lab/shared-course/'+name+'.js'),context);
 assert.equal(context.RaceSharedCourse.active.distanceM,2000);
 assert(Object.isFrozen(context.RaceSharedCourse.active.source));
-assert.throws(()=>vm.runInNewContext(read('docs/lab/shared-course/kyoto-compat-v1.js'),{URLSearchParams,location:{search:'?course=tokyo_turf_2000'}}));
+context.location={search:'?course=tokyo_turf_2000'};
+assert.throws(()=>vm.runInContext(read('docs/lab/shared-course/kyoto-compat-v1.js'),context),/COURSE_UNAVAILABLE/);
 console.log('PASS directed pocket / surface transition / straight / repeated loop / invalid route / availability lock');

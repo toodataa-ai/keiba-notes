@@ -8,11 +8,13 @@
  */
 (function(global){'use strict';
 const spec=global.RaceSharedCourse?.active;
-const W=spec?.source.width??620,H=spec?.source.height??430,RASTER=3;
+const W=spec?.source.width??620,H=spec?.source.height??430,RASTER=spec?.mask.raster??3;
 const DISTANCE=spec?.distanceM??2000;
 // A smartphone badge radius 13.5*0.68/7=1.31 source px.
-const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
- SLOPE=.44, SMOOTH_RADIUS=19;
+const CLEARANCE=spec?.mask.clearance??1.95, MIN_INNER_OFFSET=spec?.mask.minInnerOffset??1.60, MAX_SPAN=spec?.mask.maxSpan??17.5,
+ SLOPE=spec?.mask.slope??.44, SMOOTH_RADIUS=spec?.mask.smoothRadius??19;
+const MAX_LANE=spec?.mask.maxLane??14;
+const COLOR=spec?.mask.color??{minAlpha:240,minG:108,greenRedRatio:1.4,greenBlueRatio:1.4};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 const railProjection=global.RaceSafeRailProjection;
@@ -56,7 +58,7 @@ function create(image){
  let greenPixels=0;
  for(let i=0;i<grid.length;i++){
   const j=i*4,r=raw[j],g=raw[j+1],b=raw[j+2],a=raw[j+3];
-  if(a>=240&&g>=108&&g>r*1.4&&g>b*1.4){grid[i]=1;greenPixels++}
+  if(a>=COLOR.minAlpha&&g>=COLOR.minG&&g>r*COLOR.greenRedRatio&&g>b*COLOR.greenBlueRatio){grid[i]=1;greenPixels++}
  }
  samples=[];
  let forkSections=0,missing=0;
@@ -86,10 +88,10 @@ function create(image){
   if(runs.length>1)forkSections++;
   // Fixed target near the true *inner* rail: merging green corridors must
   // not pull the horses to the centroid of the whole green region.
-  const wanted=5.0;
+  const wanted=spec?.mask.legacyCalibration.innerTargetPx??5.0;
   runs.sort((a,b)=>
    Math.max(a.a-wanted,wanted-a.b,0)-Math.max(b.a-wanted,wanted-b.b,0)||
-   Math.abs(a.a-5)-Math.abs(b.a-5));
+   Math.abs(a.a-wanted)-Math.abs(b.a-wanted));
   const run=runs[0];
   if(!run){samples.push(null);missing++;continue}
   const low=Math.max(MIN_INNER_OFFSET,run.a+.30);
@@ -277,7 +279,7 @@ function buildSourceArcMap(){
  // Preserve the validated 1435m boundary compression fix. Blend it into
  // the overall image-distance profile over 45m on either side of the
  // outer endpoints to avoid generating a new jolt at 1270 or 1671.6m.
- const thirdStart=1270,thirdEnd=1435,fourthEnd=1671.6;
+ const [thirdStart,thirdEnd,fourthEnd]=spec?.mask.legacyCalibration.turnAnchorsM??[1270,1435,1671.6];
  const thirdArc=arcAt(thirdStart),junctionArc=arcAt(thirdEnd),
   fourthArc=arcAt(fourthEnd);
  const leftRate=(junctionArc-thirdArc)/(thirdEnd-thirdStart),
@@ -287,7 +289,7 @@ function buildSourceArcMap(){
   const v=clamp(t,0,1);
   return v*v*(3-2*v);
  };
- const transitionM=45;
+ const transitionM=spec?.mask.legacyCalibration.transitionM??45;
  for(let n=0;n<dedup.length;n++){
   const d=dedup[n];
   if(d<=thirdStart||d>=fourthEnd)continue;
@@ -414,7 +416,7 @@ function runners(state){
 function audit(step=1,radius=1.80){
  let total=0,badCenters=0,badDiscs=0,maxJump=0,maxJumpAt=0,
   maxActualInnerOffset=0;
- for(let lane=0;lane<=14;lane++){
+ for(let lane=0;lane<=MAX_LANE;lane++){
   let prev=null;
   for(let d=0;d<=DISTANCE;d+=step){
    const p=point(d,lane);

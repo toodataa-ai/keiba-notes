@@ -6,7 +6,8 @@
 (function(){'use strict';
 const $=id=>document.getElementById(id);
 const course=window.RaceSharedCourse.active;
-const model=window.RaceCleanCourse;
+const runtime=window.RaceSharedCourse.createRuntime();
+const model=runtime.model;
 if(model.id!==course.id||model.distance!==course.distanceM)throw Error('COURSE_ADAPTER_MISMATCH');
 const courseSelect=$('courseSelect');
 for(const spec of window.RaceSharedCourse.catalog){
@@ -17,7 +18,18 @@ courseSelect.value=course.id;
 courseSelect.addEventListener('change',()=>{
  const url=new URL(location.href);url.searchParams.set('course',courseSelect.value);location.assign(url);
 });
-const turf=window.RaceCleanTurf;
+const sourceTurf=window.RaceCleanTurf;
+const turf=Object.freeze({...sourceTurf,point:runtime.position,runners:runtime.runners});
+const query=new URLSearchParams(location.search);
+const integer=(value,min,max,fallback)=>{if(value===null)return fallback;const n=Number(value);if(!Number.isInteger(n)||n<min||n>max)throw Error('INVALID_SIM_SETTING');return n;};
+let selectedSeed=integer(query.get('seed'),1,999999,2026);
+let selectedFieldSize=integer(query.get('field'),2,18,18);
+const fieldSelect=$('fieldSize');
+for(let n=2;n<=18;n++){const option=document.createElement('option');option.value=n;option.textContent=n+'頭';fieldSelect.appendChild(option);}
+$('seed').value=selectedSeed;
+if(query.has('surface')&&query.get('surface')!==course.surface||query.has('distance')&&Number(query.get('distance'))!==course.distanceM)throw Error('COURSE_UNAVAILABLE');
+if(query.has('speed'))$('speed').value=String(integer(query.get('speed'),1,4,2));
+if(!['1','2','4'].includes($('speed').value))throw Error('INVALID_PLAYBACK_SPEED');
 // Actual Oct 18 entrants are used ONLY on explicit selection. The real
 // finish positions / laps belong to a wholly separate holdout reference.
 const FIXTURE_SYNTHETIC=window.RaceLab18Fixture;
@@ -28,8 +40,8 @@ let trialMode=new URLSearchParams(location.search).get('trial')===REAL_TRIAL?
 let fixture=trialMode===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
 const ABILITY_SCALE=new URLSearchParams(location.search).get('ability')==='legacy'?'legacy-50':'90-v1';
 const GOAL_SPAN=new URLSearchParams(location.search).get('goalCamera')==='legacy'?course.camera.legacyGoalSpanM:course.camera.goalSpanM;
-function fixtureHorses(){return fixture.horses({abilityScale:ABILITY_SCALE});}
-function fixtureRace(){return {...fixture.entry(),horses:entries,
+function fixtureHorses(){const horses=fixture.horses({abilityScale:ABILITY_SCALE});return trialMode===REAL_TRIAL?horses:horses.slice(0,selectedFieldSize);}
+function fixtureRace(){return {...fixture.entry(),horses:entries,field_size:entries.length,
  ...(ABILITY_SCALE==='90-v1'?{labAbilityScale:ABILITY_SCALE}:{})};}
 let entries=fixtureHorses();
 let race=fixtureRace();
@@ -58,8 +70,9 @@ function jraWaku(number,fieldSize=18){
  // neutral white marker. Official 8–18 runner JRA waku validation is unchanged.
  
  if(!Number.isInteger(number)||!Number.isInteger(fieldSize)||
-   fieldSize<8||fieldSize>18||number<1||number>fieldSize)
+   fieldSize<2||fieldSize>18||number<1||number>fieldSize)
    throw Error('JRA_WAKU_FIELD_INVALID');
+ if(fieldSize<8)return {waku:number,...JRA_WAKU[number-1]};
  const base=Math.floor(fieldSize/8),extra=fieldSize%8;
  let first=1;
  for(let i=0;i<8;i++){
@@ -110,7 +123,7 @@ function renderAbilities(){
   '90を中立とする能力値です。標準88〜91、高能力92〜98、低能力82〜87が目安。':
   '比較用の旧50基準です。')+(trialIsReal()?
   '発走前データに基づく未校正の推定値です。実測値・正式予想の能力点ではありません。':
-  '架空18頭のテスト用能力値です。実馬の能力ではありません。');
+  '架空'+entries.length+'頭のテスト用能力値です。実馬の能力ではありません。');
  const labels={early:'先行力',cruise:'巡航速度',burst:'瞬発力',
   sustain:'持続力',stamina:'スタミナ',acceleration:'加速力'};
  const styles={nige:'逃げ',senko:'先行',sashi:'差し',oikomi:'追込'};
@@ -143,7 +156,7 @@ let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  lastCamera=null,lastPaintCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
  visualLaneState=new Map(),visualRenderTime=null,
  finishSequenceActive=false,finishSequenceElapsedMs=0,finishSequenceDone=false;
-const FINISH_SEQUENCE_MS=3200;
+const FINISH_SEQUENCE_MS=course.camera.finishSequenceMs;
 let vectorReady=false,originalError=false,turfReady=false,turfError=null,turfStats=null;
 let lastGoalFrame=null,curveLensStats=null,curveLensError=null,
  sharedGeometryStats=null,sharedGeometryError=null;
@@ -154,7 +167,9 @@ const SHARED_IMAGE_GEOMETRY=new URLSearchParams(location.search).get('geometry')
 const SOURCE_VECTOR=course.source.url;
 for(const id of ['liveCourseImage','realCourseImage']){
  $(id).src=SOURCE_VECTOR;$(id).width=course.source.width;$(id).height=course.source.height;
+ if(id==='liveCourseImage'){ $(id).style.width=course.source.width+'px';$(id).style.height=course.source.height+'px';}
 }
+document.querySelector('.real-overview').style.aspectRatio=course.source.width+'/'+course.source.height;
 function rebuildFixtureUi(){
  const focus=$('focus');
  focus.innerHTML='<option value="leader">先頭</option>';
@@ -181,14 +196,15 @@ function rebuildFixtureUi(){
  }
  const host=$('runningOrder');host.innerHTML='';delete host.dataset.ready;
  const real=trialIsReal();
+ fieldSelect.value=String(real?17:selectedFieldSize);fieldSelect.disabled=real;
  $('trialMode').value=trialMode;
  $('labDescription').textContent=real?
   '2026年10月18日・秋華賞｜発走前に記録された実出走馬17頭で仮想シミュレーション。実際のレースの再現映像ではありません。':
-  'LAB開発中・非公式／架空18頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。';
- $('horseGridTitle').textContent=real?'2026年秋華賞・実出走馬17頭':'架空18頭の馬番';
+  'LAB開発中・非公式／架空'+entries.length+'頭。実況も全体図も同じうまぽっと原画像を使用し、枠色の馬番丸そのものが走ります。正式予想・買い目・払戻とは無関係です。';
+ $('horseGridTitle').textContent=real?'2026年秋華賞・実出走馬17頭':'架空'+entries.length+'頭の馬番';
  $('trialDescription').textContent=real?
   '出走馬・前走位置取り・能力9項目は発走前保存データ。3歳牝馬・芝中距離の共通基準速度（暫定）を使用。実際の着順・時計・ラップは走行計算に使用しません。':
-  '架空18頭の比較テスト。実レースデータは読み込んでいません。';
+  '架空'+entries.length+'頭の比較テスト。実レースデータは読み込んでいません。';
  $('benchmarkPanel').hidden=!real;
  $('benchmarkResults').hidden=true;
  $('compareBtn').textContent='JRA公式結果と比較（別データ）';
@@ -210,7 +226,7 @@ function compareWithOfficialResult(){
  if(!ref||ref.race_id!==race.source_report?.match(/shuka-sho/)?.[0]&&
     ref.race_id!=='2026-10-18-shuka-sho')
   throw Error('OFFICIAL_POSTRACE_HOLDOUT_MISSING');
- const sim=RaceSimEngine.create({...race,horses:fixtureHorses()},{seed:2026,bias:'neutral'});
+ const sim=runtime.simulate({...race,horses:fixtureHorses()},{seed:selectedSeed,bias:'neutral'});
  const orders=[],splitTargets=[1000,...ref.officialCorners.map(c=>c.distanceApprox)]
   .sort((a,b)=>a-b);
  let i=0,loops=0,splitTime=null,splitPace=null;
@@ -253,7 +269,7 @@ function compareWithOfficialResult(){
  root.appendChild(source);
 }
 function reset(){
- engine=RaceSimEngine.create({...race,horses:fixtureHorses()},{seed:2026,bias:'neutral'});
+ engine=runtime.simulate({...race,horses:fixtureHorses()},{seed:selectedSeed,bias:'neutral'});
  renderAbilities();
  playing=false;last=0;acc=0;lastCamera=null;lastPaintCamera=null;lastRenderedPoints=[];
  framePrevious=frameCurrent=captureFrame();
@@ -349,7 +365,7 @@ function verifyVectorSource(){
    // Use the same generic mapper tested independently for Kyoto1400 and
    // Tokyo2000. Only named physically grounded course landmarks are data.
    // Pass existing (read-only) camera gain to the global optimizer.
-   const anchors=[0,...model.sections.map(s=>s.to)];
+   const anchors=course.anchorsM;
    const shared=window.RaceCourseImageGeometry.build({
     distanceM:model.distance,anchorsM:anchors,
     pointAt:(d,lane)=>turf.pointAtImageDistance(d,lane),
@@ -385,13 +401,13 @@ function cameraFor(points,w,h,chosen,autoLeader=true){
   // Lock the camera to the RACE DISTANCE instead of the physical pack's
   // moment-to-moment centroid. Group membership and overtakes cannot
   // make the entire course abruptly jump or appear to collapse.
-  center=turf.point(Math.max(0,Math.min(course.distanceM,leaderDistance-10)),3);
+  center=turf.point(Math.max(0,Math.min(course.distanceM,leaderDistance-course.camera.focusOffsetM)),course.camera.focusLane);
  }
  // Fix the optical zoom; the old density-based group bounds changed camera
  // magnification at every overtake and caused visible frame-to-frame shakes.
- return {x:center.x,y:center.y,cx:w*.54,cy:h*.51,
+ return {x:center.x,y:center.y,cx:w*course.camera.cx,cy:h*course.camera.cy,
   // Tighter normal broadcast. Fixed across overtakes to prevent breathing.
-  scale:(w<540?8.8:9.7)*
+  scale:(w<course.camera.mobileBreakpoint?course.camera.mobileZoom:course.camera.desktopZoom)*
    (CURVE_LENS_ENABLED&&curveLensStats?
     window.RaceCleanCurveCamera.gain(leaderDistance):1)};
 }
@@ -404,7 +420,7 @@ function displayPoints(state){
   // Extend the drawn run-off gently after the virtual results are locked.
   // This is a display-only coast, not an extra RaceSimEngine step.
   const progress=Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS);
-  const coast=6*(1-Math.pow(1-progress,3));
+  const coast=course.camera.finishCoastM*(1-Math.pow(1-progress,3));
   return state.horses.map(h=>{
    const d=(h.displayD??h.d)+coast;
    return {number:h.number,d,lane:h.lane,
@@ -440,7 +456,7 @@ function displayPoints(state){
   // Always apply the ORIGINAL turf.point(d,lane), so smoothing cannot
   // drag a number into white or distort the source course drawing.
   const predictedD=(h.displayD??h.d)+Math.min(1.7,travel/.08*fraction);
-  const predictedLane=Math.max(0,Math.min(14,h.lane+(h.laneVelocity||0)*fraction));
+  const predictedLane=Math.max(0,Math.min(course.maxLane,h.lane+(h.laneVelocity||0)*fraction));
   const previous=visualLaneState.get(h.number);
   const alongBlend=1-Math.exp(-dt/.070),laneBlend=1-Math.exp(-dt/.21);
   const smoothD=previous===undefined?predictedD:
@@ -518,7 +534,7 @@ function paint(){
   // Ease from the horse-focused close camera to a wider finish tableau.
   const p=Math.min(1,finishSequenceElapsedMs/FINISH_SEQUENCE_MS);
   const eased=p*p*(3-2*p);
-  target.scale*=1-.22*eased;
+  target.scale*=1-course.camera.finishPullback*eased;
  }
  // Stabilize view with a real elapsed-time exponential filter; frame rate
  // changes do not change the amount of camera smoothing.
@@ -527,7 +543,7 @@ function paint(){
  cameraRenderTime=now;
  if(!lastCamera)lastCamera=target;
  else {
-  const blend=1-Math.exp(-dt/.20);
+  const blend=1-Math.exp(-dt/course.camera.smoothTau);
   lastCamera={...target,
    x:lastCamera.x+(target.x-lastCamera.x)*blend,
    y:lastCamera.y+(target.y-lastCamera.y)*blend,
@@ -554,13 +570,13 @@ function paint(){
    lastGoalFrame=window.RaceCleanGoalView.render({
     canvas:goalCanvas,points,leaderNo:state.leadingNo,focusedNo:chosen,
     paintNumber:raceNumberMarker,maxLane:course.maxLane,distance:course.distanceM,turn:course.turn,
-    fieldSize:race.field_size,pullback:1+.22*eased,screenSpan:GOAL_SPAN
+    fieldSize:race.field_size,pullback:1+course.camera.finishPullback*eased,screenSpan:GOAL_SPAN
    });
   }else lastGoalFrame=null;
  }
  const map=sizeCanvas($('overview'));
  // Transparent numbers over the ACTUAL original 620x430 course diagram.
- const overview={x:310,y:215,cx:map.w/2,cy:map.h/2,
+ const overview={x:course.source.width/2,y:course.source.height/2,cx:map.w/2,cy:map.h/2,
   scale:Math.min(map.w/course.source.width,map.h/course.source.height),w:map.w,h:map.h};
  markers(map.ctx,points,overview,chosen,true);
  updateRunningOrder(points,chosen);
@@ -614,6 +630,11 @@ function setup(){
  verifyVectorSource();
  rebuildFixtureUi();
  $('trialMode').addEventListener('change',e=>switchTrial(e.target.value));
+ fieldSelect.addEventListener('change',()=>{selectedFieldSize=integer(fieldSelect.value,2,18,18);switchTrial(trialMode);});
+ $('seed').addEventListener('change',()=>{try{selectedSeed=integer($('seed').value,1,999999,2026);$('seed').setCustomValidity('');reset();}catch{ $('seed').setCustomValidity('1〜999999の整数を指定してください');$('seed').reportValidity();$('seed').value=selectedSeed;}});
+ for(const id of ['surfaceSelect','distanceSelect'])$(id).addEventListener('change',()=>{
+  if($('surfaceSelect').value!==course.surface||Number($('distanceSelect').value)!==course.distanceM)throw Error('COURSE_UNAVAILABLE');
+ });
  $('compareBtn').addEventListener('click',()=>{
   postraceBenchmarkVisible=!postraceBenchmarkVisible;
   $('benchmarkResults').hidden=!postraceBenchmarkVisible;
@@ -643,6 +664,9 @@ function setup(){
 }
 window.CleanLab=Object.freeze({
  getState:()=>engine?.state,
+ settings:()=>({course:course.id,surface:course.surface,distanceM:course.distanceM,fieldSize:race.field_size,seed:selectedSeed,speed:Number($('speed').value)}),
+ physicalSnapshot:()=>JSON.parse(JSON.stringify(engine.state)),
+ waku:jraWaku,
  setTrial:mode=>{switchTrial(mode);return trialMode},
  trial:()=>({id:trialMode,fixtureId:fixture.id,fieldSize:race.field_size,
   names:entries.map(h=>({number:h.number,name:h.name,style:h.style})),
@@ -700,7 +724,7 @@ window.CleanLab=Object.freeze({
     Math.hypot(lastPaintCamera.cx-lastCamera.cx,
       lastPaintCamera.cy-lastCamera.cy):0,
    goalBoardVisible:Boolean(!$('goalCamera')?.hidden),
-   goalFrame:lastGoalFrame,goalCameraSwitchDistance:1920,
+   goalFrame:lastGoalFrame,goalCameraSwitchDistance:course.distanceM-course.camera.switchBeforeM,
    finishSequenceActive,finishSequenceDone,finishSequenceElapsedMs,
    finishedBannerVisible:Boolean(!$('finishBanner')?.hidden),
    visualSimulationTime:visualRenderTime,

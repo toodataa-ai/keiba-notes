@@ -1,0 +1,508 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "race-course-spec-v1.schema.json",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "blueprintId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "distanceM": {
+      "type": "integer",
+      "minimum": 600,
+      "maximum": 4000
+    },
+    "surface": {
+      "enum": [
+        "turf",
+        "dirt"
+      ]
+    },
+    "edgeIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$"
+      },
+      "minItems": 1
+    },
+    "startOffsetM": {
+      "type": "number",
+      "minimum": 0
+    },
+    "endOffsetM": {
+      "type": "number",
+      "minimum": 0
+    },
+    "runoff": {
+      "type": "object",
+      "properties": {
+        "edgeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "minItems": 1
+        },
+        "distanceM": {
+          "type": "number",
+          "minimum": 0.1
+        },
+        "displayExtraM": {
+          "type": "number",
+          "minimum": 0
+        },
+        "finishThresholdM": {
+          "type": "number",
+          "minimum": 0.1
+        }
+      },
+      "required": [
+        "edgeIds",
+        "distanceM",
+        "displayExtraM",
+        "finishThresholdM"
+      ],
+      "additionalProperties": false
+    },
+    "anchorsM": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      },
+      "minItems": 2
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "number",
+            "minimum": 0
+          },
+          "to": {
+            "type": "number",
+            "minimum": 0.1
+          },
+          "kind": {
+            "enum": [
+              "straight",
+              "turn",
+              "chute"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "kind",
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "finalStraightM": {
+      "type": "number",
+      "minimum": 0.1
+    },
+    "mask": {
+      "type": "object",
+      "properties": {
+        "raster": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "clearance": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 5
+        },
+        "minInnerOffset": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "maxSpan": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 100
+        },
+        "slope": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 5
+        },
+        "smoothRadius": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "maxLane": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 24
+        },
+        "color": {
+          "type": "object",
+          "properties": {
+            "minG": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 255
+            },
+            "greenRedRatio": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 5
+            },
+            "greenBlueRatio": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 5
+            },
+            "minAlpha": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 255
+            }
+          },
+          "required": [
+            "minG",
+            "greenRedRatio",
+            "greenBlueRatio",
+            "minAlpha"
+          ],
+          "additionalProperties": false
+        },
+        "legacyCalibration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "innerTargetPx",
+            "turnAnchorsM",
+            "transitionM"
+          ],
+          "properties": {
+            "innerTargetPx": {
+              "type": "number",
+              "minimum": 0
+            },
+            "turnAnchorsM": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "transitionM": {
+              "type": "number",
+              "minimum": 0.01
+            }
+          }
+        }
+      },
+      "required": [
+        "raster",
+        "clearance",
+        "minInnerOffset",
+        "maxSpan",
+        "slope",
+        "smoothRadius",
+        "maxLane",
+        "color",
+        "legacyCalibration"
+      ],
+      "additionalProperties": false
+    },
+    "camera": {
+      "type": "object",
+      "properties": {
+        "goalSpanM": {
+          "type": "number",
+          "minimum": 1
+        },
+        "legacyGoalSpanM": {
+          "type": "number",
+          "minimum": 1
+        },
+        "switchBeforeM": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mobileZoom": {
+          "type": "number",
+          "minimum": 0.1
+        },
+        "desktopZoom": {
+          "type": "number",
+          "minimum": 0.1
+        },
+        "mobileBreakpoint": {
+          "type": "number",
+          "minimum": 1
+        },
+        "focusOffsetM": {
+          "type": "number",
+          "minimum": 0
+        },
+        "focusLane": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "cy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "smoothTau": {
+          "type": "number",
+          "minimum": 0.001
+        },
+        "finishSequenceMs": {
+          "type": "number",
+          "minimum": 1
+        },
+        "finishCoastM": {
+          "type": "number",
+          "minimum": 0
+        },
+        "finishPullback": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "lens": {
+          "type": "object",
+          "properties": {
+            "spanM": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lane": {
+              "type": "number",
+              "minimum": 0
+            },
+            "maxGain": {
+              "type": "number",
+              "minimum": 1
+            },
+            "radiusM": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "deadzone": {
+              "type": "number",
+              "minimum": 0
+            },
+            "referenceFromM": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "referenceToM": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "referenceQuantile": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "fadeInM": {
+              "type": "number",
+              "minimum": 0.1
+            },
+            "fadeOutM": {
+              "type": "number",
+              "minimum": 0.1
+            },
+            "metrics": {
+              "type": "object",
+              "properties": {
+                "thirdFourthTurn": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "firstSecondTurn": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "midStraight": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "fullRace": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "thirdFourthTurn",
+                "firstSecondTurn",
+                "midStraight",
+                "fullRace"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "spanM",
+            "lane",
+            "maxGain",
+            "radiusM",
+            "deadzone",
+            "referenceFromM",
+            "referenceToM",
+            "referenceQuantile",
+            "fadeInM",
+            "fadeOutM",
+            "metrics"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "goalSpanM",
+        "legacyGoalSpanM",
+        "switchBeforeM",
+        "mobileZoom",
+        "desktopZoom",
+        "mobileBreakpoint",
+        "focusOffsetM",
+        "focusLane",
+        "cx",
+        "cy",
+        "smoothTau",
+        "finishSequenceMs",
+        "finishCoastM",
+        "finishPullback",
+        "lens"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "numerical": {
+          "type": "boolean"
+        },
+        "replay": {
+          "type": "boolean"
+        },
+        "visualApproval": {
+          "type": "boolean"
+        },
+        "productionApproval": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "numerical",
+        "replay",
+        "visualApproval",
+        "productionApproval"
+      ],
+      "additionalProperties": false
+    },
+    "adapter": {
+      "enum": [
+        "kyoto-compat-v1",
+        "graph-v1"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "blueprintId",
+    "label",
+    "distanceM",
+    "surface",
+    "edgeIds",
+    "startOffsetM",
+    "endOffsetM",
+    "runoff",
+    "anchorsM",
+    "sections",
+    "finalStraightM",
+    "mask",
+    "camera",
+    "status",
+    "adapter"
+  ],
+  "additionalProperties": false
+}

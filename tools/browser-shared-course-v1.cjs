@@ -2,7 +2,7 @@ const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..'),base=path.resolve(process.argv[2]);
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+ const browser=await chromium.launch({...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:fs.existsSync('/usr/bin/chromium')?{executablePath:'/usr/bin/chromium'}:{}),headless:true,args:['--no-sandbox']});
  try{
  for(const width of [390,1024])for(const trial of ['synthetic','shuka2026']){
  const results=[];
@@ -29,6 +29,9 @@ const root=path.resolve(__dirname,'..'),base=path.resolve(process.argv[2]);
  }
  assert.deepEqual(results[1].state,results[0].state);
  assert.deepEqual(results[1].inspect.positions,results[0].inspect.positions);
+ assert.deepEqual(results[1].inspect.liveLabelPositions,results[0].inspect.liveLabelPositions);
+ assert.equal(results[1].inspect.zoom,results[0].inspect.zoom);
+ assert.equal(results[1].inspect.turfBadDiscs,0);
  console.log('PASS browser geometry/state/overflow',width,trial);
  }
  }finally{await browser.close();}
