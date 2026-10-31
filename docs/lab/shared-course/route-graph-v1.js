@@ -104,7 +104,9 @@ function compile(blueprint,spec){
   const d=maxD*i/samples,r=rails(d);
   if([r.inner.x,r.inner.y,r.outer.x,r.outer.y].some(v=>!Number.isFinite(v)||v<0||v>1)||Math.hypot(r.inner.x-r.outer.x,r.inner.y-r.outer.y)<1e-7)fail('invalid interpolated rails');
   if(previous&&(intersect(previous.inner,r.inner,previous.outer,r.outer)||intersect(previous.inner,previous.outer,r.inner,r.outer)))fail('crossed rails');
-  tangent(d);previous=r;
+  const heading=tangent(d),side=heading.x*(r.outer.y-r.inner.y)-heading.y*(r.outer.x-r.inner.x);
+  if(blueprint.turn==='右'&&side>=-1e-12||blueprint.turn==='左'&&side<=1e-12||Math.abs(side)<1e-12)fail('inner/outer rail orientation');
+  previous=r;
  }
  // Node joins require position and travel direction continuity. Branches may
  // share a merge node; only the selected directed edge sequence is traversed.

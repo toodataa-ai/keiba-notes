@@ -5,7 +5,7 @@ const clone=x=>JSON.parse(JSON.stringify(x));
 function fixture(loop=false){
  const spec=JSON.parse(fs.readFileSync(dir+'/kyoto-2000.spec.json','utf8'));
  const blueprint=JSON.parse(fs.readFileSync(dir+'/kyoto-inner-A.blueprint.json','utf8'));
- Object.assign(blueprint,{id:'structural_test',venue:'架空テスト',layout:'synthetic',turn:'左'});
+ Object.assign(blueprint,{id:'structural_test',venue:'架空テスト',layout:'synthetic',turn:'右'});
  blueprint.source={...blueprint.source,url:'assets/test-only.svg',attribution:'synthetic test',reference:'https://example.invalid/structural-fixture',permission:'unknown'};
  const edge=(id,from,to,lengthM,a,b,kind='straight',surface='dirt')=>({id,from,to,lengthM,surface,kind,name:id,rails:[[0,...a],[lengthM,...b]],widthM:27,gradeProfile:[[0,0],[lengthM,0]],gradeAccuracy:'unknown',bend:kind==='turn'?.7:0});
  const a=[.1,.32,.1,.28],b=[.4,.32,.4,.28],c=[.7,.32,.7,.28],d=[.825,.32,.825,.28];

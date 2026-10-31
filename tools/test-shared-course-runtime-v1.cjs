@@ -8,6 +8,7 @@ const compile=x=>context.RaceRouteGraph.compile(x.blueprint,x.spec);
 const original=fixture();
 const mutations=[
  x=>x.spec.distanceM='600',x=>x.spec.extra=true,x=>x.blueprint.extra=true,
+ x=>x.blueprint.turn='左',
  x=>x.blueprint.edges[0].rails[1][1]=NaN,x=>x.spec.camera.mobileZoom=Infinity,
  x=>x.spec.blueprintId='missing',x=>x.blueprint.nodes.push('start'),
  x=>x.blueprint.edges[1].id='pocket',x=>x.blueprint.edges[0].from='unknown',
@@ -49,4 +50,6 @@ for(const loop of [false,true]){
  const initial=runtime.position(0,0);data.blueprint.edges[0].rails[0][1]=.9;assert.deepEqual(runtime.position(0,0),initial);
  result.push({loop,runners:6,complete:true});
 }
+const left=fixture(true);left.blueprint.turn='左';for(const e of left.blueprint.edges)for(const k of e.rails){k[2]=1-k[2];k[4]=1-k[4];}
+assert.equal(compile(left).geometry.get(left.spec.id).turn,'左');
 console.log('PASS_STRICT_SCHEMA_AND_GRAPH_RUNTIME',JSON.stringify({invalidDefinitions:mutations.length,cases:result}));
