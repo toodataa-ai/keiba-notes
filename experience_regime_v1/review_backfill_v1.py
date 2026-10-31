@@ -270,14 +270,16 @@ def aggregate(reviews):
             key = "predicted_" + ("win" if prefix == "win" else "top3") + "_probability"
             samples = [x for x in rows if key in x]
             result[prefix + "_prediction_observations"] = len(samples)
-            # Incomplete groups do not receive a deceptively full-group score.
-            if n and len(samples) == n:
-                mean_p = sum(x[key] for x in samples) / n
+            # Score only actually fixed predictions. Counts explicitly reveal
+            # partial group coverage; never compare with a full-group actual rate.
+            if samples:
+                m = len(samples)
+                mean_p = sum(x[key] for x in samples) / m
+                actual_p = sum(x[target] for x in samples) / m
                 result["predicted_" + prefix + "_rate"] = round(mean_p, 6)
                 result[prefix + "_brier"] = round(
-                    sum((x[key] - x[target])**2 for x in samples)/n, 6)
-                result[prefix + "_calibration_error"] = round(
-                    mean_p - result["actual_" + prefix + "_rate"], 6)
+                    sum((x[key] - x[target])**2 for x in samples)/m, 6)
+                result[prefix + "_calibration_error"] = round(mean_p - actual_p, 6)
             else:
                 result["predicted_" + prefix + "_rate"] = None
                 result[prefix + "_brier"] = None
@@ -317,6 +319,52 @@ def regime_rate_differences(metrics):
 
 
 
+
+def verified_research_step1(week, item, snapshot):
+    """Accept only a separately frozen, Git-proven prereace formal STEP1.
+
+    Never fill absent data from postrace results or current odds.
+    """
+    path = BASE / "step1_frozen" / week / (item["race_id"] + ".json")
+    if not path.is_file():
+        return {}
+    proof = load(path)
+    start = datetime.fromisoformat(snapshot["race_context"]["start_at"])
+    if (proof.get("race_id") != item["race_id"] or proof.get("date") != item["date"] or
+            proof.get("start_at") != snapshot["race_context"]["start_at"] or
+            proof.get("no_odds_used") is not True or
+            proof.get("no_synthetic_predictions") is not True or
+            proof.get("production_effect") is not False):
+        raise ValueError("research_STEP1_identity_or_provenance_invalid")
+    rel = str(path.relative_to(ROOT))
+    history = subprocess.check_output(
+        ["git", "log", "--diff-filter=A", "--reverse", "--format=%H %cI", "--", rel],
+        cwd=ROOT, text=True).strip().splitlines()
+    if len(history) != 1:
+        raise ValueError("research_STEP1_first_commit_unverifiable")
+    sha, committed_at = history[0].split()
+    if datetime.fromisoformat(committed_at) >= start:
+        raise ValueError("research_STEP1_committed_after_start")
+    if subprocess.check_output(["git", "show", sha + ":" + rel], cwd=ROOT) != path.read_bytes():
+        raise ValueError("research_STEP1_changed_since_proof")
+    if datetime.fromisoformat(proof["step1_fixed_at"].replace("Z", "+00:00")) >= start:
+        raise ValueError("research_STEP1_prediction_fixed_after_start")
+    rows = proof.get("runners") or []
+    expected = {int(n) for n in snapshot["experience"]["horses"]}
+    if {x["horse_number"] for x in rows} != expected or len(rows) != len(expected):
+        raise ValueError("research_STEP1_field_incomplete")
+    found = {}
+    for row in rows:
+        n = row["horse_number"]
+        if row["horse_name"] != snapshot["experience"]["horses"][str(n)]["horse_name"]:
+            raise ValueError("research_STEP1_frozen_horse_name_conflict")
+        fields = {key: row[key] for key in (
+            "step1_rank", "mark", "factor_grades", "predicted_win_probability",
+            "predicted_top3_probability") if key in row}
+        found[n] = fields
+    return found
+
+
 def run(week, dates):
     folder = BASE / "collection" / week
     plan = load(folder / "sample_plan.json")
@@ -351,6 +399,11 @@ def run(week, dates):
                 if "払戻金" not in soup.get_text(" ", strip=True):
                     raise ValueError("official_payout_not_confirmed")
                 horses = parse_horse_results(soup, snapshot)
+                # Only attach actual prereace predictions independently frozen
+                # in Git before the race. No postrace inference or approximation.
+                frozen_ranks = verified_research_step1(week, item, snapshot)
+                for horse in horses:
+                    horse.update(frozen_ranks.get(horse["horse_number"], {}))
                 # Optional controls must actually exist in the immutable snapshot.
                 pre_runners = {int(x["horse_number"]): x for x in snapshot.get("step1", {}).get("runners", [])}
                 for horse in horses:
@@ -377,7 +430,10 @@ def run(week, dates):
                     "official_result_sha256": hashlib.sha256(result_r.content).hexdigest(),
                     "result_capture_at": datetime.now(timezone.utc).isoformat(),
                     "status": "reviewed_official_result",
-                    "prediction_accuracy_state": snapshot["step1_prediction_status"],
+                    "prediction_accuracy_state": (
+                        "available_from_git_proven_formal_step1" if frozen_ranks
+                        else snapshot["step1_prediction_status"]
+                    ),
                     "no_synthetic_prediction": True,
                     "production_effect": False,
                     "horses": horses,
