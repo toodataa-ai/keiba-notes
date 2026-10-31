@@ -118,8 +118,10 @@ function validData(data){
 }
 function create(data,options={}){
  validData(data);
- const geo=data.course_id==='tokyo_turf_2000'&&data.labTokyoSourceModel==='source-linked-v5'?
-  (global.RaceTokyoSourcePhysicsV5?.resolve(data,options.labTokyoSourceSession)||(()=>{throw Error('TOKYO_SOURCE_ADAPTER_MISSING')})()):global.RaceCourseGeometry;
+ const courseRuntime=options.courseRuntime;
+ if(courseRuntime&&(!courseRuntime.geometry||!Number.isFinite(courseRuntime.runoffM)||courseRuntime.runoffM<=0||!Number.isFinite(courseRuntime.goalBeforeM)||courseRuntime.goalBeforeM<0||courseRuntime.goalBeforeM>=data.distance_m))throw Error('COURSE_RUNTIME_INVALID');
+ const geo=courseRuntime?.geometry??(data.course_id==='tokyo_turf_2000'&&data.labTokyoSourceModel==='source-linked-v5'?
+  (global.RaceTokyoSourcePhysicsV5?.resolve(data,options.labTokyoSourceSession)||(()=>{throw Error('TOKYO_SOURCE_ADAPTER_MISSING')})()):global.RaceCourseGeometry);
  const profile=geo&&geo.get(data.course_id);
  if(!profile || profile.distance_m!==data.distance_m || profile.venue!==data.venue || profile.turn!==data.turn)
    throw Error('COURSE_PROFILE_MISMATCH: このコースの測定値・条件を確認できません');
@@ -170,7 +172,7 @@ function create(data,options={}){
    trail:[],events:0,phase:rng()*6,lateKick:traits.kick+(rng()-.5)*.16,
    fatigue:0,effortDebt:0,distancePenaltyM:0,lastCourseSegment:'',gradeNow:0,turnNow:0 };
  });
- const RUNOFF_M=32;
+ const RUNOFF_M=courseRuntime?.runoffM??32;
  // All horses ease down after the wire on the SAME monotone runoff curve.
  // Their screen order then remains tied to the real fractional crossing
  // times instead of changing due to arbitrary post-race acceleration, and
@@ -442,7 +444,7 @@ function create(data,options={}){
   }
   state.leadingNo=leaders[0].number;
   state.progress=clamp(state.leader/length,0,1);
-  state.goalCamera=state.leader>=length-80;
+  state.goalCamera=state.leader>=length-(courseRuntime?.goalBeforeM??80);
   state.tick++;
   if(state.tick%150===0){
     state.paceHistory.push({d:Math.round(state.leader),pressure:Number(state.pacePressure.toFixed(3)),

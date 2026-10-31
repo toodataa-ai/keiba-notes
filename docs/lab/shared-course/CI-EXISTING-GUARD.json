@@ -1,0 +1,102 @@
+{
+  "assertion": "GitHub UI release registry and public UI history disagree",
+  "knownFailingRun": 41195664110,
+  "failureBeforeThisFollowup": true,
+  "repairedInPR1": false,
+  "evidence": [
+    {
+      "ref": "c653c23fc7d80745dce08e32b890cb92a846e2eb",
+      "files": [
+        {
+          "path": ".github/production-releases.json",
+          "blob": "ca3f2d4829c40206aa82a8bce6180817c4776d67",
+          "sha256": "29a083108f9280e5dc2d7b45c8b6bfc2a061fe0672be14280323cffeff68257b",
+          "currentPublicVersion": "1.05",
+          "releaseCount": 6,
+          "latestReleaseId": "release/jra-site-v1.05-20261025"
+        },
+        {
+          "path": "docs/data/production-releases.json",
+          "blob": "99da9d9f339799b30a46ca52c9f5449aa6bd8c9f",
+          "sha256": "f1858e8caa96616980a1aa67d124089bbce9c3fac6543c6736ad78057dfd4cde",
+          "currentPublicVersion": "1.05",
+          "releaseCount": 6,
+          "latestReleaseId": "release/jra-site-v1.05-20261025"
+        }
+      ],
+      "byteEqual": false
+    },
+    {
+      "ref": "f176feab634055ddd1833827e47a54fd8eb7784b",
+      "files": [
+        {
+          "path": ".github/production-releases.json",
+          "blob": "ca3f2d4829c40206aa82a8bce6180817c4776d67",
+          "sha256": "29a083108f9280e5dc2d7b45c8b6bfc2a061fe0672be14280323cffeff68257b",
+          "currentPublicVersion": "1.05",
+          "releaseCount": 6,
+          "latestReleaseId": "release/jra-site-v1.05-20261025"
+        },
+        {
+          "path": "docs/data/production-releases.json",
+          "blob": "99da9d9f339799b30a46ca52c9f5449aa6bd8c9f",
+          "sha256": "f1858e8caa96616980a1aa67d124089bbce9c3fac6543c6736ad78057dfd4cde",
+          "currentPublicVersion": "1.05",
+          "releaseCount": 6,
+          "latestReleaseId": "release/jra-site-v1.05-20261025"
+        }
+      ],
+      "byteEqual": false
+    },
+    {
+      "ref": "a49dfdc070fdd08e825892f815a5796d2482154e",
+      "files": [
+        {
+          "path": ".github/production-releases.json",
+          "blob": "ca3f2d4829c40206aa82a8bce6180817c4776d67",
+          "sha256": "29a083108f9280e5dc2d7b45c8b6bfc2a061fe0672be14280323cffeff68257b",
+          "currentPublicVersion": "1.05",
+          "releaseCount": 6,
+          "latestReleaseId": "release/jra-site-v1.05-20261025"
+        },
+        {
+          "path": "docs/data/production-releases.json",
+          "blob": "99da9d9f339799b30a46ca52c9f5449aa6bd8c9f",
+          "sha256": "f1858e8caa96616980a1aa67d124089bbce9c3fac6543c6736ad78057dfd4cde",
+          "currentPublicVersion": "1.05",
+          "releaseCount": 6,
+          "latestReleaseId": "release/jra-site-v1.05-20261025"
+        }
+      ],
+      "byteEqual": false
+    }
+  ],
+  "action": "No registry edits, no guard disabling, no merge/publication. Investigate independently.",
+  "semanticDifferenceAtBaseline": [
+    {
+      "path": "/pending_public_validation",
+      "github": null,
+      "public": [
+        {
+          "release_id": "release/jra-site-v1.06-20261028-importance-map",
+          "branch": "release/jra-site-v1.06-20261028-importance-map",
+          "commit_sha": "ce368da731a868fe247ba28fc8ce88ba2d6fcdf9",
+          "proposed_public_version": "1.06",
+          "approval_date": "2026-10-28",
+          "status": "production_source_committed_public_http_unverified",
+          "deployed_at": null,
+          "note": "ユーザー承認。重視度マップ（赤=⑨、橙=①、青=条件依存、灰=補助）と①〜⑨開閉詳細を既存の予想ロジック説明02章に統合。トップ案内文と結果ページからのリンクも更新。GitHub main原本は確認済み、GitHub Pagesの実体HTTP・CI検証は未確認のため正式な公開済み履歴へは未昇格。",
+          "presentation_only": true,
+          "scope_files": [
+            "docs/methodology.html",
+            "docs/index.html",
+            "docs/results.html"
+          ],
+          "immutable_predictions_and_settlements_preserved": true,
+          "public_http_files_verified": 0,
+          "rollback_ui_only": true
+        }
+      ]
+    }
+  ]
+}

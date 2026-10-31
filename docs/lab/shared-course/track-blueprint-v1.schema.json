@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "track-blueprint-v1.schema.json",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "venue": {
+      "type": "string",
+      "minLength": 1
+    },
+    "layout": {
+      "type": "string",
+      "minLength": 1
+    },
+    "railSetting": {
+      "type": "string",
+      "minLength": 1
+    },
+    "turn": {
+      "enum": [
+        "右",
+        "左",
+        "直線"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "width": {
+          "type": "number",
+          "minimum": 1
+        },
+        "height": {
+          "type": "number",
+          "minimum": 1
+        },
+        "attribution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "termsUrl": {
+          "type": "string",
+          "minLength": 1
+        },
+        "permission": {
+          "enum": [
+            "unknown",
+            "restricted",
+            "confirmed"
+          ]
+        },
+        "accuracy": {
+          "enum": [
+            "illustration",
+            "surveyed"
+          ]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "url",
+        "width",
+        "height",
+        "attribution",
+        "reference",
+        "termsUrl",
+        "permission",
+        "accuracy",
+        "evidence"
+      ],
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$"
+      },
+      "minItems": 2
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "from": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "lengthM": {
+            "type": "number",
+            "minimum": 0.001
+          },
+          "surface": {
+            "enum": [
+              "turf",
+              "dirt"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "straight",
+              "turn",
+              "chute"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rails": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              ],
+              "items": false,
+              "minItems": 5,
+              "maxItems": 5
+            },
+            "minItems": 2
+          },
+          "widthM": {
+            "type": "number",
+            "minimum": 0.1
+          },
+          "gradeProfile": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 2
+          },
+          "gradeAccuracy": {
+            "enum": [
+              "unknown",
+              "approximate",
+              "official"
+            ]
+          },
+          "bend": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "id",
+          "from",
+          "to",
+          "lengthM",
+          "surface",
+          "kind",
+          "name",
+          "rails",
+          "widthM",
+          "gradeProfile",
+          "gradeAccuracy",
+          "bend"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "venue",
+    "layout",
+    "railSetting",
+    "turn",
+    "source",
+    "nodes",
+    "edges"
+  ],
+  "additionalProperties": false
+}

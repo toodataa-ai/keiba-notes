@@ -51,10 +51,10 @@ function profile(h,race,avg){
  if(v(4)===null)missing.push('⑤コース適性');
  if(!prev)missing.push('前走通過順');
  if(!recent.length)missing.push('近走距離・着順');
- // Opt-in only for the clean Kyoto2000 LAB. Other courses retain every
+ // Explicit display-scale opt-in for shared LAB courses. Other callers retain every
  // original value. A 90-centred point is 1/.3 legacy points: normalize
  // before the unchanged engine applies its 50-centred coefficients.
- const use90=race.labAbilityScale==='90-v1'&&race.course_id==='kyoto_turf_inner_2000';
+ const use90=race.labAbilityScale==='90-v1';
  const keys=Object.keys(six),displaySix={},normalizedSix={};
  if(use90){
   const synthetic=h.styleMeta?.source==='LAB_SYNTHETIC_NOT_OFFICIAL';
@@ -77,3 +77,4 @@ function profile(h,race,avg){
 }
 global.RaceSimAbility=Object.freeze({profile,gradeValue:grade});
 })(typeof window!=='undefined'?window:globalThis);
+

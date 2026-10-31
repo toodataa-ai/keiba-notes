@@ -7,16 +7,20 @@
  * lane preference, pace, overtaking, outcomes, bets or other production data.
  */
 (function(global){'use strict';
-const W=620,H=430,RASTER=3;
+const spec=global.RaceSharedCourse?.active;
+const W=spec?.source.width??620,H=spec?.source.height??430,RASTER=spec?.mask.raster??3;
+const DISTANCE=spec?.distanceM??2000;
 // A smartphone badge radius 13.5*0.68/7=1.31 source px.
-const CLEARANCE=1.95, MIN_INNER_OFFSET=1.60, MAX_SPAN=17.5,
- SLOPE=.44, SMOOTH_RADIUS=19;
+const CLEARANCE=spec?.mask.clearance??1.95, MIN_INNER_OFFSET=spec?.mask.minInnerOffset??1.60, MAX_SPAN=spec?.mask.maxSpan??17.5,
+ SLOPE=spec?.mask.slope??.44, SMOOTH_RADIUS=spec?.mask.smoothRadius??19;
+const MAX_LANE=spec?.mask.maxLane??14;
+const COLOR=spec?.mask.color??{minAlpha:240,minG:108,greenRedRatio:1.4,greenBlueRatio:1.4};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const c=global.RaceCleanCourse;
 const railProjection=global.RaceSafeRailProjection;
 if(!railProjection)throw Error('SAFE_RAIL_PROJECTION_MISSING');
 let grid=null,samples=null,statistics=null,sourceDistanceTable=null,sharedGeometry=null;
-const ARC_ANCHORS=Object.freeze([0,308.7,530,720,1270,1435,1671.6,2000]);
+const ARC_ANCHORS=Object.freeze(spec?.anchorsM??[0,308.7,530,720,1270,1435,1671.6,2000]);
 // SVG artwork is stylized rather than surveyed. Around 1435m the drawn
 // centreline changes from about 0.76 to 0.50 source px per race metre,
 // making real horses appear to telescope together. Equalize physical
@@ -54,14 +58,14 @@ function create(image){
  let greenPixels=0;
  for(let i=0;i<grid.length;i++){
   const j=i*4,r=raw[j],g=raw[j+1],b=raw[j+2],a=raw[j+3];
-  if(a>=240&&g>=108&&g>r*1.4&&g>b*1.4){grid[i]=1;greenPixels++}
+  if(a>=COLOR.minAlpha&&g>=COLOR.minG&&g>r*COLOR.greenRedRatio&&g>b*COLOR.greenBlueRatio){grid[i]=1;greenPixels++}
  }
  samples=[];
  let forkSections=0,missing=0;
  const previousRuns=[];
  // 2001 scalar distances, each using the physically meaningful INNER rail
  // and its outward normal, rather than the moving midpoint of a green blob.
- for(let d=0;d<=2000;d++){
+ for(let d=0;d<=DISTANCE;d++){
   const rr=c.rails(d),inner=rr.inner,ox=rr.outer.x-inner.x,
    oy=rr.outer.y-inner.y,len=Math.hypot(ox,oy)||1,
    nx=ox/len,ny=oy/len;
@@ -84,10 +88,10 @@ function create(image){
   if(runs.length>1)forkSections++;
   // Fixed target near the true *inner* rail: merging green corridors must
   // not pull the horses to the centroid of the whole green region.
-  const wanted=5.0;
+  const wanted=spec?.mask.legacyCalibration.innerTargetPx??5.0;
   runs.sort((a,b)=>
    Math.max(a.a-wanted,wanted-a.b,0)-Math.max(b.a-wanted,wanted-b.b,0)||
-   Math.abs(a.a-5)-Math.abs(b.a-5));
+   Math.abs(a.a-wanted)-Math.abs(b.a-wanted));
   const run=runs[0];
   if(!run){samples.push(null);missing++;continue}
   const low=Math.max(MIN_INNER_OFFSET,run.a+.30);
@@ -167,7 +171,7 @@ function create(image){
  limitSlope();
  let minWidth=Infinity,maxLane0FromInner=0,maxStationJump=0,
   maxStationJumpAt=0,badStations=0,tooFarOut=0;
- for(let d=0;d<=2000;d++){
+ for(let d=0;d<=DISTANCE;d++){
   const p=samples[d];
   minWidth=Math.min(minWidth,p.high-p.low);
   if(p.high-p.low<3)throw Error('TURF_INNER_CORRIDOR_TOO_NARROW_'+d);
@@ -207,7 +211,7 @@ function positionAt(d,lane){
 // 308.7m and 1671.6m entries. Both the SVG and RaceSimEngine are untouched.
 // Only the distance -> source-image path parameter is changed.
 function buildSourceArcMap(){
- const end=2000,arc=new Float64Array(end+1);
+ const end=DISTANCE,arc=new Float64Array(end+1);
  let prev=positionAt(0,2);
  for(let d=1;d<=end;d++){
   const p=positionAt(d,2);
@@ -275,7 +279,7 @@ function buildSourceArcMap(){
  // Preserve the validated 1435m boundary compression fix. Blend it into
  // the overall image-distance profile over 45m on either side of the
  // outer endpoints to avoid generating a new jolt at 1270 or 1671.6m.
- const thirdStart=1270,thirdEnd=1435,fourthEnd=1671.6;
+ const [thirdStart,thirdEnd,fourthEnd]=spec?.mask.legacyCalibration.turnAnchorsM??[1270,1435,1671.6];
  const thirdArc=arcAt(thirdStart),junctionArc=arcAt(thirdEnd),
   fourthArc=arcAt(fourthEnd);
  const leftRate=(junctionArc-thirdArc)/(thirdEnd-thirdStart),
@@ -285,7 +289,7 @@ function buildSourceArcMap(){
   const v=clamp(t,0,1);
   return v*v*(3-2*v);
  };
- const transitionM=45;
+ const transitionM=spec?.mask.legacyCalibration.transitionM??45;
  for(let n=0;n<dedup.length;n++){
   const d=dedup[n];
   if(d<=thirdStart||d>=fourthEnd)continue;
@@ -323,7 +327,7 @@ function buildSourceArcMap(){
  return {nodes:dedup,mapped,summary};
 }
 function sourceDistance(distance){
- const d=clamp(Number(distance)||0,0,2000);
+ const d=clamp(Number(distance)||0,0,DISTANCE);
  if(sharedGeometry)return sharedGeometry.sourceDistance(d);
  if(!sourceDistanceTable)return d;
  const nodes=sourceDistanceTable.nodes,map=sourceDistanceTable.mapped;
@@ -342,7 +346,7 @@ function sourceDistance(distance){
 function activateSharedGeometry(model){
  if(!samples||!model||typeof model.sourceDistance!=='function')
   throw Error('SHARED_GEOMETRY_NOT_READY');
- if(Math.abs(model.distanceM-2000)>1e-8)
+ if(Math.abs(model.distanceM-DISTANCE)>1e-8)
   throw Error('SHARED_GEOMETRY_WRONG_RACE_DISTANCE');
  const before=sharedGeometry;
  sharedGeometry=model;
@@ -371,20 +375,20 @@ function activateSharedGeometry(model){
 // alternative anchor-preserving calibrations without altering race physics.
 function pointAtImageDistance(distance,lane=0){
  if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
- const d=clamp(Number(distance)||0,0,2000),a=Math.floor(d),b=Math.ceil(d),t=d-a;
+ const d=clamp(Number(distance)||0,0,DISTANCE),a=Math.floor(d),b=Math.ceil(d),t=d-a;
  const first=positionAt(a,lane),last=positionAt(b,lane);
  return {x:first.x+(last.x-first.x)*t,y:first.y+(last.y-first.y)*t};
 }
 function point(distance,lane=0){
  if(!samples)throw Error('TURF_SOURCE_MASK_NOT_READY');
- if(distance>2000){
+ if(distance>DISTANCE){
   // Unclamped tangent extension after the finish. The old source spline
   // capped extra metres at 45 and visibly stopped the leading numbers.
-  const end=point(2000,lane),before=point(1990,lane),extra=distance-2000;
+  const end=point(DISTANCE,lane),before=point(DISTANCE-10,lane),extra=distance-DISTANCE;
   const tx=(end.x-before.x)/10,ty=(end.y-before.y)/10;
   let x=end.x+tx*extra,y=end.y+ty*extra;
   if(!discOnTurf(x,y,1.9)){
-   const normal=samples[2000];
+   const normal=samples[DISTANCE];
    let nearest=null;
    for(let a=-5;a<=5;a+=.25){
     const px=x+normal.nx*a,py=y+normal.ny*a;
@@ -395,7 +399,7 @@ function point(distance,lane=0){
   }
   return {x,y,d:distance,lane,section:'ゴール後'};
  }
- const raceD=clamp(Number(distance)||0,0,2000);
+ const raceD=clamp(Number(distance)||0,0,DISTANCE);
  const d=sourceDistance(raceD);
  const a=Math.floor(d),b=Math.ceil(d),t=d-a;
  const first=positionAt(a,lane),last=positionAt(b,lane);
@@ -412,9 +416,9 @@ function runners(state){
 function audit(step=1,radius=1.80){
  let total=0,badCenters=0,badDiscs=0,maxJump=0,maxJumpAt=0,
   maxActualInnerOffset=0;
- for(let lane=0;lane<=14;lane++){
+ for(let lane=0;lane<=MAX_LANE;lane++){
   let prev=null;
-  for(let d=0;d<=2000;d+=step){
+  for(let d=0;d<=DISTANCE;d+=step){
    const p=point(d,lane);
    total++;
    if(!isGreen(p.x,p.y))badCenters++;
@@ -433,10 +437,10 @@ function audit(step=1,radius=1.80){
   maxActualInnerOffset,step,radius};
 }
 // Read-only geometry diagnostics for tracing missing drawn-rail segments.
-function trace(from=0,to=2000,step=25){
+function trace(from=0,to=DISTANCE,step=25){
  if(!samples)return [];
  const out=[];
- for(let d=Math.max(0,from);d<=Math.min(2000,to);d+=step){
+ for(let d=Math.max(0,from);d<=Math.min(DISTANCE,to);d+=step){
   const sourceD=sourceDistance(d),
    p=samples[Math.round(sourceD)],rr=c.rails(sourceD),
    pos=point(d,0),dist=Math.hypot(pos.x-rr.inner.x,pos.y-rr.inner.y);
@@ -459,3 +463,4 @@ global.RaceCleanTurf=Object.freeze({
   stats:()=>statistics
 });
 })(typeof window!=='undefined'?window:globalThis);
+
