@@ -1,0 +1,44 @@
+name: LAB Tokyo 2000 preparation gate
+on:
+  push:
+    paths:
+      - 'docs/lab/*tokyo*'
+      - 'docs/lab/TOKYO_2000_QA_V1.md'
+      - 'tools/test_race_tokyo_2000*'
+      - '.github/workflows/lab-tokyo-2000-v1.yml'
+  pull_request:
+    paths:
+      - 'docs/lab/*tokyo*'
+      - 'tools/test_race_tokyo_2000*'
+      - '.github/workflows/lab-tokyo-2000-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  blocked-page-and-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tokyo isolation and numerical audit
+        run: node tools/test_race_tokyo_2000_v1.cjs
+      - name: Existing Kyoto regression
+        run: |
+          node tools/test_race_clean_ability90_v1.cjs
+          node tools/test_race_clean_course_v1.cjs
+      - name: Install browser
+        run: |
+          python -m pip install playwright==1.58.0
+          python -m playwright install --with-deps chromium
+      - name: Mobile and PC locked-page screenshots
+        run: python tools/test_race_tokyo_2000_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tokyo-2000-blocked-page-comparison
+          path: artifacts/tokyo-2000/
