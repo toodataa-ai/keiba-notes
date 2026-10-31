@@ -51,6 +51,12 @@
         "change": "Fixed goal camera span 290m to 100m; goal post stays 30%; engine, normal view, SVG, lane spacing and equal marker size unchanged.",
         "verification": "24 Chromium cases: before/after x synthetic18/real17 x 390/1024 x 1/2/4 playback. Full per-horse finishTime, d, displayD, lane and podium/results parity. No promotion.",
         "qa_report": "docs/lab/KYOTO_GOAL_CAMERA_100M_QA.md"
+      },
+      "ability_display_20261031": {
+        "phase": "lab_visual_review_pending",
+        "approval": "not_approved",
+        "change": "Add all-runner six-trait ability cards from existing engine horse.six and abilityProfile, including prestart evidence and missing inputs. No engine or input changes.",
+        "verification": "Chromium 390/1024px: synthetic18 (108 values) / real17 (102 values), switch back and reset; all values equal engine state, no viewport overflow, complete initial engine state equals independent fixture simulation."
       }
     },
     {

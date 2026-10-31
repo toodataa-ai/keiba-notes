@@ -85,6 +85,40 @@ function raceNumberMarker(ctx,number,x,y,scale,focused=false,leading=false,field
 }
 
 function waku(no){const w=jraWaku(no,race.field_size);return {fill:w.fill,ink:w.text};}
+// Read the exact profiles already used by the engine. Rendering must not
+// recalculate, normalize or mutate any runner's ability or physical state.
+function renderAbilities(){
+ const host=$('runnerAbilities');host.replaceChildren();
+ $('abilityNote').textContent=trialIsReal()?
+  '発走前データに基づく未校正の推定値です。実測値・正式予想の能力点ではありません。':
+  '架空18頭のテスト用能力値です。全馬共通の入力評価による仮想値で、実馬の能力ではありません。';
+ const labels={early:'先行力',cruise:'巡航速度',burst:'瞬発力',
+  sustain:'持続力',stamina:'スタミナ',acceleration:'加速性能'};
+ const styles={nige:'逃げ',senko:'先行',sashi:'差し',oikomi:'追込'};
+ for(const horse of engine.state.horses){
+  const card=document.createElement('article');card.className='runner-ability-card';
+  card.dataset.number=horse.number;
+  const heading=document.createElement('h3'),badge=document.createElement('span');
+  const color=waku(horse.number);badge.className='ability-number';
+  badge.style.backgroundColor=color.fill;badge.style.color=color.ink;
+  badge.textContent=horse.number;
+  heading.append(badge,document.createTextNode(horse.name+' ／ '+(styles[horse.style]||'脚質不明')));
+  const values=document.createElement('dl');values.className='ability-values';
+  for(const [key,label] of Object.entries(labels)){
+   const item=document.createElement('div'),term=document.createElement('dt'),value=document.createElement('dd');
+   term.textContent=label;value.textContent=horse.six[key];value.dataset.trait=key;
+   item.append(term,value);values.appendChild(item);
+  }
+  card.append(heading,values);
+  const details=document.createElement('details'),summary=document.createElement('summary'),note=document.createElement('p');
+  summary.textContent='能力の根拠';
+  const profile=horse.abilityProfile;
+  note.textContent=(trialIsReal()?'':'架空データ。')+profile.evidence.join(' ／ ')+
+   (profile.missing.length?' ／ 未取得：'+profile.missing.join('・'):'')+
+   ' ／ 根拠の確かさ：'+profile.confidence;
+  details.append(summary,note);card.appendChild(details);host.appendChild(card);
+ }
+}
 let engine,playing=false,last=0,acc=0,renderStamp=0,focusNo='leader',
  lastCamera=null,lastPaintCamera=null,lastLabelPositions=[],lastRenderedPoints=[],cameraRenderTime=0,
  visualLaneState=new Map(),visualRenderTime=null,
@@ -197,6 +231,7 @@ function compareWithOfficialResult(){
 }
 function reset(){
  engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
+ renderAbilities();
  playing=false;last=0;acc=0;lastCamera=null;lastPaintCamera=null;lastRenderedPoints=[];
  framePrevious=frameCurrent=captureFrame();
  cameraRenderTime=0;visualRenderTime=null;visualLaneState.clear();

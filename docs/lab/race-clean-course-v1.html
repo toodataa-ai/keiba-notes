@@ -2,7 +2,7 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#192d2c">
 <title>実況＋全体図・秋華賞17頭｜JRAシミュレータLAB</title>
-<link rel="stylesheet" href="race-clean-course-v1.css?v=20261020-26">
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261031-ability">
 </head><body>
 <header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
 <h1>京都芝2000m内回り｜新コース方式</h1>
@@ -55,6 +55,11 @@
 <tbody id="resultsBody"></tbody></table></div>
 <p class="results-note">馬身差はゴール時の推定速度と時間差から、1馬身=約2.4mとして換算。公式の着差ではありません。</p></section>
 <section class="panel"><div class="panel-title"><h2 id="horseGridTitle">架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
+<section class="panel" aria-labelledby="abilityTitle">
+<div class="panel-title"><h2 id="abilityTitle">各馬の能力（仮想）</h2><span>6項目・0〜100</span></div>
+<p class="ability-note" id="abilityNote"></p>
+<div class="runner-abilities" id="runnerAbilities"></div>
+</section>
 <section class="panel benchmark-panel" id="benchmarkPanel" hidden>
 <div class="panel-title"><h2>実レースとの比較（観測結果は入力に不使用）</h2><span>2026年秋華賞</span></div>
 <div class="benchmark-body"><p>まず発走前データだけで仮想レースを走らせ、その後にJRA公式のコーナー通過順や1000m通過を照合できます。</p>
@@ -89,6 +94,6 @@
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
 <script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
 <script src="race-frame-interpolator-v1.js?v=20261020-24"></script>
-<script src="race-clean-course-app-v1.js?v=20261020-25"></script>
+<script src="race-clean-course-app-v1.js?v=20261031-ability"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

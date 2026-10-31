@@ -185,7 +185,7 @@ console.log('PASS_REAL_2026_SHUKA_17_SEALED_PRESTART_HORSES_NO_OUTCOME_LEAK',rea
 const html=fs.readFileSync(root+'race-clean-course-v1.html','utf8');
 const app=fs.readFileSync(root+'race-clean-course-app-v1.js','utf8');
 assert.ok(html.includes('race-clean-course-v1.js?v=20261018-14'));
-assert.ok(html.includes('race-clean-course-app-v1.js?v=20261020-25'));
+assert.ok(html.includes('race-clean-course-app-v1.js?v=20261031-ability'));
 assert.ok(html.includes('race-real-shuka-2026-fixture-v1.js?v=20261020-25'));
 assert.ok(html.includes('race-real-shuka-2026-reference-v1.js?v=20261019-22'));
 assert.ok(html.includes('id="trialMode"'));
@@ -325,7 +325,7 @@ assert.ok(app.includes("scale:(w<540?8.8:9.7)*"));
 assert.ok(app.includes('RaceSimEngine.create('));
 assert.ok(html.includes('race-safe-rail-projection-v1.js?v=20261020-26'));
 assert.ok(html.includes('race-clean-turf-mask-v1.js?v=20261020-26'));
-assert.ok(html.includes('race-clean-course-v1.css?v=20261020-26'));
+assert.ok(html.includes('race-clean-course-v1.css?v=20261031-ability'));
 assert.ok(html.indexOf('race-safe-rail-projection-v1.js')<html.indexOf('race-clean-turf-mask-v1.js'));
 const safeRailSource=fs.readFileSync(root+'race-safe-rail-projection-v1.js','utf8');
 assert.ok(!safeRailSource.includes('kyoto')&&!safeRailSource.includes('tokyo'));

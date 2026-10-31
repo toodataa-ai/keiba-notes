@@ -112,6 +112,20 @@ canvas{display:block;width:100%;background:#f4f6f0}
  .finish-banner span{font-size:13px}
 }
 
+.ability-note{margin:0;padding:10px 12px;color:#536459;font-size:12px;line-height:1.6}
+.runner-abilities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 12px 12px}
+.runner-ability-card{min-width:0;border:1px solid #d9dfdc;border-radius:8px;padding:10px;background:#fafcf9}
+.runner-ability-card h3{display:flex;align-items:center;gap:7px;margin:0 0 10px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.ability-number{display:inline-flex;align-items:center;justify-content:center;flex:0 0 25px;height:25px;border:1px solid #62716a;border-radius:50%;font-weight:800}
+.ability-values{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.ability-values div{min-width:0;border-radius:5px;padding:6px;background:#edf3eb;text-align:center}
+.ability-values dt{font-size:11px;color:#536459}
+.ability-values dd{margin:2px 0 0;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.runner-ability-card details{margin-top:9px;font-size:11px;color:#536459;line-height:1.6}
+.runner-ability-card summary{cursor:pointer}
+.runner-ability-card details p{margin:6px 0 0;overflow-wrap:anywhere}
+@media(max-width:760px){.runner-abilities{grid-template-columns:1fr}}
+
 /* LAB v26: unified compact clock for every race, independent of course. */
 .broadcast-clock{min-width:135px;padding:9px 11px}
 .broadcast-clock #clock{font-size:clamp(27px,2.9vw,38px)}
