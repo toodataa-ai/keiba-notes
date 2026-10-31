@@ -96,17 +96,17 @@ def main() -> int:
         if old_object.returncode or old_object.stdout.strip() != exception["original_blob_sha"]:
             raise RuntimeError("original E2E CI Git history unavailable: "+component_path)
 
-    # Draft runtime preparation: four old workflow ENTRYPOINTS now call the
+    # Draft runtime preparation: five old workflow ENTRYPOINTS now call the
     # existing current-E2E auditor. Frozen validators and every original manifest
     # remain untouched. Exact old and new workflow blobs are independently pinned.
     operations = json.loads((repo_root / 'shadow_lab/ci/legacy-workflow-bridge.json').read_text())
     operation_paths = {'.github/workflows/'+name for name in (
         'validate-jra-balanced-v311.yml', 'validate-jra-portfolio-v310.yml',
-        'validate-jra-strategy-v39.yml', 'validate-jra-strategy-v38.yml')}
+        'validate-jra-strategy-v39.yml', 'validate-jra-strategy-v38.yml', 'validate-jra-v312.yml')}
     operation_overrides = {x['path']:x for x in operations['replacements']}
-    if (operations.get('scope') != 'four_legacy_workflow_entrypoints_only' or
+    if (operations.get('scope') != 'five_legacy_workflow_entrypoints_only' or
             operations.get('no_manifest_or_prediction_changes') is not True or
-            set(operation_overrides) != operation_paths or len(operations['replacements']) != 4):
+            set(operation_overrides) != operation_paths or len(operations['replacements']) != 5):
         raise RuntimeError('unexpected legacy workflow entrypoint supersession')
     for src, item in operation_overrides.items():
         if git_hash_object(repo_root, src) != item['current_blob_sha']:
