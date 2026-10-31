@@ -92,8 +92,22 @@ def check_runners(source, frozen):
                 top3_from_frozen[n] += probability
         if abs(mass - 1) > 0.0001:
             raise ValueError("frozen_outcome_distribution_not_normalized")
+    # Formal v3.13's step1_ranking is a list of runners in HORSE-NUMBER
+    # order (jra-prestart-pipeline-v312.mjs copies step1.runners verbatim).
+    # Use exactly the fixed price-blind rank rule in
+    # .github/scripts/jra-gather-live-v314.py (rank=sorted(...)).
+    # Never mistake list position for model rank.
+    mark_order = {"◎": 0, "○": 1, "▲": 2, "△": 3, "×": 4}
+    grade_weight = {"A+": 5.3, "A": 3.7, "B+": 2.55, "B": 1.65, "B-": 1.0, "C": 0.6}
+    if any(row.get("mark") not in mark_order or
+           row.get("overall_grade") not in grade_weight for row in original):
+        raise ValueError("frozen_STEP1_rank_factors_unavailable")
+    ranked = sorted(original, key=lambda row:
+                    (mark_order[row["mark"]], -grade_weight[row["overall_grade"]],
+                     row["horse_number"]))
+    rank_by_number = {row["horse_number"]: rank for rank, row in enumerate(ranked, 1)}
     rows = []
-    for rank, row in enumerate(original, 1):
+    for row in original:
         n = row["horse_number"]
         grades = row.get("factor_grades")
         if not isinstance(grades, list) or len(grades) != 9:
@@ -103,7 +117,7 @@ def check_runners(source, frozen):
         if row.get("horse_name") != exp[str(n)]["horse_name"]:
             raise ValueError("formal_horse_name_mismatch_" + str(n))
         result = {
-            "horse_number": n, "horse_name": row["horse_name"], "step1_rank": rank,
+            "horse_number": n, "horse_name": row["horse_name"], "step1_rank": rank_by_number[n],
             "mark": row["mark"], "factor_grades": grades,
             "predicted_win_probability": row["win_probability"],
         }
@@ -157,6 +171,7 @@ def formal_source(item, frozen, registry):
         "source_first_commit": first_sha, "source_first_commit_at": first_at,
         "source_proof_commit": proof, "source_proof_commit_at": proof_at.isoformat(),
         "step1_fixed_at": source["step1_fixed_at"],
+        "rank_method": "existing_v314_price_blind_mark_grade_number_sort",
         "no_odds_used": True, "no_synthetic_predictions": True,
         "production_effect": False, "runners": rows,
     }
