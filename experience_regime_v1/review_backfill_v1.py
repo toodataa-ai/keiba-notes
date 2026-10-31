@@ -95,14 +95,19 @@ def verify_immutable(week, date, item, proof, snapshot_path, snapshot, audit):
     entry = next((x for x in proof["races"] if x["race_id"] == rid), None)
     if entry is None or not entry["proof_prestart_valid"]:
         raise ValueError("missing_valid_prerace_proof")
-    if proof["proof_commit"] != entry["proof_commit"]:
-        raise ValueError("proof_sha_mismatch")
-    sha = proof["proof_commit"]
+    # A daily proof may combine races frozen in different commits.
+    # Verify each race against its own prestart commit in the explicit lineage.
+    sha = entry.get("proof_commit")
+    proof_timestamp = entry.get("proof_commit_at")
+    lineage = {proof.get("proof_commit")}
+    lineage.update(p.get("proof_commit") for p in proof.get("previous_proof_reports", []))
+    if not sha or not proof_timestamp or sha not in lineage:
+        raise ValueError("missing_or_unlisted_per_race_proof_commit")
     committed_at = subprocess.check_output(
         ["git", "show", "-s", "--format=%cI", sha], cwd=ROOT, text=True
     ).strip()
     if datetime.fromisoformat(committed_at) != datetime.fromisoformat(
-        proof["proof_commit_at"].replace("Z", "+00:00")
+        proof_timestamp.replace("Z", "+00:00")
     ):
         raise ValueError("proof_commit_timestamp_conflict")
     if snapshot["race_context"]["race_category"] != item["race_category"]:
@@ -138,7 +143,7 @@ def verify_immutable(week, date, item, proof, snapshot_path, snapshot, audit):
         if evidence_frozen != evidence_path.read_bytes():
             raise ValueError(error_code)
     t = datetime.fromisoformat(snapshot["race_context"]["start_at"])
-    proof_at = datetime.fromisoformat(proof["proof_commit_at"].replace("Z", "+00:00"))
+    proof_at = datetime.fromisoformat(proof_timestamp.replace("Z", "+00:00"))
     if not (proof_at < t and datetime.fromisoformat(snapshot["captured_at"]) < t):
         raise ValueError("prerace_timing_failed")
     expected = item["sample_origin"]
@@ -329,9 +334,10 @@ def run(week, dates):
                 snapshot = load(input_path)
                 audit = load(audit_path)
                 verify_immutable(week, date, item, proof, input_path, snapshot, audit)
+                per_race_proof = next(x["proof_commit"] for x in proof["races"] if x["race_id"] == rid)
                 if dest.exists():
                     reviewed = load(dest)
-                    if reviewed["race_id"] != rid or reviewed["prerace_proof_commit"] != proof["proof_commit"]:
+                    if reviewed["race_id"] != rid or reviewed["prerace_proof_commit"] != per_race_proof:
                         raise ValueError("existing_result_proof_conflict")
                     persist_official_result(week, reviewed)
                     reviews.append(reviewed)
@@ -365,7 +371,7 @@ def run(week, dates):
                     "race_category": item["race_category"],
                     "sample_origin": item["sample_origin"],
                     "research_model_version": snapshot["model_version"],
-                    "prerace_proof_commit": proof["proof_commit"],
+                    "prerace_proof_commit": per_race_proof,
                     "prerace_snapshot_sha256": hashlib.sha256(input_path.read_bytes()).hexdigest(),
                     "official_result_url": result_r.url,
                     "official_result_sha256": hashlib.sha256(result_r.content).hexdigest(),
@@ -396,7 +402,11 @@ def run(week, dates):
         if not date_proof.is_file():
             continue
         proof_row = load(date_proof)
-        if row.get("prerace_proof_commit") != proof_row.get("proof_commit"):
+        frozen_commit = next(
+            (x.get("proof_commit") for x in proof_row["races"] if x["race_id"] == item["race_id"]),
+            None,
+        )
+        if not frozen_commit or row.get("prerace_proof_commit") != frozen_commit:
             raise ValueError("stored_weekly_review_proof_mismatch_" + item["race_id"])
         week_reviews.append(row)
     week_ids = {x["race_id"] for x in week_reviews}
