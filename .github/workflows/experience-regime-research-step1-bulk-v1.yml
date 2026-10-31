@@ -1,0 +1,131 @@
+name: E012 bulk prereace research STEP1 candidates (independent, no odds)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/experience-regime-research-step1-bulk-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: e012-undercard-bulk-current-day
+  cancel-in-progress: false
+jobs:
+  bulk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify only current fixed prospective plan
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m py_compile experience_regime_v1/research_step1_bulk_v1.py
+          python - <<'PY'
+          import json,datetime,os
+          from zoneinfo import ZoneInfo
+          from pathlib import Path
+          p=json.loads(Path('experience_regime_v1/requests/run-current.json').read_text())
+          today=datetime.datetime.now(ZoneInfo('Asia/Tokyo')).date().isoformat()
+          assert today==p['date'] and p['mode']=='prospective_strict'
+          assert p['week_id']=='2026-10-31' and today=='2026-11-01'
+          with open(os.environ['GITHUB_ENV'],'a') as out:
+              out.write('E012_WEEK='+p['week_id']+'\nE012_DAY='+today+'\n')
+          print('E012_BULK_SINGLE_FIXED_DAY',today,p['week_id'])
+          PY
+      - name: Capture ALL ten stratified races in one run without betting odds or results
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            python -m experience_regime_v1.research_step1_bulk_v1 --week-id "$E012_WEEK" --date "$E012_DAY"
+            python - <<'PY'
+          import json
+          p=json.load(open('docs/data/experience_regime_research_step1_bulk_status.json'))
+          print('E012_BULK_RESEARCH_PARTIAL',len(p['experimental_partial_races']),
+                'of',p['target_undercard_races'],'blocked',p['blocked'])
+          PY
+            if python - <<'PY'
+          import json
+          p=json.load(open('docs/data/experience_regime_research_step1_bulk_status.json'))
+          raise SystemExit(0 if len(p['experimental_partial_races'])==p['target_undercard_races'] else 1)
+          PY
+            then break; fi
+            if [ "$attempt" -lt 3 ]; then sleep 10; fi
+          done
+      - name: Commit exactly the new independent research candidates, before each race
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -d "experience_regime_v1/research_step1_candidates/$E012_WEEK" ]]; then
+            git add -A -- "experience_regime_v1/research_step1_candidates/$E012_WEEK"
+          fi
+          git add -- docs/data/experience_regime_research_step1_bulk_status.json
+          python - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          staged=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          prefix='experience_regime_v1/research_step1_candidates/'+os.environ['E012_WEEK']+'/'
+          assert staged, 'no new research candidate or status to commit'
+          assert all(x.startswith(prefix) or x=='docs/data/experience_regime_research_step1_bulk_status.json' for x in staged),staged
+          today=datetime.now(ZoneInfo('Asia/Tokyo'))
+          report=json.loads(Path('docs/data/experience_regime_research_step1_bulk_status.json').read_text())
+          assert report['production_effect'] is False and report['does_not_change_canonical_step1_status'] is True
+          for path in staged:
+              if not path.startswith(prefix):continue
+              d=json.loads(Path(path).read_text())
+              assert today<datetime.fromisoformat(d['start_at']),('prestart_gate_failed',path)
+              assert d['not_canonical_formal_STEP1'] and not d['complete_nine_factor_evidence']
+              assert not d['probabilities_calibrated'] and d['no_odds_or_results_accessed']
+              assert d['production_effect'] is False and d['no_fabricated_source_evidence']
+              assert all(len(h['factor_grades'])==9 for h in d['runners'])
+              assert all(all(h['factor_grades'][i] is None for i in (1,2,5,6,7)) for h in d['runners'])
+          print('E012_BULK_RESEARCH_STAGING_APPROVED',len(staged),len(report['experimental_partial_races']))
+          PY
+          git commit -m "Freeze independent prospective E012 undercard research-only STEP1 proxy candidates"
+          for attempt in 1 2 3 4 5; do
+            if ! git pull --rebase origin main; then
+              git rebase --abort || true
+              echo "::error::Concurrent data conflict: no original sources overwritten";exit 1
+            fi
+            if git push origin HEAD:main;then break;fi
+            if [ "$attempt" -eq 5 ];then exit 1;fi
+            sleep 2
+          done
+      - name: Audit each first Git introduction, frozen original, and independently report partial results
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess,os
+          from pathlib import Path
+          from datetime import datetime
+          p=Path('experience_regime_v1/research_step1_candidates')/os.environ['E012_WEEK']
+          report=json.loads(Path('docs/data/experience_regime_research_step1_bulk_status.json').read_text())
+          count=0;horses=0
+          for rid in report['experimental_partial_races']:
+              file=p/(rid+'.json')
+              d=json.loads(file.read_text())
+              git=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(file)],text=True).strip().splitlines()
+              assert len(git)==1,(rid,git)
+              sha,at=git[0].split()
+              assert datetime.fromisoformat(at)<datetime.fromisoformat(d['start_at']),(rid,'first commit after start')
+              original=Path('experience_regime_v1/collection')/os.environ['E012_WEEK']/'snapshots'/(rid+'.json')
+              import hashlib
+              assert hashlib.sha256(original.read_bytes()).hexdigest()==d['original_experience_snapshot_sha256']
+              assert d['no_odds_or_results_accessed'] and not d['production_effect']
+              print('E012_BULK_RESEARCH_PROOF',rid,sha,at,len(d['runners']),len(d['unobserved_factors']))
+              count+=1;horses+=len(d['runners'])
+          assert count>0,'zero candidates: research incomplete'
+          print('E012_BULK_PROVEN_PARTIAL_RESEARCH',count,'/',report['target_undercard_races'],'horses',horses,
+                'blocked',report['blocked'])
+          print('E012_CANONICAL_FORMAL_STEP1_REMAINS_SEPARATE; MISSING FACTORS ARE NOT IMPUTED')
+          PY
