@@ -61,4 +61,37 @@ requestAnimationFrame時刻で走行1919m地点から余走完了まで再生。
 
 公開先：<https://toodataa-ai.github.io/keiba-notes/lab/race-clean-course-v1.html?v=20261031-goal-100>
 秋華賞：同URLに `&trial=shuka2026` を付加。
-公開HTTP一致・公開URLの実時間ブラウザ再生の結果は作業報告を参照。
+## 公開検証
+
+実装コミット `e2094832edea264dfe76629076d385ee9f11e0b6`。
+Pages [41156283331](https://github.com/toodataa-ai/keiba-notes/actions/runs/41156283331) 成功。
+LAB HTML・ゴールJS・本番index.htmlをTLS検証有効のHTTP GETで取得し、
+リポジトリとのバイト一致を確認。本番トップは変更していない。
+
+- [LAB表示QA 41156283981](https://github.com/toodataa-ai/keiba-notes/actions/runs/41156283981)：390/1024pxの実ブラウザ、4倍実時間の停止0・逆行0、余走と上位3着、公開8資産のバイト一致に合格。
+- [WebKit公開再生 41156283979](https://github.com/toodataa-ai/keiba-notes/actions/runs/41156283979)：ローカルと公開URLの共有幾何でゴールまで再生に合格。
+- [iPhone相当WebKit 41156284020](https://github.com/toodataa-ai/keiba-notes/actions/runs/41156284020)：公開URLで実際に新しい100m投影のゴール座標を確認、余走3.2秒・上位3着・18頭を確認。
+- 実出走17頭QA 41156283959、HUD 41156284009、フレーム補間 41156284028、汎用幾何 41156283944、LABブラウザQA 41156284004も成功。
+
+ローカルの公開URL直結ChromiumはプロキシCAの信頼設定で停止したため、
+公開URLの直接ブラウザ検証は上記GitHub Actionsの実行結果を使用した。
+ローカルの24条件比較とは独立した検証である。
+
+別系統のCI失敗3件は比較基準コミットにも存在する条件不整合：
+
+- 41156283955：台帳の既存 `keiba-anonymous-usage.phase=production_released` が生成スクリプトの許容リスト外。
+- 41156283952：change-boardの件数を8件と固定、基準コミットの実データは9件。
+- 41156283999：LABと旧STAGINGの `race-sim-engine.js` バイト一致を要求、基準コミットの時点で不一致。
+
+本変更はこれらの失敗を隠す修正やSTAGING/エンジンの書換えを行っていない。
+
+保護対象Git tree SHAは実装前後で一致：
+
+|対象|tree SHA|
+|---|---|
+|docs/data|38b1a39764c4ae6372403644d826311fbfacd8f1|
+|docs/reports|1563d3265a23a7f53779bed812789c6f42d5b096|
+|docs/pdfs|d9b4a59027e3e5914e1273cd818e40c4db41edf6|
+|e2e_validation|01619043ca363f193a67bff724f54fce61aa83aa|
+|local_racing_shadow_v1|88a07a88a56440f065c01bd02a6218052436075b|
+|docs/staging|ae8b0a4d0eda64234ea70cb60abbf779d7b90dd5|
