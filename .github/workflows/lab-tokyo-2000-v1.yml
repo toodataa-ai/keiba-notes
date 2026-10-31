@@ -3,17 +3,29 @@ on:
   push:
     paths:
       - 'docs/lab/*tokyo*'
+      - 'docs/lab/race-sim-engine.js'
+      - 'docs/lab/race-lane-ai-v1.js'
+      - 'docs/lab/race-ability-model-v1.js'
+      - 'docs/lab/race-course-geometry-v1.js'
+      - 'docs/lab/race-lab-18-fixture-v1.js'
       - 'docs/lab/TOKYO_2000_QA_V1.md'
-      - 'tools/test_race_tokyo_2000*'
-      - 'tools/test_race_tokyo_source*'
+      - 'tools/test_race_tokyo_*'
+      - 'tools/lib/race-swept-audit-v1.cjs'
+      - 'docs/lab/TOKYO_2000_MOTION_AUDIT_V4*'
       - 'tools/audit_tokyo_2000*'
       - 'docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md'
       - '.github/workflows/lab-tokyo-2000-v1.yml'
   pull_request:
     paths:
       - 'docs/lab/*tokyo*'
-      - 'tools/test_race_tokyo_2000*'
-      - 'tools/test_race_tokyo_source*'
+      - 'docs/lab/race-sim-engine.js'
+      - 'docs/lab/race-lane-ai-v1.js'
+      - 'docs/lab/race-ability-model-v1.js'
+      - 'docs/lab/race-course-geometry-v1.js'
+      - 'docs/lab/race-lab-18-fixture-v1.js'
+      - 'tools/test_race_tokyo_*'
+      - 'tools/lib/race-swept-audit-v1.cjs'
+      - 'docs/lab/TOKYO_2000_MOTION_AUDIT_V4*'
       - 'tools/audit_tokyo_2000*'
       - 'docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md'
       - '.github/workflows/lab-tokyo-2000-v1.yml'
@@ -94,3 +106,29 @@ jobs:
         with:
           name: tokyo-source-audit-numerical-summary-only
           path: artifacts/tokyo-source-summary/
+
+  tokyo-motion-candidate-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate diagnostic geometry and wire-clearance regression
+        run: |
+          node tools/test_race_tokyo_launch_audit_v4.cjs
+          node tools/test_race_tokyo_lateral_policy_v4.cjs
+      - name: Default full-state parity and strict opt-in isolation
+        run: node tools/test_race_tokyo_motion_isolation_v4.cjs --out artifacts/tokyo-motion/default-parity.json
+      - name: Audit 32 seeds and step-size sensitivity
+        run: |
+          node tools/audit_tokyo_2000_launch_v4.cjs --out artifacts/tokyo-motion/legacy.json
+          node tools/audit_tokyo_2000_launch_v4.cjs --motion bounded-lateral-v4 --out artifacts/tokyo-motion/candidate.json
+          node tools/test_race_tokyo_launch_report_v4.cjs artifacts/tokyo-motion/legacy.json artifacts/tokyo-motion/candidate.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tokyo-motion-candidate-numerical-audit
+          path: artifacts/tokyo-motion/

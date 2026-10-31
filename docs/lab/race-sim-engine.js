@@ -133,6 +133,9 @@ function create(data,options={}){
  const abilityModel=global.RaceSimAbility;
  if(!abilityModel)throw Error('SIM_ABILITY_MODEL_MISSING');
  const laneCfg=laneAI.config(profile);
+ // Explicit, synthetic Tokyo LAB experiment. Every default/other-course path stays unchanged.
+ const tokyoMotion=data.course_id==='tokyo_turf_2000'&&data.labTokyoMotion==='bounded-lateral-v4'?
+  (global.RaceTokyoLateralV4?.create(data,laneCfg)||(()=>{throw Error('TOKYO_LATERAL_POLICY_MISSING')})()):null;
  const maxNumber=Math.max(...data.horses.map(h=>h.number));
  const mean=data.horses.reduce((s,h)=>s+(Number(h.win_pct)||0),0)/data.horses.length;
  const length=data.distance_m;
@@ -173,6 +176,7 @@ function create(data,options={}){
  // the early finishers keep their elapsed head start at the final frame.
  function postFinishTravel(seconds){
   const t=Math.max(0,Number(seconds)||0);
+  if(tokyoMotion)return tokyoMotion.postFinishTravel(t);
   return (14.2/.12)*(1-Math.exp(-.12*t));
  }
  const events=[];
@@ -233,6 +237,7 @@ function create(data,options={}){
   const paceEffect=0; // No manual pace multiplier.
   const sorted=horses.slice().sort((a,b)=>b.d-a.d);
   const prior=horses.map(h=>({number:h.number,d:h.d,finished:h.finished}));
+  if(tokyoMotion)tokyoMotion.beginStep(horses,dt,state.t);
   for(const h of sorted){
    if(h.finished)continue;
    // Inside rail is preferred on every course, but NEVER at the expense
@@ -261,7 +266,7 @@ function create(data,options={}){
      const desired=h.initialLane+(h.launchTargetLane-h.initialLane)*ratio;
      const speed=lateralSpeedAt(state.leader);
      const amount=clamp(desired-h.lane,-dt*speed,dt*speed);
-     const proposed=clamp(h.lane+amount,0,laneCfg.maxLane);
+     const proposed=tokyoMotion?tokyoMotion.propose(h,desired,dt):clamp(h.lane+amount,0,laneCfg.maxLane);
      const safe=laneAI.launchStepSafe(h,horses,proposed,laneCfg);
      movement=safe?proposed-h.lane:0;
      h.desiredLane=h.lane+movement;
@@ -280,11 +285,12 @@ function create(data,options={}){
      // each frame because the corridor may have changed after route planning.
      const limit=dt*lateralSpeedAt(h.d)*(m.bend>.6?.86:1);
      const tentative=clamp(move,-limit,limit);
-     const nextLane=clamp(h.lane+tentative,0,laneCfg.maxLane);
+     const nextLane=tokyoMotion?tokyoMotion.propose(h,h.desiredLane,dt):clamp(h.lane+tentative,0,laneCfg.maxLane);
      const clear=laneAI.launchStepSafe(h,horses,nextLane,laneCfg);
-     movement=clear?tentative:0;
+     movement=clear?(tokyoMotion?nextLane-h.lane:tentative):0;
      if(!clear)h.desiredLane=h.lane;
    }
+   if(tokyoMotion)tokyoMotion.commit(h,movement);
    h.laneVelocity=movement/(dt||1);
    h.lane=clamp(h.lane+movement,0,laneCfg.maxLane);
    const groundBias=(bias==='inner'?(laneCfg.maxLane/2-h.lane):bias==='outer'?(h.lane-laneCfg.maxLane/2):0)*.026;
@@ -358,7 +364,8 @@ function create(data,options={}){
    const before=h.d;
    const physical=speed*dt;
    const proposed=physical/m.pathStretch;
-   const safe=laneAI.throttle(h,horses,proposed,dt,laneCfg);
+   const originalSafe=laneAI.throttle(h,horses,proposed,dt,laneCfg);
+   const safe=tokyoMotion?tokyoMotion.limitTravel(h,horses,originalSafe,dt,state.t):originalSafe;
    if(safe.held){
      h.blocked=true;
      h.trafficHoldSeconds+=dt;state.trafficHolds++;
@@ -453,7 +460,7 @@ function create(data,options={}){
  }
  function standings(){return horses.slice().sort((a,b)=>Number(b.finished)-Number(a.finished)||
      (a.finished&&b.finished?a.finishTime-b.finishTime:b.d-a.d)||a.number-b.number)}
- return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg};
+ return {state,step,standings,rand:rng,course:profile,laneConfig:laneCfg,...(tokyoMotion?{labTokyoMotionStats:tokyoMotion.stats}:{})};
 }
 global.RaceSimEngine=Object.freeze({create,validData,hash,MARKS,startSpeedFactor,lateralSpeedAt,finishDrive,closingTurnOpportunity,closingTurnResponse,contestedPace,band,sectionalSpeedAdjustment,classifySplitPace});
 })(typeof window!=='undefined'?window:globalThis);

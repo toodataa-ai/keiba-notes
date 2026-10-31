@@ -7,6 +7,15 @@
 <li>実際の進入角と2コーナー出口までの正確な距離は未確定。候補の「2角出口300m」は仮設定です。</li></ul>
 <p><a href="https://www.jra.go.jp/keiba/thisweek/2025/1102_1/race.html">JRA コース説明</a> ／ <a href="https://sugo.jra-van.jp/sugotoku/crs/crs05t2000.html">JRA-VAN 約100mの説明</a> ／ <a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_START_EVIDENCE_V3.md">根拠と未確定事項</a></p></section>
 <div class="facts"><span>距離 <b>2,000m</b></span><span>1周 <b>2,083.1m</b></span><span>直線 <b>525.9m</b></span><span>高低差 <b>2.7m</b></span></div>
+<section id="launchAudit"><h2>発走安全の改善候補（画面には未適用）</h2>
+<p>架空18頭・32シードの数値監査です。既存動作を保ち、東京の明示的な研究設定だけで横移動とゴール付近の間隔制御を試験しました。</p>
+<table><thead><tr><th>検査項目</th><th>既存</th><th>改善候補</th></tr></thead><tbody>
+<tr><th>発走区間のフレーム間重なり</th><td>250</td><td>0</td></tr>
+<tr><th>全区間・余走のフレーム間重なり</th><td>3,917</td><td>0</td></tr>
+<tr><th>競走中の最大横速度</th><td>6.02m/s</td><td>1.14m/s</td></tr>
+<tr><th>全18頭の完走・余走</th><td>32/32シード</td><td>32/32シード</td></tr>
+</tbody></table><p>重なりは検査用矩形の「組×ステップ」数で、実馬の衝突件数ではありません。改善候補も実際の進入角・走路との整合、再生速度別検証、目視は未完了です。走行ロックを継続します。</p>
+<p><a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_MOTION_AUDIT_V4.md">監査条件と残課題</a> ／ <a href="TOKYO_2000_MOTION_AUDIT_V4.json">数値要約</a></p></section>
 <div class="views"><section><h2>実況ビュー</h2><div class="empty">原図と走路の照合待ち</div></section><section><h2>全体図</h2><div class="empty">公開用ベクター・対応走路の準備待ち</div></section></div>
 <div class="controls"><button id="startBtn" disabled>走行ロック中</button><label>再生速度 <select disabled><option>1倍</option><option>2倍</option><option>4倍</option></select></label></div>
 <p>実況仕様：残り80mで固定カメラ・横幅100m。東京の左回りと実況の右から左への進行方向は別管理。走行映像・余走・時計・着差の検証は未実施です。</p>
