@@ -30,6 +30,7 @@ jobs:
           sleep 2
           python .github/scripts/jra-improvement-stage-browser-audit.py
       - name: Verify actual deployed stage HTML CSS and roadmap data bytes
+        if: github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
           BASE='https://toodataa-ai.github.io/keiba-notes'
