@@ -57,7 +57,7 @@ BASE_CHECKOUTは必ず指定SHA。CIもこのSHAをcheckoutする。既存Node�
 
 ## CI・blocker・完了判定
 
-新CIの最新実行状況・commit SHAはPR本文に記録。既存release-channel-guardは **作業前から** 2つの公開履歴JSONが不一致。公開側だけに `pending_public_validation` のv1.06項目がある。基準/引継ぎHEAD/mainのblob/SHA256と意味差は [CI-EXISTING-GUARD.json](CI-EXISTING-GUARD.json)。両原本は編集せず、CIを無効化しない。
+新CIの最新実行状況・commit SHAはPR本文に記録。初回の追加監査は、Actionsの合成mergeに含まれるmain並行更新と比較用checkoutをPR差分と誤認して失敗。比較対象を合成mergeの第1親に固定し、`.course-base/` の検査用checkoutだけを未追跡一覧から除外した。正式データの許可範囲は広げていない。既存release-channel-guardは **作業前から** 2つの公開履歴JSONが不一致。公開側だけに `pending_public_validation` のv1.06項目がある。基準/引継ぎHEAD/mainのblob/SHA256と意味差は [CI-EXISTING-GUARD.json](CI-EXISTING-GUARD.json)。両原本は編集せず、CIを無効化しない。
 
 実装とローカル自動QAは完了し、レビュー可能。**PR1の最終受入れは未完了**：ユーザーによる全体の目視承認、権利台帳の未確認事項、既存CI blockerの扱いに関するレビューが残る。Safari/実機は未確認、Chromiumでの検査を全ブラウザ保証とはしない。人の目視検査を自動検査で代替した扱いにしない。
 

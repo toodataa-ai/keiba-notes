@@ -12,9 +12,13 @@ inventory.candidateTotal=inventory.venues.reduce((n,v)=>n+v.candidateDistances,0
 const bytes=JSON.stringify(inventory,null,2)+'\n',target='docs/lab/shared-course/INVENTORY.json';
 if(process.argv.includes('--check'))assert.equal(fs.readFileSync(target,'utf8'),bytes);else fs.writeFileSync(target,bytes);
 // A per-commit allowlist prevents accidental DATA, STAGING or production edits.
-const base=process.env.COURSE_CHANGE_BASE||'f176feab634055ddd1833827e47a54fd8eb7784b';
-const files=cp.execFileSync('git',['diff','--name-only',base],{encoding:'utf8'}).trim().split('\n').filter(Boolean).concat(cp.execFileSync('git',['ls-files','--others','--exclude-standard'],{encoding:'utf8'}).trim().split('\n').filter(Boolean));
+const parents=cp.execFileSync('git',['show','-s','--format=%P','HEAD'],{encoding:'utf8'}).trim().split(' ');
+// Actions checks out a synthetic merge: compare only the PR delta against
+// its first parent, preserving concurrent main DATA updates.
+const base=process.env.COURSE_CHANGE_BASE||(process.env.GITHUB_EVENT_NAME==='pull_request'&&parents.length===2?parents[0]:'f176feab634055ddd1833827e47a54fd8eb7784b');
+const files=cp.execFileSync('git',['diff','--name-only',base],{encoding:'utf8'}).trim().split('\n').filter(Boolean).concat(cp.execFileSync('git',['ls-files','--others','--exclude-standard','--exclude=.course-base/'],{encoding:'utf8'}).trim().split('\n').filter(Boolean));
 const allowed=p=>p.startsWith('docs/lab/')||p.startsWith('tools/')||p==='.github/workflows/lab-shared-course-v1.yml'||p==='.github/lab/feature-registry.json';
 assert(files.every(allowed),files.filter(p=>!allowed(p)).join(','));
 for(const asset of registry.assets){assert.equal(cp.execFileSync('git',['show',base+':'+asset.path]).compare(fs.readFileSync(asset.path)),0);}
+console.log('AUDIT_CHANGE_BASE',base);
 console.log('PASS_LAB_ONLY_ASSET_INTEGRITY_AND_CANDIDATE_INVENTORY',JSON.stringify({candidateTotal:inventory.candidateTotal,venues:inventory.venues.length,approved:0,files:files.length}));
