@@ -1,0 +1,20 @@
+name: LAB shared course foundation
+on:
+  pull_request:
+    paths: ['docs/lab/**', 'tools/*shared-course-v1.cjs', '.github/workflows/lab-shared-course-v1.yml']
+permissions:
+  contents: read
+jobs:
+  graph-and-kyoto-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .course-base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tools/test-shared-course-v1.cjs
+      - run: node tools/compare-shared-course-v1.cjs .course-base
