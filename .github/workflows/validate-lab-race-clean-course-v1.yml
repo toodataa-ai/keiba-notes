@@ -9,6 +9,10 @@ on:
       - 'docs/lab/race-clean-turf-mask-v1.js'
       - 'docs/lab/assets/kyoto-umapot-course-clean-v8.svg'
       - 'tools/test_race_clean_course_v1.cjs'
+      - 'tools/test_race_clean_ability90_v1.cjs'
+      - 'tools/test_race_clean_ability90_browser.py'
+      - 'docs/lab/race-ability-model-v1.js'
+      - 'docs/lab/race-lab-18-fixture-v1.js'
       - '.github/workflows/validate-lab-race-clean-course-v1.yml'
   workflow_dispatch:
 permissions: {contents: read}
@@ -24,6 +28,7 @@ jobs:
           set -euo pipefail
           for f in docs/lab/race-clean-course*.js;do node --check "$f";done
           node tools/test_race_clean_course_v1.cjs
+          node tools/test_race_clean_ability90_v1.cjs
           python3 .github/scripts/staging-baseline-v2.py --check
           python3 - <<'PY'
           import subprocess
@@ -441,6 +446,8 @@ jobs:
             page.close()
            browser.close()
           PY
+      - name: LAB90 abilities and independent goal camera at real-time 1x 2x 4x
+        run: python3 tools/test_race_clean_ability90_browser.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

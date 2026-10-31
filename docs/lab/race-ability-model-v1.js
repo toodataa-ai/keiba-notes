@@ -51,7 +51,27 @@ function profile(h,race,avg){
  if(v(4)===null)missing.push('⑤コース適性');
  if(!prev)missing.push('前走通過順');
  if(!recent.length)missing.push('近走距離・着順');
- return Object.freeze({baseSpeed,courseSpeed,paceSpeed,earlySpeed,kick,stamina,six,
+ // Opt-in only for the clean Kyoto2000 LAB. Other courses retain every
+ // original value. A 90-centred point is 1/.3 legacy points: normalize
+ // before the unchanged engine applies its 50-centred coefficients.
+ const use90=race.labAbilityScale==='90-v1'&&race.course_id==='kyoto_turf_inner_2000';
+ const keys=Object.keys(six),displaySix={},normalizedSix={};
+ if(use90){
+  const synthetic=h.styleMeta?.source==='LAB_SYNTHETIC_NOT_OFFICIAL';
+  const fixed=synthetic?h.labAbility90:null;
+  for(const key of keys){
+   const score=fixed?.[key]??Math.round(cl(90+(six[key]-50)*.3,82,98)*10)/10;
+   if(!Number.isFinite(score)||score<82||score>98)throw Error('LAB_ABILITY_90_INVALID');
+   displaySix[key]=score;
+   // Prestart grades have integer legacy scores. Keep their exact original
+   // physics contribution, without round-trip floating point drift.
+   normalizedSix[key]=fixed?(score-90)/.3+50:six[key];
+  }
+ }
+ return Object.freeze({baseSpeed,courseSpeed,paceSpeed,earlySpeed,kick,stamina,
+  six:use90?Object.freeze(normalizedSix):six,
+  ...(use90?{displaySix:Object.freeze(displaySix),
+   scale:'90-v1',neutral:90,legacyPointsPerScore:1/.3}:{}),
   evidence:Object.freeze(evidence),missing:Object.freeze(missing),confidence:missing.length?'低い':'限定的',
   excluded:'異条件の生時計・上がり3Fの直接比較、未取得調教、事後結果・払戻'});
 }

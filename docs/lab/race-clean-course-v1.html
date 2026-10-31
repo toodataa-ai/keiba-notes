@@ -2,7 +2,7 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#192d2c">
 <title>実況＋全体図・秋華賞17頭｜JRAシミュレータLAB</title>
-<link rel="stylesheet" href="race-clean-course-v1.css?v=20261031-ability">
+<link rel="stylesheet" href="race-clean-course-v1.css?v=20261031-ability90">
 </head><body>
 <header><div class="shell"><a href="race-simulator.html?demo=shuka-18">← 従来版LABへ戻る</a>
 <h1>京都芝2000m内回り｜新コース方式</h1>
@@ -18,6 +18,7 @@
 <button class="primary" id="startBtn">▶ スタート</button><button id="pauseBtn">一時停止</button><button id="resetBtn">最初に戻す</button>
 <label>追跡<select id="focus" aria-label="追跡する馬番"><option value="leader">先頭</option></select></label>
 <label>速度<select id="speed"><option value="1">1倍（等速）</option><option value="2" selected>2倍（標準）</option><option value="4">4倍（早送り）</option></select></label>
+<a class="ability-jump" href="#abilityPanel">各馬の能力を見る ↓</a>
 </section>
 <p class="trial-description" id="trialDescription">架空18頭の比較テスト。</p>
 <section class="panel race-display-panel">
@@ -55,8 +56,8 @@
 <tbody id="resultsBody"></tbody></table></div>
 <p class="results-note">馬身差はゴール時の推定速度と時間差から、1馬身=約2.4mとして換算。公式の着差ではありません。</p></section>
 <section class="panel"><div class="panel-title"><h2 id="horseGridTitle">架空18頭の馬番</h2><span>枠色対応</span></div><div id="horseGrid"></div></section>
-<section class="panel" aria-labelledby="abilityTitle">
-<div class="panel-title"><h2 id="abilityTitle">各馬の能力（仮想）</h2><span>6項目・0〜100</span></div>
+<section class="panel" id="abilityPanel" aria-labelledby="abilityTitle">
+<div class="panel-title"><h2 id="abilityTitle">各馬の能力（仮想）</h2><span id="abilityScaleLabel">90基準・82〜98</span></div>
 <p class="ability-note" id="abilityNote"></p>
 <div class="runner-abilities" id="runnerAbilities"></div>
 </section>
@@ -80,20 +81,20 @@
 <script src="race-course-geometry-v1.js?v=20261016-40"></script>
 <script src="race-lane-ai-v1.js?v=20261015-25"></script>
 <script src="race-runner-style-v1.js?v=20261015-24"></script>
-<script src="race-ability-model-v1.js?v=20261015-22"></script>
+<script src="race-ability-model-v1.js?v=20261031-ability90"></script>
 <script src="race-cohort-speed-v1.js?v=20261020-25"></script>
 <script src="race-sim-engine.js?v=20261020-25"></script>
-<script src="race-lab-18-fixture-v1.js?v=20261018-48"></script>
+<script src="race-lab-18-fixture-v1.js?v=20261031-ability90"></script>
 <script src="race-real-shuka-2026-fixture-v1.js?v=20261020-25"></script>
 <script src="race-real-shuka-2026-reference-v1.js?v=20261019-22"></script>
 <script src="race-clean-course-v1.js?v=20261018-14"></script>
 <script src="race-course-image-geometry-v1.js?v=20261019-21"></script>
 <script src="race-safe-rail-projection-v1.js?v=20261020-26"></script>
 <script src="race-clean-turf-mask-v1.js?v=20261020-26"></script>
-<script src="race-clean-goal-view-v1.js?v=20261031-goal-100"></script>
+<script src="race-clean-goal-view-v1.js?v=20261031-ability90"></script>
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
 <script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
 <script src="race-frame-interpolator-v1.js?v=20261020-24"></script>
-<script src="race-clean-course-app-v1.js?v=20261031-ability"></script>
+<script src="race-clean-course-app-v1.js?v=20261031-ability90"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>

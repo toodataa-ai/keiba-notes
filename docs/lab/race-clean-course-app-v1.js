@@ -15,8 +15,13 @@ const REAL_TRIAL='shuka2026';
 let trialMode=new URLSearchParams(location.search).get('trial')===REAL_TRIAL?
  REAL_TRIAL:'synthetic';
 let fixture=trialMode===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
-let entries=fixture.horses();
-let race={...fixture.entry(),horses:entries};
+const ABILITY_SCALE=new URLSearchParams(location.search).get('ability')==='legacy'?'legacy-50':'90-v1';
+const GOAL_SPAN=new URLSearchParams(location.search).get('goalCamera')==='legacy'?290:100;
+function fixtureHorses(){return fixture.horses({abilityScale:ABILITY_SCALE});}
+function fixtureRace(){return {...fixture.entry(),horses:entries,
+ ...(ABILITY_SCALE==='90-v1'?{labAbilityScale:ABILITY_SCALE}:{})};}
+let entries=fixtureHorses();
+let race=fixtureRace();
 let postraceBenchmarkVisible=false;
 const hud=window.RaceBroadcastHud,resultCache={signature:''};
 const frameMotion=window.RaceFrameInterpolator;
@@ -89,11 +94,14 @@ function waku(no){const w=jraWaku(no,race.field_size);return {fill:w.fill,ink:w.
 // recalculate, normalize or mutate any runner's ability or physical state.
 function renderAbilities(){
  const host=$('runnerAbilities');host.replaceChildren();
- $('abilityNote').textContent=trialIsReal()?
+ $('abilityScaleLabel').textContent=ABILITY_SCALE==='90-v1'?'90基準・82〜98':'旧50基準・0〜100';
+ $('abilityNote').textContent=(ABILITY_SCALE==='90-v1'?
+  '90を中立とする能力値です。標準88〜91、高能力92〜98、低能力82〜87が目安。':
+  '比較用の旧50基準です。')+(trialIsReal()?
   '発走前データに基づく未校正の推定値です。実測値・正式予想の能力点ではありません。':
-  '架空18頭のテスト用能力値です。全馬共通の入力評価による仮想値で、実馬の能力ではありません。';
+  '架空18頭のテスト用能力値です。実馬の能力ではありません。');
  const labels={early:'先行力',cruise:'巡航速度',burst:'瞬発力',
-  sustain:'持続力',stamina:'スタミナ',acceleration:'加速性能'};
+  sustain:'持続力',stamina:'スタミナ',acceleration:'加速力'};
  const styles={nige:'逃げ',senko:'先行',sashi:'差し',oikomi:'追込'};
  for(const horse of engine.state.horses){
   const card=document.createElement('article');card.className='runner-ability-card';
@@ -106,14 +114,15 @@ function renderAbilities(){
   const values=document.createElement('dl');values.className='ability-values';
   for(const [key,label] of Object.entries(labels)){
    const item=document.createElement('div'),term=document.createElement('dt'),value=document.createElement('dd');
-   term.textContent=label;value.textContent=horse.six[key];value.dataset.trait=key;
+   term.textContent=label;value.textContent=(horse.abilityProfile.displaySix||horse.six)[key];value.dataset.trait=key;
    item.append(term,value);values.appendChild(item);
   }
   card.append(heading,values);
   const details=document.createElement('details'),summary=document.createElement('summary'),note=document.createElement('p');
   summary.textContent='能力の根拠';
   const profile=horse.abilityProfile;
-  note.textContent=(trialIsReal()?'':'架空データ。')+profile.evidence.join(' ／ ')+
+  note.textContent=(trialIsReal()?'':ABILITY_SCALE==='90-v1'?
+   '架空データ。6能力は脚質別の固定テスト設定。':'架空データ。')+profile.evidence.join(' ／ ')+
    (profile.missing.length?' ／ 未取得：'+profile.missing.join('・'):'')+
    ' ／ 根拠の確かさ：'+profile.confidence;
   details.append(summary,note);card.appendChild(details);host.appendChild(card);
@@ -174,8 +183,8 @@ function rebuildFixtureUi(){
 function switchTrial(next){
  if(next!==REAL_TRIAL&&next!=='synthetic')return;
  trialMode=next;fixture=next===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
- entries=fixture.horses();
- race={...fixture.entry(),horses:entries};
+ entries=fixtureHorses();
+ race=fixtureRace();
  rebuildFixtureUi();
  reset();
 }
@@ -187,7 +196,7 @@ function compareWithOfficialResult(){
  if(!ref||ref.race_id!==race.source_report?.match(/shuka-sho/)?.[0]&&
     ref.race_id!=='2026-10-18-shuka-sho')
   throw Error('OFFICIAL_POSTRACE_HOLDOUT_MISSING');
- const sim=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
+ const sim=RaceSimEngine.create({...race,horses:fixtureHorses()},{seed:2026,bias:'neutral'});
  const orders=[],splitTargets=[1000,...ref.officialCorners.map(c=>c.distanceApprox)]
   .sort((a,b)=>a-b);
  let i=0,loops=0,splitTime=null,splitPace=null;
@@ -230,7 +239,7 @@ function compareWithOfficialResult(){
  root.appendChild(source);
 }
 function reset(){
- engine=RaceSimEngine.create({...race,horses:fixture.horses()},{seed:2026,bias:'neutral'});
+ engine=RaceSimEngine.create({...race,horses:fixtureHorses()},{seed:2026,bias:'neutral'});
  renderAbilities();
  playing=false;last=0;acc=0;lastCamera=null;lastPaintCamera=null;lastRenderedPoints=[];
  framePrevious=frameCurrent=captureFrame();
@@ -531,7 +540,7 @@ function paint(){
    lastGoalFrame=window.RaceCleanGoalView.render({
     canvas:goalCanvas,points,leaderNo:state.leadingNo,focusedNo:chosen,
     paintNumber:raceNumberMarker,maxLane:14,distance:2000,turn:'右',
-    fieldSize:race.field_size,pullback:1+.22*eased
+    fieldSize:race.field_size,pullback:1+.22*eased,screenSpan:GOAL_SPAN
    });
   }else lastGoalFrame=null;
  }
@@ -552,7 +561,9 @@ function paint(){
 }
 function tick(ts){
  if(!last)last=ts;
- let delta=Math.min(.18,(ts-last)/1000);last=ts;
+ // A seek can block across a queued RAF timestamp. Do not count that
+ // paused work as playback time, or 4x can skip the offscreen entrance.
+ let delta=Math.max(0,Math.min(.18,(ts-last)/1000));last=Math.max(last,ts);
  if(playing){
   if(!engine.state.finished){
    acc+=delta*Number($('speed').value);
@@ -602,7 +613,7 @@ function setup(){
  });
  $('startBtn').addEventListener('click',()=>{
   if(engine.state.finished)reset();
-  playing=true;$('startBtn').textContent='▶ 再生中';
+  playing=true;last=performance.now();$('startBtn').textContent='▶ 再生中';
  });
  $('pauseBtn').addEventListener('click',()=>{
   playing=false;$('startBtn').textContent='▶ 再開';
@@ -646,6 +657,7 @@ window.CleanLab=Object.freeze({
    nominalSpeedProfile:engine.state.nominalSpeedProfile,
    nominalCruiseSpeedMps:engine.state.nominalCruiseSpeedMps,
    trialMode,fixtureId:fixture.id,raceFieldSize:race.field_size,
+   abilityScale:ABILITY_SCALE,goalScreenSpan:GOAL_SPAN,
    realPrestartOnly:trialIsReal(),
    originalImageSrc:image?.getAttribute('src')||null,
    originalLoaded:sourceImageReady(image),

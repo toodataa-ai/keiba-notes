@@ -10,13 +10,13 @@
 function laneStep(height,maxLane){
  return Math.min(30,height/16,(height-100)/(maxLane+3.2));
 }
-function goalScreenPosition(distance,lane,finish,width,height,maxLane,turn='左',pullback=1){
+function goalScreenPosition(distance,lane,finish,width,height,maxLane,turn='左',pullback=1,screenSpan=100){
  const center=height*.52,step=laneStep(height,maxLane)/pullback;
  const direction=turn==='右'?-1:1,finishX=turn==='右'?width*.30:width*.70;
  // A fixed 100m screen span puts the leader at 110% width at the
  // 80m camera cut (right-handed course). Keep this linear through the
  // wire: entry, gaps and speed all use the same physical distance.
- return {x:finishX+direction*(distance-finish)*width/(100*pullback),
+ return {x:finishX+direction*(distance-finish)*width/(screenSpan*pullback),
          y:center+(lane-maxLane/2)*step};
 }
 function drawGoalPost(ctx,x,top,bottom){
@@ -32,7 +32,7 @@ function drawGoalPost(ctx,x,top,bottom){
 }
 function render(options){
  const {canvas,points,leaderNo,focusedNo,paintNumber,pullback=1,
-  fieldSize=18,turn='右',distance=2000,maxLane=14}=options;
+  fieldSize=18,turn='右',distance=2000,maxLane=14,screenSpan=100}=options;
  const rect=canvas.getBoundingClientRect(),w=Math.max(1,rect.width),
    h=Math.max(1,rect.height),dpr=Math.min(2.5,Math.max(1,global.devicePixelRatio||1)),
    pixelW=Math.round(w*dpr),pixelH=Math.round(h*dpr);
@@ -56,7 +56,7 @@ function render(options){
  const markers=[];
  for(const p of points.slice().sort((a,b)=>
   Number(a.number===focusedNo)-Number(b.number===focusedNo)||a.number-b.number)){
-  const q=goalScreenPosition(p.d,p.lane,distance,w,h,maxLane,turn,pullback);
+  const q=goalScreenPosition(p.d,p.lane,distance,w,h,maxLane,turn,pullback,screenSpan);
   const scale=.81,rad=13.5*scale;
   if(q.x<-rad||q.x>w+rad||q.y<-rad||q.y>h+rad)continue;
   paintNumber(ctx,p.number,q.x,q.y,scale,p.number===focusedNo,
@@ -64,7 +64,7 @@ function render(options){
   markers.push({number:p.number,x:q.x,y:q.y,d:p.d});
  }
  return {mode:'kyoto1400-goal-camera',goalX,top,bottom,
-  markers,visible:markers.length,pullback,leaderD:Math.max(...points.map(p=>p.d))};
+  markers,visible:markers.length,pullback,screenSpan,leaderD:Math.max(...points.map(p=>p.d))};
 }
 global.RaceCleanGoalView=Object.freeze({goalScreenPosition,drawGoalPost,render,laneStep});
 })(typeof window!=='undefined'?window:globalThis);
