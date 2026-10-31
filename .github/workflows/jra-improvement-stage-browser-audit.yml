@@ -25,6 +25,7 @@ jobs:
       - name: Check dashboard in real Chrome on mobile and desktop
         run: |
           set -euo pipefail
+          python shadow_lab/browser_audit.py
           python3 -m http.server 8765 --directory docs >/tmp/jra-improvement-server.log 2>&1 &
           sleep 2
           python .github/scripts/jra-improvement-stage-browser-audit.py
@@ -58,5 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jra-improvement-stage-qa
-          path: /tmp/jra-improvement-stage-*.png
+          path: |
+            /tmp/jra-improvement-stage-*.png
+            /tmp/shadow-stage-*.png
           if-no-files-found: ignore

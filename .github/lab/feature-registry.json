@@ -254,6 +254,23 @@
         "source_physics_audit": "docs/lab/TOKYO_2000_SOURCE_PHYSICS_AUDIT_V5.json",
         "visual_approval_pending": true
       }
+    },
+    {
+      "id": "jra-seven-theme-shadow",
+      "name": "JRA全7テーマ前向きShadow実験",
+      "phase": "draft_runtime_staging_verification",
+      "approval": "not_approved_for_production",
+      "preview_path": "staging/improvement-cycle.html",
+      "staging_paths": [
+        "docs/staging/improvement-cycle.html",
+        "docs/staging/all-experiments.html"
+      ],
+      "production_paths": [],
+      "lab_paths": [
+        "shadow_lab",
+        "docs/lab/data/shadow-runtime.json"
+      ],
+      "next_action": "発走前の実データ不足をblockerとして保存。候補生成・GitHubサーバー時刻proof・結果突合・集計を検証し、Draftで審査。正式版・本番公開への自動反映なし。"
     }
   ]
 }

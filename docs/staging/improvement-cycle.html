@@ -91,6 +91,8 @@ function add(parent,tag,value,cls){
  return el;
 }
 function pairForTopic(d,ids){
+ const runtime=d.shadowRuntime?.find(x=>ids.includes(x.theme));
+ if(runtime)return {count:runtime.valid_pairs,registered:runtime.runner_ready};
  const c=d.formal.comparison||{},src=d.experiments||[];
  const active=src.find(x=>x.id&&x.baseline===d.latest_formal_prompt_version&&
     x.challenger===c.candidate&&x.status!=='rejected'&&
@@ -139,6 +141,7 @@ function forecastForTopic(d,topicIds,paired){
 }
 function topicCard(d,h){
  const card=add($('topicRoadmaps'),'article',undefined,'road-card topic-road');
+ card.dataset.theme=h.id;
  const screen=h.next_decision?.screening||{},eligible=!!screen.ready_to_design_experiment;
  const paired=pairForTopic(d,[h.id]);
  const target=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
@@ -189,6 +192,7 @@ function topicCard(d,h){
  add(src,'summary','証拠レースIDを見る');
  const ul=add(src,'ul');
  (h.observation_races||[]).forEach(r=>add(ul,'li',r.race_id));
+ runtimeDetails(card,d.shadowRuntime?.find(x=>x.theme===h.id));
 }
 function verifiedCollection(data){
  const ids=new Set(),regimes={};
@@ -210,10 +214,12 @@ function verifiedCollection(data){
 }
 function studyCard(d,s,collection){
  const card=add($('studyRoadmaps'),'article',undefined,'road-card study-road');
+ const runtime=d.shadowRuntime?.find(x=>x.theme===(s.id||'').replace('experience_','').toUpperCase());
+ card.dataset.theme=runtime?.theme||s.id;
  const next=s.next_decision||{},goal=s.diagnostic_initial_target||{};
  const aggregate=collection.regimes[(s.id||'').replace('experience_','').toUpperCase()]||{races:0,horses:0};
  const target=Math.max(1,Number(goal.win_probability_cases)||30);
- const valid=Math.min(Number(s.strict_win_probability_observations)||0,Number(s.strict_top3_probability_observations)||0);
+ const valid=runtime?.probability_horses??Math.min(Number(s.strict_win_probability_observations)||0,Number(s.strict_top3_probability_observations)||0);
  const researchReady=valid>=target&&goal.minimum_data_counts_observed===true&&!goal.needs_record_level_overlap_and_proof_audit;
  const paired=pairForTopic(d,[s.id,'field_experience']);
  const pairTarget=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
@@ -234,10 +240,11 @@ function studyCard(d,s,collection){
  add(right,'strong',fmt(s.cumulative_reviewed_horse_observations)+'頭分・'+fmt(s.cumulative_weeks_with_observations)+'週','value');
  add(right,'small','着順データはあるが、確率予測の正しさはまだ判定できません');
  const rows=add(card,'div',undefined,'progress-pair');
- progress(rows,s.strict_win_probability_observations,target,'勝率の発走前予測＋結果の照合','research-prob');
- progress(rows,s.strict_top3_probability_observations,goal.top3_probability_cases||30,'3着内確率の発走前予測＋結果の照合','research-prob');
+ progress(rows,valid,target,'勝率の発走前予測＋結果の照合','research-prob');
+ progress(rows,valid,goal.top3_probability_cases||30,'3着内確率の発走前予測＋結果の照合','research-prob');
  const mini=add(card,'div',undefined,'comparison-mini');
- progress(mini,paired.count,pairTarget,'この研究に関連する候補版の厳格比較');
+ progress(mini,runtime?.distinct_races||0,3,'研究初期診断の異なるレース数');
+ progress(mini,runtime?.independent_weeks||0,2,'研究初期診断の独立開催週');
  const hint=add(card,'p',undefined,'decision-hint');
  hint.textContent='次の判断：有効な確率予測データがあと'+fmt(next.win_probability_horse_records_remaining)+'頭分（勝率）、'+fmt(next.top3_probability_horse_records_remaining)+'頭分（3着内）必要です。';
  const timing=add(card,'div',undefined,'timing-row');
@@ -254,14 +261,34 @@ function studyCard(d,s,collection){
  [['調べたいこと',plan.question||s.investigation],['調査方法',plan.test||'精度・確率校正を比較'],['次にすること',plan.next||'発走前予測確率を記録']].forEach(([k,v])=>{
    const line=add(details,'div',undefined,'details-pair');add(line,'b',k);add(line,'span',v);
  });
+ runtimeDetails(card,runtime);
+}
+function runtimeDetails(card,x){
+ if(!x)throw Error('Shadow実行状態を取得できません');
+ const box=add(card,'div',undefined,'shadow-runtime');
+ box.style.overflowWrap='anywhere';
+ add(box,'b','Shadow実行・証拠監査');
+ add(box,'p','候補版：'+x.candidate_version+' ／ 実装済み・入力条件付きで実行可能');
+ add(box,'p','精度・副作用：'+(x.valid_pairs?'有効比較から集計中':'有効比較の収集中')+' ／ 承認：'+x.approval+' ／ 採用：未採用');
+ const detail=add(box,'details');add(detail,'summary','現在のblockerと次の作業');
+ const ul=add(detail,'ul');x.blockers.forEach(b=>add(ul,'li',b));
+ add(detail,'p','次の作業：'+x.next_action);
+ const metrics=add(box,'details');add(metrics,'summary','精度・回収率・条件別検証');
+ const pre=add(metrics,'pre',JSON.stringify({metrics:x.metrics,conditions:x.condition_audit,overfit:x.overfit_review},null,2));
+ pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px';
+ card.querySelector('.stage-label').textContent=x.blockers.length?'実績収集中・blockerあり':x.approval;
 }
 async function render(){
- const [response,source]=await Promise.all([
+ const [response,source,shadow]=await Promise.all([
     fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'}),
-    fetch('data/experience_regime_status.json',{cache:'no-store'})
+    fetch('data/experience_regime_status.json',{cache:'no-store'}),
+    fetch('data/jra_shadow_experiment_status_v1.json',{cache:'no-store'})
  ]);
- if(!response.ok||!source.ok)throw Error('必要な発走前実績データを取得できません');
+ if(!response.ok||!source.ok||!shadow.ok)throw Error('必要な発走前実績データを取得できません');
  const d=await response.json();
+ const shadowStatus=await shadow.json();
+ if(shadowStatus.runtime?.experiments?.length!==7)throw Error('7テーマの実行状態が揃っていません');
+ d.shadowRuntime=shadowStatus.runtime.experiments;
  const researchSource=await source.json();
  const collection=verifiedCollection(researchSource);
  if(d.schema_version!==1||!d.formal||!d.research||!d.public_roadmap)throw Error('集計データの形式が違います');

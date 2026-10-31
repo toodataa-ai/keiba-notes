@@ -175,7 +175,7 @@ with sync_playwright() as pw:
             assert str(observed["horses"])+"頭分" in x["first"],(width,x)
             assert x["second"].startswith(str(src["cumulative_reviewed_horse_observations"])+"頭分"),(width,x)
             assert x["states"]==5 and x["current"]==1,(width,x)
-            assert len(x["bars"])==3 and all(b[0]==0 for b in x["bars"]),(width,x)
+            assert len(x["bars"])==4 and all(b[0]==0 for b in x["bars"]),(width,x)
             remaining=max(n["win_probability_horse_records_remaining"],n["top3_probability_horse_records_remaining"])
             approx=max(n["minimum_distinct_new_qualifying_races"],
                        -(-remaining*observed["races"]//observed["horses"]))
