@@ -62,7 +62,7 @@ jobs:
               assert sha==proof_rows[rid]['proof_commit'] and proof_rows[rid]['proof_prestart_valid']
               obj=json.loads(snap.read_text());aud=json.loads(audit_path.read_text())
               assert aud['usable_for_e012_shadow'] and not aud['missing_prerace_evidence']
-              assert aud['source_input_sha256']==hashlib.sha256(snap.read_bytes()).hexdigest()
+              assert aud['source_input_sha256']==hashlib.sha256(json.dumps(obj,ensure_ascii=False).encode('utf-8')).hexdigest()
               assert datetime.fromisoformat(obj['captured_at'])<start
               assert item['sample_origin']==obj['race_context']['sample_origin']
               assert item['race_category']==obj['race_context']['race_category']
