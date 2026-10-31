@@ -43,6 +43,9 @@ with sync_playwright() as pw:
       assert a['worldX']==b['worldX'] and a['worldY']==b['worldY']
     else:
      assert f['broadcast']['screenSpan']==100
+     for marker in f['broadcast']['positions']:
+      assert marker['y']-12*.81>=f['broadcast']['top']+13
+      assert marker['y']+12*.81<=f['broadcast']['bottom']-13
      w=page.locator('#liveBroadcast').bounding_box()['width']
      lead=max(f['broadcast']['positions'],key=lambda h:h['d'])
      assert math.isclose(lead['x']/w,.3+(2000-d)/100,abs_tol=.00002)
@@ -52,7 +55,7 @@ with sync_playwright() as pw:
     assert page.evaluate('''()=>{const a=JSON.stringify(RaceTokyoLocalPreviewV5.lastFrame);RaceTokyoLocalPreviewV5.draw();return a===JSON.stringify(RaceTokyoLocalPreviewV5.lastFrame)}''')
    # Fixed physics replay from the start. Only wall-time rate changes.
    page.evaluate('RaceTokyoLocalPreviewV5.seek(0)');page.locator('#playSpeed').select_option(str(speed));page.locator('#startBtn').click()
-   samples=page.evaluate('''()=>{let old=null,rows=[],lastGoal=null,goalCut=null;for(let i=0;i<10000&&RaceTokyoLocalPreviewV5.isPlaying;i++){window.__tick(1000/60);const f=RaceTokyoLocalPreviewV5.lastFrame;if(old&&f.time>old.time){const dt=f.time-old.time;for(let j=0;j<18;j++){if(f.points[j].d<old.points[j].d-1e-8)throw Error('backwards');if((f.points[j].d-old.points[j].d)/dt>30)throw Error('presentation acceleration');}if(f.leaderD<1920){const lead=f.points.reduce((a,b)=>b.d>a.d?b:a);const a=f.overview.positions.find(p=>p.number===lead.number);const b=f.broadcast.positions.find(p=>p.number===lead.number);if(!Number.isFinite(a.worldX+b.worldX))throw Error('projection');}else{if(goalCut===null)goalCut=f.leaderD;const lead=f.broadcast.positions.reduce((a,b)=>b.d>a.d?b:a);if(lastGoal!==null&&lead.x>lastGoal+1e-7)throw Error('goal direction reversed');lastGoal=lead.x;}}old=f;if(i%120===0)rows.push({time:f.time,leaderD:f.leaderD});}if(RaceTokyoLocalPreviewV5.isPlaying)throw Error('not complete');return{rows,goalCut,final:RaceTokyoLocalPreviewV5.lastFrame}}''')
+   samples=page.evaluate('''()=>{let old=null,rows=[],lastGoal=null,goalCut=null;for(let i=0;i<10000&&RaceTokyoLocalPreviewV5.isPlaying;i++){window.__tick(1000/60);const f=RaceTokyoLocalPreviewV5.lastFrame;if(old&&f.time>old.time){const dt=f.time-old.time;for(let j=0;j<18;j++){if(f.points[j].d<old.points[j].d-1e-8)throw Error('backwards');if((f.points[j].d-old.points[j].d)/dt>30)throw Error('presentation acceleration');}if(f.leaderD<1920){const lead=f.points.reduce((a,b)=>b.d>a.d?b:a);const a=f.overview.positions.find(p=>p.number===lead.number);const b=f.broadcast.positions.find(p=>p.number===lead.number);if(!Number.isFinite(a.worldX+b.worldX))throw Error('projection');const prior=old.overview.positions.find(p=>p.number===lead.number);const dx=a.worldX-prior.worldX,dy=a.worldY-prior.worldY;const forwardX=dx*Math.cos(f.camera.angle)-dy*Math.sin(f.camera.angle);if(forwardX>1e-5)throw Error('tracking direction reversed');}else{if(goalCut===null)goalCut=f.leaderD;const lead=f.broadcast.positions.reduce((a,b)=>b.d>a.d?b:a);if(lastGoal!==null&&lead.x>lastGoal+1e-7)throw Error('goal direction reversed');lastGoal=lead.x;}}old=f;if(i%120===0)rows.push({time:f.time,leaderD:f.leaderD});}if(RaceTokyoLocalPreviewV5.isPlaying)throw Error('not complete');return{rows,goalCut,final:RaceTokyoLocalPreviewV5.lastFrame}}''')
    assert samples['goalCut']>=1920
    assert page.locator('#raceRows tr').count()==18
    assert page.locator('#raceBanner').is_visible()
