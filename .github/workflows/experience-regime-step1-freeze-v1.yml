@@ -1,0 +1,106 @@
+name: Freeze genuine formal STEP1 for E012 research (no synthetic predictions)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/experience-regime-step1-freeze-v1.yml'
+      - 'experience_regime_v1/step1_capture_v1.py'
+      - 'experience_regime_v1/test_step1_capture_v1.py'
+      - 'experience_regime_v1/requests/run-current.json'
+      - 'experience_regime_v1/collection/**'
+      - 'docs/data/races.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: experience-regime-step1-prestart
+  cancel-in-progress: false
+jobs:
+  freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate capture implementation and test guards
+        run: |
+          set -euo pipefail
+          python -m py_compile experience_regime_v1/step1_capture_v1.py
+          python -m unittest experience_regime_v1.test_step1_capture_v1 experience_regime_v1.test_model experience_regime_v1.test_prestart_collection_audit_v1
+      - name: Select today's frozen plan (not historical)
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,datetime,os
+          from zoneinfo import ZoneInfo
+          p=json.load(open("experience_regime_v1/requests/run-current.json"))
+          day=datetime.datetime.now(ZoneInfo("Asia/Tokyo")).date().isoformat()
+          active=p["date"]==day and p["mode"]=="prospective_strict"
+          with open(os.environ["GITHUB_ENV"],"a") as f:
+              f.write("E012_ACTIVE="+str(active).lower()+"\n")
+              if active:f.write("E012_WEEK="+p["week_id"]+"\nE012_DAY="+day+"\n")
+          print("E012_STEP1_DUE",active)
+          PY
+      - name: Collect only proof-backed actual STEP1 and report gaps
+        if: env.E012_ACTIVE == 'true'
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.step1_capture_v1 --week-id "$E012_WEEK" --date "$E012_DAY"
+      - name: Stage isolated research files, enforce start gate, and commit
+        if: env.E012_ACTIVE == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -d "experience_regime_v1/step1_frozen/$E012_WEEK" ]];then
+            git add -A -- "experience_regime_v1/step1_frozen/$E012_WEEK"
+          fi
+          git add -- docs/data/experience_regime_step1_status.json
+          python - <<'PY'
+          import os,json,subprocess
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          staged=subprocess.check_output(["git","diff","--cached","--name-only"],text=True).splitlines()
+          prefix="experience_regime_v1/step1_frozen/"+os.environ["E012_WEEK"]+"/"
+          assert all(x.startswith(prefix) or x=="docs/data/experience_regime_step1_status.json" for x in staged),staged
+          now=datetime.now(ZoneInfo("Asia/Tokyo"))
+          for path in staged:
+            if path.startswith(prefix):
+              r=json.loads(Path(path).read_text())
+              assert r["date"]==os.environ["E012_DAY"] and now<datetime.fromisoformat(r["start_at"]),("cannot commit STEP1 after start",path)
+              assert r["no_odds_used"] and r["no_synthetic_predictions"] and not r["production_effect"]
+          print("E012_STEP1_STAGED_RESEARCH_ONLY",len(staged))
+          PY
+          if git diff --cached --quiet;then
+            echo E012_STEP1_ALREADY_FROZEN_NO_DUPLICATES
+          else
+            git commit -m "Freeze only proof-verified formal STEP1 observations for E012 shadow"
+            for n in 1 2 3 4 5;do
+              git pull --rebase origin main
+              if git push origin HEAD:main;then break;fi
+              if [[ "$n" -eq 5 ]];then exit 1;fi
+              sleep 2
+            done
+          fi
+      - name: Check public research status is byte-identical
+        if: env.E012_ACTIVE == 'true'
+        run: |
+          set -euo pipefail
+          BASE="https://toodataa-ai.github.io/keiba-notes/data/experience_regime_step1_status.json"
+          for attempt in $(seq 1 24);do
+            if curl -fLsS --max-time 20 "$BASE?step1=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-step1-pub.json &&
+               cmp -s docs/data/experience_regime_step1_status.json /tmp/e012-step1-pub.json;then
+              echo E012_STEP1_PUBLIC_BYTE_IDENTICAL
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::STEP1 research status is stale on Pages"
+          exit 1
