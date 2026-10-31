@@ -62,8 +62,242 @@
       ],
       "release_gate": "A/B/C explicit manual approval only; stage B validation and full STEP1 shadow required; never auto promote",
       "valid_pairs_count": 0,
-      "notes": "This design record is not an activated trial. No strict paired result can be credited until a runnable candidate and independent before-start proof are reviewed."
+      "notes": "This design record is not an activated trial. No strict paired result can be credited until a runnable candidate and independent before-start proof are reviewed.",
+      "runner_ready": false,
+      "experiment_family": "formal_jra",
+      "strict_pairs_count": 0
+    },
+    {
+      "id": "pace_positioning",
+      "title": "展開・位置取り・先行力：STEP1②検証",
+      "hypothesis_ids": [
+        "pace_positioning"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13-pace-positioning-shadow-v0.1",
+      "status": "design",
+      "experiment_family": "formal_jra",
+      "runner_ready": false,
+      "strict_pairs_count": 0,
+      "scope": {
+        "races": "JRA formal main",
+        "surface_split": true,
+        "meeting_weeks": "multiple"
+      },
+      "fixed_change": "②展開・隊列予測のみを変更。①③④〜⑨とSTEP2を固定。レース前S/M/Hシナリオを比較し、位置取りが印に及ぼす影響を保存。",
+      "prestart_pairing": {
+        "minimum_valid_pairs": 20,
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "grade": "prospective_strict",
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "pace_prediction_accuracy",
+        "honmei_top3_rate",
+        "top3_marks_capture_rate",
+        "roi_secondary"
+      ],
+      "release_gate": "A/B/C explicit manual approval; 20 paired races are a minimum not an approval guarantee",
+      "notes": "Observation screen met; candidate runner and proof publisher not yet implemented."
+    },
+    {
+      "id": "ticket_portfolio",
+      "title": "購入セット・印との整合性：STEP2検証",
+      "hypothesis_ids": [
+        "ticket_portfolio"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13-ticket-portfolio-shadow-v0.1",
+      "status": "design",
+      "experiment_family": "formal_jra",
+      "runner_ready": false,
+      "strict_pairs_count": 0,
+      "scope": {
+        "races": "JRA formal main",
+        "budget_yen": 6000,
+        "ticket_types": 8
+      },
+      "fixed_change": "①〜⑨のSTEP1と印を厳密固定。発走前に確認できた同一時点の実オッズ、同じ予算6000円以下で8券種・選択構成・購入配分のみ比較。",
+      "prestart_pairing": {
+        "minimum_valid_pairs": 20,
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "grade": "prospective_strict",
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "expected_value",
+        "risk_of_loss",
+        "portfolio_hit_probability",
+        "realized_roi_secondary"
+      ],
+      "release_gate": "A/B/C explicit manual approval; 20 paired races are a minimum not an approval guarantee",
+      "notes": "Observation screen met; candidate runner and proof publisher not yet implemented."
+    },
+    {
+      "id": "field_experience",
+      "title": "若駒・経験不足：E0/E1/E2の不確実性評価",
+      "hypothesis_ids": [
+        "field_experience"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13-field-experience-shadow-v0.1",
+      "status": "awaiting_evidence",
+      "experiment_family": "formal_jra",
+      "runner_ready": false,
+      "strict_pairs_count": 0,
+      "scope": {
+        "races": "JRA formal main",
+        "groups": [
+          "E0",
+          "E1",
+          "E2"
+        ]
+      },
+      "fixed_change": "STEP1で戦歴に応じた不確実性だけを変える。前走戦績・当日結果で戦歴区分を遡及変更しない。",
+      "prestart_pairing": {
+        "minimum_valid_pairs": 20,
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "grade": "prospective_strict",
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "win_brier",
+        "top3_brier",
+        "honmei_top3_rate",
+        "cross_class_degradation"
+      ],
+      "release_gate": "A/B/C explicit manual approval; 20 paired races are a minimum not an approval guarantee",
+      "notes": "Observation screen not yet met; plan may be frozen but challenger cannot be activated."
+    },
+    {
+      "id": "experience_e0_probability_20261101_v1",
+      "title": "E0戦歴研究：発走前勝率・3着内確率の校正",
+      "hypothesis_ids": [
+        "field_experience"
+      ],
+      "baseline": "experience_regime_v1 current prereace collection (frozen)",
+      "challenger": "experience-regime-e0-probability-shadow-v0.1",
+      "status": "awaiting_evidence",
+      "experiment_family": "experience_regime_research",
+      "research_regime": "E0",
+      "runner_ready": false,
+      "strict_pairs_count": 0,
+      "scope": {
+        "races": "fixed weekly hash-sampled JRA 1R-12R and formal main",
+        "group": "E0"
+      },
+      "fixed_change": "E0の発走前不確実性・勝率・3着内確率のみ独立して比較。週次抽出計画と結果ラベルを後から変更しない。",
+      "preliminary_diagnostic": {
+        "minimum_win_probability_with_result": 30,
+        "minimum_top3_probability_with_result": 30,
+        "minimum_distinct_races": 3,
+        "minimum_independent_weeks": 2
+      },
+      "prestart_pairing": {
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "win_brier",
+        "win_log_loss",
+        "top3_brier",
+        "calibration_error"
+      ],
+      "release_gate": "Research only. Never promote to formal without separate prospective formal Grade A comparison and A/B/C manual approval.",
+      "notes": "Historical horse observations and unpaired reviews do not qualify as scored predicted probabilities. Currently no strict probability observations."
+    },
+    {
+      "id": "experience_e1_probability_20261101_v1",
+      "title": "E1戦歴研究：発走前勝率・3着内確率の校正",
+      "hypothesis_ids": [
+        "field_experience"
+      ],
+      "baseline": "experience_regime_v1 current prereace collection (frozen)",
+      "challenger": "experience-regime-e1-probability-shadow-v0.1",
+      "status": "awaiting_evidence",
+      "experiment_family": "experience_regime_research",
+      "research_regime": "E1",
+      "runner_ready": false,
+      "strict_pairs_count": 0,
+      "scope": {
+        "races": "fixed weekly hash-sampled JRA 1R-12R and formal main",
+        "group": "E1"
+      },
+      "fixed_change": "E1の発走前不確実性・勝率・3着内確率のみ独立して比較。週次抽出計画と結果ラベルを後から変更しない。",
+      "preliminary_diagnostic": {
+        "minimum_win_probability_with_result": 30,
+        "minimum_top3_probability_with_result": 30,
+        "minimum_distinct_races": 3,
+        "minimum_independent_weeks": 2
+      },
+      "prestart_pairing": {
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "win_brier",
+        "win_log_loss",
+        "top3_brier",
+        "calibration_error"
+      ],
+      "release_gate": "Research only. Never promote to formal without separate prospective formal Grade A comparison and A/B/C manual approval.",
+      "notes": "Historical horse observations and unpaired reviews do not qualify as scored predicted probabilities. Currently no strict probability observations."
+    },
+    {
+      "id": "experience_e2_probability_20261101_v1",
+      "title": "E2戦歴研究：発走前勝率・3着内確率の校正",
+      "hypothesis_ids": [
+        "field_experience"
+      ],
+      "baseline": "experience_regime_v1 current prereace collection (frozen)",
+      "challenger": "experience-regime-e2-probability-shadow-v0.1",
+      "status": "awaiting_evidence",
+      "experiment_family": "experience_regime_research",
+      "research_regime": "E2",
+      "runner_ready": false,
+      "strict_pairs_count": 0,
+      "scope": {
+        "races": "fixed weekly hash-sampled JRA 1R-12R and formal main",
+        "group": "E2"
+      },
+      "fixed_change": "E2の発走前不確実性・勝率・3着内確率のみ独立して比較。週次抽出計画と結果ラベルを後から変更しない。",
+      "preliminary_diagnostic": {
+        "minimum_win_probability_with_result": 30,
+        "minimum_top3_probability_with_result": 30,
+        "minimum_distinct_races": 3,
+        "minimum_independent_weeks": 2
+      },
+      "prestart_pairing": {
+        "same_race": true,
+        "same_information_cutoff": true,
+        "both_predictions_before_official_start": true,
+        "immutable_proof_commit_for_both": true,
+        "cannot_backfill": true
+      },
+      "primary_metrics": [
+        "win_brier",
+        "win_log_loss",
+        "top3_brier",
+        "calibration_error"
+      ],
+      "release_gate": "Research only. Never promote to formal without separate prospective formal Grade A comparison and A/B/C manual approval.",
+      "notes": "Historical horse observations and unpaired reviews do not qualify as scored predicted probabilities. Currently no strict probability observations."
     }
   ],
-  "note": "Tokyo/Kyoto track-condition trial is in design only. Registration does not imply runner readiness or new/old paired evidence."
+  "note": "Seven distinct experiment plans covering all formal improvement topics (4) and E0/E1/E2 research (3). Three formal themes pass observation screening; field-experience and three research diagnostics are awaiting evidence. All candidate runners remain unimplemented; zero prospective pairs; no automatic promotion."
 }
