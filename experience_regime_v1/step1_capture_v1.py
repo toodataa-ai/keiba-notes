@@ -70,6 +70,28 @@ def check_runners(source, frozen):
         raise ValueError("formal_win_probabilities_missing_or_invalid")
     if abs(sum(probs) - 1) > 0.00001:
         raise ValueError("formal_win_probabilities_not_normalized")
+    # Reuse only outcome probabilities computed and frozen by the genuine
+    # formal STEP1-anchored prereace model; never derive from finish results.
+    top3_from_frozen = {}
+    distribution = (source.get("outcome_distributions") or {}).get("central")
+    if distribution is not None:
+        if not isinstance(distribution, list) or not distribution:
+            raise ValueError("frozen_outcome_distribution_invalid")
+        top3_from_frozen = {n: 0.0 for n in numbers}
+        mass = 0.0
+        for event in distribution:
+            finish = event.get("finish")
+            probability = event.get("probability")
+            if (not isinstance(finish, list) or len(finish) != 3 or
+                    len(set(finish)) != 3 or not set(finish).issubset(top3_from_frozen) or
+                    not isinstance(probability, (float, int)) or isinstance(probability, bool) or
+                    probability < 0):
+                raise ValueError("invalid_frozen_outcome_event")
+            mass += probability
+            for n in finish:
+                top3_from_frozen[n] += probability
+        if abs(mass - 1) > 0.0001:
+            raise ValueError("frozen_outcome_distribution_not_normalized")
     rows = []
     for rank, row in enumerate(original, 1):
         n = row["horse_number"]
@@ -88,6 +110,8 @@ def check_runners(source, frozen):
         top3 = row.get("top3_probability")
         if isinstance(top3, (int, float)) and not isinstance(top3, bool) and 0 <= top3 <= 1:
             result["predicted_top3_probability"] = top3
+        elif n in top3_from_frozen:
+            result["predicted_top3_probability"] = min(1.0, max(0.0, top3_from_frozen[n]))
         rows.append(result)
     return rows
 
