@@ -64,6 +64,14 @@
         "change": "Opt-in 90-centred six-trait normalization only for clean Kyoto2000 LAB. Synthetic18 fixed individual scores, sealed real17 prestart grades unchanged. Legacy camera/ability independently selectable. No RaceSimEngine/RaceLaneAI or other-course implementation changes.",
         "comparison": "Synthetic18 mean90.53 range82-98, split57.7960->57.7827s, winner118.6739->118.4414s; real17 all race results unchanged. Seed2026 reproducible; camera changes have no physics effect.",
         "qa_report": "docs/lab/KYOTO_ABILITY90_QA.md"
+      },
+      "shared_course_pr1": {
+        "phase": "draft_foundation",
+        "approval": "not_approved",
+        "source_base": "c653c23fc7d80745dce08e32b890cb92a846e2eb",
+        "verification": "12 full race-state cases + deterministic repeats; 30015 coordinate parity; Chromium 390/1024 x synthetic18/real17 at 1270m",
+        "remaining": "PR1 graph/schema completion, seed/field UI, 1/2/4 real-time finish and visual QA; no Tokyo unlock or promotion",
+        "report": "docs/lab/shared-course/QA-PR1.md"
       }
     },
     {

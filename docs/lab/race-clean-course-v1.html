@@ -11,6 +11,7 @@
 <main class="shell">
 <div class="tag">LAB v26・内ラチ寄りの安全表示／時計コンパクト化／2倍速標準／未承認</div>
 <section class="panel toolbar" aria-label="シミュレーション操作">
+<label>コース<select id="courseSelect" aria-label="検証対象コース"></select></label>
 <label>出走馬<select id="trialMode" aria-label="出走馬データを切り替える">
 <option value="synthetic">架空18頭（従来テスト）</option>
 <option value="shuka2026">2026年秋華賞・実出走馬17頭</option>
@@ -78,10 +79,11 @@
 <p>確認：<a href="?checkpoint=310">1角</a> ／ <a href="?checkpoint=530">2角出口</a> ／ <a href="?checkpoint=585">585m</a> ／ <a href="?checkpoint=602">602m</a> ／ <a href="?checkpoint=640">640m</a> ／ <a href="?checkpoint=700">700m</a> ／ <a href="?checkpoint=900">向正面</a> ／ <a href="?checkpoint=1672">直線入口</a></p>
 </section>
 </main>
+<script src="shared-course/kyoto-compat-v1.js?v=20261031-pr1"></script>
 <script src="race-course-geometry-v1.js?v=20261016-40"></script>
 <script src="race-lane-ai-v1.js?v=20261015-25"></script>
 <script src="race-runner-style-v1.js?v=20261015-24"></script>
-<script src="race-ability-model-v1.js?v=20261031-ability90"></script>
+<script src="race-ability-model-v1.js?v=20261031-pr1"></script>
 <script src="race-cohort-speed-v1.js?v=20261020-25"></script>
 <script src="race-sim-engine.js?v=20261020-25"></script>
 <script src="race-lab-18-fixture-v1.js?v=20261031-ability90"></script>
@@ -90,11 +92,12 @@
 <script src="race-clean-course-v1.js?v=20261018-14"></script>
 <script src="race-course-image-geometry-v1.js?v=20261019-21"></script>
 <script src="race-safe-rail-projection-v1.js?v=20261020-26"></script>
-<script src="race-clean-turf-mask-v1.js?v=20261020-26"></script>
+<script src="race-clean-turf-mask-v1.js?v=20261031-pr1"></script>
 <script src="race-clean-goal-view-v1.js?v=20261031-ability90"></script>
 <script src="race-clean-curve-camera-v1.js?v=20261019-19"></script>
 <script src="race-broadcast-hud-v1.js?v=20261019-23"></script>
 <script src="race-frame-interpolator-v1.js?v=20261020-24"></script>
-<script src="race-clean-course-app-v1.js?v=20261031-ability90"></script>
+<script src="race-clean-course-app-v1.js?v=20261031-pr1"></script>
   <script src="../assets/visitor-counter.js?v=20261006-1" defer></script>
 </body></html>
+

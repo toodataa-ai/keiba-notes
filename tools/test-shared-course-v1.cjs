@@ -1,0 +1,24 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('node:vm');
+const root=require('node:path').resolve(__dirname,'..');
+const read=p=>fs.readFileSync(root+'/'+p,'utf8');
+const context=vm.createContext({URLSearchParams});
+vm.runInContext(read('docs/lab/shared-course/route-graph-v1.js'),context);
+const edge=(id,from,to,a,b,surface='turf')=>({id,from,to,lengthM:100,surface,rails:[[0,...a],[100,...b]]});
+const a=[.1,.1,.1,.2],b=[.4,.1,.4,.2],c=[.7,.1,.7,.2];
+const blueprint={id:'test',edges:[edge('pocket','start','merge',a,b),edge('main','merge','goal',b,c,'dirt')]};
+const spec={blueprintId:'test',distanceM:200,edgeIds:['pocket','main']};
+const build=(bp=blueprint,s=spec)=>context.RaceRouteGraph.build(bp,s);
+const route=build();
+for(let d=0;d<=200;d+=.25){const p=route.position(d);assert(Number.isFinite(p.x));assert(p.y>=.1&&p.y<=.2);if(d)assert(p.x>route.position(d-.25).x);}
+assert.equal(route.rails(100).surface,'dirt');
+assert.throws(()=>build(blueprint,{...spec,distanceM:201}));
+assert.throws(()=>build({...blueprint,edges:[blueprint.edges[0],{...blueprint.edges[1],from:'wrong'}]}));
+assert.throws(()=>route.position(201));assert.throws(()=>route.position(50,2));
+const loop={id:'loop',edges:[edge('out','x','y',a,b),edge('back','y','x',b,a)]};
+assert.equal(build(loop,{blueprintId:'loop',distanceM:400,edgeIds:['out','back','out','back']}).distanceM,400);
+vm.runInContext(read('docs/lab/shared-course/kyoto-compat-v1.js'),context);
+assert.equal(context.RaceSharedCourse.active.distanceM,2000);
+assert(Object.isFrozen(context.RaceSharedCourse.active.source));
+assert.throws(()=>vm.runInNewContext(read('docs/lab/shared-course/kyoto-compat-v1.js'),{URLSearchParams,location:{search:'?course=tokyo_turf_2000'}}));
+console.log('PASS directed pocket / surface transition / straight / repeated loop / invalid route / availability lock');

@@ -81,10 +81,15 @@ const profile=window.RaceSimAbility.profile(neutral.horses[0],neutral,0);
 assert(keys.every(k=>profile.six[k]===50&&profile.displaySix[k]===90));
 for(const course of ['kyoto_turf_outer_1400','tokyo_turf_2000']){
  const h=neutral.horses[0],race={...neutral,course_id:course};
- assert.deepEqual(clean(window.RaceSimAbility.profile(h,race,0)),
-  clean(window.RaceSimAbility.profile(h,{...race,labAbilityScale:undefined},0)),
-  'LAB90 must not affect other courses');
+ const modern=clean(window.RaceSimAbility.profile(h,race,0));
+ const legacy=clean(window.RaceSimAbility.profile(h,{...race,labAbilityScale:undefined},0));
+ const {displaySix,scale,neutral:centre,legacyPointsPerScore,...physics}=modern;
+ assert.deepEqual(physics,legacy,'common display must preserve all physical terms and evidence');
+ assert.equal(centre,90);assert.equal(scale,'90-v1');
+ assert(keys.every(k=>displaySix[k]===90&&modern.six[k]===50));
+ assert.equal(legacy.displaySix,undefined,'old callers keep opt-in isolation');
 }
-console.log('PASS_LAB_ABILITY90_NEUTRAL_REPRODUCIBLE_CAMERA_INDEPENDENT_OTHER_COURSES_UNCHANGED');
+console.log('PASS_LAB_ABILITY90_NEUTRAL_REPRODUCIBLE_CAMERA_INDEPENDENT_SHARED_DISPLAY_PHYSICS_UNCHANGED');
 if(process.env.LAB_QA_JSON)fs.writeFileSync(process.env.LAB_QA_JSON,JSON.stringify({
  seed:2026,stepSeconds:.08,metrics:comparison},null,2)+'\n');
+

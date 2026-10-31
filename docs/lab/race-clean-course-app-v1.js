@@ -5,7 +5,18 @@
  */
 (function(){'use strict';
 const $=id=>document.getElementById(id);
+const course=window.RaceSharedCourse.active;
 const model=window.RaceCleanCourse;
+if(model.id!==course.id||model.distance!==course.distanceM)throw Error('COURSE_ADAPTER_MISMATCH');
+const courseSelect=$('courseSelect');
+for(const spec of window.RaceSharedCourse.catalog){
+ const option=document.createElement('option');option.value=spec.id;
+ option.textContent=spec.label+'（LAB・目視承認待ち）';courseSelect.appendChild(option);
+}
+courseSelect.value=course.id;
+courseSelect.addEventListener('change',()=>{
+ const url=new URL(location.href);url.searchParams.set('course',courseSelect.value);location.assign(url);
+});
 const turf=window.RaceCleanTurf;
 // Actual Oct 18 entrants are used ONLY on explicit selection. The real
 // finish positions / laps belong to a wholly separate holdout reference.
@@ -16,7 +27,7 @@ let trialMode=new URLSearchParams(location.search).get('trial')===REAL_TRIAL?
  REAL_TRIAL:'synthetic';
 let fixture=trialMode===REAL_TRIAL?FIXTURE_REAL:FIXTURE_SYNTHETIC;
 const ABILITY_SCALE=new URLSearchParams(location.search).get('ability')==='legacy'?'legacy-50':'90-v1';
-const GOAL_SPAN=new URLSearchParams(location.search).get('goalCamera')==='legacy'?290:100;
+const GOAL_SPAN=new URLSearchParams(location.search).get('goalCamera')==='legacy'?course.camera.legacyGoalSpanM:course.camera.goalSpanM;
 function fixtureHorses(){return fixture.horses({abilityScale:ABILITY_SCALE});}
 function fixtureRace(){return {...fixture.entry(),horses:entries,
  ...(ABILITY_SCALE==='90-v1'?{labAbilityScale:ABILITY_SCALE}:{})};}
@@ -140,7 +151,10 @@ const CURVE_LENS_ENABLED=new URLSearchParams(location.search).get('lens')!=='off
 // LAB v21 default: reusable course-independent arclength projection.
  // Append ?geometry=legacy to revert instantly; no production change.
 const SHARED_IMAGE_GEOMETRY=new URLSearchParams(location.search).get('geometry')!=='legacy';
-const SOURCE_VECTOR='assets/kyoto-umapot-course-clean-v8.svg';
+const SOURCE_VECTOR=course.source.url;
+for(const id of ['liveCourseImage','realCourseImage']){
+ $(id).src=SOURCE_VECTOR;$(id).width=course.source.width;$(id).height=course.source.height;
+}
 function rebuildFixtureUi(){
  const focus=$('focus');
  focus.innerHTML='<option value="leader">先頭</option>';
@@ -307,7 +321,7 @@ function sourceImageReady(img){
  // original file being 620x430. Pixel-equality wrongly blocked painting.
  // The source viewBox and intended 620:430 coordinate space are unchanged.
  return Boolean(img&&img.complete&&img.naturalWidth>0&&img.naturalHeight>0&&
-  Math.abs(img.naturalWidth/img.naturalHeight-620/430)<.025&&
+  Math.abs(img.naturalWidth/img.naturalHeight-course.source.width/course.source.height)<.025&&
   img.getAttribute('src')===SOURCE_VECTOR);
 }
 function verifyVectorSource(){
@@ -371,7 +385,7 @@ function cameraFor(points,w,h,chosen,autoLeader=true){
   // Lock the camera to the RACE DISTANCE instead of the physical pack's
   // moment-to-moment centroid. Group membership and overtakes cannot
   // make the entire course abruptly jump or appear to collapse.
-  center=turf.point(Math.max(0,Math.min(2000,leaderDistance-10)),3);
+  center=turf.point(Math.max(0,Math.min(course.distanceM,leaderDistance-10)),3);
  }
  // Fix the optical zoom; the old density-based group bounds changed camera
  // magnification at every overtake and caused visible frame-to-frame shakes.
@@ -539,7 +553,7 @@ function paint(){
    const eased=p*p*(3-2*p);
    lastGoalFrame=window.RaceCleanGoalView.render({
     canvas:goalCanvas,points,leaderNo:state.leadingNo,focusedNo:chosen,
-    paintNumber:raceNumberMarker,maxLane:14,distance:2000,turn:'右',
+    paintNumber:raceNumberMarker,maxLane:course.maxLane,distance:course.distanceM,turn:course.turn,
     fieldSize:race.field_size,pullback:1+.22*eased,screenSpan:GOAL_SPAN
    });
   }else lastGoalFrame=null;
@@ -547,10 +561,10 @@ function paint(){
  const map=sizeCanvas($('overview'));
  // Transparent numbers over the ACTUAL original 620x430 course diagram.
  const overview={x:310,y:215,cx:map.w/2,cy:map.h/2,
-  scale:Math.min(map.w/620,map.h/430),w:map.w,h:map.h};
+  scale:Math.min(map.w/course.source.width,map.h/course.source.height),w:map.w,h:map.h};
  markers(map.ctx,points,overview,chosen,true);
  updateRunningOrder(points,chosen);
- $('progress').textContent=Math.round(state.leader)+'m / 2000m';
+ $('progress').textContent=Math.round(state.leader)+'m / '+course.distanceM+'m';
  hud.render(state,hudElements(),resultCache);
  $('section').textContent=(state.allCrossedAt!==null?'全馬ゴール・余走中':
    state.goalCamera?'ゴール板固定カメラ':model.center(state.leader).section)+
@@ -623,7 +637,7 @@ function setup(){
  reset();
  const params=new URLSearchParams(location.search);
  const checkpoint=Number(params.get('checkpoint'));
- if(params.has('checkpoint')&&Number.isFinite(checkpoint)&&checkpoint>=0&&checkpoint<=2000)
+ if(params.has('checkpoint')&&Number.isFinite(checkpoint)&&checkpoint>=0&&checkpoint<=course.distanceM)
   advanceTo(checkpoint);
  requestAnimationFrame(tick);
 }
@@ -740,3 +754,4 @@ window.CleanLab=Object.freeze({
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);
 else setup();
 })();
+
