@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<base href="../">
+<title>全7改善実験の準備状況｜ステージング</title>
+<link rel="stylesheet" href="staging/stage-indicator.css">
+<style>
+:root{font-family:"Meiryo UI",Meiryo,-apple-system,BlinkMacSystemFont,sans-serif;color:#28242b;background:#f7f3f5}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:920px;margin:0 auto;padding:36px 20px 70px}
+a{color:#982f50}nav{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:24px}
+h1{font-size:clamp(24px,4vw,35px);margin:12px 0}.lead{line-height:1.8;color:#675d65}
+.intro{border-left:5px solid #a62c56;background:#fff2f6;padding:16px;border-radius:8px;line-height:1.7;margin:24px 0}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.stat{background:white;border:1px solid #ddd3da;padding:16px;border-radius:12px}.stat b{display:block;font-size:26px;margin-top:6px}.stat small{color:#655d65}
+.cards{display:grid;gap:14px}.item{background:white;border:1px solid #d8ced6;border-radius:16px;padding:20px}
+.head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h2{font-size:18px;margin:0}.pill{font-size:13px;font-weight:bold;background:#fceef2;color:#96294d;border:1px solid #dca2b5;border-radius:24px;padding:5px 12px}
+.item p{line-height:1.65;color:#655c66;margin:12px 0}.progress-label{display:flex;justify-content:space-between;font-size:14px;margin-top:12px}
+progress{display:block;width:100%;height:14px;accent-color:#a52d55;margin-top:7px}
+.note{font-size:13px;color:#635d62;margin-top:12px}.error{padding:14px;background:#fff0f2;border:1px solid #aa3756}
+@media(max-width:500px){.wrap{padding:28px 14px}.stats{grid-template-columns:1fr 1fr}.stat b{font-size:23px}.item{padding:16px}}
+</style>
+</head>
+<body>
+<div class="staging-shell-marker" role="status">STAGING <span>検証中</span></div>
+<main class="wrap">
+<nav aria-label="ページ移動"><a href="staging/improvement-cycle.html">← 改善テーマ別ロードマップ</a><a href="staging/index.html">ステージングトップ</a></nav>
+<h1>全7改善実験の準備状況</h1>
+<p class="lead">展開・馬場・買い目・若駒の正式JRA改善と、E0/E1/E2の研究を個別に進めます。実験案を登録しただけでは比較実績として数えません。</p>
+<div class="intro">このページは<strong>実験開始前の設計進捗</strong>です。発走前の候補版実行・GitHub証拠保存の共通処理は未実装です。正式予想・印・買い目・過去の原本・回収率は変更しません。</div>
+<div class="stats">
+<div class="stat"><small>実験計画</small><b id="total">—</b></div>
+<div class="stat"><small>観測条件達成・設計段階</small><b id="ready">—</b></div>
+<div class="stat"><small>新旧の厳格比較</small><b id="pairs">—</b></div>
+</div>
+<div id="status" role="status">実験データを確認しています…</div>
+<section id="cards" class="cards" aria-label="実験別進捗"></section>
+</main>
+<script>
+"use strict";
+function el(parent,tag,text,cls){const x=document.createElement(tag);if(text!==undefined)x.textContent=String(text);if(cls)x.className=cls;parent.appendChild(x);return x;}
+async function show(){
+ const resp=await fetch("data/jra_shadow_experiment_status_v1.json",{cache:"no-store"});
+ if(!resp.ok)throw Error("実験進捗データを読み込めません");
+ const d=await resp.json();
+ if(d.kind!=="design_readiness_only_not_execution"||d.experiment_count!==7||!Array.isArray(d.experiments))throw Error("実験進捗データの形式が違います");
+ document.getElementById("total").textContent=d.experiment_count+"件";
+ document.getElementById("ready").textContent=d.registered_design_count+"件";
+ document.getElementById("pairs").textContent=d.strict_paired_cases_total+"件";
+ const list=document.getElementById("cards");
+ d.experiments.forEach(x=>{
+  const card=el(list,"article",undefined,"item");
+  const head=el(card,"div",undefined,"head");
+  el(head,"h2",x.title||x.id);
+  el(head,"span",x.stage==="design"?"候補版設計中":"観測条件待ち","pill");
+  const isFormal=x.family==="formal_jra";
+  el(card,"p",x.stage==="design"
+    ?"観測条件は達成。候補版の実装と発走前証拠の仕組みを整備する段階です。"
+    :"まだ必要な証拠が不足しています。発走後の追記で埋めず、次の発走前研究で収集します。");
+  const row=el(card,"div",undefined,"progress-label");
+  el(row,"span",isFormal?"正式予想との同条件比較":"発走前確率と結果の初期診断");
+  const value=isFormal?x.prospective_strict_paired_cases:x.qualified_observations;
+  const target=isFormal?x.minimum_paired_cases:30;
+  el(row,"strong",value+" / "+target);
+  const p=el(card,"progress");p.max=target;p.value=value;
+  el(card,"div",isFormal
+    ?"現時点で比較開始前。20件は採否決定ではなく精度監査開始の下限。"
+    :"初期診断は勝率・3着内確率の両方で各30頭分、異なる3レース、2週以上が必要。正式版の20件比較とは別。","note");
+ });
+ document.getElementById("status").textContent="7テーマとも正式版への自動反映は禁止。予測候補実装後に有効なペアのみ計上します。";
+}
+show().catch(err=>{const n=document.getElementById("status");n.className="error";n.textContent="表示できません："+err.message;});
+</script>
+</body>
+</html>
