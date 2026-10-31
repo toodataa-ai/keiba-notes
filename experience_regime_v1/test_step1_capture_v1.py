@@ -8,7 +8,7 @@ class TestStrictStep1Capture(unittest.TestCase):
         horses = {str(i): {"horse_number": i, "horse_name": "馬" + str(i)} for i in (1,2,3)}
         source = {"stage": "formal_prestart", "no_odds_used_to_change_marks": True,
                   "step1_ranking": [{"horse_number":i,"horse_name":"馬"+str(i),
-                      "factor_grades":["A"]*9,"mark": mark, "win_probability":p}
+                      "factor_grades":["A"]*9,"overall_grade":"A", "mark": mark, "win_probability":p}
                       for i,mark,p in ((1,"◎",0.5),(2,"○",0.3),(3,"▲",0.2))]}
         return source, {"experience": {"horses": horses}}
 
@@ -36,6 +36,22 @@ class TestStrictStep1Capture(unittest.TestCase):
         self.assertEqual([r["step1_rank"] for r in result], [1,2,3])
         self.assertNotIn("predicted_top3_probability",result[0])
         self.assertEqual(result[0]["predicted_win_probability"],0.5)
+
+    def test_true_model_rank_not_numeric_horse_order(self):
+        source, frozen = self.example()
+        for r, mark, grade in zip(source["step1_ranking"],
+                                  ["▲", "○", "◎"], ["B", "A", "A+"]):
+            r["mark"] = mark
+            r["overall_grade"] = grade
+        ranks = check_runners(source, frozen)
+        self.assertEqual([r["step1_rank"] for r in ranks], [3, 2, 1])
+        self.assertEqual([r["horse_number"] for r in ranks], [1, 2, 3])
+
+    def test_unknown_grade_rejected_no_invented_model_rank(self):
+        source, frozen = self.example()
+        source["step1_ranking"][1]["overall_grade"] = "UNKNOWN"
+        with self.assertRaisesRegex(ValueError, "rank_factors_unavailable"):
+            check_runners(source, frozen)
 
     def test_frozen_central_top3_marginal_is_not_invented(self):
         source,frozen=self.example()
