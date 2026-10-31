@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-25T10:51:21.634181+00:00",
+  "generated_at": "2026-10-31T11:15:38.980435+00:00",
   "policy": {
     "formal_grade_a_independent_of_research": true,
     "never_reconstruct_missing_prerace_experience": true,
@@ -11,12 +11,12 @@
   "latest_formal_prompt_version": "v3.13",
   "formal_grade_a": {
     "passed": true,
-    "validated_case_count": 18,
+    "validated_case_count": 20,
     "errors": []
   },
   "shadow_research": {
     "state": "evidence_incomplete",
-    "prerace_evidence_gap_count": 17,
+    "prerace_evidence_gap_count": 19,
     "evidence_gaps": [
       {
         "race_id": "2026-10-10-mimuro-stakes",
@@ -116,6 +116,18 @@
       },
       {
         "race_id": "2026-10-25-lumiere-autumn-dash",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-31-fantasy-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-10-31-perseus-stakes",
         "version": "v3.13",
         "cause": "race_context.race_category is required",
         "source": "sealed_prediction_missing_prerace_fields"
@@ -276,6 +288,48 @@
       ],
       "weekly_improvement_decision": "no_change",
       "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
+    },
+    {
+      "meeting_id": "2026-10-31-to-2026-11-01",
+      "dates": [
+        "2026-10-31",
+        "2026-11-01"
+      ],
+      "registered_races": 2,
+      "expected_races": 4,
+      "formal_grade_a_review_state": "pending",
+      "races": [
+        {
+          "race_id": "2026-10-31-perseus-stakes",
+          "date": "2026-10-31",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-10-31-fantasy-stakes",
+          "date": "2026-10-31",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-11-01-tenno-sho-autumn",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        },
+        {
+          "race_id": "2026-11-01-mahoroba-stakes",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        }
+      ],
+      "weekly_improvement_decision": "not_evaluated",
+      "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
     }
   ]
 }

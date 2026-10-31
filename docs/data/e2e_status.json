@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-25T10:51:20+00:00",
+  "generated_at": "2026-10-31T11:15:37+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 18,
+    "strict": 20,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 18
+    "prediction_entries": 20
   },
   "versions": {
     "v3.12": {
@@ -57,11 +57,11 @@
     },
     "v3.13": {
       "all_non_synthetic": {
-        "cases": 14,
-        "honmei_win_rate": 0.285714,
-        "honmei_top3_rate": 0.571429,
-        "top3_marks_capture_rate": 0.52381,
-        "winner_in_top3_marks_rate": 0.571429,
+        "cases": 16,
+        "honmei_win_rate": 0.25,
+        "honmei_top3_rate": 0.5,
+        "top3_marks_capture_rate": 0.5,
+        "winner_in_top3_marks_rate": 0.5625,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -69,21 +69,21 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 39600,
+        "stake_yen": 43900,
         "payout_yen": 55630,
-        "roi_pct": 140.48,
-        "bet_cases": 14,
+        "roi_pct": 126.72,
+        "bet_cases": 16,
         "probability_cases": {
           "win": 0,
           "top3": 0
         }
       },
       "strict": {
-        "cases": 14,
-        "honmei_win_rate": 0.285714,
-        "honmei_top3_rate": 0.571429,
-        "top3_marks_capture_rate": 0.52381,
-        "winner_in_top3_marks_rate": 0.571429,
+        "cases": 16,
+        "honmei_win_rate": 0.25,
+        "honmei_top3_rate": 0.5,
+        "top3_marks_capture_rate": 0.5,
+        "winner_in_top3_marks_rate": 0.5625,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -91,10 +91,10 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 39600,
+        "stake_yen": 43900,
         "payout_yen": 55630,
-        "roi_pct": 140.48,
-        "bet_cases": 14,
+        "roi_pct": 126.72,
+        "bet_cases": 16,
         "probability_cases": {
           "win": 0,
           "top3": 0
@@ -169,7 +169,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 18
+    "strict_bet_cases": 20
   },
   "errors": [],
   "entries": [
@@ -882,6 +882,86 @@
         "winner_rank": null,
         "winner_mrr": null,
         "stake_yen": 3200,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-31-fantasy-stakes",
+      "date": "2026-10-31",
+      "venue": "京都",
+      "surface": "turf",
+      "race": "ファンタジーステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-31-fantasy-stakes/v3.15-run41143733649-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "cd40797fec3fc5b5c40db5b34e7dda60611e8767",
+        "proof_commit_at": "2026-10-30T23:20:33+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 0,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 200,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-10-31-perseus-stakes",
+      "date": "2026-10-31",
+      "venue": "東京",
+      "surface": "dirt",
+      "race": "ペルセウスステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-10-31-perseus-stakes/v3.15-run41142696654-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "d876c410d696d165b9b8f8d2c4a8796f0ccaa2ee",
+        "proof_commit_at": "2026-10-30T23:10:47+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 4100,
         "payout_yen": 0,
         "roi_pct": 0.0,
         "going_log_loss": null,
