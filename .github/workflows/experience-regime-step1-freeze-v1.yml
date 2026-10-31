@@ -115,3 +115,19 @@ jobs:
           done
           echo "::error::STEP1 research status is stale on Pages"
           exit 1
+      - name: Require at least one genuinely frozen STEP1 before reporting workflow success
+        if: env.E012_ACTIVE == 'true'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('docs/data/experience_regime_step1_status.json').read_text(encoding='utf-8'))
+          assert p.get('no_synthetic_prediction') is True and p.get('production_effect') is False
+          done = p.get('step1_frozen_races')
+          total = p.get('selected_races')
+          if not isinstance(done, int) or done < 1:
+              print('::error::E012 STEP1 0 real frozen races: incomplete; do not report collection success. Formal main prereace predictions may not yet be available.')
+              raise SystemExit(2)
+          print(f'E012_STEP1_VERIFIED_NONZERO {done}/{total}; missing={len(p.get("missing_step1") or [])}')
+          PY
