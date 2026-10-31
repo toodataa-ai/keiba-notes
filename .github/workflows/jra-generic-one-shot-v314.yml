@@ -12,6 +12,7 @@ on:
         required: true
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: jra-v313-prestart-proof
   cancel-in-progress: false
@@ -267,6 +268,17 @@ jobs:
             fi
           done
           echo "JRA_V313_COMMITTED_AWAITING_PUBLIC_HTTP_VERIFICATION $RACE_ID proof=$PROOF"
+      - name: Trigger separate strict E012 STEP1 research capture from frozen formal source
+        # Research-only: failure cannot invalidate a legitimate formal prestart prediction.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh workflow run experience-regime-step1-freeze-v1.yml --ref main; then
+            echo "E012_STEP1_FREEZE_DISPATCH_REQUESTED $RACE_ID"
+          else
+            echo "::warning::E012 dispatch not available; scheduled verification retries remain enabled"
+          fi
       - name: Independently compare deployed website HTML PDF and public race registry
         run: |
           set -euo pipefail
