@@ -87,3 +87,7 @@ PPTX原版は上記ハッシュ。ブラウザはChromium、幅390/1024px。
 `RaceTokyo2000.assertCanAnimate` は引き続き無条件停止。既存rolloutは未変更。
 
 実装後もLAB未承認。STAGING・本番・正式予想データへ移行しない。
+
+## 発走位置の根拠確認（続報）
+
+[発走位置・約100m・進入角の根拠確認v3](TOKYO_2000_START_EVIDENCE_V3.md)。約100mの概略はJRA-VAN解説に記載があるが、実際の角度と2角出口距離は未確定。PPTXの目印一致を実測走路の承認として扱わない。

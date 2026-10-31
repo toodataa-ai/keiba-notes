@@ -1,6 +1,11 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>東京芝2000m LAB — 走路監査待ち</title><link rel="stylesheet" href="race-clean-tokyo-2000-v1.css"></head><body><main>
 <p class="tag">KEIBA NOTES / LAB・未承認</p><h1>東京 芝2000m</h1><p>左回り・芝Aコース相当 / 架空18頭 / 正式予想とは無関係</p>
 <section class="warning" role="status"><h2>走路監査待ち・走行不可</h2><p>原PPTXからの静止照合を実施しましたが、原図に対応する物理走路の統合と再生検証は未完了です。原図は端末内だけで読み込めます。既存の東京2000m幾何データは近似で、承認された走路ではありません。原図・内外ラチ・走行位置の照合と安全監査が完了するまで再生できません。</p><p>低画質画像の拡大や近似走路を原図の代用として表示しません。</p></section>
+<section id="startEvidence"><h2>スタート位置：確認できた範囲</h2>
+<ul><li>発走位置はPPTXの「2000m」目印に一致。JRA図の右側ポケットとも概略一致しますが、実地の測量座標は未確認です。</li>
+<li>発走後「約100mで左カーブ」はJRA-VANの解説に記載。ちょうど100mという境界の確定ではありません。</li>
+<li>実際の進入角と2コーナー出口までの正確な距離は未確定。候補の「2角出口300m」は仮設定です。</li></ul>
+<p><a href="https://www.jra.go.jp/keiba/thisweek/2025/1102_1/race.html">JRA コース説明</a> ／ <a href="https://sugo.jra-van.jp/sugotoku/crs/crs05t2000.html">JRA-VAN 約100mの説明</a> ／ <a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_START_EVIDENCE_V3.md">根拠と未確定事項</a></p></section>
 <div class="facts"><span>距離 <b>2,000m</b></span><span>1周 <b>2,083.1m</b></span><span>直線 <b>525.9m</b></span><span>高低差 <b>2.7m</b></span></div>
 <div class="views"><section><h2>実況ビュー</h2><div class="empty">原図と走路の照合待ち</div></section><section><h2>全体図</h2><div class="empty">公開用ベクター・対応走路の準備待ち</div></section></div>
 <div class="controls"><button id="startBtn" disabled>走行ロック中</button><label>再生速度 <select disabled><option>1倍</option><option>2倍</option><option>4倍</option></select></label></div>
@@ -11,7 +16,7 @@
 <p><a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md">ローカル検査データの作成方法</a></p>
 <label>audit-local.json と source-local.svg を一緒に選択 <input id="sourceAuditFiles" type="file" multiple accept=".json,.svg"></label>
 <p id="sourceAuditStatus" role="status">原図未読込。走行ロック中。</p>
-<div id="sourceAuditViews" hidden><label>静止地点 <select id="sourceCheckpoint"></select></label>
+<div id="sourceAuditViews" hidden><label>静止地点（距離配分は仮設定） <select id="sourceCheckpoint"></select></label>
 <div class="audit-views"><section><h3>原図全体＋走路候補</h3><canvas id="sourceOverview" aria-label="ローカル原図と全18頭の静止照合"></canvas></section>
 <section><h3>同じ原図の拡大</h3><canvas id="sourceDetail" aria-label="原図を同一倍率で拡大した静止照合"></canvas></section></div>
 <p id="sourceSnapshotNote"></p><button id="sourceRasterBtn" type="button">原図の芝画素と検査点を照合</button><p id="sourceRasterResult" role="status"></p></div>
