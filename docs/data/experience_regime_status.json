@@ -2486,32 +2486,68 @@
           "shortfall": 2
         }
       },
-      "proof_commit": "7ba2f84553a93405f3ba9b6d5f3789ee4545346f",
-      "proof_commit_at": "2026-10-31T21:53:11Z",
-      "prerace_proof_valid_races": 0,
-      "complete_evidence_races": 0,
-      "complete_evidence_race_ids": [],
+      "proof_commit": "87790a85d2b7375edcd1b92ea01b7139b911ccaa",
+      "proof_commit_at": "2026-10-31T21:55:32Z",
+      "prerace_proof_valid_races": 12,
+      "complete_evidence_races": 12,
+      "complete_evidence_race_ids": [
+        "2026-11-01-kyoto-01",
+        "2026-11-01-kyoto-02",
+        "2026-11-01-kyoto-05",
+        "2026-11-01-kyoto-09",
+        "2026-11-01-kyoto-10",
+        "2026-11-01-kyoto-11",
+        "2026-11-01-kyoto-12",
+        "2026-11-01-tokyo-04",
+        "2026-11-01-tokyo-05",
+        "2026-11-01-tokyo-07",
+        "2026-11-01-tokyo-10",
+        "2026-11-01-tokyo-11"
+      ],
       "regimes": {
         "E0": {
-          "horse_observations": 0,
-          "races": 0
+          "horse_observations": 40,
+          "races": 4
         },
         "E1": {
-          "horse_observations": 0,
-          "races": 0
+          "horse_observations": 24,
+          "races": 3
         },
         "E2": {
-          "horse_observations": 0,
-          "races": 0
+          "horse_observations": 92,
+          "races": 7
         }
       },
-      "category_regime_verified_horses": {},
-      "collection_gaps": 24,
+      "category_regime_verified_horses": {
+        "maiden": {
+          "E1": 23,
+          "E0": 1
+        },
+        "debut": {
+          "E0": 39
+        },
+        "class_2": {
+          "E2": 23
+        },
+        "class_3": {
+          "E2": 25
+        },
+        "open_listed": {
+          "E2": 13
+        },
+        "class_1": {
+          "E1": 1,
+          "E2": 14
+        },
+        "graded": {
+          "E2": 17
+        }
+      },
+      "collection_gaps": 12,
       "planned_exclusions": 12,
-      "collection_failures": 12,
+      "collection_failures": 0,
       "gap_reasons": {
-        "not_selected_by_fixed_weekly_plan": 12,
-        "source_capture_failed": 12
+        "not_selected_by_fixed_weekly_plan": 12
       },
       "collection_errors": [],
       "step1_prediction_scope": "only preserved official control if a verified immutable source exists; otherwise unavailable",
@@ -2519,5 +2555,5 @@
       "production_effect": false
     }
   },
-  "last_collection_audit_at": "2026-11-01T06:53:12.896522+09:00"
+  "last_collection_audit_at": "2026-11-01T06:55:33.996385+09:00"
 }
