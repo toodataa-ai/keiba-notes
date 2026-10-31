@@ -29,10 +29,10 @@ async function loadFiles(files){
    throw Error('原図の縦横比が一致しません');
   source=img;route=built;data=candidate;snapshots=shots;index=0;
   $('sourceCheckpoint').replaceChildren(...checkpoints.map((d,i)=>{
-   const opt=document.createElement('option');opt.value=i;opt.textContent=d>2000?'ゴール後':d+'m';return opt;
+   const opt=document.createElement('option');opt.value=i;opt.textContent=d>2000?'ゴール後':d+'m（仮配分）';return opt;
   }));
   $('sourceAuditViews').hidden=false;
-  $('sourceAuditStatus').textContent='ローカル原図一致。静止照合のみ／走路・途中距離は未承認。';
+  $('sourceAuditStatus').textContent='PPTX由来SVGのハッシュ一致。実コースの進入角・2角出口距離は未確定／走行不可。';
   draw();
  }catch(e){if(token===generation)$('sourceAuditStatus').textContent='読込停止：'+e.message;}
 }
@@ -61,7 +61,7 @@ function drawView(id,detail){
 }
 function draw(){if(!source)return;
  const overview=drawView('sourceOverview',false),detail=drawView('sourceDetail',true),shot=snapshots[index];
- $('sourceSnapshotNote').textContent='指定 '+(shot.distance>2000?'ゴール後':shot.distance+'m')+' ／ 物理時刻 '+shot.t.toFixed(2)+'秒 ／ 描画先頭 '+Math.max(...shot.horses.map(h=>h.displayD)).toFixed(3)+'m。共通エンジンの静止状態。馬番は実距離・実レーンで投影し、重なり回避の移動はしていません。線は走路境界の候補です。';
+ $('sourceSnapshotNote').textContent='検査用仮距離 '+(shot.distance>2000?'ゴール後':shot.distance+'m')+' ／ 物理時刻 '+shot.t.toFixed(2)+'秒 ／ 描画先頭 '+Math.max(...shot.horses.map(h=>h.displayD)).toFixed(3)+'m。共通エンジンの静止状態。馬番は実距離・実レーンで投影し、重なり回避の移動はしていません。線は走路境界の候補です。';
  inspector.lastView={overview,detail,checkpoint:shot.distance,canAnimate:false};
 }
 function rasterAudit(){
