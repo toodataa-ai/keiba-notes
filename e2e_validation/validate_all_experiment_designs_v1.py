@@ -7,6 +7,7 @@ prestart prediction, proof_commit, paired Grade A case, or formal approval.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -133,11 +134,21 @@ def validate(registry: dict, evidence: dict, latest: dict, models: dict) -> tupl
 
 def load() -> tuple[list[str], dict]:
     load_json = lambda p: json.loads((ROOT / p).read_text(encoding="utf-8"))
-    return validate(
+    errors, status = validate(
         load_json("e2e_validation/improvement_experiments_v1.json"),
         load_json("docs/data/jra_improvement_cycle_v1.json"),
         load_json("docs/data/latest_prompt.json"),
         load_json("baba_models_v2/model_registry.json"))
+    # Preserve the original v1 design records. Execution counts come exclusively
+    # from the separately audited runtime, never from their hand-edited fields.
+    sys.path.insert(0, str(ROOT))
+    from shadow_lab.runtime import status as runtime_status
+    runtime = runtime_status()
+    status['kind'] = 'design_and_audited_shadow_runtime'
+    status['runtime'] = runtime
+    status['candidate_execution_implemented'] = True
+    status['strict_paired_cases_total'] = sum(x['valid_pairs'] for x in runtime['experiments'] if x['paired_target'])
+    return errors, status
 
 
 def main() -> None:
@@ -146,7 +157,7 @@ def main() -> None:
         raise SystemExit("ALL_EXPERIMENT_DESIGN_FAIL:\n" + "\n".join(errors))
     out = ROOT / "docs/data/jra_shadow_experiment_status_v1.json"
     out.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("ALL_EXPERIMENT_DESIGNS_PASS: 7 plans, 0 prospective candidate pairs")
+    print("ALL_EXPERIMENT_DESIGNS_PASS:", status['experiment_count'], "plans; audited formal pairs:",status['strict_paired_cases_total'])
     print("wrote", out.relative_to(ROOT))
 
 

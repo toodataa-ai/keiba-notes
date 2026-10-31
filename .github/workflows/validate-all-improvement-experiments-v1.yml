@@ -3,6 +3,7 @@ name: Validate seven JRA improvement experiment design gates
 on:
   pull_request:
     paths:
+      - 'shadow_lab/**'
       - 'e2e_validation/improvement_experiments_v1.json'
       - 'e2e_validation/validate_all_experiment_designs_v1.py'
       - 'e2e_validation/test_all_experiment_designs_v1.py'
