@@ -75,7 +75,8 @@ def fetch_race_card(session,item):
     raw=r.content
     soup=BeautifulSoup(raw,"html.parser")
     visible=soup.get_text(" ",strip=True)
-    identity=f"{item['date'][-2:]}日"
+    # JRA displays unpadded calendar days (e.g. 1日, never 01日).
+    identity=f"{int(item['date'][-2:])}日"
     match_venue=(item["venue"] in visible)
     match_race=re.search(rf"(?:^|\s){item['race_no']}\s*レース",visible) is not None
     if not (match_venue and match_race and (identity in visible)):
