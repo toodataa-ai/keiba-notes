@@ -188,6 +188,10 @@ def make_pair(packet, theme, instant=None):
         check(all(when(q['observed_at']) <= cutoff for q in inp['market_quotes']), 'odds_after_cutoff')
         check((cutoff-min(when(q['observed_at']) for q in inp['market_quotes'])).total_seconds()<=600, 'odds_stale_at_shared_cutoff')
         metadata = {'rule':'positive_low_EV_equal_100_v1', 'marks_unchanged':True}
+    if 'experience' in features and 'groups' not in metadata:
+        f=features['experience'];source(f,cutoff)
+        check(set(f['starts_by_horse'])==ids,'collateral_experience_full_field_missing')
+        metadata['groups']={n:classify_regime(v) for n,v in f['starts_by_horse'].items()}
     request = {'theme':theme,'input':inp,'baseline':baseline,'baseline_bytes':baseline_bytes,'purchase':purchase,'multipliers':multipliers,'grades':grades,'factor_index':index,
                'cutoff':packet['information_cutoff_at'],'candidate_version':design(theme)['challenger']+'-runtime1'}
     with tempfile.NamedTemporaryFile(mode='w',suffix='.json') as temp:
@@ -336,7 +340,11 @@ def audit(receipt, fetch_status=None):
     status=next((s for s in statuses if s['id']==receipt['status_id']),None)
     check(status and status['context']=='shadow/prestart-sealed' and status['state']=='success', 'github_status_missing')
     stamp=when(status['created_at']); start=when(pair['scheduled_start_at'])
-    check(when(pair['information_cutoff_at'])<=when(pair['generated_at'])<=stamp<start, 'not_prospective_grade_A')
+    generated=when(pair['generated_at'])
+    # GitHub commit-status timestamps have second precision; local generation
+    # timestamps have microseconds. Compare equal-precision times, still strictly
+    # before the official start. Git author timestamps are never substituted.
+    check(when(pair['information_cutoff_at'])<=generated and generated.replace(microsecond=0)<=stamp<start, 'not_prospective_grade_A')
     check(status['created_at']==receipt['status_created_at'], 'receipt_timestamp_changed')
     for path,expected in pair['sources'].items():
         check(digest(subprocess.check_output(['git','show',sha+':'+path],cwd=ROOT))==expected, 'source_not_in_proof')
@@ -495,6 +503,12 @@ def status(fetch_status=None):
                        'valid_pairs':races,'paired_target':None if theme.startswith('E') else 20,'probability_horses':horse_count,
                        'distinct_races':races,'independent_weeks':weeks,'diagnostic_ready':diagnostic if theme.startswith('E') else None,
                        'sealed_awaiting_result':pending[theme],'metrics':metrics,'condition_audit':conditions,
+                       'regime_probability_audit':{group:{side:{
+                           'horse_records':len(hs),
+                           **{key:sum(h[key] for h in hs)/len(hs) if hs else None for key in ('win_brier','top3_brier','win_log_loss')}
+                           } for side in ('baseline','candidate')
+                           for hs in [[h for c in cases for h in c['sides'][side]['horses'] if h['group']==group]]}
+                           for group in ('E0','E1','E2')},
                        'approval':approval,'manual_decision':decision,'adopted':False,'automatic_promotion':False,
                        'validation':'sample_threshold_only_review_required' if enough else 'collecting',
                        'overfit_review':{'frozen_policy':True,'independent_weeks':weeks,'holdout_review':'required_before_approval','multiple_testing':'seven_themes_report_all_no_winner_selection'},
