@@ -8,6 +8,9 @@ function create(data,cfg){
  if(data.course_id!=='tokyo_turf_2000'||data.labTokyoMotion!==ID||data.scope!=='LAB_SYNTHETIC_NOT_OFFICIAL'||
     data.horses.length!==18||data.horses.some(h=>h.styleMeta?.source!=='LAB_SYNTHETIC_NOT_OFFICIAL'))
   throw Error('TOKYO_LATERAL_OPT_IN_INVALID');
+ // Source-linked candidate reserves extra room for sequential runner updates.
+ // The v4/default path retains its original .35m side buffer.
+ const sideBuffer=data.labTokyoSourceModel==='source-linked-v5'?.55:LIMITS.sideBufferM;
  const laneM=cfg.laneWidthM,velocity=new Map(),pending=new Map(),snapshot=new Map(),previous=new Map();
  let lastTime=null;
  const stats={id:ID,emergencyStops:0,limitedSteps:0,maxPlannedSpeedMps:0};
@@ -33,7 +36,7 @@ function create(data,cfg){
    // Reserve the other runner's stopping distance only if it moves toward us.
    const approaching=otherV*side<0?Math.abs(otherV):0;
    const reserve=approaching*dt+approaching*approaching/(2*a);
-   room=Math.min(room,Math.max(0,Math.abs(side)-LIMITS.bodyWidthM-LIMITS.sideBufferM-reserve));
+   room=Math.min(room,Math.max(0,Math.abs(side)-LIMITS.bodyWidthM-sideBuffer-reserve));
   }
   limit=Math.min(limit,Math.sqrt(Math.max(0,2*a*room)));
   // One-step anticipation avoids reaching a stopping envelope too late.
@@ -57,6 +60,16 @@ function create(data,cfg){
  }
  function limitTravel(h,horses,original,dt,t){
   let distance=original.distance;
+  if(data.labTokyoSourceModel==='source-linked-v5'){
+   // Match forward clearance to the wider lateral stopping envelope. Otherwise
+   // a faster follower can enter LaneAI's side corridor while its neighbour is
+   // already braking sideways, forcing an instantaneous lateral stop.
+   for(const other of horses){
+    if(other===h||other.finished||other.d<h.d)continue;
+    if(Math.abs(other.lane-h.lane)*laneM>=LIMITS.bodyWidthM+sideBuffer)continue;
+    distance=Math.min(distance,Math.max(0,other.d-cfg.minimumLongitudinalM-h.d));
+   }
+  }
   // The shared loop marks a leading runner finished before processing followers.
   // Keep that real runner's current runoff position in the clearance calculation.
   // Without this, a follower may advance through it during the same physical tick.

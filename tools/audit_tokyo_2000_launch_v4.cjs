@@ -8,15 +8,22 @@ if(!['legacy','bounded-lateral-v4'].includes(motion))throw Error('AUDIT_MOTION_I
 const seedText=option('--seeds','1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,2026,2027');
 const seeds=seedText.split(',').map(Number);
 if(!seeds.length||new Set(seeds).size!==seeds.length||seeds.some(x=>!Number.isInteger(x)||x<1||x>999999))throw Error('AUDIT_SEEDS_INVALID');
-const root=path.resolve(__dirname,'../docs/lab'),g={};
+const sourcePath=option('--source-manifest',null);
+if(sourcePath&&motion!=='bounded-lateral-v4')throw Error('SOURCE_REQUIRES_BOUNDED_MOTION');
+const root=path.resolve(__dirname,'../docs/lab'),g={crypto:crypto.webcrypto};
 const modules=['race-course-geometry-v1','race-lane-ai-v1','race-runner-style-v1','race-ability-model-v1',
  'race-tokyo-ability90-v1','race-tokyo-lateral-policy-v4','race-cohort-speed-v1','race-sim-engine','race-lab-18-fixture-v1','race-clean-goal-view-v1','race-tokyo-2000-v1'];
+if(sourcePath)modules.push('race-tokyo-source-audit-v2','race-tokyo-source-physics-v5');
 const sourceHashes={};
-for(const n of modules){const bytes=fs.readFileSync(path.join(root,n+'.js'));sourceHashes[n]=crypto.createHash('sha256').update(bytes).digest('hex');vm.runInNewContext(bytes.toString(),{window:g,globalThis:g});}
+for(const n of modules){const bytes=fs.readFileSync(path.join(root,n+'.js'));sourceHashes[n]=crypto.createHash('sha256').update(bytes).digest('hex');vm.runInNewContext(bytes.toString(),{window:g,globalThis:g,TextEncoder});}
+(async()=>{
+const sourceSession=sourcePath?await g.RaceTokyoSourcePhysicsV5.prepare(JSON.parse(fs.readFileSync(sourcePath,'utf8'))):null;
 const rules={lengthMetres:2.55,widthMetres:.8,laneMetres:1.65,epsilonMetres:1e-6,
  description:'Axis-aligned horse rectangles in course-distance/lane coordinates; linear swept interpolation. Not measured horse silhouettes or proof of real-world collision safety.'};
 function run(seed,dt=.08){
- const data=g.RaceTokyo2000.race({motion}),inputBefore=JSON.stringify(data),sim=g.RaceSimEngine.create(data,{seed,bias:'neutral'});
+ const data=g.RaceTokyo2000.race({motion});
+ if(sourceSession)data.labTokyoSourceModel='source-linked-v5';
+ const inputBefore=JSON.stringify(data),sim=g.RaceSimEngine.create(data,{seed,bias:'neutral',labTokyoSourceSession:sourceSession});
  const maxLane=sim.laneConfig.maxLane,laneMetres=sim.laneConfig.laneWidthM;
  let steps=0,pairs=0,endpointHits=0,sweptHits=0,launchEndpointHits=0,launchSweptHits=0,boundsViolations=0,backwardSteps=0;
  let runoffEndpointHits=0,allStateSweptHits=0;
@@ -81,19 +88,22 @@ const stepSensitivity=sensitivitySeeds.map(seed=>{const original=runs.find(x=>x.
  maxLateralMps:smaller.maxLateral.mps,maxLateralVelocityJumpMps:smaller.maxLateralVelocityJump.mps,
  winnerTimeChangeSeconds:smaller.results[0].finishTime-original.results[0].finishTime,
  sameFinishOrder:smaller.results.map(x=>x.number).join(',')===original.results.map(x=>x.number).join(',')};});
+const sourceRoute=sourceSession?g.RaceTokyoSourcePhysicsV5.inspect(sourceSession):null;
 const physical=g.RaceCourseGeometry.get('tokyo_turf_2000');
-const boundaryComparison=[85,100,110,120,130,150,220,300,900,1145,1474.1].map(d=>{const m=g.RaceCourseGeometry.metrics(physical,d,0);return{
+const boundaryComparison=[85,100,110,120,130,150,220,300,900,1145,1474.1].map(d=>{const m=sourceRoute?sourceRoute.metrics(d,0):g.RaceCourseGeometry.metrics(physical,d,0);return{
  distance:d,physicalKind:m.kind,physicalBend:m.bend,physicalSegment:m.segment,
  illustrationCandidateKind:d<100?'line':d<300?'left-curve':d<900?'line':d<1474.1?'left-curve':'line',
  illustrationDistancesAreHypotheses:true};});
 const report={schema:'tokyo-launch-audit-v4',courseId:'tokyo_turf_2000',canAnimate:false,approval:'not_approved',
- motion,sourceHashes,rules,seeds,referenceSeed,reproducible:true,runs,stepSensitivity,boundaryComparison,
+ sourceSession,motion,sourceHashes,rules,seeds,referenceSeed,reproducible:true,runs,stepSensitivity,boundaryComparison,
  summary:{seedCount:runs.length,all18Finished:runs.every(r=>r.all18Finished),all18RunoffComplete:runs.every(r=>r.all18RunoffComplete),
   endpointHits:runs.reduce((s,r)=>s+r.endpointHits,0),sweptHits:runs.reduce((s,r)=>s+r.sweptHits,0),
   launchEndpointHits:runs.reduce((s,r)=>s+r.launchEndpointHits,0),launchSweptHits:runs.reduce((s,r)=>s+r.launchSweptHits,0),
   runoffEndpointHits:runs.reduce((s,r)=>s+r.runoffEndpointHits,0),allStateSweptHits:runs.reduce((s,r)=>s+r.allStateSweptHits,0),
   boundsViolations:runs.reduce((s,r)=>s+r.boundsViolations,0),backwardSteps:runs.reduce((s,r)=>s+r.backwardSteps,0),
   maxLateralMps:Math.max(...runs.map(r=>r.maxLateral.mps)),maxLateralVelocityJumpMps:Math.max(...runs.map(r=>r.maxLateralVelocityJump.mps)),emergencyStops:runs.reduce((s,r)=>s+(r.motionStats?.emergencyStops||0),0)},
- unresolved:['unmeasured-real-entry-angle','illustration/physical-boundary-mismatch','lateral-motion-naturalness','full-source-topology','real-time-1x/2x/4x','visual-approval']};
+ unresolved:['unmeasured-real-entry-angle',...(sourceSession?[]:['illustration/physical-boundary-mismatch']),'lateral-motion-naturalness','full-source-topology','real-time-1x/2x/4x','visual-approval']};
 const out=option('--out',null);if(out){fs.mkdirSync(path.dirname(path.resolve(out)),{recursive:true});fs.writeFileSync(out,JSON.stringify(report,null,2)+'\n');}
 console.log(JSON.stringify({summary:report.summary,stepSensitivity,boundaryComparison,canAnimate:false},null,2));
+
+})().catch(e=>{console.error(e);process.exitCode=1;});
