@@ -13,7 +13,10 @@ function laneStep(height,maxLane){
 function goalScreenPosition(distance,lane,finish,width,height,maxLane,turn='左',pullback=1){
  const center=height*.52,step=laneStep(height,maxLane)/pullback;
  const direction=turn==='右'?-1:1,finishX=turn==='右'?width*.30:width*.70;
- return {x:finishX+direction*(distance-finish)*width/(290*pullback),
+ // A fixed 100m screen span puts the leader at 110% width at the
+ // 80m camera cut (right-handed course). Keep this linear through the
+ // wire: entry, gaps and speed all use the same physical distance.
+ return {x:finishX+direction*(distance-finish)*width/(100*pullback),
          y:center+(lane-maxLane/2)*step};
 }
 function drawGoalPost(ctx,x,top,bottom){

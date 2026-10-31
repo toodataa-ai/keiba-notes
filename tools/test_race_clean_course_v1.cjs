@@ -240,7 +240,7 @@ assert.ok(raceHud.gap(sorted[0],sorted[1]).seconds>=0);
 assert.ok(!app.includes('race.finalTop3'));
 assert.ok(!app.includes('engine.state.horses=window.RaceRealShuka2026Reference'));
 
-assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-20'));
+assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261031-goal-100'));
 assert.ok(app.includes('const scale=mini?.48:(points.length>=12?(compact?.78:.84):.90)'));
 assert.ok(app.includes('const paintCamera=pixelAlignedCamera(lastCamera,live.ctx)'));
 assert.ok(app.includes('backdrop(paintCamera)'));
@@ -277,7 +277,7 @@ assert.ok(app.includes("get('geometry')!=='legacy'"));
 
 assert.ok(!app.includes('RaceCleanDistanceCamera'));
 assert.ok(!app.includes('ctx.drawImage('));
-assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261019-20'));
+assert.ok(html.includes('race-clean-goal-view-v1.js?v=20261031-goal-100'));
 assert.ok(html.includes('id="goalCamera"'));
 const kyoto1400=fs.readFileSync(root+'race-simulator.html','utf8');
 assert.ok(kyoto1400.includes('race-sim-engine.js?v=20261016-41'));
@@ -286,6 +286,16 @@ assert.ok(html.includes('race-cohort-speed-v1.js?v=20261020-25'));
 assert.ok(kyoto1400.includes('race-lane-ai-v1.js?v=20261015-25'));
 assert.ok(html.includes('race-lane-ai-v1.js?v=20261015-25'));
 const goal=fs.readFileSync(root+'race-clean-goal-view-v1.js','utf8');
+vm.runInNewContext(goal,{window,globalThis:window});
+for(const width of [368,588.28125,1200]){
+ const project=d=>window.RaceCleanGoalView.goalScreenPosition(d,3,2000,width,380,14,'右');
+ assert.ok(project(1920).x>width+13.5*.81,'GOAL_ENTRY_COMPLETELY_OFFSCREEN');
+ assert.ok(Math.abs(project(2000).x-width*.30)<1e-9,'GOAL_POST_FIXED_30_PERCENT');
+ for(let d=1920;d<=2020;d+=.25){
+  const displacement=project(d).x-project(d+.25).x;
+  assert.ok(Math.abs(displacement-width*.0025)<1e-9,'GOAL_LINEAR_SPEED_THROUGH_WIRE');
+ }
+}
 assert.ok(goal.includes('const scale=.81,rad=13.5*scale'));
 assert.ok(goal.includes("turn==='右'?-1:1"));
 assert.ok(goal.includes('drawGoalPost('));
