@@ -18,7 +18,7 @@ async function run(session,seed,{yieldEvery=40}={}){
   for(let i=0;i<18;i++){
    const a=before[i],b=after[i],v=(b.lane-a.lane)*1.65/.08;
    if(!a.finished){maxLateral=Math.max(maxLateral,Math.abs(v));maxJump=Math.max(maxJump,Math.abs(v-vel[i]));}
-   if(!Number.isFinite(b.d)||!Number.isFinite(b.lane)||b.lane<0||b.lane>16)bounds++;
+   if(!Number.isFinite(b.d)||b.d<0||b.d>2120||!Number.isFinite(b.lane)||b.lane<0||b.lane>16)bounds++;
    if(b.d<a.d-1e-9)backward++;vel[i]=v;
    for(let j=0;j<i;j++)if(overlap(a,b,before[j],after[j]))hits++;
   }

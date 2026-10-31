@@ -49,10 +49,10 @@ function mapped(canvas,points,cam,overview){const {ctx,w,h}=surface(canvas),rout
  const scale=overview?Math.min(w/ready.vector.width,h/ready.vector.height):(w<500?8:10),cx=overview?ready.vector.width/2:cam.x,cy=overview?ready.vector.height/2:cam.y,angle=overview?0:cam.angle;
  const cos=Math.cos(angle),sin=Math.sin(angle),project=p=>({x:w/2+scale*(cos*(p.x-cx)-sin*(p.y-cy)),y:h/2+scale*(sin*(p.x-cx)+cos*(p.y-cy))});
  ctx.fillStyle='#edf2e8';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2,h/2);ctx.rotate(angle);ctx.scale(scale,scale);ctx.translate(-cx,-cy);ready.vector.render(ctx);ctx.restore();
- const positions=points.map(p=>{const world=route.point(Math.min(2120,p.d),p.lane),q=project(world);number(ctx,p.number,q.x,q.y,overview?.38:.83);return{...p,worldX:world.x,worldY:world.y,x:q.x,y:q.y};});
+ const positions=points.map(p=>{const world=route.point(p.d,p.lane),q=project(world);number(ctx,p.number,q.x,q.y,overview?.38:.83);return{...p,worldX:world.x,worldY:world.y,x:q.x,y:q.y};});
  return{positions,sourceScaleX:scale,sourceScaleY:scale,angle,scale};}
-function draw(reset=false,elapsed=0){if(!ready)return;const f=frame(),lead=f.points.reduce((a,b)=>b.d>a.d?b:a),route=ready.route,p=route.center(Math.min(2120,lead.d));
- const center=f.points.reduce((v,h)=>{const q=route.point(Math.min(2120,h.d),h.lane);v.x+=q.x/18;v.y+=q.y/18;return v;},{x:0,y:0});
+function draw(reset=false,elapsed=0){if(!ready)return;const f=frame(),lead=f.points.reduce((a,b)=>b.d>a.d?b:a),route=ready.route,p=route.center(lead.d);
+ const center=f.points.reduce((v,h)=>{const q=route.point(h.d,h.lane);v.x+=q.x/18;v.y+=q.y/18;return v;},{x:0,y:0});
  let angle=Math.PI-Math.atan2(p.ty,p.tx);
  if(camera){while(angle-camera.angle>Math.PI)angle-=2*Math.PI;while(angle-camera.angle< -Math.PI)angle+=2*Math.PI;}
  if(reset||!camera)camera={...center,angle};else{const k=1-Math.exp(-Math.max(0,elapsed)/.22);camera.x+=(center.x-camera.x)*k;camera.y+=(center.y-camera.y)*k;camera.angle+=(angle-camera.angle)*k;}
