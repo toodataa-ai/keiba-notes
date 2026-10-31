@@ -17,6 +17,24 @@ class TestStrictStep1Capture(unittest.TestCase):
         self.assertNotIn("predicted_top3_probability",result[0])
         self.assertEqual(result[0]["predicted_win_probability"],0.5)
 
+    def test_frozen_central_top3_marginal_is_not_invented(self):
+        source,frozen=self.example()
+        source["outcome_distributions"]={"central":[
+            {"finish":[1,2,3],"probability":0.6},
+            {"finish":[2,1,3],"probability":0.4},
+        ]}
+        result=check_runners(source,frozen)
+        self.assertAlmostEqual(result[0]["predicted_top3_probability"],1)
+        self.assertAlmostEqual(result[1]["predicted_top3_probability"],1)
+
+    def test_invalid_frozen_central_distribution_fails(self):
+        source,frozen=self.example()
+        source["outcome_distributions"]={"central":[
+            {"finish":[1,2,3],"probability":0.5}
+        ]}
+        with self.assertRaisesRegex(ValueError,"not_normalized"):
+            check_runners(source,frozen)
+
     def test_missing_nine_grades_fails(self):
         source,frozen=self.example()
         source["step1_ranking"][0]["factor_grades"]=[]
