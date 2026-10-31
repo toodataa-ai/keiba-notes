@@ -118,7 +118,8 @@ function validData(data){
 }
 function create(data,options={}){
  validData(data);
- const geo=global.RaceCourseGeometry;
+ const geo=data.course_id==='tokyo_turf_2000'&&data.labTokyoSourceModel==='source-linked-v5'?
+  (global.RaceTokyoSourcePhysicsV5?.resolve(data,options.labTokyoSourceSession)||(()=>{throw Error('TOKYO_SOURCE_ADAPTER_MISSING')})()):global.RaceCourseGeometry;
  const profile=geo&&geo.get(data.course_id);
  if(!profile || profile.distance_m!==data.distance_m || profile.venue!==data.venue || profile.turn!==data.turn)
    throw Error('COURSE_PROFILE_MISMATCH: このコースの測定値・条件を確認できません');

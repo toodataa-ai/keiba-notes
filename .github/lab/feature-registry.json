@@ -243,6 +243,16 @@
         "candidate_option": "labTokyoMotion=bounded-lateral-v4",
         "verification": "32 seeds at .08s plus 3 seeds at .04s; rectangle endpoints/swept paths incl runoff zero for candidate. Default full-state parity against reference engine for Tokyo2000/Kyoto2000/Kyoto1400 x2 seeds. Shared LAB engine adds explicit opt-in hook; default behavior unchanged.",
         "remaining": "Physical/source boundary mismatch, actual entry angle, real-time 1/2/4x and visual approval. RaceTokyo2000.create remains locked."
+      },
+      "source_linked_v5": {
+        "status": "lab_development",
+        "approval": "not_approved",
+        "enabled_without_local_source": false,
+        "legacy_route_can_animate": false,
+        "local_evaluation": "only after source fingerprint, original vector/body mask, numerical safety and full-frame repeatability pass",
+        "source_redistribution": false,
+        "source_physics_audit": "docs/lab/TOKYO_2000_SOURCE_PHYSICS_AUDIT_V5.json",
+        "visual_approval_pending": true
       }
     }
   ]

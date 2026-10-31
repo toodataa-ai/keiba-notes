@@ -12,5 +12,5 @@ for(const horse of race.horses){
  card.append(h,dl);document.getElementById('abilities').append(card);
 }
 // Fail closed even if a user removes the disabled attribute in devtools.
-document.getElementById('startBtn').addEventListener('click',()=>model.assertCanAnimate());
+document.getElementById('startBtn').addEventListener('click',()=>{if(!window.RaceTokyoLocalPreviewV5?.audit)model.assertCanAnimate();});
 })();

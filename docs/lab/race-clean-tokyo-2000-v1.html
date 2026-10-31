@@ -1,27 +1,36 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>東京芝2000m LAB — 走路監査待ち</title><link rel="stylesheet" href="race-clean-tokyo-2000-v1.css"></head><body><main>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>東京芝2000m LAB — 走路監査待ち</title><link rel="stylesheet" href="race-clean-tokyo-2000-v1.css?v=tokyo-local-v5"></head><body><main>
 <p class="tag">KEIBA NOTES / LAB・未承認</p><h1>東京 芝2000m</h1><p>左回り・芝Aコース相当 / 架空18頭 / 正式予想とは無関係</p>
-<section class="warning" role="status"><h2>走路監査待ち・走行不可</h2><p>原PPTXからの静止照合を実施しましたが、原図に対応する物理走路の統合と再生検証は未完了です。原図は端末内だけで読み込めます。既存の東京2000m幾何データは近似で、承認された走路ではありません。原図・内外ラチ・走行位置の照合と安全監査が完了するまで再生できません。</p><p>低画質画像の拡大や近似走路を原図の代用として表示しません。</p></section>
+<section class="warning" role="status"><h2>LAB未承認・原図なしでは走行不可</h2><p>原PPTXからの静止照合を実施しましたが、原図に対応する物理走路を別候補として統合中です。原図は端末内だけで読み込めます。既存の東京2000m幾何データは近似で、承認された走路ではありません。端末内の原図・内外ラチ・走行位置の照合と安全監査に合格した場合だけ、別候補の評価再生を利用できます。正式走路は目視承認待ちです。</p><p>低画質画像の拡大や近似走路を原図の代用として表示しません。</p></section>
 <section id="startEvidence"><h2>スタート位置：確認できた範囲</h2>
 <ul><li>発走位置はPPTXの「2000m」目印に一致。JRA図の右側ポケットとも概略一致しますが、実地の測量座標は未確認です。</li>
 <li>発走後「約100mで左カーブ」はJRA-VANの解説に記載。ちょうど100mという境界の確定ではありません。</li>
 <li>実際の進入角と2コーナー出口までの正確な距離は未確定。候補の「2角出口300m」は仮設定です。</li></ul>
 <p><a href="https://www.jra.go.jp/keiba/thisweek/2025/1102_1/race.html">JRA コース説明</a> ／ <a href="https://sugo.jra-van.jp/sugotoku/crs/crs05t2000.html">JRA-VAN 約100mの説明</a> ／ <a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_START_EVIDENCE_V3.md">根拠と未確定事項</a></p></section>
 <div class="facts"><span>距離 <b>2,000m</b></span><span>1周 <b>2,083.1m</b></span><span>直線 <b>525.9m</b></span><span>高低差 <b>2.7m</b></span></div>
-<section id="launchAudit"><h2>発走安全の改善候補（画面には未適用）</h2>
+<section id="launchAudit"><h2>発走安全の改善候補（既存モデルの比較）</h2>
 <p>架空18頭・32シードの数値監査です。既存動作を保ち、東京の明示的な研究設定だけで横移動とゴール付近の間隔制御を試験しました。</p>
 <table><thead><tr><th>検査項目</th><th>既存</th><th>改善候補</th></tr></thead><tbody>
 <tr><th>発走区間のフレーム間重なり</th><td>250</td><td>0</td></tr>
 <tr><th>全区間・余走のフレーム間重なり</th><td>3,917</td><td>0</td></tr>
 <tr><th>競走中の最大横速度</th><td>6.02m/s</td><td>1.14m/s</td></tr>
 <tr><th>全18頭の完走・余走</th><td>32/32シード</td><td>32/32シード</td></tr>
-</tbody></table><p>重なりは検査用矩形の「組×ステップ」数で、実馬の衝突件数ではありません。改善候補も実際の進入角・走路との整合、再生速度別検証、目視は未完了です。走行ロックを継続します。</p>
+</tbody></table><p>重なりは検査用矩形の「組×ステップ」数で、実馬の衝突件数ではありません。このv4比較は旧近似コースでの結果です。下の原図連携v5は別候補として検査します。既存走路の走行ロックと未承認状態は維持します。</p>
 <p><a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_MOTION_AUDIT_V4.md">監査条件と残課題</a> ／ <a href="TOKYO_2000_MOTION_AUDIT_V4.json">数値要約</a></p></section>
-<div class="views"><section><h2>実況ビュー</h2><div class="empty">原図と走路の照合待ち</div></section><section><h2>全体図</h2><div class="empty">公開用ベクター・対応走路の準備待ち</div></section></div>
-<div class="controls"><button id="startBtn" disabled>走行ロック中</button><label>再生速度 <select disabled><option>1倍</option><option>2倍</option><option>4倍</option></select></label></div>
-<p>実況仕様：残り80mで固定カメラ・横幅100m。東京の左回りと実況の右から左への進行方向は別管理。走行映像・余走・時計・着差の検証は未実施です。</p>
+<section id="localPreview"><h2>端末内の原図で評価再生</h2>
+<p id="previewWarning" role="status">原図・走路・安全監査待ち。評価再生は無効です。</p>
+<p><a href="TOKYO_2000_LOCAL_PREVIEW_V5.md">評価再生の手順・検証結果</a> ／ <a href="TOKYO_2000_SOURCE_PHYSICS_AUDIT_V5.json">原図連携32シード数値監査</a></p><p>下の「ローカル原図と走路候補の静止照合」で2ファイルを読み込み、この端末で走路と全18頭の安全監査を実行してください。素材は送信・保存しません。原図なしの近似コース再生はできません。</p>
+<div class="controls"><label>シード <input id="previewSeed" type="number" min="1" max="999999" step="1" value="2026"></label><button id="prepareLocalBtn" disabled>端末内で安全監査・再生を準備</button></div>
+<p id="localPreviewStatus" role="status">原図未読込。走行ロック中。</p>
+<div class="race-hud"><b id="raceClock">—</b><span><span id="raceSplitLabel">1000m 通過</span> <span id="raceSplit">—</span></span><span id="raceProgress">先頭 0m / 2,000m</span></div>
+<div class="views"><section><h3>実況ビュー</h3><canvas id="liveBroadcast" aria-label="東京芝2000m実況ビュー"></canvas><p id="cameraMode">原図の照合待ち</p></section><section><h3>同期全体図</h3><canvas id="liveOverview" aria-label="東京芝2000m原図と走行座標"></canvas></section></div>
+<div class="controls"><button id="startBtn" disabled>走行ロック中</button><button id="resetLocalBtn" disabled>最初へ</button><label>再生速度 <select id="playSpeed" disabled><option value="1">1倍</option><option value="2">2倍</option><option value="4">4倍</option></select></label>
+<label>確認地点 <select id="previewCheckpoint" disabled><option value="0">0m</option><option value="100">100m</option><option value="130">130m</option><option value="300">300m</option><option value="900">900m</option><option value="1145">1145m</option><option value="1474.1">1474.1m</option><option value="1600">1600m</option><option value="1920">1920m</option><option value="1950">1950m</option><option value="1980">1980m</option><option value="2000">2000m</option><option value="2032">ゴール後</option></select></label></div>
+<div id="raceBanner" hidden><h3 id="raceHeading"></h3><p id="racePodium"></p></div>
+<div id="raceResults" hidden class="result-scroll"><table><thead><tr><th>着順</th><th>馬番</th><th>架空馬</th><th>時計</th><th>前馬差（概算）</th><th>勝馬との秒差</th></tr></thead><tbody id="raceRows"></tbody></table></div>
+<p>残り80mで横幅100mの固定カメラへ切替。時計・距離・着順は共通エンジンの計算値で、再生速度を変えても同じです。馬身差は時間差からの概算です。</p></section>
 <details><summary>確認地点と未完了の監査</summary><p id="checkpoints"></p><ul><li>発走後約100mの進入角度、2コーナー出口〜3コーナー入口の直線保持</li><li>内外ラチ・白帯・ダート・別走路への侵入、0.25m刻みの連続性</li><li>390px / 1024px以上 × 1・2・4倍の同期表示と全18頭の完走・余走</li><li>同一シード再現性・時計と着差・京都回帰・ユーザー目視</li></ul></details>
 <details id="sourceInspector"><summary>ローカル原図と走路候補の静止照合</summary>
-<p>原素材を再配布せず、手元で生成した原図をこの端末だけに読み込みます。ファイルはアップロードされません。再生はできません。途中距離の配分と勾配は近似で、目視・走行承認は別途必要です。</p>
+<p>原素材を再配布せず、手元で生成した原図をこの端末だけに読み込みます。ファイルはアップロードされません。上の評価再生は別途、端末内の安全監査に通る必要があります。途中距離の配分と勾配は近似で、目視・走行承認は別途必要です。</p>
 <p><a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md">ローカル検査データの作成方法</a></p>
 <label>audit-local.json と source-local.svg を一緒に選択 <input id="sourceAuditFiles" type="file" multiple accept=".json,.svg"></label>
 <p id="sourceAuditStatus" role="status">原図未読込。走行ロック中。</p>
@@ -32,5 +41,5 @@
 </details>
 <h2>架空18頭の固定能力</h2><p>90が中立。標準88〜91、高能力92〜98、低能力82〜87。走行用は50 + (能力 − 90) / 0.3へ正規化。結果に合わせた調整は行っていません。</p><div id="abilities" class="abilities"></div>
 <footer><p>素材候補：<a href="https://umapot.com/?p=13273">うまぽっと・東京競馬場PPTX</a> / <a href="https://umapot.com/?page_id=116">利用規約</a>。原素材は同梱していません。</p><p>STAGING・本番への移行なし。<a href="TOKYO_2000_QA_V1.md">調査・検証記録</a></p><a href="race-clean-course-v1.html">既存の京都LAB</a></footer>
-</main><script src="race-ability-model-v1.js"></script><script src="race-tokyo-ability90-v1.js"></script><script src="race-lab-18-fixture-v1.js"></script><script src="race-clean-goal-view-v1.js"></script><script src="race-tokyo-2000-v1.js"></script><script src="race-clean-tokyo-2000-app-v1.js"></script><script src="race-tokyo-source-audit-v2.js"></script><script src="race-tokyo-source-inspector-v2.js"></script>  <script src="../assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+</main><script src="race-ability-model-v1.js"></script><script src="race-tokyo-ability90-v1.js"></script><script src="race-lab-18-fixture-v1.js"></script><script src="race-clean-goal-view-v1.js"></script><script src="race-tokyo-2000-v1.js"></script><script src="race-clean-tokyo-2000-app-v1.js?v=tokyo-local-v5"></script><script src="race-tokyo-source-audit-v2.js"></script><script src="race-tokyo-source-inspector-v2.js?v=tokyo-local-v5"></script><script src="race-course-geometry-v1.js?v=tokyo-local-v5"></script><script src="race-lane-ai-v1.js?v=tokyo-local-v5"></script><script src="race-runner-style-v1.js?v=tokyo-local-v5"></script><script src="race-cohort-speed-v1.js?v=tokyo-local-v5"></script><script src="race-tokyo-lateral-policy-v4.js?v=tokyo-local-v5"></script><script src="race-tokyo-source-physics-v5.js?v=tokyo-local-v5"></script><script src="race-sim-engine.js?v=tokyo-local-v5"></script><script src="race-frame-interpolator-v1.js?v=tokyo-local-v5"></script><script src="race-broadcast-hud-v1.js?v=tokyo-local-v5"></script><script src="race-tokyo-source-vector-v5.js?v=tokyo-local-v5"></script><script src="race-tokyo-source-mask-v5.js?v=tokyo-local-v5"></script><script src="race-tokyo-safety-v5.js?v=tokyo-local-v5"></script><script src="race-tokyo-local-preview-v5.js?v=tokyo-local-v5"></script>  <script src="../assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body></html>

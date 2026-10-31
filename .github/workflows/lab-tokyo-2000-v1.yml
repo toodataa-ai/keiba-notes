@@ -12,6 +12,8 @@ on:
       - 'tools/test_race_tokyo_*'
       - 'tools/lib/race-swept-audit-v1.cjs'
       - 'docs/lab/TOKYO_2000_MOTION_AUDIT_V4*'
+      - 'docs/lab/TOKYO_2000_LOCAL_PREVIEW_V5.md'
+      - 'docs/lab/TOKYO_2000_SOURCE_PHYSICS_AUDIT_V5.json'
       - 'tools/audit_tokyo_2000*'
       - 'docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md'
       - '.github/workflows/lab-tokyo-2000-v1.yml'
@@ -26,6 +28,8 @@ on:
       - 'tools/test_race_tokyo_*'
       - 'tools/lib/race-swept-audit-v1.cjs'
       - 'docs/lab/TOKYO_2000_MOTION_AUDIT_V4*'
+      - 'docs/lab/TOKYO_2000_LOCAL_PREVIEW_V5.md'
+      - 'docs/lab/TOKYO_2000_SOURCE_PHYSICS_AUDIT_V5.json'
       - 'tools/audit_tokyo_2000*'
       - 'docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md'
       - '.github/workflows/lab-tokyo-2000-v1.yml'
@@ -37,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -67,6 +73,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -97,11 +105,22 @@ jobs:
           python tools/audit_tokyo_2000_source_v2.py --pptx /tmp/tokyo-source.pptx --out /tmp/tokyo-source-audit
           node tools/audit_tokyo_2000_run_v2.cjs /tmp/tokyo-source-audit/audit-local.json
           python tools/test_race_tokyo_source_browser_v2.py --source-dir /tmp/tokyo-source-audit
+      - name: Source-linked physics, isolation and 32-seed safety
+        run: |
+          node tools/test_race_tokyo_source_physics_v5.cjs /tmp/tokyo-source-audit/audit-local.json
+          node tools/audit_tokyo_2000_launch_v4.cjs --motion bounded-lateral-v4 --source-manifest /tmp/tokyo-source-audit/audit-local.json --out /tmp/tokyo-v5-motion.json
+          node tools/test_race_tokyo_source_report_v5.cjs /tmp/tokyo-v5-motion.json
+      - name: Local-source mobile and PC replay at 1x 2x 4x
+        run: |
+          python -m http.server 8775 --bind 127.0.0.1 --directory docs > /tmp/tokyo-v5-server.log 2>&1 &
+          python tools/test_race_tokyo_local_preview_v5.py --source-dir /tmp/tokyo-source-audit --out /tmp/tokyo-v5-browser
       - name: Collect only non-source numerical summaries
         run: |
           mkdir -p artifacts/tokyo-source-summary
           cp /tmp/tokyo-source-audit/numeric-audit.json artifacts/tokyo-source-summary/
           cp /tmp/tokyo-source-audit/browser-audit.json artifacts/tokyo-source-summary/
+          cp /tmp/tokyo-v5-motion.json artifacts/tokyo-source-summary/
+          cp /tmp/tokyo-v5-browser/numeric-browser-report.json artifacts/tokyo-source-summary/
       - uses: actions/upload-artifact@v4
         with:
           name: tokyo-source-audit-numerical-summary-only

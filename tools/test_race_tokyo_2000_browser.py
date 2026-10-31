@@ -25,7 +25,7 @@ with sync_playwright() as p:
         assert page.locator('.horse').count() == 18
         assert page.locator('dd').count() == 108
         assert page.locator('#startBtn').is_disabled()
-        assert page.locator('.controls select').is_disabled()
+        assert page.locator('#playSpeed').is_disabled()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert page.evaluate('RaceTokyo2000.status.canAnimate === false')
         assert page.evaluate('RaceTokyo2000.race().labTokyoMotion === undefined')

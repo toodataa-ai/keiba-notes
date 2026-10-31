@@ -1,12 +1,12 @@
 /* Local original-source inspector: never uploads, stores or executes imported source. */
 (function(g){'use strict';
 const $=id=>document.getElementById(id),ui=$('sourceAuditFiles');if(!ui)return;
-let source=null,route=null,data=null,snapshots=null,index=0,generation=0;
+let source=null,route=null,data=null,snapshots=null,index=0,generation=0,localSvg=null;
 const checkpoints=[0,100,130,300,900,1145,1474.1,1600,1920,1950,1980,2000,2032];
 const hex=bytes=>Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
 async function loadFiles(files){
  const token=++generation;
- source=null;route=null;data=null;snapshots=null;inspector.lastView=null;inspector.lastRaster=null;$('sourceRasterResult').textContent='';$('sourceAuditViews').hidden=true;
+ source=null;route=null;data=null;snapshots=null;localSvg=null;window.dispatchEvent(new Event('tokyo-source-clear'));inspector.lastView=null;inspector.lastRaster=null;$('sourceRasterResult').textContent='';$('sourceAuditViews').hidden=true;
  $('sourceAuditStatus').textContent='原図のハッシュと検査データを確認中…';
  try{
   const list=Array.from(files),json=list.find(f=>f.name==='audit-local.json'),svg=list.find(f=>f.name==='source-local.svg');
@@ -27,13 +27,13 @@ async function loadFiles(files){
   if(token!==generation)return;
   if(Math.abs(img.naturalWidth/img.naturalHeight-built.width/built.height)>.003)
    throw Error('原図の縦横比が一致しません');
-  source=img;route=built;data=candidate;snapshots=shots;index=0;
+  source=img;route=built;data=candidate;snapshots=shots;index=0;localSvg=new TextDecoder().decode(content);
   $('sourceCheckpoint').replaceChildren(...checkpoints.map((d,i)=>{
    const opt=document.createElement('option');opt.value=i;opt.textContent=d>2000?'ゴール後':d+'m（仮配分）';return opt;
   }));
   $('sourceAuditViews').hidden=false;
   $('sourceAuditStatus').textContent='PPTX由来SVGのハッシュ一致。実コースの進入角・2角出口距離は未確定／走行不可。';
-  draw();
+  draw();window.dispatchEvent(new Event('tokyo-source-ready'));
  }catch(e){if(token===generation)$('sourceAuditStatus').textContent='読込停止：'+e.message;}
 }
 function surface(id){const c=$(id),r=c.getBoundingClientRect(),w=r.width,h=r.height,px=Math.min(2,devicePixelRatio||1);
@@ -90,7 +90,7 @@ function rasterAudit(){
  $('sourceRasterResult').textContent='原図画素検査 '+samples.toLocaleString('ja-JP')+'点 ／ 芝帯外 '+bad+'点（ゴール線の黒色 '+finishInk+'点は別集計）。走路承認ではありません。';
  return result;
 }
-const inspector={loadFiles,draw,rasterAudit,lastView:null,lastRaster:null};g.RaceTokyoSourceInspector=inspector;
+const inspector={loadFiles,draw,rasterAudit,getLocalInputs:()=>data?{manifest:JSON.parse(JSON.stringify(data)),svg:localSvg}:null,lastView:null,lastRaster:null};g.RaceTokyoSourceInspector=inspector;
 ui.addEventListener('change',()=>loadFiles(ui.files));
 $('sourceCheckpoint').addEventListener('change',e=>{index=Number(e.target.value);draw();});
 $('sourceRasterBtn').addEventListener('click',()=>{try{rasterAudit();}catch(e){$('sourceRasterResult').textContent='検査停止：'+e.message;}});

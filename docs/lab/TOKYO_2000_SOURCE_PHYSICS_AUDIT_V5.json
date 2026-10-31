@@ -1,0 +1,1433 @@
+{
+  "schema": "tokyo-source-linked-physics-audit-v5",
+  "courseId": "tokyo_turf_2000",
+  "canAnimate": false,
+  "approval": "not_approved",
+  "sourceSession": {
+    "model": "source-linked-v5",
+    "courseId": "tokyo_turf_2000",
+    "geometrySha256": "281afd0bffdc43c7b314c2d5bd3ed544344eee2f75c4b6240571aa8381a7723d",
+    "sourceSvgSha256": "4160369ab4103688c12ee9e3dce30a5e551766a234aaf1403091a1f1c3906c8e",
+    "canAnimate": false,
+    "approval": "not_approved",
+    "distanceAnchorsSurveyed": false
+  },
+  "sourceHashes": {
+    "race-course-geometry-v1": "c6d6478ff318d2ca3f73be5b90d54f2c7c1a25a8de2a413e0c554a6925337599",
+    "race-lane-ai-v1": "ac18da3fd75b519e29a0f1e5ecc2405adc6130110877473e5199f1538ba219e3",
+    "race-runner-style-v1": "967e4e28a8e83b4c8978392fa0e0de6f8204b694d74fc6a4a6e3ce7828ee419e",
+    "race-ability-model-v1": "53b6896287f45515c3d3cab01537bbea81319c79d67b4b750965564a2eebb143",
+    "race-tokyo-ability90-v1": "64c8205971cccd65f1049085d6cf2e0c210cb1a7ee6f71e213220a54d0e82981",
+    "race-tokyo-lateral-policy-v4": "a6b2ec7d150ebfa010a00f4ca297a046ccd598759dd3b673ca25a6caee6833fa",
+    "race-cohort-speed-v1": "8a2c544d9a707988d7058700ab8ad2d71c01d11270e1124a4b0b2fd538983ea5",
+    "race-sim-engine": "462c712d2e7a2417eef78495268987e44d66e9f682947348b00e16aab1eb731e",
+    "race-lab-18-fixture-v1": "0b49a101713d9e065484511318e7f05959747185a992b0ce600503a45a036b1e",
+    "race-clean-goal-view-v1": "52caa29ee65138c76601482bce1b781357ff09f52eb3c7fb990384df8778703a",
+    "race-tokyo-2000-v1": "0d7a4ddba0465c9d81ba8fc2b39e1bbc41dbd72f83d77d56afa86ccdf52357c8",
+    "race-tokyo-source-audit-v2": "aa9296b59ba754b3be6b918c898f605d9ca659f820506d2137e5a0f0b9395be5",
+    "race-tokyo-source-physics-v5": "b61606540f4d3a6f32b4ea63a71b0a250d4bc5104db84e8fbb77b8c2457d318d"
+  },
+  "rules": {
+    "lengthMetres": 2.55,
+    "widthMetres": 0.8,
+    "laneMetres": 1.65,
+    "epsilonMetres": 1e-06,
+    "description": "Axis-aligned horse rectangles in course-distance/lane coordinates; linear swept interpolation. Not measured horse silhouettes or proof of real-world collision safety."
+  },
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    2026,
+    2027
+  ],
+  "referenceSeed": 2026,
+  "reproducible": true,
+  "stepSensitivity": [
+    {
+      "seed": 1,
+      "stepSeconds": 0.04,
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "allStateSweptHits": 0,
+      "maxLateralMps": 1.1680000000000044,
+      "maxLateralVelocityJumpMps": 0.032000000000039774,
+      "winnerTimeChangeSeconds": 0.01699178981921534,
+      "sameFinishOrder": false
+    },
+    {
+      "seed": 2027,
+      "stepSeconds": 0.04,
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "allStateSweptHits": 0,
+      "maxLateralMps": 1.1680000000000044,
+      "maxLateralVelocityJumpMps": 0.03200000000000325,
+      "winnerTimeChangeSeconds": -0.20271138400271127,
+      "sameFinishOrder": false
+    },
+    {
+      "seed": 2026,
+      "stepSeconds": 0.04,
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "allStateSweptHits": 0,
+      "maxLateralMps": 1.167088839957382,
+      "maxLateralVelocityJumpMps": 0.032000000000021456,
+      "winnerTimeChangeSeconds": -0.07038321026216465,
+      "sameFinishOrder": false
+    }
+  ],
+  "boundaryComparison": [
+    {
+      "distance": 85,
+      "physicalKind": "chute",
+      "physicalBend": 0,
+      "physicalSegment": "ポケット・発走直後（距離配分は仮説）",
+      "illustrationCandidateKind": "line",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 100,
+      "physicalKind": "turn",
+      "physicalBend": 0.5269149186044338,
+      "physicalSegment": "2コーナー・外側走路",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 110,
+      "physicalKind": "turn",
+      "physicalBend": 1.0897340373464448,
+      "physicalSegment": "2コーナー・外側走路",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 120,
+      "physicalKind": "turn",
+      "physicalBend": 1.045775491623621,
+      "physicalSegment": "2コーナー・外側走路",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 130,
+      "physicalKind": "turn",
+      "physicalBend": 1.2295827700035395,
+      "physicalSegment": "2コーナー・外側走路",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 150,
+      "physicalKind": "turn",
+      "physicalBend": 1.0172893334002084,
+      "physicalSegment": "2コーナー・外側走路",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 220,
+      "physicalKind": "turn",
+      "physicalBend": 1.0021327405638465,
+      "physicalSegment": "2コーナー・外側走路",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 300,
+      "physicalKind": "straight",
+      "physicalBend": 0.31611368686717023,
+      "physicalSegment": "向正面・直線保持",
+      "illustrationCandidateKind": "line",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 900,
+      "physicalKind": "turn",
+      "physicalBend": 0.3063396133340715,
+      "physicalSegment": "3コーナー",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 1145,
+      "physicalKind": "turn",
+      "physicalBend": 0.612610567449823,
+      "physicalSegment": "4コーナー",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 1474.1,
+      "physicalKind": "straight",
+      "physicalBend": 0.24246019561254478,
+      "physicalSegment": "最後の直線525.9m",
+      "illustrationCandidateKind": "line",
+      "illustrationDistancesAreHypotheses": true
+    }
+  ],
+  "summary": {
+    "seedCount": 32,
+    "all18Finished": true,
+    "all18RunoffComplete": true,
+    "endpointHits": 0,
+    "sweptHits": 0,
+    "launchEndpointHits": 0,
+    "launchSweptHits": 0,
+    "runoffEndpointHits": 0,
+    "allStateSweptHits": 0,
+    "boundsViolations": 0,
+    "backwardSteps": 0,
+    "maxLateralMps": 1.1360000000000015,
+    "maxLateralVelocityJumpMps": 0.06400000000002459,
+    "emergencyStops": 0
+  },
+  "runs": [
+    {
+      "seed": 1,
+      "resultSignature": "d5e5134389b88b414b796f12fc2f6e14f81f09e528985e3d5aced6798f0e1f38",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 11.200000000000008,
+        "d": 151.53741926121552,
+        "leader": 175.07556407252093
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 81.59999999999862,
+        "d": 1295.0797667152187,
+        "leader": 1337.6649564022134
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27834,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 2,
+      "resultSignature": "4ff260224601519f36c832ef0b04641dd3dec9fe2cf58829ecf6d777912195f8",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 14.08000000000001,
+        "d": 197.02599615351843,
+        "leader": 218.0750827850513
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 9,
+        "t": 14.480000000000011,
+        "d": 204.7819107686309,
+        "leader": 224.6643367172891
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28222,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 3,
+      "resultSignature": "4e096f4dffd84cac9cd8b6737e0d98121cacd9b01a3bbef22d2190529c61b773",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 9,
+        "t": 20.959999999999905,
+        "d": 309.2373725291754,
+        "leader": 331.1890277020497
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 8,
+        "t": 16.95999999999999,
+        "d": 242.59758962141223,
+        "leader": 265.5673361843307
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28022,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 4,
+      "resultSignature": "79895f634c939ccf02275325792aea04d31f7595a1b0e0f8f99f540ee5f87562",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 5,
+        "t": 14.24000000000001,
+        "d": 203.03960422243387,
+        "leader": 218.46793407335377
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 8,
+        "t": 21.1199999999999,
+        "d": 307.7441398652501,
+        "leader": 330.41197163784534
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28291,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 5,
+      "resultSignature": "98025c692ea1315d6ba820ec4c49142bdede59614c08298b6c724217319c7710",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 14,
+        "t": 12.240000000000009,
+        "d": 155.04282281523916,
+        "leader": 189.6237163485717
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000002459,
+        "finiteDifferenceMps2": 0.8000000000003074,
+        "number": 18,
+        "t": 31.11999999999969,
+        "d": 451.9069495276222,
+        "leader": 504.11396113462627
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27740,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 6,
+      "resultSignature": "ad80749a1d53aabf5d1839b77e48e17c3e2c0bd8ba98b7892e985c2731b75de0",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 18,
+        "t": 76.07999999999873,
+        "d": 1189.706444627346,
+        "leader": 1249.4838267764173
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 48.799999999999315,
+        "d": 757.3639394833442,
+        "leader": 797.6415591907563
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27579,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 7,
+      "resultSignature": "3aa1a8686620755303795bec7d61ddc749abb8e7de556f773e473ebd079ab4e2",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 10,
+        "t": 14.16000000000001,
+        "d": 193.66828614012647,
+        "leader": 223.84505868953624
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000002459,
+        "finiteDifferenceMps2": 0.8000000000003074,
+        "number": 13,
+        "t": 22.63999999999987,
+        "d": 326.37464524987683,
+        "leader": 364.62506428368613
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27693,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 8,
+      "resultSignature": "3dcc8a1266f999fc43f4197fa81ead944eaedb095511bbcbccb75db458104d62",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 7.840000000000005,
+        "d": 97.96870117377635,
+        "leader": 113.59099069810792
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000002459,
+        "finiteDifferenceMps2": 0.8000000000003074,
+        "number": 17,
+        "t": 49.99999999999929,
+        "d": 759.610537818667,
+        "leader": 798.1441940544903
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28448,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 9,
+      "resultSignature": "1cf9184b54f19a8ccebf081c9632bfdaa489e592a681794d7cdac0a1235de433",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 16,
+        "t": 25.199999999999815,
+        "d": 355.3447546497084,
+        "leader": 401.9033866308901
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 34.95999999999961,
+        "d": 517.6637277377553,
+        "leader": 559.9497579092246
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27999,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 10,
+      "resultSignature": "39ae30c96480fd9d5fda808dde62a571eac4df44b6197d761105aee7b95c89e6",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 13.04000000000001,
+        "d": 181.52741266846684,
+        "leader": 199.91020937390726
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 11,
+        "t": 73.75999999999878,
+        "d": 1155.6808528817162,
+        "leader": 1178.64928435027
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28385,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 11,
+      "resultSignature": "87e46619c991cb1e2430fedb7def925626945842a2171e8cf8c6d39bf783b8f1",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 11.760000000000009,
+        "d": 158.5192315338349,
+        "leader": 181.90446577703688
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 10,
+        "t": 14.24000000000001,
+        "d": 200.90881553224352,
+        "leader": 223.49032065246556
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27873,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 12,
+      "resultSignature": "826de942cbcd06947b5fcc8434f4953746fb41a52c85683ee8e0792a1ac4007a",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 14.16000000000001,
+        "d": 197.94469789526133,
+        "leader": 223.56510517066044
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 8,
+        "t": 16.240000000000006,
+        "d": 230.66379188896104,
+        "leader": 258.28632769706866
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27753,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 13,
+      "resultSignature": "ca9c631d670d22c23b8dc0768eb2313215ac9d0e5ebc8089eb7b3999e7e3ded0",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 16,
+        "t": 27.999999999999755,
+        "d": 401.1128918772165,
+        "leader": 453.61884913664204
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 16,
+        "t": 41.67999999999947,
+        "d": 630.3306871821937,
+        "leader": 677.7266300786191
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27670,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 14,
+      "resultSignature": "c77ebb58a7f1b5cf67409e5ba44e3d98465b11e05079968ec1695ae1b30ee99f",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 15,
+        "t": 21.1199999999999,
+        "d": 289.5454133147167,
+        "leader": 333.6728965400573
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 14,
+        "t": 24.159999999999837,
+        "d": 339.72384687492644,
+        "leader": 382.9731833033431
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28115,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 15,
+      "resultSignature": "159418c6086cfea3391c8d5ef1ed78e6fae7effbb029bc31e76193acf71fff86",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 11.760000000000009,
+        "d": 158.08270734473206,
+        "leader": 179.22675646098654
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 13,
+        "t": 14.560000000000011,
+        "d": 200.11341947018906,
+        "leader": 225.49219569717505
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28369,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 16,
+      "resultSignature": "ce83413b24ecf38a6b25c3a1826577c92bc99bf52e7ca16186ffb88a4add47b3",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 16,
+        "t": 13.28000000000001,
+        "d": 168.452423431775,
+        "leader": 205.8705399951492
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000001549,
+        "finiteDifferenceMps2": 0.8000000000001936,
+        "number": 7,
+        "t": 122.95999999999773,
+        "d": 1993.8361162833835,
+        "leader": 2000
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27990,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 17,
+      "resultSignature": "96c13ab1174a4df61833e6e4a2aa2a30290b6b124945a55ab202d3d0202dcd23",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 5,
+        "t": 11.600000000000009,
+        "d": 163.84369445819337,
+        "leader": 180.65567703859398
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 10,
+        "t": 14.320000000000011,
+        "d": 202.19583688900423,
+        "leader": 226.38373310027745
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27717,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 18,
+      "resultSignature": "e577b63e5f8b6ec5f440dcedab06dd92b9e563f271bfc9a3bd4317a3d03fbe7d",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 17.35999999999998,
+        "d": 246.40502933604967,
+        "leader": 272.70971451740473
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 9,
+        "t": 21.999999999999883,
+        "d": 323.8514136983541,
+        "leader": 348.1855022295573
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28191,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 19,
+      "resultSignature": "687947ee9ec5c02a40db1f8b2f8a68211523641442ed9d1376502cb3bb6247d5",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 14,
+        "t": 9.920000000000007,
+        "d": 123.33502522484048,
+        "leader": 149.25840906559904
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 16,
+        "t": 22.879999999999864,
+        "d": 322.9081197049053,
+        "leader": 362.47241957191113
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28103,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 20,
+      "resultSignature": "06646c311ed8b0939e80434aedd7666aec4fbee066df3ef7655c76e3e8424dfe",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 9.520000000000007,
+        "d": 123.66634541993668,
+        "leader": 141.95513496020817
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000002459,
+        "finiteDifferenceMps2": 0.8000000000003074,
+        "number": 13,
+        "t": 18.479999999999958,
+        "d": 257.897531482058,
+        "leader": 290.1292347110612
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28435,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 21,
+      "resultSignature": "5ede5a1fabc01d93b7906f158337cc9e7e1f266868b38d6b892da44889acc957",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 15,
+        "t": 17.679999999999975,
+        "d": 232.91679347707512,
+        "leader": 276.1960438812704
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 8,
+        "t": 24.07999999999984,
+        "d": 356.6353761297624,
+        "leader": 379.66745603633075
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28313,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 22,
+      "resultSignature": "5b82166335546313dd4acae891ad81b93c76a275b1eebf7a6036f1054b35f590",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 12.40000000000001,
+        "d": 171.74141679497296,
+        "leader": 195.7431843668884
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 14.00000000000001,
+        "d": 184.92576950913778,
+        "leader": 222.83413275401887
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27673,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 23,
+      "resultSignature": "e555cbf87adbab8e9de5dfbd027edd0f6724b761b80d4af98a521b691c7afd1a",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 3,
+        "t": 8.560000000000006,
+        "d": 118.32487587978576,
+        "leader": 128.2341093873605
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000002459,
+        "finiteDifferenceMps2": 0.8000000000003074,
+        "number": 16,
+        "t": 85.83999999999853,
+        "d": 1350.1671758179377,
+        "leader": 1397.2209709086471
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27891,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 24,
+      "resultSignature": "3bce37683e9ae2e1b284332ed5595c80207fac123e34869a13fa5674ad80e3cf",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 12.56000000000001,
+        "d": 175.3301193057506,
+        "leader": 196.23591700310828
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 14.16000000000001,
+        "d": 191.18633901100398,
+        "leader": 223.24364599708406
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27843,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 25,
+      "resultSignature": "e757e9562ebb1994d16737431b68a41244e1e7ff54583cb1b6afc714767eb5a3",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 9,
+        "t": 17.35999999999998,
+        "d": 245.34216113747573,
+        "leader": 275.22480171217705
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 22.55999999999987,
+        "d": 311.88721996549907,
+        "leader": 361.55582479135364
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27930,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 26,
+      "resultSignature": "d762a240ee1ff65b2165d04dac694a592f4c19bec3c6f36a939942eb7a72fd61",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 7,
+        "t": 32.07999999999967,
+        "d": 505.24725916788253,
+        "leader": 511.42671862634484
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 15,
+        "t": 14.320000000000011,
+        "d": 190.80161876924765,
+        "leader": 223.1337157746628
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28068,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 27,
+      "resultSignature": "8e676e2d3517144b5114ee80dbdb0fbb5b10fe326af844939cf206e4a9e0c629",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 13.76000000000001,
+        "d": 193.54230568042064,
+        "leader": 216.2010348658897
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 9,
+        "t": 14.320000000000011,
+        "d": 204.59819134759184,
+        "leader": 225.60535880227638
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27776,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 28,
+      "resultSignature": "209b692f44e61b6f9d5516db54f0f9374de87e2cf73504ca801e222de900b838",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 15,
+        "t": 10.400000000000007,
+        "d": 128.63127666993924,
+        "leader": 157.74145813409052
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 17,
+        "t": 25.519999999999808,
+        "d": 363.32436729545225,
+        "leader": 406.3541461115113
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28091,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 29,
+      "resultSignature": "f094b7dd788197e53690309fa004551eb0c76f460c81ed2b210cc91c8413b88f",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 11.840000000000009,
+        "d": 160.87871680550225,
+        "leader": 181.403625684525
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.0640000000000065,
+        "finiteDifferenceMps2": 0.8000000000000812,
+        "number": 7,
+        "t": 119.27999999999781,
+        "d": 1905.43436766251,
+        "leader": 1942.7519616513116
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 28032,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 30,
+      "resultSignature": "707ddfd7ef0f969481d37225871f27983c0b51476e8c586bde0a4506b65cec8b",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 9,
+        "t": 22.799999999999866,
+        "d": 333.36669565091194,
+        "leader": 367.5817069538734
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 12,
+        "t": 14.24000000000001,
+        "d": 193.8229007376193,
+        "leader": 224.9473469366259
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27746,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 2026,
+      "resultSignature": "ea403788239b732121bf298a736708e565b0eaa6257c73cabc3ca0d921653825",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 4,
+        "t": 17.599999999999977,
+        "d": 264.44486439242627,
+        "leader": 281.334415595143
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 17,
+        "t": 25.43999999999981,
+        "d": 358.2480146087001,
+        "leader": 411.23129457523885
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27706,
+        "maxPlannedSpeedMps": 1.136
+      }
+    },
+    {
+      "seed": 2027,
+      "resultSignature": "08569e8cd62ac8fd1797af8963291367e9dc01fdb4c6db66e13235103f70a169",
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "allStateSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "boundsViolations": 0,
+      "backwardSteps": 0,
+      "maxLateral": {
+        "mps": 1.1360000000000015,
+        "signedMps": -1.1360000000000015,
+        "number": 8,
+        "t": 12.64000000000001,
+        "d": 175.89213340573014,
+        "leader": 195.94552742003924
+      },
+      "maxLateralVelocityJump": {
+        "mps": 0.06400000000000639,
+        "finiteDifferenceMps2": 0.8000000000000798,
+        "number": 9,
+        "t": 14.480000000000011,
+        "d": 200.7645139980357,
+        "leader": 226.50038946050807
+      },
+      "motionStats": {
+        "id": "bounded-lateral-v4",
+        "emergencyStops": 0,
+        "limitedSteps": 27946,
+        "maxPlannedSpeedMps": 1.136
+      }
+    }
+  ],
+  "unresolved": [
+    "schematic-distance-allocation",
+    "unmeasured-real-entry-angle",
+    "provisional-curvature-and-grade",
+    "visual-approval"
+  ],
+  "browserVerification": [
+    {
+      "width": 390,
+      "speed": 1,
+      "checkpoints": 13,
+      "resultSha256": "4b038aa661b53e8a330162465390f42dd4f7f8257df02dc946e333677b1aebcb",
+      "goalCutDistance": 1920.0971622115273,
+      "all18Results": true,
+      "noPageErrors": true,
+      "noSourcePost": true
+    },
+    {
+      "width": 390,
+      "speed": 2,
+      "checkpoints": 13,
+      "resultSha256": "4b038aa661b53e8a330162465390f42dd4f7f8257df02dc946e333677b1aebcb",
+      "goalCutDistance": 1920.0971622115912,
+      "all18Results": true,
+      "noPageErrors": true,
+      "noSourcePost": true
+    },
+    {
+      "width": 390,
+      "speed": 4,
+      "checkpoints": 13,
+      "resultSha256": "4b038aa661b53e8a330162465390f42dd4f7f8257df02dc946e333677b1aebcb",
+      "goalCutDistance": 1920.6580884528917,
+      "all18Results": true,
+      "noPageErrors": true,
+      "noSourcePost": true
+    },
+    {
+      "width": 1024,
+      "speed": 1,
+      "checkpoints": 13,
+      "resultSha256": "4b038aa661b53e8a330162465390f42dd4f7f8257df02dc946e333677b1aebcb",
+      "goalCutDistance": 1920.0971622115273,
+      "all18Results": true,
+      "noPageErrors": true,
+      "noSourcePost": true
+    },
+    {
+      "width": 1024,
+      "speed": 2,
+      "checkpoints": 13,
+      "resultSha256": "4b038aa661b53e8a330162465390f42dd4f7f8257df02dc946e333677b1aebcb",
+      "goalCutDistance": 1920.0971622115912,
+      "all18Results": true,
+      "noPageErrors": true,
+      "noSourcePost": true
+    },
+    {
+      "width": 1024,
+      "speed": 4,
+      "checkpoints": 13,
+      "resultSha256": "4b038aa661b53e8a330162465390f42dd4f7f8257df02dc946e333677b1aebcb",
+      "goalCutDistance": 1920.6580884528917,
+      "all18Results": true,
+      "noPageErrors": true,
+      "noSourcePost": true
+    }
+  ],
+  "sourceBodyMask": {
+    "samples": 720885,
+    "bad": 0,
+    "folds": 0,
+    "minJacobian": 0.30050070931073913,
+    "failures": [],
+    "bodyLengthM": 2.55,
+    "bodyWidthM": 0.8,
+    "stepM": 0.25,
+    "sourceScaleX": 0.7948621658299937,
+    "sourceScaleY": 0.7948621658299937,
+    "canAnimate": false
+  },
+  "finalStraightPassesRange": [
+    17,
+    86
+  ]
+}
