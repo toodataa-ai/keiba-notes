@@ -246,8 +246,7 @@ def make_one(item, snapshot, proof):
         "source_official_jra_url": official_url,
         "source_official_html_sha256": html_sha, "source_official_html_bytes": html_bytes,
         "original_experience_proof_commit": proof["proof_commit"],
-        "original_experience_snapshot_sha256": hashlib.sha256(
-            json.dumps(snapshot, ensure_ascii=False, indent=2).encode("utf-8")).hexdigest(),
+        "original_experience_snapshot_sha256": hashlib.sha256((ROOT / "experience_regime_v1" / "collection" / item["week_id"] / "snapshots" / (item["race_id"] + ".json")).read_bytes()).hexdigest(),
         "calculated_at": datetime.now(JST).isoformat(),
         "runners": rows
     }
@@ -282,7 +281,7 @@ def run(week, day):
             evidence = next(x for x in proof["races"] if x["race_id"] == rid)
             if not evidence["proof_prestart_valid"]:
                 raise ValueError("original_observation_proof_invalid")
-            result = make_one(item, snapshot, proof)
+            result = make_one({**item, "week_id": week}, snapshot, proof)
             if datetime.now(JST) >= start:
                 raise ValueError("start_passed_during_preparation")
             outdir.mkdir(parents=True, exist_ok=True)
