@@ -341,77 +341,7 @@ def validate_request(req):
  schedule=json.loads(Path('docs/data/upcoming_schedule.json').read_text())
  valid=next((r for d in schedule['days'] if d['date']==date for r in d['races']
              if r['track']==race['venue'] and
-             re.sub(r'（(?:G[ⅠⅡⅢI123]+|L|OP)）
- require(valid is not None and valid['post_time']==start.strftime('%H:%M'),
-         'venue/name/post not verified against recorded official JRA schedule')
- registry=json.loads(Path('docs/data/races.json').read_text())
- require(not any(x['id']==race['slug'] for x in registry['races']),
-         'race already has a canonical published record; use formal prereace revision, not overwrite')
- preview=safe_path(req.get('preview_path',''),'docs/research/')
- data=json.loads(preview.read_text(encoding='utf-8'))
- require(data.get('date')==date,'STEP1 research date mismatch')
- candidate=[x for x in data.get('races',[]) if x.get('id')==race['slug']]
- require(len(candidate)==1,'exactly one matching frozen STEP1 research race required')
- horses=candidate[0].get('horses',[])
- require(len(horses)>=9 and all(h.get('mark') in ('◎','○','▲','△','×') and
-         h.get('overall_grade') in ('A+','A','B+','B','B-','C') and
-         isinstance(h.get('judgement'),str) and len(h['judgement'])>=8 for h in horses),
-         'incomplete premarket marks, grades, or horse-specific evidence')
- require(sum(h['mark']=='◎' for h in horses)==1 and sum(h['mark']=='○' for h in horses)==1 and
-         sum(h['mark']=='▲' for h in horses)==1,'unique STEP1 ◎○▲ required')
- if req.get('official_snapshot_path'):
-  evidence=safe_path(req['official_snapshot_path'],'e2e_validation/source-evidence/')
-  require(re.fullmatch(r'[0-9a-f]{64}',req.get('official_snapshot_sha256','')) is not None,
-          'audited official HTML SHA256 required')
-  raw=evidence.read_bytes()
-  require(hashlib.sha256(raw).hexdigest()==req['official_snapshot_sha256'],
-          'official HTML evidence SHA mismatch')
-  # Cannot infer timestamp from file mtime: require separately recorded capture UTC timestamp.
-  stamped=datetime.fromisoformat(req.get('official_snapshot_captured_at',''))
-  require(stamped.tzinfo is not None and stamped<=datetime.now(JST) and stamped<start,
-          'official capture timestamp invalid')
-  require((datetime.now(JST)-stamped).total_seconds()<86400,'official roster snapshot older than 24h')
- return race,data
-def require_market_open(req,race):
- opened=datetime.fromisoformat(req['market_open_at'])
- if datetime.now(JST)<opened:
-  raise RuntimeError('NOT_YET_ON_SALE: '+race['slug']+' opens '+req['market_open_at']+
-    ' under JRA published sales timetable. Do not misclassify as HTTP403 or missing data.')
-
-def entry():
- import argparse
- parser=argparse.ArgumentParser()
- parser.add_argument('--request',required=True)
- parser.add_argument('--validate-only',action='store_true')
- a=parser.parse_args()
- request_path=safe_path(a.request,'e2e_validation/requests/v314/')
- req=json.loads(request_path.read_text(encoding='utf-8'))
- race,preview=validate_request(req)
- if a.validate_only:
-  print('V314_RESEARCH_REQUEST_VERIFIED',race['slug']);return
- require_market_open(req,race)
- global DATE,PREVIEW,RACES,load
- DATE=req['date'];PREVIEW=Path(req['preview_path']);RACES=[race]
- if req.get('official_snapshot_path'):
-  old_load=load
-  evidence=safe_path(req['official_snapshot_path'],'e2e_validation/source-evidence/')
-  def audited_load(url):
-   if url==race['official']:
-    raw=evidence.read_bytes()
-    return raw,BeautifulSoup(raw,'html.parser')
-   return old_load(url)
-  load=audited_load
- output=build(race,preview['races'][next(i for i,x in enumerate(preview['races']) if x['id']==race['slug'])])
- Path('/tmp/jra-v314-actual-input-manifest.json').write_text(json.dumps({
-   'date':DATE,'request':str(request_path),'race_id':race['slug'],
-   'input':output[0],'captures':output[1]},ensure_ascii=False))
- print('V314_SOURCE_COMPLETE',race['slug'],'input=',output[0])
-if __name__=='__main__':
- try:entry()
- except Exception as exc:
-  print('JRA_V314_BLOCKER:',str(exc),file=sys.stderr)
-  sys.exit(1)
-, '', r['race'])==race['name']),None)
+             re.sub(r'（(?:G[ⅠⅡⅢI123]+|L|OP)）$', '', r['race'])==race['name']),None)
  require(valid is not None and valid['post_time']==start.strftime('%H:%M'),
          'venue/name/post not verified against recorded official JRA schedule')
  registry=json.loads(Path('docs/data/races.json').read_text())
