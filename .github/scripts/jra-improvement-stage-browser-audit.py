@@ -8,6 +8,7 @@ from playwright.sync_api import sync_playwright
 
 url="http://127.0.0.1:8765/staging/improvement-cycle.html"
 d=json.loads(Path("docs/data/jra_improvement_cycle_v1.json").read_text(encoding="utf-8"))
+runtime={x['theme']:x for x in json.loads(Path('docs/data/jra_shadow_experiment_status_v1.json').read_text())['runtime']['experiments']}
 col=json.loads(Path("docs/data/experience_regime_status.json").read_text(encoding="utf-8"))
 verified_runs=[x for x in col.get("collection_runs",{}).values()
     if x.get("proof_commit") and x.get("complete_evidence_races",0)>0
@@ -165,7 +166,7 @@ with sync_playwright() as pw:
             assert x["first"]==str(src["race_observation_count"])+"レース",(width,x)
             assert x["second"].startswith(str(src["next_decision"]["screening"]["qualifying_race_reviews"])+"件"),(width,x)
             assert x["states"]==5 and len(x["current"])==1,(width,x)
-            assert len(x["bars"])==3 and x["bars"][-1][0]==0,(width,x)
+            assert len(x["bars"])==3 and x["bars"][-1][0]==min(20,runtime[src['id']]['valid_pairs']),(width,x)
             assert "20" in x["comparison"] and "20" in x["eta"] or "実績からは未算出" in x["eta"],(width,x)
         for x,src in zip(info["studies"],d["research"]["regimes"]):
             n=src["next_decision"]
@@ -174,9 +175,10 @@ with sync_playwright() as pw:
             assert x["first"].startswith(str(observed["races"])+"レース"),(width,x)
             assert str(observed["horses"])+"頭分" in x["first"],(width,x)
             assert x["second"].startswith(str(src["cumulative_reviewed_horse_observations"])+"頭分"),(width,x)
-            assert x["states"]==5 and x["current"]==1,(width,x)
-            assert len(x["bars"])==4 and all(b[0]==0 for b in x["bars"]),(width,x)
-            remaining=max(n["win_probability_horse_records_remaining"],n["top3_probability_horse_records_remaining"])
+            actual=runtime[code]
+            assert x["states"]==5 and x["current"]==(3 if actual['diagnostic_ready'] else 1),(width,x)
+            assert len(x["bars"])==4 and [b[0] for b in x['bars']]==[min(30,actual['probability_horses'])]*2+[min(3,actual['distinct_races']),min(2,actual['independent_weeks'])],(width,x)
+            remaining=max(0,30-actual['probability_horses'])
             approx=max(n["minimum_distinct_new_qualifying_races"],
                        -(-remaining*observed["races"]//observed["horses"]))
             assert "あと約"+str(approx)+"レース" in x["eta"],(width,x)

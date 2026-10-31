@@ -145,7 +145,7 @@ function topicCard(d,h){
  const screen=h.next_decision?.screening||{},eligible=!!screen.ready_to_design_experiment;
  const paired=pairForTopic(d,[h.id]);
  const target=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
- const compareReady=paired.registered&&paired.count>=target&&d.formal.comparison.sufficient_for_review;
+ const compareReady=paired.registered&&paired.count>=target;
  const current=eligible?(paired.registered?(compareReady?3:2):1):0;
  const header=add(card,'div',undefined,'card-head');
  const titles=add(header,'div');
@@ -220,16 +220,16 @@ function studyCard(d,s,collection){
  const aggregate=collection.regimes[(s.id||'').replace('experience_','').toUpperCase()]||{races:0,horses:0};
  const target=Math.max(1,Number(goal.win_probability_cases)||30);
  const valid=runtime?.probability_horses??Math.min(Number(s.strict_win_probability_observations)||0,Number(s.strict_top3_probability_observations)||0);
- const researchReady=valid>=target&&goal.minimum_data_counts_observed===true&&!goal.needs_record_level_overlap_and_proof_audit;
+ const researchReady=runtime?.diagnostic_ready??(valid>=target&&goal.minimum_data_counts_observed===true&&!goal.needs_record_level_overlap_and_proof_audit);
  const paired=pairForTopic(d,[s.id,'field_experience']);
  const pairTarget=Math.max(1,Number(d.formal.comparison.minimum_paired_cases)||20);
- const current=researchReady?(paired.registered?(paired.count>=pairTarget?4:3):2):1;
+ const current=researchReady?3:1;
  const header=add(card,'div',undefined,'card-head');
  const titles=add(header,'div');
  add(titles,'small','戦歴別の発走前Shadow研究','card-kicker');
  add(titles,'h3',s.title);
  add(header,'span',researchReady?'比較検討へ':'予測精度の証拠を収集中','stage-label');
- phaseTrack(card,['観測を蓄積','確率と結果を照合','初期研究診断','新旧20件比較','正式採用の審査'],current);
+ phaseTrack(card,['観測・発走前固定','確率と結果を照合','30頭・3レース・2週','精度・副作用の監査','A/B/C判断'],current);
  const actual=add(card,'div',undefined,'evidence-layout');
  const left=add(actual,'div',undefined,'evidence-actual');
  add(left,'b','収集済みの発走前データ');
@@ -246,10 +246,10 @@ function studyCard(d,s,collection){
  progress(mini,runtime?.distinct_races||0,3,'研究初期診断の異なるレース数');
  progress(mini,runtime?.independent_weeks||0,2,'研究初期診断の独立開催週');
  const hint=add(card,'p',undefined,'decision-hint');
- hint.textContent='次の判断：有効な確率予測データがあと'+fmt(next.win_probability_horse_records_remaining)+'頭分（勝率）、'+fmt(next.top3_probability_horse_records_remaining)+'頭分（3着内）必要です。';
+ hint.textContent='次の判断：有効な確率予測データがあと'+fmt(Math.max(0,target-valid))+'頭分。異なる3レース・独立2開催週も必要です。';
  const timing=add(card,'div',undefined,'timing-row');
  add(timing,'b','初期診断までの概算');
- const remaining=Math.max(0,Number(next.win_probability_horse_records_remaining)||0,Number(next.top3_probability_horse_records_remaining)||0);
+ const remaining=Math.max(0,target-valid);
  const minRaces=Math.max(1,Number(next.minimum_distinct_new_qualifying_races)||3);
  const estimatedRaces=aggregate.horses>0&&aggregate.races>0?
    Math.max(minRaces,Math.ceil(remaining*aggregate.races/aggregate.horses)):null;
