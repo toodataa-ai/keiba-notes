@@ -1,0 +1,913 @@
+{
+  "schema": "tokyo-motion-audit-v4-summary",
+  "scope": "LAB_SYNTHETIC_NOT_OFFICIAL",
+  "referenceCommit": "5412362f21309842797d9bfb12fd63f817d2ef2b",
+  "canAnimate": false,
+  "approval": "not_approved",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    2026,
+    2027
+  ],
+  "stepSeconds": 0.08,
+  "rules": {
+    "lengthMetres": 2.55,
+    "widthMetres": 0.8,
+    "laneMetres": 1.65,
+    "epsilonMetres": 1e-06,
+    "description": "Axis-aligned horse rectangles in course-distance/lane coordinates; linear swept interpolation. Not measured horse silhouettes or proof of real-world collision safety."
+  },
+  "legacy": {
+    "seedCount": 32,
+    "all18Finished": true,
+    "all18RunoffComplete": true,
+    "endpointHits": 50,
+    "sweptHits": 306,
+    "launchEndpointHits": 50,
+    "launchSweptHits": 250,
+    "runoffEndpointHits": 3663,
+    "allStateSweptHits": 3917,
+    "boundsViolations": 0,
+    "backwardSteps": 0,
+    "maxLateralMps": 6.022500000000001,
+    "maxLateralVelocityJumpMps": 6.022500000000001,
+    "emergencyStops": 0
+  },
+  "boundedCandidate": {
+    "seedCount": 32,
+    "all18Finished": true,
+    "all18RunoffComplete": true,
+    "endpointHits": 0,
+    "sweptHits": 0,
+    "launchEndpointHits": 0,
+    "launchSweptHits": 0,
+    "runoffEndpointHits": 0,
+    "allStateSweptHits": 0,
+    "boundsViolations": 0,
+    "backwardSteps": 0,
+    "maxLateralMps": 1.1360000000000015,
+    "maxLateralVelocityJumpMps": 0.06400000000002459,
+    "emergencyStops": 0
+  },
+  "sourceHashes": {
+    "race-course-geometry-v1": "c6d6478ff318d2ca3f73be5b90d54f2c7c1a25a8de2a413e0c554a6925337599",
+    "race-lane-ai-v1": "ac18da3fd75b519e29a0f1e5ecc2405adc6130110877473e5199f1538ba219e3",
+    "race-runner-style-v1": "967e4e28a8e83b4c8978392fa0e0de6f8204b694d74fc6a4a6e3ce7828ee419e",
+    "race-ability-model-v1": "53b6896287f45515c3d3cab01537bbea81319c79d67b4b750965564a2eebb143",
+    "race-tokyo-ability90-v1": "64c8205971cccd65f1049085d6cf2e0c210cb1a7ee6f71e213220a54d0e82981",
+    "race-tokyo-lateral-policy-v4": "bb9a03757d5b33daa0ff554026d446d591bbae7aacb79a8595a73e6c60c43d51",
+    "race-cohort-speed-v1": "8a2c544d9a707988d7058700ab8ad2d71c01d11270e1124a4b0b2fd538983ea5",
+    "race-sim-engine": "af16620bc0c804f0434b0d2202942f7ad7234e978b0d15703d544cc4f7eea1ce",
+    "race-lab-18-fixture-v1": "0b49a101713d9e065484511318e7f05959747185a992b0ce600503a45a036b1e",
+    "race-clean-goal-view-v1": "52caa29ee65138c76601482bce1b781357ff09f52eb3c7fb990384df8778703a",
+    "race-tokyo-2000-v1": "0d7a4ddba0465c9d81ba8fc2b39e1bbc41dbd72f83d77d56afa86ccdf52357c8"
+  },
+  "stepSensitivity": [
+    {
+      "seed": 1,
+      "stepSeconds": 0.04,
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "allStateSweptHits": 0,
+      "maxLateralMps": 1.1680000000000044,
+      "maxLateralVelocityJumpMps": 0.03200000000000336,
+      "winnerTimeChangeSeconds": 0.049944791655377685,
+      "sameFinishOrder": false
+    },
+    {
+      "seed": 2027,
+      "stepSeconds": 0.04,
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "allStateSweptHits": 0,
+      "maxLateralMps": 1.1680000000000044,
+      "maxLateralVelocityJumpMps": 0.03200000000003966,
+      "winnerTimeChangeSeconds": 0.0200464651505996,
+      "sameFinishOrder": false
+    },
+    {
+      "seed": 2026,
+      "stepSeconds": 0.04,
+      "all18Finished": true,
+      "all18RunoffComplete": true,
+      "endpointHits": 0,
+      "sweptHits": 0,
+      "launchSweptHits": 0,
+      "runoffEndpointHits": 0,
+      "allStateSweptHits": 0,
+      "maxLateralMps": 1.1680000000000044,
+      "maxLateralVelocityJumpMps": 0.032000000000039774,
+      "winnerTimeChangeSeconds": 0.027898089792429914,
+      "sameFinishOrder": false
+    }
+  ],
+  "boundaryComparison": [
+    {
+      "distance": 85,
+      "physicalKind": "chute",
+      "physicalBend": 0,
+      "physicalSegment": "引き込み線・スタート",
+      "illustrationCandidateKind": "line",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 100,
+      "physicalKind": "chute",
+      "physicalBend": 0,
+      "physicalSegment": "引き込み線・スタート",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 110,
+      "physicalKind": "chute",
+      "physicalBend": 0,
+      "physicalSegment": "引き込み線・スタート",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 120,
+      "physicalKind": "chute",
+      "physicalBend": 0.1328125,
+      "physicalSegment": "引き込み線・スタート",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 130,
+      "physicalKind": "chute",
+      "physicalBend": 0.425,
+      "physicalSegment": "引き込み線・スタート",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 150,
+      "physicalKind": "turn",
+      "physicalBend": 0.85,
+      "physicalSegment": "2コーナー",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 220,
+      "physicalKind": "turn",
+      "physicalBend": 0.85,
+      "physicalSegment": "2コーナー",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 300,
+      "physicalKind": "turn",
+      "physicalBend": 0.425,
+      "physicalSegment": "2コーナー",
+      "illustrationCandidateKind": "line",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 900,
+      "physicalKind": "straight",
+      "physicalBend": 0.335,
+      "physicalSegment": "向正面",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 1145,
+      "physicalKind": "turn",
+      "physicalBend": 0.745,
+      "physicalSegment": "3コーナー",
+      "illustrationCandidateKind": "left-curve",
+      "illustrationDistancesAreHypotheses": true
+    },
+    {
+      "distance": 1474.1,
+      "physicalKind": "turn",
+      "physicalBend": 0.41,
+      "physicalSegment": "4コーナー",
+      "illustrationCandidateKind": "line",
+      "illustrationDistancesAreHypotheses": true
+    }
+  ],
+  "perSeed": [
+    {
+      "seed": 1,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 10,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 265,
+        "allStateSweptHits": 272,
+        "resultSignature": "46759040473fd6bc706179c63e5e0689353d493c2496527807924d6fe9b15102"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "83473a292952cce659fecd2a4461efb58d193c95a851317c8071a10816c5e73a"
+      },
+      "legacyWinnerTime": 121.93993066035618,
+      "candidateWinnerTime": 122.28474080722782
+    },
+    {
+      "seed": 2,
+      "legacy": {
+        "endpointHits": 3,
+        "sweptHits": 11,
+        "launchSweptHits": 11,
+        "runoffEndpointHits": 20,
+        "allStateSweptHits": 31,
+        "resultSignature": "13f17c41415a66a7c3ddb92a861c149014e853784bb56d2b3da9fe585e6ee41c"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "931b404c39dea8db1bd987eccf769f5e245f5f54fdcac67f7b154211f0eb0be8"
+      },
+      "legacyWinnerTime": 122.58285728875231,
+      "candidateWinnerTime": 123.35344420828343
+    },
+    {
+      "seed": 3,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 6,
+        "launchSweptHits": 6,
+        "runoffEndpointHits": 17,
+        "allStateSweptHits": 23,
+        "resultSignature": "b562b5debc0e4e030d83706bb1835698751466445b05bbb7a4230ce3ed4b1c2b"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "1d40e02f26e8ff88399e8fd74121b05f87db698e6cdaa2768fb8b4b34cc2f1ad"
+      },
+      "legacyWinnerTime": 121.29295409409322,
+      "candidateWinnerTime": 122.24146753447337
+    },
+    {
+      "seed": 4,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 10,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 154,
+        "allStateSweptHits": 162,
+        "resultSignature": "0d8a4acfbdef57bbe54b913c37e4da6c480df84db75b72c6fc54afab735d3ff1"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "d51bc64d9858a11bbea183477b39e64bd17e52408376e19d51af285c367a8706"
+      },
+      "legacyWinnerTime": 122.17990898427239,
+      "candidateWinnerTime": 123.00422752287169
+    },
+    {
+      "seed": 5,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 12,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 219,
+        "allStateSweptHits": 227,
+        "resultSignature": "0f58742999dfa7b2f63845de5bf8956b8b3f9f3f0cb1fafead5aa47d99414e56"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "65bd1fd4c351c5285311c75225bf5ae166bccd5ca28c1bbf0acdf9327941362a"
+      },
+      "legacyWinnerTime": 121.35221648753623,
+      "candidateWinnerTime": 121.94035488338174
+    },
+    {
+      "seed": 6,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 8,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 98,
+        "allStateSweptHits": 105,
+        "resultSignature": "57725fb9cd1bb67ba04d948e6b1f60cca9752972cc98bd6598fdb7ad8f3721eb"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "8f6f08889ff5d9030051fd3b7d5a85bc4d426f7334379e2149fb8e0d3feb8eaa"
+      },
+      "legacyWinnerTime": 120.55892600761213,
+      "candidateWinnerTime": 122.03574676324035
+    },
+    {
+      "seed": 7,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 7,
+        "launchSweptHits": 4,
+        "runoffEndpointHits": 130,
+        "allStateSweptHits": 135,
+        "resultSignature": "ae0982ae129c6050978a1fdc3458820b55bc442073a57627b618998fe86455cd"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "18d78164b9d47c5402fb4c69b14d2285d2c8e69262c1548c425846564ef4788c"
+      },
+      "legacyWinnerTime": 121.28982594982786,
+      "candidateWinnerTime": 121.72558422120181
+    },
+    {
+      "seed": 8,
+      "legacy": {
+        "endpointHits": 0,
+        "sweptHits": 5,
+        "launchSweptHits": 3,
+        "runoffEndpointHits": 188,
+        "allStateSweptHits": 191,
+        "resultSignature": "b73b2264fef3b5979427a469342aa4439b2e0cc997c7a1fc2c50591d2e095fc6"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "af944ab6bb0edd328caede1d66c0ba70c22bae591b315a352fb9681bda12a782"
+      },
+      "legacyWinnerTime": 123.01489716879902,
+      "candidateWinnerTime": 123.05235284122583
+    },
+    {
+      "seed": 9,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 14,
+        "launchSweptHits": 10,
+        "runoffEndpointHits": 216,
+        "allStateSweptHits": 226,
+        "resultSignature": "6fcb67a0cf80a5820a8cb1be366ed5097e9308dc954cada3d4d045b62668bf97"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "b5ba5d1ed63fb0eb060809f89122f7195ebf5d35200d078b31d379179519bb7f"
+      },
+      "legacyWinnerTime": 122.25641905398074,
+      "candidateWinnerTime": 123.01186009377784
+    },
+    {
+      "seed": 10,
+      "legacy": {
+        "endpointHits": 3,
+        "sweptHits": 9,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 102,
+        "allStateSweptHits": 110,
+        "resultSignature": "531e0633e6256ed2fa50e71c4210c60a6160af5f933c5a635bd9928f8de50ffd"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "4d4c72edb5a292c48f22244149ee3190e8650e048e45f54bd3fd9644985d0c48"
+      },
+      "legacyWinnerTime": 122.20568071805228,
+      "candidateWinnerTime": 122.86213357846734
+    },
+    {
+      "seed": 11,
+      "legacy": {
+        "endpointHits": 0,
+        "sweptHits": 8,
+        "launchSweptHits": 5,
+        "runoffEndpointHits": 267,
+        "allStateSweptHits": 272,
+        "resultSignature": "318223a0b2379af6e6ef1ab24e5caa3ec6f52638275a8a6fa69b5c53837c0450"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "4acf7dd3f5931cf9c60f9107a31faffc9138f15bff39e727a6ec991c5e7f3b82"
+      },
+      "legacyWinnerTime": 121.4570961971635,
+      "candidateWinnerTime": 122.10604990641832
+    },
+    {
+      "seed": 12,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 11,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 182,
+        "allStateSweptHits": 189,
+        "resultSignature": "9795f5dbc1e2d4c19869d6657bc04783f79afbb0e4b0ca2fc0fa17b623ed1169"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "b47551cbc78e0fef0c71c4fe625fde4e01162d23e274b2ee212cd0936097d653"
+      },
+      "legacyWinnerTime": 121.82331673292272,
+      "candidateWinnerTime": 121.90488348880992
+    },
+    {
+      "seed": 13,
+      "legacy": {
+        "endpointHits": 3,
+        "sweptHits": 16,
+        "launchSweptHits": 13,
+        "runoffEndpointHits": 152,
+        "allStateSweptHits": 165,
+        "resultSignature": "1dbb661d6df068e130830c18c5061e2f34d24bef1a4d5ec7f67a9653d3f0bb0b"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "d55f29f8e35606de02cc25c33e3b902f898bd6e9da3cf250228a710d3224f37b"
+      },
+      "legacyWinnerTime": 120.93986234216715,
+      "candidateWinnerTime": 121.55981490088388
+    },
+    {
+      "seed": 14,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 10,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 82,
+        "allStateSweptHits": 91,
+        "resultSignature": "aa100e9c099a2190e84b0cfa7a07128cc3f13aa9c1e3bb204240fc924393ede6"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "18a6bac7b9fc017ff4d6ff029d0ae09547fa9e9e345de99b1df6c7027337cb74"
+      },
+      "legacyWinnerTime": 121.83746435420915,
+      "candidateWinnerTime": 122.65793170226353
+    },
+    {
+      "seed": 15,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 10,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 134,
+        "allStateSweptHits": 142,
+        "resultSignature": "edc3d33368978ed139fef3114e2afd340cd58cd8b7af5f9d87c5cc6970a3c672"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "aed64aabde00890b7ed3edf43cde67e0e2b40c7eac38f54282a09dc27ea0b5f6"
+      },
+      "legacyWinnerTime": 122.56132589600642,
+      "candidateWinnerTime": 123.8044129036115
+    },
+    {
+      "seed": 16,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 8,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 8,
+        "resultSignature": "f0e8a9a35c15c25a210a2e8cb435db0881cd8c8f8f84b7e4ee6738cdd7a6aa58"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "729b93c5a9e4cfb267d5baef14ad78f884d55253ead6d45dad899400db77113e"
+      },
+      "legacyWinnerTime": 121.78922862523764,
+      "candidateWinnerTime": 122.1818117944264
+    },
+    {
+      "seed": 17,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 11,
+        "launchSweptHits": 10,
+        "runoffEndpointHits": 9,
+        "allStateSweptHits": 20,
+        "resultSignature": "c9392f15bcde4227d5050fae11a4a65f4ad19e3ac83e856f4445fe3de6c81c96"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "892f6b56e0e772dae84654576e962c82dd5d48f8ba535a013bdf2a7bee423328"
+      },
+      "legacyWinnerTime": 121.9021896272317,
+      "candidateWinnerTime": 122.23695753238688
+    },
+    {
+      "seed": 18,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 8,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 73,
+        "allStateSweptHits": 80,
+        "resultSignature": "d30f4539561b59cd7bcd5b1de300d88abb47a72f3e180f81b359b9170be81482"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "fe5bdaf17761cd89756c7d5a70c27d7940b5db0fbafd3157073c1882a5db8bc0"
+      },
+      "legacyWinnerTime": 122.3611442604657,
+      "candidateWinnerTime": 123.28232611356752
+    },
+    {
+      "seed": 19,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 10,
+        "launchSweptHits": 9,
+        "runoffEndpointHits": 172,
+        "allStateSweptHits": 181,
+        "resultSignature": "7babc8499f7d174da313c6968656adc37b5719984e2bf6b99882f5b29115cfd2"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "b4b6c384c6dbfabcbbb0b4c231164f273f2807727ed9eaa782ab44d71cc797a1"
+      },
+      "legacyWinnerTime": 121.84806726257877,
+      "candidateWinnerTime": 123.70754588398914
+    },
+    {
+      "seed": 20,
+      "legacy": {
+        "endpointHits": 0,
+        "sweptHits": 7,
+        "launchSweptHits": 6,
+        "runoffEndpointHits": 70,
+        "allStateSweptHits": 76,
+        "resultSignature": "8257798ffe215631fa4e906113dbb2f44a8f82fa33e34ea5c3b6d978e965047d"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "5a068e2cf6dcc338d30aac0f38861df1d49ee823bfd4cb41efad24ff1b07b162"
+      },
+      "legacyWinnerTime": 122.25106103509066,
+      "candidateWinnerTime": 122.52005378618526
+    },
+    {
+      "seed": 21,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 9,
+        "launchSweptHits": 9,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 9,
+        "resultSignature": "c2e86aa2b6437094d472d4f1268ce1713a6a7e8c7164e93584eee91e6fa4facb"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "79573bbcd3b3eeaf578989736e57b5ac47b77073a0f806d3c78450f3f19ba12c"
+      },
+      "legacyWinnerTime": 122.69153852955478,
+      "candidateWinnerTime": 123.14966777385312
+    },
+    {
+      "seed": 22,
+      "legacy": {
+        "endpointHits": 3,
+        "sweptHits": 9,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 78,
+        "allStateSweptHits": 86,
+        "resultSignature": "1bbff6b0a2f8d52b17d6e43c9344df28e981d1117746a4d749290157aa991cf1"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "e6fbbeece24de73b0162310bfd47d90d5af8af19318874fb389c0c9338bb8d50"
+      },
+      "legacyWinnerTime": 121.68995146078552,
+      "candidateWinnerTime": 121.44032318492879
+    },
+    {
+      "seed": 23,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 11,
+        "launchSweptHits": 9,
+        "runoffEndpointHits": 134,
+        "allStateSweptHits": 143,
+        "resultSignature": "3ec00fe6dcaf8e041c70c8f6473ef80b2de4c6684c38cb904df39a75cd51b11a"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "9c1aa650258c4d3ec66909f1eb5262b6f0e59beeb75a65f55ddfb53993ce00d2"
+      },
+      "legacyWinnerTime": 121.44545955373603,
+      "candidateWinnerTime": 123.01806066955669
+    },
+    {
+      "seed": 24,
+      "legacy": {
+        "endpointHits": 3,
+        "sweptHits": 9,
+        "launchSweptHits": 9,
+        "runoffEndpointHits": 38,
+        "allStateSweptHits": 47,
+        "resultSignature": "6248d8d15c0a3fadec35dc14be7922eeb03603deea50960e5442c9fe192f2ba3"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "bdfac2b66155b74da659246830a6bf9017c18b6097906b0193da2d6f11e6903e"
+      },
+      "legacyWinnerTime": 121.56793902228968,
+      "candidateWinnerTime": 121.8685576378727
+    },
+    {
+      "seed": 25,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 10,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 160,
+        "allStateSweptHits": 167,
+        "resultSignature": "0eaa7bafe293585345652d59e876efd070af80712231f56a3fc9f0dc8b09d13f"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "eda3bb1d4c2de870eb33b64e677a6bac51cdb4180fd5037e968f5a6c6846ef10"
+      },
+      "legacyWinnerTime": 122.0292855480502,
+      "candidateWinnerTime": 121.70105704548648
+    },
+    {
+      "seed": 26,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 10,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 129,
+        "allStateSweptHits": 137,
+        "resultSignature": "114cbeb27226db194c962baad267593e1b8070ef384f3a08f9586110d1c20f23"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "567bf83725a7d4f4a758ddf98abc1d62d6c1565330c20d43240507fa2c7454c3"
+      },
+      "legacyWinnerTime": 122.48673314278612,
+      "candidateWinnerTime": 122.72426713252086
+    },
+    {
+      "seed": 27,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 9,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 99,
+        "allStateSweptHits": 106,
+        "resultSignature": "475c68f3eb95e42720d5b8f48ea4c718a121ee4a4b620e622c1299f8abcac3e4"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "0613ad24c7aee2e117e422f2aa2a3304cc1d0aa977d3b345a883e20c58012fb9"
+      },
+      "legacyWinnerTime": 121.49708286252115,
+      "candidateWinnerTime": 122.01733655343072
+    },
+    {
+      "seed": 28,
+      "legacy": {
+        "endpointHits": 0,
+        "sweptHits": 7,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 19,
+        "allStateSweptHits": 26,
+        "resultSignature": "4749f573a2e7ec9d21bd96c8157a522b526880772f30b3307c6d190d5015e4e7"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "8dad99fe4c09a4659d6714aac92bf2ab802624fde8bd1c065a8683f890227b98"
+      },
+      "legacyWinnerTime": 121.87467391099678,
+      "candidateWinnerTime": 122.45710967145443
+    },
+    {
+      "seed": 29,
+      "legacy": {
+        "endpointHits": 2,
+        "sweptHits": 10,
+        "launchSweptHits": 8,
+        "runoffEndpointHits": 132,
+        "allStateSweptHits": 140,
+        "resultSignature": "d143a2b9fda71cc4e03b9aa31f60f77fa25b501b9db7f466f3d407a843f24e1b"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "e16343a7f21ba7d7d0cfddb27aecb0e5ca13b1adddaf7ac65b47b84b7487e89b"
+      },
+      "legacyWinnerTime": 121.73403462559814,
+      "candidateWinnerTime": 122.48645993538118
+    },
+    {
+      "seed": 30,
+      "legacy": {
+        "endpointHits": 1,
+        "sweptHits": 10,
+        "launchSweptHits": 7,
+        "runoffEndpointHits": 202,
+        "allStateSweptHits": 209,
+        "resultSignature": "b4101025ac02b0b8d689ce25560023ea05d88e8e920d37fd4dc687dde736f012"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "eda4bd65baaec4957342f996ac3276d91a36ba683341211d9016c22f07090619"
+      },
+      "legacyWinnerTime": 122.04762679273995,
+      "candidateWinnerTime": 121.54153751988837
+    },
+    {
+      "seed": 2026,
+      "legacy": {
+        "endpointHits": 0,
+        "sweptHits": 11,
+        "launchSweptHits": 10,
+        "runoffEndpointHits": 77,
+        "allStateSweptHits": 87,
+        "resultSignature": "0e33749afe6cea5c0f2d7478dbed7ed01b9214806dbd68c3103ff7a8bd1b5311"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "e7fad7f378b09cf5dafa59ab9f4faba87bb38de8eecf2946a6784249269c627e"
+      },
+      "legacyWinnerTime": 121.81555526046262,
+      "candidateWinnerTime": 121.95771538584904
+    },
+    {
+      "seed": 2027,
+      "legacy": {
+        "endpointHits": 3,
+        "sweptHits": 10,
+        "launchSweptHits": 9,
+        "runoffEndpointHits": 45,
+        "allStateSweptHits": 54,
+        "resultSignature": "78bdc4dfa3df0be9568a26d6b4e81d8f4f41ff8ccd6d64f6486c32fe2f25c1f8"
+      },
+      "candidate": {
+        "endpointHits": 0,
+        "sweptHits": 0,
+        "launchSweptHits": 0,
+        "runoffEndpointHits": 0,
+        "allStateSweptHits": 0,
+        "resultSignature": "08f754053573a9c870bd10abed4d591212299227e22d3bc63a7160f30bfe059e"
+      },
+      "legacyWinnerTime": 121.02654634527595,
+      "candidateWinnerTime": 121.78576239807947
+    }
+  ],
+  "unresolved": [
+    "unmeasured-real-entry-angle",
+    "illustration/physical-boundary-mismatch",
+    "lateral-motion-naturalness",
+    "full-source-topology",
+    "real-time-1x/2x/4x",
+    "visual-approval"
+  ]
+}

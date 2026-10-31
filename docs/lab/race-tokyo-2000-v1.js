@@ -7,10 +7,11 @@ const status=Object.freeze({courseId:id,canAnimate:false,approval:'not_approved'
  archive:'https://umapot.com/data/powerpoint/tokyo_couse/tokyo_couse.zip',
  terms:'https://umapot.com/?page_id=116'});
 function assertCanAnimate(){throw Error('TOKYO_ORIGINAL_ROUTE_UNVERIFIED');}
-function race(){return {...g.RaceLab18Fixture.entry(),id:'lab-tokyo-2000-synthetic-18-v1',
+function race(options={}){return {...g.RaceLab18Fixture.entry(),id:'lab-tokyo-2000-synthetic-18-v1',
  venue:'東京',race:'東京芝2000m・架空18頭',turn:'左',course_id:id,
  labAbilityScale:'90-v1',labTokyoAbility90:true,
- horses:g.RaceLab18Fixture.horses({abilityScale:'90-v1'})};}
+ horses:g.RaceLab18Fixture.horses({abilityScale:'90-v1'}),
+ ...(options.motion==='bounded-lateral-v4'?{labTokyoMotion:options.motion}:{})};}
 // Separate broadcast orientation: camera right-to-left need not equal map turn.
 const camera=Object.freeze({cutRemainingM:80,spanM:100,screenTurn:'右',courseTurn:'左'});
 function goalPosition(d,lane,width,height,maxLane=16){
