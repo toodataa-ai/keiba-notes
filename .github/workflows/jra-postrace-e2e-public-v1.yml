@@ -132,9 +132,9 @@ jobs:
           import json
           from pathlib import Path
           reg=json.loads(Path('docs/data/races.json').read_text())
-          paths=['docs/staging/improvement-cycle.html','docs/staging/improvement-cycle.css','docs/data/jra_improvement_cycle_v1.json','docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json','docs/data/jra_postrace_audit_2026-10-17.json', 'docs/data/jra_postrace_audit_2026-10-18.json','docs/data/jra_postrace_audit_2026-10-24.json','docs/data/jra_postrace_audit_2026-10-25.json', 'docs/data/experience_regime_status.json']
+          paths=['docs/staging/improvement-cycle.html','docs/staging/improvement-cycle.css','docs/data/jra_improvement_cycle_v1.json','docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json','docs/data/jra_postrace_audit_2026-10-17.json', 'docs/data/jra_postrace_audit_2026-10-18.json','docs/data/jra_postrace_audit_2026-10-24.json','docs/data/jra_postrace_audit_2026-10-25.json', 'docs/data/jra_postrace_audit_2026-10-31.json', 'docs/data/experience_regime_status.json']
           for r in reg['races']:
-              if r['date'] in ('2026-10-10','2026-10-11','2026-10-12','2026-10-17','2026-10-18','2026-10-24','2026-10-25') and r['scope']=='jra-main' and r['status']=='reviewed':
+              if r['date'] >= '2026-10-10' and r['scope']=='jra-main' and r['status']=='reviewed':
                   paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json','docs/data/e2e-shadow/results/'+r['id']+'.json'])
           for p in paths:
               assert Path(p).is_file(),p
