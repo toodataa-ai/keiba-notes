@@ -274,7 +274,7 @@ function runtimeDetails(card,x){
  const ul=add(detail,'ul');x.blockers.forEach(b=>add(ul,'li',b));
  add(detail,'p','次の作業：'+x.next_action);
  const metrics=add(box,'details');add(metrics,'summary','精度・回収率・条件別検証');
- const pre=add(metrics,'pre',JSON.stringify({metrics:x.metrics,conditions:x.condition_audit,overfit:x.overfit_review},null,2));
+ const pre=add(metrics,'pre',JSON.stringify({metrics:x.metrics,conditions:x.condition_audit,experience:x.regime_probability_audit,overfit:x.overfit_review},null,2));
  pre.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px';
  card.querySelector('.stage-label').textContent=x.blockers.length?'実績収集中・blockerあり':x.approval;
 }
