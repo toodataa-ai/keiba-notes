@@ -27,13 +27,13 @@ function jraReadableLinks(r){
    return {report:r.report,pdf:r.pdf};
  return {report:approved.report,pdf:approved.pdf};
 }
-function card(r){
+function card(r,statusText='AI予想公開済み'){
   const marks=r.marks?`<div class="marks"><span class="mark"><b>◎</b>${esc(r.marks.win||'—')}</span><span class="mark"><b>○</b>${esc(r.marks.second||'—')}</span><span class="mark"><b>▲</b>${esc(r.marks.third||'—')}</span></div>`:'';
   const links=[];
   const display=jraReadableLinks(r);
   if(display.report)links.push(`<a class="btn" href="${encodeURI(display.report)}">AI予想詳細を見る</a>`);
   if(display.pdf)links.push(`<a class="btn secondary" href="${encodeURI(display.pdf)}">PDF</a>`);
-  return `<article class="race-card"><div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race||'')}</h3></div><span class="status">AI予想公開済み</span></div>${marks}${links.length?`<div class="actions">${links.join('')}</div>`:''}</article>`;
+  return `<article class="race-card"><div class="race-top"><div><div class="meta">${esc(r.date)} · ${esc(r.venue||'JRA')} · ${esc(r.prompt_version||'—')}</div><h3>${esc(r.race||'')}</h3></div><span class="status">${esc(statusText)}</span></div>${marks}${links.length?`<div class="actions">${links.join('')}</div>`:''}</article>`;
 }
 // Display the newest audited v3.11 report, while preserving historical prereace proof.
 // This overlay only changes visitor-facing links: settlement/analysis history is untouched.
@@ -103,6 +103,8 @@ function selectNextBlock(days,rows){
   const scheduleRoot=document.getElementById('weekSchedule');
   const period=document.getElementById('weekPeriod');
   const scheduleTitle=document.getElementById('scheduleTitle');
+  const pendingSection=document.getElementById('pendingReviewSection');
+  const pendingRoot=document.getElementById('pendingReviewRaces');
   // Staging is allowed to preview public notice wording without changing production policy.
   const policyPath=document.documentElement.dataset.stage==='preview'
     ? 'staging/data/prediction_publication_policy.json'
@@ -121,6 +123,15 @@ function selectNextBlock(days,rows){
     const allRows=displayNewestPredictions(
       (db.races||[]).filter(r=>r.scope==='jra-main'&&!(r.source==='legacy-performance-list'&&!hasReview(r))),
       parallel);
+    // Past predictions stay discoverable until the immutable pre-race record has a valid formal review.
+    // This is display-only. Do not recalculate bets, settle tickets, or mark anything reviewed.
+    const pastPending=allRows
+      .filter(r=>r.status==='predicted'&&r.date<jstToday())
+      .sort((a,b)=>`${b.date}-${b.id}`.localeCompare(`${a.date}-${a.id}`));
+    if(pendingSection&&pendingRoot){
+      pendingSection.hidden=pastPending.length===0;
+      pendingRoot.innerHTML=pastPending.map(r=>card(r,'回顧待ち')).join('');
+    }
     const days=selectNextBlock(schedule.days||[],allRows);
     if(scheduleTitle)scheduleTitle.textContent='次回の対象レース';
     if(days.length){
