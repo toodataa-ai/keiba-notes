@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "policy_name": "free_workout_source_permission_gate_v1",
+  "scope": "third_party_public_workout_clock_numeric_facts_only",
+  "sources": [
+    {
+      "host": "umasiru.com",
+      "approved_article_prefix": "/archives/",
+      "automatic_reuse": "permission_unverified",
+      "public_redistribution": "not_approved",
+      "primary_source_url": "https://umasiru.com/contact",
+      "terms_url_verified": null,
+      "permission_granted_at": null,
+      "permission_evidence_url": null,
+      "rights_owner_verified": false,
+      "robots_txt_is_not_reuse_license": true
+    }
+  ],
+  "default_decision": "block_automated_git_commit_until_explicit_reuse_grant",
+  "approved_alternatives": [
+    "manual_view_only_without_publishing_detail",
+    "source_metadata_and_sha_only_when_captured_prospectively"
+  ],
+  "notes_ja": "無料で閲覧・一回取得できても、恒常的な機械取得・公表・数値データの継続利用が認められるとは限らない。運営者から利用条件を確認するまでは自動固定を実行しない。"
+}
