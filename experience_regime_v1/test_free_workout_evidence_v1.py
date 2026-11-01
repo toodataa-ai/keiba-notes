@@ -79,7 +79,7 @@ class TestWorkoutSource(unittest.TestCase):
         duplicate=HTML.replace(b"</article>", HTML.split(b"<h3>")[1].split(b"<h3>")[0].join([b"<h3>",b""])+b"</article>")
         with self.assertRaisesRegex(ValueError,"duplicate_horse_heading"):
             workbook_from_html(duplicate,ROSTER,date(2026,11,15))
-        bad=HTML.replace(b">81.7<",b">35.0<")
+        bad=HTML.replace(b">81.7<",b">65.0<")
         with self.assertRaisesRegex(ValueError,"impossible_workout_split_order"):
             workbook_from_html(bad,ROSTER,date(2026,11,15))
 
