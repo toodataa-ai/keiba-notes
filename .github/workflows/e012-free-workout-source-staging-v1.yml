@@ -1,36 +1,36 @@
-name: E012 free workout timing source STAGING research QA
+name: E012 free workout STAGING proof and prospective comparison QA (offline)
 on:
   push:
     branches: [staging/e012-free-workout-source-v1]
     paths:
       - 'experience_regime_v1/free_workout_evidence_v1.py'
       - 'experience_regime_v1/test_free_workout_evidence_v1.py'
+      - 'experience_regime_v1/workout_prestart_proof_v1.py'
+      - 'experience_regime_v1/test_workout_prestart_proof_v1.py'
+      - 'experience_regime_v1/workout_prospective_comparison_v1.py'
+      - 'experience_regime_v1/test_workout_prospective_comparison_v1.py'
+      - 'experience_regime_v1/workout_source_permission_v1.json'
       - '.github/workflows/e012-free-workout-source-staging-v1.yml'
       - '.github/workflows/e012-free-workout-prerace-research-v1.yml'
+      - '.github/workflows/e012-free-workout-prestart-git-proof-v1.yml'
       - 'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md'
   pull_request:
     branches: [main]
     paths:
-      - 'experience_regime_v1/free_workout_evidence_v1.py'
-      - 'experience_regime_v1/test_free_workout_evidence_v1.py'
-      - '.github/workflows/e012-free-workout-source-staging-v1.yml'
-      - '.github/workflows/e012-free-workout-prerace-research-v1.yml'
-      - 'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md'
+      - 'experience_regime_v1/**'
+      - '.github/workflows/e012-free-workout-*.yml'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
-  parse-and-audit:
+  proof-safety:
     runs-on: ubuntu-latest
-    timeout-minutes: 9
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
+        with: {fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Verify new source adapter is research-only and old betting files unchanged
+        with: {python-version: '3.12'}
+      - name: Show exactly which staging source files changed and reject production changes
         run: |
           set -euo pipefail
           git fetch origin main
@@ -41,91 +41,51 @@ jobs:
           allowed={
              'experience_regime_v1/free_workout_evidence_v1.py',
              'experience_regime_v1/test_free_workout_evidence_v1.py',
+             'experience_regime_v1/workout_prestart_proof_v1.py',
+             'experience_regime_v1/test_workout_prestart_proof_v1.py',
+             'experience_regime_v1/workout_prospective_comparison_v1.py',
+             'experience_regime_v1/test_workout_prospective_comparison_v1.py',
+             'experience_regime_v1/workout_source_permission_v1.json',
              '.github/workflows/e012-free-workout-source-staging-v1.yml',
              '.github/workflows/e012-free-workout-prerace-research-v1.yml',
-             'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md',
+             '.github/workflows/e012-free-workout-prestart-git-proof-v1.yml',
+             'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md'
           }
-          assert set(modified).issubset(allowed),('canonical_prediction_or_UI_modified',modified)
-          print('E012_NO_PRODUCTION_OR_HISTORICAL_FILES_CHANGED',modified)
+          assert set(modified).issubset(allowed),('protected_racing_data_or_production_UI_modified',modified)
+          print('PASS_ONLY_RESEARCH_STAGE_FILES_CHANGED',modified)
           PY
-          python -m pip install -q beautifulsoup4 requests
-          python -m compileall -q experience_regime_v1/free_workout_evidence_v1.py
-      - name: Validate guardrails against synthetic/non-public/redated article cases
+      - name: Parser, permission, future-prediction proofs (zero publisher network fetches)
         run: |
           set -euo pipefail
-          python -m unittest -v experience_regime_v1.test_free_workout_evidence_v1
-          python -m unittest -v experience_regime_v1.test_step1_factors_evidence_v1
-      - name: Single official-roster-backed live free article smoke test, never publish scores
+          python -m pip install -q beautifulsoup4 requests
+          python -m py_compile \
+             experience_regime_v1/free_workout_evidence_v1.py \
+             experience_regime_v1/workout_prestart_proof_v1.py \
+             experience_regime_v1/workout_prospective_comparison_v1.py
+          python -m unittest -v \
+             experience_regime_v1.test_free_workout_evidence_v1 \
+             experience_regime_v1.test_workout_prestart_proof_v1 \
+             experience_regime_v1.test_workout_prospective_comparison_v1 \
+             experience_regime_v1.test_step1_factors_evidence_v1
+      - name: Verify rights remain explicitly UNVERIFIED and automated Git proof is closed
         run: |
           set -euo pipefail
           python - <<'PY'
           import json
-          from datetime import datetime
-          from zoneinfo import ZoneInfo
-          from experience_regime_v1.free_workout_evidence_v1 import (
-              find_roster,fetch_single_article,workbook_from_html,extract_publication_time,capture)
           from pathlib import Path
-          from datetime import date
-          race='2026-11-01-tokyo-11'
-          start='2026-11-01T15:40:00+09:00'
-          before=datetime.now(ZoneInfo('Asia/Tokyo'))<datetime.fromisoformat(start)
-          if not before:
-              print('SOURCE_LIVE_SMOKE_SKIPPED_AFTER_START; NO_RETROACTIVE_PROOF')
+          from experience_regime_v1.workout_prestart_proof_v1 import permission_gate
+          p=json.loads(Path('experience_regime_v1/workout_source_permission_v1.json').read_text())
+          assert p['default_decision']=='block_automated_git_commit_until_explicit_reuse_grant'
+          assert p['sources'][0]['automatic_reuse']=='permission_unverified'
+          try:
+              permission_gate('https://umasiru.com/archives/22113',p)
+          except PermissionError:
+              print('PASS_RIGHTS_UNVERIFIED_NO_AUTOMATED_REUSE_OR_PUBLIC_CLOCK_EXPORT')
           else:
-              roster,proof,formal=find_roster('2026-10-31',race,start)
-              url='https://umasiru.com/archives/22113'
-              try:
-                  source=fetch_single_article(url)
-              except Exception as ex:
-                  print('SOURCE_SCRAPE_NOT_ENABLED_OR_BLOCKED',type(ex).__name__,str(ex)[:220])
-                  print('SOURCE_RIGHTS_OR_ROBOTS_REVIEW_REQUIRED_BEFORE_AUTOMATED_USE')
-              else:
-                  observed=datetime.now(ZoneInfo('Asia/Tokyo')).isoformat(timespec='milliseconds')
-                  evidence=capture('2026-10-31',race,start,url,source,observed,
-                                   frozen_roster=roster,roster_proof=proof,is_formal=formal)
-                  records=workbook_from_html(source,roster,date(2026,11,1))
-                  assert evidence['verified_horses']==len(records)
-                  assert not evidence['production_effect']
-                  assert evidence['workout_factor_grades'] is None
-                  assert evidence['prediction_rank_grade_bets_unchanged']
-                  # Only minimal numerical facts go into the short-lived Actions
-                  # artifact, never the public Pages tree or final_bets.
-                  Path('/tmp/e012-workout-stage-facts.json').write_text(
-                      json.dumps(evidence,ensure_ascii=False,indent=2))
-                  if not records:
-                      from bs4 import BeautifulSoup
-                      soup=BeautifulSoup(source,'html.parser')
-                      article=soup.find('article') or soup.find('main') or soup
-                      headers=article.find_all(['h3','h4'])
-                      tables=article.find_all('table')
-                      print('SOURCE_STRUCTURE_ONLY',json.dumps({
-                         'article_tag':article.name,
-                         'article_heading_count':len(headers),
-                         'first_headers':[h.get_text(' ',strip=True)[:65] for h in headers[:24]],
-                         'table_count':len(tables),
-                         'first_table_labels':[
-                           [c.get_text(' ',strip=True)[:35] for c in t.find_all('tr')[0].find_all(['th','td'])]
-                           for t in tables[:4] if t.find_all('tr')],
-                         'roster_first':list(roster)[:4]
-                      },ensure_ascii=False))
-                  report={'race_id':race,'article':url,'official_field_size':len(roster),
-                      'horse_count_with_times':len(records),
-                      'total_number_of_workouts':sum(len(x['workouts']) for x in records.values()),
-                      'article_published_at':extract_publication_time(source),
-                      'fetched_at':observed,'page_html_sha256':evidence['source']['html_sha256'],
-                      'source_clocks_only':True,'betting_effect':False,
-                      'first_roster_proof':proof['commit_sha']}
-                  Path('/tmp/e012-workout-stage-smoke.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
-                  print('SOURCE_LIVE_PRESTART_SMOKE',json.dumps(report,ensure_ascii=False))
-                  assert len(records)>=1,'Official roster had no matching workout tables'
+              raise AssertionError('permission_gate_bypassed')
           PY
-      - name: Upload source availability report, not article content or bets
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e012-free-workout-source-staging-audit
-          path: |
-            /tmp/e012-workout-stage-smoke.json
-            /tmp/e012-workout-stage-facts.json
-          if-no-files-found: ignore
-          retention-days: 7
+      - name: Verify primary original JRA research audit still passes offline
+        run: |
+          set -euo pipefail
+          python -m unittest -q experience_regime_v1.test_model
+          echo "PASSED_OFFLINE_WITH_NO_RACE_MODEL_OR_RESULTS_MODIFICATION"
