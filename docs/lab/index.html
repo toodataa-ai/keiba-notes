@@ -63,7 +63,7 @@ footer{padding:16px 0 30px;color:#73808e;font-size:11px}
 <script>
 (async function(){
 const list=document.getElementById('featureList');
-const labels={lab_development:'開発中',lab_evaluation:'評価中',needs_review:'差分検証待ち',staging_review:'承認待ち',released:'公開済み',reference_only:'参照資料'};
+const labels={lab_development:'開発中',lab_evaluation:'評価中',needs_review:'差分検証待ち',staging_review:'承認待ち',released:'公開済み',production_released:'本番公開済み',reference_only:'参照資料'};
 const set=(id,v)=>{document.getElementById(id).textContent=String(v);};
 try{
  const resp=await fetch('change-board.json',{cache:'no-store'});
@@ -73,7 +73,7 @@ try{
  const c=data.counts||{};
  set('nLab',(c.lab_development||0)+(c.lab_evaluation||0));
  set('nReview',(c.needs_review||0)+(c.staging_review||0));
- set('nReleased',c.released||0);set('nReference',c.reference_only||0);
+ set('nReleased',(c.released||0)+(c.production_released||0));set('nReference',c.reference_only||0);
  document.getElementById('scan').textContent='自動照合元: '+(data.scan_commit||'不明').slice(0,12)+' · GitHub承認状態は手動確定';
  list.replaceChildren();
  for(const f of data.features){
