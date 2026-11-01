@@ -1,0 +1,95 @@
+name: Verify E012 free workout STAGING report and live browser
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/e012-free-workout-source.html'
+      - 'docs/staging/data/e012-free-workout-trial-v1.json'
+      - 'docs/staging/e012-free-factor-compare.html'
+      - '.github/workflows/e012-free-workout-preview-staging-qa-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  stage-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Check only source-supported aggregate data, never publish copyrighted workout tables
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          obj=json.loads(Path('docs/staging/data/e012-free-workout-trial-v1.json').read_text())
+          for name in ('official_field_horses','horses_with_public_numeric_clocks','session_count'):
+              assert type(obj[name]) is int and obj[name]>=1
+          assert obj['official_field_horses']==obj['horses_with_public_numeric_clocks']==17
+          assert obj['session_count']==50
+          assert obj['race_id']=='2026-11-01-tokyo-11'
+          assert obj['observed_at']<obj['race_start_at']
+          assert obj['source_html_sha256']=='91de5c729bdd8f10d31aceb954d27541047d206d2549d312024730cb9c737645'
+          assert obj['source_redistribution_terms_status']=='review_required'
+          assert obj['research_only'] and obj['formal_rank_bets_untouched']
+          assert not obj['full_workout_data_published']
+          assert not obj['full_nine_factor_grades_completed']
+          page=Path('docs/staging/e012-free-workout-source.html').read_text()
+          before=Path('docs/staging/e012-free-factor-compare.html').read_text()
+          assert 'data-stage="preview"' in page and 'noindex,nofollow' in page
+          assert 'e012-free-workout-trial-v1.json' in page
+          assert 'e012-free-workout-source.html' in before
+          assert '⑦調教' in page and '0 / 125' not in page
+          assert '<script>' in page and 'fetch(' in page
+          print('PASS_FREE_WORKOUT_AGGREGATE_AND_STAGE_ONLY_SOURCE_CONTRACT')
+          PY
+      - name: Verify HTML JSON and parent comparison page over live Pages byte for byte
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 25);do
+            good=1
+            for path in e012-free-workout-source.html data/e012-free-workout-trial-v1.json e012-free-factor-compare.html;do
+              curl -fsSL --max-time 18 "https://toodataa-ai.github.io/keiba-notes/staging/$path?check=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-workout-public || { good=0;break; }
+              cmp -s "docs/staging/$path" /tmp/e012-workout-public || { good=0;break; }
+            done
+            if [[ "$good" == 1 ]];then echo PASS_FREE_WORKOUT_STAGE_THREE_FILES_EXACT_PUBLIC_BYTES;exit 0;fi
+            sleep 8
+          done
+          echo "::error::Staging site not byte-identical"
+          exit 1
+      - name: Verify actual desktop and mobile Chromium JS / width / links
+        run: |
+          set -euo pipefail
+          python -m pip install -q playwright
+          python -m playwright install --with-deps chromium
+          mkdir -p /tmp/e012-free-workout-browser
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as pw:
+              browser=pw.chromium.launch(headless=True,args=['--no-sandbox'])
+              for label,width,height in [('mobile',390,844),('desktop',1280,900)]:
+                  page=browser.new_page(viewport={'width':width,'height':height})
+                  errors=[]
+                  page.on('pageerror',lambda err:errors.append(str(err)))
+                  r=page.goto('https://toodataa-ai.github.io/keiba-notes/staging/e012-free-workout-source.html',timeout=40000,wait_until='domcontentloaded')
+                  assert r and r.status==200,(label,'source_page_http_error')
+                  page.wait_for_function('() => document.querySelector("#source-status")?.textContent.includes("照合済み")',timeout=25000)
+                  assert page.locator('#covered').inner_text()=='17 / 17'
+                  assert page.locator('#sessions').inner_text()=='50件'
+                  assert page.locator('a[href="e012-free-factor-compare.html"]').count()==1
+                  assert page.locator('a[href="https://umasiru.com/archives/22113"]').count()==1
+                  assert not errors,(label,errors)
+                  scroll=page.evaluate('document.documentElement.scrollWidth-document.documentElement.clientWidth')
+                  assert scroll<=1,(label,'horizontal_scroll',scroll)
+                  page.screenshot(path='/tmp/e012-free-workout-browser/'+label+'.png',full_page=True)
+                  print('PASS_FREE_WORKOUT_REAL_CHROMIUM',label,width,height)
+                  page.close()
+              browser.close()
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: free-workout-staging-phone-desktop
+          path: /tmp/e012-free-workout-browser/
+          retention-days: 14
