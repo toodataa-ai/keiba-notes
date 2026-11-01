@@ -47,7 +47,7 @@ def column(plan,source):
   valid(len(tickets)==c['points'] and all(x.get('quote_verified') is True for x in tickets),'first operation not matched to verified purchased tickets')
   odds=[x['market_odds'][0] if isinstance(x['market_odds'],list) else x['market_odds'] for x in tickets]
   valid(all(isinstance(x,(float,int)) and x>1 for x in odds),'real odds missing')
-  first=f'{min(odds):g}倍' if min(odds)==max(odds) else f'{min(odds):g}～{max(odds):g}倍'
+  first=f'{min(odds):g}倍' if min(odds)==max(odds) else f'{min(odds):g}〜{max(odds):g}倍'
   valid(metrics.get('modeled_expected_net_profit_yen') is not None and metrics.get('modeled_net_loss_probability') is not None,'missing portfolio metrics')
   body=(f'{c["type"]}（{"・".join(names)}）は実測{first}を確認。'
         f'購入{len(plan["formal_bets"])}点・{plan["total_stake_yen"]:,}円のモデル期待純利益は'
@@ -76,7 +76,7 @@ def verify_pdf(original_pdf,new_pdf,note,names):
    valid(''.join(word.split()) in first,'missing rendered PDF commentary/horse name: '+word)
   valid(first.index(''.join(TITLE.split()))>first.index('購入操作とJRA入力馬番'),'commentary is not after purchased ticket header')
   for i in range(1,len(old)):
-   if old[i].get_text()!=new[i].get_text():
+   if old[i].get_text().replace('～','〜')!=new[i].get_text().replace('～','〜'):
     print('DIAGNOSTIC_PAGE_DIFF',i+1,
       'old_first',repr(old[i].get_text()[:180]),
       'new_first',repr(new[i].get_text()[:180]),flush=True)
