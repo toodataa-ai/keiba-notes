@@ -154,12 +154,22 @@ def main():
         raise SystemExit("Both prestart predictions required, not one posthoc comparator")
     proofpath=Path(args.proof_json)
     p=load(proofpath)
-    gitproof=first_commit_verified(proofpath,when(p["start_at"]))
+    deadline=when(p["start_at"])
+    gitproof=first_commit_verified(proofpath,deadline)
+    # A real existing legacy and a separately sealed challenger are required.
+    # Comparing against a newly invented historical forecast is prohibited.
+    prediction_proofs=None
+    if args.legacy_json and args.challenger_json:
+        prediction_proofs={
+            "legacy":first_commit_verified(Path(args.legacy_json),deadline),
+            "challenger":first_commit_verified(Path(args.challenger_json),deadline)
+        }
     result=compare(proof=p,captured=load(Path(args.evidence_json)),
                    legacy=load(Path(args.legacy_json)) if args.legacy_json else None,
                    challenger=load(Path(args.challenger_json)) if args.challenger_json else None,
                    result=load(Path(args.result_json)) if args.result_json else None)
     result["source_hash_proof_first_commit"]=gitproof
+    result["two_prestart_prediction_first_commit_proofs"]=prediction_proofs
     print(json.dumps(result,ensure_ascii=False,indent=2))
 
 
