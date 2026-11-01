@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>無料9項目データ監査｜E0/E1/E2 STAGING</title>
+<style>
+:root{color-scheme:light;--ink:#1b2430;--sub:#536071;--line:#d9e0e8;--surface:#f4f6f8;--accent:#9e253c;--good:#1f6952}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:14px/1.7 "Meiryo UI",Meiryo,"Hiragino Kaku Gothic ProN",sans-serif}
+a{color:#255c8c;text-underline-offset:3px}a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.wrap{max-width:920px;margin:0 auto;padding:0 18px}
+.top{background:#172032;color:#f7f8f9;padding:11px 0}
+.top .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between}
+.top a{color:#f5f5f6;text-decoration:none;font-weight:700}.top .label{font-size:12px;border:1px solid #adb8c7;border-radius:3px;padding:2px 9px;letter-spacing:.08em}
+header.hero{padding:31px 0 25px;background:linear-gradient(160deg,#fff,#f8f9fb);border-bottom:1px solid var(--line)}
+h1{font-size:clamp(23px,4vw,31px);line-height:1.4;letter-spacing:.01em;margin:5px 0 14px}h2{font-size:19px;margin:0 0 9px}h3{font-size:16px;margin:0 0 6px}p{margin:5px 0 13px}
+.kicker{color:var(--accent);font-weight:800;font-size:12px;letter-spacing:.08em}
+.lead{font-size:15px;color:#394a5c;max-width:750px}.muted{color:var(--sub);font-size:12px}
+main{padding-top:23px;padding-bottom:55px}.block{margin:0 0 30px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:21px 0}
+.metric{background:var(--surface);border-radius:10px;padding:15px 14px;border:1px solid var(--line)}
+.metric b{display:block;font-size:24px;line-height:1.3;font-variant-numeric:tabular-nums}.metric small{display:block;color:var(--sub);font-size:12px}
+.callout{background:#faf9f7;border-left:4px solid #b88b62;border-radius:2px;padding:13px 15px;margin:14px 0;color:#384453}
+.tablewrap{overflow-x:auto;max-width:100%}table{width:100%;border-collapse:collapse;table-layout:fixed}thead{background:#f1f4f7}
+th,td{border-bottom:1px solid var(--line);padding:11px 9px;text-align:left;vertical-align:middle}
+th:first-child{width:17%}th:nth-child(2){width:18%}th:nth-child(3){width:18%}th:last-child{width:47%}
+.number{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.bar{height:6px;background:#e4e9ee;border-radius:5px;overflow:hidden;margin-top:4px}
+.bar>i{display:block;height:100%;background:#527a95}
+.pill{display:inline-block;font-size:11px;padding:1px 7px;border:1px solid #ccd4df;border-radius:20px;white-space:nowrap;color:#465668}
+.pill.unavailable{border-color:#d2c4c4;color:#864d57}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{padding:15px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.subpanel{margin-top:12px;padding:15px;background:var(--surface);border-radius:10px}
+details{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0}summary{cursor:pointer;font-weight:700}
+.notice{font-size:12px;color:#526071;padding:8px 0}footer{padding:20px 0;border-top:1px solid var(--line);font-size:12px;color:var(--sub)}
+.error{color:#a8233d;font-weight:700}
+@media(max-width:650px){.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.two{grid-template-columns:1fr}body{font-size:13px}th{display:none}table,tbody,tr,td{display:block;width:100%!important}tr{margin-bottom:9px;border:1px solid var(--line);border-radius:10px;padding:10px 13px}td{border:0;padding:3px 0}td:nth-child(1){font-weight:800;font-size:15px}td:nth-child(2)::before{content:"取得状況：";color:var(--sub);font-size:11px}td:nth-child(3)::before{content:"確認数：";color:var(--sub);font-size:11px}td:nth-child(4){color:var(--sub);font-size:12px}.bar{max-width:100%}}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="ステージング専用の案内"><div class="wrap"><a href="experience-regime.html">← E0/E1/E2研究ページに戻る</a><span class="label">STAGING 検証中</span></div></nav>
+<header class="hero"><div class="wrap">
+<div class="kicker">JRA STEP1 ①〜⑨ / 無料データ検証</div>
+<h1>9項目の評価に、<br>どこまで実データがあるか。</h1>
+<p class="lead">実際に取得した根拠、馬名・血統・騎手名だけ確認できた項目、未評価の項目を分離しました。<strong>グレードの表示だけでは、評価データが取得できた証拠にはなりません。</strong></p>
+<p class="muted">対象：2026年11月1日の発走前にGitHubへ固定された12レースの研究原本。集計処理は後日でも、当日レースの結果・オッズは評価に使用していません。</p>
+</div></header>
+<main class="wrap">
+<section class="block" aria-labelledby="coverage-title">
+<h2 id="coverage-title">対象・保存状況</h2>
+<div class="metrics">
+ <div class="metric"><small>正式JRAメイン</small><b id="formal">2レース</b><small id="formal-horses">30頭・原本不変</small></div>
+ <div class="metric"><small>E0/E1/E2研究</small><b id="research">10レース</b><small id="research-horses">125頭・発走前固定済み</small></div>
+ <div class="metric"><small>9項目完全な実測評価</small><b>未達</b><small>⑦調教など不足あり</small></div>
+</div>
+<div class="callout"><strong>これは予測精度を上げたという報告ではありません。</strong> 本番のSTEP1順位・印・勝率・買い目・結果・回収率は変更していません。今回の「新旧比較」はデータ充足状況の比較であり、的中率や収益性のA/B検証ではありません。</div>
+</section>
+<section class="block" aria-labelledby="factor-title">
+<h2 id="factor-title">①〜⑨の証拠・取得率</h2>
+<p class="muted">以下の確認数は研究用125頭のうち発走前情報が記録された頭数です。「名前のみ」「代理評価」は予測モデルの優位性を意味しません。</p>
+<div class="tablewrap">
+<table aria-label="9つの評価項目のソース確認状況">
+<thead><tr><th>項目</th><th>根拠の種類</th><th>確認数（125頭中）</th><th>何を確認したか・足りないもの</th></tr></thead>
+<tbody id="factors">
+<tr><td>① 斤量</td><td>数値確認</td><td>125 / 125</td><td>負担重量。能力への有効な換算は未校正</td></tr>
+<tr><td>② 展開</td><td>過去実績</td><td>86 / 125</td><td>過去の通過順位であり、当日展開の確定情報ではない</td></tr>
+<tr><td>③ 馬場</td><td>過去実績</td><td>58 / 125</td><td>同じ馬場状態の過去走。バイアスは未校正</td></tr>
+<tr><td>④ ローテ</td><td>代理評価</td><td>86 / 125</td><td>間隔は実測、評価グレードは未校正</td></tr>
+<tr><td>⑤ コース</td><td>過去実績</td><td>35 / 125</td><td>同条件の過去走</td></tr>
+<tr><td>⑥ 血統</td><td>名前のみ</td><td>125 / 125</td><td>父・母・母父。条件別適性の統計なし</td></tr>
+<tr><td>⑦ 調教</td><td>未取得</td><td>0 / 125</td><td>馬別の調教時計が未取得</td></tr>
+<tr><td>⑧ 騎手</td><td>名前のみ</td><td>125 / 125</td><td>騎手名。競馬場別・距離別の勝率は未取得</td></tr>
+<tr><td>⑨ 基礎能力</td><td>代理評価</td><td>86 / 125</td><td>過去戦績の参考値。新馬は未評価</td></tr>
+</tbody>
+</table></div>
+<p class="notice" role="status" id="load-status">保存済みのステージング比較データと照合中…</p>
+</section>
+<section class="block">
+<h2>正式JRA予想と比べた違い</h2>
+<div class="two">
+  <article class="panel"><h3>既存の正式JRA予想</h3>
+    <p>①〜⑨すべてにグレード欄が存在しますが、以下の3項目は実測データによる評価ではなく固定値でした。</p>
+    <p><strong>⑥ 血統：B ／ ⑦ 調教：B− ／ ⑧ 騎手：B</strong></p>
+    <p class="muted">今回の30頭全員でこの固定値を確認。過去に公開された予想には手を加えていません。</p>
+  </article>
+  <article class="panel"><h3>新しい無料データ診断</h3>
+    <p>評価根拠ごとに<strong>数値確認・過去実績・代理評価・名前のみ・未取得</strong>を区別します。血統名や騎手名だけを根拠に有利な評価を付けません。</p>
+    <p class="muted">新馬E0は実戦データ不足を理由に自動減点せず、推定できない項目は未評価のまま保持します。</p>
+  </article>
+</div>
+<div class="subpanel"><h3>E0/E1/E2別の対象頭数</h3><p id="regimes">E0（0戦）39頭、E1（1〜3戦）24頭、E2（4戦以上）62頭</p></div>
+</section>
+<section class="block">
+<h2>本番リリース前の判定</h2>
+<details open><summary>第1弾：根拠の取得状況・未評価表示</summary>
+<p>新旧データ件数の一致、発走前Git証拠、既存予想の原本不変、スマホ表示、公開HTML/JSON一致を検査。<strong>本番UIへの反映にはユーザー承認が必要です。</strong></p></details>
+<details><summary>第2弾：新しい予測ロジックの採用</summary>
+<p>未実施です。将来開催の発走前Shadowで旧版・新版の予測を両方固定し、結果確定後にE0/E1/E2・レース区分ごとのBrier score、回収率、E2悪化有無を比較します。今回の9項目データ監査だけで採用しません。</p></details>
+<p class="muted">参照資料：
+<a href="https://github.com/toodataa-ai/keiba-notes/pull/85">PR #85（無料版評価エンジン）</a> ／
+<a href="../data/experience_regime_factor_evidence_status.json">研究根拠監査JSON</a> ／
+<a href="../data/experience_regime_formal_factor_availability.json">正式予想との照合監査JSON</a>
+</p>
+</section>
+</main>
+<footer><div class="wrap">E0/E1/E2 Shadow研究・STAGING専用。正式な購入推奨ではありません。固定済みの正式予想・回顧・回収率に影響しません。</div></footer>
+<script>
+(async()=>{
+ const state=document.getElementById('load-status');
+ try{
+  const response=await fetch('data/e012-free-factor-compare-v1.json?preview=20261101-1',{cache:'no-store'});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const d=await response.json();
+  if(d.kind!=='staging_e012_free_factor_evidence_quality_comparison' || d.production_effect!==false ||
+     d.no_old_prediction_changes!==true || d.research_horses!==125 ||
+     d.formal_horses!==30 || !Array.isArray(d.factors) || d.factors.length!==9)throw new Error('監査対象または研究原本が一致しません');
+  document.getElementById('formal').textContent=d.formal_races+'レース';
+  document.getElementById('formal-horses').textContent=d.formal_horses+'頭・原本不変';
+  document.getElementById('research').textContent=d.research_races+'レース';
+  document.getElementById('research-horses').textContent=d.research_horses+'頭・発走前固定済み';
+  document.getElementById('regimes').textContent='E0（0戦）'+d.research_regime_horses.E0+'頭、E1（1〜3戦）'+d.research_regime_horses.E1+'頭、E2（4戦以上）'+d.research_regime_horses.E2+'頭';
+  const tbody=document.getElementById('factors');
+  const fragment=document.createDocumentFragment();
+  for(let i=0;i<9;i++){
+   const f=d.factors[i];
+   if(f.number!==i+1 || !Number.isInteger(f.count) || f.count<0 || f.count>d.research_horses)throw new Error('評価根拠の件数不正');
+   const tr=document.createElement('tr');
+   const td1=document.createElement('td');td1.textContent=['①','②','③','④','⑤','⑥','⑦','⑧','⑨'][i]+' '+f.label;
+   const td2=document.createElement('td');
+   const tag=document.createElement('span');tag.className='pill'+(f.kind==='未取得'?' unavailable':'');tag.textContent=f.kind;td2.append(tag);
+   const td3=document.createElement('td');
+   const fraction=document.createElement('span');fraction.className='number';fraction.textContent=f.count+' / '+d.research_horses;td3.append(fraction);
+   const bar=document.createElement('div');bar.className='bar';bar.setAttribute('aria-hidden','true');
+   const progress=document.createElement('i');progress.style.width=(f.count/d.research_horses*100)+'%';bar.append(progress);td3.append(bar);
+   const td4=document.createElement('td');td4.textContent=f.detail;
+   tr.append(td1,td2,td3,td4);fragment.append(tr);
+  }
+  tbody.replaceChildren(fragment);
+  state.textContent='発走前の保存原本と照合済みのステージングデータを読み込みました。これは実測データの充足状況であり的中結果ではありません。';
+ }catch(error){
+  state.classList.add('error');
+  state.textContent='公開比較データとの照合に失敗しました。上記の固定表示は2026年11月1日の参考値です。原因：'+String(error.message||error);
+ }
+})();
+</script>
+</body>
+</html>
