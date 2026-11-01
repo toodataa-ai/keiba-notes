@@ -63,17 +63,27 @@ def parse_official(url, race_date, number_to_name):
     html = BeautifulSoup(raw, "html.parser")
     rows = html.select("table tr")
     parsed = {}
+    withdrawals = {}
+    inverse = {name: number for number, name in number_to_name.items()}
+    if len(inverse) != len(number_to_name):
+        raise ValueError("original_duplicate_horse_names")
     for tr in rows:
         number = tr.select_one("td.num")
         horse = tr.select_one("td.horse")
         jockey = tr.select_one("td.jockey")
         if not (number and horse and jockey):
             continue
-        n = re.search(r"\d+", number.get_text(" ", strip=True))
+        num_text = number.get_text(" ", strip=True)
+        n = re.search(r"\d+", num_text)
+        name = horse.get_text(" ", strip=True).split(" ")[0]
         if not n:
+            if ("取消" in num_text or "除外" in num_text) and name in inverse:
+                withdrawn_no = inverse[name]
+                withdrawals[withdrawn_no] = {"horse_number": withdrawn_no,
+                    "horse_name": name, "official_status": num_text,
+                    "reason": "official_prerace_withdrawal"}
             continue
         no = int(n.group())
-        name = horse.get_text(" ", strip=True).split(" ")[0]
         if no in parsed:
             raise ValueError("duplicated_official_horse_number")
         # Only source-visible evidence; no odds, results, future data, or synthetic history.
@@ -83,7 +93,9 @@ def parse_official(url, race_date, number_to_name):
         for cell in tr.select("td.past"):
             t = " ".join(cell.get_text(" ", strip=True).split())
             day = re.search(r"(\d{4})年(\d{1,2})月(\d{1,2})日", t)
-            if not day:
+            if not day or "除外" in t or "取消" in t:
+                # JRA cards include excluded nominations in the past-races column.
+                # Excluded/withdrawn is not an actual career start (0.0.0.0 remains E0).
                 continue
             past_date = date(*map(int, day.groups()))
             if past_date >= race_date:
@@ -101,12 +113,13 @@ def parse_official(url, race_date, number_to_name):
         parsed[no] = {"horse_name": name, "weight_kg": float(kg.group(1)) if kg else None,
                       "past": past}
     expected = set(number_to_name)
-    if set(parsed) != expected:
-        raise ValueError("official_roster_mismatch:" + str(sorted(expected ^ set(parsed))))
+    if set(parsed) & set(withdrawals) or (set(parsed) | set(withdrawals)) != expected:
+        raise ValueError("official_roster_mismatch_unexplained:" +
+                         str(sorted(expected ^ (set(parsed) | set(withdrawals)))))
     for n, name in number_to_name.items():
         if parsed[n]["horse_name"] != name:
             raise ValueError("horse_number_name_changed:" + str(n))
-    return parsed, hashlib.sha256(raw).hexdigest(), len(raw)
+    return parsed, hashlib.sha256(raw).hexdigest(), len(raw), list(withdrawals.values())
 
 
 def grade(value):
@@ -199,10 +212,10 @@ def make_one(item, snapshot, proof):
     race = {"venue": item["venue"], "surface": None, "distance_m": None}
     # The original fixed race card records names/starts but no distance/surface.
     # Do not guess these; leave same-condition suitability unavailable.
-    parsed, html_sha, html_bytes = parse_official(
+    parsed, html_sha, html_bytes, withdrawals = parse_official(
         official_url, date.fromisoformat(item["date"]), names)
     rows = []
-    for no in sorted(names):
+    for no in sorted(parsed):
         h = exp[str(no)]
         if h["source_url"] != official_url or h["regime"] != ("E0" if h["starts_before_race"] == 0 else "E1" if h["starts_before_race"] <= 3 else "E2"):
             raise ValueError("original_lifetime_record_not_verified")
@@ -248,6 +261,8 @@ def make_one(item, snapshot, proof):
         "original_experience_proof_commit": proof["proof_commit"],
         "original_experience_snapshot_sha256": hashlib.sha256((ROOT / "experience_regime_v1" / "collection" / item["week_id"] / "snapshots" / (item["race_id"] + ".json")).read_bytes()).hexdigest(),
         "calculated_at": datetime.now(JST).isoformat(),
+        "withdrawn_horses": withdrawals,
+        "excluded_horses_are_not_scored": True,
         "runners": rows
     }
 
