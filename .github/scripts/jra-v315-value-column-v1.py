@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Presentation-only v3.15 value commentary. Never rewrite sealed forecasts or historical PDFs."""
-import argparse,hashlib,html,json,re
+import argparse,hashlib,html,json,re,tempfile
 from pathlib import Path
 import fitz
 from weasyprint import HTML
@@ -97,7 +97,15 @@ def run(args):
  out_html.write_text(revised,encoding='utf8')
  HTML(string=revised,base_url=str(Path.cwd())).write_pdf(str(out_pdf))
  valid(revised.replace(note,'',1)==original,'presentation-only HTML diff verification failed')
- verify_pdf(args.pdf_input,out_pdf,note,names)
+ # Existing immutable PDF can have a different renderer/font environment. Compare
+ # before/after reflow in the SAME WeasyPrint 68 process, never against unreliable
+ # historical rasterization. Original PDF bytes and all source artifacts stay untouched.
+ with tempfile.TemporaryDirectory() as tempdir:
+  baseline=Path(tempdir)/'unmodified-baseline.pdf'
+  HTML(string=original,base_url=str(Path.cwd())).write_pdf(str(baseline))
+  with fitz.open(args.pdf_input) as historical, fitz.open(baseline) as rerender:
+   valid(len(historical)==len(rerender),'historical report page count drift')
+  verify_pdf(baseline,out_pdf,note,names)
  import importlib.util
  spec=importlib.util.spec_from_file_location('jra_layout_gate',Path('.github/scripts/validate-jra-pdf-layout.py'))
  gate=importlib.util.module_from_spec(spec);spec.loader.exec_module(gate)
