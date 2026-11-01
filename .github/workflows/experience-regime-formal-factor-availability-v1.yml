@@ -1,0 +1,88 @@
+name: Audit JRA formal 9 factor labels vs actual evidence (research only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/experience-regime-formal-factor-availability-v1.yml'
+      - 'experience_regime_v1/formal_factor_availability_audit_v1.py'
+  workflow_run:
+    workflows: ['E012 prove all remaining STEP1 factor evidence before post (research only)']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: e012-formal-factor-availability-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify formal code itself against E012 immutable saved evidence
+        run: |
+          set -euo pipefail
+          python -m py_compile experience_regime_v1/formal_factor_availability_audit_v1.py
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          p=json.loads(Path('experience_regime_v1/requests/run-current.json').read_text())
+          subprocess.run(['python','-m','experience_regime_v1.formal_factor_availability_audit_v1',
+                          '--week-id',p['week_id'],'--date',p['date']],check=True)
+          a=json.loads(Path('docs/data/experience_regime_formal_factor_availability.json').read_text())
+          assert a['formal_horses']==30 and a['formal_races']==2, 're-audit formal coverage'
+          assert a['research_horses']==125 and a['research_undercard_races']==10, 're-audit undercard coverage'
+          assert a['formal_factors_6_7_8_observed'] is False
+          assert a['research_workouts_with_actual_times']==0
+          assert a['canonical_prediction_changed'] is False
+          assert a['no_data_fabrication'] is True
+          print('PASS_JRA_NINE_GRADES_DO_NOT_EQUAL_NINE_EVIDENCED_FACTORS')
+          PY
+      - name: Commit only provenance audit; leave original 12 predictions and research data unchanged
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/experience_regime_formal_factor_availability.json
+          staged="$(git diff --cached --name-only)"
+          if [[ -n "$staged" && "$staged" != "docs/data/experience_regime_formal_factor_availability.json" ]];then
+            echo "::error::Unexpected files staged";exit 1
+          fi
+          if git diff --cached --quiet;then
+            echo E012_FORMAL_AVAILABILITY_AUDIT_UNCHANGED
+          else
+            git commit -m "Publish JRA nine-factor real-source availability audit with E012 evidence"
+            for n in 1 2 3 4 5;do
+              if ! git pull --rebase origin main;then
+                git rebase --abort || true
+                echo "::error::Concurrent changes require source re-audit";exit 1
+              fi
+              if git push origin HEAD:main;then break;fi
+              if [[ "$n" == 5 ]];then exit 1;fi
+              sleep 2
+            done
+          fi
+      - name: Audit public research JSON byte-for-byte
+        run: |
+          set -euo pipefail
+          for n in $(seq 1 18);do
+            if curl -fLsS --max-time 15 "https://toodataa-ai.github.io/keiba-notes/data/experience_regime_formal_factor_availability.json?run=$GITHUB_RUN_ID-$n" \
+                 -o /tmp/formal-evidence-audit-live.json &&
+               cmp -s docs/data/experience_regime_formal_factor_availability.json /tmp/formal-evidence-audit-live.json;then
+              echo JRA_FORMAL_FACTOR_AVAILABILITY_PUBLIC_EXACT_MATCH
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::GitHub audit saved but Pages not verified"
+          exit 1
