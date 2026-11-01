@@ -1,0 +1,112 @@
+name: Verify E012 free factor STAGING site and release registry audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/staging/e012-free-factor-compare.html'
+      - 'docs/staging/data/e012-free-factor-compare-v1.json'
+      - '.github/production-releases.json'
+      - '.github/workflows/e012-free-factor-staging-preview-qa-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: e012-free-factor-staging-http-qa
+  cancel-in-progress: false
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare staging-only preview to real prereace sources without any winner/results
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,subprocess,re
+          from pathlib import Path
+          stage=Path('docs/staging')
+          data=json.loads((stage/'data/e012-free-factor-compare-v1.json').read_text())
+          status=json.loads(Path('docs/data/experience_regime_factor_evidence_status.json').read_text())
+          formal=json.loads(Path('docs/data/experience_regime_formal_factor_availability.json').read_text())
+          source=Path('.github/production-releases.json').read_bytes()
+          public=Path('docs/data/production-releases.json').read_bytes()
+          assert source==public,'CANONICAL_RELEASE_REGISTRY_MISMATCH'
+          registry=json.loads(source)
+          assert registry['current_public_version']=='1.05'
+          assert registry['pending_public_validation'][0]['proposed_public_version']=='1.06'
+          assert registry['pending_public_validation'][0]['status']=='production_source_committed_public_http_unverified'
+          assert data['formal_races']==formal['formal_races']==2
+          assert data['formal_horses']==formal['formal_horses']==30
+          assert data['research_races']==status['target_races']==10
+          assert data['research_horses']==status['horses']==125
+          assert status['blocked']==[]
+          assert data['former_fixed_formal_factors']==formal['formal_fallback_grades']
+          expected=[125,status['factor_support_counts']['2'],status['factor_support_counts']['3'],86,
+                    status['factor_support_counts']['5'],status['factor_support_counts']['6'],
+                    status['factor_support_counts']['7'],status['factor_support_counts']['8'],86]
+          assert [a['count'] for a in data['factors']]==expected,'STAGING_FACTOR_COUNTS_SOURCE_MISMATCH'
+          assert [f['number'] for f in data['factors']]==list(range(1,10))
+          assert data['no_old_prediction_changes'] and not data['production_effect']
+          assert data['ranking_win_probability_comparison'] is None and data['betting_roi_comparison'] is None
+          ids=status['proof_verified_races']
+          observed=[0]*9
+          regime={'E0':0,'E1':0,'E2':0}
+          for rid in ids:
+              frozen=Path('experience_regime_v1/research_step1_candidates/2026-10-31')/(rid+'.json')
+              card=json.loads(frozen.read_text())
+              assert card['no_odds_or_results_accessed'] and not card['production_effect']
+              assert card['date']=='2026-11-01'
+              for row in card['runners']:
+                  regime[row['regime']]+=1
+                  for j,g in enumerate(row['factor_grades']):
+                      if g is not None:observed[j]+=1
+          assert observed[0]==125 and observed[3]==86 and observed[8]==86
+          assert regime==data['research_regime_horses']
+          html=(stage/'e012-free-factor-compare.html').read_text()
+          assert html.count('data-stage="preview"')==1
+          assert 'noindex,nofollow' in html
+          assert 'data/e012-free-factor-compare-v1.json' in html
+          assert '新たな発走前予想ではない' in data['scope']
+          assert html.count('<tbody id="factors">')==1
+          assert html.count('<tr><td>')==9
+          js=re.findall(r'<script>(.*?)</script>',html,re.S)
+          assert len(js)==1
+          Path('/tmp/e012-free-stage-embedded.js').write_text(js[0])
+          commitfiles={
+            '5af2acf137da96776ab385de5988b7def797b2ab':['.github/production-releases.json'],
+            '85fa9f50922cdbd7f339da0e0a54a23075228d58':['docs/staging/data/e012-free-factor-compare-v1.json'],
+            'e2a065072b1e210ce27f37961bbf657477980cef':['docs/staging/e012-free-factor-compare.html']
+          }
+          for sha,allowed in commitfiles.items():
+              changed=subprocess.check_output(
+                  ['git','diff-tree','--no-commit-id','--name-only','-r',sha],text=True).splitlines()
+              assert sorted(changed)==allowed,('unexpected_production_modification',sha,changed)
+          print('STAGING_FREE_FACTOR_SOURCE_AUDIT_PASS 12 races 155 horses; canonical sources unchanged')
+          PY
+          node --check /tmp/e012-free-stage-embedded.js
+      - name: Compare live Pages HTML and JSON exactly with committed staging artifacts
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 35);do
+            ok=1
+            for file in e012-free-factor-compare.html data/e012-free-factor-compare-v1.json;do
+              if ! curl -fsSL --max-time 25 "https://toodataa-ai.github.io/keiba-notes/staging/${file}?verify=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-live-stage;then
+                ok=0;break
+              fi
+              if ! cmp -s "docs/staging/${file}" /tmp/e012-live-stage;then
+                ok=0;break
+              fi
+            done
+            if [[ "$ok" == 1 ]];then echo PASS_E012_STAGING_HTML_AND_JSON_PUBLIC_EXACT_BYTES;exit 0;fi
+            sleep 8
+          done
+          echo "::error::E012 staging Pages HTML or JSON not byte-identical to GitHub main"
+          exit 1
