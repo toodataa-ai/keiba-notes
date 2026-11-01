@@ -1,11 +1,11 @@
-name: E012 immutable prereace free workout SOURCE HASH proof (permission-gated)
+name: E012 manually instructed prereace free workout SOURCE HASH proof
 on:
   workflow_dispatch:
     inputs:
       week_id: {description: "Frozen JRA study week YYYY-MM-DD", required: true, type: string}
       race_id: {description: "Existing frozen race ID YYYY-MM-DD-venue-NN", required: true, type: string}
       start_at: {description: "Official local post time e.g. 2026-11-08T15:40:00+09:00", required: true, type: string}
-      source_url: {description: "Single article URL explicitly permitted for automated use", required: true, type: string}
+      source_url: {description: "One public article URL, user-instructed single fetch", required: true, type: string}
 permissions: {contents: write}
 concurrency:
   group: e012-free-workout-hash-proof
@@ -20,7 +20,7 @@ jobs:
         with: {ref: staging/e012-free-workout-source-v1, fetch-depth: 0, persist-credentials: true}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Check publisher's explicit automation permission BEFORE any article HTTP
+      - name: Gate manual one URL request separately from scheduled automatic reuse
         shell: bash
         env:
           SOURCE_URL: ${{ inputs.source_url }}
@@ -29,18 +29,20 @@ jobs:
           python - <<'PY'
           import os,json
           from pathlib import Path
-          from experience_regime_v1.workout_prestart_proof_v1 import permission_gate
+          from experience_regime_v1.workout_prestart_proof_v1 import user_requested_single_article_gate
           p=json.loads(Path('experience_regime_v1/workout_source_permission_v1.json').read_text())
-          print('FREE_WORKOUT_PERMISSION_CHECK_STRICT_DENY_BY_DEFAULT')
-          permission_gate(os.environ['SOURCE_URL'],p)
-          print('EXPLICIT_PUBLISHER_REUSE_PERMISSION_VERIFIED')
+          assert os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch'
+          assert os.environ['GITHUB_ACTOR']
+          user_requested_single_article_gate(os.environ['SOURCE_URL'],p,
+                                              request_id=os.environ['GITHUB_RUN_ID'])
+          print('USER_INSTRUCTED_SINGLE_PUBLIC_SOURCE_MODE_WITH_ROBOTS_AND_NONREPUBLICATION')
           PY
       - name: Check new regression tests and install free dependencies
         run: |
           set -euo pipefail
           python -m pip install -q requests beautifulsoup4
           python -m unittest -q experience_regime_v1.test_free_workout_evidence_v1 experience_regime_v1.test_workout_prestart_proof_v1
-      - name: Read one proven official prereace roster and one explicitly approved source
+      - name: Read one user-instructed public article and prestart fixed JRA roster
         shell: bash
         env:
           WEEK_ID: ${{ inputs.week_id }}
@@ -54,7 +56,8 @@ jobs:
             --week-id "$WEEK_ID" --race-id "$RACE_ID" --start-at "$START_AT" \
             --source-url "$SOURCE_URL" --outdir /tmp/e012-workout-prerace
           python -m experience_regime_v1.workout_prestart_proof_v1 \
-            --capture-json "/tmp/e012-workout-prerace/$RACE_ID.json"
+            --capture-json "/tmp/e012-workout-prerace/$RACE_ID.json" \
+            --user-requested-single-article --manual-request-id "$GITHUB_RUN_ID"
           python - <<'PY'
           import os,json
           from pathlib import Path
@@ -86,7 +89,7 @@ jobs:
           git add -- "$path"
           staged="$(git diff --cached --name-only)"
           [[ "$staged" == "$path" ]] || { echo "::error::Only immutable hash proof may be committed";exit 1; }
-          git commit -m "Freeze permission-verified prereace workout hash source proof $RACE_ID"
+          git commit -m "Freeze user-triggered one-article prereace workout hash source proof $RACE_ID"
           python - <<'PY'
           import os,subprocess
           from datetime import datetime
