@@ -1,0 +1,101 @@
+name: Publish JRA v3.15 value column (append-only presentation revision)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/value-column-v1/*.json'
+  workflow_dispatch:
+    inputs:
+      request_path:
+        type: string
+        required: true
+        description: 'Existing, approved presentation-only request'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  value-column-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 36
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Resolve one append-only authorized presentation-only request
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          UI_PATH: ${{ inputs.request_path }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == push ]]; then
+            mapfile -t ADD < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- e2e_validation/requests/value-column-v1)
+            test "${#ADD[@]}" -eq 1 || { echo '::error::Exactly one new request';exit 1; }
+            REQUEST="${ADD[0]}"
+          else
+            REQUEST="$UI_PATH"
+          fi
+          case "$REQUEST" in e2e_validation/requests/value-column-v1/*.json) ;; *) echo '::error::Invalid request';exit 1;; esac
+          test -f "$REQUEST" || exit 1
+          echo "REQUEST=$REQUEST" >> "$GITHUB_ENV"
+      - name: Install exact approved renderer and regression dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 .github/scripts/test-jra-v315-value-column-v1.py -v
+      - name: Build both versioned report/PDF copies, validate every page, change only current report pointers
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-v315-value-column-publish-v1.py --request "$REQUEST"
+          git add -- docs/data/races.json docs/data/jra-value-column-revision-log-v1.json
+          git add -- docs/reports/*-value-column-v1.html docs/pdfs/*-value-column-v1.pdf
+          python3 - <<'PY'
+          import subprocess
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          new={p for p in actual if p.endswith('-value-column-v1.html') or p.endswith('-value-column-v1.pdf')}
+          assert len(new)==4,new
+          assert actual==new|{'docs/data/races.json','docs/data/jra-value-column-revision-log-v1.json'},actual
+          assert not any(p.startswith('e2e_validation/predictions/') or p.startswith('e2e_validation/snapshots/') for p in actual),actual
+          PY
+      - name: Commit only new presentation editions, protected source files remain unchanged
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "Restore approved betting-value explanation in JRA 2026-11-01 reports; financial evidence and old PDFs unchanged"
+          for n in 1 2 3 4 5;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then git rebase --abort || true;exit 1;fi
+            if git push origin HEAD:main;then break;fi
+            test "$n" -lt 5 || exit 1
+          done
+      - name: Verify exact deployed bytes of both rewritten pointers and newly versioned reports
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > /tmp/jra-column-public-files.txt
+          import json
+          from pathlib import Path
+          d=json.loads(Path('docs/data/races.json').read_text())
+          print('docs/data/races.json')
+          print('docs/data/jra-value-column-revision-log-v1.json')
+          for rid in ('2026-11-01-mahoroba-stakes','2026-11-01-tenno-sho-autumn'):
+            r=next(x for x in d['races'] if x['id']==rid)
+            print('docs/'+r['report']);print('docs/'+r['pdf'])
+          PY
+          for attempt in $(seq 1 36);do
+            ok=1
+            while IFS= read -r file;do
+              url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
+              if ! curl -LfsS --max-time 20 "$url?edition=$GITHUB_RUN_ID" -o /tmp/jra-value-http ||
+                 ! cmp -s "$file" /tmp/jra-value-http;then ok=0;break;fi
+            done < /tmp/jra-column-public-files.txt
+            if [[ "$ok" == 1 ]];then echo PASS_VALUE_COLUMN_BOTH_REAL_PAGES_HTTP_BYTE_IDENTITY;exit 0;fi
+            sleep 12
+          done
+          echo '::error::Public HTML/PDF or registry not byte-identical; report incomplete';exit 1
