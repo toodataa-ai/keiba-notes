@@ -1,0 +1,131 @@
+name: E012 immutable prereace free workout SOURCE HASH proof (permission-gated)
+on:
+  workflow_dispatch:
+    inputs:
+      week_id: {description: "Frozen JRA study week YYYY-MM-DD", required: true, type: string}
+      race_id: {description: "Existing frozen race ID YYYY-MM-DD-venue-NN", required: true, type: string}
+      start_at: {description: "Official local post time e.g. 2026-11-08T15:40:00+09:00", required: true, type: string}
+      source_url: {description: "Single article URL explicitly permitted for automated use", required: true, type: string}
+permissions: {contents: write}
+concurrency:
+  group: e012-free-workout-hash-proof
+  cancel-in-progress: false
+jobs:
+  freeze-one-study-race:
+    if: github.ref == 'refs/heads/staging/e012-free-workout-source-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: staging/e012-free-workout-source-v1, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Check publisher's explicit automation permission BEFORE any article HTTP
+        shell: bash
+        env:
+          SOURCE_URL: ${{ inputs.source_url }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,json
+          from pathlib import Path
+          from experience_regime_v1.workout_prestart_proof_v1 import permission_gate
+          p=json.loads(Path('experience_regime_v1/workout_source_permission_v1.json').read_text())
+          print('FREE_WORKOUT_PERMISSION_CHECK_STRICT_DENY_BY_DEFAULT')
+          permission_gate(os.environ['SOURCE_URL'],p)
+          print('EXPLICIT_PUBLISHER_REUSE_PERMISSION_VERIFIED')
+          PY
+      - name: Check new regression tests and install free dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m unittest -q experience_regime_v1.test_free_workout_evidence_v1 experience_regime_v1.test_workout_prestart_proof_v1
+      - name: Read one proven official prereace roster and one explicitly approved source
+        shell: bash
+        env:
+          WEEK_ID: ${{ inputs.week_id }}
+          RACE_ID: ${{ inputs.race_id }}
+          START_AT: ${{ inputs.start_at }}
+          SOURCE_URL: ${{ inputs.source_url }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/e012-workout-prerace
+          python -m experience_regime_v1.free_workout_evidence_v1 \
+            --week-id "$WEEK_ID" --race-id "$RACE_ID" --start-at "$START_AT" \
+            --source-url "$SOURCE_URL" --outdir /tmp/e012-workout-prerace
+          python -m experience_regime_v1.workout_prestart_proof_v1 \
+            --capture-json "/tmp/e012-workout-prerace/$RACE_ID.json"
+          python - <<'PY'
+          import os,json
+          from pathlib import Path
+          r=os.environ['RACE_ID'];w=os.environ['WEEK_ID']
+          path=Path('experience_regime_v1/workout_proof_commitments')/w/(r+'.json')
+          d=json.loads(path.read_text())
+          assert d['proof_final_status']=='PENDING_REAL_FIRST_GIT_COMMIT_AND_TIMESTAMP_CHECK'
+          assert d['formal_step1_2_and_bets_untouched'] and not d['production_effect']
+          assert not d['third_party_detail_published'] and not d['prediction_created']
+          assert d['research_horses_with_source']>0
+          print('PRESTART_HASH_PROOF_FILE_READY',r)
+          PY
+      - name: Commit ONLY source/hash proof before racing start; no results or odds
+        shell: bash
+        env:
+          WEEK_ID: ${{ inputs.week_id }}
+          RACE_ID: ${{ inputs.race_id }}
+          START_AT: ${{ inputs.start_at }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          path="experience_regime_v1/workout_proof_commitments/$WEEK_ID/$RACE_ID.json"
+          python - <<'PY'
+          import os
+          from datetime import datetime
+          assert datetime.now().astimezone()<datetime.fromisoformat(os.environ['START_AT']), "already_started"
+          PY
+          git add -- "$path"
+          staged="$(git diff --cached --name-only)"
+          [[ "$staged" == "$path" ]] || { echo "::error::Only immutable hash proof may be committed";exit 1; }
+          git commit -m "Freeze permission-verified prereace workout hash source proof $RACE_ID"
+          python - <<'PY'
+          import os,subprocess
+          from datetime import datetime
+          when=subprocess.check_output(['git','show','-s','--format=%cI','HEAD'],text=True).strip()
+          assert datetime.fromisoformat(when)<datetime.fromisoformat(os.environ['START_AT']), 'proof_not_prestart'
+          print('FIRST_GIT_COMMIT_LOCAL_BEFORE_RACE',when)
+          PY
+          # Do not rewrite or rebase an already frozen source. If branch moved,
+          # abort and report a blocker rather than backfill/replace.
+          git push origin HEAD:staging/e012-free-workout-source-v1
+      - name: Verify Git's first-introduction commit timestamp and immutable digest
+        shell: bash
+        env:
+          WEEK_ID: ${{ inputs.week_id }}
+          RACE_ID: ${{ inputs.race_id }}
+          START_AT: ${{ inputs.start_at }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          from datetime import datetime
+          from pathlib import Path
+          from experience_regime_v1.workout_prestart_proof_v1 import build_commitment
+          path=Path('experience_regime_v1/workout_proof_commitments')/os.environ['WEEK_ID']/(os.environ['RACE_ID']+'.json')
+          first=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(path)],text=True).strip().splitlines()
+          assert len(first)==1,first
+          commit,at=first[0].split()
+          assert datetime.fromisoformat(at)<datetime.fromisoformat(os.environ['START_AT'])
+          initial=subprocess.check_output(['git','show',commit+':'+str(path)])
+          assert initial==path.read_bytes(),'proof_metadata_changed_after_first_introduction'
+          report=json.loads(path.read_text())
+          assert report['research_horses_with_source']>0
+          assert report['factual_observations_canonical_sha256']
+          print('E012_WORKOUT_FIRST_GIT_PROOF_BEFORE_POST_VALID',commit,at)
+          PY
+      - name: Keep source numeric details only in short-lived workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e012-workout-research-${{ github.run_id }}
+          path: /tmp/e012-workout-prerace/*.json
+          if-no-files-found: error
+          retention-days: 30
