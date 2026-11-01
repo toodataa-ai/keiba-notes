@@ -75,6 +75,22 @@ jobs:
                   print('SOURCE_RIGHTS_OR_ROBOTS_REVIEW_REQUIRED_BEFORE_AUTOMATED_USE')
               else:
                   records=workbook_from_html(source,roster,date(2026,11,1))
+                  if not records:
+                      from bs4 import BeautifulSoup
+                      soup=BeautifulSoup(source,'html.parser')
+                      article=soup.find('article') or soup.find('main') or soup
+                      headers=article.find_all(['h3','h4'])
+                      tables=article.find_all('table')
+                      print('SOURCE_STRUCTURE_ONLY',json.dumps({
+                         'article_tag':article.name,
+                         'article_heading_count':len(headers),
+                         'first_headers':[h.get_text(' ',strip=True)[:65] for h in headers[:24]],
+                         'table_count':len(tables),
+                         'first_table_labels':[
+                           [c.get_text(' ',strip=True)[:35] for c in t.find_all('tr')[0].find_all(['th','td'])]
+                           for t in tables[:4] if t.find_all('tr')],
+                         'roster_first':list(roster)[:4]
+                      },ensure_ascii=False))
                   report={'race_id':race,'article':url,'official_field_size':len(roster),
                       'horse_count_with_times':len(records),
                       'total_number_of_workouts':sum(len(x['workouts']) for x in records.values()),
