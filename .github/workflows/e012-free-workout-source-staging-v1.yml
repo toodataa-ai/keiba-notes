@@ -7,6 +7,7 @@ on:
       - 'experience_regime_v1/test_free_workout_evidence_v1.py'
       - '.github/workflows/e012-free-workout-source-staging-v1.yml'
       - '.github/workflows/e012-free-workout-prerace-research-v1.yml'
+      - 'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md'
   pull_request:
     branches: [main]
     paths:
@@ -14,6 +15,7 @@ on:
       - 'experience_regime_v1/test_free_workout_evidence_v1.py'
       - '.github/workflows/e012-free-workout-source-staging-v1.yml'
       - '.github/workflows/e012-free-workout-prerace-research-v1.yml'
+      - 'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md'
   workflow_dispatch:
 permissions: {contents: read}
 jobs:
@@ -41,6 +43,7 @@ jobs:
              'experience_regime_v1/test_free_workout_evidence_v1.py',
              '.github/workflows/e012-free-workout-source-staging-v1.yml',
              '.github/workflows/e012-free-workout-prerace-research-v1.yml',
+             'experience_regime_v1/FREE_WORKOUT_SOURCE_V1.md',
           }
           assert set(modified).issubset(allowed),('canonical_prediction_or_UI_modified',modified)
           print('E012_NO_PRODUCTION_OR_HISTORICAL_FILES_CHANGED',modified)
