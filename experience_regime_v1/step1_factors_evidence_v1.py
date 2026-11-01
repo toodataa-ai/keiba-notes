@@ -71,7 +71,7 @@ def parse_past(cell, race_day):
     condition = re.search(r"(?:\d+:\d{2}\.\d+)\s*(良|稍重|重|不良)", t)
     passing = None
     if "kg" in t and "3F" in t:
-        between = t.split("kg", 1)[1].split("3F", 1)[0]
+        between = t.split("3F", 1)[0].rsplit("kg", 1)[-1]
         if re.fullmatch(r"\s*(?:\d{1,2}\s+){0,3}\d{1,2}\s*", between):
             parts = [int(s) for s in between.split()]
             field = int(position.group(1)) if position else 0
