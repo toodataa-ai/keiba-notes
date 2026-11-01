@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "kind": "staging_e012_free_factor_evidence_quality_comparison",
+  "scope": "2026-11-01固定済み発走前ソースを後から監査した結果。新たな発走前予想ではない",
+  "source_paths": [
+    "docs/data/experience_regime_factor_evidence_status.json",
+    "docs/data/experience_regime_formal_factor_availability.json",
+    "experience_regime_v1/research_step1_candidates/2026-10-31/*.json"
+  ],
+  "status": "observational_not_calibrated",
+  "formal_races": 2,
+  "formal_horses": 30,
+  "research_races": 10,
+  "research_horses": 125,
+  "research_regime_horses": {
+    "E0": 39,
+    "E1": 24,
+    "E2": 62
+  },
+  "factors": [
+    {
+      "number": 1,
+      "label": "斤量",
+      "count": 125,
+      "kind": "数値確認",
+      "detail": "出馬表の負担重量。重みの有効性は未校正"
+    },
+    {
+      "number": 2,
+      "label": "展開",
+      "count": 86,
+      "kind": "過去実績",
+      "detail": "過去の通過順位のみ。次走のペースを的中させた根拠ではない"
+    },
+    {
+      "number": 3,
+      "label": "馬場",
+      "count": 58,
+      "kind": "過去実績",
+      "detail": "発走前に確認できた同じ馬場状態の過去走"
+    },
+    {
+      "number": 4,
+      "label": "ローテ",
+      "count": 86,
+      "kind": "代理評価",
+      "detail": "レース間隔は実測。評価グレードへの変換は未校正"
+    },
+    {
+      "number": 5,
+      "label": "コース",
+      "count": 35,
+      "kind": "過去実績",
+      "detail": "同競馬場・同距離・同馬場種別の過去走"
+    },
+    {
+      "number": 6,
+      "label": "血統",
+      "count": 125,
+      "kind": "名前のみ",
+      "detail": "父・母・母父の情報。適性統計や勝率は未取得"
+    },
+    {
+      "number": 7,
+      "label": "調教",
+      "count": 0,
+      "kind": "未取得",
+      "detail": "馬別調教時計の検証可能な無料データなし"
+    },
+    {
+      "number": 8,
+      "label": "騎手",
+      "count": 125,
+      "kind": "名前のみ",
+      "detail": "騎手名のみ。条件別成績・母数は未取得"
+    },
+    {
+      "number": 9,
+      "label": "基礎能力",
+      "count": 86,
+      "kind": "代理評価",
+      "detail": "過去戦績に基づく参考値。実績0戦の新馬は未評価"
+    }
+  ],
+  "former_fixed_formal_factors": {
+    "6_pedigree": "B",
+    "7_workout": "B-",
+    "8_jockey": "B"
+  },
+  "no_odds_results_used_for_factor_scoring": true,
+  "no_old_prediction_changes": true,
+  "ranking_win_probability_comparison": null,
+  "betting_roi_comparison": null,
+  "prices_calibrated": false,
+  "production_effect": false,
+  "immutable_research_races": [
+    {
+      "race_id": "2026-11-01-kyoto-01",
+      "horses": 11,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-kyoto-02",
+      "horses": 13,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-kyoto-05",
+      "horses": 17,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-kyoto-09",
+      "horses": 10,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-kyoto-10",
+      "horses": 9,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-kyoto-12",
+      "horses": 13,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-tokyo-04",
+      "horses": 13,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-tokyo-05",
+      "horses": 8,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-tokyo-07",
+      "horses": 15,
+      "first_proof_existing": true
+    },
+    {
+      "race_id": "2026-11-01-tokyo-10",
+      "horses": 16,
+      "first_proof_existing": true
+    }
+  ]
+}
