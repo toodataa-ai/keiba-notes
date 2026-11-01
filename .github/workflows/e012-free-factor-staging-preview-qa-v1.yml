@@ -110,3 +110,44 @@ jobs:
           done
           echo "::error::E012 staging Pages HTML or JSON not byte-identical to GitHub main"
           exit 1
+
+      - name: Verify real Chromium desktop and mobile layout, runtime data and links
+        run: |
+          set -euo pipefail
+          python -m pip install -q playwright
+          python -m playwright install --with-deps chromium
+          mkdir -p /tmp/e012-stage-browser
+          python - <<'PY'
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          url='https://toodataa-ai.github.io/keiba-notes/staging/e012-free-factor-compare.html'
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+              for kind,width,height in [('desktop',1280,900),('mobile',390,844)]:
+                  page=browser.new_page(viewport={'width':width,'height':height},device_scale_factor=1)
+                  errors=[]
+                  page.on('pageerror',lambda e:errors.append(str(e)))
+                  r=page.goto(url,wait_until='domcontentloaded',timeout=45000)
+                  assert r is not None and r.status==200,(kind,'html HTTP',r.status if r else None)
+                  page.wait_for_function(
+                      "() => document.querySelector('#load-status')?.textContent.includes('読み込みました')",
+                      timeout=45000)
+                  assert page.locator('#factors tr').count()==9,(kind,'factor_row_count')
+                  assert '2レース' in page.locator('#formal').inner_text()
+                  assert '10レース' in page.locator('#research').inner_text()
+                  assert page.locator('td').filter(has_text='0 / 125').count()>=1,(kind,'unavailable_training')
+                  assert not errors,(kind,'page_js_errors',errors)
+                  overflow=page.evaluate('document.documentElement.scrollWidth-document.documentElement.clientWidth')
+                  assert overflow<=1,(kind,'unexpected_horizontal_overflow',overflow)
+                  Path('/tmp/e012-stage-browser').mkdir(exist_ok=True)
+                  page.screenshot(path=f'/tmp/e012-stage-browser/{kind}.png',full_page=True)
+                  print('E012_STAGE_REAL_BROWSER_PASS',kind,width,height,'horiz_scroll=',overflow)
+                  page.close()
+              browser.close()
+          PY
+      - name: Save approved-for-review desktop/mobile stage screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: e012-free-factor-staging-browser-preview
+          path: /tmp/e012-stage-browser/
+          retention-days: 14
