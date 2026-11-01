@@ -1,0 +1,90 @@
+name: E012 free official nine-factor evidence staging QA
+on:
+  push:
+    branches:
+      - staging/e012-free-shared-factor-evidence-v1
+    paths:
+      - 'experience_regime_v1/free_shared_factor_quality_v1.py'
+      - 'experience_regime_v1/free_factor_comparison_v1.py'
+      - 'experience_regime_v1/test_free_shared_factor_quality_v1.py'
+      - '.github/workflows/experience-regime-free-factor-quality-staging-v1.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'experience_regime_v1/free_shared_factor_quality_v1.py'
+      - 'experience_regime_v1/free_factor_comparison_v1.py'
+      - 'experience_regime_v1/test_free_shared_factor_quality_v1.py'
+      - '.github/workflows/experience-regime-free-factor-quality-staging-v1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: e012-free-factor-staging
+  cancel-in-progress: true
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check zero paid data integrations, and immutable production sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          python - <<'PY'
+          import subprocess
+          paths=subprocess.check_output(['git','diff','--name-only','origin/main...HEAD'],text=True).splitlines()
+          allowed={
+            '.github/workflows/experience-regime-free-factor-quality-staging-v1.yml',
+            'experience_regime_v1/free_shared_factor_quality_v1.py',
+            'experience_regime_v1/free_factor_comparison_v1.py',
+            'experience_regime_v1/test_free_shared_factor_quality_v1.py'
+          }
+          assert set(paths).issubset(allowed),('production_code_or_frozen_evidence_was_changed',paths)
+          print('E012_FREE_STAGE_SAFE_CHANGED_FILES',paths)
+          PY
+          python -m pip install -q requests beautifulsoup4
+          python -m py_compile \
+            experience_regime_v1/free_shared_factor_quality_v1.py \
+            experience_regime_v1/free_factor_comparison_v1.py \
+            experience_regime_v1/test_free_shared_factor_quality_v1.py
+      - name: Run original parser and new real frozen evidence tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest -v \
+            experience_regime_v1.test_step1_factors_evidence_v1 \
+            experience_regime_v1.test_free_shared_factor_quality_v1 \
+            experience_regime_v1.test_model
+      - name: Build 12-race zero-cost evidence comparison and Japanese preview
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.free_factor_comparison_v1 \
+            --week-id 2026-10-31 --date 2026-11-01 \
+            --outdir /tmp/e012-free-factor-staging
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/e012-free-factor-staging/e012-free-factor-compare.json'))
+          assert p['undercard_races']==10 and p['undercard_horses']==125
+          assert p['formal_races']==2 and p['formal_horses']==30
+          assert p['frozen_predictions_untouched']==125
+          assert p['data_collection_cost_yen']==0
+          assert p['full_nine_factor_grades_calibrated'] is False
+          assert p['winner_accuracy_old'] is None and p['winner_accuracy_challenger'] is None
+          assert p['roi_old'] is None and p['roi_challenger'] is None
+          assert p['outcome_data_read'] is False and p['production_effect'] is False
+          print('FREE_FACTOR_STAGING_GRADE_A_DATA_INTEGRITY_PASS; SKILL_PROMOTION_NOT_APPROVED')
+          PY
+      - name: Upload staging report (not public production prediction)
+        uses: actions/upload-artifact@v4
+        with:
+          name: e012-free-nine-factor-staging-report
+          path: /tmp/e012-free-factor-staging/
+          retention-days: 30
