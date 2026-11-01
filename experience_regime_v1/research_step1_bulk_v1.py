@@ -117,6 +117,10 @@ def parse_official(url, race_date, number_to_name):
         raise ValueError("official_roster_mismatch_unexplained:" +
                          str(sorted(expected ^ (set(parsed) | set(withdrawals)))))
     for n, name in number_to_name.items():
+        if n in withdrawals:
+            if withdrawals[n]["horse_name"] != name:
+                raise ValueError("withdrawn_horse_identity_mismatch:" + str(n))
+            continue
         if parsed[n]["horse_name"] != name:
             raise ValueError("horse_number_name_changed:" + str(n))
     return parsed, hashlib.sha256(raw).hexdigest(), len(raw), list(withdrawals.values())
