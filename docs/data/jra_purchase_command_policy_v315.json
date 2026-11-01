@@ -34,7 +34,7 @@
     "renderer": ".github/scripts/jra-render-formal-reader-v315.py",
     "renderer_git_blob_sha": "b96d6d35b668d6f3edec0034c32d8df7b7ab34ff",
     "workflow": ".github/workflows/jra-prerace-formal-3action-v315.yml",
-    "workflow_git_blob_sha": "908ca58b7b357f6e4f43b194e9ae947e6de085b0",
+    "workflow_git_blob_sha": "b6990e696aa9c451ea1c8cac7d7abda2b2d31e45",
     "horse_renderer_helper": ".github/scripts/jra_v315_horse_layout.py",
     "horse_renderer_helper_git_blob_sha": "101d361d8623dee1a83ca21cb23b5580e114e61f",
     "historical_renderer": ".github/scripts/jra-render-formal-3action-v315.py",
@@ -70,6 +70,17 @@
       "policy": "docs/data/jra_pdf_layout_policy_v1.json",
       "css": "docs/assets/jra-pdf-reader-v1.css",
       "constraints": "No historical files rewritten, no CSS or model changes; reader-visible SHA prohibited. Future live prestart publication requires fresh PDF validation and public HTTP matching."
+    },
+    "value_commentary_v1": {
+      "status": "restoration_of_previously_approved_commentary_not_a_redesign",
+      "policy": "Add named market-odds / estimated value rationale immediately after final purchase commands; no new box; no change to prediction STEP1, odds, final_bets or immutable historical HTML/PDF.",
+      "overlay_script": ".github/scripts/jra-v315-value-column-v1.py",
+      "regression_workflow": ".github/workflows/validate-jra-v315-value-column-v1.yml",
+      "enforced_by": ".github/workflows/jra-prerace-formal-3action-v315.yml",
+      "previous_workflow_blob_sha": "908ca58b7b357f6e4f43b194e9ae947e6de085b0",
+      "renderer_blob_unchanged": true,
+      "layout_css_blob_unchanged": true,
+      "gate": "render with WeasyPrint 68, actual PDF all-page layout and noncover text integrity checks; fail closed before publication if column absent"
     }
   },
   "audited_pass_extension_v1": {
@@ -89,7 +100,7 @@
     "date": "2026-10-18",
     "scope": "only GitHub proof and publication push retry, no forecast/bets/PDF/CSS changes",
     "historical_workflow_git_blob_sha": "f9618054af98536314187f039a797974d13d4b37",
-    "approved_current_workflow_git_blob_sha": "908ca58b7b357f6e4f43b194e9ae947e6de085b0",
+    "approved_current_workflow_git_blob_sha": "b6990e696aa9c451ea1c8cac7d7abda2b2d31e45",
     "algorithm": "git fetch main, non-forced git rebase main, push max 5; abort on irreconcilable races.json conflict"
   }
 }

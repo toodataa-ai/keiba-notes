@@ -133,6 +133,16 @@ jobs:
           PY
           python3 .github/scripts/jra-render-formal-reader-v315.py \
             --plan "$PREDICTION" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          # Presentation-only mandatory value column: evidence-backed horse names, odds and EV.
+          # Newly rendered artifacts are NOT yet published. Never modify historical files.
+          VALUE_HTML="${REPORT%.html}-value-preflight.html"
+          VALUE_PDF="${PDF%.pdf}-value-preflight.pdf"
+          python3 .github/scripts/jra-v315-value-column-v1.py \
+            --plan "$PREDICTION" --source "$SOURCE" \
+            --html-input "$REPORT" --pdf-input "$PDF" \
+            --html-output "$VALUE_HTML" --pdf-output "$VALUE_PDF"
+          mv -- "$VALUE_HTML" "$REPORT"
+          mv -- "$VALUE_PDF" "$PDF"
           # Approved reader-v1 is the publication gate. Never promote a custom CSS, SHA-leaking,
           # shortened or overflowed v3.15 PDF, even if its own loose assertions pass.
           python3 .github/scripts/validate-jra-pdf-layout.py \
