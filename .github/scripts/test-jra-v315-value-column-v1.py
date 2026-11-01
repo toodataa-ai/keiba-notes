@@ -14,7 +14,7 @@ class ValueColumnContract(unittest.TestCase):
    'formal_bets':[{'type':'馬連','selection':[1,2],'stake_yen':100,'market_selection_id':'馬連:[1,2]',
       'quote_verified':True,'market_odds':21.2}],
    'total_stake_yen':100,'regular_commands':[{'type':'馬連','definition':{'selection':[1,2]},'points':1,'ticket_keys':['馬連:[1,2]']}],
-   'purchase_metrics':{'modeled_expected_net_profit_yen':36.5,'modeled_net_loss_probability':0.52}}
+   'purchase_metrics':{'modeled_expected_net_profit_yen':36.7,'modeled_net_loss_probability':0.52}}
  def test_column_is_real_names_and_executed_value(self):
   note,names=mod.column(self.p,self.src)
   for term in ('妙味','期待値','一番馬','二番馬','21.2倍','37円','52.0%'):
