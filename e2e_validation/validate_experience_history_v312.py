@@ -159,7 +159,32 @@ def main():
         or not all(oct31.get("policy",{}).get(k) is True for k in
            ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
         raise RuntimeError("2026-10-31 formal research gaps must be separately pinned and fully disclosed")
-    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"]+extra["entries"]+today["entries"]+oct25["entries"]+oct31["entries"],hash_case)
+    # New 2026-11-01 formal reviews: evidence was never present in immutable
+    # prereace E0/E1/E2 race_context. Disclose exact errors and case blobs
+    # without modifying any older ledger or reconstructing data after results.
+    nov1_rel="e2e_validation/experience_new_gaps_20261101_v1.json"
+    nov1_audit=json.loads((ROOT/"docs/data/jra_postrace_audit_2026-11-01.json").read_text(encoding="utf-8"))
+    nov1_meta=nov1_audit.get("shadow_integrity",{})
+    if (nov1_meta.get("new_gap_ledger_path")!=nov1_rel or
+        not nov1_meta.get("new_gap_ledger_git_blob_sha") or
+        nov1_meta.get("formal_grade_a_independent") is not True or
+        nov1_meta.get("never_backfill_postrace") is not True):
+        raise RuntimeError("missing separately SHA-pinned 2026-11-01 research-only omissions")
+    nov1_path=ROOT/nov1_rel
+    nov1_sha=subprocess.check_output(["git","hash-object",str(nov1_path)],cwd=ROOT,text=True).strip()
+    if nov1_sha!=nov1_meta["new_gap_ledger_git_blob_sha"]:
+        raise RuntimeError("2026-11-01 research gap ledger SHA mismatch")
+    nov1=json.loads(nov1_path.read_text(encoding="utf-8"))
+    required_nov1={"2026-11-01-tenno-sho-autumn","2026-11-01-mahoroba-stakes"}
+    if (nov1.get("schema_version")!=1
+        or nov1.get("scope")!="explicitly_reviewed_additional_missing_prerace_shadow_evidence"
+        or {e.get("race_id") for e in nov1.get("entries",[])}!=required_nov1
+        or len(nov1.get("entries",[]))!=2
+        or nov1.get("earlier_baseline_path")!=oct31_rel
+        or not all(nov1.get("policy",{}).get(k) is True for k in
+            ("case_git_blob_sha_required","exact_error_set_required","do_not_backfill_postrace","formal_grade_a_independent","shadow_promotion_blocked"))):
+        raise RuntimeError("2026-11-01 research omissions not separately reviewed and pinned")
+    result=validate_known_gaps(report.get("errors"),ledger["entries"]+addition["entries"]+extra["entries"]+today["entries"]+oct25["entries"]+oct31["entries"]+nov1["entries"],hash_case)
     # This is a CI success for no NEW integrity regressions, NOT a claim that
     # research evidence is complete. Existing missing cases remain unusable.
     print("SHADOW_CI_INTEGRITY_PASS:",json.dumps(result,ensure_ascii=False))
