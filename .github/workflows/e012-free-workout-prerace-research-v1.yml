@@ -16,6 +16,20 @@ jobs:
         with: {ref: "${{ github.ref }}", fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
+      - name: Require verified provider permission before ANY automatic source HTTP
+        shell: bash
+        env:
+          SOURCE_URL: ${{ inputs.source_url }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from experience_regime_v1.workout_prestart_proof_v1 import permission_gate
+          policy=json.loads(Path('experience_regime_v1/workout_source_permission_v1.json').read_text())
+          permission_gate(os.environ['SOURCE_URL'],policy)
+          print('EXPLICIT_PROVIDER_PERMISSION_GATE_PASS')
+          PY
       - name: Install free parser dependencies
         run: python -m pip install -q requests beautifulsoup4
       - name: Capture one authorized prestart factual workout source without production changes
