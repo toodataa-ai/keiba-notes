@@ -6,6 +6,10 @@ on:
       - '.github/workflows/experience-regime-research-step1-bulk-v1.yml'
       - 'experience_regime_v1/research_step1_bulk_v1.py'
   workflow_dispatch:
+  workflow_run:
+    workflows: ['E012 JRA reusable strict prereace research collector']
+    types: [completed]
+    branches: [main]
 permissions:
   contents: write
 concurrency:
@@ -36,7 +40,8 @@ jobs:
           p=json.loads(Path('experience_regime_v1/requests/run-current.json').read_text())
           today=datetime.datetime.now(ZoneInfo('Asia/Tokyo')).date().isoformat()
           assert today==p['date'] and p['mode']=='prospective_strict'
-          assert p['week_id']=='2026-10-31' and today=='2026-11-01'
+          assert p['week_id'] <= today
+          assert (datetime.date.fromisoformat(today)-datetime.date.fromisoformat(p['week_id'])).days <= 6
           with open(os.environ['GITHUB_ENV'],'a') as out:
               out.write('E012_WEEK='+p['week_id']+'\nE012_DAY='+today+'\n')
           print('E012_BULK_SINGLE_FIXED_DAY',today,p['week_id'])
@@ -69,6 +74,10 @@ jobs:
             git add -A -- "experience_regime_v1/research_step1_candidates/$E012_WEEK"
           fi
           git add -- docs/data/experience_regime_research_step1_bulk_status.json
+          if git diff --cached --quiet; then
+            echo E012_BULK_ALREADY_FROZEN_ALL_PROOFS_UNCHANGED
+            exit 0
+          fi
           python - <<'PY'
           import json,os,subprocess
           from pathlib import Path
