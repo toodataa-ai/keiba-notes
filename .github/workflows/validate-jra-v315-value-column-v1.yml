@@ -29,7 +29,7 @@ jobs:
           sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
           python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
       - name: Unit regression for value-column contract
-        run: python3 -m unittest discover -s .github/scripts -p 'test-jra-v315-value-column-v1.py' -v
+        run: python3 .github/scripts/test-jra-v315-value-column-v1.py -v
       - name: Test both real 2026-11-01 published formal files without changing history
         run: |
           set -euo pipefail
