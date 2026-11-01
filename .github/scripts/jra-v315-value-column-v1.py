@@ -49,10 +49,10 @@ def column(plan,source):
   valid(all(isinstance(x,(float,int)) and x>1 for x in odds),'real odds missing')
   first=f'{min(odds):g}倍' if min(odds)==max(odds) else f'{min(odds):g}～{max(odds):g}倍'
   valid(metrics.get('modeled_expected_net_profit_yen') is not None and metrics.get('modeled_net_loss_probability') is not None,'missing portfolio metrics')
-  body=(f'{c["type"]}（{"・".join(names)}など）の採用組番は、発走前の実測オッズ{first}を確認。'
-        f'全{len(plan["formal_bets"])}点・{plan["total_stake_yen"]:,}円を合わせた中央モデル期待純利益は'
-        f'{metrics["modeled_expected_net_profit_yen"]:,.0f}円、純損失確率は{metrics["modeled_net_loss_probability"]*100:.1f}%。'
-        '印は能力評価、買い目は価格と期待値で判断。推定は未校正で利益を保証しません。')
+  body=(f'{c["type"]}（{"・".join(names)}）は実測{first}を確認。'
+        f'購入{len(plan["formal_bets"])}点・{plan["total_stake_yen"]:,}円のモデル期待純利益は'
+        f'{metrics["modeled_expected_net_profit_yen"]:,.0f}円、損失確率{metrics["modeled_net_loss_probability"]*100:.1f}%。'
+        '能力の印と購入時の妙味を分けて判断。推定値で利益は保証されません。')
  valid(30<len(body)<260,'value commentary unexpectedly short/long')
  return '<p '+TAG+'><strong>'+html.escape(TITLE)+'</strong>：'+html.escape(body)+'</p>',names
 
@@ -76,7 +76,11 @@ def verify_pdf(original_pdf,new_pdf,note,names):
    valid(''.join(word.split()) in first,'missing rendered PDF commentary/horse name: '+word)
   valid(first.index(''.join(TITLE.split()))>first.index('購入操作とJRA入力馬番'),'commentary is not after purchased ticket header')
   for i in range(1,len(old)):
-   valid(old[i].get_text()==new[i].get_text(),f'PDF changed outside commentary cover at page {i+1}')
+   if old[i].get_text()!=new[i].get_text():
+    print('DIAGNOSTIC_PAGE_DIFF',i+1,
+      'old_first',repr(old[i].get_text()[:180]),
+      'new_first',repr(new[i].get_text()[:180]),flush=True)
+    fail(f'PDF changed outside commentary cover at page {i+1}')
  finally:
   old.close();new.close()
 
