@@ -58,6 +58,56 @@ def permission_gate(source_url:str, policy:dict)->dict:
             "public_redistribution":entry["public_redistribution"]}
 
 
+def user_requested_single_article_gate(source_url:str, policy:dict, *, request_id:str)->dict:
+    """One public article explicitly requested now, not permission for a crawler.
+
+    Do not infer publisher consent. This mode only permits a minimal, nonpublic
+    factual analysis, source attribution and a hash-only Git proof.
+    A recurring workflow, autonomous URL discovery, scraping results,
+    external redistribution or article copies remain disallowed.
+    """
+    p=urlparse(source_url)
+    if (p.scheme!="https" or not p.hostname or p.username or p.password or
+            p.query or p.fragment or p.port):
+        raise ValueError("manual_public_https_exact_url_required")
+    if (not isinstance(request_id,str) or not request_id.strip() or
+            len(request_id)>128):
+        raise ValueError("explicit_user_request_identifier_required")
+    if policy.get("default_decision")!="block_automated_git_commit_until_explicit_reuse_grant":
+        raise ValueError("scheduled_collection_must_remain_denied")
+    entry=next((s for s in policy.get("sources",[]) if
+        s.get("host")==p.hostname and
+        p.path.startswith(s.get("approved_article_prefix","/INVALID/"))),None)
+    if entry is None:
+        raise ValueError("single_article_host_not_allowlisted")
+    manual=entry.get("manual_user_initiated_single_article") or {}
+    expected={
+        "decision":"allow_limited_factual_research_with_safeguards",
+        "max_article_requests_per_user_dispatch":1,
+        "require_explicit_source_url":True,
+        "require_robots_allow":True,
+        "allow_article_text_copy":False,
+        "allow_editor_grade_copy":False,
+        "allow_copyrighted_media_copy":False,
+        "allow_public_clock_table_republication":False,
+        "require_source_attribution_url":True,
+        "require_prestart_frozen_jra_roster":True,
+        "require_prestart_git_first_commit_for_proof":True,
+    }
+    for key,value in expected.items():
+        if manual.get(key)!=value:
+            raise ValueError("manual_one_article_safeguard_missing:"+key)
+    if entry.get("public_redistribution")!="not_approved":
+        raise ValueError("manual_mode_cannot_authorize_public_republication")
+    if entry.get("automatic_reuse") not in ALLOWED_STATUSES:
+        raise ValueError("unknown_scheduled_permission")
+    return {"host":p.hostname,"permission_evidence_url":None,
+            "public_redistribution":"not_approved",
+            "source_access_basis":"user_initiated_one_public_article_factual_nonpublic_research",
+            "explicit_request_id":request_id,
+            "publisher_automatic_harvesting_permission_claimed":False}
+
+
 def validate_captured(capture:dict,*,now:datetime):
     start=_time(capture["start_at"])
     capture_time=_time(capture["source"]["fetched_at"])
@@ -100,8 +150,11 @@ def validate_captured(capture:dict,*,now:datetime):
     return {"horses":len(names),"sessions":sessions,"start_at":start.isoformat()}
 
 
-def build_commitment(capture:dict, *, now:datetime, policy:dict)->dict:
-    grant=permission_gate(capture["source"]["url"],policy)
+def build_commitment(capture:dict, *, now:datetime, policy:dict,
+                     manual_request_id:str|None=None)->dict:
+    grant=(user_requested_single_article_gate(
+        capture["source"]["url"],policy,request_id=manual_request_id)
+        if manual_request_id is not None else permission_gate(capture["source"]["url"],policy))
     coverage=validate_captured(capture,now=now)
     # Content-addressed proof of the WHOLE observed per-horse JSON, without
     # redistributing third-party timing tables on public GitHub Pages.
@@ -122,6 +175,11 @@ def build_commitment(capture:dict, *, now:datetime, policy:dict)->dict:
       "research_horses_with_source":coverage["horses"],
       "research_workout_sessions_with_source":coverage["sessions"],
       "rights_permission_document_url":grant["permission_evidence_url"],
+      "source_access_mode":grant.get("source_access_basis","publisher_explicitly_approved"),
+      "manual_request_id":grant.get("explicit_request_id"),
+      "publisher_automatic_permission_claimed":grant.get("publisher_automatic_harvesting_permission_claimed",True),
+      "article_or_editorial_content_published":False,
+      "source_attribution_url":capture["source"]["url"],
       "third_party_detail_published":False,
       "prediction_created":False,"prediction_modified":False,
       "formal_step1_2_and_bets_untouched":True,
@@ -131,8 +189,10 @@ def build_commitment(capture:dict, *, now:datetime, policy:dict)->dict:
     }
 
 
-def write_new_commitment(root:Path,capture:dict, now:datetime, policy:dict)->Path:
-    result=build_commitment(capture,now=now,policy=policy)
+def write_new_commitment(root:Path,capture:dict, now:datetime, policy:dict,
+                         manual_request_id:str|None=None)->Path:
+    result=build_commitment(capture,now=now,policy=policy,
+                            manual_request_id=manual_request_id)
     week=capture["week_id"]
     race=capture["race_id"]
     if not (race.startswith(capture["start_at"][:10]) and
@@ -152,13 +212,26 @@ def main():
     ap.add_argument("--capture-json",required=True)
     ap.add_argument("--permission-registry",default=str(ROOT/"experience_regime_v1/workout_source_permission_v1.json"))
     ap.add_argument("--output-root",default=str(ROOT))
+    ap.add_argument("--user-requested-single-article",action="store_true")
+    ap.add_argument("--manual-request-id")
     args=ap.parse_args()
     doc=_read(Path(args.capture_json))
     policy=_read(Path(args.permission_registry))
-    # Abort before writing a single file if permission is unverified.
-    permission_gate(doc["source"]["url"],policy)
+    # Distinguish one real user-triggered action from scheduled automation.
+    manual=None
+    if args.user_requested_single_article:
+        if (os.environ.get("GITHUB_EVENT_NAME")!="workflow_dispatch" or
+                not os.environ.get("GITHUB_ACTOR") or
+                not args.manual_request_id):
+            raise SystemExit("MANUAL_MODE_REQUIRES_WORKFLOW_DISPATCH_USER_AND_RUN_ID")
+        manual=args.manual_request_id
+        user_requested_single_article_gate(doc["source"]["url"],policy,
+                                           request_id=manual)
+    else:
+        permission_gate(doc["source"]["url"],policy)
     now=datetime.now(JST)
-    path=write_new_commitment(Path(args.output_root),doc,now,policy)
+    path=write_new_commitment(Path(args.output_root),doc,now,policy,
+                              manual_request_id=manual)
     print("PRESTART_SOURCE_HASH_COMMITMENT_CREATED_PENDING_GIT_PROOF",path)
 
 
