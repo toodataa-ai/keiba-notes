@@ -41,7 +41,7 @@ jobs:
           assert 'data-stage="preview"' in page and 'noindex,nofollow' in page
           assert 'e012-free-workout-trial-v1.json' in page
           assert 'e012-free-workout-source.html' in before
-          assert '⑦調教' in page and '0 / 125' not in page
+          assert '⑦調教「0 / 125」との関係' in page, 'legacy undercard scope must remain visible'
           assert '<script>' in page and 'fetch(' in page
           print('PASS_FREE_WORKOUT_AGGREGATE_AND_STAGE_ONLY_SOURCE_CONTRACT')
           PY
