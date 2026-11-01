@@ -1,0 +1,70 @@
+<!doctype html><html lang="ja" data-stage="preview"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>⑦調教 無料データ取得の検証｜STAGING</title>
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f8f9fb;color:#1b2532;font:14px/1.7 "Meiryo UI",Meiryo,"Hiragino Kaku Gothic ProN",sans-serif}
+a{color:#215f94}header{background:#182134;color:#fff;padding:14px 17px}header .in{max-width:800px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}header a{color:#f1f4f8}
+.tag{border:1px solid #9faabc;font-weight:700;padding:2px 8px;font-size:11px}
+main{max-width:832px;margin:0 auto;padding:27px 17px 48px}h1{font-size:clamp(24px,5vw,33px);line-height:1.35;margin:0 0 12px}h2{font-size:19px;margin:0 0 9px}p{margin:6px 0 14px}
+.sub{color:#596779;font-size:12px}.intro{font-size:15px;color:#37485d}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:22px 0}
+.card{background:#fff;border:1px solid #d8dfe7;border-radius:10px;padding:14px;min-width:0}
+.card small{font-size:11px;color:#506173;display:block}
+.card b{font-size:clamp(20px,3.7vw,29px);display:block;line-height:1.35;font-variant-numeric:tabular-nums}
+.section{background:#fff;border:1px solid #d8dfe7;border-radius:12px;padding:19px;margin:16px 0}
+ul{margin:8px 0 0;padding-left:20px}li{margin:8px 0}
+.callout{background:#fcf7f1;border-left:4px solid #c19252;padding:12px}
+.data{font-size:12px;color:#526175;word-break:break-all}
+.status{font-size:12px}
+@media(max-width:550px){.cards{grid-template-columns:1fr 1fr}.card:last-child{grid-column:1/-1}.section{padding:15px}body{font-size:13px}}
+</style></head>
+<body><header><div class="in"><a href="e012-free-factor-compare.html">← ①〜⑨の比較に戻る</a><span class="tag">STAGING　研究のみ</span></div></header>
+<main>
+<p class="sub">E0/E1/E2 研究 ／ 無料調教時計の実データ取得テスト</p>
+<h1>⑦調教の時計は、無料情報から取得できました。</h1>
+<p class="intro">重賞1レースで、無料公開記事と発走前に固定済みのJRA出馬表を照合。出典を確認できた時計だけを取得し、記事の独自評価や文章は取り込んでいません。</p>
+<div class="cards">
+ <div class="card"><small>今回の公式出走馬</small><b id="field">17頭</b><small>2026年天皇賞（秋）</small></div>
+ <div class="card"><small>時計を確認できた馬</small><b id="covered">17 / 17</b><small>数値の抽出に成功</small></div>
+ <div class="card"><small>最終・1週前・前走時</small><b id="sessions">50件</b><small>調教セッション数</small></div>
+</div>
+<section class="section"><h2>今回の確認内容</h2>
+<ul><li>馬名をJRA正式の発走前固定出馬表と照合</li>
+<li>調教日・栗東／美浦・坂路／ウッドなどの調教コースを抽出</li>
+<li>6F／5F／4F／3F／1Fの時計を数値として取得。7F時計の誤認を防止</li>
+<li>取得した数値を<strong>調教評価A/B/Cに自動変換しない</strong></li></ul>
+<p class="sub" id="capture-time">発走前取得時刻を確認中…</p>
+<p><a href="https://umasiru.com/archives/22113" rel="noopener noreferrer">無料公開の元記事を確認する</a>　／
+<a href="https://www.jra.go.jp/keiba/g1/akiten/movie.html" rel="noopener noreferrer">JRA公式の調教動画を確認する</a></p></section>
+<section class="section"><h2>⑦調教「0 / 125」との関係</h2>
+<p>従来の研究125頭のうち、発走前データ内に調教時計を保存していた馬は<strong>0頭</strong>でした。</p>
+<p>今回の17頭は、そこに含まれない<strong>正式メイン1レースの別の取得試験</strong>です。したがって研究125頭の過去のデータや⑦の数字を17頭に書き換えることはしていません。</p>
+<p class="callout"><strong>時計が取得できたことと、予測の精度が上がったことは別です。</strong> 速度を比較するには調教コース、実施日、馬場状態、過去の同条件時計を揃え、発走前の別モデルで検証する必要があります。</p></section>
+<section class="section"><h2>次に必要な検証</h2>
+<p>無料記事の自動取得・再利用条件を確認し、将来レースの出典と発走時刻を固定してから研究専用で取り込みます。平場や新馬は元情報がない場合、未取得のまま表示します。</p>
+<p>今回の試験データはGitHub Actionsの短期研究用成果物に限定し、詳細な調教時計一覧を公開サイトへ転載していません。元記事の著作物・映像は複製しません。</p>
+<p>正式JRA予想の印・勝率・買い目・PDF・回顧・回収率は一切変更していません。</p>
+<p><a href="https://github.com/toodataa-ai/keiba-notes/actions/runs/41260866255">実ページ取得と数値照合の成功ログ</a></p>
+<p class="data" id="source-hash">ソース照合情報を確認中…</p></section>
+<p class="status" id="source-status" role="status">ステージングの監査JSONを読み込み中…</p>
+</main>
+<script>
+(async()=>{
+ const status=document.getElementById("source-status");
+ try{
+  const res=await fetch("data/e012-free-workout-trial-v1.json?v=20261101-a",{cache:"no-store"});
+  if(!res.ok)throw new Error("HTTP "+res.status);
+  const d=await res.json();
+  if(d.kind!=="staging_free_workout_single_source_trial"||d.official_field_horses!==17||
+     d.horses_with_public_numeric_clocks!==17||d.session_count!==50||d.research_only!==true||
+     d.full_workout_data_published!==false||d.formal_rank_bets_untouched!==true)throw new Error("公開データと固定原本の値が一致しません");
+  document.getElementById("field").textContent=d.official_field_horses+"頭";
+  document.getElementById("covered").textContent=d.horses_with_public_numeric_clocks+" / "+d.official_field_horses;
+  document.getElementById("sessions").textContent=d.session_count+"件";
+  document.getElementById("capture-time").textContent="取得時刻：2026年11月1日 10:23（JST・レース発走前）";
+  document.getElementById("source-hash").textContent="公開記事のHTML SHA-256："+d.source_html_sha256;
+  status.textContent="発走前の取得試験を照合済み。既存の予想と研究125頭には変更なし。";
+ }catch(e){status.textContent="監査JSONの読み込みに失敗しました。掲載数値は過去の固定テスト時点の参考値です。原因："+String(e.message||e);}
+})();
+</script></body></html>
