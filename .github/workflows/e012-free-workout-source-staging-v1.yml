@@ -67,22 +67,27 @@ jobs:
              experience_regime_v1.test_workout_prestart_proof_v1 \
              experience_regime_v1.test_workout_prospective_comparison_v1 \
              experience_regime_v1.test_step1_factors_evidence_v1
-      - name: Verify rights remain explicitly UNVERIFIED and automated Git proof is closed
+      - name: Separate user-initiated single article from blocked scheduled/public reuse
         run: |
           set -euo pipefail
           python - <<'PY'
           import json
           from pathlib import Path
-          from experience_regime_v1.workout_prestart_proof_v1 import permission_gate
+          from experience_regime_v1.workout_prestart_proof_v1 import permission_gate,user_requested_single_article_gate
           p=json.loads(Path('experience_regime_v1/workout_source_permission_v1.json').read_text())
           assert p['default_decision']=='block_automated_git_commit_until_explicit_reuse_grant'
           assert p['sources'][0]['automatic_reuse']=='permission_unverified'
+          url='https://umasiru.com/archives/22113'
           try:
-              permission_gate('https://umasiru.com/archives/22113',p)
+              permission_gate(url,p)
           except PermissionError:
-              print('PASS_RIGHTS_UNVERIFIED_NO_AUTOMATED_REUSE_OR_PUBLIC_CLOCK_EXPORT')
+              print('PASS_SCHEDULED_REUSE_REMAINS_BLOCKED')
           else:
-              raise AssertionError('permission_gate_bypassed')
+              raise AssertionError('scheduled_permission_gate_bypassed')
+          scope=user_requested_single_article_gate(url,p,request_id='manual-test-one-run')
+          assert scope['publisher_automatic_harvesting_permission_claimed'] is False
+          assert scope['public_redistribution']=='not_approved'
+          print('PASS_USER_REQUESTED_ONE_SOURCE_MODE_NO_BULK_OR_PUBLIC_COPY')
           PY
       - name: Verify primary original JRA research audit still passes offline
         run: |
