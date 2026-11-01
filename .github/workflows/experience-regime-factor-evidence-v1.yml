@@ -1,0 +1,143 @@
+name: E012 prove all remaining STEP1 factor evidence before post (research only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/experience-regime-factor-evidence-v1.yml'
+      - 'experience_regime_v1/step1_factors_evidence_v1.py'
+      - 'experience_regime_v1/test_step1_factors_evidence_v1.py'
+  workflow_run:
+    workflows: ['E012 bulk prereace research STEP1 candidates (independent, no odds)']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: e012-factor-evidence-current-date
+  cancel-in-progress: false
+jobs:
+  sources:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check exact official source parsing and current JRA plan
+        run: |
+          set -euo pipefail
+          python -m pip install -q requests beautifulsoup4
+          python -m unittest experience_regime_v1.test_step1_factors_evidence_v1
+          python -m py_compile experience_regime_v1/step1_factors_evidence_v1.py
+          python - <<'PY'
+          import json,datetime,os
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          p=json.loads(Path('experience_regime_v1/requests/run-current.json').read_text())
+          today=datetime.datetime.now(ZoneInfo('Asia/Tokyo')).date().isoformat()
+          assert p['date']==today and p['mode']=='prospective_strict'
+          assert (datetime.date.fromisoformat(today)-datetime.date.fromisoformat(p['week_id'])).days in range(7)
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+              f.write('E012_WEEK='+p['week_id']+'\nE012_DAY='+today+'\n')
+          print('E012_FACTOR_EVIDENCE_STRICT_PRESTART_ONLY',today,p['week_id'])
+          PY
+      - name: Capture all candidate cards and individual historical-factor source evidence
+        run: |
+          set -euo pipefail
+          python -m experience_regime_v1.step1_factors_evidence_v1 --week-id "$E012_WEEK" --date "$E012_DAY"
+      - name: Commit only research evidence introduced BEFORE race start
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ -d "experience_regime_v1/factor_evidence/$E012_WEEK" ]]; then
+            git add -A -- "experience_regime_v1/factor_evidence/$E012_WEEK"
+          fi
+          git add -- docs/data/experience_regime_factor_evidence_status.json
+          if git diff --cached --quiet; then
+            echo E012_FACTOR_RESEARCH_ALREADY_FROZEN
+          else
+            python - <<'PY'
+          import json,os,subprocess,hashlib
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          prefix='experience_regime_v1/factor_evidence/'+os.environ['E012_WEEK']+'/'
+          staged=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          assert all(s.startswith(prefix) or s=='docs/data/experience_regime_factor_evidence_status.json' for s in staged),staged
+          report=json.loads(Path('docs/data/experience_regime_factor_evidence_status.json').read_text())
+          assert report['production_effect'] is False and report['full_nine_factor_predictions']==0
+          now=datetime.now(ZoneInfo('Asia/Tokyo'))
+          for path in staged:
+              if not path.startswith(prefix):continue
+              obj=json.loads(Path(path).read_text())
+              assert now<datetime.fromisoformat(obj['start_at']),('late_enrichment_not_allowed',path)
+              assert obj['production_effect'] is False and obj['all_nine_factors_scored'] is False
+              assert obj['no_current_race_results_used'] and obj['no_odds_read_for_scores']
+              assert obj['source_existing_research_first_proof']['commit']
+              original=Path(obj['source_original_research_file'])
+              assert original.exists()
+              assert hashlib.sha256(original.read_bytes()).hexdigest()==obj['source_original_research_sha256']
+              reference=Path(obj['source_existing_research_file'])
+              assert reference.exists()
+              assert hashlib.sha256(reference.read_bytes()).hexdigest()==obj['source_existing_research_sha256']
+          print('E012_FACTOR_ONLY_SAFE_STAGED',len(staged))
+          PY
+            git commit -m "Freeze additional JRA source-based STEP1 factor observations for E012, no formal model changes"
+            for n in 1 2 3 4 5; do
+              if ! git pull --rebase origin main; then
+                git rebase --abort || true
+                echo "::error::Source-enrichment conflict: no overwrite performed"
+                exit 1
+              fi
+              if git push origin HEAD:main;then break;fi
+              if [ "$n" -eq 5 ];then exit 1;fi
+              sleep 2
+            done
+          fi
+      - name: Verify first introduction and research-only completeness for every committed race
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,subprocess
+          from datetime import datetime
+          from pathlib import Path
+          base=Path('experience_regime_v1/factor_evidence')/os.environ['E012_WEEK']
+          report=json.loads(Path('docs/data/experience_regime_factor_evidence_status.json').read_text())
+          assert len(report['proof_verified_races'])+len(report['blocked'])==report['target_races']
+          for rid in report['proof_verified_races']:
+              file=base/(rid+'.json')
+              obj=json.loads(file.read_text())
+              hist=subprocess.check_output(['git','log','--diff-filter=A','--reverse','--format=%H %cI','--',str(file)],text=True).strip().splitlines()
+              assert len(hist)==1,(rid,'first introduction not proved',hist)
+              sha,at=hist[0].split()
+              assert datetime.fromisoformat(at)<datetime.fromisoformat(obj['start_at']),(rid,'after start')
+              assert obj['official_card']['sha256'] and obj['official_card']['url'].startswith('https://www.jra.go.jp/JRADB/')
+              assert obj['no_odds_read_for_scores'] and obj['no_current_race_results_used']
+              assert not obj['production_effect'] and not obj['all_nine_factors_scored']
+              assert all(h['factor_evidence']['7_workouts']['grade'] is None for h in obj['runners'])
+              print('E012_EVIDENCE_FIRST_GIT_PROOF',rid,sha,at,len(obj['runners']))
+          assert report['proof_verified_races'], 'Zero captured source evidence'
+          print('E012_FACTOR_FINAL_STATUS',json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Verify public research status exact bytes without modifying source
+        run: |
+          set -euo pipefail
+          URL="https://toodataa-ai.github.io/keiba-notes/data/experience_regime_factor_evidence_status.json"
+          for n in $(seq 1 18); do
+            if curl -fLsS --max-time 20 "$URL?evidence=$GITHUB_RUN_ID-$n" -o /tmp/e012-evidence-live.json &&
+               cmp -s docs/data/experience_regime_factor_evidence_status.json /tmp/e012-evidence-live.json;then
+              echo E012_FACTOR_EVIDENCE_LIVE_PAGES_BYTE_IDENTICAL
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Factor evidence has Git proof but public status is not verified"
+          exit 1
