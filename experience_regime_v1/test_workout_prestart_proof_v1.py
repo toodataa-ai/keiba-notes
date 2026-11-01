@@ -7,7 +7,8 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 from experience_regime_v1.workout_prestart_proof_v1 import (
-    build_commitment, permission_gate, validate_captured, write_new_commitment)
+    build_commitment, permission_gate, validate_captured, write_new_commitment,
+    user_requested_single_article_gate)
 
 NOW=datetime.fromisoformat("2026-11-15T08:00:00+09:00")
 START="2026-11-15T15:40:00+09:00"
@@ -65,6 +66,72 @@ class TestWorkoutProof(unittest.TestCase):
             with self.assertRaisesRegex(PermissionError,"PUBLISHER_PERMISSION_NOT_VERIFIED"):
                 write_new_commitment(Path(tmp),CAPTURE,NOW,POLICY)
             self.assertEqual(list(Path(tmp).rglob("*")),[])
+
+    def test_user_directed_one_article_mode_available_without_scheduled_permission(self):
+        p=copy.deepcopy(POLICY)
+        p["sources"][0]["manual_user_initiated_single_article"]={
+            "decision":"allow_limited_factual_research_with_safeguards",
+            "max_article_requests_per_user_dispatch":1,
+            "require_explicit_source_url":True,
+            "require_robots_allow":True,
+            "allow_article_text_copy":False,
+            "allow_editor_grade_copy":False,
+            "allow_copyrighted_media_copy":False,
+            "allow_public_clock_table_republication":False,
+            "require_source_attribution_url":True,
+            "require_prestart_frozen_jra_roster":True,
+            "require_prestart_git_first_commit_for_proof":True
+        }
+        self.assertEqual(p["sources"][0]["automatic_reuse"],"permission_unverified")
+        with self.assertRaises(PermissionError):
+            permission_gate(URL,p)
+        manual=user_requested_single_article_gate(URL,p,request_id="chat-run-123")
+        self.assertFalse(manual["publisher_automatic_harvesting_permission_claimed"])
+        obj=build_commitment(CAPTURE,now=NOW,policy=p,manual_request_id="chat-run-123")
+        self.assertEqual(obj["manual_request_id"],"chat-run-123")
+        self.assertEqual(obj["source_attribution_url"],URL)
+        self.assertFalse(obj["publisher_automatic_permission_claimed"])
+        self.assertFalse(obj["third_party_detail_published"])
+        self.assertIsNone(obj["rights_permission_document_url"])
+        with tempfile.TemporaryDirectory() as tmp:
+            x=write_new_commitment(Path(tmp),CAPTURE,NOW,p,
+                                   manual_request_id="chat-run-123")
+            self.assertTrue(x.exists())
+
+    def test_manual_mode_does_not_bypass_article_or_storage_guards(self):
+        p=copy.deepcopy(POLICY)
+        p["sources"][0]["manual_user_initiated_single_article"]={
+            "decision":"allow_limited_factual_research_with_safeguards",
+            "max_article_requests_per_user_dispatch":1,
+            "require_explicit_source_url":True,
+            "require_robots_allow":True,
+            "allow_article_text_copy":False,
+            "allow_editor_grade_copy":False,
+            "allow_copyrighted_media_copy":False,
+            "allow_public_clock_table_republication":False,
+            "require_source_attribution_url":True,
+            "require_prestart_frozen_jra_roster":True,
+            "require_prestart_git_first_commit_for_proof":True
+        }
+        for key,val in [("max_article_requests_per_user_dispatch",2),
+                        ("allow_public_clock_table_republication",True),
+                        ("require_robots_allow",False),
+                        ("allow_editor_grade_copy",True)]:
+            broken=copy.deepcopy(p)
+            broken["sources"][0]["manual_user_initiated_single_article"][key]=val
+            with self.assertRaisesRegex(ValueError,"manual_one_article_safeguard_missing"):
+                user_requested_single_article_gate(URL,broken,request_id="run123")
+        for url in ("http://umasiru.com/archives/12345",
+                    "https://umasiru.com/archives/12345?loop=true",
+                    "https://example.com/archives/12345"):
+            with self.assertRaises(ValueError):
+                user_requested_single_article_gate(url,p,request_id="run123")
+        with self.assertRaises(ValueError):
+            user_requested_single_article_gate(URL,p,request_id="")
+        late=copy.deepcopy(CAPTURE)
+        late["source"]["fetched_at"]="2026-11-15T16:01:00+09:00"
+        with self.assertRaisesRegex(ValueError,"after_start_capture_or_commit"):
+            build_commitment(late,now=NOW,policy=p,manual_request_id="run123")
 
     def test_fake_permission_without_source_evidence_is_rejected(self):
         p=approved()
