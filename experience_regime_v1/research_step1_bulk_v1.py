@@ -281,9 +281,13 @@ def run(week, day):
         raise ValueError("wrong_fixed_plan")
     selected = [r for r in plan["selected_races"] if r["date"] == day and r["sample_origin"] == "stratified_sample"]
     outdir = ROOT / "experience_regime_v1" / "research_step1_candidates" / week
+    formal_status = ROOT / "docs/data/experience_regime_step1_status.json"
+    real_formal = read(formal_status) if formal_status.exists() else {}
+    real_formal_count = (real_formal.get("step1_frozen_races", 0)
+                         if real_formal.get("date") == day and real_formal.get("week_id") == week else 0)
     report = {"schema_version": 1, "date": day, "week_id": week,
               "target_undercard_races": len(selected), "experimental_partial_races": [],
-              "blocked": [], "formal_step1_frozen_races_separately": 2,
+              "blocked": [], "formal_step1_frozen_races_separately": real_formal_count,
               "complete_nine_factor_research_predictions": 0,
               "production_effect": False, "does_not_change_canonical_step1_status": True}
     for item in selected:
