@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "read_only_ui_development_inventory",
   "state": "verified_git_source",
-  "scan_commit": "8158c40c2db90eee9887f907d13c8bc69e633837",
+  "scan_commit": "b9ba79bbb4d9bc28ae3a61ebb9459544ca8be0e7",
   "policy": {
     "mode": "lab_active_experiments_staging_exact_production_ui",
     "lab_root": "docs/lab/",
@@ -15,11 +15,12 @@
     "release_process": "approved UI paths allowlist + diff review + preserve protected tree SHA + real Pages HTTP parity"
   },
   "counts": {
-    "lab_development": 3,
+    "lab_development": 4,
     "lab_evaluation": 1,
     "needs_review": 2,
-    "staging_review": 1,
+    "staging_review": 0,
     "released": 1,
+    "production_released": 1,
     "reference_only": 1
   },
   "features": [
@@ -59,26 +60,26 @@
         "docs/lab/race-simulator.html": "658c5af9b10c8871f899637a819a7855502c532a",
         "docs/lab/race-simulator.js": "52b50b5108a936eafe5d2869cd45bdc93e775cc0",
         "docs/lab/race-simulator.css": "8a905005e09c6828bed4c51ebf2afaf62fdac073",
-        "docs/lab/race-sim-engine.js": "108584557d1b61564de1ff3128b8315cdf69f771",
+        "docs/lab/race-sim-engine.js": "86332c8fa2a3a1fb7b1fbcc0c6a71f290367d871",
         "docs/lab/race-umapot-overlay-v1.js": "bc65c4cf4623ef8abfac10b3e8958b68d2c3a74b",
         "docs/lab/race-sim-manifest-v1.json": "bd141771f18877ac62ca91ad9b90b63361ba0c97",
-        "docs/lab/race-ability-model-v1.js": "b812e2adee39f2933bc6a18392392af33939cfe4",
+        "docs/lab/race-ability-model-v1.js": "b8f6243438b83814fef9a9a1131177f30f9e3b5c",
         "docs/lab/race-lane-ai-v1.js": "3a9a9aa2e0499ee25f9c56076f9d27bfecda8cb5",
         "docs/lab/race-broadcast-map-v1.js": "fa285348d1d57bfba492359ac52b72e3e8f45f1f",
-        "docs/lab/race-lab-18-fixture-v1.js": "9bf9b45bbfb17a9a9335f38934e8a45567fe8d3a",
+        "docs/lab/race-lab-18-fixture-v1.js": "ade51bb93babc6295790bf18248e17022e9ccbd6",
         "docs/lab/race-turf-corridor-v1.js": "c28159adf13a188d770925e928ec567df4900058",
         "docs/lab/race-turf-rails-kyoto-inner-2000-v1.json": "491e30ecbb322db9a9176c0a75ab0d6f8b55888d",
         "docs/lab/race-clean-course-v1.js": "ba98d14e708a526a8b56f1bb1ff900fb8fce2ec8",
-        "docs/lab/race-clean-course-app-v1.js": "47d3693d911dc58d13748735e193fa1745165ad7",
-        "docs/lab/race-clean-course-v1.html": "fff60481464e11f784f6c6268f56f15e619429c3",
-        "docs/lab/race-clean-course-v1.css": "44d3c9b5e4b6d98a6c6b164a3daa50211959bfd6",
+        "docs/lab/race-clean-course-app-v1.js": "82af51aa49a9faf30c5ca0598601a61e4ca6b553",
+        "docs/lab/race-clean-course-v1.html": "e13b14fd561a7c27ce078f09f800ed3ef2f99af6",
+        "docs/lab/race-clean-course-v1.css": "b0b149543da3b605b18d900dbd27c678a318efd6",
         "docs/lab/assets/kyoto-umapot-course-clean-v8.svg": "dd01913246b54bc1fabb8b5050b75139bba47a19",
         "docs/lab/race-clean-turf-mask-v1.js": "d06d82d558a7390e258b82139862996cbd6e2c3c",
-        "docs/lab/race-clean-goal-view-v1.js": "7d40736f995730bdce99cad29700b8aaaeb780b8",
+        "docs/lab/race-clean-goal-view-v1.js": "2b1c644145ed8a06365f3e1f73f5f598e3abfe1e",
         "docs/lab/race-clean-curve-camera-v1.js": "1056fb436038122aa9085feffc68a90cbd057170",
         "docs/lab/race-course-image-geometry-v1.js": "c9be79fc93db23a9b19c03dd9012bd1c1f2e9e35"
       },
-      "latest_source_change_commit": "1a39e02218c6c64ce804991827023d4f1918a58a"
+      "latest_source_change_commit": "982c0eefb5b7d6087f010c0cc0d88baf4b821c63"
     },
     {
       "id": "course-catalog",
@@ -164,10 +165,10 @@
         "docs/lab/this-week-preview.html": "607afab1bb77f86558fd2fbaa1e655bb3d7c98f3",
         "docs/lab/stage-week-preview.js": "4faf2afee8946c7b0df51254280f650a2ba51e1d",
         "docs/lab/stage-week-preview.css": "67ac8634fb0b9e57aea1db778a64cfd99eb8ed38",
-        "docs/this-week.html": "47f5795496a22bdded49b8cbdfce705e9fb07e09",
+        "docs/this-week.html": "05895d8c3581c83fb0c2a53ca40e09613f9917cc",
         "docs/assets/jra-inline-report.js": "62a798fc87473167fe4f3674d88ec3d490853c49"
       },
-      "latest_source_change_commit": "f438521a54f8826d88d6eef347f1a351bcf9f1e8"
+      "latest_source_change_commit": "65a5a64c0f4c3175fb7f8864fe932e623fc18893"
     },
     {
       "id": "results-staging-diff",
@@ -233,9 +234,9 @@
     {
       "id": "keiba-anonymous-usage",
       "name": "サイトアクセス数と過去閲覧推移（日別匿名集計）",
-      "phase": "staging_review",
-      "approval": "pending_production_approval",
-      "next_action": "LABの競馬専用/keiba集計APIをステージングのトップ下部カウンターと閲覧推移画面へ昇格。ステージングのUIは読み取り専用で本番PVの計測POSTは未開始。既存のproduction docs/index.html・admin・予想回顧データは不変。ステージング表示と実ブラウザ/HTTP検証後、ユーザーによる本番リリースの明示承認でのみ本番UIと計測開始を別途実施。",
+      "phase": "production_released",
+      "approval": "approved_by_user",
+      "next_action": "2026-10-31 JST ユーザーの本番リリース承認により、トップに今日/累計PV、日別折れ線(7/30/90/365日)、実測開始の匿名PV・セッション概数の収集を正式公開。Cloudflare /keiba別テーブル使用、旧CounterAPI送信を停止。実ブラウザ390px/1200pxでPV POST各HTTP 200と日別線・端末横スクロールなしを確認（Actions 41079882530）、Pagesデプロイ 41079881621 成功。計測前の歴史は復元不可でサンプルは明確表示。本番予想・回顧等のGit tree SHA不変。継続：蓄積した日別件数の監視、旧admin.htmlの導線再編は別件。",
       "preview_path": "lab/usage-analytics.html",
       "staging_paths": [
         "docs/staging/index.html",
@@ -257,7 +258,16 @@
         "docs/lab/analytics/wrangler.example.toml",
         "docs/lab/analytics/worker.test.mjs"
       ],
-      "production_paths": [],
+      "production_paths": [
+        "docs/index.html",
+        "docs/usage-analytics.html",
+        "docs/usage-analytics.js",
+        "docs/usage-analytics.css",
+        "docs/assets/usage-summary.js",
+        "docs/assets/usage-summary.css",
+        "docs/assets/visitor-counter.js",
+        "docs/assets/site-usage-config.json"
+      ],
       "file_blob_shas": {
         "docs/lab/usage-analytics.html": "8aebd95572a74461762dc2cdbff53217f6f9961c",
         "docs/lab/usage-analytics.css": "882d975e5e7cbd2afb52c4bf95be4a23076d2978",
@@ -274,9 +284,58 @@
         "docs/staging/usage-analytics.html": "3ff138680551099bfb2d3e81cef99309b007b98e",
         "docs/staging/usage-analytics.js": "3632e7405590847447d2485c9644143759a97a06",
         "docs/staging/usage-analytics.css": "70f53e4923368552059963365a867566dfca41a6",
-        "docs/staging/usage-analytics-config.json": "f786e9405a5da59e26bdd662be02c8ff0c5e6fd9"
+        "docs/staging/usage-analytics-config.json": "f786e9405a5da59e26bdd662be02c8ff0c5e6fd9",
+        "docs/index.html": "9e15bd4cb3da630abea9263ac6dc2e506a1cc2c1",
+        "docs/usage-analytics.html": "d76c8431d21519bf874ed619ec80974c1b0a9f83",
+        "docs/usage-analytics.js": "e3c35c0e332a5bfeefb3475abc4bbeb56921b485",
+        "docs/usage-analytics.css": "70f53e4923368552059963365a867566dfca41a6",
+        "docs/assets/usage-summary.js": "2de97abd623ca88bfa88a53174791bd833530063",
+        "docs/assets/usage-summary.css": "15d04e6984326f3135c9df019cb53ed978b809a0",
+        "docs/assets/visitor-counter.js": "230b20cc702ee723ea53cee421f487e512a62d03",
+        "docs/assets/site-usage-config.json": "4a575fadc0dbdb9530277f89d4287e1d755dce5b"
       },
-      "latest_source_change_commit": "369ddd3a4ac39170be3addbdb32f3ef5b90dadca"
+      "latest_source_change_commit": "5976dd5ec5ca7e55668b87ae9bfa13b21f079608"
+    },
+    {
+      "id": "tokyo_turf_2000_independent_v1",
+      "name": "東京芝2000m独立LAB",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "next_action": "原PPTXは再配布せずローカルだけで原図・走路候補を静止照合。発走目印の90度group回転、左回りの内側法線、東京maxLane16を検証。13地点×18頭・原図画素1299699点/画面の検査を実施。候補境界は未承認、共通エンジンの旧幾何metricsとは未統合。走行は無条件ロック。物理整合・複数seed衝突・1/2/4倍実時間QA・目視完了まで走行解除禁止。京都・STAGING・本番・正式データ不変。 発走根拠v3：JRA公式の引込線・緩やかな曲線とJRA-VANの約100m説明を照合。進入角度・正確な曲線開始点・2角出口300mは未確定。座標・物理・走行ロックは変更しない。",
+      "preview_path": "lab/race-clean-tokyo-2000-v1.html",
+      "staging_paths": [],
+      "lab_paths": [
+        "docs/lab/race-clean-tokyo-2000-v1.html",
+        "docs/lab/race-clean-tokyo-2000-v1.css",
+        "docs/lab/race-clean-tokyo-2000-app-v1.js",
+        "docs/lab/race-tokyo-2000-v1.js",
+        "docs/lab/race-tokyo-ability90-v1.js",
+        "docs/lab/TOKYO_2000_QA_V1.md",
+        "docs/lab/race-tokyo-source-audit-v2.js",
+        "docs/lab/race-tokyo-source-inspector-v2.js",
+        "docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md",
+        "docs/lab/TOKYO_2000_START_EVIDENCE_V3.md",
+        "docs/lab/race-tokyo-lateral-policy-v4.js",
+        "docs/lab/TOKYO_2000_MOTION_AUDIT_V4.md",
+        "docs/lab/TOKYO_2000_MOTION_AUDIT_V4.json"
+      ],
+      "production_paths": [],
+      "file_blob_shas": {
+        "docs/lab/race-clean-tokyo-2000-v1.html": "6dfdd01db5b2400b446d87f52a017f94aa69fce4",
+        "docs/lab/race-clean-tokyo-2000-v1.css": "7435d2a431a72a088835d3d496752af4d9550066",
+        "docs/lab/race-clean-tokyo-2000-app-v1.js": "514045acfddfdea1a6aa6ac694b6c48a6881caf9",
+        "docs/lab/race-tokyo-2000-v1.js": "dd98b989e886e09501d2686f08c150a247fd828f",
+        "docs/lab/race-tokyo-ability90-v1.js": "bcf510d0cf0e6a3b816eba177951d61e97fb73f5",
+        "docs/lab/TOKYO_2000_QA_V1.md": "81ab96f4bbadd321e58fa38f511832928f5b5012",
+        "docs/lab/race-tokyo-source-audit-v2.js": "ffe78047ff419bffb90c6618406fa1d72c200d57",
+        "docs/lab/race-tokyo-source-inspector-v2.js": "57075d4e61471f01711fd55068fde9a1c0d6e76c",
+        "docs/lab/TOKYO_2000_SOURCE_AUDIT_V2.md": "b3585b0b8e7c025999cdac17609df74b6b1620d2",
+        "docs/lab/TOKYO_2000_START_EVIDENCE_V3.md": "493e3925ad5e5e41caa5849d3e04bca1f26404c4",
+        "docs/lab/race-tokyo-lateral-policy-v4.js": "faaa1ac8271bea7340235794e9b5570da2b1e4bc",
+        "docs/lab/TOKYO_2000_MOTION_AUDIT_V4.md": "d1640836a77db5f3b1c5956f3fced07d4b1eb65b",
+        "docs/lab/TOKYO_2000_MOTION_AUDIT_V4.json": "da96d0228a567083c3bddcde792c9f071486b644"
+      },
+      "latest_source_change_commit": "b9ba79bbb4d9bc28ae3a61ebb9459544ca8be0e7"
     }
   ],
   "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB hosts live experiment copies; legacy staging paths redirect for compatibility."
