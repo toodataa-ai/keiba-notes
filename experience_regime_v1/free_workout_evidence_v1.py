@@ -178,15 +178,30 @@ def workbook_from_html(html: bytes, roster: dict[str, int], race_date: date):
         lines = table.find_all("tr")
         if not lines:
             continue
-        labels = [s.get_text(" ", strip=True) for s in lines[0].find_all(["th","td"])]
         norm = lambda t: re.sub(r"\s+","",t).replace("Ｆ","F")
-        labels = [norm(t) for t in labels]
-        # Strictly require explicit column labels to avoid shifted/misread clocks.
-        if not ({"時期", "場所", "6F", "5F", "4F", "3F", "1F"} <= set(labels) and
-                len(set(labels)) == len(labels)):
+        # Publisher's WordPress tables often start with a full-width title row
+        # ("horse - date - editor's grade") BEFORE the split-column headers.
+        # Find the actual split headers; never reinterpret the headline as F data.
+        labels, label_row = None, None
+        for idx, candidate in enumerate(lines[:4]):
+            cells=[s.get_text(" ",strip=True) for s in candidate.find_all(["th","td"])]
+            cand=[norm(t) for t in cells]
+            if ({"時期","場所","6F","5F","4F","3F","1F"} <= set(cand) and
+                    len(set(cand)) == len(cand)):
+                labels, label_row=cand,idx
+                break
+            if session_date is None:
+                head=" ".join(cells)
+                m=re.search(r"(\d{1,2})月(\d{1,2})日",head)
+                if m:
+                    candidate_date=date(race_date.year,int(m.group(1)),int(m.group(2)))
+                    if candidate_date>race_date:
+                        candidate_date=date(race_date.year-1,int(m.group(1)),int(m.group(2)))
+                    session_date=candidate_date.isoformat()
+        if labels is None:
             continue
         entries = []
-        for tr in lines[1:]:
+        for tr in lines[label_row+1:]:
             cells = [x.get_text(" ", strip=True) for x in tr.find_all(["td","th"])]
             if len(cells) != len(labels):
                 continue
