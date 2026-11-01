@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "week_id": "2026-10-31",
+  "date": "2026-11-01",
+  "source_code_sha256": "5601f6f2f78fecb95246deb43980e2fbede795ae20e45b32f4ac78bbb75b1d76",
+  "formal_races": 2,
+  "formal_horses": 30,
+  "formal_nine_grade_labels": true,
+  "formal_factors_6_7_8_observed": false,
+  "formal_fallback_grades": {
+    "6_pedigree": "B",
+    "7_workout": "B-",
+    "8_jockey": "B"
+  },
+  "formal_explanation": "The three entries above are fixed grade placeholders in the current source; not measured or calibrated factor ratings",
+  "formal_files": {
+    "2026-11-01-kyoto-11": {
+      "source_path": "e2e_validation/predictions/2026-11-01-mahoroba-stakes/v3.13-run41253210379-attempt1.json",
+      "formal_proof_commit": "e98142684c1127f93fe4685363d7b0e0f3b0882f",
+      "first_committed": "2026-10-31T23:37:39Z",
+      "runners": 13,
+      "grade_is_not_observation": [
+        6,
+        7,
+        8
+      ]
+    },
+    "2026-11-01-tokyo-11": {
+      "source_path": "e2e_validation/predictions/2026-11-01-tenno-sho-autumn/v3.13-run41254117399-attempt1.json",
+      "formal_proof_commit": "4cff71fb5dfbf6a86b7424361ca7a13479dd0507",
+      "first_committed": "2026-10-31T23:53:23Z",
+      "runners": 17,
+      "grade_is_not_observation": [
+        6,
+        7,
+        8
+      ]
+    }
+  },
+  "research_undercard_races": 10,
+  "research_horses": 125,
+  "research_observed_source_counts": {
+    "2": 86,
+    "3": 58,
+    "5": 35,
+    "6": 125,
+    "7": 0,
+    "8": 125
+  },
+  "research_workouts_with_actual_times": 0,
+  "research_pedigree_sires_observed_not_calibrated": 125,
+  "research_jockey_names_observed_not_course_stats": 125,
+  "result": "9_grade_fields_exist_but_9_source_verified_grades_do_not",
+  "canonical_prediction_changed": false,
+  "existing_research_prediction_changed": false,
+  "no_data_fabrication": true
+}
