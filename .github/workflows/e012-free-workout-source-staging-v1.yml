@@ -1,0 +1,95 @@
+name: E012 free workout timing source STAGING research QA
+on:
+  push:
+    branches: [staging/e012-free-workout-source-v1]
+    paths:
+      - 'experience_regime_v1/free_workout_evidence_v1.py'
+      - 'experience_regime_v1/test_free_workout_evidence_v1.py'
+      - '.github/workflows/e012-free-workout-source-staging-v1.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'experience_regime_v1/free_workout_evidence_v1.py'
+      - 'experience_regime_v1/test_free_workout_evidence_v1.py'
+      - '.github/workflows/e012-free-workout-source-staging-v1.yml'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  parse-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify new source adapter is research-only and old betting files unchanged
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          python - <<'PY'
+          import subprocess
+          modified=subprocess.check_output(
+              ['git','diff','--name-only','origin/main...HEAD'],text=True).splitlines()
+          allowed={
+             'experience_regime_v1/free_workout_evidence_v1.py',
+             'experience_regime_v1/test_free_workout_evidence_v1.py',
+             '.github/workflows/e012-free-workout-source-staging-v1.yml',
+          }
+          assert set(modified).issubset(allowed),('canonical_prediction_or_UI_modified',modified)
+          print('E012_NO_PRODUCTION_OR_HISTORICAL_FILES_CHANGED',modified)
+          PY
+          python -m pip install -q beautifulsoup4 requests
+          python -m compileall -q experience_regime_v1/free_workout_evidence_v1.py
+      - name: Validate guardrails against synthetic/non-public/redated article cases
+        run: |
+          set -euo pipefail
+          python -m unittest -v experience_regime_v1.test_free_workout_evidence_v1
+          python -m unittest -v experience_regime_v1.test_step1_factors_evidence_v1
+      - name: Single official-roster-backed live free article smoke test, never publish scores
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          from experience_regime_v1.free_workout_evidence_v1 import (
+              find_roster,fetch_single_article,workbook_from_html,extract_publication_time)
+          from pathlib import Path
+          from datetime import date
+          race='2026-11-01-tokyo-11'
+          start='2026-11-01T15:40:00+09:00'
+          before=datetime.now(ZoneInfo('Asia/Tokyo'))<datetime.fromisoformat(start)
+          if not before:
+              print('SOURCE_LIVE_SMOKE_SKIPPED_AFTER_START; NO_RETROACTIVE_PROOF')
+          else:
+              roster,proof,formal=find_roster('2026-10-31',race,start)
+              url='https://umasiru.com/archives/22113'
+              try:
+                  source=fetch_single_article(url)
+              except Exception as ex:
+                  print('SOURCE_SCRAPE_NOT_ENABLED_OR_BLOCKED',type(ex).__name__,str(ex)[:220])
+                  print('SOURCE_RIGHTS_OR_ROBOTS_REVIEW_REQUIRED_BEFORE_AUTOMATED_USE')
+              else:
+                  records=workbook_from_html(source,roster,date(2026,11,1))
+                  report={'race_id':race,'article':url,'official_field_size':len(roster),
+                      'horse_count_with_times':len(records),
+                      'total_number_of_workouts':sum(len(x['workouts']) for x in records.values()),
+                      'article_published_at':extract_publication_time(source),
+                      'source_clocks_only':True,'betting_effect':False,
+                      'first_roster_proof':proof['commit_sha']}
+                  Path('/tmp/e012-workout-stage-smoke.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
+                  print('SOURCE_LIVE_PRESTART_SMOKE',json.dumps(report,ensure_ascii=False))
+                  assert len(records)>=1,'Official roster had no matching workout tables'
+          PY
+      - name: Upload source availability report, not article content or bets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e012-free-workout-source-staging-audit
+          path: /tmp/e012-workout-stage-smoke.json
+          if-no-files-found: ignore
+          retention-days: 7
