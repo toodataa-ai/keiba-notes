@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-01",
+  "meeting_id": "2026-10-31-to-2026-11-01",
+  "observed_at": "2026-11-02T07:57:58.531+09:00",
+  "status": "OFFICIAL_RESULTS_SETTLED_GRADE_A_VALIDATION_PENDING_PUBLICATION_UNVERIFIED",
+  "immutable_forecasts": true,
+  "immutable_final_bets": true,
+  "original_html_pdf_unchanged": true,
+  "reviewed_races": [
+    "2026-11-01-tenno-sho-autumn",
+    "2026-11-01-mahoroba-stakes"
+  ],
+  "official_result_urls": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202604111120261101%2F62",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1008202604111120261101%2F1F"
+  ],
+  "grade_a_case_expected_new": 2,
+  "case_publication_proof_commits": {
+    "2026-11-01-tenno-sho-autumn": "8beafb544f37c97d6b6451417b720fec889fde9c",
+    "2026-11-01-mahoroba-stakes": "740542a5a9d025c413b0b830064426e6cc7298e9"
+  },
+  "weekly_change_decision": "not_evaluated",
+  "weekly_reason": "Strict Grade A proof and public byte parity must be verified before evaluating 2026-10-31 to 2026-11-01 meeting",
+  "manual_approval_rules": "A/B/C approvals retained, automatic promotion forbidden",
+  "overfit_control": "Historical frozen STEP1 and 78 tickets unchanged; do not tune weights from these results.",
+  "preserved_versions": true,
+  "preserved_inflight_e2e_comparison": true,
+  "publication_verification": {
+    "verified": false,
+    "ci": "pending",
+    "live_github_pages_http_byte_parity": false
+  },
+  "blockers": [
+    "Staging only until new two Grade A cases validated and public byte parity confirmed.",
+    "E0/E1/E2 missing original prereace race_category cannot be retrospectively fabricated."
+  ],
+  "source_checks": [
+    {
+      "race_id": "2026-11-01-tenno-sho-autumn",
+      "purchase_publication_proof_commit": "8beafb544f37c97d6b6451417b720fec889fde9c",
+      "source_prediction_blob_sha": "68e475c5d35d34e72cf343f8ecec1f63add6856b",
+      "prerace_bet_count": 28,
+      "immutable_bets_reconciled": true,
+      "official_settlement_payout_yen": 0
+    },
+    {
+      "race_id": "2026-11-01-mahoroba-stakes",
+      "purchase_publication_proof_commit": "740542a5a9d025c413b0b830064426e6cc7298e9",
+      "source_prediction_blob_sha": "bce1c45af01bc8fdc9502773b0ddd8d46e95ffb7",
+      "prerace_bet_count": 50,
+      "immutable_bets_reconciled": true,
+      "official_settlement_payout_yen": 4060
+    }
+  ],
+  "shadow_integrity": {
+    "status": "sha_pinned_missing_prerace_research_fields_not_promotable",
+    "formal_grade_a_independent": true,
+    "new_2026_11_01_missing_prerace_cases": 2,
+    "new_gap_ledger_path": "e2e_validation/experience_new_gaps_20261101_v1.json",
+    "new_gap_ledger_git_blob_sha": "792d5517a183646bebbef4db8bc6f038df82de14",
+    "prior_gap_ledgers_unchanged": true,
+    "never_backfill_postrace": true
+  }
+}
