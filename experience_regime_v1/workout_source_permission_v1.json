@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "policy_name": "free_workout_source_permission_gate_v1",
+  "policy_name": "free_workout_source_access_modes_v2",
   "scope": "third_party_public_workout_clock_numeric_facts_only",
   "sources": [
     {
@@ -21,6 +21,21 @@
         "quotation_not_equivalent_to_automated_harvest_permission": true,
         "source_verified_on": "2026-11-01",
         "detailed_note": "Published page expressly requests attribution and original/top-page URL when quoting article/image; does not explicitly grant automated recurring collection or database republication."
+      },
+      "manual_user_initiated_single_article": {
+        "decision": "allow_limited_factual_research_with_safeguards",
+        "max_article_requests_per_user_dispatch": 1,
+        "require_explicit_source_url": true,
+        "require_robots_allow": true,
+        "allow_article_text_copy": false,
+        "allow_editor_grade_copy": false,
+        "allow_copyrighted_media_copy": false,
+        "allow_public_clock_table_republication": false,
+        "require_source_attribution_url": true,
+        "require_prestart_frozen_jra_roster": true,
+        "require_prestart_git_first_commit_for_proof": true,
+        "allowed_storage": "research_only_short_lived_actions_artifact_and_public_hash_only_proof",
+        "notes_ja": "ユーザーがチャットから指定・起動する単一公開記事の単発取得。自律的な定期巡回・大量取得・記事転載は別扱い。これは権利者が収集を許諾したという意味ではない。"
       }
     }
   ],
@@ -29,5 +44,5 @@
     "manual_view_only_without_publishing_detail",
     "source_metadata_and_sha_only_when_captured_prospectively"
   ],
-  "notes_ja": "公式お問い合わせページで引用時の出典表示＋元記事等へのリンク指示を確認。記事を紹介・限定的に引用する場合は出典リンクを付ける。一方、定期自動取得・全頭時計の蓄積・データベースの再配布に関する明示条件は見当たらないため、自動収集は保留する。"
+  "notes_ja": "うましるの引用・リンク指針を確認。ユーザー発の単発公開記事・数値事実の限定分析と、自律的な定期収集を区別する。手動は1 URL / 1回 / robots確認 / 出典・非転載 / 発走前Git証拠のみ。定期・大量・転載は許諾未確認で停止。"
 }
