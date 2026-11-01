@@ -111,7 +111,10 @@ jobs:
           from pathlib import Path
           base=Path('experience_regime_v1/factor_evidence')/os.environ['E012_WEEK']
           report=json.loads(Path('docs/data/experience_regime_factor_evidence_status.json').read_text())
-          assert len(report['proof_verified_races'])+len(report['blocked'])==report['target_races']
+          assert len(report['proof_verified_races'])==report['target_races'] and not report['blocked'], ('incomplete_prestart_factor_evidence',report['blocked'])
+          assert report['horses']>0
+          assert report['full_nine_factor_predictions']==0
+          print('::warning::Full 9-factor STEP1 is NOT complete. Pedigree/jockey identities are not calibrated skill scores; workout data remain unavailable.')
           for rid in report['proof_verified_races']:
               file=base/(rid+'.json')
               obj=json.loads(file.read_text())
