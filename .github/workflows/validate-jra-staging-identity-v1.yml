@@ -41,9 +41,17 @@ jobs:
               text=path.read_text()
               assert 'location.replace(' in text and 'lab/' in text and 'noindex' in text,name
           data=json.loads((root/'lab/change-board.json').read_text())
-          assert len(data['features'])==8
-          assert sum(x['preview_path'].startswith('lab/') for x in data['features'])==7
-          assert any(x['phase']=='released' for x in data['features'])
+          registry=json.loads(Path('.github/lab/feature-registry.json').read_text())
+          source=registry['features']
+          published=data['features']
+          assert data['state']=='verified_git_source'
+          assert len(published)==len(source),('registered_feature_count_drift',len(published),len(source))
+          assert [x['id'] for x in published]==[x['id'] for x in source],('registered_feature_identity_drift',)
+          assert all(out['phase']==inp['phase'] and out['preview_path']==inp['preview_path']
+                     for out,inp in zip(published,source)),('registered_feature_status_or_destination_drift',)
+          assert sum(x['preview_path'].startswith('lab/') for x in published)==sum(
+                     x['preview_path'].startswith('lab/') for x in source)
+          assert any(x['phase'] in ('released','production_released') for x in published)
           assert (root/'lab/archive/staging-prebaseline/this-week.html').is_file()
           assert (root/'lab/archive/staging-prebaseline/results.html').is_file()
           print('PASS_11_JRA_STAGING_PAGES_EXACT_PROD_UI_LAB_REDIRECTS_NO_DATA_CHANGE')
