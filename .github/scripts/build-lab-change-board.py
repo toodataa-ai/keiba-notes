@@ -36,7 +36,7 @@ def main():
         fid = feature["id"]
         assert fid not in ids and fid and "/" not in fid, fid
         ids.add(fid)
-        assert feature["phase"] in ("lab_development","lab_evaluation","needs_review","staging_review","released","reference_only")
+        assert feature["phase"] in ("lab_development","lab_evaluation","needs_review","staging_review","released","production_released","reference_only")
         assert feature["approval"] and feature["name"] and feature["next_action"]
         assert feature["preview_path"].startswith(("staging/","lab/"))
         assert ((ROOT / "docs" / feature["preview_path"]).is_file() or
@@ -67,7 +67,7 @@ def main():
         "scan_commit": recent_commit([".github/lab/feature-registry.json"] + [p for f in registry["features"] for p in f.get("lab_paths",[])+f["staging_paths"]+f["production_paths"]]),
         "policy": registry["policy"],
         "counts": {x: sum(f["phase"] == x for f in entries) for x in
-                   ("lab_development","lab_evaluation","needs_review","staging_review","released","reference_only")},
+                   ("lab_development","lab_evaluation","needs_review","staging_review","released","production_released","reference_only")},
         "features": entries,
         "note": "Git source hashes and timestamps are automatic; approval and phase are curated explicitly. LAB hosts live experiment copies; legacy staging paths redirect for compatibility."
     }
