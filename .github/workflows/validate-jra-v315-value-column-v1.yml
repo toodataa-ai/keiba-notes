@@ -57,5 +57,17 @@ jobs:
           PY
       - name: Assert repository original bytes were untouched
         run: |
-          test -z "$(git status --porcelain)" || { git status --short; exit 1; }
+          git diff --quiet
+          git diff --cached --quiet
+          test -z "$(git ls-files --others --exclude-standard | grep -v '^.github/scripts/__pycache__/' || true)"
           echo 'PASS_NO_PREDICTION_BET_PDF_HISTORICAL_FILE_MODIFICATION'
+      - name: Save both real reviewed PDF and HTML previews for staging approval
+        uses: actions/upload-artifact@v4
+        with:
+          name: jra-v315-value-column-staging-2026-11-01
+          path: |
+            /tmp/2026-11-01-mahoroba-stakes-value-staging.html
+            /tmp/2026-11-01-mahoroba-stakes-value-staging.pdf
+            /tmp/2026-11-01-tenno-sho-autumn-value-staging.html
+            /tmp/2026-11-01-tenno-sho-autumn-value-staging.pdf
+          retention-days: 7
