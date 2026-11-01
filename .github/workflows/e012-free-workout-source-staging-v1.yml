@@ -57,7 +57,7 @@ jobs:
           from datetime import datetime
           from zoneinfo import ZoneInfo
           from experience_regime_v1.free_workout_evidence_v1 import (
-              find_roster,fetch_single_article,workbook_from_html,extract_publication_time)
+              find_roster,fetch_single_article,workbook_from_html,extract_publication_time,capture)
           from pathlib import Path
           from datetime import date
           race='2026-11-01-tokyo-11'
@@ -74,7 +74,18 @@ jobs:
                   print('SOURCE_SCRAPE_NOT_ENABLED_OR_BLOCKED',type(ex).__name__,str(ex)[:220])
                   print('SOURCE_RIGHTS_OR_ROBOTS_REVIEW_REQUIRED_BEFORE_AUTOMATED_USE')
               else:
+                  observed=datetime.now(ZoneInfo('Asia/Tokyo')).isoformat(timespec='milliseconds')
+                  evidence=capture('2026-10-31',race,start,url,source,observed,
+                                   frozen_roster=roster,roster_proof=proof,is_formal=formal)
                   records=workbook_from_html(source,roster,date(2026,11,1))
+                  assert evidence['verified_horses']==len(records)
+                  assert not evidence['production_effect']
+                  assert evidence['workout_factor_grades'] is None
+                  assert evidence['prediction_rank_grade_bets_unchanged']
+                  # Only minimal numerical facts go into the short-lived Actions
+                  # artifact, never the public Pages tree or final_bets.
+                  Path('/tmp/e012-workout-stage-facts.json').write_text(
+                      json.dumps(evidence,ensure_ascii=False,indent=2))
                   if not records:
                       from bs4 import BeautifulSoup
                       soup=BeautifulSoup(source,'html.parser')
@@ -95,6 +106,7 @@ jobs:
                       'horse_count_with_times':len(records),
                       'total_number_of_workouts':sum(len(x['workouts']) for x in records.values()),
                       'article_published_at':extract_publication_time(source),
+                      'fetched_at':observed,'page_html_sha256':evidence['source']['html_sha256'],
                       'source_clocks_only':True,'betting_effect':False,
                       'first_roster_proof':proof['commit_sha']}
                   Path('/tmp/e012-workout-stage-smoke.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
@@ -106,6 +118,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e012-free-workout-source-staging-audit
-          path: /tmp/e012-workout-stage-smoke.json
+          path: |
+            /tmp/e012-workout-stage-smoke.json
+            /tmp/e012-workout-stage-facts.json
           if-no-files-found: ignore
           retention-days: 7
