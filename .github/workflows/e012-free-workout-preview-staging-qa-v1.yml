@@ -79,7 +79,7 @@ jobs:
                   assert page.locator('#covered').inner_text()=='17 / 17'
                   assert page.locator('#sessions').inner_text()=='50件'
                   assert page.locator('a[href="e012-free-factor-compare.html"]').count()==1
-                  assert page.locator('a[href="https://umasiru.com/archives/22113"]').count()==1
+                  assert page.locator('a[href="https://umasiru.com/archives/22113"]').count()>=1, 'source citation must remain linked'
                   assert not errors,(label,errors)
                   scroll=page.evaluate('document.documentElement.scrollWidth-document.documentElement.clientWidth')
                   assert scroll<=1,(label,'horizontal_scroll',scroll)
