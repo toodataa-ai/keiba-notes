@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "registry_version": "1.3",
-  "updated_at": "2026-11-02",
+  "updated_at": "2026-11-03T08:00:00+09:00",
   "policy_file": "promotion_policy.json",
   "production_router_changed": false,
   "models": [
@@ -59,7 +59,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "insufficient",
+        "label": "まだ足りない",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -24.1,
+          "brier_gain_pct": -29.6
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 21.2,
+          "brier_gain_pct": -8.0
+        },
+        "races": 340,
+        "transition_races": 37,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "sapporo",
@@ -115,7 +131,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 20.2,
+          "brier_gain_pct": 11.3
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 29.4,
+          "brier_gain_pct": 13.9
+        },
+        "races": 220,
+        "transition_races": 43,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "hakodate",
@@ -171,7 +203,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "insufficient",
+        "label": "まだ足りない",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -3.0,
+          "brier_gain_pct": -19.6
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 9.7,
+          "brier_gain_pct": -6.7
+        },
+        "races": 292,
+        "transition_races": 30,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "hakodate",
@@ -227,7 +275,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "insufficient",
+        "label": "まだ足りない",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 11.5,
+          "brier_gain_pct": 21.5
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 39.8,
+          "brier_gain_pct": 31.3
+        },
+        "races": 188,
+        "transition_races": 20,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "fukushima",
@@ -283,7 +347,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 6.3,
+          "brier_gain_pct": 18.2
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 67.3,
+          "brier_gain_pct": 63.1
+        },
+        "races": 460,
+        "transition_races": 43,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "fukushima",
@@ -339,7 +419,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 10.9,
+          "brier_gain_pct": 19.5
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 54.6,
+          "brier_gain_pct": 54.2
+        },
+        "races": 280,
+        "transition_races": 38,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "niigata",
@@ -395,7 +491,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -1.1,
+          "brier_gain_pct": 5.9
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 53.5,
+          "brier_gain_pct": 41.1
+        },
+        "races": 618,
+        "transition_races": 137,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "niigata",
@@ -451,7 +563,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 7.6,
+          "brier_gain_pct": 9.6
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 73.6,
+          "brier_gain_pct": 67.3
+        },
+        "races": 401,
+        "transition_races": 67,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "tokyo",
@@ -506,7 +634,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 27.3,
+          "brier_gain_pct": 22.7
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 44.4,
+          "brier_gain_pct": 36.9
+        },
+        "races": 822,
+        "transition_races": 82,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "tokyo",
@@ -561,7 +705,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -0.2,
+          "brier_gain_pct": -8.3
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 50.8,
+          "brier_gain_pct": 34.5
+        },
+        "races": 872,
+        "transition_races": 101,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "nakayama",
@@ -596,7 +756,23 @@
         "Stage Bの発走時公式状態ラベルによる校正未実施",
         "v2共通基準でのbaseline比較未実施",
         "季節横断一般化未検証"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -4.9,
+          "brier_gain_pct": -2.5
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 38.6,
+          "brier_gain_pct": 32.1
+        },
+        "races": 658,
+        "transition_races": 87,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "nakayama",
@@ -631,7 +807,23 @@
         "Stage Bの発走時公式状態ラベルによる校正未実施",
         "v2共通基準でのbaseline比較未実施",
         "雨天時誤差の再監査"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 17.6,
+          "brier_gain_pct": 16.7
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 37.5,
+          "brier_gain_pct": 31.9
+        },
+        "races": 932,
+        "transition_races": 194,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "chukyo",
@@ -690,7 +882,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -7.7,
+          "brier_gain_pct": -0.5
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 50.2,
+          "brier_gain_pct": 48.2
+        },
+        "races": 542,
+        "transition_races": 54,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "chukyo",
@@ -749,7 +957,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 15.1,
+          "brier_gain_pct": -0.5
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 20.9,
+          "brier_gain_pct": 8.9
+        },
+        "races": 578,
+        "transition_races": 57,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "kyoto",
@@ -804,7 +1028,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -1.8,
+          "brier_gain_pct": -6.9
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 47.3,
+          "brier_gain_pct": 37.9
+        },
+        "races": 747,
+        "transition_races": 101,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "kyoto",
@@ -859,7 +1099,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 24.1,
+          "brier_gain_pct": 17.8
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 50.1,
+          "brier_gain_pct": 39.0
+        },
+        "races": 902,
+        "transition_races": 125,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "hanshin",
@@ -899,7 +1155,23 @@
         "Stage Bの発走時公式状態ラベルによる校正未実施",
         "2025構造差の追加検証",
         "v2共通基準でのbaseline比較未実施"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 8.5,
+          "brier_gain_pct": 11.2
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 54.6,
+          "brier_gain_pct": 52.4
+        },
+        "races": 581,
+        "transition_races": 112,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "hanshin",
@@ -939,7 +1211,23 @@
         "Stage Bの発走時公式状態ラベルによる校正未実施",
         "2025構造差の追加検証",
         "雨天時精度の再監査"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 22.1,
+          "brier_gain_pct": 19.5
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 50.8,
+          "brier_gain_pct": 39.5
+        },
+        "races": 759,
+        "transition_races": 149,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "kokura",
@@ -995,7 +1283,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "waiting_forecast",
+        "label": "予報待ち",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": -9.8,
+          "brier_gain_pct": -9.3
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 33.0,
+          "brier_gain_pct": 26.7
+        },
+        "races": 600,
+        "transition_races": 119,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     },
     {
       "track": "kokura",
@@ -1051,7 +1355,23 @@
         "Stage AはCandidate（本番未接続）",
         "Stage B公式状態ラベル校正未完了",
         "Stage BのLog Loss/Brier/Calibration検証未完了"
-      ]
+      ],
+      "going_status": {
+        "state": "usable",
+        "label": "使える見込み",
+        "as_of": "2026-11-03",
+        "without_forecast": {
+          "logloss_gain_pct": 12.6,
+          "brier_gain_pct": 15.1
+        },
+        "perfect_forecast": {
+          "logloss_gain_pct": 20.7,
+          "brier_gain_pct": 9.2
+        },
+        "races": 259,
+        "transition_races": 36,
+        "source": "baba_models_v2/stage_b/status_v1.json"
+      }
     }
   ]
 }
