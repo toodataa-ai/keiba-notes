@@ -23,17 +23,9 @@ jobs:
               out=[]
               for m in list(re.finditer(pat,t))[:n]: out.append(t[max(0,m.start()-w):m.end()+w].replace('\n',' '))
               return out
-          for u in ['https://www.jra.go.jp/keiba/baba/archive/2025pdf/tokyo01.pdf','https://www.jra.go.jp/keiba/baba/archive/2025pdf/nakayama01.pdf']:
+          for u in ['https://www.jra.go.jp/keiba/baba/archive/2024pdf/tokyo01.pdf','https://www.jra.go.jp/keiba/baba/archive/2022pdf/nakayama01.pdf','https://www.jra.go.jp/keiba/baba/archive/2019pdf/nakayama01.pdf']:
               time.sleep(2); r=requests.get(u,headers=H,timeout=60); print('####PDF',u,r.status_code,len(r.content))
               if r.status_code==200:
-                  t=j.extract_pdf_text(r.content); print('  len',len(t)); print('  HEAD',t[:500].replace('\n',' | '))
+                  t=j.extract_pdf_text(r.content); print('  len',len(t)); print('  HEAD',t[:900].replace('\n',' | '))
                   for c in ctx(t,r'コース|[ABCD]コース|仮柵|内柵'): print('  CTX',c)
-          for u in ['https://www.jra.go.jp/keiba/baba/','https://www.jra.go.jp/keiba/baba/archive/','https://www.jra.go.jp/keiba/course/','https://www.jra.go.jp/keiba/overview/rule/course.html']:
-              time.sleep(2)
-              try:
-                  r=requests.get(u,headers=H,timeout=40); r.encoding=r.apparent_encoding
-                  t=BeautifulSoup(r.text,'html.parser').get_text(' ',strip=True)
-                  print('####PAGE',u,r.status_code,len(t))
-                  for c in ctx(t,r'[ABCD]コース|仮柵|コース替わり|コース区分',6): print('  CTX',c)
-              except Exception as e: print('####PAGE',u,'ERR',e)
           PY
