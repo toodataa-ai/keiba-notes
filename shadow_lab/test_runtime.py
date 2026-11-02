@@ -12,7 +12,10 @@ from shadow_lab import runtime as rt
 class RuntimeTests(unittest.TestCase):
     def test_all_seven_have_independent_current_candidates(self):
         self.assertEqual(len({rt.design(t)['challenger'] for t in rt.THEMES}),7)
-        self.assertFalse(rt.gate('field_experience'))
+        observation=rt.read(rt.ROOT/'docs/data/jra_improvement_cycle_v1.json')
+        young=next(h for h in observation['formal']['hypotheses'] if h['id']=='field_experience')
+        self.assertEqual(rt.gate('field_experience'),
+                         young['next_decision']['screening']['ready_to_design_experiment'])
         self.assertTrue(rt.gate('E0')) # probability shortage must not deadlock collection
 
     def test_retroactive_preparation_blocked_for_every_theme(self):
