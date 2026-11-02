@@ -72,6 +72,12 @@ def render(prod,*,candidate=False,assets=(),page=None):
         if plain in PAGES: return 'href='+quote+'staging/'+plain+hashpart+(sep+tail if sep else '')+quote
         return match.group(0)
     out=re.sub(r'href=(["\x27])([^"\x27]+)\1',fix,out)
+    # Links built by page scripts from a config ("href": "baba-models.html") bypass the href= rewrite above
+    # and, with <base href="../">, would open the production page. Keep them on staging too.
+    def fix_cfg(m):
+        base,sep,tail=m.group(1).partition('#')
+        return m.group(0) if base not in PAGES else '"href": "staging/'+m.group(1)+'"'
+    out=re.sub(r'"href":\s*"([\w-]+\.html(?:#[\w-]*)?)"',fix_cfg,out)
     # Production has the approved visitor widget now. Replace it with the
     # stage's existing READ-ONLY preview instead of rendering duplicate counts.
     if 'id="siteUsageToday"' in out:
