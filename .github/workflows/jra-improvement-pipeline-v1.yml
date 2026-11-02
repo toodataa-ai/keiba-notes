@@ -1,0 +1,64 @@
+name: JRA improvement pipeline status (research -> registration -> comparison -> decision; notify only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-improvement-pipeline-v1.yml'
+      - 'e2e_validation/improvement_pipeline_v1.py'
+      - 'e2e_validation/improvement_pipeline_policy_v1.json'
+      - 'e2e_validation/improvement_experiments_v1.json'
+      - 'docs/data/baba_model_registry.json'
+      - 'docs/data/experience_regime_factor_evidence_status.json'
+  schedule:
+    # 22:40 JST daily: 17 minutes after the experiment scoring job
+    - cron: '40 13 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: jra-postrace-e2e-public-v1
+  cancel-in-progress: false
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Test criteria (no promotion, no cross-unit leakage)
+        run: python -m unittest e2e_validation.test_improvement_pipeline_v1 -v
+      - name: Commit derived pipeline status only
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            python e2e_validation/improvement_pipeline_v1.py
+            git add docs/data/jra_improvement_pipeline_v1.json
+            if git diff --cached --quiet; then echo 'No pipeline changes'; exit 0; fi
+            git commit -q -m 'Update improvement pipeline status (derived, research only)'
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((i*3))
+          done
+          echo 'Could not push pipeline status'; exit 1
+      - name: Open one registration-ready Issue per unit that reached its criteria (notification only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python e2e_validation/improvement_pipeline_v1.py --issues > "$RUNNER_TEMP/ready.jsonl"
+          if [ ! -s "$RUNNER_TEMP/ready.jsonl" ]; then echo 'No unit ready to register'; exit 0; fi
+          gh label create registration-ready --color 1D76DB --description '改善案として登録できる条件に到達（A/B/C待ち・通知のみ）' 2>/dev/null || true
+          while IFS= read -r line; do
+            title=$(printf '%s' "$line" | jq -r .title)
+            id=$(printf '%s' "$line" | jq -r .unit_id)
+            existing=$(gh issue list --state all --label registration-ready --limit 300 --json title --jq "[.[]|select(.title|contains(\"($id)\"))]|length")
+            if [ "$existing" != "0" ]; then echo "Issue already exists for $id"; continue; fi
+            printf '%s' "$line" | jq -r .body > "$RUNNER_TEMP/body.md"
+            gh issue create --title "$title" --label registration-ready --body-file "$RUNNER_TEMP/body.md"
+          done < "$RUNNER_TEMP/ready.jsonl"
