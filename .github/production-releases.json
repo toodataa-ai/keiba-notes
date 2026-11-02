@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.09-20261102",
-  "current_public_version": "1.09",
+  "current_public_release": "release/jra-site-v1.10-20261103",
+  "current_public_version": "1.10",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -192,6 +192,38 @@
         "docs/assets/usage-summary.css",
         "docs/assets/usage-summary.js",
         "docs/assets/visitor-counter.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.10-20261103",
+      "branch": "release/jra-site-v1.10-20261103",
+      "commit_sha": "8dc349191d62cfaf9c51c11446949b7a5646b96a",
+      "deployed_at": "2026-11-03T07:20:36+09:00",
+      "workflow_run_id": 41536404505,
+      "validation_workflow_run_id": 41536404505,
+      "public_version": "1.10",
+      "note": "2026-11-03ユーザー明示承認済み。ページ内の「一番上へ」ボタン／トップ下線の色を戻す：少し下へ読み進めると、画面の右下に「一番上へ」ボタンが出る。あわせてトップのタイトル下線の色を元の色に戻す。",
+      "user_approval_quote": "本番リリースOKです",
+      "staging_candidate_id": "ui-page-nav-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/this-week.html",
+        "docs/schedule.html",
+        "docs/results.html",
+        "docs/methodology.html",
+        "docs/roadmap.html",
+        "docs/e2e.html",
+        "docs/baba-models.html",
+        "docs/local-racing-shadow.html",
+        "docs/experience-regime.html",
+        "docs/release-history.html",
+        "docs/improvement-cycle.html",
+        "docs/assets/page-nav-v1.js"
       ],
       "public_http_files_verified": null
     }
