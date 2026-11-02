@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.05-20261025",
-  "current_public_version": "1.05",
+  "current_public_release": "release/jra-site-v1.06-20261102",
+  "current_public_version": "1.06",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -96,6 +96,27 @@
         "docs/assets/improvement-cycle.css"
       ],
       "public_http_files_verified": 4
+    },
+    {
+      "release_id": "release/jra-site-v1.06-20261102",
+      "branch": "release/jra-site-v1.06-20261102",
+      "commit_sha": "707f01da7dbcd1ea9c04d6dbcb9e1c9f7b847dd4",
+      "deployed_at": "2026-11-02T14:00:46+09:00",
+      "workflow_run_id": 41391527604,
+      "validation_workflow_run_id": 41391527604,
+      "public_version": "1.06",
+      "note": "2026-11-02ユーザー明示承認済み。改善状況ページのシンプル化：改善の流れ（手動/自動）、比較中の改善案ごとの進み具合（○/20レース）、次に試すテーマ、これまでの判定を平易な日本語で表示",
+      "user_approval_quote": "本番リリースお願いします",
+      "staging_candidate_id": "ui-improvement-simple-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/improvement-cycle.html",
+        "docs/assets/improvement-cycle-v2.css"
+      ],
+      "public_http_files_verified": null
     }
   ],
   "pending_public_validation": [
