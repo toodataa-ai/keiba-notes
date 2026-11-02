@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="競馬予想精度向上AIが、これまで何を改善し、今後どの順番で何を検証し、どの条件で本番採用するのか。馬場予測、展開、ACI、再現性、E2E、確率校正、出力品質までを一つの改善思想として公開します。">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>今後のブラッシュアップ思想 | 競馬予想精度向上AI</title>
+  <title>改善の歩み（履歴） | AIによる競馬予想研究所</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
   <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
 <style id="simple-home-navigation-style">
@@ -22,7 +22,7 @@
   <div class="wrap">
     <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
-      <h1>改善は、足すことではない。<br>測って、捨てて、残すこと。</h1>
+      <h1>改善の歩み（履歴）</h1>
       <p class="hero-deck">このページは「次にどんな機能を付けるか」の一覧ではありません。予想精度を高めるために、何を仮説として立て、どう検証し、どこまで自動化し、どの条件を満たしたら本番へ採用するか。その判断基準を、これまでの改善履歴と今後の方向性をつないで公開する読み物です。</p>
       <div class="hero-thesis">目標は、ルールを増やし続けることではありません。<strong>予測時点で使える情報を取りこぼさず、結果リークを防ぎ、改善したつもりの改悪を検出し、効いた部分だけを残す</strong>ことです。</div>
       <div class="status-strip" aria-label="現在地">
@@ -38,9 +38,9 @@
 <main class="wrap article">
   <section class="chapter anchor" id="live-milestones" aria-labelledby="liveMilestoneHeading" style="margin:12px 0 28px;padding:22px;border:2px solid #a7223b;border-radius:18px;background:#fff9fa">
     <small style="display:block;color:#a7223b;font-weight:900;letter-spacing:.05em">本番 / データ連動</small>
-    <h2 id="liveMilestoneHeading" style="margin:8px 0">改善テーマ別の今後のマイルストンはこちら</h2>
-    <p style="margin:6px 0 14px">「展開・馬場・購入セット・若駒」と「E0/E1/E2研究」を<strong>テーマ別の矢羽と進捗グラフ</strong>で表示しています。収集済みの実績、次の判断までの不足数、最低20件の新旧比較、仮定した週当たりペースからの所要期間を確認できます。未検証データは比較完了扱いにしません。</p>
-    <a href="improvement-cycle.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 17px;background:#a7223b;color:white;border-radius:999px;font-weight:850;text-decoration:none">テーマ別ロードマップ・マイルストンを見る →</a>
+    <h2 id="liveMilestoneHeading" style="margin:8px 0">いま比較している改善案は「予想の改善状況」で見られます</h2>
+    <p style="margin:6px 0 14px">いま比較している改善案と、あと何レースで判定できるかを、データ連動で表示しています。このページは、これまでの改善の経緯と、改善案を本番へ採用するまでの判断基準をまとめた<strong>履歴</strong>です。</p>
+    <a href="improvement-cycle.html" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 17px;background:#a7223b;color:white;border-radius:999px;font-weight:850;text-decoration:none">予想の改善状況を見る →</a>
     <p style="margin:12px 0 0;font-size:12px;color:#6b4650">この下は、これまでの改善思想と長期的な方向性を説明する従来ページです。</p>
   </section>
   <section class="toc" aria-labelledby="tocTitle">
@@ -92,15 +92,8 @@
 
   <section class="chapter anchor" id="cycle">
     <div class="chapter-head"><div class="chapter-no">03</div><div><h2>改善は、レースごとの循環と、本番採用のガードを分ける</h2><p class="chapter-lead">トップページで示している基本思想を、ここでは実際の運用レベルまで展開します。</p></div></div>
-    <h3 class="cycle-subhead">まず、日々の基本サイクル</h3>
-    <p>予想を出して終わりではなく、結果を記録し、外れ方まで検証して、次の改善へつなげます。変更内容は版ごとに残し、次のレースで再検証します。</p>
-    <div class="daily-cycle" aria-label="日々の改善サイクル">
-      <div class="daily-cycle-step"><span class="daily-cycle-no">1</span><b>予想する</b><span>最新プロンプトと同じ評価軸で全頭を分析</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">2</span><b>結果を記録</b><span>印・着順・馬券収支を予想時の情報とセットで保存</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">3</span><b>反省・誤差分析</b><span>見落とし、過大評価・過小評価、展開差などを分解</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">4</span><b>プロンプト改良</b><span>再発防止ルールを検討し、変更理由と内容を版管理</span></div>
-      <div class="daily-cycle-step"><span class="daily-cycle-no">5</span><b>次レースで再検証</b><span>改良版を適用し、精度・回収率・誤差の変化を継続観測</span></div>
-    </div>
+    <h3 class="cycle-subhead">日々の基本サイクル</h3>
+    <p>予想を出して終わりではなく、結果を記録し、新旧を比べて、20レース分たまったら人が判定します。いまの進み具合は<a href="improvement-cycle.html">予想の改善状況</a>で確認できます。</p>
     <h3 class="cycle-subhead">リマインドと実行を分離して運用する</h3>
     <p>リマインドが届いたことは、発走前予想や回顧が完了した証拠ではありません。手動指示やGitHub Actionsの実行状況を確認し、必要なファイルの保存と本番HTTP照合まで終えたときだけ完了と判断します。開催有無は土日・祝日月曜を含め公式日程で確認します。</p>
     <div class="phase-grid" aria-label="現在のJRA運用">
@@ -269,7 +262,7 @@
   <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 
-<footer class="wrap foot">競馬予想精度向上AI — 改善案は、検証できる形にしてから採用する。対象成績はJRA各開催日のメインレース。海外競馬・地方競馬は成績集計と改善学習の対象外です。</footer>
+<footer class="wrap foot">AIによる競馬予想研究所 — 改善案は、検証できる形にしてから採用する。対象成績はJRA各開催日のメインレース。海外競馬・地方競馬は成績集計と改善学習の対象外です。</footer>
 
 <script>
 const $=s=>document.querySelector(s);

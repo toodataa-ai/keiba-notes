@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="地方競馬Daily Shadowの発走前予測・proof・結果照合・回顧を、JRA正式予想とは分離して公開します。">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>地方競馬での予想研究 | 競馬予想精度向上AI</title>
+  <title>地方競馬でのAI予想研究 | AIによる競馬予想研究所</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
   <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
   <style>
@@ -127,7 +127,7 @@
       <div class="guardrail"><b>オッズ非混入</b><span>能力順位へ人気・オッズを混ぜない。</span></div>
       <div class="guardrail"><b>原本不変</b><span>結果確定後も発走前predictionを編集しない。</span></div>
       <div class="guardrail"><b>JRA分離</b><span>地方Shadowの結果でJRA正式プロンプトを直接変更しない。</span></div>
-      <div class="guardrail"><b>場別監査</b><span>6場を均質な母集団として扱わず、venue biasを分離する。</span></div>
+      <div class="guardrail"><b>場別監査</b><span>競馬場ごとの特徴が違うので、15場を均質な母集団として扱わず、場ごとの偏りを分けて見る。</span></div>
     </div>
   </section>
 
@@ -144,7 +144,7 @@
   <div class="simple-home-bottom"><a href="staging/index.html">トップページに戻る</a></div>
 </main>
 
-<footer class="wrap foot">地方競馬での予想研究 — Pre-race snapshots are public research artifacts and remain isolated from JRA production.</footer>
+<footer class="wrap foot">地方競馬でのAI予想研究 — 発走前に固定した予想は研究用の公開記録で、JRAの正式予想とは分けて運用しています。</footer>
 <script>
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
