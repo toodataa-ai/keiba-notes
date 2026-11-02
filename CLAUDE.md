@@ -30,7 +30,7 @@
 - 管理単位：展開／馬場（公式馬場補正＋10競馬場）／若駒（0戦・1〜3戦・4戦以上・血統）／購入セット。各単位の段階は 研究→登録→比較→判定。
 - 登録条件：馬場の競馬場＝芝・ダートの両方が「候補」以上（すでに本番で使っている中山・阪神は対象外）／若駒の戦歴区分＝勝率を確かめられる馬30頭分／血統＝0戦・1〜3戦が条件に届き、かつ血統情報が9割以上／その他＝回顧で3レース・2開催以上。
 - 条件に届くと Issue（ラベル registration-ready、題名に単位ID）が1単位1回だけ立つ。ユーザーが A/B/C で答える。**A のとき Claude が比較用プログラムを書いて登録する**（`e2e_validation/challengers/` に追加、`improvement_experiments_v1.json` に別実験IDで登録。単位ごとの登録は登録簿の `unit_ids`（例 `["field_experience:e0"]`）で紐づける。`unit_ids` が無い登録は、その仮説全体の単位だけに紐づく）。
-- 馬場モデルの記録（`baba_models_v2/model_registry.json` → `build_dashboard_data.py` → `docs/data/baba_model_registry.json`）は**自動では更新されない**。バックテストを実行したときに Claude が更新する。21日以上止まると画面に警告が出る（2026-11-02時点で 10/5 から停止）。
+- 馬場モデルの記録（`baba_models_v2/model_registry.json` → `build_dashboard_data.py` → `docs/data/baba_model_registry.json`）は**自動では更新されない**。バックテスト（`.github/workflows/baba-stage-a-all-tracks-v1.yml`、手動起動）を実行し、`baba_models_v2/apply_stage_a_results.py` で記録に反映する。2026-11-02 に札幌・函館・福島・新潟・中京・小倉のStage A（翌朝の含水率）が「候補」になり、東京・京都と合わせて8競馬場がStage A候補。**次はStage B（発走時の馬場の確率予測）**：公式の馬場状態ラベル付きレースデータの収集と校正が必要（昇格基準：ラベル付き80レース・12開催日・2年・雨天遷移6日）。Stage Bが候補になって初めて、競馬場ごとの改善案登録の条件に届く。札幌2018年の書式と画像のみPDF（中京2021年第6回）への対応済み（後者は読み飛ばして記録）。
 - 中山・阪神の馬場モデルは記録上 routing.production=true（本番で使用中の扱い）。ただし実際に予想へどう使われているかは未確認。
 
 ### 登録中の改善案（どちらも 2026-11-02 13:00 JST 以降のレースから計上、各20ペアで判定）

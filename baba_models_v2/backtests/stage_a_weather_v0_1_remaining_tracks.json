@@ -1,0 +1,410 @@
+{
+ "schema_version": 2,
+ "generated_by": ".github/workflows/baba-stage-a-all-tracks-v1.yml",
+ "github_actions_run": "https://github.com/toodataa-ai/keiba-notes/actions/runs/41408448628",
+ "model": "ridge-delta-v0.1 + training-envelope-guard",
+ "feature_policy": {
+  "target_cutoff_local": "04:00",
+  "window_start_local": "06:00 on previous official observation date",
+  "wet_threshold_mm": 1.0,
+  "guardrail": "clip prediction to min/max target moisture observed in each training fold",
+  "future_information_used": false
+ },
+ "weather_stations": {
+  "sapporo": "札幌 観測所 (14/47412)",
+  "hakodate": "函館 観測所 (23/47430)",
+  "fukushima": "福島 観測所 (36/47595)",
+  "niigata": "雨量: 松浜 AMeDAS (54/1469)、その他: 新潟 観測所 (54/47604)",
+  "chukyo": "大府 AMeDAS (51/1638)、副: 名古屋 観測所 (51/47636)",
+  "kokura": "八幡 AMeDAS (82/0780)、副: 行橋 AMeDAS (82/0782)"
+ },
+ "tracks": {
+  "sapporo": {
+   "schema_version": 2,
+   "track": "sapporo",
+   "model": "ridge-delta-v0.1 + training-envelope-guard",
+   "data": {
+    "observations": 183,
+    "date_from": "2018-07-27",
+    "date_to": "2026-09-06",
+    "meetings": 18,
+    "years": 9
+   },
+   "results": {
+    "turf": {
+     "usable_pairs": 122,
+     "forward": {
+      "n": 98,
+      "mae": 0.706714709156325,
+      "rmse": 0.913735219493254,
+      "within_1_0pt": 0.7244897959183674,
+      "max_abs_error": 3.7462360959878254,
+      "baseline_mae": 0.9147959183673472,
+      "baseline_rmse": 1.1796639957450357,
+      "mae_improvement_pct": 22.746189071589708,
+      "rmse_improvement_pct": 22.542756006029506,
+      "wet_n": 23,
+      "wet_mae": 0.9274534082567171,
+      "wet_baseline_mae": 1.3913043478260871
+     },
+     "loyo": {
+      "n": 122,
+      "mae": 0.6774132904489326,
+      "rmse": 0.8384227825528908,
+      "baseline_mae": 1.0032786885245903,
+      "mae_improvement_pct": 32.480047847410326
+     },
+     "guardrail_applied_forward": 1
+    },
+    "dirt": {
+     "usable_pairs": 122,
+     "forward": {
+      "n": 98,
+      "mae": 0.9957494694582301,
+      "rmse": 1.6874947869828767,
+      "within_1_0pt": 0.7040816326530612,
+      "max_abs_error": 9.783728594895981,
+      "baseline_mae": 1.8020408163265307,
+      "baseline_rmse": 2.9456211014774776,
+      "mae_improvement_pct": 44.743234424175235,
+      "rmse_improvement_pct": 42.71174978559002,
+      "wet_n": 23,
+      "wet_mae": 1.8857738860813507,
+      "wet_baseline_mae": 3.7717391304347827
+     },
+     "loyo": {
+      "n": 122,
+      "mae": 1.0398394165249594,
+      "rmse": 1.8115256634525496,
+      "baseline_mae": 2.1364754098360654,
+      "mae_improvement_pct": 51.329212040650276
+     },
+     "guardrail_applied_forward": 2
+    }
+   }
+  },
+  "hakodate": {
+   "schema_version": 2,
+   "track": "hakodate",
+   "model": "ridge-delta-v0.1 + training-envelope-guard",
+   "data": {
+    "observations": 144,
+    "date_from": "2019-06-14",
+    "date_to": "2026-07-19",
+    "meetings": 11,
+    "years": 8
+   },
+   "results": {
+    "turf": {
+     "usable_pairs": 96,
+     "forward": {
+      "n": 72,
+      "mae": 0.8118617495708652,
+      "rmse": 1.092151384256798,
+      "within_1_0pt": 0.7083333333333334,
+      "max_abs_error": 4.958882175066567,
+      "baseline_mae": 1.120138888888889,
+      "baseline_rmse": 1.6527439305591174,
+      "mae_improvement_pct": 27.521331718410057,
+      "rmse_improvement_pct": 33.91889910693382,
+      "wet_n": 20,
+      "wet_mae": 1.1682297785730256,
+      "wet_baseline_mae": 2.06
+     },
+     "loyo": {
+      "n": 96,
+      "mae": 0.8554646893909724,
+      "rmse": 1.1274141687486674,
+      "baseline_mae": 1.0645833333333334,
+      "mae_improvement_pct": 19.643238569928233
+     },
+     "guardrail_applied_forward": 11
+    },
+    "dirt": {
+     "usable_pairs": 96,
+     "forward": {
+      "n": 72,
+      "mae": 0.8137461326284187,
+      "rmse": 1.0388289520535028,
+      "within_1_0pt": 0.7083333333333334,
+      "max_abs_error": 3.8636271070654455,
+      "baseline_mae": 2.4805555555555556,
+      "baseline_rmse": 3.8169395826732413,
+      "mae_improvement_pct": 67.1950047316651,
+      "rmse_improvement_pct": 72.78372031956697,
+      "wet_n": 20,
+      "wet_mae": 1.159900014357795,
+      "wet_baseline_mae": 5.3025
+     },
+     "loyo": {
+      "n": 96,
+      "mae": 0.8974596948423277,
+      "rmse": 1.174955594615689,
+      "baseline_mae": 2.3859375,
+      "mae_improvement_pct": 62.38544828427703
+     },
+     "guardrail_applied_forward": 12
+    }
+   }
+  },
+  "fukushima": {
+   "schema_version": 2,
+   "track": "fukushima",
+   "model": "ridge-delta-v0.1 + training-envelope-guard",
+   "data": {
+    "observations": 229,
+    "date_from": "2018-11-02",
+    "date_to": "2026-07-19",
+    "meetings": 23,
+    "years": 9
+   },
+   "results": {
+    "turf": {
+     "usable_pairs": 152,
+     "forward": {
+      "n": 126,
+      "mae": 0.7743043699959833,
+      "rmse": 0.9884599424123593,
+      "within_1_0pt": 0.7222222222222222,
+      "max_abs_error": 3.0,
+      "baseline_mae": 0.8496031746031747,
+      "baseline_rmse": 1.2482765897205812,
+      "mae_improvement_pct": 8.86282053293425,
+      "rmse_improvement_pct": 20.81402867343528,
+      "wet_n": 27,
+      "wet_mae": 1.0098222097123097,
+      "wet_baseline_mae": 1.6
+     },
+     "loyo": {
+      "n": 152,
+      "mae": 0.731926463506313,
+      "rmse": 0.9692911244154199,
+      "baseline_mae": 0.8904605263157895,
+      "mae_improvement_pct": 17.803603654998476
+     },
+     "guardrail_applied_forward": 6
+    },
+    "dirt": {
+     "usable_pairs": 152,
+     "forward": {
+      "n": 126,
+      "mae": 1.2022086276452417,
+      "rmse": 1.6533802235340034,
+      "within_1_0pt": 0.5793650793650794,
+      "max_abs_error": 7.979243755857889,
+      "baseline_mae": 1.8182539682539682,
+      "baseline_rmse": 3.026221385327893,
+      "mae_improvement_pct": 33.88114924343061,
+      "rmse_improvement_pct": 45.36486221562873,
+      "wet_n": 27,
+      "wet_mae": 2.328913768069487,
+      "wet_baseline_mae": 4.461111111111111
+     },
+     "loyo": {
+      "n": 152,
+      "mae": 1.0780839074078057,
+      "rmse": 1.5283540778833238,
+      "baseline_mae": 1.7726973684210527,
+      "mae_improvement_pct": 39.1839844401609
+     },
+     "guardrail_applied_forward": 6
+    }
+   }
+  },
+  "niigata": {
+   "schema_version": 2,
+   "track": "niigata",
+   "model": "ridge-delta-v0.1 + training-envelope-guard",
+   "data": {
+    "observations": 349,
+    "date_from": "2018-07-27",
+    "date_to": "2026-10-25",
+    "meetings": 34,
+    "years": 9
+   },
+   "results": {
+    "turf": {
+     "usable_pairs": 233,
+     "forward": {
+      "n": 188,
+      "mae": 0.7457047219385938,
+      "rmse": 0.9946757854923579,
+      "within_1_0pt": 0.7074468085106383,
+      "max_abs_error": 3.6566204428963793,
+      "baseline_mae": 1.1973404255319147,
+      "baseline_rmse": 1.7403304283957113,
+      "mae_improvement_pct": 37.71990771903347,
+      "rmse_improvement_pct": 42.845578675005996,
+      "wet_n": 62,
+      "wet_mae": 0.9864141240713707,
+      "wet_baseline_mae": 1.961290322580645
+     },
+     "loyo": {
+      "n": 233,
+      "mae": 0.7336724525485778,
+      "rmse": 0.9619332215515027,
+      "baseline_mae": 1.2201716738197423,
+      "mae_improvement_pct": 39.871374799923096
+     },
+     "guardrail_applied_forward": 0
+    },
+    "dirt": {
+     "usable_pairs": 233,
+     "forward": {
+      "n": 188,
+      "mae": 1.2414066953544172,
+      "rmse": 1.7173997760007864,
+      "within_1_0pt": 0.5638297872340425,
+      "max_abs_error": 9.577673873911591,
+      "baseline_mae": 2.1920212765957445,
+      "baseline_rmse": 3.4583578995965887,
+      "mae_improvement_pct": 43.367032582715254,
+      "rmse_improvement_pct": 50.3406001963788,
+      "wet_n": 62,
+      "wet_mae": 1.9586784603968597,
+      "wet_baseline_mae": 4.199193548387097
+     },
+     "loyo": {
+      "n": 233,
+      "mae": 1.1516729120898592,
+      "rmse": 1.6049864408475865,
+      "baseline_mae": 2.239055793991416,
+      "mae_improvement_pct": 48.5643495271349
+     },
+     "guardrail_applied_forward": 2
+    }
+   }
+  },
+  "chukyo": {
+   "schema_version": 2,
+   "track": "chukyo",
+   "model": "ridge-delta-v0.1 + training-envelope-guard",
+   "data": {
+    "observations": 371,
+    "date_from": "2018-11-30",
+    "date_to": "2026-08-30",
+    "meetings": 35,
+    "years": 9
+   },
+   "results": {
+    "turf": {
+     "usable_pairs": 249,
+     "forward": {
+      "n": 217,
+      "mae": 0.7698478651922626,
+      "rmse": 0.9780884950322789,
+      "within_1_0pt": 0.7096774193548387,
+      "max_abs_error": 3.3000000000000007,
+      "baseline_mae": 0.9735023041474654,
+      "baseline_rmse": 1.3520806632060338,
+      "mae_improvement_pct": 20.919769587351016,
+      "rmse_improvement_pct": 27.660492332384234,
+      "wet_n": 53,
+      "wet_mae": 1.0038355808628847,
+      "wet_baseline_mae": 1.509433962264151
+     },
+     "loyo": {
+      "n": 249,
+      "mae": 0.7644039668095393,
+      "rmse": 0.9734791927564803,
+      "baseline_mae": 0.993574297188755,
+      "mae_improvement_pct": 23.065243437520095
+     },
+     "guardrail_applied_forward": 3
+    },
+    "dirt": {
+     "usable_pairs": 249,
+     "forward": {
+      "n": 217,
+      "mae": 1.1042797437678913,
+      "rmse": 1.693350637827491,
+      "within_1_0pt": 0.6359447004608295,
+      "max_abs_error": 7.01052020434599,
+      "baseline_mae": 2.0117511520737326,
+      "baseline_rmse": 3.2414279012049114,
+      "mae_improvement_pct": 45.1085318067501,
+      "rmse_improvement_pct": 47.75911451869608,
+      "wet_n": 53,
+      "wet_mae": 2.1159456129616188,
+      "wet_baseline_mae": 4.254716981132075
+     },
+     "loyo": {
+      "n": 249,
+      "mae": 1.0006498968595088,
+      "rmse": 1.547918998464947,
+      "baseline_mae": 1.9313253012048193,
+      "mae_improvement_pct": 48.18843328799798
+     },
+     "guardrail_applied_forward": 7
+    }
+   },
+   "skipped_image_only_pdfs": [
+    "https://www.jra.go.jp/keiba/baba/archive/2021pdf/chukyo06.pdf"
+   ]
+  },
+  "kokura": {
+   "schema_version": 2,
+   "track": "kokura",
+   "model": "ridge-delta-v0.1 + training-envelope-guard",
+   "data": {
+    "observations": 297,
+    "date_from": "2018-07-27",
+    "date_to": "2026-07-19",
+    "meetings": 23,
+    "years": 9
+   },
+   "results": {
+    "turf": {
+     "usable_pairs": 198,
+     "forward": {
+      "n": 166,
+      "mae": 0.5915054206603144,
+      "rmse": 0.8187533070505962,
+      "within_1_0pt": 0.8373493975903614,
+      "max_abs_error": 3.1499999999999986,
+      "baseline_mae": 0.8783132530120482,
+      "baseline_rmse": 1.325093767993761,
+      "mae_improvement_pct": 32.65438969162401,
+      "rmse_improvement_pct": 38.21167023596996,
+      "wet_n": 58,
+      "wet_mae": 0.8510226121539214,
+      "wet_baseline_mae": 1.3362068965517242
+     },
+     "loyo": {
+      "n": 198,
+      "mae": 0.5532045989123208,
+      "rmse": 0.7498816976180777,
+      "baseline_mae": 0.8454545454545455,
+      "mae_improvement_pct": 34.567197978112596
+     },
+     "guardrail_applied_forward": 4
+    },
+    "dirt": {
+     "usable_pairs": 198,
+     "forward": {
+      "n": 166,
+      "mae": 1.550257101582939,
+      "rmse": 2.4560381755111127,
+      "within_1_0pt": 0.463855421686747,
+      "max_abs_error": 13.387083207041599,
+      "baseline_mae": 2.092168674698795,
+      "baseline_rmse": 3.404435448483576,
+      "mae_improvement_pct": 25.901906460475704,
+      "rmse_improvement_pct": 27.857695859526547,
+      "wet_n": 58,
+      "wet_mae": 2.3558372322197916,
+      "wet_baseline_mae": 3.371551724137931
+     },
+     "loyo": {
+      "n": 198,
+      "mae": 1.4119542462279162,
+      "rmse": 2.1113007904344916,
+      "baseline_mae": 1.9757575757575758,
+      "mae_improvement_pct": 28.53605808969136
+     },
+     "guardrail_applied_forward": 11
+    }
+   }
+  }
+ }
+}

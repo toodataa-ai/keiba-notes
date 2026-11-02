@@ -32,9 +32,9 @@
     }
   ],
   "baba_registry_freshness": {
-    "updated_at": "2026-10-05",
-    "age_days": 28,
-    "is_stale": true,
+    "updated_at": "2026-11-02",
+    "age_days": 0,
+    "is_stale": false,
     "owner": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。"
   },
   "experience_evidence_week": "2026-10-31",
@@ -73,15 +73,23 @@
       "label": "札幌",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.0,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：試作 ／ ダート：試作",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "turf": "pilot",
-        "dirt": "pilot",
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -91,15 +99,23 @@
       "label": "函館",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.0,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：試作 ／ ダート：試作",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "turf": "pilot",
-        "dirt": "pilot",
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -109,15 +125,23 @@
       "label": "福島",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.0,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：試作 ／ ダート：試作",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "turf": "pilot",
-        "dirt": "pilot",
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -127,15 +151,23 @@
       "label": "新潟",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.0,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：試作 ／ ダート：試作",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "turf": "pilot",
-        "dirt": "pilot",
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -145,15 +177,23 @@
       "label": "東京",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.5,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：検証中 ／ ダート：検証中",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
         "turf": "backtesting",
         "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -172,6 +212,14 @@
       "detail": {
         "turf": "validated",
         "dirt": "validated",
+        "stage_a": {
+          "turf": "validated",
+          "dirt": "validated"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": true
       }
     },
@@ -181,15 +229,23 @@
       "label": "中京",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.0,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：試作 ／ ダート：試作",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "turf": "pilot",
-        "dirt": "pilot",
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -199,15 +255,23 @@
       "label": "京都",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.5,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：検証中 ／ ダート：検証中",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
         "turf": "backtesting",
         "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
@@ -226,6 +290,14 @@
       "detail": {
         "turf": "validated",
         "dirt": "validated",
+        "stage_a": {
+          "turf": "validated",
+          "dirt": "validated"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": true
       }
     },
@@ -235,15 +307,23 @@
       "label": "小倉",
       "stage": 0,
       "stage_name": "研究",
-      "frac": 0.0,
+      "frac": 0.375,
       "state": "research",
-      "text": "芝：試作 ／ ダート：試作",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "turf": "pilot",
-        "dirt": "pilot",
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "stage_a": {
+          "turf": "candidate",
+          "dirt": "candidate"
+        },
+        "stage_b": {
+          "turf": "pilot",
+          "dirt": "pilot"
+        },
         "in_production": false
       }
     },
