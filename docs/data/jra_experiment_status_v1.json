@@ -1,0 +1,496 @@
+{
+  "schema_version": 1,
+  "generated_by": "e2e_validation/experiment_runner_v1.py",
+  "automatic_promotion": false,
+  "approval": "A/B/C manual only",
+  "lower_is_better": [
+    "win_brier",
+    "win_log_loss",
+    "top3_brier"
+  ],
+  "experiments": [
+    {
+      "id": "EXP-001",
+      "title": "展開・位置取り補正（ペース予想で先行/差しの勝率を補正）",
+      "hypothesis_ids": [
+        "pace_positioning"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13+pace_v1",
+      "status": "collecting",
+      "effective_prospective_from": "2026-11-02T13:00:00+09:00",
+      "registration_commit_at": "2026-11-02T12:32:59+09:00",
+      "minimum_prospective_pairs": 20,
+      "remaining_prospective_pairs": 20,
+      "ready_for_manual_review": false,
+      "prospective": {
+        "pairs": 0
+      },
+      "replay_support_only": {
+        "pairs": 18,
+        "honmei_win": {
+          "formal": 0.2222,
+          "challenger": 0.1667,
+          "delta": -0.0556
+        },
+        "honmei_top3": {
+          "formal": 0.5,
+          "challenger": 0.5556,
+          "delta": 0.0556
+        },
+        "win_brier": {
+          "formal": 0.8707,
+          "challenger": 0.8691,
+          "delta": -0.0016
+        },
+        "win_log_loss": {
+          "formal": 2.3165,
+          "challenger": 2.3008,
+          "delta": -0.0157
+        },
+        "top3_brier": {
+          "formal": 0.1378,
+          "challenger": 0.138,
+          "delta": 0.0002
+        },
+        "challenger_better_log_loss_races": 14
+      },
+      "replay_caveat": "過去レースの再現。発走前に登録された比較ではないため採用判定の件数に数えない",
+      "races": [
+        {
+          "race_id": "2026-10-12-october-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 1,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.129403,
+            "win_brier": 0.819724,
+            "win_log_loss": 2.044824,
+            "top3_brier": 0.136137
+          },
+          "challenger": {
+            "honmei": 1,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.138177,
+            "win_brier": 0.80452,
+            "win_log_loss": 1.979217,
+            "top3_brier": 0.134378
+          }
+        },
+        {
+          "race_id": "2026-10-12-swan-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 9,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.090851,
+            "win_brier": 0.890914,
+            "win_log_loss": 2.398532,
+            "top3_brier": 0.108907
+          },
+          "challenger": {
+            "honmei": 9,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.096135,
+            "win_brier": 0.880683,
+            "win_log_loss": 2.341997,
+            "top3_brier": 0.111036
+          }
+        },
+        {
+          "race_id": "2026-10-17-fuji-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 4,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.014654,
+            "win_brier": 1.073094,
+            "win_log_loss": 4.223069,
+            "top3_brier": 0.162385
+          },
+          "challenger": {
+            "honmei": 4,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.015839,
+            "win_brier": 1.069552,
+            "win_log_loss": 4.145273,
+            "top3_brier": 0.165929
+          }
+        },
+        {
+          "race_id": "2026-10-17-hokuriku-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 6,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.126823,
+            "win_brier": 0.826912,
+            "win_log_loss": 2.064965,
+            "top3_brier": 0.111723
+          },
+          "challenger": {
+            "honmei": 6,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.135564,
+            "win_brier": 0.81256,
+            "win_log_loss": 1.998311,
+            "top3_brier": 0.108681
+          }
+        },
+        {
+          "race_id": "2026-10-17-tourmaline-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "H",
+          "formal": {
+            "honmei": 5,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.090864,
+            "win_brier": 0.919108,
+            "win_log_loss": 2.398394,
+            "top3_brier": 0.112148
+          },
+          "challenger": {
+            "honmei": 5,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.081327,
+            "win_brier": 0.935069,
+            "win_log_loss": 2.509275,
+            "top3_brier": 0.117472
+          }
+        },
+        {
+          "race_id": "2026-10-18-brazil-cup",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 9,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.185612,
+            "win_brier": 0.731498,
+            "win_log_loss": 1.684099,
+            "top3_brier": 0.131726
+          },
+          "challenger": {
+            "honmei": 9,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.197903,
+            "win_brier": 0.710185,
+            "win_log_loss": 1.619976,
+            "top3_brier": 0.133863
+          }
+        },
+        {
+          "race_id": "2026-10-18-niigata-himba-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "S",
+          "formal": {
+            "honmei": 3,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.248352,
+            "win_brier": 0.644284,
+            "win_log_loss": 1.392908,
+            "top3_brier": 0.125879
+          },
+          "challenger": {
+            "honmei": 1,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.201349,
+            "win_brier": 0.734962,
+            "win_log_loss": 1.602716,
+            "top3_brier": 0.136551
+          }
+        },
+        {
+          "race_id": "2026-10-18-shuka-sho",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 13,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.152024,
+            "win_brier": 0.788537,
+            "win_log_loss": 1.883718,
+            "top3_brier": 0.100851
+          },
+          "challenger": {
+            "honmei": 13,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.160763,
+            "win_brier": 0.774527,
+            "win_log_loss": 1.827826,
+            "top3_brier": 0.097663
+          }
+        },
+        {
+          "race_id": "2026-10-24-artemis-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 5,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.073078,
+            "win_brier": 0.951185,
+            "win_log_loss": 2.616222,
+            "top3_brier": 0.162923
+          },
+          "challenger": {
+            "honmei": 5,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.077706,
+            "win_brier": 0.944496,
+            "win_log_loss": 2.55482,
+            "top3_brier": 0.158909
+          }
+        },
+        {
+          "race_id": "2026-10-24-cassiopeia-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 13,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.065834,
+            "win_brier": 0.951155,
+            "win_log_loss": 2.720624,
+            "top3_brier": 0.150897
+          },
+          "challenger": {
+            "honmei": 13,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.070708,
+            "win_brier": 0.941611,
+            "win_log_loss": 2.649197,
+            "top3_brier": 0.145743
+          }
+        },
+        {
+          "race_id": "2026-10-24-uonuma-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 3,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.077541,
+            "win_brier": 0.964815,
+            "win_log_loss": 2.556954,
+            "top3_brier": 0.194732
+          },
+          "challenger": {
+            "honmei": 10,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.083115,
+            "win_brier": 0.956715,
+            "win_log_loss": 2.487535,
+            "top3_brier": 0.189518
+          }
+        },
+        {
+          "race_id": "2026-10-25-kannazuki-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "S",
+          "formal": {
+            "honmei": 4,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.166489,
+            "win_brier": 0.756597,
+            "win_log_loss": 1.792825,
+            "top3_brier": 0.11265
+          },
+          "challenger": {
+            "honmei": 4,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.172311,
+            "win_brier": 0.748414,
+            "win_log_loss": 1.758453,
+            "top3_brier": 0.115023
+          }
+        },
+        {
+          "race_id": "2026-10-25-kikka-sho",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 8,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.090969,
+            "win_brier": 0.889646,
+            "win_log_loss": 2.397237,
+            "top3_brier": 0.116089
+          },
+          "challenger": {
+            "honmei": 8,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.081776,
+            "win_brier": 0.909401,
+            "win_log_loss": 2.503775,
+            "top3_brier": 0.122124
+          }
+        },
+        {
+          "race_id": "2026-10-25-lumiere-autumn-dash",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 14,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.050055,
+            "win_brier": 0.994666,
+            "win_log_loss": 2.994641,
+            "top3_brier": 0.142521
+          },
+          "challenger": {
+            "honmei": 14,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.045441,
+            "win_brier": 1.004553,
+            "win_log_loss": 3.09133,
+            "top3_brier": 0.145125
+          }
+        },
+        {
+          "race_id": "2026-10-31-fantasy-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "H",
+          "formal": {
+            "honmei": 8,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.086195,
+            "win_brier": 0.951256,
+            "win_log_loss": 2.45114,
+            "top3_brier": 0.233987
+          },
+          "challenger": {
+            "honmei": 8,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.095219,
+            "win_brier": 0.931311,
+            "win_log_loss": 2.351581,
+            "top3_brier": 0.233625
+          }
+        },
+        {
+          "race_id": "2026-10-31-perseus-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "S",
+          "formal": {
+            "honmei": 14,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.126365,
+            "win_brier": 0.851471,
+            "win_log_loss": 2.068584,
+            "top3_brier": 0.123891
+          },
+          "challenger": {
+            "honmei": 14,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.127843,
+            "win_brier": 0.840124,
+            "win_log_loss": 2.056951,
+            "top3_brier": 0.120924
+          }
+        },
+        {
+          "race_id": "2026-11-01-mahoroba-stakes",
+          "grade": "replay_support_only",
+          "pace_forecast": "M",
+          "formal": {
+            "honmei": 12,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.154029,
+            "win_brier": 0.823682,
+            "win_log_loss": 1.870613,
+            "top3_brier": 0.106508
+          },
+          "challenger": {
+            "honmei": 12,
+            "honmei_win": 0,
+            "honmei_top3": 1,
+            "winner_probability": 0.157115,
+            "win_brier": 0.813196,
+            "win_log_loss": 1.850778,
+            "top3_brier": 0.103936
+          }
+        },
+        {
+          "race_id": "2026-11-01-tenno-sho-autumn",
+          "grade": "replay_support_only",
+          "pace_forecast": "H",
+          "formal": {
+            "honmei": 7,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.117877,
+            "win_brier": 0.844493,
+            "win_log_loss": 2.138112,
+            "top3_brier": 0.147047
+          },
+          "challenger": {
+            "honmei": 7,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.124162,
+            "win_brier": 0.832233,
+            "win_log_loss": 2.086169,
+            "top3_brier": 0.143723
+          }
+        }
+      ],
+      "skipped": [
+        {
+          "race_id": "2026-10-10-mimuro-stakes",
+          "reason": "baseline is v3.2"
+        },
+        {
+          "race_id": "2026-10-10-saudi-arabia-royal-cup",
+          "reason": "baseline is v3.2"
+        },
+        {
+          "race_id": "2026-10-11-ireland-trophy",
+          "reason": "baseline is v3.12"
+        },
+        {
+          "race_id": "2026-10-11-uzumasa-stakes",
+          "reason": "baseline is v3.12"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}
