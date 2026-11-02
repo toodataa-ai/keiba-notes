@@ -127,5 +127,21 @@ class RunnerTests(unittest.TestCase):
         self.assertFalse(x["gates"]["automated_prompt_change"])
 
 
+class ReadyIssueTests(unittest.TestCase):
+    def test_body_lists_metrics_and_manual_steps(self):
+        from e2e_validation.experiment_ready_issue_v1 import body, title
+        m = {"formal": 2.3, "challenger": 2.2, "delta": -0.1}
+        exp = {"id": "EXP-9", "title": "t", "baseline": "v3.13", "challenger": "c",
+               "minimum_prospective_pairs": 20,
+               "prospective": {"pairs": 20, "challenger_better_log_loss_races": 12,
+                               **{k: m for k in ("honmei_win", "honmei_top3", "win_brier",
+                                                 "win_log_loss", "top3_brier")}}}
+        b = body(exp, {"decision_rule": "rule"})
+        self.assertIn("20件", b)
+        self.assertIn("rule", b)
+        self.assertIn("自動で採用・正式版変更は行いません", b)
+        self.assertIn("EXP-9", title("EXP-9"))
+
+
 if __name__ == "__main__":
     unittest.main()
