@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.06-20261102",
-  "current_public_version": "1.06",
+  "current_public_release": "release/jra-site-v1.07-20261102",
+  "current_public_version": "1.07",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -115,6 +115,27 @@
       "scope_files": [
         "docs/improvement-cycle.html",
         "docs/assets/improvement-cycle-v2.css"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.07-20261102",
+      "branch": "release/jra-site-v1.07-20261102",
+      "commit_sha": "7a395d3392065e83c325080e97e3c8ca09f0d896",
+      "deployed_at": "2026-11-02T14:32:21+09:00",
+      "workflow_run_id": 41394591364,
+      "validation_workflow_run_id": 41394591364,
+      "public_version": "1.07",
+      "note": "2026-11-02ユーザー明示承認済み。トップと今週のAI予想をわかりやすい日本語に：英語の見出しを日本語に、専門用語を平易に言い換え、研究4件を折りたたみ、フッターの版表示を自動化。今週のAI予想に「予想は発走前に確定し変えていない」の一文を追加。トップの「今週のAI予想」カードに次回のAI予想公開予定を1行表示",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-plain-top-week-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/this-week.html"
       ],
       "public_http_files_verified": null
     }
