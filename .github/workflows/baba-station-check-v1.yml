@@ -11,18 +11,22 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
-      - name: List stations and test one day each
+      - name: Test candidate stations on three dates
         run: |
           python - <<'PY'
-          import re, time, requests
+          import time, requests
           from bs4 import BeautifulSoup
           UA={'User-Agent':'keiba-notes track-condition research/1.0'}
-          for name,prec in (('千葉',45),('兵庫',63)):
-              url=f'https://www.data.jma.go.jp/stats/etrn/select/prefecture.php?prec_no={prec}&block_no=&year=&month=&day=&view='
-              r=requests.get(url,headers=UA,timeout=30); r.encoding=r.apparent_encoding
-              s=BeautifulSoup(r.text,'html.parser'); print('=====',name,prec,r.status_code)
-              for a in s.select('area'):
-                  href=a.get('href',''); m=re.search(r'prec_no=(\d+)&block_no=(\d+)',href)
-                  kind='s1' if 'hourly_s1' in href else ('a1' if 'hourly_a1' in href else '?')
-                  if m: print(' ',a.get('alt'),m.group(1),m.group(2),kind)
+          cands=[('船橋',45,'1236','a1'),('西宮',63,'1588','a1'),('芦屋',63,'1449','a1'),('名塩',63,'0622','a1'),('三田',63,'0969','a1'),('神戸空港',63,'1587','a1'),('大阪',62,'47772','s1'),('千葉',45,'47682','s1')]
+          for name,prec,block,kind in cands:
+              for d in ('2018-06-10','2021-06-10','2025-06-10'):
+                  y,m,dd=d.split('-')
+                  url=f'https://www.data.jma.go.jp/stats/etrn/view/hourly_{kind}.php?prec_no={prec}&block_no={block}&year={y}&month={int(m)}&day={int(dd)}&view='
+                  time.sleep(1)
+                  r=requests.get(url,headers=UA,timeout=30); r.encoding=r.apparent_encoding
+                  s=BeautifulSoup(r.text,'html.parser')
+                  rows=[[td.get_text(' ',strip=True) for td in tr.find_all('td')] for tr in s.find_all('tr')]
+                  rows=[c for c in rows if c and c[0].isdigit() and len(c)>=9]
+                  blank=sum(1 for c in rows for x in c[1:] if '///' in x)
+                  print('RES',name,block,d,'rows',len(rows),'ncols',len(rows[0]) if rows else 0,'missing-cells',blank,'noon',rows[12][:10] if len(rows)>12 else '')
           PY
