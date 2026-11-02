@@ -8,6 +8,8 @@ on:
       - '!docs/lab/change-board.json'
       - '.github/scripts/staging-baseline-v2.py'
       - '.github/workflows/validate-jra-staging-identity-v1.yml'
+      - '.github/staging-candidates.json'
+      - '.github/staging-candidates/**'
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: jra-staging-identity, cancel-in-progress: true}
@@ -33,7 +35,7 @@ jobs:
               assert 'data-stage="preview"' in text,(name,'missing marker attribute')
               assert text.count('class="staging-shell-marker"')==1,(name,'missing stage badge')
               assert 'noindex,nofollow' in text and 'staging/stage-indicator.css' in text
-              assert text==g.render((root/name).read_text())
+              assert text==g.expected(name),(name,'staging must equal render(production) or render(pending candidate)')
           for name in ('race-simulator.html','race-course-catalog.html',
              'weekend-main-course-review.html','purchase-preview.html',
              'jra-v315-20261012/index.html'):

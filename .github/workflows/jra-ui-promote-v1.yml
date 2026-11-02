@@ -1,0 +1,85 @@
+name: Promote approved STAGING UI candidate to production
+# Run ONLY after the user explicitly approved the candidate seen on STAGING.
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_id:
+        description: 'Candidate id in .github/staging-candidates.json'
+        required: true
+      approval_quote:
+        description: "The user's explicit approval, verbatim (e.g. 本番リリースOK)"
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: jra-stage-baseline-mirror-v2
+  cancel-in-progress: false
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Copy candidate to production, re-baseline STAGING, record approved release
+        id: promote
+        env:
+          CANDIDATE: ${{ inputs.candidate_id }}
+          APPROVAL: ${{ inputs.approval_quote }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            BASE=$(git rev-parse HEAD)
+            PROTECT=$(for t in docs/data docs/reports docs/pdfs e2e_validation local_racing_shadow_v1; do git rev-parse "HEAD:$t"; done)
+            SCOPE=$(python3 .github/scripts/jra-ui-promote-v1.py apply --candidate "$CANDIDATE")
+            python3 .github/scripts/staging-baseline-v2.py
+            git add -A -- docs .github/staging-candidates.json .github/staging-candidates
+            python3 - "$SCOPE" <<'PY'
+          import json,subprocess,sys
+          scope=set(json.loads(sys.argv[1]))
+          files=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          extra={f for f in files-scope if not (f.startswith('docs/staging/') or f.startswith('.github/staging-candidates'))}
+          assert scope<=files|scope and not extra,('unexpected release scope',sorted(extra))
+          print('PASS_UI_ONLY_RELEASE_SCOPE',sorted(files))
+          PY
+            git commit -q -m "UI release: promote approved STAGING candidate $CANDIDATE"
+            UI_COMMIT=$(git rev-parse HEAD)
+            AFTER=$(for t in docs/data docs/reports docs/pdfs e2e_validation local_racing_shadow_v1; do git rev-parse "HEAD:$t"; done)
+            test "$PROTECT" = "$AFTER" || { echo '::error::Protected data trees changed'; exit 1; }
+            RID=$(python3 .github/scripts/jra-ui-promote-v1.py record --commit "$UI_COMMIT" --run-id "$GITHUB_RUN_ID" --approval "$APPROVAL" --scope "$SCOPE")
+            rm -f .promote-candidate.json
+            python3 .github/scripts/staging-baseline-v2.py --only=release-history.html
+            git add .github/production-releases.json docs/data/production-releases.json docs/staging/release-history.html
+            git commit -q -m "Record approved UI release $RID"
+            python3 .github/scripts/jra-release-guard-v1.py
+            python3 .github/scripts/staging-baseline-v2.py --check
+            if git push origin HEAD:main; then
+              git push origin "$UI_COMMIT:refs/heads/$RID"
+              echo "scope=$SCOPE" >> "$GITHUB_OUTPUT"
+              echo "rid=$RID" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo '::error::main kept moving; rerun the promotion'; exit 1
+      - name: Verify promoted files are served byte-for-byte by GitHub Pages
+        env:
+          SCOPE: ${{ steps.promote.outputs.scope }}
+        run: |
+          set -euo pipefail
+          FILES=$(python3 -c "import json,os;print(' '.join(json.loads(os.environ['SCOPE'])+['docs/data/production-releases.json']))")
+          for attempt in $(seq 1 45); do
+            ok=1
+            for f in $FILES; do
+              if ! curl -fsSL --max-time 20 -H 'Cache-Control: no-cache' "https://toodataa-ai.github.io/keiba-notes/${f#docs/}?promote=$GITHUB_RUN_ID-$attempt" -o /tmp/promote-http ||
+                 ! cmp -s "$f" /tmp/promote-http; then ok=0; echo "not yet: $f ($attempt)"; break; fi
+            done
+            if [ "$ok" = 1 ]; then echo "PASS_PROMOTED_UI_HTTP_BYTES ${{ steps.promote.outputs.rid }}"; exit 0; fi
+            sleep 10
+          done
+          echo '::error::Promoted UI not served byte-for-byte by Pages'; exit 1

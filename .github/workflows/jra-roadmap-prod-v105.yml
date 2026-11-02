@@ -6,6 +6,7 @@ on:
       - 'docs/roadmap.html'
       - 'docs/improvement-cycle.html'
       - 'docs/assets/improvement-cycle.css'
+      - 'docs/assets/improvement-cycle-v2.css'
       - '.github/scripts/test-jra-roadmap-prod-v105.py'
       - '.github/workflows/jra-roadmap-prod-v105.yml'
   push:
@@ -15,6 +16,7 @@ on:
       - 'docs/roadmap.html'
       - 'docs/improvement-cycle.html'
       - 'docs/assets/improvement-cycle.css'
+      - 'docs/assets/improvement-cycle-v2.css'
       - '.github/scripts/test-jra-roadmap-prod-v105.py'
       - '.github/workflows/jra-roadmap-prod-v105.yml'
 permissions: {contents: read}
@@ -45,6 +47,7 @@ jobs:
           allowed={
             'docs/index.html','docs/roadmap.html',
             'docs/improvement-cycle.html','docs/assets/improvement-cycle.css',
+            'docs/assets/improvement-cycle-v2.css',
             '.github/scripts/test-jra-roadmap-prod-v105.py',
             '.github/workflows/jra-roadmap-prod-v105.yml'}
           assert actual and actual<=allowed,("Unexpected release scope",sorted(actual-allowed))

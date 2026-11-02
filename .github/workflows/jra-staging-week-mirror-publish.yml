@@ -17,6 +17,9 @@ on:
       - 'docs/local-racing-shadow.html'
       - 'docs/experience-regime.html'
       - 'docs/release-history.html'
+      - 'docs/improvement-cycle.html'
+      - '.github/staging-candidates.json'
+      - '.github/staging-candidates/**'
   workflow_dispatch:
 permissions: {contents: write}
 concurrency: {group: jra-stage-baseline-mirror-v2, cancel-in-progress: false}
@@ -36,11 +39,13 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             python3 .github/scripts/staging-baseline-v2.py
-            git add -- docs/staging/index.html docs/staging/this-week.html docs/staging/schedule.html docs/staging/results.html docs/staging/methodology.html docs/staging/roadmap.html docs/staging/e2e.html docs/staging/baba-models.html docs/staging/local-racing-shadow.html docs/staging/experience-regime.html docs/staging/release-history.html
+            git add -- docs/staging/index.html docs/staging/this-week.html docs/staging/schedule.html docs/staging/results.html docs/staging/methodology.html docs/staging/roadmap.html docs/staging/e2e.html docs/staging/baba-models.html docs/staging/local-racing-shadow.html docs/staging/experience-regime.html docs/staging/release-history.html docs/staging/improvement-cycle.html
+            git add -A -- docs/staging/candidate-assets
             python3 - <<'PY'
           import subprocess
           files=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
-          assert all(p.startswith('docs/staging/') and p.endswith('.html') and p.count('/')==2 for p in files),files
+          assert all((p.startswith('docs/staging/') and p.endswith('.html') and p.count('/')==2)
+                     or p.startswith('docs/staging/candidate-assets/') for p in files),files
           print('PASS_STAGE_MIRROR_UI_ONLY',sorted(files))
           PY
             if git diff --cached --quiet;then echo PASS_STAGE_ALREADY_BASELINED;break;fi
