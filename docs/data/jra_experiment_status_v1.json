@@ -26,6 +26,11 @@
       "prospective": {
         "pairs": 0
       },
+      "prospective_breakdown": {
+        "venue": {},
+        "surface": {},
+        "going": {}
+      },
       "replay_support_only": {
         "pairs": 18,
         "honmei_win": {
@@ -55,11 +60,227 @@
         },
         "challenger_better_log_loss_races": 14
       },
+      "replay_breakdown": {
+        "venue": {
+          "京都": {
+            "pairs": 7,
+            "honmei_win": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.5714,
+              "challenger": 0.5714,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8878,
+              "challenger": 0.8837,
+              "delta": -0.0041
+            },
+            "win_log_loss": {
+              "formal": 2.3029,
+              "challenger": 2.2906,
+              "delta": -0.0123
+            },
+            "top3_brier": {
+              "formal": 0.1328,
+              "challenger": 0.1331,
+              "delta": 0.0003
+            },
+            "challenger_better_log_loss_races": 5
+          },
+          "新潟": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.5,
+              "challenger": 0.25,
+              "delta": -0.25
+            },
+            "honmei_top3": {
+              "formal": 0.5,
+              "challenger": 0.75,
+              "delta": 0.25
+            },
+            "win_brier": {
+              "formal": 0.8577,
+              "challenger": 0.8772,
+              "delta": 0.0195
+            },
+            "win_log_loss": {
+              "formal": 2.2524,
+              "challenger": 2.295,
+              "delta": 0.0426
+            },
+            "top3_brier": {
+              "formal": 0.1437,
+              "challenger": 0.145,
+              "delta": 0.0013
+            },
+            "challenger_better_log_loss_races": 2
+          },
+          "東京": {
+            "pairs": 7,
+            "honmei_win": {
+              "formal": 0.2857,
+              "challenger": 0.2857,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.4286,
+              "challenger": 0.4286,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8612,
+              "challenger": 0.8499,
+              "delta": -0.0112
+            },
+            "win_log_loss": {
+              "formal": 2.3668,
+              "challenger": 2.3144,
+              "delta": -0.0524
+            },
+            "top3_brier": {
+              "formal": 0.1395,
+              "challenger": 0.139,
+              "delta": -0.0006
+            },
+            "challenger_better_log_loss_races": 7
+          }
+        },
+        "surface": {
+          "ダート": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.5,
+              "challenger": 0.5,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.75,
+              "challenger": 0.75,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8147,
+              "challenger": 0.8084,
+              "delta": -0.0062
+            },
+            "win_log_loss": {
+              "formal": 1.986,
+              "challenger": 1.9862,
+              "delta": 0.0002
+            },
+            "top3_brier": {
+              "formal": 0.1201,
+              "challenger": 0.1218,
+              "delta": 0.0017
+            },
+            "challenger_better_log_loss_races": 3
+          },
+          "芝": {
+            "pairs": 14,
+            "honmei_win": {
+              "formal": 0.1429,
+              "challenger": 0.0714,
+              "delta": -0.0714
+            },
+            "honmei_top3": {
+              "formal": 0.4286,
+              "challenger": 0.5,
+              "delta": 0.0714
+            },
+            "win_brier": {
+              "formal": 0.8867,
+              "challenger": 0.8865,
+              "delta": -0.0003
+            },
+            "win_log_loss": {
+              "formal": 2.411,
+              "challenger": 2.3908,
+              "delta": -0.0202
+            },
+            "top3_brier": {
+              "formal": 0.1429,
+              "challenger": 0.1426,
+              "delta": -0.0003
+            },
+            "challenger_better_log_loss_races": 11
+          }
+        },
+        "going": {
+          "良": {
+            "pairs": 13,
+            "honmei_win": {
+              "formal": 0.2308,
+              "challenger": 0.1538,
+              "delta": -0.0769
+            },
+            "honmei_top3": {
+              "formal": 0.6154,
+              "challenger": 0.6923,
+              "delta": 0.0769
+            },
+            "win_brier": {
+              "formal": 0.8561,
+              "challenger": 0.8545,
+              "delta": -0.0016
+            },
+            "win_log_loss": {
+              "formal": 2.257,
+              "challenger": 2.2354,
+              "delta": -0.0215
+            },
+            "top3_brier": {
+              "formal": 0.1327,
+              "challenger": 0.1325,
+              "delta": -0.0002
+            },
+            "challenger_better_log_loss_races": 11
+          },
+          "道悪（稍重〜不良）": {
+            "pairs": 5,
+            "honmei_win": {
+              "formal": 0.2,
+              "challenger": 0.2,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.2,
+              "challenger": 0.2,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.9087,
+              "challenger": 0.9071,
+              "delta": -0.0016
+            },
+            "win_log_loss": {
+              "formal": 2.4713,
+              "challenger": 2.4709,
+              "delta": -0.0004
+            },
+            "top3_brier": {
+              "formal": 0.1512,
+              "challenger": 0.1523,
+              "delta": 0.0011
+            },
+            "challenger_better_log_loss_races": 3
+          }
+        }
+      },
       "replay_caveat": "過去レースの再現。発走前に登録された比較ではないため採用判定の件数に数えない",
       "races": [
         {
           "race_id": "2026-10-12-october-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 4
@@ -86,6 +307,11 @@
         {
           "race_id": "2026-10-12-swan-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 2
@@ -112,6 +338,11 @@
         {
           "race_id": "2026-10-17-fuji-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 3
@@ -138,6 +369,11 @@
         {
           "race_id": "2026-10-17-hokuriku-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 4
@@ -164,6 +400,11 @@
         {
           "race_id": "2026-10-17-tourmaline-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "ダート",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "H",
             "habitual_leaders": 6
@@ -190,6 +431,11 @@
         {
           "race_id": "2026-10-18-brazil-cup",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 3
@@ -216,6 +462,11 @@
         {
           "race_id": "2026-10-18-niigata-himba-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "S",
             "habitual_leaders": 0
@@ -242,6 +493,11 @@
         {
           "race_id": "2026-10-18-shuka-sho",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 5
@@ -268,6 +524,11 @@
         {
           "race_id": "2026-10-24-artemis-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 3
@@ -294,6 +555,11 @@
         {
           "race_id": "2026-10-24-cassiopeia-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 4
@@ -320,6 +586,11 @@
         {
           "race_id": "2026-10-24-uonuma-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 2
@@ -346,6 +617,11 @@
         {
           "race_id": "2026-10-25-kannazuki-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "pace_forecast": "S",
             "habitual_leaders": 1
@@ -372,6 +648,11 @@
         {
           "race_id": "2026-10-25-kikka-sho",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 2
@@ -398,6 +679,11 @@
         {
           "race_id": "2026-10-25-lumiere-autumn-dash",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 4
@@ -424,6 +710,11 @@
         {
           "race_id": "2026-10-31-fantasy-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "pace_forecast": "H",
             "habitual_leaders": 5
@@ -450,6 +741,11 @@
         {
           "race_id": "2026-10-31-perseus-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "S",
             "habitual_leaders": 1
@@ -476,6 +772,11 @@
         {
           "race_id": "2026-11-01-mahoroba-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "M",
             "habitual_leaders": 2
@@ -502,6 +803,11 @@
         {
           "race_id": "2026-11-01-tenno-sho-autumn",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "pace_forecast": "H",
             "habitual_leaders": 6
@@ -562,6 +868,11 @@
       "prospective": {
         "pairs": 0
       },
+      "prospective_breakdown": {
+        "venue": {},
+        "surface": {},
+        "going": {}
+      },
       "replay_support_only": {
         "pairs": 18,
         "honmei_win": {
@@ -591,11 +902,227 @@
         },
         "challenger_better_log_loss_races": 8
       },
+      "replay_breakdown": {
+        "venue": {
+          "京都": {
+            "pairs": 7,
+            "honmei_win": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.5714,
+              "challenger": 0.4286,
+              "delta": -0.1429
+            },
+            "win_brier": {
+              "formal": 0.8878,
+              "challenger": 0.9005,
+              "delta": 0.0128
+            },
+            "win_log_loss": {
+              "formal": 2.3029,
+              "challenger": 2.3804,
+              "delta": 0.0775
+            },
+            "top3_brier": {
+              "formal": 0.1328,
+              "challenger": 0.1367,
+              "delta": 0.0039
+            },
+            "challenger_better_log_loss_races": 1
+          },
+          "新潟": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.5,
+              "challenger": 0.5,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.5,
+              "challenger": 0.5,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8577,
+              "challenger": 0.8404,
+              "delta": -0.0173
+            },
+            "win_log_loss": {
+              "formal": 2.2524,
+              "challenger": 2.1798,
+              "delta": -0.0725
+            },
+            "top3_brier": {
+              "formal": 0.1437,
+              "challenger": 0.1436,
+              "delta": -0.0001
+            },
+            "challenger_better_log_loss_races": 2
+          },
+          "東京": {
+            "pairs": 7,
+            "honmei_win": {
+              "formal": 0.2857,
+              "challenger": 0.4286,
+              "delta": 0.1429
+            },
+            "honmei_top3": {
+              "formal": 0.4286,
+              "challenger": 0.5714,
+              "delta": 0.1429
+            },
+            "win_brier": {
+              "formal": 0.8612,
+              "challenger": 0.855,
+              "delta": -0.0061
+            },
+            "win_log_loss": {
+              "formal": 2.3668,
+              "challenger": 2.3313,
+              "delta": -0.0355
+            },
+            "top3_brier": {
+              "formal": 0.1395,
+              "challenger": 0.139,
+              "delta": -0.0006
+            },
+            "challenger_better_log_loss_races": 5
+          }
+        },
+        "surface": {
+          "ダート": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.5,
+              "challenger": 0.5,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.75,
+              "challenger": 0.5,
+              "delta": -0.25
+            },
+            "win_brier": {
+              "formal": 0.8147,
+              "challenger": 0.8119,
+              "delta": -0.0028
+            },
+            "win_log_loss": {
+              "formal": 1.986,
+              "challenger": 2.0119,
+              "delta": 0.0259
+            },
+            "top3_brier": {
+              "formal": 0.1201,
+              "challenger": 0.122,
+              "delta": 0.0019
+            },
+            "challenger_better_log_loss_races": 2
+          },
+          "芝": {
+            "pairs": 14,
+            "honmei_win": {
+              "formal": 0.1429,
+              "challenger": 0.2143,
+              "delta": 0.0714
+            },
+            "honmei_top3": {
+              "formal": 0.4286,
+              "challenger": 0.5,
+              "delta": 0.0714
+            },
+            "win_brier": {
+              "formal": 0.8867,
+              "challenger": 0.8859,
+              "delta": -0.0008
+            },
+            "win_log_loss": {
+              "formal": 2.411,
+              "challenger": 2.4038,
+              "delta": -0.0072
+            },
+            "top3_brier": {
+              "formal": 0.1429,
+              "challenger": 0.144,
+              "delta": 0.0011
+            },
+            "challenger_better_log_loss_races": 6
+          }
+        },
+        "going": {
+          "良": {
+            "pairs": 13,
+            "honmei_win": {
+              "formal": 0.2308,
+              "challenger": 0.3077,
+              "delta": 0.0769
+            },
+            "honmei_top3": {
+              "formal": 0.6154,
+              "challenger": 0.6154,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8561,
+              "challenger": 0.8543,
+              "delta": -0.0018
+            },
+            "win_log_loss": {
+              "formal": 2.257,
+              "challenger": 2.2456,
+              "delta": -0.0114
+            },
+            "top3_brier": {
+              "formal": 0.1327,
+              "challenger": 0.1339,
+              "delta": 0.0012
+            },
+            "challenger_better_log_loss_races": 7
+          },
+          "道悪（稍重〜不良）": {
+            "pairs": 5,
+            "honmei_win": {
+              "formal": 0.2,
+              "challenger": 0.2,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.2,
+              "challenger": 0.2,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.9087,
+              "challenger": 0.9089,
+              "delta": 0.0002
+            },
+            "win_log_loss": {
+              "formal": 2.4713,
+              "challenger": 2.5016,
+              "delta": 0.0303
+            },
+            "top3_brier": {
+              "formal": 0.1512,
+              "challenger": 0.1526,
+              "delta": 0.0014
+            },
+            "challenger_better_log_loss_races": 1
+          }
+        }
+      },
       "replay_caveat": "過去レースの再現。発走前に登録された比較ではないため採用判定の件数に数えない",
       "races": [
         {
           "race_id": "2026-10-12-october-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -623,6 +1150,11 @@
         {
           "race_id": "2026-10-12-swan-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -650,6 +1182,11 @@
         {
           "race_id": "2026-10-17-fuji-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -677,6 +1214,11 @@
         {
           "race_id": "2026-10-17-hokuriku-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -704,6 +1246,11 @@
         {
           "race_id": "2026-10-17-tourmaline-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "ダート",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -731,6 +1278,11 @@
         {
           "race_id": "2026-10-18-brazil-cup",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -758,6 +1310,11 @@
         {
           "race_id": "2026-10-18-niigata-himba-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -785,6 +1342,11 @@
         {
           "race_id": "2026-10-18-shuka-sho",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -812,6 +1374,11 @@
         {
           "race_id": "2026-10-24-artemis-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -839,6 +1406,11 @@
         {
           "race_id": "2026-10-24-cassiopeia-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "official_going_prestart": "稍重",
             "race_category": "wet",
@@ -866,6 +1438,11 @@
         {
           "race_id": "2026-10-24-uonuma-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -893,6 +1470,11 @@
         {
           "race_id": "2026-10-25-kannazuki-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "official_going_prestart": "稍重",
             "race_category": "wet",
@@ -920,6 +1502,11 @@
         {
           "race_id": "2026-10-25-kikka-sho",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "official_going_prestart": "稍重",
             "race_category": "wet",
@@ -947,6 +1534,11 @@
         {
           "race_id": "2026-10-25-lumiere-autumn-dash",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "新潟",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "official_going_prestart": "稍重",
             "race_category": "wet",
@@ -974,6 +1566,11 @@
         {
           "race_id": "2026-10-31-fantasy-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "道悪（稍重〜不良）"
+          },
           "challenger_summary": {
             "official_going_prestart": "稍重",
             "race_category": "wet",
@@ -1001,6 +1598,11 @@
         {
           "race_id": "2026-10-31-perseus-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -1028,6 +1630,11 @@
         {
           "race_id": "2026-11-01-mahoroba-stakes",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
@@ -1055,6 +1662,11 @@
         {
           "race_id": "2026-11-01-tenno-sho-autumn",
           "grade": "replay_support_only",
+          "segments": {
+            "venue": "東京",
+            "surface": "芝",
+            "going": "良"
+          },
           "challenger_summary": {
             "official_going_prestart": "良",
             "race_category": "dry",
