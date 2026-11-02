@@ -146,9 +146,11 @@ Promise.all([
   const gchip=(n,g)=>`<span style="margin-right:14px;white-space:nowrap">${n} <b style="color:${gcol[g.state]||'#666'}">${esc(g.label)}</b></span>`;
   const row=u=>{
     const g=u.detail&&u.detail.going;
-    if(g&&u.state==='research') return `<div class="pr"><span class="pl">${esc(u.label)}</span><span class="pt">${gchip('芝',g.turf)}${gchip('ダート',g.dirt)}</span></div>`;
-    const txt=(g&&u.detail.going_text)?u.detail.going_text:u.text;
-    return `<div class="pr"><span class="pl">${esc(u.label)}</span>${bar(u)}<span class="pt">${esc(txt)}</span></div>`};
+    if(g){
+      const note={ready_to_register:'登録できる状態（通知を出しています）',in_production:'本番の予想で使用中',comparing:'改善案として比較中',decided:'判定済み'}[u.state]||'';
+      return `<div class="pr"><span class="pl">${esc(u.label)}</span><span class="pt">${gchip('芝',g.turf)}${gchip('ダート',g.dirt)}${note?`<br><span class="tiny" style="color:#555">${note}</span>`:''}</span></div>`;
+    }
+    return `<div class="pr"><span class="pl">${esc(u.label)}</span>${bar(u)}<span class="pt">${esc(u.text)}</span></div>`};
   const groups=cfg.themes.map(t=>{
     const us=pipe.units.filter(u=>u.theme===t.id);
     const ids=new Set(us.map(u=>u.experiment_id).filter(Boolean));
