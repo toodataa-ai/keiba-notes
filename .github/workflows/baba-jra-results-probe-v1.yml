@@ -32,15 +32,14 @@ jobs:
               for p,c in a[:25]: print('   ',p,c)
               for m in list(re.finditer('馬場',txt))[:4]: print('  ...',txt[max(0,m.start()-30):m.end()+40])
               return a
-          r=post('/JRADB/accessS.html','pw01sli00/AF'); a=show('list',r)
-          # a meeting-level link (開催) : pick first accessS cname not equal to the list itself
-          cand=[x for x in a if x[0].endswith('accessS.html') and x[1]!='pw01sli00/AF']
-          if cand:
-              r2=post(*cand[0]); a2=show('level2 '+cand[0][1],r2)
-              c2=[x for x in a2 if x[0].endswith('accessS.html')]
-              if c2:
-                  r3=post(*c2[0]); a3=show('level3 '+c2[0][1],r3)
-                  c3=[x for x in a3 if x[0].endswith('accessS.html')]
-                  if c3:
-                      r4=post(*c3[0]); show('level4 '+c3[0][1],r4)
+          def sacts(a): return [x for x in a if x[0].endswith('accessS.html')]
+          r=post('/JRADB/accessS.html','pw01skl10202511/EC'); a=show('month 2025-11',r)
+          print('  month links:',[c for p,c in sacts(a) if c.startswith('pw01skl10')])
+          r=post('/JRADB/accessS.html','pw01srl10052026041120261101/E2'); a=show('meeting day Tokyo 2026-11-01',r)
+          rc=[c for p,c in sacts(a) if c.startswith('pw01sde')]
+          print('  race links',len(rc),rc[:3])
+          if rc:
+              r=post('/JRADB/accessS.html',rc[0]); s2=BeautifulSoup(r.text,'html.parser'); t=s2.get_text(' ',strip=True)
+              print('#### race page',r.status_code,len(t))
+              for m in list(re.finditer(r'(芝|ダート)\s*[:：]?\s*(良|稍重|重|不良)|天候|馬場',t))[:8]: print('  ...',t[max(0,m.start()-30):m.end()+40])
           PY
