@@ -10,8 +10,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf
-      - name: Look for course (A-D) wording
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Find baba overview pages and their course tables
         working-directory: baba_models_v2
         run: |
           python - <<'PY'
@@ -19,13 +19,18 @@ jobs:
           from bs4 import BeautifulSoup
           import jra_observations as j
           H={'User-Agent':j.UA}
-          def ctx(t,pat,n=4,w=70):
-              out=[]
-              for m in list(re.finditer(pat,t))[:n]: out.append(t[max(0,m.start()-w):m.end()+w].replace('\n',' '))
-              return out
-          for u in ['https://www.jra.go.jp/keiba/baba/archive/2024pdf/tokyo01.pdf','https://www.jra.go.jp/keiba/baba/archive/2022pdf/nakayama01.pdf','https://www.jra.go.jp/keiba/baba/archive/2019pdf/nakayama01.pdf']:
-              time.sleep(2); r=requests.get(u,headers=H,timeout=60); print('####PDF',u,r.status_code,len(r.content))
-              if r.status_code==200:
-                  t=j.extract_pdf_text(r.content); print('  len',len(t)); print('  HEAD',t[:900].replace('\n',' | '))
-                  for c in ctx(t,r'コース|[ABCD]コース|仮柵|内柵'): print('  CTX',c)
+          def get(u):
+              time.sleep(2); r=requests.get(u,headers=H,timeout=40); r.encoding=r.apparent_encoding; return r
+          for y in (2018,2020,2024):
+              r=get(j.archive_url(y)); print('####archive',y,r.status_code,r.url)
+              s=BeautifulSoup(r.text,'html.parser')
+              hs=sorted({a['href'] for a in s.find_all('a',href=True) if 'overview' in a['href']})
+              print('  overview links',len(hs),hs[:12])
+          for u in ['https://www.jra.go.jp/keiba/baba/overview/','https://www.jra.go.jp/keiba/baba/overview/2024_2-3_tokyo.html','https://www.jra.go.jp/keiba/baba/overview/2018_1-2_tokyo.html','https://www.jra.go.jp/keiba/baba/overview/2019_1-2_tokyo.html']:
+              r=get(u); print('####',u,r.status_code,len(r.text))
+              if r.status_code!=200: continue
+              s=BeautifulSoup(r.text,'html.parser')
+              for a in sorted({a['href'] for a in s.find_all('a',href=True) if 'overview' in a['href']})[:12]: print('  LINK',a)
+              k=r.text.find('使用コース'); print('  RAW',re.sub(r'\s+',' ',r.text[k-100:k+1400]))
+              print('  TITLE',s.title.get_text(strip=True) if s.title else '')
           PY
