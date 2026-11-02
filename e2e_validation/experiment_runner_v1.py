@@ -122,6 +122,17 @@ def score(win: dict, honmei: int, finish: list) -> dict:
 METRICS = ["honmei_win", "honmei_top3", "win_brier", "win_log_loss", "top3_brier"]
 
 
+def breakdown(rows: list) -> dict:
+    """Side-effect check: the same metrics split by venue, surface and prestart going."""
+    out = {}
+    for dim in ("venue", "surface", "going"):
+        groups = {}
+        for r in rows:
+            groups.setdefault((r.get("segments") or {}).get(dim, "不明"), []).append(r)
+        out[dim] = {k: summarize(v) for k, v in sorted(groups.items())}
+    return out
+
+
 def summarize(rows: list) -> dict:
     if not rows:
         return {"pairs": 0}
@@ -203,7 +214,16 @@ def run(write: bool = True) -> dict:
             honmei = next((h["horse_number"] for h in formal["step1_ranking"] if h.get("mark") == "◎"),
                           max(formal_win, key=formal_win.get))
             ch_win = {r["horse_number"]: r["challenger_win_probability"] for r in ch["runners"]}
+            ctx = formal.get("race_context") or {}
+            going = ctx.get("official_going")
             rows.append({"race_id": rid, "grade": grade,
+                         "segments": {
+                             "venue": ctx.get("venue") or "不明",
+                             "surface": "芝" if str(ctx.get("surface", "")).startswith("芝")
+                             else "ダート" if str(ctx.get("surface", "")).startswith("ダ") else "不明",
+                             "going": ("良" if going == "良" else "道悪（稍重〜不良）"
+                                       if going in ("稍重", "重", "不良") else "不明"),
+                         },
                          "challenger_summary": {k: v for k, v in ch.items()
                                                 if k not in ("runners", "marks", "challenger")},
                          "formal": score(formal_win, honmei, finish),
@@ -219,7 +239,9 @@ def run(write: bool = True) -> dict:
             "remaining_prospective_pairs": max(0, minimum - len(prospective)),
             "ready_for_manual_review": len(prospective) >= minimum,
             "prospective": summarize(prospective),
+            "prospective_breakdown": breakdown(prospective),
             "replay_support_only": summarize(replay),
+            "replay_breakdown": breakdown(replay),
             "replay_caveat": "過去レースの再現。発走前に登録された比較ではないため採用判定の件数に数えない",
             "races": rows, "skipped": skipped,
         })
