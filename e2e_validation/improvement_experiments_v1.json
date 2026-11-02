@@ -40,6 +40,36 @@
       ],
       "decision_rule": "発走前登録後の同一レース20ペア以上で、win_log_lossとwin_brierがともに正式版より改善し、◎3着内率が悪化しない場合にA/B/C承認へ提出。どれかを満たさなければ棄却して次の案へ",
       "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない"
+    },
+    {
+      "id": "EXP-002",
+      "title": "馬場状態補正（発走前の公式馬場と各馬の良/道悪実績で勝率を補正）",
+      "hypothesis_ids": [
+        "track_condition"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13+going_v1",
+      "status": "collecting",
+      "registered_by": "Claude (user-approved, 2026-11-02)",
+      "prospective_from": "2026-11-02T13:00:00+09:00",
+      "change_scope": "STEP1の勝率のみ。正式の印・買い目・final_betsには一切反映しない研究用shadow",
+      "inputs": "発走前に固定された正式v3.13 STEP1（発走前の公式馬場、近走の馬場・着順・頭数）だけ。オッズ・結果・発走後の馬場変化は使わない",
+      "method": "同じ芝/ダートの近走で、良と道悪（稍重・重・不良）の両方に出走歴がある馬だけ、今回の馬場区分での着順スコア平均から他方の平均を引いた差を求め、勝率にexp(k×差)を掛けて正規化（道悪レースk=0.8、良レースk=0.4、倍率0.80〜1.25）",
+      "code": {
+        "path": "e2e_validation/challengers/going_v1.py",
+        "module": "e2e_validation.challengers.going_v1",
+        "git_blob_sha": "1024640be87cd1c619f7b446fb065387e000b4c3"
+      },
+      "primary_metric": "win_log_loss（低いほど良い）",
+      "secondary_metrics": [
+        "win_brier",
+        "top3_brier",
+        "honmei_win",
+        "honmei_top3"
+      ],
+      "decision_rule": "発走前登録後の同一レース20ペア以上で、win_log_lossとwin_brierがともに正式版より改善し、◎3着内率が悪化しない場合にA/B/C承認へ提出。道悪レースだけの成績も別に確認する",
+      "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない",
+      "not_covered": "内外の有利不利（トラックバイアス）は発走前の根拠データが封印予想に無いため対象外。別の改善案で扱う"
     }
   ],
   "note": "Registered challengers run as deterministic SHA-pinned overlays on the sealed formal STEP1. Only races starting after registration count as prospective pairs."

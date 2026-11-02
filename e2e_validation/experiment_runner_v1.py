@@ -69,6 +69,17 @@ def formal_prediction(entry: dict):
     return pred, entry["prediction_path"]
 
 
+def same_record(a, b, tol=1e-9) -> bool:
+    """Equality that ignores last-bit float noise across Python versions."""
+    if isinstance(a, float) or isinstance(b, float):
+        return isinstance(a, (int, float)) and isinstance(b, (int, float)) and abs(a - b) <= tol
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(same_record(a[k], b[k], tol) for k in a)
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(same_record(x, y, tol) for x, y in zip(a, b))
+    return a == b
+
+
 def top3_probs(win: dict) -> dict:
     """Exact P(horse finishes top 3) under Plackett-Luce from win probabilities."""
     keys = list(win)
@@ -174,7 +185,7 @@ def run(write: bool = True) -> dict:
             dest = ROOT / OUT_DIR / exp["id"] / "predictions" / f"{rid}.json"
             if dest.exists():
                 old = json.loads(dest.read_text(encoding="utf-8"))
-                if old.get("runners") != record["runners"]:
+                if not same_record(old.get("runners"), record["runners"]):
                     report["errors"].append(f"{exp['id']}/{rid}: stored challenger prediction differs; refusing to overwrite")
                     continue
             elif write:
@@ -192,7 +203,9 @@ def run(write: bool = True) -> dict:
             honmei = next((h["horse_number"] for h in formal["step1_ranking"] if h.get("mark") == "◎"),
                           max(formal_win, key=formal_win.get))
             ch_win = {r["horse_number"]: r["challenger_win_probability"] for r in ch["runners"]}
-            rows.append({"race_id": rid, "grade": grade, "pace_forecast": ch.get("pace_forecast"),
+            rows.append({"race_id": rid, "grade": grade,
+                         "challenger_summary": {k: v for k, v in ch.items()
+                                                if k not in ("runners", "marks", "challenger")},
                          "formal": score(formal_win, honmei, finish),
                          "challenger": score(ch_win, ch["marks"]["◎"], finish)})
         prospective = [r for r in rows if r["grade"] == "prospective_preregistered"]
