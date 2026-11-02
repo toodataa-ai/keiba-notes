@@ -18,6 +18,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  issues: write
 concurrency:
   # Shares the group with the postrace E2E publisher: both rewrite jra_improvement_cycle_v1.json
   group: jra-postrace-e2e-public-v1
@@ -65,3 +66,19 @@ jobs:
             sleep $((i*3))
           done
           echo 'Could not push experiment records'; exit 1
+      - name: Open one approval-review Issue per experiment that reached the paired minimum
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python e2e_validation/experiment_ready_issue_v1.py > "$RUNNER_TEMP/ready.jsonl"
+          if [ ! -s "$RUNNER_TEMP/ready.jsonl" ]; then echo 'No experiment ready for review'; exit 0; fi
+          gh label create experiment-ready --color 0E8A16 --description '新旧比較が規定件数に到達（手動A/B/C判定待ち）' 2>/dev/null || true
+          while IFS= read -r line; do
+            title=$(printf '%s' "$line" | jq -r .title)
+            id=$(printf '%s' "$line" | jq -r .experiment_id)
+            existing=$(gh issue list --state all --label experiment-ready --limit 200 --json title --jq "[.[]|select(.title|contains(\"$id\"))]|length")
+            if [ "$existing" != "0" ]; then echo "Issue already exists for $id"; continue; fi
+            printf '%s' "$line" | jq -r .body > "$RUNNER_TEMP/body.md"
+            gh issue create --title "$title" --label experiment-ready --body-file "$RUNNER_TEMP/body.md"
+          done < "$RUNNER_TEMP/ready.jsonl"
