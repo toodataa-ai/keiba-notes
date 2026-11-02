@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.08-20261102",
-  "current_public_version": "1.08",
+  "current_public_release": "release/jra-site-v1.09-20261102",
+  "current_public_version": "1.09",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -156,6 +156,42 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.09-20261102",
+      "branch": "release/jra-site-v1.09-20261102",
+      "commit_sha": "c18a0cdce90c300f50e45311ce901c9c3f3bd562",
+      "deployed_at": "2026-11-02T16:57:05+09:00",
+      "workflow_run_id": 41409567326,
+      "validation_workflow_run_id": 41409567326,
+      "public_version": "1.09",
+      "note": "2026-11-02ユーザー明示承認済み。サイト全体の整理（文字サイズ統一・閲覧数・ページ構成・AI予想ロジックの再構成）：全ページの文字を最大24px（スマホ22px）に統一。トップの閲覧数を控えめな1行にし、?owner=1 を開いたブラウザは数えない。トップのカードを「予想のしくみと改善／改善案を育てる研究／別の研究」に再編。旧比較検証は「旧方式の比較記録（参考）」に格下げ。「今後のブラッシュアップ思想」を「改善の歩み（履歴）」に改名。AI予想ロジックのページを重複を省いて再構成し、番号の誤り等を修正。サイト名を統一",
+      "user_approval_quote": "サイトの改修は本番リリースOKですが",
+      "staging_candidate_id": "ui-site-cleanup-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/this-week.html",
+        "docs/schedule.html",
+        "docs/results.html",
+        "docs/methodology.html",
+        "docs/roadmap.html",
+        "docs/e2e.html",
+        "docs/baba-models.html",
+        "docs/local-racing-shadow.html",
+        "docs/experience-regime.html",
+        "docs/release-history.html",
+        "docs/improvement-cycle.html",
+        "docs/assets/type-scale-v1.css",
+        "docs/assets/theme-light-v1.css",
+        "docs/assets/usage-summary.css",
+        "docs/assets/usage-summary.js",
+        "docs/assets/visitor-counter.js"
       ],
       "public_http_files_verified": null
     }
