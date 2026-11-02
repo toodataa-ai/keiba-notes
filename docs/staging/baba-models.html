@@ -60,6 +60,10 @@
       <tr><td>新しいモデル（天気が完全に当たった場合）</td><td>0.165</td><td>0.154</td><td>0.751</td><td>0.642</td></tr>
     </tbody></table></div>
     <p class="rd-small">「天気が完全に当たった場合」は上限の目安です。過去の天気予報は残っていないため、実際の天気で代用しています。本当の精度は、この行と「予報なし」の行のあいだになります。</p>
+    <h3 style="margin-top:24px" id="overview">競馬場ごとの一覧（ひと目で見る）</h3>
+    <p class="rd-small">数字は「今のやり方より、馬場状態の外れ具合が何％減ったか」です。プラスなら良くなった、マイナスなら悪くなったことを表します。「予報なし」は天気予報を使わない場合、「予報が当たれば」は天気予報が完全に当たったと仮定した上限です。</p>
+    <div class="rd-tablewrap"><style>#ovTable th,#ovTable td{padding:8px 5px;font-size:13px;text-align:center}#ovTable td:first-child,#ovTable th:first-child{text-align:left}</style><table class="rd-table" id="ovTable"><thead><tr><th rowspan="2">競馬場</th><th colspan="2">芝</th><th colspan="2">ダート</th></tr><tr><th>予報なし</th><th>予報<br>当たれば</th><th>予報なし</th><th>予報<br>当たれば</th></tr></thead><tbody id="ovBody"><tr><td colspan="5">読み込み中…</td></tr></tbody></table></div>
+    <p class="rd-small">緑の太字は、今のやり方より15％以上良くなった（外れ具合が15％以上減った）ものです。「本番で使用中」は、馬場の研究結果をすでに本番の予想に使っている競馬場です。</p>
     <h3 style="margin-top:24px">分かったこと</h3>
     <ul>
       <li>当日朝の含水率が、いちばん効く情報の一つです。</li>
@@ -79,9 +83,11 @@
   </section>
 
   <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>競馬場別の整備状況</h2><p class="chapter-lead">競馬場ごとに、芝・ダートの研究状況と精度を確認できます。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>競馬場別の詳しい数字</h2><p class="chapter-lead">上の一覧の元になる、競馬場ごとの詳しい数字です。必要なときだけ開いてください。</p></div></div>
+    <details class="rd-tech"><summary>競馬場ごとの詳しい数字を開く（専門的な内容です）</summary>
     <div class="rd-chips" style="margin:18px 0 12px"><span class="rd-chip validated">検証済み</span><span class="rd-chip candidate">候補</span><span class="rd-chip backtesting">検証中</span><span class="rd-chip pilot">試験運用</span><span class="rd-chip degraded">要改善</span></div>
     <div id="cards" class="rd-model-grid"><p class="rd-small">モデルレジストリを読み込み中…</p></div>
+  </details>
   </section>
 
   <details class="rd-tech">
@@ -111,6 +117,20 @@
 
   <div class="rd-home-bottom"><a href="staging/index.html">トップページに戻る</a></div>
 </main>
+<script>
+(function(){
+const SB={"札幌": {"turf": [-24, 21], "dirt": [20, 29]}, "函館": {"turf": [-3, 10], "dirt": [12, 40]}, "福島": {"turf": [6, 67], "dirt": [11, 55]}, "新潟": {"turf": [-1, 54], "dirt": [8, 74]}, "東京": {"turf": [27, 44], "dirt": [0, 51]}, "中山": {"turf": [-5, 39], "dirt": [18, 38]}, "中京": {"turf": [-8, 50], "dirt": [15, 21]}, "京都": {"turf": [-2, 47], "dirt": [24, 50]}, "阪神": {"turf": [8, 55], "dirt": [22, 51]}, "小倉": {"turf": [-10, 33], "dirt": [13, 21]}};
+const lab={validated:'検証済み',candidate:'候補',backtesting:'検証中',pilot:'試験運用',degraded:'要改善',retired:'終了'};
+const cell=v=>{if(v==null)return '<td>—</td>';const c=v>=15?'#1a6b3a':(v<0?'#a32020':'#444');const w=v>=15?700:400;return `<td style="color:${c};font-weight:${w};white-space:nowrap">${v>0?'+':''}${v}%</td>`};
+fetch('data/baba_model_registry.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+ const by={};for(const m of d.models){by[m.track_ja+m.surface]=m}
+ document.getElementById('ovBody').innerHTML=Object.keys(SB).map(t=>{
+  const row=s=>{const m=by[t+s];const b=SB[t][s]||[null,null];return `${cell(b[0])}${cell(b[1])}`};
+  const prod=(by[t+'turf']&&by[t+'turf'].routing&&by[t+'turf'].routing.production)?'<br><span class="rd-small">本番で使用中</span>':'';
+  return `<tr><td><b>${t}</b>${prod}</td>${row('turf')}${row('dirt')}</tr>`}).join('');
+}).catch(()=>{document.getElementById('ovBody').innerHTML='<tr><td colspan="5">一覧を読み込めませんでした。</td></tr>'});
+})();
+</script>
 <script>
 const th=[['札幌','≤15','14–18','17–21','≥20'],['函館','≤15','14–18','17–21','≥20'],['福島','≤15','13–17','15–19','≥17'],['新潟','≤15','13–17','15–19','≥17'],['中山','≤13','11–15','14–18','≥17'],['東京','≤19','17–21','18–23','≥20'],['中京','≤14','12–16','14–17','≥16'],['京都','≤13','11–14','13–16','≥14'],['阪神','≤14','12–16','14–18','≥16'],['小倉','≤10','8–12','10–14','≥12']];
 document.querySelector('#thresholds').innerHTML=th.map(r=>'<tr>'+r.map(x=>`<td>${x}</td>`).join('')+'</tr>').join('');
