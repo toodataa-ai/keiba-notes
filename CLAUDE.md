@@ -1,7 +1,7 @@
 # CLAUDE.md — keiba-notes（Claude向け引き継ぎ）
 
 このリポジトリで作業する Claude は、まずこのファイルと `AGENTS.md`、`.github/skills/keiba-site-change-routing/SKILL.md` を読むこと。
-最終更新：2026-11-02（Claudeチャットでの検討内容を引き継ぎ）
+最終更新：2026-11-02（v1.06 リリース済み・モデル使い分けを追記）
 
 ## ユーザーの方針
 - 報告は**日本語**で行う（英語で報告しない）。専門用語は避け、平易に。
@@ -33,11 +33,23 @@
 ## サイト変更の仕組み（2026-11-02 作り直し）
 - STAGING ＝「本番＋承認待ちの変更案」。変更案は**本番と同じ書き方**で `.github/staging-candidates/<docs配下と同じパス>` に置き、`.github/staging-candidates.json` に登録 → `python3 .github/scripts/staging-baseline-v2.py` でステージングを生成。docs/staging/ の HTML を直接編集しない（自動で作り直される）。
 - 変更案のページはバッジ「STAGING 変更案・承認待ち」。ステージング内のリンクはステージングに留まる（improvement-cycle.html も対象ページに追加済み）。
-- ユーザーの明示承認（「本番リリースOK」など）を得たら、`.github/workflows/jra-ui-promote-v1.yml` を `candidate_id` と承認の原文 `approval_quote` で実行（`gh workflow run jra-ui-promote-v1.yml -f candidate_id=... -f approval_quote=...`）。本番へバイト一致コピー → ステージング再同期 → リリース台帳に自動採番で記録 → 保護データ不変・ガード・公開HTTP一致を確認。
+- ユーザーの明示承認（「本番リリースOK」など）を得たら、`.github/workflows/jra-ui-promote-v1.yml` を `candidate_id` と承認の原文 `approval_quote` で実行（この環境では下の「作業上の注意」の REST 起動を使う）。本番へバイト一致コピー → ステージング再同期 → リリース台帳に自動採番で記録 → 保護データ不変・ガード・公開HTTP一致を確認。
 - ガード：`.github/scripts/jra-release-guard-v1.py`（全リリース共通の不変条件＋過去リリースの固定値）。
 
 ### 承認待ちの変更案
-- `ui-improvement-simple-v1`：改善状況ページ（improvement-cycle.html）のシンプル版。確認URL：https://toodataa-ai.github.io/keiba-notes/staging/index.html →「改善テーマ別ロードマップ」カード。**ユーザーの「本番リリースOK」待ち**。承認されれば v1.06 として昇格する。
+- なし（2026-11-02 14:00 JST に `ui-improvement-simple-v1`＝改善状況ページのシンプル版を v1.06 として本番リリース済み）。
+- 本番化の候補メモ：改善案の「参考：過去18レースでの試算」に「判定には数えません」と一言添える（ユーザーへ提案済み・未回答）。やる場合は新しい変更案としてステージングで確認してもらう。
+
+## モデルの使い分け（2026-11-02 ユーザー合意）
+- 方針：簡単な作業は軽いモデル、判断・設計は上位モデル。外部のAI（ChatGPT・Gemini）のAPI連携は**不要**（ユーザー判断）。Claude の中だけで使い分ける。
+- 目安：
+  | 作業 | モデル |
+  |---|---|
+  | 機械的な作業（ファイル検索、表記の置き換え、Actions の成否確認、通知文の表示） | Haiku |
+  | 通常の改修（画面修正、変更案づくり、PR、リリース手順） | Sonnet |
+  | 設計と判断（改善案の設計、比較結果の読み解き、リリース前の最終点検、あいまいな相談） | Opus |
+- 方法：会話全体は `/model` で切り替え（ユーザー操作）。まとまった独立作業は助手（サブエージェント）にモデルを指定して任せる。数行の修正は助手を使わず直接行う（助手は文脈なしで始まるため、小さい作業では割に合わない）。
+- 使用量の確認：この会話の内訳は explain-usage スキル、プラン全体は claude.ai の設定の使用量画面（Claude Code では `/usage`）。スケジュールタスクの見直し（下記）の材料にする。
 
 ## スケジュールタスク（Claude、通知文の表示のみ）
 - T1 地方競馬Shadow 毎日 7:52 JST（trig_01GCEqKctMCwULuPhm9oF5QK）
@@ -46,14 +58,13 @@
 - 3件とも毎回 Claude の使用量を消費する（見積もり：週140〜150万トークン、Opus）。2026-11-02 18:44 の T3 初回の前後で使用量を実測し、「残す／軽いモデルにする／削除して ChatGPT 側に一本化」を決める予定。ChatGPT 側の同じ通知も有効なまま。
 
 ## 未解決・次の候補
-1. 改善状況ページの本番リリース承認待ち（上記）。
-2. トップページ・「今週のAI予想」も同じ方針でわかりやすく書き直す提案（ユーザー未回答）。
-3. 次の改善案（購入セット／若駒）の登録。
-4. `Validate JRA v3.8〜v3.11` の4検査が 2026-10-18 から main で失敗（10/18 の予想実行で `e2e_validation/validate_manifests.py` が変わり、`.github/scripts/validate-jra-prompt-v312.mjs` の固定SHAと不一致）。今回の変更とは無関係。
-5. 古い改善ページ用の比較設定（`docs/data/e2e_status.json` の comparison が v3.0/v3.1 のまま）、E2E評価で新形式予想の勝率Brierが null になる問題（新しい runner は独自に計算しているので比較には影響なし）。
+1. トップページ・「今週のAI予想」も同じ方針でわかりやすく書き直す提案（ユーザー未回答）。
+2. 次の改善案（購入セット／若駒）の登録。
+3. `Validate JRA v3.8〜v3.11` の4検査が 2026-10-18 から main で失敗（10/18 の予想実行で `e2e_validation/validate_manifests.py` が変わり、`.github/scripts/validate-jra-prompt-v312.mjs` の固定SHAと不一致）。今回の変更とは無関係。
+4. 古い改善ページ用の比較設定（`docs/data/e2e_status.json` の comparison が v3.0/v3.1 のまま）、E2E評価で新形式予想の勝率Brierが null になる問題（新しい runner は独自に計算しているので比較には影響なし）。
 
 ## 作業上の注意
-- GitHub の GraphQL はこの環境から使えない。PR作成・マージは REST（`gh api repos/toodataa-ai/keiba-notes/pulls ...`）。
+- GitHub の GraphQL はこの環境から使えない（`gh workflow run` や `gh pr` 系も失敗する）。PR作成・マージ・ワークフロー起動は REST（`gh api repos/toodataa-ai/keiba-notes/pulls ...`、起動は `gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>.yml/dispatches -f ref=main -f 'inputs[キー]=値'`）。
 - GITHUB_TOKEN でのpushは他のワークフローを起動しない。自動処理の後続はワークフロー内で直接実行する。
 - このサンドボックスから github.io には接続できない（公開ページのバイト一致確認は Actions 側で行う）。
 - 浅いクローンでは古いリリースのコミットが見えない。必要なら `git fetch --depth=1000 origin main`。
