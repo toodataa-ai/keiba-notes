@@ -1,29 +1,1057 @@
 {
   "schema_version": 2,
-  "registry_version": "1.2",
-  "updated_at": "2026-10-05",
+  "registry_version": "1.3",
+  "updated_at": "2026-11-02",
   "policy_file": "promotion_policy.json",
   "production_router_changed": false,
   "models": [
-    {"track":"sapporo","track_ja":"札幌","surface":"turf","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"sapporo","track_ja":"札幌","surface":"dirt","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"hakodate","track_ja":"函館","surface":"turf","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"hakodate","track_ja":"函館","surface":"dirt","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"fukushima","track_ja":"福島","surface":"turf","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"fukushima","track_ja":"福島","surface":"dirt","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"niigata","track_ja":"新潟","surface":"turf","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"niigata","track_ja":"新潟","surface":"dirt","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"tokyo","track_ja":"東京","surface":"turf","version":"v0.2-stageA-candidate","status":"backtesting","stage_a":{"status":"candidate","version":"ridge-delta-v0.1+envelope","metrics":{"n":292,"mae":0.8915,"rmse":1.1639,"within_1_0pt":0.6747,"validation":"forward-time; LOYO secondary","baseline_mae":1.2670,"baseline_rmse":1.7856,"mae_improvement_vs_baseline_pct":29.63,"rmse_improvement_vs_baseline_pct":34.82,"wet_mae":1.2382,"wet_baseline_mae":2.0555,"max_abs_error":4.4010,"loyo_n":354,"loyo_mae":0.8817,"loyo_rmse":1.1885},"audits":{"leakage_passed":true,"reproducible":true},"guardrail":"clip to training-fold target min/max","backtest_file":"backtests/tokyo_kyoto_stage_a_weather_v0_1.json"},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2018-10-05〜2026-06-21","samples":354,"years":9,"wet_samples":73,"observations":530,"meetings":40},"routing":{"production":false,"legacy":false},"promotion_gaps":["Stage AはCandidate（本番未接続）","Stage B公式状態ラベル校正未完了","Stage BのLog Loss/Brier/Calibration検証未完了"]},
-    {"track":"tokyo","track_ja":"東京","surface":"dirt","version":"v0.2-stageA-candidate","status":"backtesting","stage_a":{"status":"candidate","version":"ridge-delta-v0.1+envelope","metrics":{"n":292,"mae":1.1232,"rmse":1.4829,"within_1_0pt":0.5342,"validation":"forward-time; LOYO secondary","baseline_mae":1.9445,"baseline_rmse":2.9678,"mae_improvement_vs_baseline_pct":42.24,"rmse_improvement_vs_baseline_pct":50.03,"wet_mae":1.7015,"wet_baseline_mae":3.8062,"max_abs_error":7.1422,"loyo_n":354,"loyo_mae":1.1178,"loyo_rmse":1.5885},"audits":{"leakage_passed":true,"reproducible":true},"guardrail":"clip to training-fold target min/max","backtest_file":"backtests/tokyo_kyoto_stage_a_weather_v0_1.json"},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2018-10-05〜2026-06-21","samples":354,"years":9,"wet_samples":73,"observations":530,"meetings":40},"routing":{"production":false,"legacy":false},"promotion_gaps":["Stage AはCandidate（本番未接続）","Stage B公式状態ラベル校正未完了","Stage BのLog Loss/Brier/Calibration検証未完了"]},
-    {"track":"nakayama","track_ja":"中山","surface":"turf","version":"v1.1","status":"validated","stage_a":{"status":"validated","metrics":{"n":27,"mae":0.7678,"rmse":1.0477,"within_1_0pt":0.8148,"validation":"LOYO"}},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2018-2025年9月","samples":27,"years":8},"routing":{"production":true,"legacy":true},"promotion_gaps":["Stage Bの発走時公式状態ラベルによる校正未実施","v2共通基準でのbaseline比較未実施","季節横断一般化未検証"]},
-    {"track":"nakayama","track_ja":"中山","surface":"dirt","version":"v1.1","status":"validated","stage_a":{"status":"validated","metrics":{"n":27,"mae":1.5107,"rmse":2.0884,"within_1_0pt":0.5926,"validation":"LOYO blend"}},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2018-2025年9月","samples":27,"years":8},"routing":{"production":true,"legacy":true},"promotion_gaps":["Stage Bの発走時公式状態ラベルによる校正未実施","v2共通基準でのbaseline比較未実施","雨天時誤差の再監査"]},
-    {"track":"chukyo","track_ja":"中京","surface":"turf","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"chukyo","track_ja":"中京","surface":"dirt","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"kyoto","track_ja":"京都","surface":"turf","version":"v0.2-stageA-candidate","status":"backtesting","stage_a":{"status":"candidate","version":"ridge-delta-v0.1+envelope","metrics":{"n":66,"mae":0.7161,"rmse":0.8450,"within_1_0pt":0.6667,"validation":"forward-time; LOYO secondary","baseline_mae":1.0015,"baseline_rmse":1.3897,"mae_improvement_vs_baseline_pct":28.49,"rmse_improvement_vs_baseline_pct":39.20,"wet_mae":1.0017,"wet_baseline_mae":1.6929,"max_abs_error":1.6243,"loyo_n":155,"loyo_mae":0.6689,"loyo_rmse":0.8709},"audits":{"leakage_passed":true,"reproducible":true},"guardrail":"clip to training-fold target min/max","backtest_file":"backtests/tokyo_kyoto_stage_a_weather_v0_1.json"},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2023-04-21〜2026-05-31（現行レジーム）","samples":155,"years":4,"wet_samples":14,"observations":233,"meetings":17},"routing":{"production":false,"legacy":false},"promotion_gaps":["Stage AはCandidate（本番未接続）","Stage B公式状態ラベル校正未完了","Stage BのLog Loss/Brier/Calibration検証未完了"]},
-    {"track":"kyoto","track_ja":"京都","surface":"dirt","version":"v0.2-stageA-candidate","status":"backtesting","stage_a":{"status":"candidate","version":"ridge-delta-v0.1+envelope","metrics":{"n":66,"mae":1.2341,"rmse":1.7106,"within_1_0pt":0.5455,"validation":"forward-time; LOYO secondary","baseline_mae":2.2258,"baseline_rmse":3.7731,"mae_improvement_vs_baseline_pct":44.55,"rmse_improvement_vs_baseline_pct":54.66,"wet_mae":2.5348,"wet_baseline_mae":6.1143,"max_abs_error":5.3594,"loyo_n":155,"loyo_mae":1.0814,"loyo_rmse":1.4706},"audits":{"leakage_passed":true,"reproducible":true},"guardrail":"clip to training-fold target min/max","backtest_file":"backtests/tokyo_kyoto_stage_a_weather_v0_1.json"},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2023-04-21〜2026-05-31（現行レジーム）","samples":155,"years":4,"wet_samples":14,"observations":233,"meetings":17},"routing":{"production":false,"legacy":false},"promotion_gaps":["Stage AはCandidate（本番未接続）","Stage B公式状態ラベル校正未完了","Stage BのLog Loss/Brier/Calibration検証未完了"]},
-    {"track":"hanshin","track_ja":"阪神","surface":"turf","version":"v1.0","status":"validated","stage_a":{"status":"validated","metrics":{"n":19,"mae":0.5714,"rmse":0.7127,"within_1_0pt":0.7895,"validation":"2019-2023 LOYO"},"holdout_2025":{"n":4,"mae":1.112,"rmse":1.4977}},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2019-2023 + 2025 holdout","samples":23,"years":6},"routing":{"production":true,"legacy":true},"promotion_gaps":["Stage Bの発走時公式状態ラベルによる校正未実施","2025構造差の追加検証","v2共通基準でのbaseline比較未実施"]},
-    {"track":"hanshin","track_ja":"阪神","surface":"dirt","version":"v1.0","status":"validated","stage_a":{"status":"validated","metrics":{"n":19,"mae":1.5242,"rmse":1.9462,"within_1_0pt":0.3158,"validation":"2019-2023 LOYO"},"holdout_2025":{"n":4,"mae":1.1913,"rmse":1.3227}},"stage_b":{"status":"pilot","metrics":null},"data":{"period":"2019-2023 + 2025 holdout","samples":23,"years":6},"routing":{"production":true,"legacy":true},"promotion_gaps":["Stage Bの発走時公式状態ラベルによる校正未実施","2025構造差の追加検証","雨天時精度の再監査"]},
-    {"track":"kokura","track_ja":"小倉","surface":"turf","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]},
-    {"track":"kokura","track_ja":"小倉","surface":"dirt","version":"pilot-heuristic-v2","status":"pilot","stage_a":{"status":"pilot","metrics":null},"stage_b":{"status":"pilot","metrics":null},"data":{"period":null,"samples":0,"years":0},"routing":{"production":false,"legacy":false},"promotion_gaps":["競馬場別Stage Aデータセット未構築","Stage Aバックテスト未実施","Stage B競馬場別校正未実施"]}
+    {
+      "track": "sapporo",
+      "track_ja": "札幌",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 98,
+          "mae": 0.7067,
+          "rmse": 0.9137,
+          "within_1_0pt": 0.7245,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 0.9148,
+          "baseline_rmse": 1.1797,
+          "mae_improvement_vs_baseline_pct": 22.75,
+          "rmse_improvement_vs_baseline_pct": 22.54,
+          "wet_mae": 0.9275,
+          "wet_baseline_mae": 1.3913,
+          "max_abs_error": 3.7462,
+          "loyo_n": 122,
+          "loyo_mae": 0.6774,
+          "loyo_rmse": 0.8384
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-07-27〜2026-09-06",
+        "samples": 122,
+        "years": 9,
+        "wet_samples": 23,
+        "observations": 183,
+        "meetings": 18
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "sapporo",
+      "track_ja": "札幌",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 98,
+          "mae": 0.9957,
+          "rmse": 1.6875,
+          "within_1_0pt": 0.7041,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.802,
+          "baseline_rmse": 2.9456,
+          "mae_improvement_vs_baseline_pct": 44.74,
+          "rmse_improvement_vs_baseline_pct": 42.71,
+          "wet_mae": 1.8858,
+          "wet_baseline_mae": 3.7717,
+          "max_abs_error": 9.7837,
+          "loyo_n": 122,
+          "loyo_mae": 1.0398,
+          "loyo_rmse": 1.8115
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-07-27〜2026-09-06",
+        "samples": 122,
+        "years": 9,
+        "wet_samples": 23,
+        "observations": 183,
+        "meetings": 18
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "hakodate",
+      "track_ja": "函館",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 72,
+          "mae": 0.8119,
+          "rmse": 1.0922,
+          "within_1_0pt": 0.7083,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.1201,
+          "baseline_rmse": 1.6527,
+          "mae_improvement_vs_baseline_pct": 27.52,
+          "rmse_improvement_vs_baseline_pct": 33.92,
+          "wet_mae": 1.1682,
+          "wet_baseline_mae": 2.06,
+          "max_abs_error": 4.9589,
+          "loyo_n": 96,
+          "loyo_mae": 0.8555,
+          "loyo_rmse": 1.1274
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2019-06-14〜2026-07-19",
+        "samples": 96,
+        "years": 8,
+        "wet_samples": 20,
+        "observations": 144,
+        "meetings": 11
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "hakodate",
+      "track_ja": "函館",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 72,
+          "mae": 0.8137,
+          "rmse": 1.0388,
+          "within_1_0pt": 0.7083,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 2.4806,
+          "baseline_rmse": 3.8169,
+          "mae_improvement_vs_baseline_pct": 67.2,
+          "rmse_improvement_vs_baseline_pct": 72.78,
+          "wet_mae": 1.1599,
+          "wet_baseline_mae": 5.3025,
+          "max_abs_error": 3.8636,
+          "loyo_n": 96,
+          "loyo_mae": 0.8975,
+          "loyo_rmse": 1.175
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2019-06-14〜2026-07-19",
+        "samples": 96,
+        "years": 8,
+        "wet_samples": 20,
+        "observations": 144,
+        "meetings": 11
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "fukushima",
+      "track_ja": "福島",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 126,
+          "mae": 0.7743,
+          "rmse": 0.9885,
+          "within_1_0pt": 0.7222,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 0.8496,
+          "baseline_rmse": 1.2483,
+          "mae_improvement_vs_baseline_pct": 8.86,
+          "rmse_improvement_vs_baseline_pct": 20.81,
+          "wet_mae": 1.0098,
+          "wet_baseline_mae": 1.6,
+          "max_abs_error": 3.0,
+          "loyo_n": 152,
+          "loyo_mae": 0.7319,
+          "loyo_rmse": 0.9693
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-11-02〜2026-07-19",
+        "samples": 152,
+        "years": 9,
+        "wet_samples": 27,
+        "observations": 229,
+        "meetings": 23
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "fukushima",
+      "track_ja": "福島",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 126,
+          "mae": 1.2022,
+          "rmse": 1.6534,
+          "within_1_0pt": 0.5794,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.8183,
+          "baseline_rmse": 3.0262,
+          "mae_improvement_vs_baseline_pct": 33.88,
+          "rmse_improvement_vs_baseline_pct": 45.36,
+          "wet_mae": 2.3289,
+          "wet_baseline_mae": 4.4611,
+          "max_abs_error": 7.9792,
+          "loyo_n": 152,
+          "loyo_mae": 1.0781,
+          "loyo_rmse": 1.5284
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-11-02〜2026-07-19",
+        "samples": 152,
+        "years": 9,
+        "wet_samples": 27,
+        "observations": 229,
+        "meetings": 23
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "niigata",
+      "track_ja": "新潟",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 188,
+          "mae": 0.7457,
+          "rmse": 0.9947,
+          "within_1_0pt": 0.7074,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.1973,
+          "baseline_rmse": 1.7403,
+          "mae_improvement_vs_baseline_pct": 37.72,
+          "rmse_improvement_vs_baseline_pct": 42.85,
+          "wet_mae": 0.9864,
+          "wet_baseline_mae": 1.9613,
+          "max_abs_error": 3.6566,
+          "loyo_n": 233,
+          "loyo_mae": 0.7337,
+          "loyo_rmse": 0.9619
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-07-27〜2026-10-25",
+        "samples": 233,
+        "years": 9,
+        "wet_samples": 62,
+        "observations": 349,
+        "meetings": 34
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "niigata",
+      "track_ja": "新潟",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 188,
+          "mae": 1.2414,
+          "rmse": 1.7174,
+          "within_1_0pt": 0.5638,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 2.192,
+          "baseline_rmse": 3.4584,
+          "mae_improvement_vs_baseline_pct": 43.37,
+          "rmse_improvement_vs_baseline_pct": 50.34,
+          "wet_mae": 1.9587,
+          "wet_baseline_mae": 4.1992,
+          "max_abs_error": 9.5777,
+          "loyo_n": 233,
+          "loyo_mae": 1.1517,
+          "loyo_rmse": 1.605
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-07-27〜2026-10-25",
+        "samples": 233,
+        "years": 9,
+        "wet_samples": 62,
+        "observations": 349,
+        "meetings": 34
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "tokyo",
+      "track_ja": "東京",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 292,
+          "mae": 0.8915,
+          "rmse": 1.1639,
+          "within_1_0pt": 0.6747,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.267,
+          "baseline_rmse": 1.7856,
+          "mae_improvement_vs_baseline_pct": 29.63,
+          "rmse_improvement_vs_baseline_pct": 34.82,
+          "wet_mae": 1.2382,
+          "wet_baseline_mae": 2.0555,
+          "max_abs_error": 4.401,
+          "loyo_n": 354,
+          "loyo_mae": 0.8817,
+          "loyo_rmse": 1.1885
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/tokyo_kyoto_stage_a_weather_v0_1.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-10-05〜2026-06-21",
+        "samples": 354,
+        "years": 9,
+        "wet_samples": 73,
+        "observations": 530,
+        "meetings": 40
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "tokyo",
+      "track_ja": "東京",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 292,
+          "mae": 1.1232,
+          "rmse": 1.4829,
+          "within_1_0pt": 0.5342,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.9445,
+          "baseline_rmse": 2.9678,
+          "mae_improvement_vs_baseline_pct": 42.24,
+          "rmse_improvement_vs_baseline_pct": 50.03,
+          "wet_mae": 1.7015,
+          "wet_baseline_mae": 3.8062,
+          "max_abs_error": 7.1422,
+          "loyo_n": 354,
+          "loyo_mae": 1.1178,
+          "loyo_rmse": 1.5885
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/tokyo_kyoto_stage_a_weather_v0_1.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-10-05〜2026-06-21",
+        "samples": 354,
+        "years": 9,
+        "wet_samples": 73,
+        "observations": 530,
+        "meetings": 40
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "nakayama",
+      "track_ja": "中山",
+      "surface": "turf",
+      "version": "v1.1",
+      "status": "validated",
+      "stage_a": {
+        "status": "validated",
+        "metrics": {
+          "n": 27,
+          "mae": 0.7678,
+          "rmse": 1.0477,
+          "within_1_0pt": 0.8148,
+          "validation": "LOYO"
+        }
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-2025年9月",
+        "samples": 27,
+        "years": 8
+      },
+      "routing": {
+        "production": true,
+        "legacy": true
+      },
+      "promotion_gaps": [
+        "Stage Bの発走時公式状態ラベルによる校正未実施",
+        "v2共通基準でのbaseline比較未実施",
+        "季節横断一般化未検証"
+      ]
+    },
+    {
+      "track": "nakayama",
+      "track_ja": "中山",
+      "surface": "dirt",
+      "version": "v1.1",
+      "status": "validated",
+      "stage_a": {
+        "status": "validated",
+        "metrics": {
+          "n": 27,
+          "mae": 1.5107,
+          "rmse": 2.0884,
+          "within_1_0pt": 0.5926,
+          "validation": "LOYO blend"
+        }
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-2025年9月",
+        "samples": 27,
+        "years": 8
+      },
+      "routing": {
+        "production": true,
+        "legacy": true
+      },
+      "promotion_gaps": [
+        "Stage Bの発走時公式状態ラベルによる校正未実施",
+        "v2共通基準でのbaseline比較未実施",
+        "雨天時誤差の再監査"
+      ]
+    },
+    {
+      "track": "chukyo",
+      "track_ja": "中京",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 217,
+          "mae": 0.7698,
+          "rmse": 0.9781,
+          "within_1_0pt": 0.7097,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 0.9735,
+          "baseline_rmse": 1.3521,
+          "mae_improvement_vs_baseline_pct": 20.92,
+          "rmse_improvement_vs_baseline_pct": 27.66,
+          "wet_mae": 1.0038,
+          "wet_baseline_mae": 1.5094,
+          "max_abs_error": 3.3,
+          "loyo_n": 249,
+          "loyo_mae": 0.7644,
+          "loyo_rmse": 0.9735
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json",
+        "data_gaps": [
+          "画像のみのPDFで読み取れなかった開催 1件"
+        ]
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-11-30〜2026-08-30",
+        "samples": 249,
+        "years": 9,
+        "wet_samples": 53,
+        "observations": 371,
+        "meetings": 35
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "chukyo",
+      "track_ja": "中京",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 217,
+          "mae": 1.1043,
+          "rmse": 1.6934,
+          "within_1_0pt": 0.6359,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 2.0118,
+          "baseline_rmse": 3.2414,
+          "mae_improvement_vs_baseline_pct": 45.11,
+          "rmse_improvement_vs_baseline_pct": 47.76,
+          "wet_mae": 2.1159,
+          "wet_baseline_mae": 4.2547,
+          "max_abs_error": 7.0105,
+          "loyo_n": 249,
+          "loyo_mae": 1.0006,
+          "loyo_rmse": 1.5479
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json",
+        "data_gaps": [
+          "画像のみのPDFで読み取れなかった開催 1件"
+        ]
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-11-30〜2026-08-30",
+        "samples": 249,
+        "years": 9,
+        "wet_samples": 53,
+        "observations": 371,
+        "meetings": 35
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "kyoto",
+      "track_ja": "京都",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 66,
+          "mae": 0.7161,
+          "rmse": 0.845,
+          "within_1_0pt": 0.6667,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 1.0015,
+          "baseline_rmse": 1.3897,
+          "mae_improvement_vs_baseline_pct": 28.49,
+          "rmse_improvement_vs_baseline_pct": 39.2,
+          "wet_mae": 1.0017,
+          "wet_baseline_mae": 1.6929,
+          "max_abs_error": 1.6243,
+          "loyo_n": 155,
+          "loyo_mae": 0.6689,
+          "loyo_rmse": 0.8709
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/tokyo_kyoto_stage_a_weather_v0_1.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2023-04-21〜2026-05-31（現行レジーム）",
+        "samples": 155,
+        "years": 4,
+        "wet_samples": 14,
+        "observations": 233,
+        "meetings": 17
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "kyoto",
+      "track_ja": "京都",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 66,
+          "mae": 1.2341,
+          "rmse": 1.7106,
+          "within_1_0pt": 0.5455,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 2.2258,
+          "baseline_rmse": 3.7731,
+          "mae_improvement_vs_baseline_pct": 44.55,
+          "rmse_improvement_vs_baseline_pct": 54.66,
+          "wet_mae": 2.5348,
+          "wet_baseline_mae": 6.1143,
+          "max_abs_error": 5.3594,
+          "loyo_n": 155,
+          "loyo_mae": 1.0814,
+          "loyo_rmse": 1.4706
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/tokyo_kyoto_stage_a_weather_v0_1.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2023-04-21〜2026-05-31（現行レジーム）",
+        "samples": 155,
+        "years": 4,
+        "wet_samples": 14,
+        "observations": 233,
+        "meetings": 17
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "hanshin",
+      "track_ja": "阪神",
+      "surface": "turf",
+      "version": "v1.0",
+      "status": "validated",
+      "stage_a": {
+        "status": "validated",
+        "metrics": {
+          "n": 19,
+          "mae": 0.5714,
+          "rmse": 0.7127,
+          "within_1_0pt": 0.7895,
+          "validation": "2019-2023 LOYO"
+        },
+        "holdout_2025": {
+          "n": 4,
+          "mae": 1.112,
+          "rmse": 1.4977
+        }
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2019-2023 + 2025 holdout",
+        "samples": 23,
+        "years": 6
+      },
+      "routing": {
+        "production": true,
+        "legacy": true
+      },
+      "promotion_gaps": [
+        "Stage Bの発走時公式状態ラベルによる校正未実施",
+        "2025構造差の追加検証",
+        "v2共通基準でのbaseline比較未実施"
+      ]
+    },
+    {
+      "track": "hanshin",
+      "track_ja": "阪神",
+      "surface": "dirt",
+      "version": "v1.0",
+      "status": "validated",
+      "stage_a": {
+        "status": "validated",
+        "metrics": {
+          "n": 19,
+          "mae": 1.5242,
+          "rmse": 1.9462,
+          "within_1_0pt": 0.3158,
+          "validation": "2019-2023 LOYO"
+        },
+        "holdout_2025": {
+          "n": 4,
+          "mae": 1.1913,
+          "rmse": 1.3227
+        }
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2019-2023 + 2025 holdout",
+        "samples": 23,
+        "years": 6
+      },
+      "routing": {
+        "production": true,
+        "legacy": true
+      },
+      "promotion_gaps": [
+        "Stage Bの発走時公式状態ラベルによる校正未実施",
+        "2025構造差の追加検証",
+        "雨天時精度の再監査"
+      ]
+    },
+    {
+      "track": "kokura",
+      "track_ja": "小倉",
+      "surface": "turf",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 166,
+          "mae": 0.5915,
+          "rmse": 0.8188,
+          "within_1_0pt": 0.8373,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 0.8783,
+          "baseline_rmse": 1.3251,
+          "mae_improvement_vs_baseline_pct": 32.65,
+          "rmse_improvement_vs_baseline_pct": 38.21,
+          "wet_mae": 0.851,
+          "wet_baseline_mae": 1.3362,
+          "max_abs_error": 3.15,
+          "loyo_n": 198,
+          "loyo_mae": 0.5532,
+          "loyo_rmse": 0.7499
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-07-27〜2026-07-19",
+        "samples": 198,
+        "years": 9,
+        "wet_samples": 58,
+        "observations": 297,
+        "meetings": 23
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    },
+    {
+      "track": "kokura",
+      "track_ja": "小倉",
+      "surface": "dirt",
+      "version": "v0.2-stageA-candidate",
+      "status": "backtesting",
+      "stage_a": {
+        "status": "candidate",
+        "version": "ridge-delta-v0.1+envelope",
+        "metrics": {
+          "n": 166,
+          "mae": 1.5503,
+          "rmse": 2.456,
+          "within_1_0pt": 0.4639,
+          "validation": "forward-time; LOYO secondary",
+          "baseline_mae": 2.0922,
+          "baseline_rmse": 3.4044,
+          "mae_improvement_vs_baseline_pct": 25.9,
+          "rmse_improvement_vs_baseline_pct": 27.86,
+          "wet_mae": 2.3558,
+          "wet_baseline_mae": 3.3716,
+          "max_abs_error": 13.3871,
+          "loyo_n": 198,
+          "loyo_mae": 1.412,
+          "loyo_rmse": 2.1113
+        },
+        "audits": {
+          "leakage_passed": true,
+          "reproducible": true,
+          "basis": "same code and feature policy as Tokyo/Kyoto (04:00 cutoff, no future information); rerun by GitHub Actions"
+        },
+        "guardrail": "clip to training-fold target min/max",
+        "backtest_file": "backtests/stage_a_weather_v0_1_remaining_tracks.json"
+      },
+      "stage_b": {
+        "status": "pilot",
+        "metrics": null
+      },
+      "data": {
+        "period": "2018-07-27〜2026-07-19",
+        "samples": 198,
+        "years": 9,
+        "wet_samples": 58,
+        "observations": 297,
+        "meetings": 23
+      },
+      "routing": {
+        "production": false,
+        "legacy": false
+      },
+      "promotion_gaps": [
+        "Stage AはCandidate（本番未接続）",
+        "Stage B公式状態ラベル校正未完了",
+        "Stage BのLog Loss/Brier/Calibration検証未完了"
+      ]
+    }
   ]
 }

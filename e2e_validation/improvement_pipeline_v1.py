@@ -110,11 +110,14 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
                     v = by.get(key, {})
                     uid = f"track_condition:track:{key}"
                     st = {s: (v.get(s) or {}).get("status", "—") for s in ("turf", "dirt")}
+                    sa = {s: ((v.get(s) or {}).get("stage_a") or {}).get("status", "—") for s in ("turf", "dirt")}
+                    sb = {s: ((v.get(s) or {}).get("stage_b") or {}).get("status", "—") for s in ("turf", "dirt")}
                     ja_st = {"validated": "検証済み", "candidate": "候補", "backtesting": "検証中", "pilot": "試作", "—": "—"}
                     in_prod = any((v.get(s) or {}).get("routing", {}).get("production") for s in ("turf", "dirt"))
                     met = all(st[s] in crit["baba_track"]["ok_statuses"] for s in st)
-                    detail = {"turf": st["turf"], "dirt": st["dirt"], "in_production": in_prod}
-                    text_st = f"芝：{ja_st[st['turf']]} ／ ダート：{ja_st[st['dirt']]}"
+                    detail = {"turf": st["turf"], "dirt": st["dirt"], "stage_a": sa, "stage_b": sb, "in_production": in_prod}
+                    text_st = (f"Stage A（翌朝の含水率）：芝{ja_st.get(sa['turf'], sa['turf'])}・ダ{ja_st.get(sa['dirt'], sa['dirt'])} ／ "
+                               f"Stage B（発走時の馬場）：芝{ja_st.get(sb['turf'], sb['turf'])}・ダ{ja_st.get(sb['dirt'], sb['dirt'])}")
                     exps = matching_experiments(uid, None, registry, status)
                     if exps:
                         s, f, t, eid = comparison_state(exps)
@@ -124,7 +127,8 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
                     elif met:
                         finish(unit_record(tid, uid, ja, 1, 0.0, "ready_to_register", f"条件に届いた（登録待ち）　{text_st}", crit["baba_track"]["text"], True, None, detail))
                     else:
-                        sc = sum(score.get(st[s], 0.0) for s in st) / 2
+                        # half of the progress is Stage A, half Stage B (the stage that matters at race time)
+                        sc = sum(0.5 * score.get(sa[s], 0.0) + 0.5 * score.get(sb[s], 0.0) for s in st) / 2
                         finish(unit_record(tid, uid, ja, 0, sc, "research", text_st, crit["baba_track"]["text"], False, None, detail))
             elif kind == "experience_regime":
                 r = regimes.get(u["regime"], {})

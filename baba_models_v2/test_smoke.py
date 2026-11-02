@@ -64,9 +64,10 @@ def test_stage_a_candidate_can_pass_when_all_guardrails_pass():
 def test_registered_stage_a_candidates_really_pass_policy_and_are_not_routed():
     registry = json.loads(Path("model_registry.json").read_text(encoding="utf-8"))
     candidates = [m for m in registry["models"] if m["stage_a"]["status"] == "candidate"]
-    assert {(m["track"], m["surface"]) for m in candidates} == {
-        ("tokyo", "turf"), ("tokyo", "dirt"), ("kyoto", "turf"), ("kyoto", "dirt")
-    }
+    # Candidate generation is automatic (class B) once promotion.stage_a_candidate() passes.
+    # Any addition must be listed here on purpose, with its backtest committed.
+    expected = {(t, s) for t in ("tokyo", "kyoto", "sapporo", "hakodate", "fukushima", "niigata", "chukyo", "kokura") for s in ("turf", "dirt")}
+    assert {(m["track"], m["surface"]) for m in candidates} == expected
     for model in candidates:
         ok, gaps = stage_a_candidate(
             model["stage_a"]["metrics"],
