@@ -43,6 +43,15 @@ class DiscoverRegistryAuditTests(unittest.TestCase):
         self.assertTrue(all(r["blocker"].startswith("canonical_races_present_but_same_cutoff_inputs_unavailable:")
                             for r in reports))
 
+    def test_workflow_never_pushes_to_main_or_legacy_evidence_branch(self):
+        workflow = (Path(__file__).resolve().parents[1] /
+                    ".github/workflows/jra-shadow-runtime.yml").read_text(encoding="utf-8")
+        self.assertIn("experiment/jra-shadow-evidence-main-20261102", workflow)
+        self.assertNotIn("experiment/jra-shadow-evidence-v1", workflow)
+        self.assertNotIn("git push origin HEAD:refs/heads/main", workflow)
+        self.assertIn("if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'",
+                      workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
