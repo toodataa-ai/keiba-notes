@@ -1,0 +1,39 @@
+name: Baba research - where is the turf course (A-D) setting published? (read only, few requests)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf
+      - name: Look for course (A-D) wording
+        working-directory: baba_models_v2
+        run: |
+          python - <<'PY'
+          import re, time, requests
+          from bs4 import BeautifulSoup
+          import jra_observations as j
+          H={'User-Agent':j.UA}
+          def ctx(t,pat,n=4,w=70):
+              out=[]
+              for m in list(re.finditer(pat,t))[:n]: out.append(t[max(0,m.start()-w):m.end()+w].replace('\n',' '))
+              return out
+          for u in ['https://www.jra.go.jp/keiba/baba/archive/2025pdf/tokyo01.pdf','https://www.jra.go.jp/keiba/baba/archive/2025pdf/nakayama01.pdf']:
+              time.sleep(2); r=requests.get(u,headers=H,timeout=60); print('####PDF',u,r.status_code,len(r.content))
+              if r.status_code==200:
+                  t=j.extract_pdf_text(r.content); print('  len',len(t)); print('  HEAD',t[:500].replace('\n',' | '))
+                  for c in ctx(t,r'コース|[ABCD]コース|仮柵|内柵'): print('  CTX',c)
+          for u in ['https://www.jra.go.jp/keiba/baba/','https://www.jra.go.jp/keiba/baba/archive/','https://www.jra.go.jp/keiba/course/','https://www.jra.go.jp/keiba/overview/rule/course.html']:
+              time.sleep(2)
+              try:
+                  r=requests.get(u,headers=H,timeout=40); r.encoding=r.apparent_encoding
+                  t=BeautifulSoup(r.text,'html.parser').get_text(' ',strip=True)
+                  print('####PAGE',u,r.status_code,len(t))
+                  for c in ctx(t,r'[ABCD]コース|仮柵|コース替わり|コース区分',6): print('  CTX',c)
+              except Exception as e: print('####PAGE',u,'ERR',e)
+          PY
