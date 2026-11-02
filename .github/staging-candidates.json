@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-baba-progress-v1",
+      "title": "馬場モデルの最新の進捗（発走時の馬場の予測・予報の収集状況）",
+      "pages": [
+        "baba-models.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-03",
+      "summary": "馬場状態の研究ページに、今のやり方との比較結果とデータ集め（天気予報の毎日保存を含む）の進み具合を追加する。"
+    }
+  ]
 }
