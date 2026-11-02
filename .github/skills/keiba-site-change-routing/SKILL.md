@@ -16,6 +16,15 @@ description: Route future keiba-notes site modifications into STAGING for existi
 
 LABとSTAGINGはGitHub Pagesで閲覧可能だが、そのこと自体は「本番に機能が存在する」の根拠ではない。本番画面とその正式導線・実装を確認すること。
 
+## STAGING変更案の仕組み（2026-11-02から）
+本番に既にある画面の変更は、次の手順だけで行う。docs/staging/ のHTMLを直接編集しない（自動で作り直される）。
+1. 変更後の画面を**本番と同じ書き方**で `.github/staging-candidates/<docs配下と同じパス>` に置く（例：`.github/staging-candidates/improvement-cycle.html`、新しいCSSは `.github/staging-candidates/assets/xxx.css`）。
+2. `.github/staging-candidates.json` に候補（id・title・pages・assets・summary、status=awaiting_user_approval）を登録する。
+3. `python3 .github/scripts/staging-baseline-v2.py` を実行してコミット。STAGINGの該当ページは変更案で表示され（バッジ「変更案・承認待ち」）、ステージング内のリンクはステージング内に留まる。候補のCSS等は docs/staging/candidate-assets/ から配信される。
+4. ユーザーにステージングURLで確認してもらい、「本番リリースOK」等の明示承認を得る。
+5. 承認後、`.github/workflows/jra-ui-promote-v1.yml` を candidate_id と承認の原文（approval_quote）で実行する。変更案を本番へバイト一致でコピーし、候補を台帳から外し、STAGINGを本番に再同期し、リリース台帳（v番号を自動採番）に記録、保護データ不変・ガード検査・公開HTTPバイト一致まで確認する。
+承認前に docs/ の本番画面を直接変更しない。ガードは `.github/scripts/jra-release-guard-v1.py`（全リリース共通の不変条件＋過去リリースの固定値）。
+
 ## 絶対的な振り分けルール
 
 ### A. 本番に存在する機能を改修

@@ -58,7 +58,8 @@
 }
 </style>
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
-<link rel="stylesheet" href="staging/usage-summary.css?v=20261030-1">\n</head>
+<link rel="stylesheet" href="staging/usage-summary.css?v=20261030-1">
+</head>
 <body>
 <div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
 <header class="hero"><div class="wrap">
@@ -75,7 +76,7 @@
 </div>
 <div class="submain-block"><p class="submain-label">予想のしくみと改善</p><div class="portal-grid submain-grid">
 <a class="portal-card submain-card" href="staging/methodology.html"><span><span class="portal-title">AI予想ロジックと検証思想</span><span class="portal-desc">①〜⑨の重視度マップ・使うデータ・タイム指数・予想と買い目の仕組み</span></span><span class="portal-arrow">→</span></a>
-<a class="portal-card submain-card milestone-card" href="improvement-cycle.html"><span><span class="portal-title">改善テーマ別ロードマップ・今後のマイルストン</span><span class="portal-desc">収集済み実績・あと何件・20件到達の目安・次の判断を矢羽とグラフで確認</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card submain-card milestone-card" href="staging/improvement-cycle.html"><span><span class="portal-title">改善テーマ別ロードマップ・今後のマイルストン</span><span class="portal-desc">収集済み実績・あと何件・20件到達の目安・次の判断を矢羽とグラフで確認</span></span><span class="portal-arrow">→</span></a>
 </div></div></section>
 <section class="portal-section" aria-labelledby="researchTitle"><div class="portal-head"><span class="portal-kicker">精度向上のための研究</span><h2 id="researchTitle">予想を強くするための研究・検証</h2><p>本番予想とは切り分けながら、精度向上につながる要素を検証しています。</p></div>
 <div class="portal-grid research-grid">
@@ -92,7 +93,8 @@
 </div>
 <div class="hero-prompt-status"><div id="promptBadge" class="prompt-badge">最新版プロンプトを確認中…</div></div>
 <p class="footer-note">地方競馬の研究はJRA正式予想・成績とは分離して運用しています。 <a style="color:#bfc7d5" href="staging/release-history.html">公開履歴・旧版復元</a>　<small>正式版 v1.03</small></p>
-<section class="stage-usage" aria-labelledby="stageUsageTitle"><div class="stage-usage-top"><strong id="stageUsageTitle" class="stage-usage-title">サイト利用状況</strong><div class="stage-usage-values"><span class="stage-usage-value">今日のPV <b id="stageUsageToday" aria-live="polite">—</b></span><span class="stage-usage-value">累計PV <b id="stageUsageTotal" aria-live="polite">—</b></span><a href="staging/usage-analytics.html">過去の閲覧推移を見る</a></div></div><p class="stage-usage-notice" id="stageUsageNote" role="status">競馬専用の実測データを確認中…</p></section>\n<p class="photo-credit">背景写真：<a href="https://commons.wikimedia.org/wiki/File:Racing_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Racing (Unsplash)／CC0</a>（海外の競馬場で撮影）</p>
+<section class="stage-usage" aria-labelledby="stageUsageTitle"><div class="stage-usage-top"><strong id="stageUsageTitle" class="stage-usage-title">サイト利用状況</strong><div class="stage-usage-values"><span class="stage-usage-value">今日のPV <b id="stageUsageToday" aria-live="polite">—</b></span><span class="stage-usage-value">累計PV <b id="stageUsageTotal" aria-live="polite">—</b></span><a href="staging/usage-analytics.html">過去の閲覧推移を見る</a></div></div><p class="stage-usage-notice" id="stageUsageNote" role="status">競馬専用の実測データを確認中…</p></section>
+<p class="photo-credit">背景写真：<a href="https://commons.wikimedia.org/wiki/File:Racing_(Unsplash).jpg" target="_blank" rel="noopener noreferrer">Racing (Unsplash)／CC0</a>（海外の競馬場で撮影）</p>
 </div></header>
 <script>fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{document.getElementById('promptBadge').textContent=`最新版プロンプト ${d.version||'—'}`}).catch(()=>{document.getElementById('promptBadge').textContent='最新版プロンプト'});</script>
 <script>
@@ -115,4 +117,5 @@ fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)thro
 }).catch(()=>{document.getElementById('releaseHistoryList').textContent='履歴の取得に失敗しました。'});
 </script>
 <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
-<script src="staging/usage-summary.js?v=20261030-1" defer></script>\n</body></html>
+<script src="staging/usage-summary.js?v=20261030-1" defer></script>
+</body></html>

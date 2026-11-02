@@ -22,14 +22,50 @@ assert 'staging-shell-marker' not in html
 assert 'noindex,nofollow' not in html
 assert 'href="staging/' not in html
 assert '<base ' not in html
-assert 'assets/improvement-cycle.css?v=20261025-1' in html
 assert 'data/jra_improvement_cycle_v1.json' in html
-assert 'data/experience_regime_status.json' in html
+# v1.05 dashboard checks apply only while that design is in production.
+LEGACY='assets/improvement-cycle.css?v=20261025-1' in html
+if not LEGACY:
+    assert 'data/jra_experiment_status_v1.json' in html
+
+def generic_checks(browser):
+    """Any later approved improvement page: loads data, no JS errors, no overflow, links work."""
+    for w in (320,375,390,430,768,1024,1440):
+        page=browser.new_page(viewport={"width":w,"height":860},is_mobile=w<=430,has_touch=w<=430)
+        errors=[]
+        page.on("pageerror", lambda err:errors.append(str(err)))
+        page.goto(url+"/improvement-cycle.html",wait_until="load",timeout=30000)
+        page.wait_for_function("!document.querySelector('#experiments').textContent.includes('読み込み中')",timeout=15000)
+        width=page.evaluate("document.documentElement.scrollWidth")
+        assert not errors,(w,errors)
+        assert width<=w+2,(w,"overflow",width)
+        assert page.locator('#experiments .card').count()==sum(
+            e.get('status') in ('collecting','comparing','reviewing') for e in formal.get('experiments',[])),w
+        print("PASS_PRODUCTION_IMPROVEMENT_PAGE_BROWSER",w)
+        page.close()
+    for w in (390,1440):
+        p=browser.new_page(viewport={"width":w,"height":850},is_mobile=w==390,has_touch=w==390)
+        p.goto(url+"/index.html")
+        card=p.locator("a.milestone-card")
+        assert card.count()==1 and card.get_attribute("href")=="improvement-cycle.html"
+        card.click()
+        p.wait_for_url("**/improvement-cycle.html")
+        p.goto(url+"/roadmap.html")
+        anchor=p.locator("#live-milestones a[href='improvement-cycle.html']")
+        assert anchor.count()==1
+        anchor.click()
+        p.wait_for_url("**/improvement-cycle.html")
+        print("PASS_PRODUCTION_HOMEPAGE_AND_OLD_BOOKMARK",w)
+        p.close()
 
 with sync_playwright() as pw:
     chrome=next((shutil.which(x) for x in ("google-chrome","chromium","chromium-browser") if shutil.which(x)),None)
     assert chrome,"Local Chrome/Chromium required"
     browser=pw.chromium.launch(headless=True,executable_path=chrome,args=["--no-sandbox"])
+    if not LEGACY:
+        generic_checks(browser)
+        browser.close()
+        raise SystemExit(0)
     for w in (320,375,390,430,768,1024,1440):
         page=browser.new_page(viewport={"width":w,"height":860},is_mobile=w<=430,has_touch=w<=430)
         errors=[]
