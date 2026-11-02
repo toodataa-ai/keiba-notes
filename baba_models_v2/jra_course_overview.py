@@ -93,7 +93,11 @@ def candidate_urls(year, track_ja, kais, extra_next=0):
         for a in known:
             rng = [a + i for i in range(width)]
             if all(k in pool for k in rng):
-                out.append((tuple(rng), '%s%s_%s_%s.html' % (BASE, year, '-'.join(str(k) for k in rng), t)))
+                # JRA names 3-meeting pages either 4-5-6 (hanshin 2021) or 5-7 (kyoto 2024)
+                names = ['-'.join(str(k) for k in rng)]
+                if width == 3: names.append('%d-%d' % (rng[0], rng[-1]))
+                for nm in names:
+                    out.append((tuple(rng), '%s%s_%s_%s.html' % (BASE, year, nm, t)))
     return out
 
 
