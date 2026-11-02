@@ -73,8 +73,17 @@ def verified_weekly_pairs(e2e, comparison, current_version, proposals):
     return weeks
 
 
-def build(registry, review_status, e2e, shadow_status, regime_review, topics, experiments, roadmap=None, research_collection=None):
+def build(registry, review_status, e2e, shadow_status, regime_review, topics, experiments, roadmap=None, research_collection=None, experiment_status=None):
     roadmap = roadmap or {}
+    # Registered challengers (EXP-xxx) and their verified prospective pair counts.
+    # Counts come only from experiment_runner_v1 output; nothing is inferred here.
+    run_by_id = {x.get("id"): x for x in (experiment_status or {}).get("experiments", [])}
+    exp_by_topic = {}
+    for exp in experiments.get("experiments") or []:
+        if exp.get("status") in ("rejected", "approved"):
+            continue
+        for hid in exp.get("hypothesis_ids", []):
+            exp_by_topic.setdefault(hid, []).append(exp)
     verified = {
         x.get("race_id") for x in e2e.get("entries", [])
         if x.get("grade") == "prospective_strict"
@@ -126,6 +135,11 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
         screening_weeks = max(1, int(screening.get("minimum_completed_meetings", 2)))
         topic_screen_met = completed_mentions >= screening_mentions and len(complete_weeks) >= screening_weeks
         story = (roadmap.get("themes") or {}).get(topic["id"]) or {}
+        registered = exp_by_topic.get(topic["id"], [])
+        run_info = [run_by_id.get(e["id"]) or {} for e in registered]
+        minimum_pairs = min((int(r.get("minimum_prospective_pairs") or 20) for r in run_info), default=20)
+        remaining_pairs = min((int(r.get("remaining_prospective_pairs", minimum_pairs)) for r in run_info),
+                              default=20)
         hypotheses.append({
             "id": topic["id"], "source": "formal_jra_review",
             "public_plan": story,
@@ -135,7 +149,8 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
             "completed_meetings_with_observation": len(complete_weeks),
             "completed_meeting_review_mentions": completed_mentions,
             "next_decision": {
-                "stage": "plan_challenger" if topic_screen_met else "finish_observation_gate",
+                "stage": ("collect_challenger_pairs" if registered
+                          else "plan_challenger" if topic_screen_met else "finish_observation_gate"),
                 "screening": {
                     "minimum_qualifying_race_reviews": screening_mentions,
                     "qualifying_race_reviews": completed_mentions,
@@ -146,9 +161,10 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
                     "ready_to_design_experiment": topic_screen_met
                 },
                 "formal_comparison": {
-                    "minimum_paired_races_per_registered_challenger": 20,
-                    "remaining_paired_races": 20,
-                    "challenger_not_yet_registered": True,
+                    "minimum_paired_races_per_registered_challenger": minimum_pairs,
+                    "remaining_paired_races": remaining_pairs,
+                    "challenger_not_yet_registered": not registered,
+                    "registered_experiment_ids": [e["id"] for e in registered],
                     "minimum_not_promise_of_approval": True
                 }
             },
@@ -291,6 +307,9 @@ def build(registry, review_status, e2e, shadow_status, regime_review, topics, ex
         "baseline": exp.get("baseline"), "challenger": exp.get("challenger"),
         "status": exp.get("status", "design"),
         "prestart_pairing_required": True,
+        "prospective_pairs": (run_by_id.get(exp["id"], {}).get("prospective") or {}).get("pairs", 0),
+        "remaining_prospective_pairs": run_by_id.get(exp["id"], {}).get("remaining_prospective_pairs"),
+        "replay_support_only_pairs": (run_by_id.get(exp["id"], {}).get("replay_support_only") or {}).get("pairs", 0),
         "auto_approved": False,
     } for exp in proposals]
     weekly_pairs = verified_weekly_pairs(
@@ -367,6 +386,8 @@ def main():
         read("e2e_validation/improvement_experiments_v1.json"),
         read("e2e_validation/improvement_roadmap_v1.json"),
         read("docs/data/experience_regime_status.json"),
+        read("docs/data/jra_experiment_status_v1.json")
+        if (ROOT / "docs/data/jra_experiment_status_v1.json").exists() else None,
     )
     dest = ROOT / args.output
     dest.parent.mkdir(parents=True, exist_ok=True)

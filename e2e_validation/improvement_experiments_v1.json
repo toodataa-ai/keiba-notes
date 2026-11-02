@@ -11,6 +11,36 @@
     "no_backfilling_before_race": true,
     "record_approved_versions_in_prompt_history": true
   },
-  "experiments": [],
-  "note": "No challenger trial is registered. Observed themes and unpaired Grade A reviews are not trial wins."
+  "experiments": [
+    {
+      "id": "EXP-001",
+      "title": "展開・位置取り補正（ペース予想で先行/差しの勝率を補正）",
+      "hypothesis_ids": [
+        "pace_positioning"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13+pace_v1",
+      "status": "collecting",
+      "registered_by": "Claude (user-approved plan B, 2026-11-02)",
+      "prospective_from": "2026-11-02T13:00:00+09:00",
+      "change_scope": "STEP1の勝率のみ。正式の印・買い目・final_betsには一切反映しない研究用shadow",
+      "inputs": "発走前に固定された正式v3.13 STEP1（勝率とJRA公式の近走通過順位）だけ。オッズ・結果は使わない",
+      "method": "近4走の1角通過順位から脚質（先行/中団/差し）を判定し、先行馬の数でペースS/M/Hを予想。Sは先行×1.25・差し×0.80、Mは先行×1.10・差し×0.92、Hは先行×0.85・差し×1.15を勝率に掛けて正規化",
+      "code": {
+        "path": "e2e_validation/challengers/pace_v1.py",
+        "module": "e2e_validation.challengers.pace_v1",
+        "git_blob_sha": "82f3caf35bddd6ab1c3c654f2b277a77a8f21c4e"
+      },
+      "primary_metric": "win_log_loss（低いほど良い）",
+      "secondary_metrics": [
+        "win_brier",
+        "top3_brier",
+        "honmei_win",
+        "honmei_top3"
+      ],
+      "decision_rule": "発走前登録後の同一レース20ペア以上で、win_log_lossとwin_brierがともに正式版より改善し、◎3着内率が悪化しない場合にA/B/C承認へ提出。どれかを満たさなければ棄却して次の案へ",
+      "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない"
+    }
+  ],
+  "note": "Registered challengers run as deterministic SHA-pinned overlays on the sealed formal STEP1. Only races starting after registration count as prospective pairs."
 }
