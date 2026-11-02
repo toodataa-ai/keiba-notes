@@ -61,6 +61,8 @@ def expand(spec, total):
     if re.fullmatch(r'第\d+日(?:[・,、]第?\d+日)*', s):
         return [int(x) for x in re.findall(r'(\d+)', s)]
     if s in ('全日', '全開催日') and total: return list(range(1, total + 1))
+    m = re.fullmatch(r'全(\d+)日', s)
+    if m: return list(range(1, int(m.group(1)) + 1))
     return None
 
 
@@ -74,11 +76,17 @@ def load_meetings(labels_dir):
 
 
 def candidate_urls(year, track_ja, kais):
+    """Every contiguous range of meetings up to 3 wide, smallest first (the page name joins meetings)."""
     t = ROMAJI[track_ja]
     ks = sorted(kais)
-    urls = ['%s%s_%d_%s.html' % (BASE, year, k, t) for k in ks]
-    urls += ['%s%s_%d-%d_%s.html' % (BASE, year, a, b, t) for a, b in zip(ks, ks[1:]) if b == a + 1]
-    return urls
+    out = []
+    for width in (1, 2, 3):
+        for a in ks:
+            rng = [a + i for i in range(width)]
+            if all(k in kais for k in rng):
+                name = str(a) if width == 1 else '%d-%d' % (a, rng[-1])
+                out.append((tuple(rng), '%s%s_%s_%s.html' % (BASE, year, name, t)))
+    return out
 
 
 def main(argv=None):
@@ -96,7 +104,10 @@ def main(argv=None):
     for (year, track), kais in sorted(meetings.items()):
         if want and year not in want:
             continue
-        for url in candidate_urls(year, track, kais):
+        done_kai = set()
+        for rng, url in candidate_urls(year, track, kais):
+            if all(k in done_kai for k in rng):
+                continue
             time.sleep(a.delay)
             try:
                 r = s.get(url, timeout=60)
@@ -106,6 +117,7 @@ def main(argv=None):
                 report['pages'].append({'url': url, 'status': r.status_code}); continue
             r.encoding = r.apparent_encoding
             rows, problems = parse_overview(r.text, track)
+            done_kai.update(x['kai'] for x in rows if x['kai'])
             rec = {'url': url, 'status': 200, 'rows': len(rows), 'problems': problems}
             report['pages'].append(rec)
             for x in rows:
