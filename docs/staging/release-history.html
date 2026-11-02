@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head><body>
-<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div><main class="shell">
+<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div><main class="shell">
 <a class="link" href="staging/index.html">← 研究所トップ</a><h1>サイト公開履歴</h1>
 <p class="sub">画面の公開版とレース予想・結果データは独立管理しています。復元は画面ファイルだけに適用し、過去の予想や最新レース台帳を変更しません。</p>
 <div id="versions" aria-live="polite"><p>公開履歴を読み込み中…</p></div>
@@ -23,5 +23,5 @@ for(const r of [...(d.releases||[])].reverse()){const b=el('section','');b.class
 }
 }).catch(()=>{list.textContent='';list.append(el('div','公開履歴の取得に失敗しました。'));});
 </script>  <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
-<script src="staging/candidate-assets/page-nav-v1.js?v=20261102-1" defer></script>
+<script src="assets/page-nav-v1.js?v=20261102-1" defer></script>
 </body></html>

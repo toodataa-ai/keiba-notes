@@ -1,30 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-page-nav-v1",
-      "title": "ページ内の「一番上へ」ボタン／トップ下線の色を戻す",
-      "pages": [
-        "index.html",
-        "this-week.html",
-        "schedule.html",
-        "results.html",
-        "methodology.html",
-        "roadmap.html",
-        "e2e.html",
-        "baba-models.html",
-        "local-racing-shadow.html",
-        "experience-regime.html",
-        "release-history.html",
-        "improvement-cycle.html"
-      ],
-      "assets": [
-        "assets/page-nav-v1.js"
-      ],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-02",
-      "summary": "少し下へ読み進めると、画面の右下に「一番上へ」ボタンが出る。あわせてトップのタイトル下線の色を元の色に戻す。"
-    }
-  ]
+  "candidates": []
 }

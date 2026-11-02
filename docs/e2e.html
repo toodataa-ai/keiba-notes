@@ -101,4 +101,5 @@ function loadPublic(){return fetch('data/e2e_public.json',{cache:'no-store'}).th
 for(const id of ['gradeFilter','statusFilter','venueFilter'])document.getElementById(id).addEventListener('change',renderRaces);Promise.allSettled([loadStatus(),loadPublic()]).then(xs=>{if(xs.some(x=>x.status==='rejected')){const st=document.getElementById('state');if(st.textContent==='読み込み中'){st.textContent='一部データ読み込みエラー';st.className='rd-status bad'}}});
 </script>
 <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+<script src="assets/page-nav-v1.js?v=20261102-1" defer></script>
 </body></html>
