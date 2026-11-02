@@ -88,10 +88,31 @@ def discover(day):
             for theme in groups or {'E0','E1','E2'}:
                 missing.append({'theme':theme,'race_id':race['race_id'],'state':'blocked',
                                 'blocker':'full_field_prerace_probabilities_required; fixed_sample_unchanged'})
+    # A Draft experiment checkout can be older than the canonical main branch.
+    # Do not report published races as "missing forecasts" merely because they
+    # have not yet entered the experimental branch. Never count the later
+    # discovery of a race as a prospective comparison.
+    checkout_races=[r['id'] for r in rt.read(rt.ROOT/'docs/data/races.json')['races']
+                    if r.get('scope')=='jra-main' and r.get('date')==day]
+    main_only=[]
+    try:
+        main_registry=json.loads(rt.git('show','origin/main:docs/data/races.json'))['races']
+        main_only=sorted(r['id'] for r in main_registry
+                         if r.get('scope')=='jra-main' and r.get('date')==day
+                         and r['id'] not in checkout_races)
+    except (ValueError, KeyError, OSError, rt.subprocess.CalledProcessError):
+        # A missing remote ref cannot be treated as evidence of freshness.
+        pass
+    registry_audit={'checkout_races':checkout_races,'main_only_races':main_only,
+                    'main_ref_checked':'origin/main'}
     if not reports:
-        reports=[{'theme':t,'state':'blocked','blocker':'current_official_forecast_or_same_cutoff_input_not_available:'+day} for t in rt.THEMES]
+        reason=('stale_experiment_checkout_main_has_canonical_races:' if main_only else
+                'no_canonical_jra_main_races_in_checkout:' if not checkout_races else
+                'canonical_races_present_but_same_cutoff_inputs_unavailable:')
+        reports=[{'theme':t,'state':'blocked','blocker':reason+day} for t in rt.THEMES]
     path=rt.ROOT/rt.DATA/'attempts'/(rt.now().strftime('%Y%m%dT%H%M%S%f')+'-discovery.json')
-    rt.dump(path,{'at':rt.now().isoformat(),'day':day,'reports':reports,'sample_gaps':missing},immutable=True)
+    rt.dump(path,{'at':rt.now().isoformat(),'day':day,'reports':reports,
+                  'sample_gaps':missing,'registry_audit':registry_audit},immutable=True)
     return reports
 
 def reconcile():
