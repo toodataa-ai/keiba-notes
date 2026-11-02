@@ -37,8 +37,9 @@ jobs:
             p,s=Tags(),Tags();p.feed(src);s.feed(stage)
             assert not s.duplicates,(name,s.duplicates)
             # The production usage widget (siteUsage*) is replaced on staging by the read-only stage preview (stageUsage*).
-            prod_ids={i for i in p.ids if not i.startswith('siteUsage')}
-            stage_ids={i for i in s.ids if not i.startswith('stageUsage')}
+            widget=('siteUsage','stageUsage')
+            prod_ids={i for i in p.ids if not i.startswith(widget)}
+            stage_ids={i for i in s.ids if not i.startswith(widget)}
             assert prod_ids==stage_ids,(name,'canonical IDs must match',sorted(prod_ids^stage_ids))
             assert set(s.anchors).issubset(s.ids),(name,'bad fragment anchors')
             assert 'href="staging/' in stage,(name,'stage links absent')
