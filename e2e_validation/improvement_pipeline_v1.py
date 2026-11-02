@@ -114,8 +114,18 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
                     sb = {s: ((v.get(s) or {}).get("stage_b") or {}).get("status", "—") for s in ("turf", "dirt")}
                     ja_st = {"validated": "検証済み", "candidate": "候補", "backtesting": "検証中", "pilot": "試作", "—": "—"}
                     in_prod = any((v.get(s) or {}).get("routing", {}).get("production") for s in ("turf", "dirt"))
-                    met = all(st[s] in crit["baba_track"]["ok_statuses"] for s in st)
-                    detail = {"turf": st["turf"], "dirt": st["dirt"], "stage_a": sa, "stage_b": sb, "in_production": in_prod}
+                    gst = {s: ((v.get(s) or {}).get("going_status") or {}).get("state") for s in ("turf", "dirt")}
+                    gst_ja = {"usable": "使える見込み", "waiting_forecast": "予報待ち", "insufficient": "まだ足りない"}
+                    if all(gst.values()):
+                        # new rule (2026-11-03): race-time going model measured directly against "morning going persists"
+                        met = all(gst[s] == "usable" for s in gst)
+                    else:
+                        met = all(st[s] in crit["baba_track"]["ok_statuses"] for s in st)
+                    detail = {"turf": st["turf"], "dirt": st["dirt"], "stage_a": sa, "stage_b": sb, "in_production": in_prod,
+                              "going": {s: {"state": gst[s], "label": gst_ja.get(gst[s], "—"),
+                                            **{k: ((v.get(s) or {}).get("going_status") or {}).get(k) for k in ("without_forecast", "perfect_forecast", "races")}}
+                                        for s in gst},
+                              "going_text": f"芝：{gst_ja.get(gst['turf'], '—')}／ダート：{gst_ja.get(gst['dirt'], '—')}"}
                     text_st = (f"Stage A（翌朝の含水率）：芝{ja_st.get(sa['turf'], sa['turf'])}・ダ{ja_st.get(sa['dirt'], sa['dirt'])} ／ "
                                f"Stage B（発走時の馬場）：芝{ja_st.get(sb['turf'], sb['turf'])}・ダ{ja_st.get(sb['dirt'], sb['dirt'])}")
                     exps = matching_experiments(uid, None, registry, status)

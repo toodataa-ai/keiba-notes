@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -142,7 +142,13 @@ Promise.all([
   const exps=status.experiments||[];
   const names=pipe.stages||['研究','登録','比較','判定'];
   const bar=(u)=>{const st=u.state==='in_production'?4:u.stage;return `<div class="pb" aria-hidden="true">${names.map((n,i)=>i<st?'<i class="d"></i>':i===st?`<i class="n"><b style="width:${Math.max(0,Math.min(1,u.frac))*100}%"></b></i>`:'<i></i>').join('')}</div>`};
-  const row=u=>`<div class="pr"><span class="pl">${esc(u.label)}</span>${bar(u)}<span class="pt">${esc(u.text)}</span></div>`;
+  const gcol={usable:'#1a6b3a',waiting_forecast:'#8a5a00',insufficient:'#666'};
+  const gchip=(n,g)=>`<span style="margin-right:14px;white-space:nowrap">${n} <b style="color:${gcol[g.state]||'#666'}">${esc(g.label)}</b></span>`;
+  const row=u=>{
+    const g=u.detail&&u.detail.going;
+    if(g&&u.state==='research') return `<div class="pr"><span class="pl">${esc(u.label)}</span><span class="pt">${gchip('芝',g.turf)}${gchip('ダート',g.dirt)}</span></div>`;
+    const txt=(g&&u.detail.going_text)?u.detail.going_text:u.text;
+    return `<div class="pr"><span class="pl">${esc(u.label)}</span>${bar(u)}<span class="pt">${esc(txt)}</span></div>`};
   const groups=cfg.themes.map(t=>{
     const us=pipe.units.filter(u=>u.theme===t.id);
     const ids=new Set(us.map(u=>u.experiment_id).filter(Boolean));
@@ -153,7 +159,7 @@ Promise.all([
     if(t.id==='track_condition'){
       const f=pipe.baba_registry_freshness;
       if(f) extra+=`<p class="tiny ${f.is_stale?'warn':''}">馬場モデルの記録の最終更新：${esc(f.updated_at)}（${f.age_days}日前）。${f.is_stale?'更新が止まっています。':''}${esc(f.owner)}</p>`;
-      extra+='<p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場モデルを使う案は、競馬場ごとに条件に届いたあと、別の改善案として登録して比べます。中山・阪神は、すでに本番の予想で使っているため、改善案としては扱いません。</p>';
+      extra+='<p class="tiny"><b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5%以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない（予報を毎日保存していて、たまり次第、本当の精度で測り直します）。<b>まだ足りない</b>＝予報が当たっても基準に届かない。</p><p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場モデルを使う案は、競馬場ごとに条件に届いたあと、別の改善案として登録して比べます。中山・阪神は、すでに本番の予想で使っているため、改善案としては扱いません。</p>';
     }
     if(t.id==='field_experience') extra+=`<p class="tiny">血統：いまの正式予想では血統は固定の評価で、実測していません。研究では血統の情報を集めていて、条件に届けば「戦歴が少ない馬ほど血統の影響が大きいか」を比較で確かめます。</p><p class="tiny">${esc(pipe.owners.experience)}</p>`;
     const entry=crit.length?`<div class="entry"><b>登録の条件：</b>${crit.map(c=>`<span class="eline">${esc(c)}</span>`).join('')}${ready?`<span class="eline"><b>いま登録できる状態：${ready}件。</b>通知（Issue）を出しています。</span>`:''}</div>`:'';

@@ -31,12 +31,7 @@
       "title": "購入セットと印の整合性"
     }
   ],
-  "baba_registry_freshness": {
-    "updated_at": "2026-11-02",
-    "age_days": 0,
-    "is_stale": false,
-    "owner": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。"
-  },
+  "baba_registry_freshness": null,
   "experience_evidence_week": "2026-10-31",
   "units": [
     {
@@ -76,7 +71,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -90,7 +85,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "insufficient",
+            "label": "まだ足りない",
+            "without_forecast": {
+              "logloss_gain_pct": -24.1,
+              "brier_gain_pct": -29.6
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 21.2,
+              "brier_gain_pct": -8.0
+            },
+            "races": 340
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 20.2,
+              "brier_gain_pct": 11.3
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 29.4,
+              "brier_gain_pct": 13.9
+            },
+            "races": 220
+          }
+        },
+        "going_text": "芝：まだ足りない／ダート：使える見込み"
       }
     },
     {
@@ -102,7 +126,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -116,20 +140,49 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "insufficient",
+            "label": "まだ足りない",
+            "without_forecast": {
+              "logloss_gain_pct": -3.0,
+              "brier_gain_pct": -19.6
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 9.7,
+              "brier_gain_pct": -6.7
+            },
+            "races": 292
+          },
+          "dirt": {
+            "state": "insufficient",
+            "label": "まだ足りない",
+            "without_forecast": {
+              "logloss_gain_pct": 11.5,
+              "brier_gain_pct": 21.5
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 39.8,
+              "brier_gain_pct": 31.3
+            },
+            "races": 188
+          }
+        },
+        "going_text": "芝：まだ足りない／ダート：まだ足りない"
       }
     },
     {
       "id": "track_condition:track:fukushima",
       "theme": "track_condition",
       "label": "福島",
-      "stage": 0,
-      "stage_name": "研究",
-      "frac": 0.375,
-      "state": "research",
-      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
-      "criteria_met": false,
+      "stage": 1,
+      "stage_name": "登録",
+      "frac": 0.0,
+      "state": "ready_to_register",
+      "text": "条件に届いた（登録待ち）　Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": true,
       "experiment_id": null,
       "detail": {
         "turf": "backtesting",
@@ -142,7 +195,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 6.3,
+              "brier_gain_pct": 18.2
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 67.3,
+              "brier_gain_pct": 63.1
+            },
+            "races": 460
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 10.9,
+              "brier_gain_pct": 19.5
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 54.6,
+              "brier_gain_pct": 54.2
+            },
+            "races": 280
+          }
+        },
+        "going_text": "芝：使える見込み／ダート：使える見込み"
       }
     },
     {
@@ -154,7 +236,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -168,7 +250,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": -1.1,
+              "brier_gain_pct": 5.9
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 53.5,
+              "brier_gain_pct": 41.1
+            },
+            "races": 618
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 7.6,
+              "brier_gain_pct": 9.6
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 73.6,
+              "brier_gain_pct": 67.3
+            },
+            "races": 401
+          }
+        },
+        "going_text": "芝：予報待ち／ダート：使える見込み"
       }
     },
     {
@@ -180,7 +291,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -194,7 +305,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 27.3,
+              "brier_gain_pct": 22.7
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 44.4,
+              "brier_gain_pct": 36.9
+            },
+            "races": 822
+          },
+          "dirt": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": -0.2,
+              "brier_gain_pct": -8.3
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 50.8,
+              "brier_gain_pct": 34.5
+            },
+            "races": 872
+          }
+        },
+        "going_text": "芝：使える見込み／ダート：予報待ち"
       }
     },
     {
@@ -206,7 +346,7 @@
       "frac": 1.0,
       "state": "in_production",
       "text": "本番の予想で使用中（改善案としての比較は不要）",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -220,7 +360,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": true
+        "in_production": true,
+        "going": {
+          "turf": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": -4.9,
+              "brier_gain_pct": -2.5
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 38.6,
+              "brier_gain_pct": 32.1
+            },
+            "races": 658
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 17.6,
+              "brier_gain_pct": 16.7
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 37.5,
+              "brier_gain_pct": 31.9
+            },
+            "races": 932
+          }
+        },
+        "going_text": "芝：予報待ち／ダート：使える見込み"
       }
     },
     {
@@ -232,7 +401,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -246,7 +415,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": -7.7,
+              "brier_gain_pct": -0.5
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 50.2,
+              "brier_gain_pct": 48.2
+            },
+            "races": 542
+          },
+          "dirt": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": 15.1,
+              "brier_gain_pct": -0.5
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 20.9,
+              "brier_gain_pct": 8.9
+            },
+            "races": 578
+          }
+        },
+        "going_text": "芝：予報待ち／ダート：予報待ち"
       }
     },
     {
@@ -258,7 +456,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -272,7 +470,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": -1.8,
+              "brier_gain_pct": -6.9
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 47.3,
+              "brier_gain_pct": 37.9
+            },
+            "races": 747
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 24.1,
+              "brier_gain_pct": 17.8
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 50.1,
+              "brier_gain_pct": 39.0
+            },
+            "races": 902
+          }
+        },
+        "going_text": "芝：予報待ち／ダート：使える見込み"
       }
     },
     {
@@ -284,7 +511,7 @@
       "frac": 1.0,
       "state": "in_production",
       "text": "本番の予想で使用中（改善案としての比較は不要）",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -298,7 +525,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": true
+        "in_production": true,
+        "going": {
+          "turf": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 8.5,
+              "brier_gain_pct": 11.2
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 54.6,
+              "brier_gain_pct": 52.4
+            },
+            "races": 581
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 22.1,
+              "brier_gain_pct": 19.5
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 50.8,
+              "brier_gain_pct": 39.5
+            },
+            "races": 759
+          }
+        },
+        "going_text": "芝：使える見込み／ダート：使える見込み"
       }
     },
     {
@@ -310,7 +566,7 @@
       "frac": 0.375,
       "state": "research",
       "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
-      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
@@ -324,7 +580,36 @@
           "turf": "pilot",
           "dirt": "pilot"
         },
-        "in_production": false
+        "in_production": false,
+        "going": {
+          "turf": {
+            "state": "waiting_forecast",
+            "label": "予報待ち",
+            "without_forecast": {
+              "logloss_gain_pct": -9.8,
+              "brier_gain_pct": -9.3
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 33.0,
+              "brier_gain_pct": 26.7
+            },
+            "races": 600
+          },
+          "dirt": {
+            "state": "usable",
+            "label": "使える見込み",
+            "without_forecast": {
+              "logloss_gain_pct": 12.6,
+              "brier_gain_pct": 15.1
+            },
+            "perfect_forecast": {
+              "logloss_gain_pct": 20.7,
+              "brier_gain_pct": 9.2
+            },
+            "races": 259
+          }
+        },
+        "going_text": "芝：予報待ち／ダート：使える見込み"
       }
     },
     {

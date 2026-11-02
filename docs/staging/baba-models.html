@@ -61,9 +61,10 @@
     </tbody></table></div>
     <p class="rd-small">「天気が完全に当たった場合」は上限の目安です。過去の天気予報は残っていないため、実際の天気で代用しています。本当の精度は、この行と「予報なし」の行のあいだになります。</p>
     <h3 style="margin-top:24px" id="overview">競馬場ごとの一覧（ひと目で見る）</h3>
-    <p class="rd-small">数字は「今のやり方より、馬場状態の外れ具合が何％減ったか」です。プラスなら良くなった、マイナスなら悪くなったことを表します。「予報なし」は天気予報を使わない場合、「予報が当たれば」は天気予報が完全に当たったと仮定した上限です。</p>
-    <div class="rd-tablewrap"><style>#ovTable th,#ovTable td{padding:8px 5px;font-size:13px;text-align:center}#ovTable td:first-child,#ovTable th:first-child{text-align:left}</style><table class="rd-table" id="ovTable"><thead><tr><th rowspan="2">競馬場</th><th colspan="2">芝</th><th colspan="2">ダート</th></tr><tr><th>予報なし</th><th>予報<br>当たれば</th><th>予報なし</th><th>予報<br>当たれば</th></tr></thead><tbody id="ovBody"><tr><td colspan="5">読み込み中…</td></tr></tbody></table></div>
-    <p class="rd-small">緑の太字は、今のやり方より15％以上良くなった（外れ具合が15％以上減った）ものです。「本番で使用中」は、馬場の研究結果をすでに本番の予想に使っている競馬場です。</p>
+    <p class="rd-small">競馬場ごと・芝ダートごとに、今の状態を3つで表します。<b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5％以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない。<b>まだ足りない</b>＝予報が当たっても基準に届かない。小さい数字は、外れ具合が何％減ったかです（左が予報なし、右が予報が当たった場合の上限）。</p>
+    <style>#ovTable th,#ovTable td{padding:9px 6px;font-size:13px;text-align:center;vertical-align:top}#ovTable td:first-child,#ovTable th:first-child{text-align:left}#ovTable small{display:block;color:#666;font-size:11px;margin-top:2px;white-space:nowrap}</style>
+    <div class="rd-tablewrap"><table class="rd-table" id="ovTable"><thead><tr><th>競馬場</th><th>芝</th><th>ダート</th></tr></thead><tbody id="ovBody"><tr><td colspan="3">読み込み中…</td></tr></tbody></table></div>
+    <p class="rd-small">「本番で使用中」は、馬場の研究結果をすでに本番の予想に使っている競馬場です。朝の馬場状態は、その日最初のレースの馬場で代用しています。</p>
     <h3 style="margin-top:24px">分かったこと</h3>
     <ul>
       <li>当日朝の含水率が、いちばん効く情報の一つです。</li>
@@ -119,16 +120,16 @@
 </main>
 <script>
 (function(){
-const SB={"札幌": {"turf": [-24, 21], "dirt": [20, 29]}, "函館": {"turf": [-3, 10], "dirt": [12, 40]}, "福島": {"turf": [6, 67], "dirt": [11, 55]}, "新潟": {"turf": [-1, 54], "dirt": [8, 74]}, "東京": {"turf": [27, 44], "dirt": [0, 51]}, "中山": {"turf": [-5, 39], "dirt": [18, 38]}, "中京": {"turf": [-8, 50], "dirt": [15, 21]}, "京都": {"turf": [-2, 47], "dirt": [24, 50]}, "阪神": {"turf": [8, 55], "dirt": [22, 51]}, "小倉": {"turf": [-10, 33], "dirt": [13, 21]}};
-const lab={validated:'検証済み',candidate:'候補',backtesting:'検証中',pilot:'試験運用',degraded:'要改善',retired:'終了'};
-const cell=v=>{if(v==null)return '<td>—</td>';const c=v>=15?'#1a6b3a':(v<0?'#a32020':'#444');const w=v>=15?700:400;return `<td style="color:${c};font-weight:${w};white-space:nowrap">${v>0?'+':''}${v}%</td>`};
+const col={usable:'#1a6b3a',waiting_forecast:'#8a5a00',insufficient:'#666'};
+const sg=v=>v==null?'—':(v>0?'+':'')+Math.round(v)+'%';
 fetch('data/baba_model_registry.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
- const by={};for(const m of d.models){by[m.track_ja+m.surface]=m}
- document.getElementById('ovBody').innerHTML=Object.keys(SB).map(t=>{
-  const row=s=>{const m=by[t+s];const b=SB[t][s]||[null,null];return `${cell(b[0])}${cell(b[1])}`};
-  const prod=(by[t+'turf']&&by[t+'turf'].routing&&by[t+'turf'].routing.production)?'<br><span class="rd-small">本番で使用中</span>':'';
-  return `<tr><td><b>${t}</b>${prod}</td>${row('turf')}${row('dirt')}</tr>`}).join('');
-}).catch(()=>{document.getElementById('ovBody').innerHTML='<tr><td colspan="5">一覧を読み込めませんでした。</td></tr>'});
+ const by={},order=[];
+ for(const m of d.models){if(!by[m.track]){by[m.track]={ja:m.track_ja};order.push(m.track)}by[m.track][m.surface]=m}
+ document.getElementById('ovBody').innerHTML=order.map(t=>{
+  const x=by[t],prod=(x.turf&&x.turf.routing&&x.turf.routing.production)?'<small>本番で使用中</small>':'';
+  const cell=m=>{const g=m&&m.going_status;if(!g)return '<td>—</td>';return `<td><b style="color:${col[g.state]||'#666'}">${g.label}</b><small>${sg(g.without_forecast.logloss_gain_pct)} / ${sg(g.perfect_forecast.logloss_gain_pct)}</small></td>`};
+  return `<tr><td><b>${x.ja}</b>${prod}</td>${cell(x.turf)}${cell(x.dirt)}</tr>`}).join('');
+}).catch(()=>{document.getElementById('ovBody').innerHTML='<tr><td colspan="3">一覧を読み込めませんでした。</td></tr>'});
 })();
 </script>
 <script>

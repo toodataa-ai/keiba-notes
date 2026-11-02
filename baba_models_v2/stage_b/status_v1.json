@@ -1,0 +1,617 @@
+{
+ "schema_version": 1,
+ "as_of": "2026-11-03",
+ "test_years": [
+  2023,
+  2024,
+  2025,
+  2026
+ ],
+ "cells": {
+  "chukyo": {
+   "turf": {
+    "races": 542,
+    "meeting_days": 112,
+    "years": 4,
+    "transition_races": 54,
+    "transition_days": 11,
+    "base": {
+     "logloss": 0.22263848932856442,
+     "brier": 0.12005163211991522,
+     "brier_transition": 1.0197091042163247
+    },
+    "G2": {
+     "logloss": 0.2398303945324224,
+     "brier": 0.12060330598596093,
+     "brier_transition": 0.8893931174314053,
+     "pass": false,
+     "logloss_gain_pct": -7.7,
+     "brier_gain_pct": -0.5
+    },
+    "G3": {
+     "logloss": 0.11095036966508304,
+     "brier": 0.06219196700731641,
+     "brier_transition": 0.4826042097007942,
+     "pass": true,
+     "logloss_gain_pct": 50.2,
+     "brier_gain_pct": 48.2
+    },
+    "state": "waiting_forecast"
+   },
+   "dirt": {
+    "races": 578,
+    "meeting_days": 112,
+    "years": 4,
+    "transition_races": 57,
+    "transition_days": 11,
+    "base": {
+     "logloss": 0.18287679825758515,
+     "brier": 0.08830886807100778,
+     "brier_transition": 0.769085674255816
+    },
+    "G2": {
+     "logloss": 0.1552901454588561,
+     "brier": 0.08874240167300088,
+     "brier_transition": 0.5092375953536663,
+     "pass": false,
+     "logloss_gain_pct": 15.1,
+     "brier_gain_pct": -0.5
+    },
+    "G3": {
+     "logloss": 0.14469811386347747,
+     "brier": 0.08040704381883282,
+     "brier_transition": 0.5182496146493226,
+     "pass": true,
+     "logloss_gain_pct": 20.9,
+     "brier_gain_pct": 8.9
+    },
+    "state": "waiting_forecast"
+   }
+  },
+  "fukushima": {
+   "turf": {
+    "races": 460,
+    "meeting_days": 74,
+    "years": 4,
+    "transition_races": 43,
+    "transition_days": 7,
+    "base": {
+     "logloss": 0.163176291816202,
+     "brier": 0.0858582937527846,
+     "brier_transition": 0.8073167078891805
+    },
+    "G2": {
+     "logloss": 0.15296653219634382,
+     "brier": 0.07019037030230554,
+     "brier_transition": 0.574685217593617,
+     "pass": true,
+     "logloss_gain_pct": 6.3,
+     "brier_gain_pct": 18.2
+    },
+    "G3": {
+     "logloss": 0.05330523601394813,
+     "brier": 0.03166849388891321,
+     "brier_transition": 0.2399064541577516,
+     "pass": true,
+     "logloss_gain_pct": 67.3,
+     "brier_gain_pct": 63.1
+    },
+    "state": "usable"
+   },
+   "dirt": {
+    "races": 280,
+    "meeting_days": 74,
+    "years": 4,
+    "transition_races": 38,
+    "transition_days": 10,
+    "base": {
+     "logloss": 0.21465091672712683,
+     "brier": 0.11802746773241607,
+     "brier_transition": 0.8304101921355608
+    },
+    "G2": {
+     "logloss": 0.19128151882705322,
+     "brier": 0.09506329525255217,
+     "brier_transition": 0.46358241342795486,
+     "pass": true,
+     "logloss_gain_pct": 10.9,
+     "brier_gain_pct": 19.5
+    },
+    "G3": {
+     "logloss": 0.09743203355467578,
+     "brier": 0.054072165109542936,
+     "brier_transition": 0.19701844003293972,
+     "pass": true,
+     "logloss_gain_pct": 54.6,
+     "brier_gain_pct": 54.2
+    },
+    "state": "usable"
+   }
+  },
+  "hakodate": {
+   "turf": {
+    "races": 292,
+    "meeting_days": 48,
+    "years": 4,
+    "transition_races": 30,
+    "transition_days": 5,
+    "base": {
+     "logloss": 0.19379052092994187,
+     "brier": 0.10689658235694,
+     "brier_transition": 0.7168550354128467
+    },
+    "G2": {
+     "logloss": 0.1995218530606498,
+     "brier": 0.1278191688993498,
+     "brier_transition": 0.5448509971574028,
+     "pass": false,
+     "logloss_gain_pct": -3.0,
+     "brier_gain_pct": -19.6
+    },
+    "G3": {
+     "logloss": 0.1749419574640718,
+     "brier": 0.11408872779898344,
+     "brier_transition": 0.45974909347494447,
+     "pass": false,
+     "logloss_gain_pct": 9.7,
+     "brier_gain_pct": -6.7
+    },
+    "state": "insufficient"
+   },
+   "dirt": {
+    "races": 188,
+    "meeting_days": 48,
+    "years": 4,
+    "transition_races": 20,
+    "transition_days": 5,
+    "base": {
+     "logloss": 0.2511631623026628,
+     "brier": 0.13424633237903286,
+     "brier_transition": 1.0435770121541583
+    },
+    "G2": {
+     "logloss": 0.2221936886885388,
+     "brier": 0.10537343069748573,
+     "brier_transition": 0.6050066062411722,
+     "pass": false,
+     "logloss_gain_pct": 11.5,
+     "brier_gain_pct": 21.5
+    },
+    "G3": {
+     "logloss": 0.15132155170631717,
+     "brier": 0.09216607833525765,
+     "brier_transition": 0.44652624596834506,
+     "pass": false,
+     "logloss_gain_pct": 39.8,
+     "brier_gain_pct": 31.3
+    },
+    "state": "insufficient"
+   }
+  },
+  "hanshin": {
+   "turf": {
+    "races": 581,
+    "meeting_days": 134,
+    "years": 4,
+    "transition_races": 112,
+    "transition_days": 26,
+    "base": {
+     "logloss": 0.3476230702843485,
+     "brier": 0.1910801235738361,
+     "brier_transition": 0.9213773620765362
+    },
+    "G2": {
+     "logloss": 0.318203210791142,
+     "brier": 0.1696625754811174,
+     "brier_transition": 0.7736169399520756,
+     "pass": true,
+     "logloss_gain_pct": 8.5,
+     "brier_gain_pct": 11.2
+    },
+    "G3": {
+     "logloss": 0.1577956765981895,
+     "brier": 0.09088952276615121,
+     "brier_transition": 0.40470113379039246,
+     "pass": true,
+     "logloss_gain_pct": 54.6,
+     "brier_gain_pct": 52.4
+    },
+    "state": "usable"
+   },
+   "dirt": {
+    "races": 759,
+    "meeting_days": 134,
+    "years": 4,
+    "transition_races": 149,
+    "transition_days": 27,
+    "base": {
+     "logloss": 0.3222298763504899,
+     "brier": 0.163216106245999,
+     "brier_transition": 0.7665605951751989
+    },
+    "G2": {
+     "logloss": 0.25085790714848494,
+     "brier": 0.13142875902948312,
+     "brier_transition": 0.6233359564482066,
+     "pass": true,
+     "logloss_gain_pct": 22.1,
+     "brier_gain_pct": 19.5
+    },
+    "G3": {
+     "logloss": 0.15862746971787361,
+     "brier": 0.0987723495147083,
+     "brier_transition": 0.39098164012595593,
+     "pass": true,
+     "logloss_gain_pct": 50.8,
+     "brier_gain_pct": 39.5
+    },
+    "state": "usable"
+   }
+  },
+  "kokura": {
+   "turf": {
+    "races": 600,
+    "meeting_days": 86,
+    "years": 4,
+    "transition_races": 119,
+    "transition_days": 17,
+    "base": {
+     "logloss": 0.4347376272024356,
+     "brier": 0.2189091835962901,
+     "brier_transition": 0.8836064434171267
+    },
+    "G2": {
+     "logloss": 0.4775231810615035,
+     "brier": 0.23929759216130164,
+     "brier_transition": 0.7237265351094838,
+     "pass": false,
+     "logloss_gain_pct": -9.8,
+     "brier_gain_pct": -9.3
+    },
+    "G3": {
+     "logloss": 0.2912543337755365,
+     "brier": 0.1604636270009218,
+     "brier_transition": 0.44545786850833513,
+     "pass": true,
+     "logloss_gain_pct": 33.0,
+     "brier_gain_pct": 26.7
+    },
+    "state": "waiting_forecast"
+   },
+   "dirt": {
+    "races": 259,
+    "meeting_days": 86,
+    "years": 4,
+    "transition_races": 36,
+    "transition_days": 12,
+    "base": {
+     "logloss": 0.321152830012961,
+     "brier": 0.16414601001838852,
+     "brier_transition": 0.9911318394552726
+    },
+    "G2": {
+     "logloss": 0.28083418079931927,
+     "brier": 0.13943541984925978,
+     "brier_transition": 0.7289772211942859,
+     "pass": true,
+     "logloss_gain_pct": 12.6,
+     "brier_gain_pct": 15.1
+    },
+    "G3": {
+     "logloss": 0.2546976652960131,
+     "brier": 0.14906485349303472,
+     "brier_transition": 0.6331434130059979,
+     "pass": true,
+     "logloss_gain_pct": 20.7,
+     "brier_gain_pct": 9.2
+    },
+    "state": "usable"
+   }
+  },
+  "kyoto": {
+   "turf": {
+    "races": 747,
+    "meeting_days": 165,
+    "years": 4,
+    "transition_races": 101,
+    "transition_days": 20,
+    "base": {
+     "logloss": 0.25507113359493094,
+     "brier": 0.13020187093870159,
+     "brier_transition": 0.8334149207617471
+    },
+    "G2": {
+     "logloss": 0.25973635551360613,
+     "brier": 0.1392051052122915,
+     "brier_transition": 0.660367496382721,
+     "pass": false,
+     "logloss_gain_pct": -1.8,
+     "brier_gain_pct": -6.9
+    },
+    "G3": {
+     "logloss": 0.1344406347004292,
+     "brier": 0.08086761685827336,
+     "brier_transition": 0.41628619446269405,
+     "pass": true,
+     "logloss_gain_pct": 47.3,
+     "brier_gain_pct": 37.9
+    },
+    "state": "waiting_forecast"
+   },
+   "dirt": {
+    "races": 902,
+    "meeting_days": 165,
+    "years": 4,
+    "transition_races": 125,
+    "transition_days": 24,
+    "base": {
+     "logloss": 0.27070988603460416,
+     "brier": 0.13956025779039932,
+     "brier_transition": 0.9231528185619813
+    },
+    "G2": {
+     "logloss": 0.20537073315594045,
+     "brier": 0.11471239225182309,
+     "brier_transition": 0.6320288223038104,
+     "pass": true,
+     "logloss_gain_pct": 24.1,
+     "brier_gain_pct": 17.8
+    },
+    "G3": {
+     "logloss": 0.1351587397458841,
+     "brier": 0.08511245334703124,
+     "brier_transition": 0.4364452334237154,
+     "pass": true,
+     "logloss_gain_pct": 50.1,
+     "brier_gain_pct": 39.0
+    },
+    "state": "usable"
+   }
+  },
+  "nakayama": {
+   "turf": {
+    "races": 658,
+    "meeting_days": 159,
+    "years": 4,
+    "transition_races": 87,
+    "transition_days": 21,
+    "base": {
+     "logloss": 0.28785040842713955,
+     "brier": 0.15227822865717375,
+     "brier_transition": 0.9802887866807771
+    },
+    "G2": {
+     "logloss": 0.30209145992503916,
+     "brier": 0.15602842978834286,
+     "brier_transition": 0.7865402401974503,
+     "pass": false,
+     "logloss_gain_pct": -4.9,
+     "brier_gain_pct": -2.5
+    },
+    "G3": {
+     "logloss": 0.17671299804109353,
+     "brier": 0.10344185367954181,
+     "brier_transition": 0.42304060871634286,
+     "pass": true,
+     "logloss_gain_pct": 38.6,
+     "brier_gain_pct": 32.1
+    },
+    "state": "waiting_forecast"
+   },
+   "dirt": {
+    "races": 932,
+    "meeting_days": 159,
+    "years": 4,
+    "transition_races": 194,
+    "transition_days": 34,
+    "base": {
+     "logloss": 0.3119993444687586,
+     "brier": 0.1676980688030692,
+     "brier_transition": 0.7354045055891715
+    },
+    "G2": {
+     "logloss": 0.2569772348302841,
+     "brier": 0.13967180483563466,
+     "brier_transition": 0.4261823322208691,
+     "pass": true,
+     "logloss_gain_pct": 17.6,
+     "brier_gain_pct": 16.7
+    },
+    "G3": {
+     "logloss": 0.1949377262088006,
+     "brier": 0.11428605983318553,
+     "brier_transition": 0.31840444822027,
+     "pass": true,
+     "logloss_gain_pct": 37.5,
+     "brier_gain_pct": 31.9
+    },
+    "state": "usable"
+   }
+  },
+  "niigata": {
+   "turf": {
+    "races": 618,
+    "meeting_days": 102,
+    "years": 4,
+    "transition_races": 137,
+    "transition_days": 23,
+    "base": {
+     "logloss": 0.5215285331164885,
+     "brier": 0.24630750944527208,
+     "brier_transition": 1.061240927299785
+    },
+    "G2": {
+     "logloss": 0.5271155463514562,
+     "brier": 0.23171452377018228,
+     "brier_transition": 0.9539620936832807,
+     "pass": false,
+     "logloss_gain_pct": -1.1,
+     "brier_gain_pct": 5.9
+    },
+    "G3": {
+     "logloss": 0.24246446118534953,
+     "brier": 0.14515806864429057,
+     "brier_transition": 0.5709756671054892,
+     "pass": true,
+     "logloss_gain_pct": 53.5,
+     "brier_gain_pct": 41.1
+    },
+    "state": "waiting_forecast"
+   },
+   "dirt": {
+    "races": 401,
+    "meeting_days": 102,
+    "years": 4,
+    "transition_races": 67,
+    "transition_days": 17,
+    "base": {
+     "logloss": 0.41402934857097967,
+     "brier": 0.19331323488086663,
+     "brier_transition": 1.0797091471192242
+    },
+    "G2": {
+     "logloss": 0.38269979808693727,
+     "brier": 0.17474308830250104,
+     "brier_transition": 0.8882200803147928,
+     "pass": true,
+     "logloss_gain_pct": 7.6,
+     "brier_gain_pct": 9.6
+    },
+    "G3": {
+     "logloss": 0.1094673813047396,
+     "brier": 0.06330047498396872,
+     "brier_transition": 0.35789232567350593,
+     "pass": true,
+     "logloss_gain_pct": 73.6,
+     "brier_gain_pct": 67.3
+    },
+    "state": "usable"
+   }
+  },
+  "sapporo": {
+   "turf": {
+    "races": 340,
+    "meeting_days": 56,
+    "years": 4,
+    "transition_races": 37,
+    "transition_days": 6,
+    "base": {
+     "logloss": 0.28793196475620936,
+     "brier": 0.13065834821345376,
+     "brier_transition": 0.8560821731118002
+    },
+    "G2": {
+     "logloss": 0.35725931248791404,
+     "brier": 0.16930967970640487,
+     "brier_transition": 0.8507234092641934,
+     "pass": false,
+     "logloss_gain_pct": -24.1,
+     "brier_gain_pct": -29.6
+    },
+    "G3": {
+     "logloss": 0.22700150303676644,
+     "brier": 0.14117174528402107,
+     "brier_transition": 0.41054062447019507,
+     "pass": false,
+     "logloss_gain_pct": 21.2,
+     "brier_gain_pct": -8.0
+    },
+    "state": "insufficient"
+   },
+   "dirt": {
+    "races": 220,
+    "meeting_days": 56,
+    "years": 4,
+    "transition_races": 43,
+    "transition_days": 11,
+    "base": {
+     "logloss": 0.3258508471382459,
+     "brier": 0.16085856023047795,
+     "brier_transition": 0.7578188661792005
+    },
+    "G2": {
+     "logloss": 0.26014326879526245,
+     "brier": 0.14274407509402307,
+     "brier_transition": 0.5191407741139231,
+     "pass": true,
+     "logloss_gain_pct": 20.2,
+     "brier_gain_pct": 11.3
+    },
+    "G3": {
+     "logloss": 0.2300174911640729,
+     "brier": 0.13845991279852357,
+     "brier_transition": 0.4297451152672871,
+     "pass": true,
+     "logloss_gain_pct": 29.4,
+     "brier_gain_pct": 13.9
+    },
+    "state": "usable"
+   }
+  },
+  "tokyo": {
+   "turf": {
+    "races": 822,
+    "meeting_days": 170,
+    "years": 4,
+    "transition_races": 82,
+    "transition_days": 17,
+    "base": {
+     "logloss": 0.18987665416690583,
+     "brier": 0.09633347371884325,
+     "brier_transition": 0.8464703170193499
+    },
+    "G2": {
+     "logloss": 0.1380073937481933,
+     "brier": 0.07448758785783206,
+     "brier_transition": 0.5684549195193375,
+     "pass": true,
+     "logloss_gain_pct": 27.3,
+     "brier_gain_pct": 22.7
+    },
+    "G3": {
+     "logloss": 0.10552351826274291,
+     "brier": 0.06077860393817738,
+     "brier_transition": 0.3761980150228765,
+     "pass": true,
+     "logloss_gain_pct": 44.4,
+     "brier_gain_pct": 36.9
+    },
+    "state": "usable"
+   },
+   "dirt": {
+    "races": 872,
+    "meeting_days": 170,
+    "years": 4,
+    "transition_races": 101,
+    "transition_days": 19,
+    "base": {
+     "logloss": 0.2521366594213457,
+     "brier": 0.1164024077669323,
+     "brier_transition": 0.8598371136693408
+    },
+    "G2": {
+     "logloss": 0.2525556608577081,
+     "brier": 0.12610860178721953,
+     "brier_transition": 0.5417961116405041,
+     "pass": false,
+     "logloss_gain_pct": -0.2,
+     "brier_gain_pct": -8.3
+    },
+    "G3": {
+     "logloss": 0.12409796471468514,
+     "brier": 0.07618733043135113,
+     "brier_transition": 0.31519798761108514,
+     "pass": true,
+     "logloss_gain_pct": 50.8,
+     "brier_gain_pct": 34.5
+    },
+    "state": "waiting_forecast"
+   }
+  }
+ },
+ "notes": [
+  "G2=予報なし（朝の馬場・含水率・前日〜早朝の実測天気）、G3=天気が完全に当たった場合（上限）",
+  "朝の馬場状態は、その日最初のレースの馬場で代用（朝の公式発表は保存開始前のため）",
+  "予報は保存開始（2026-11-03）後、実データで測り直す"
+ ]
+}

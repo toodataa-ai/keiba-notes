@@ -1,50 +1,148 @@
 {
-  "schema_version": 1,
-  "purpose": "改善テーマごと・管理単位ごとに「研究→登録→比較→判定」の段階を判定し、登録条件に届いたら人に知らせるための基準。数字はここだけで管理する（画面は結果の JSON を表示するだけ）。",
-  "stale_days": 21,
-  "owners": {
-    "baba": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。",
-    "experience": "若駒の観察は毎週の予想・回顧の実行で自動的にたまる。",
-    "registration": "登録できる通知（Issue）にユーザーが A/B/C で答え、A のとき Claude が比較用プログラムを書いて登録する。"
+ "schema_version": 1,
+ "purpose": "改善テーマごと・管理単位ごとに「研究→登録→比較→判定」の段階を判定し、登録条件に届いたら人に知らせるための基準。数字はここだけで管理する（画面は結果の JSON を表示するだけ）。",
+ "stale_days": 21,
+ "owners": {
+  "baba": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。",
+  "experience": "若駒の観察は毎週の予想・回顧の実行で自動的にたまる。",
+  "registration": "登録できる通知（Issue）にユーザーが A/B/C で答え、A のとき Claude が比較用プログラムを書いて登録する。"
+ },
+ "criteria": {
+  "baba_track": {
+   "ok_statuses": [
+    "candidate",
+    "validated"
+   ],
+   "text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+   "going_rule": "state=usable: 予報なしモデルがログ損失・Brier とも5%以上改善、雨で馬場が変わる日のBrierが10%超悪化しない、80レース・12開催日・2年・雨天遷移6日以上（baba_models_v2/stage_b_status.py）"
   },
-  "criteria": {
-    "baba_track": {
-      "ok_statuses": ["candidate", "validated"],
-      "text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。"
-    },
-    "experience_regime": {
-      "need_strict_records": 30,
-      "text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。"
-    },
-    "pedigree": {
-      "min_coverage": 0.9,
-      "requires": ["field_experience:e0", "field_experience:e1"],
-      "text": "0戦と1〜3戦の条件に届き、かつ発走前に血統の情報が9割以上の馬で集まっていたら、血統との組み合わせを改善案として登録できます。"
-    },
-    "screening": {
-      "text": "毎週の回顧で、3レース以上・2開催以上で同じ課題が出たら、改善案として登録できます。"
-    }
+  "experience_regime": {
+   "need_strict_records": 30,
+   "text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。"
   },
-  "tracks": [
-    ["sapporo", "札幌"], ["hakodate", "函館"], ["fukushima", "福島"], ["niigata", "新潟"], ["tokyo", "東京"],
-    ["nakayama", "中山"], ["chukyo", "中京"], ["kyoto", "京都"], ["hanshin", "阪神"], ["kokura", "小倉"]
+  "pedigree": {
+   "min_coverage": 0.9,
+   "requires": [
+    "field_experience:e0",
+    "field_experience:e1"
+   ],
+   "text": "0戦と1〜3戦の条件に届き、かつ発走前に血統の情報が9割以上の馬で集まっていたら、血統との組み合わせを改善案として登録できます。"
+  },
+  "screening": {
+   "text": "毎週の回顧で、3レース以上・2開催以上で同じ課題が出たら、改善案として登録できます。"
+  }
+ },
+ "tracks": [
+  [
+   "sapporo",
+   "札幌"
   ],
-  "themes": [
-    {"id": "pace_positioning", "title": "展開・位置取り", "units": [
-      {"id": "pace_positioning:all", "label": "展開・位置取り", "kind": "screening", "hypothesis_id": "pace_positioning"}
-    ]},
-    {"id": "track_condition", "title": "馬場状態", "units": [
-      {"id": "track_condition:official", "label": "公式馬場補正", "kind": "screening", "hypothesis_id": "track_condition"},
-      {"id": "track_condition:tracks", "kind": "baba_tracks"}
-    ]},
-    {"id": "field_experience", "title": "若駒・経験不足", "units": [
-      {"id": "field_experience:e0", "label": "0戦（新馬）", "kind": "experience_regime", "regime": "experience_e0"},
-      {"id": "field_experience:e1", "label": "1〜3戦", "kind": "experience_regime", "regime": "experience_e1"},
-      {"id": "field_experience:e2", "label": "4戦以上", "kind": "experience_regime", "regime": "experience_e2"},
-      {"id": "field_experience:pedigree", "label": "血統との関連", "kind": "pedigree"}
-    ]},
-    {"id": "ticket_portfolio", "title": "購入セットと印の整合性", "units": [
-      {"id": "ticket_portfolio:all", "label": "購入セット・印", "kind": "screening", "hypothesis_id": "ticket_portfolio"}
-    ]}
+  [
+   "hakodate",
+   "函館"
+  ],
+  [
+   "fukushima",
+   "福島"
+  ],
+  [
+   "niigata",
+   "新潟"
+  ],
+  [
+   "tokyo",
+   "東京"
+  ],
+  [
+   "nakayama",
+   "中山"
+  ],
+  [
+   "chukyo",
+   "中京"
+  ],
+  [
+   "kyoto",
+   "京都"
+  ],
+  [
+   "hanshin",
+   "阪神"
+  ],
+  [
+   "kokura",
+   "小倉"
   ]
+ ],
+ "themes": [
+  {
+   "id": "pace_positioning",
+   "title": "展開・位置取り",
+   "units": [
+    {
+     "id": "pace_positioning:all",
+     "label": "展開・位置取り",
+     "kind": "screening",
+     "hypothesis_id": "pace_positioning"
+    }
+   ]
+  },
+  {
+   "id": "track_condition",
+   "title": "馬場状態",
+   "units": [
+    {
+     "id": "track_condition:official",
+     "label": "公式馬場補正",
+     "kind": "screening",
+     "hypothesis_id": "track_condition"
+    },
+    {
+     "id": "track_condition:tracks",
+     "kind": "baba_tracks"
+    }
+   ]
+  },
+  {
+   "id": "field_experience",
+   "title": "若駒・経験不足",
+   "units": [
+    {
+     "id": "field_experience:e0",
+     "label": "0戦（新馬）",
+     "kind": "experience_regime",
+     "regime": "experience_e0"
+    },
+    {
+     "id": "field_experience:e1",
+     "label": "1〜3戦",
+     "kind": "experience_regime",
+     "regime": "experience_e1"
+    },
+    {
+     "id": "field_experience:e2",
+     "label": "4戦以上",
+     "kind": "experience_regime",
+     "regime": "experience_e2"
+    },
+    {
+     "id": "field_experience:pedigree",
+     "label": "血統との関連",
+     "kind": "pedigree"
+    }
+   ]
+  },
+  {
+   "id": "ticket_portfolio",
+   "title": "購入セットと印の整合性",
+   "units": [
+    {
+     "id": "ticket_portfolio:all",
+     "label": "購入セット・印",
+     "kind": "screening",
+     "hypothesis_id": "ticket_portfolio"
+    }
+   ]
+  }
+ ]
 }
