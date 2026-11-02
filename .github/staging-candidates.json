@@ -1,15 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-improvement-simple-v1",
-      "title": "改善状況ページのシンプル化",
-      "pages": ["improvement-cycle.html"],
-      "assets": ["assets/improvement-cycle-v2.css"],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-02",
-      "summary": "改善の流れ（手動/自動）、比較中の改善案ごとの進み具合（○/20レース）、次に試すテーマ、これまでの判定を平易な日本語で表示"
-    }
-  ]
+  "candidates": []
 }
