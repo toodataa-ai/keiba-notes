@@ -36,3 +36,25 @@ def test_station_urls_pin_official_jma_ids():
     assert "prec_no=61" in nagaoka and "block_no=1025" in nagaoka
     tanabe = station_url("kyotanabe", date(2026, 5, 1))
     assert "prec_no=61" in tanabe and "block_no=0598" in tanabe
+
+
+HTML_S1 = """
+<html><body><table>
+<tr><td>1</td><td>1007.9</td><td>1011.1</td><td>--</td><td>7.8</td><td>4.9</td><td>8.7</td><td>82</td><td>2.1</td><td>南東</td><td></td><td></td><td>--</td><td>--</td><td></td><td></td><td>20.0</td></tr>
+<tr><td>2</td><td>1008.3</td><td>1011.5</td><td>2.5</td><td>7.4</td><td>4.9</td><td>8.6</td><td>84</td><td>1.1</td><td>南南東</td><td>0.3</td><td></td><td>--</td><td>--</td><td></td><td></td><td>20.0</td></tr>
+</table></body></html>
+"""
+
+
+def test_parse_hourly_s1_observatory_rows():
+    rows = parse_hourly_html(HTML_S1, station="sapporo_obs", d=date(2026, 5, 10))
+    assert len(rows) == 2
+    assert rows[0].precipitation_mm == 0.0 and rows[0].temperature_c == 7.8
+    assert rows[0].humidity_pct == 82.0 and rows[0].wind_mps == 2.1 and rows[0].sunshine_hours is None
+    assert rows[1].precipitation_mm == 2.5 and rows[1].sunshine_hours == 0.3
+
+
+def test_observatory_urls_use_s1_page():
+    u = station_url("sapporo_obs", date(2026, 5, 1))
+    assert "hourly_s1.php" in u and "prec_no=14" in u and "block_no=47412" in u
+    assert "hourly_a1.php" in station_url("obu", date(2026, 5, 1))

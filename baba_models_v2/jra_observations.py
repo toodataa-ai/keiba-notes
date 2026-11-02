@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import csv
 import io
 import re
@@ -217,13 +218,22 @@ def _grouped_rows(text: str, *, year: int, track: str, meeting: int, source_url:
     return rows
 
 
+_HEAD_BEFORE_DATE = re.compile(
+    r"第\s*\d+\s*日(?:\s*・\s*第\s*\d+\s*日)*\s*の(?P<kind>含水率|気象状況)\s*"
+    r"(?P<range>\d{4}年\s*\d{1,2}月\s*\d{1,2}日(?:\s*\(\s*[月火水木金土日]\s*\))?\s*から"
+    r"(?:\d{1,2}月)?\s*\d{1,2}日(?:\s*\(\s*[月火水木金土日]\s*\))?)"
+)
+
+
 def _legacy_rows(text: str, *, year: int, track: str, meeting: int, source_url: str) -> list[Observation]:
     text = norm(text)
+    # 2018 Sapporo style: "第1日・第2日の含水率" on one line, the date range on the next.
+    text = _HEAD_BEFORE_DATE.sub(lambda m: f"{m.group('range')}の{m.group('kind')}", text)
     # 2018-2019 PDFs used both "...日の含水率" and "...日の気象状況" for the
     # same moisture table layout. Cross-month ranges are also supported.
     range_re = re.compile(
-        r"(?P<year>\d{4})年\s*(?P<sm>\d{1,2})月\s*(?P<sd>\d{1,2})日から"
-        r"(?:(?P<em>\d{1,2})月)?\s*(?P<ed>\d{1,2})日の(?:含水率|気象状況)"
+        r"(?P<year>\d{4})年\s*(?P<sm>\d{1,2})月\s*(?P<sd>\d{1,2})日(?:\s*\(\s*[月火水木金土日]\s*\))?\s*から"
+        r"(?:(?P<em>\d{1,2})月)?\s*(?P<ed>\d{1,2})日(?:\s*\(\s*[月火水木金土日]\s*\))?\s*の(?:含水率|気象状況)"
     )
     matches = list(range_re.finditer(text))
     rows: list[Observation] = []
@@ -270,7 +280,9 @@ def parse_pdf_text(text: str, *, year: int, track: str, meeting: int, source_url
     return _legacy_rows(normalized, year=year, track=track, meeting=meeting, source_url=source_url)
 
 
-def collect(years: Iterable[int], track: str, session: requests.Session | None = None) -> list[Observation]:
+def collect(years: Iterable[int], track: str, session: requests.Session | None = None, skipped: list[str] | None = None) -> list[Observation]:
+    """Collect observations. PDFs with no text layer (scanned images) are recorded in `skipped`
+    instead of aborting; a PDF that has text but cannot be parsed still raises."""
     session = session or requests.Session()
     out: list[Observation] = []
     for year in years:
@@ -278,6 +290,9 @@ def collect(years: Iterable[int], track: str, session: requests.Session | None =
             pdf = session.get(url, timeout=45, headers={"User-Agent": UA})
             pdf.raise_for_status()
             text = extract_pdf_text(pdf.content)
+            if skipped is not None and not text.strip():
+                skipped.append(url)
+                continue
             rows = parse_pdf_text(text, year=year, track=track, meeting=meeting_from_url(url), source_url=url)
             if not rows:
                 raise RuntimeError(f"parsed zero rows: {url}")
@@ -304,8 +319,13 @@ def main() -> None:
     p.add_argument("--to-year", type=int, required=True)
     p.add_argument("--output", type=Path, required=True)
     args = p.parse_args()
-    rows = collect(range(args.from_year, args.to_year + 1), args.track)
+    skipped: list[str] = []
+    rows = collect(range(args.from_year, args.to_year + 1), args.track, skipped=skipped)
     write_csv(rows, args.output)
+    if skipped:
+        side = args.output.with_suffix(".skipped.json")
+        side.write_text(json.dumps({"track": args.track, "reason": "PDF has no text layer (scanned image)", "urls": skipped}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"WARNING: skipped {len(skipped)} image-only PDFs -> {side}")
     print(f"{args.track}: {len(rows)} observations -> {args.output}")
 
 

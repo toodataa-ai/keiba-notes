@@ -16,7 +16,9 @@ from bs4 import BeautifulSoup
 
 from stage_a_baseline import build_pairs, load_csv
 
-BASE = "https://www.data.jma.go.jp/stats/etrn/view/hourly_a1.php"
+BASE_A1 = "https://www.data.jma.go.jp/stats/etrn/view/hourly_a1.php"
+BASE_S1 = "https://www.data.jma.go.jp/stats/etrn/view/hourly_s1.php"
+BASE = BASE_A1  # backwards compatible name
 UA = "keiba-notes track-condition research/1.0"
 
 # JMA station IDs are pinned so backtests remain reproducible.
@@ -27,10 +29,24 @@ STATIONS = {
     "fuchu": {"ja": "府中", "prec_no": "44", "block_no": "1133", "elements": "full"},
     "nagaokakyo": {"ja": "長岡京", "prec_no": "61", "block_no": "1025", "elements": "rain"},
     "kyotanabe": {"ja": "京田辺", "prec_no": "61", "block_no": "0598", "elements": "full"},
+    # Staffed observatories use the hourly_s1 page (different column order, same units).
+    "sapporo_obs": {"ja": "札幌", "prec_no": "14", "block_no": "47412", "elements": "full", "page": "s1"},
+    "hakodate_obs": {"ja": "函館", "prec_no": "23", "block_no": "47430", "elements": "full", "page": "s1"},
+    "fukushima_obs": {"ja": "福島", "prec_no": "36", "block_no": "47595", "elements": "full", "page": "s1"},
+    "niigata_obs": {"ja": "新潟", "prec_no": "54", "block_no": "47604", "elements": "full", "page": "s1"},
+    "nagoya_obs": {"ja": "名古屋", "prec_no": "51", "block_no": "47636", "elements": "full", "page": "s1"},
+    # AMeDAS stations nearer to the racecourse than the observatory.
+    "matsuhama": {"ja": "松浜", "prec_no": "54", "block_no": "1469", "elements": "rain"},
+    "obu": {"ja": "大府", "prec_no": "51", "block_no": "1638", "elements": "full"},
 }
 TRACK_STATIONS = {
     "tokyo": {"rain_primary": "fuchu", "full": "fuchu", "rain_secondary": None},
     "kyoto": {"rain_primary": "nagaokakyo", "full": "kyotanabe", "rain_secondary": "kyotanabe"},
+    "sapporo": {"rain_primary": "sapporo_obs", "full": "sapporo_obs", "rain_secondary": None},
+    "hakodate": {"rain_primary": "hakodate_obs", "full": "hakodate_obs", "rain_secondary": None},
+    "fukushima": {"rain_primary": "fukushima_obs", "full": "fukushima_obs", "rain_secondary": None},
+    "niigata": {"rain_primary": "matsuhama", "full": "niigata_obs", "rain_secondary": "niigata_obs"},
+    "chukyo": {"rain_primary": "obu", "full": "obu", "rain_secondary": "nagoya_obs"},
 }
 
 
@@ -51,8 +67,9 @@ class HourlyWeather:
 
 def station_url(station: str, d: date) -> str:
     s = STATIONS[station]
+    base = BASE_S1 if s.get("page") == "s1" else BASE_A1
     return (
-        f"{BASE}?prec_no={s['prec_no']}&block_no={s['block_no']}"
+        f"{base}?prec_no={s['prec_no']}&block_no={s['block_no']}"
         f"&year={d.year}&month={d.month}&day={d.day}&view="
     )
 
@@ -93,6 +110,19 @@ def parse_hourly_html(html: str, *, station: str, d: date, source_url: str = "fi
         # hour, precipitation, temperature, dewpoint, vapor pressure, humidity,
         # mean wind speed, wind direction, sunshine, snowfall, snow depth.
         end_at = datetime.combine(d, datetime.min.time()) + timedelta(hours=hour)
+        if STATIONS[station].get("page") == "s1":
+            # hourly_s1: hour, local pressure, sea-level pressure, precipitation, temperature,
+            # dewpoint, vapor pressure, humidity, mean wind speed, wind direction, sunshine, ...
+            if len(cells) < 11:
+                continue
+            rows.append(HourlyWeather(
+                station=station, station_ja=STATIONS[station]["ja"], observed_date=d.isoformat(), hour=hour,
+                end_at=end_at.isoformat(timespec="minutes"),
+                precipitation_mm=_precip(cells[3]), temperature_c=_numeric(cells[4]),
+                humidity_pct=_numeric(cells[7]), wind_mps=_numeric(cells[8]),
+                sunshine_hours=_numeric(cells[10]), source_url=source_url,
+            ))
+            continue
         rows.append(HourlyWeather(
             station=station,
             station_ja=STATIONS[station]["ja"],
@@ -142,7 +172,7 @@ def needed_dates(observation_csv: Path) -> list[date]:
 
 def collect(track: str, observation_csv: Path, max_workers: int = 5) -> list[HourlyWeather]:
     if track not in TRACK_STATIONS:
-        raise ValueError("weather collector currently supports tokyo/kyoto")
+        raise ValueError(f"no weather stations configured for {track}")
     dates = needed_dates(observation_csv)
     station_names = sorted({x for x in TRACK_STATIONS[track].values() if x})
     jobs = [(station, d) for station in station_names for d in dates]
