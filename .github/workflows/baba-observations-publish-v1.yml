@@ -1,0 +1,56 @@
+name: Baba research - collect and save official moisture / cushion / course (A-D) for all 10 tracks (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      from_year: {description: 'First year', default: '2018'}
+      to_year: {description: 'Last year', default: '2026'}
+permissions:
+  contents: write
+concurrency:
+  group: baba-observations-publish-v1
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        track: [sapporo, hakodate, fukushima, niigata, tokyo, nakayama, chukyo, kyoto, hanshin, kokura]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf
+      - name: Collect
+        run: python baba_models_v2/jra_observations.py --track ${{ matrix.track }} --from-year ${{ inputs.from_year }} --to-year ${{ inputs.to_year }} --output tmp/obs/${{ matrix.track }}_observations.csv
+      - name: Coverage summary (turf course A-D per year)
+        run: |
+          python - <<'PY'
+          import csv, collections
+          rows=list(csv.DictReader(open('tmp/obs/${{ matrix.track }}_observations.csv',encoding='utf-8')))
+          print('rows',len(rows))
+          by=collections.defaultdict(lambda: collections.Counter())
+          for r in rows: by[r['year']][r['course'] or '-']+=1
+          for y in sorted(by): print(y,dict(by[y]))
+          PY
+      - uses: actions/upload-artifact@v4
+        with: {name: obs-${{ matrix.track }}, path: tmp/obs, retention-days: 30}
+  publish:
+    needs: collect
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'obs-*', path: collected, merge-multiple: true}
+      - name: Commit research data
+        run: |
+          mkdir -p baba_models_v2/observations
+          cp collected/* baba_models_v2/observations/
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baba_models_v2/observations
+          git diff --cached --quiet && echo "nothing new" && exit 0
+          git commit -m "馬場研究: JRA公式の含水率・クッション値・使用コース（A〜D）を全10競馬場分保存（研究用データ）"
+          git pull --rebase origin main && git push origin HEAD:main
