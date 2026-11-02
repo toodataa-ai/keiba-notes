@@ -7,6 +7,7 @@
 <title>予想の改善状況 | AIによる競馬予想研究所</title>
 <link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
 <link rel="stylesheet" href="staging/candidate-assets/type-scale-v1.css?v=20261102-1">
+<style>.themes{list-style:none;padding:0;margin:0}.themes li{background:var(--panel);border:1px solid #3a404c;border-radius:12px;padding:12px 14px;margin-bottom:10px}.themes b{display:block}.themes .st{display:inline-block;margin:6px 0 4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #6b7686}.themes .st.on{border-color:#c61d31;color:#ff9aa6}.themes p{margin:4px 0 0;font-size:13px;color:var(--muted)}.themes a{font-size:13px}</style>
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body>
@@ -43,8 +44,19 @@
 <div id="experiments"><div class="empty">読み込み中…</div></div>
 </section>
 
+<section aria-labelledby="themesTitle" id="themes">
+<h2 id="themesTitle">改善テーマと、つながる研究</h2>
+<p class="sub">改善は「研究で傾向を調べる → 比較に登録する → 20レースで判定する」の順に進みます。研究ページは、そのテーマの下準備です。</p>
+<ul class="themes">
+<li><b>展開・位置取り</b><span class="st on">比較中（EXP-001）</span><p>逃げ・先行馬の数から、レースのペースを読んで勝率を補正します。</p></li>
+<li><b>馬場状態</b><span class="st on">比較中（EXP-002）</span><p>発走前の公式馬場と、同じ馬場での近走成績で補正します。10競馬場の馬場傾向を調べる研究は、まだ比較には使っていません（次の版で取り込めるか検討）。</p><a href="staging/baba-models.html">つながる研究：馬場状態予測の研究 →</a></li>
+<li><b>若駒・経験不足</b><span class="st">研究中（比較は未登録）</span><p>走った経験が少ない馬ほど予想が外れやすいかを調べています。傾向が確かめられたら、比較に登録します。</p><a href="staging/experience-regime.html">つながる研究：新馬・戦歴の少ない馬の予想研究 →</a></li>
+<li><b>購入セットと印の整合性</b><span class="st">比較の準備前</span><p>印と買い目がちぐはぐにならないよう、組み合わせを見直すテーマです。</p></li>
+</ul>
+</section>
+
 <section aria-labelledby="nextTitle">
-<h2 id="nextTitle">次に試す予定</h2>
+<h2 id="nextTitle">そのほかの候補</h2>
 <p class="sub">これまでの振り返りで、何度も課題に挙がったテーマです。</p>
 <ul class="next-list" id="nextList"><li>読み込み中…</li></ul>
 </section>
