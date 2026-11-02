@@ -105,5 +105,24 @@ class PipelineTest(unittest.TestCase):
         self.assertFalse(r["baba_registry_freshness"]["is_stale"])
 
 
+
+class GoingAdoptTest(unittest.TestCase):
+    def test_both_usable_means_ready_to_adopt_without_comparison(self):
+        i = base_inputs()
+        for m in i["baba"]["models"]:
+            if m["track"] == "fukushima":
+                m["going_status"] = {"state": "usable", "label": "使える見込み",
+                                     "without_forecast": {"logloss_gain_pct": 6.0, "brier_gain_pct": 10.0},
+                                     "perfect_forecast": {"logloss_gain_pct": 50.0, "brier_gain_pct": 40.0}, "races": 400}
+            elif m["track"] == "tokyo":
+                m["going_status"] = {"state": "usable" if m["surface"] == "turf" else "waiting_forecast", "label": "x"}
+        r = run(i)
+        self.assertEqual(unit(r, "track_condition:track:fukushima")["state"], "ready_to_adopt")
+        self.assertEqual(unit(r, "track_condition:track:tokyo")["state"], "research")
+        drafts = list(p.issue_drafts(r, i["cycle"]))
+        self.assertEqual([d["title"] for d in drafts if "fukushima" in d["unit_id"]],
+                         ["[採用できます] 福島（track_condition:track:fukushima）"])
+
+
 if __name__ == "__main__":
     unittest.main()

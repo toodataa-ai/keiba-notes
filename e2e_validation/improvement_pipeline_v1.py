@@ -134,6 +134,9 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
                         finish(unit_record(tid, uid, ja, s, f, "comparing" if s == 2 else "decided", t, crit["baba_track"]["text"], True, eid, detail))
                     elif in_prod:
                         finish(unit_record(tid, uid, ja, 3, 1.0, "in_production", "本番の予想で使用中（改善案としての比較は不要）", crit["baba_track"]["text"], False, None, detail))
+                    elif met and all(gst.values()):
+                        # decided 2026-11-03: when the going prediction itself is accurate, adopt it (no 20-race comparison)
+                        finish(unit_record(tid, uid, ja, 1, 0.0, "ready_to_adopt", f"採用できる状態（承認待ち）　{detail['going_text']}", crit["baba_track"]["text"], True, None, detail))
                     elif met:
                         finish(unit_record(tid, uid, ja, 1, 0.0, "ready_to_register", f"条件に届いた（登録待ち）　{text_st}", crit["baba_track"]["text"], True, None, detail))
                     else:
@@ -228,6 +231,30 @@ def material_lines(unit: dict, cycle: dict) -> list[str]:
 
 def issue_drafts(result: dict, cycle: dict | None = None):
     for u in result["units"]:
+        if u["state"] == "ready_to_adopt":
+            body = "\n".join([
+                f"## {u['label']}（{u['id']}）の馬場予測が、採用できる条件に届きました",
+                "",
+                f"- 条件：{u['criteria_text']}",
+                f"- いまの状況：{u['text']}",
+                "- 数字（外れ具合が何％減ったか。左は予報なし、右は天気予報が完全に当たった場合）：" + "、".join(
+                    f"{'芝' if s == 'turf' else 'ダート'} {g['without_forecast']['logloss_gain_pct']:+}% / {g['perfect_forecast']['logloss_gain_pct']:+}%"
+                    for s, g in (u.get("detail", {}).get("going") or {}).items() if g.get("without_forecast")),
+                "",
+                "## 見る場所",
+                "- 予想の改善状況：https://toodataa-ai.github.io/keiba-notes/improvement-cycle.html",
+                "- 馬場状態予測の研究：https://toodataa-ai.github.io/keiba-notes/baba-models.html",
+                "",
+                "## どう答えるか（コメントで A / B / C）",
+                "- **A（採用する）**：Claude が、この競馬場の馬場予測を毎朝自動で作り、正式予想に使える形にします。20レースの比較は挟みません。"
+                "本番の予想に出す前に、もう一度確認をお願いします。",
+                "- **B（もう少し待つ）**：天気予報の保存がたまり、予報込みの本当の精度が分かってからにしたい場合。",
+                "- **C（採用しない）**：この競馬場は今のやり方のままにする場合。",
+                "",
+                "※ このIssueは通知だけです。何も自動では採用されません。",
+            ])
+            yield {"unit_id": u["id"], "title": f"[採用できます] {u['label']}（{u['id']}）", "body": body}
+            continue
         if u["state"] != "ready_to_register":
             continue
         body = "\n".join([
