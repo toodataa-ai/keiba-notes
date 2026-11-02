@@ -1,5 +1,29 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-plain-top-week-v1",
+      "title": "トップと今週のAI予想をわかりやすい日本語に",
+      "pages": [
+        "index.html",
+        "this-week.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-02",
+      "summary": "英語の見出しを日本語に、専門用語を平易に言い換え、研究4件を折りたたみ、フッターの版表示を自動化。今週のAI予想に「予想は発走前に確定し変えていない」の一文を追加"
+    },
+    {
+      "id": "ui-improvement-note-v1",
+      "title": "改善状況ページ：試算は判定に数えない旨を明記",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-02",
+      "summary": "「参考：過去Nレースでの試算」の横に「（判定には数えません）」を追記"
+    }
+  ]
 }
