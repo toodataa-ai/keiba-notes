@@ -231,7 +231,8 @@ def run(write: bool = True) -> dict:
         prospective = [r for r in rows if r["grade"] == "prospective_preregistered"]
         replay = [r for r in rows if r["grade"] == "replay_support_only"]
         report["experiments"].append({
-            "id": exp["id"], "title": exp["title"], "hypothesis_ids": exp.get("hypothesis_ids", []),
+            "id": exp["id"], "title": exp["title"], "plain_summary": exp.get("plain_summary"),
+            "hypothesis_ids": exp.get("hypothesis_ids", []),
             "baseline": exp["baseline"], "challenger": exp["challenger"],
             "status": exp["status"], "effective_prospective_from": effective.isoformat(),
             "registration_commit_at": reg_commit,
