@@ -97,3 +97,29 @@ def test_legacy_cross_month_range_is_supported():
     assert [r.observed_date for r in rows] == [
         "2018-09-28", "2018-09-29", "2018-09-30", "2018-10-01"
     ]
+
+
+LEGACY_WEEKDAY = """
+第１日・第２日の含水率
+2018年7月27日（金）から29日（日）
+場所 金曜日 土曜日 日曜日
+芝コース含水率 ゴール前 11.7 12.6 12.4
+（パーセント） ４コーナー 10.8 13.4 11.9
+ダートコース含水率 ゴール前 2.8 2.8 2.3
+（パーセント） ４コーナー 2.3 2.6 2.8
+第３日・第４日の含水率
+2018年8月3日（金）から5日（日）
+場所 金曜日 土曜日 日曜日
+芝コース含水率 ゴール前 13.2 13.7 12.6
+（パーセント） ４コーナー 13.6 14.2 12.7
+ダートコース含水率 ゴール前 2.1 3.1 2.5
+（パーセント） ４コーナー 1.9 3.0 2.3
+"""
+
+
+def test_legacy_range_with_weekday_in_parentheses():
+    rows = parse_pdf_text(LEGACY_WEEKDAY, year=2018, track="sapporo", meeting=1)
+    assert len(rows) == 6
+    assert rows[0].observed_date == "2018-07-27" and rows[0].turf_goal == 11.7
+    assert rows[3].observed_date == "2018-08-03" and rows[3].dirt_corner == 1.9
+    assert all(r.source_format == "legacy" for r in rows)

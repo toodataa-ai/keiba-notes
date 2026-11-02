@@ -1,0 +1,45 @@
+name: Baba research - check JMA station availability on sample dates (read only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Count usable hourly precipitation rows on sample dates
+        run: |
+          python - <<'PY'
+          import re, requests, time
+          from bs4 import BeautifulSoup
+          UA={'User-Agent':'keiba-notes track-condition research/1.0'}
+          cands=[
+           ('札幌obs',14,'47412','s1'),('函館obs',23,'47430','s1'),('福島obs',36,'47595','s1'),('新潟obs',54,'47604','s1'),('名古屋obs',51,'47636','s1'),
+           ('松浜',54,'1469','a1'),('大府',51,'1638','a1'),
+           ('小倉0781',82,'0781','a1'),('八幡0780',82,'0780','a1'),('行橋0782',82,'0782','a1'),('曽根1527',82,'1527','a1'),('空港北町1590',82,'1590','a1'),
+           ('下関obs',81,'47762','s1'),('福岡obs',82,'47807','s1'),('飯塚obs',82,'47809','s1'),
+          ]
+          dates=[(2018,8,1),(2019,10,15),(2021,5,10),(2023,3,15),(2025,6,20),(2026,5,10)]
+          for name,prec,block,kind in cands:
+              res=[]
+              for y,m,d in dates:
+                  url=f'https://www.data.jma.go.jp/stats/etrn/view/hourly_{kind}.php?prec_no={prec}&block_no={block}&year={y}&month={m}&day={d}&view='
+                  try:
+                      r=requests.get(url,headers=UA,timeout=30); r.encoding=r.apparent_encoding
+                      soup=BeautifulSoup(r.text,'html.parser')
+                      ok=0; tot=0
+                      for tr in soup.find_all('tr'):
+                          c=[td.get_text(' ',strip=True) for td in tr.find_all('td')]
+                          if len(c)>=9 and re.fullmatch(r'\d{1,2}',c[0].strip()):
+                              tot+=1
+                              p=c[3] if kind=='s1' else c[1]
+                              if '///' not in p and p!='×': ok+=1
+                      res.append(f'{y}:{ok}/{tot}')
+                  except Exception as e:
+                      res.append(f'{y}:ERR')
+                  time.sleep(0.3)
+              print(f'{name:12} {kind} {prec}/{block}  '+'  '.join(res))
+          PY
