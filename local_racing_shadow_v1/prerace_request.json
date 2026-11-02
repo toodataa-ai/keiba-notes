@@ -1,15 +1,10 @@
 {
   "schema_version": 1,
   "scope": "PRE-RACE",
-  "date": "2026-11-02",
-  "request_seq": 26,
+  "date": "2026-11-03",
+  "request_seq": 27,
   "production_effect": false,
   "official_calendar_url": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/TodayRaceInfoTop",
-  "expected_races_by_venue": {
-    "obihiro": 12,
-    "morioka": 12,
-    "funabashi": 12,
-    "kasamatsu": 12
-  },
-  "reason": "Manual request 2026-11-02 JST: NAR official TodayRaceInfo confirms 4 venues / 48 races (Obihiro 12, Morioka 12, Funabashi 12, Kasamatsu 12). Official pre-start data only; freeze provably before scheduled starts; preserve immutable originals; verify proof_commit, GitHub Actions, public manifest/mirror/live Pages and explicit coverage gaps. No JRA-related changes."
+  "expected_races_by_venue": {},
+  "reason": "Manual request 2026-11-03 JST (Claude). NAR TodayRaceInfoTop could not be fetched from the requesting environment, so expected_races_by_venue is intentionally empty: the runner must enumerate all 15 enabled venues directly from NAR official RaceList and record actual per-venue counts in diagnostics. Official pre-start data only; freeze provably before scheduled starts; preserve immutable originals; verify proof_commit, GitHub Actions, public manifest/mirror/live Pages and explicit coverage gaps. No JRA-related changes."
 }
