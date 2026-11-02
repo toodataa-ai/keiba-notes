@@ -38,6 +38,8 @@ STATIONS = {
     # AMeDAS stations nearer to the racecourse than the observatory.
     "matsuhama": {"ja": "松浜", "prec_no": "54", "block_no": "1469", "elements": "rain"},
     "obu": {"ja": "大府", "prec_no": "51", "block_no": "1638", "elements": "full"},
+    "yahata": {"ja": "八幡", "prec_no": "82", "block_no": "0780", "elements": "full"},
+    "yukuhashi": {"ja": "行橋", "prec_no": "82", "block_no": "0782", "elements": "full"},
 }
 TRACK_STATIONS = {
     "tokyo": {"rain_primary": "fuchu", "full": "fuchu", "rain_secondary": None},
@@ -47,6 +49,7 @@ TRACK_STATIONS = {
     "fukushima": {"rain_primary": "fukushima_obs", "full": "fukushima_obs", "rain_secondary": None},
     "niigata": {"rain_primary": "matsuhama", "full": "niigata_obs", "rain_secondary": "niigata_obs"},
     "chukyo": {"rain_primary": "obu", "full": "obu", "rain_secondary": "nagoya_obs"},
+    "kokura": {"rain_primary": "yahata", "full": "yahata", "rain_secondary": "yukuhashi"},
 }
 
 

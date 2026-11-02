@@ -1,0 +1,83 @@
+name: Baba research - Stage A weather backtest for the remaining tracks (research only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_year:
+        description: 'First year of observations'
+        default: '2018'
+      to_year:
+        description: 'Last year of observations'
+        default: '2026'
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        track: [sapporo, hakodate, fukushima, niigata, chukyo, kokura]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check pytest requests beautifulsoup4 pypdf numpy
+      - name: Test parsers
+        working-directory: baba_models_v2
+        run: python -m pytest -q test_jma_weather.py test_jra_observations.py
+      - name: Collect JRA official observations
+        run: python baba_models_v2/jra_observations.py --track ${{ matrix.track }} --from-year ${{ inputs.from_year }} --to-year ${{ inputs.to_year }} --output tmp/stage_a/${{ matrix.track }}_observations.csv
+      - name: Validate observations
+        run: python baba_models_v2/validate_observations.py --input tmp/stage_a/${{ matrix.track }}_observations.csv --track ${{ matrix.track }} --min-rows 60 --min-race-days 30
+      - name: Collect JMA hourly weather
+        run: python baba_models_v2/jma_weather.py --track ${{ matrix.track }} --observations tmp/stage_a/${{ matrix.track }}_observations.csv --output tmp/stage_a/${{ matrix.track }}_weather.csv --workers 5
+      - name: Run leakage-safe Stage A backtests
+        run: |
+          track=${{ matrix.track }}
+          for surface in turf dirt; do
+            python baba_models_v2/stage_a_weather_model.py --track ${track} --surface ${surface} \
+              --observations tmp/stage_a/${track}_observations.csv --weather tmp/stage_a/${track}_weather.csv \
+              --metrics tmp/stage_a/${track}_${surface}_weather_metrics.json --predictions tmp/stage_a/${track}_${surface}_weather_predictions.csv
+            python baba_models_v2/stage_a_guardrail.py --input tmp/stage_a/${track}_${surface}_weather_predictions.csv \
+              --metrics tmp/stage_a/${track}_${surface}_guard_metrics.json --output tmp/stage_a/${track}_${surface}_guard_predictions.csv
+          done
+      - name: Summarize
+        run: |
+          python - <<'PY'
+          import csv, json
+          from pathlib import Path
+          track='${{ matrix.track }}'
+          root=Path('tmp/stage_a')
+          def imp(b,m): return None if b in (None,0) or m is None else (b-m)/b*100
+          obs=list(csv.DictReader((root/f'{track}_observations.csv').open(encoding='utf-8')))
+          out={'schema_version':2,'track':track,'model':'ridge-delta-v0.1 + training-envelope-guard',
+               'data':{'observations':len(obs),'date_from':min(r['observed_date'] for r in obs),'date_to':max(r['observed_date'] for r in obs),
+                       'meetings':len(set((r['year'],r['meeting']) for r in obs)),'years':len(set(r['year'] for r in obs))},
+               'results':{}}
+          sk=root/f'{track}_observations.skipped.json'
+          if sk.exists(): out['skipped_image_only_pdfs']=json.loads(sk.read_text(encoding='utf-8'))['urls']
+          for surface in ('turf','dirt'):
+              raw=json.loads((root/f'{track}_{surface}_weather_metrics.json').read_text(encoding='utf-8'))
+              g=json.loads((root/f'{track}_{surface}_guard_metrics.json').read_text(encoding='utf-8'))
+              f=g['forward']; l=g['loyo']
+              fb=f['all']['baseline']; fm=f['all']['guarded_model']; fw=f['wet']
+              lb=l['all']['baseline']; lm=l['all']['guarded_model']
+              out['results'][surface]={'usable_pairs':raw['audit']['usable_pairs'],'forward':{'n':fm['n'],'mae':fm['mae'],'rmse':fm['rmse'],'within_1_0pt':fm['within_1_0pt'],'max_abs_error':fm['max_abs_error'],
+                  'baseline_mae':fb['mae'],'baseline_rmse':fb['rmse'],'mae_improvement_pct':imp(fb['mae'],fm['mae']),'rmse_improvement_pct':imp(fb['rmse'],fm['rmse']),
+                  'wet_n':fw['guarded_model']['n'],'wet_mae':fw['guarded_model']['mae'],'wet_baseline_mae':fw['baseline']['mae']},
+                  'loyo':{'n':lm['n'],'mae':lm['mae'],'rmse':lm['rmse'],'baseline_mae':lb['mae'],'mae_improvement_pct':imp(lb['mae'],lm['mae'])},
+                  'guardrail_applied_forward':f['guardrail_applied']}
+          (root/f'{track}_summary.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps(out,ensure_ascii=False,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: baba-stage-a-${{ matrix.track }}
+          path: tmp/stage_a
+          if-no-files-found: error
+          retention-days: 30
