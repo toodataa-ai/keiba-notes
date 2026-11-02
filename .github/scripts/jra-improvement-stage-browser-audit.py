@@ -21,10 +21,52 @@ observed_by_group={code:{
 assert not d["gates"]["automated_prompt_change"]
 html=Path("docs/staging/improvement-cycle.html").read_text(encoding="utf-8")
 assert 'data-stage="preview"' in html and "noindex,nofollow" in html and "staging-shell-marker" in html
+NEW_DESIGN='id="experiments"' in html
+
+def audit_new_design(browser):
+    """Simplified improvement page (candidate or released): navigation stays on staging, data renders."""
+    status=json.loads(Path("docs/data/jra_experiment_status_v1.json").read_text(encoding="utf-8"))
+    active=sum(e.get("status") in ("collecting","comparing","reviewing") for e in status.get("experiments",[]))
+    for w in (390,1440):
+        p=browser.new_page(viewport={"width":w,"height":850},is_mobile=w<500,has_touch=w<500)
+        p.goto("http://127.0.0.1:8765/staging/index.html",wait_until="load",timeout=25000)
+        card=p.locator("a.milestone-card")
+        assert card.count()==1 and card.get_attribute("href")=="staging/improvement-cycle.html",(w,"home link")
+        card.click()
+        p.wait_for_url("**/staging/improvement-cycle.html",timeout=15000)
+        p.goto("http://127.0.0.1:8765/staging/roadmap.html",wait_until="load",timeout=25000)
+        p.locator("#live-milestones a[href='staging/improvement-cycle.html']").click()
+        p.wait_for_url("**/staging/improvement-cycle.html",timeout=15000)
+        assert all(h.startswith("staging/") for h in p.eval_on_selector_all("nav a","els=>els.map(e=>e.getAttribute('href'))")),(w,"nav leaves staging")
+        print("PASS_STAGING_IMPROVEMENT_NAVIGATION",w)
+        p.close()
+    for w in (320,375,390,430,768,1024,1440):
+        page=browser.new_page(viewport={"width":w,"height":850},is_mobile=w<=430,has_touch=w<=430)
+        errors=[]
+        page.on("pageerror",lambda e:errors.append(str(e)))
+        page.goto(url,wait_until="load",timeout=25000)
+        page.wait_for_function("!document.querySelector('#experiments').textContent.includes('読み込み中')",timeout=15000)
+        info=page.evaluate("""() => ({scroll:document.documentElement.scrollWidth,
+          font:getComputedStyle(document.body).fontFamily,
+          cards:document.querySelectorAll('#experiments .card').length,
+          marker:document.querySelectorAll('.staging-shell-marker').length,
+          version:document.querySelector('#sVersion').textContent})""")
+        assert not errors,(w,errors)
+        assert info["scroll"]<=w+2,(w,info)
+        assert info["font"].replace('"','').startswith("Meiryo UI"),(w,info)
+        assert info["cards"]==active and info["marker"]==1,(w,info)
+        assert info["version"]==d["latest_formal_prompt_version"],(w,info)
+        print("PASS_STAGING_IMPROVEMENT_SIMPLE_PAGE",w,info["cards"])
+        page.close()
+
 with sync_playwright() as pw:
     chrome=next((shutil.which(x) for x in ("google-chrome","chromium","chromium-browser") if shutil.which(x)),None)
     assert chrome,"Chrome required"
     browser=pw.chromium.launch(headless=True,executable_path=chrome,args=["--no-sandbox"])
+    if NEW_DESIGN:
+        audit_new_design(browser)
+        browser.close()
+        raise SystemExit(0)
     # The dashboard previously existed but was unreachable through the staging
     # home "future improvements" card. Verify the actual user navigation and
     # old-bookmark route, not just the dashboard when opened directly.
