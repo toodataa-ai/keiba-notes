@@ -193,7 +193,10 @@ def parse_official(soup, p):
             # class boundary). Permit only a short *suffix* omission on each
             # side of an identical grade token, never arbitrary fuzzy matching.
             # Date/venue/R number/distance/horse numbers+names remain strict.
-            grade = re.compile(r"[ABC][1-9]")
+            # A grade token never directly follows another Latin letter, so
+            # "C2" inside a title such as "JBC2026" is not a class label
+            # (2026-11-02 Funabashi 12R: "JBC2026...まであと1日C1六七").
+            grade = re.compile(r"(?<![A-Za-z])[ABC][1-9]")
             f, s = grade.search(full), grade.search(shortened)
             if not f or not s or f.group() != s.group():
                 return False
