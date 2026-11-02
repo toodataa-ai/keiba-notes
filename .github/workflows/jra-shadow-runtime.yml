@@ -73,13 +73,13 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Select isolated evidence branch (never main)
+      - name: Select fresh isolated evidence branch (never main; preserve older evidence branch)
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git switch -c experiment/jra-shadow-evidence-v1
-          if git ls-remote --exit-code --heads origin experiment/jra-shadow-evidence-v1; then
-            git fetch origin experiment/jra-shadow-evidence-v1
+          git switch -c experiment/jra-shadow-evidence-main-20261102
+          if git ls-remote --exit-code --heads origin experiment/jra-shadow-evidence-main-20261102; then
+            git fetch origin experiment/jra-shadow-evidence-main-20261102
             git merge --no-edit FETCH_HEAD
           fi
       - name: Record protected original tree hashes
@@ -108,7 +108,7 @@ jobs:
           python - <<'PY'
           from shadow_lab import runtime as r
           try:
-              r.seal('experiment/jra-shadow-evidence-v1')
+              r.seal('experiment/jra-shadow-evidence-main-20261102')
           except Exception as e:
               if str(e)!='no_unsealed_pairs':
                   r.dump(r.ROOT/r.DATA/'attempts'/(r.now().strftime('%Y%m%dT%H%M%S%f')+'-seal.json'),
@@ -130,7 +130,7 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m 'Update seven-theme Shadow evidence, blockers and audited progress'
           fi
-          git push origin HEAD:refs/heads/experiment/jra-shadow-evidence-v1
+          git push origin HEAD:refs/heads/experiment/jra-shadow-evidence-main-20261102
       - name: Preserve reviewable staging preview (no Pages deployment)
         uses: actions/upload-artifact@v4
         with:
