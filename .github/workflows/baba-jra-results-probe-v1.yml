@@ -35,14 +35,13 @@ jobs:
           def sacts(a): return [x for x in a if x[0].endswith('accessS.html')]
           def uniq(a): 
               seen=[];[seen.append(c) for p,c in sacts(a) if c not in seen]; return seen
-          r=post('/JRADB/accessS.html','pw01srl10052025041120251102/98'); h=r.text
-          t=BeautifulSoup(h,'html.parser')
-          main=t.find(id='contentsBody') or t.find('main') or t
-          n=0
-          for tr in main.find_all(['tr','li']):
-              x=str(tr)
-              if ('レース' in tr.get_text() or 'R' in tr.get_text()) and ('onclick' in x or 'href' in x) and 'gnav' not in x and 'submenu' not in x:
-                  print('  ROW',x[:450].replace('\n',' ')); n+=1
-              if n>=4: break
-          print('  tables',len(t.find_all('table')),'forms',len(t.find_all('form')))
+          r=post('/JRADB/accessS.html','pw01srl10052026041120261101/E2'); h=r.text
+          print('  day page ses/sde cnames:',sorted(set(re.findall(r"'(pw01s(?:es|de)[^']*)'",h)))[:20])
+          ses=re.findall(r"'(pw01ses[^']*)'",h)
+          if ses:
+              r=post('/JRADB/accessS.html',ses[0]); h2=r.text; t=BeautifulSoup(h2,'html.parser')
+              print('#### ses page',r.status_code,'title:',t.title.get_text(strip=True))
+              print('  sde cnames:',sorted(set(re.findall(r"'(pw01sde[^']*)'",h2)))[:14])
+              tx=t.get_text(' ',strip=True); k=tx.find('天候')
+              print('  TXT',tx[max(0,k-200):k+300] if k>0 else 'no 天候')
           PY
