@@ -7,7 +7,9 @@
 <link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
 <link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
 <link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
-<style>.themes{list-style:none;padding:0;margin:0}.themes li{background:var(--panel);border:1px solid #3a404c;border-radius:12px;padding:12px 14px;margin-bottom:10px}.themes b{display:block}.themes .st{display:inline-block;margin:6px 0 4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #6b7686}.themes .st.on{border-color:#c61d31;color:#ff9aa6}.themes p{margin:4px 0 0;font-size:13px;color:var(--muted)}.themes a{font-size:13px}</style>
+<style>.themes{list-style:none;padding:0;margin:0}.themes li{background:var(--panel);border:1px solid #3a404c;border-radius:12px;padding:12px 14px;margin-bottom:10px}.themes b{display:block}.themes .st{display:inline-block;margin:6px 0 4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #6b7686}.themes .st.on{border-color:#c61d31;color:#ff9aa6}.themes p{margin:4px 0 0;font-size:13px;color:var(--muted)}.themes a{font-size:13px}.stg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.stg span{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid #d3d5db;color:#6d6e75;background:#fff}.stg span.done{background:#f0f1f3}.stg span.now{border-color:#c61d31;color:#9f1022;font-weight:800;background:#fff5f6}
+.tcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}.tcard h3{margin:0 0 2px}.tcard .what{font-size:14px;margin:4px 0}.tcard .entry{font-size:13px;margin:8px 0 0;padding:8px 10px;border-left:3px solid #c61d31;background:#faf7f7;border-radius:4px}.tcard .prog{font-size:13px;margin:8px 0 0}.tcard table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.tcard th,.tcard td{padding:4px 6px;border-bottom:1px solid #ececef;text-align:left}.tcard th{color:#6d6e75;font-weight:600}.tcard .ok{color:#167a52;font-weight:700}.tcard .wip{color:#8a5a00}.tcard .tiny{font-size:12px;color:#6d6e75;margin-top:6px}
+</style>
 </head>
 <body class="ic-light">
 <div class="wrap">
@@ -44,20 +46,10 @@
 
 <section aria-labelledby="themesTitle" id="themes">
 <h2 id="themesTitle">改善テーマと、つながる研究</h2>
-<p class="sub">改善は「研究で傾向を調べる → 比較に登録する → 20レースで判定する」の順に進みます。研究ページは、そのテーマの下準備です。</p>
-<ul class="themes">
-<li><b>展開・位置取り</b><span class="st on">比較中（EXP-001）</span><p>逃げ・先行馬の数から、レースのペースを読んで勝率を補正します。</p></li>
-<li><b>馬場状態</b><span class="st on">比較中（EXP-002）</span><p>発走前の公式馬場と、同じ馬場での近走成績で補正します。10競馬場の馬場傾向を調べる研究は、まだ比較には使っていません（次の版で取り込めるか検討）。</p><a href="baba-models.html">つながる研究：馬場状態予測の研究 →</a></li>
-<li><b>若駒・経験不足</b><span class="st">研究中（比較は未登録）</span><p>走った経験が少ない馬ほど予想が外れやすいかを調べています。傾向が確かめられたら、比較に登録します。</p><a href="experience-regime.html">つながる研究：新馬・戦歴の少ない馬の予想研究 →</a></li>
-<li><b>購入セットと印の整合性</b><span class="st">比較の準備前</span><p>印と買い目がちぐはぐにならないよう、組み合わせを見直すテーマです。</p></li>
-</ul>
+<p class="sub">改善は「研究 → 登録 → 比較（20レース）→ 判定」の順に進みます。研究の数字が登録の条件に届くと、次の段階に進みます。数字は自動で更新されます。</p>
+<div id="themeList"><div class="empty">読み込み中…</div></div>
 </section>
 
-<section aria-labelledby="nextTitle">
-<h2 id="nextTitle">そのほかの候補</h2>
-<p class="sub">これまでの振り返りで、何度も課題に挙がったテーマです。</p>
-<ul class="next-list" id="nextList"><li>読み込み中…</li></ul>
-</section>
 
 <section aria-labelledby="doneTitle">
 <h2 id="doneTitle">これまでの判定</h2>
@@ -132,11 +124,6 @@ Promise.all([
     </article>`;
   }).join('') : '<div class="empty">いま比較中の改善案はありません。</div>';
 
-  const taken = new Set(exps.flatMap(e => e.hypothesis_ids || []));
-  const next = ((cycle.formal || {}).hypotheses || []).filter(h => !taken.has(h.id));
-  $('nextList').innerHTML = next.length ? next.map(h =>
-    `<li><b>${esc(h.title)}</b><span>${esc((h.public_plan || {}).question || '')}</span></li>`).join('')
-    : '<li>いまのところ予定はありません。</li>';
 
   const done = exps.filter(e => ['approved', 'rejected'].includes(e.status));
   $('decided').innerHTML = done.length
@@ -145,6 +132,49 @@ Promise.all([
 }).catch(() => {
   $('experiments').innerHTML = '<div class="empty">データを読み込めませんでした。時間をおいて再読み込みしてください。</div>';
 });
+
+// ---- 改善テーマと研究の連動 ----
+const THEME_CFG={"note": "改善テーマと研究の連動の設定。数字そのものは data/*.json から読み、ここには条件と説明だけを置く。", "themes": [{"id": "pace_positioning", "title": "展開・位置取り", "what": "逃げ・先行馬の数から、レースのペースを読んで勝率を補正します。", "research": null, "entry": null}, {"id": "track_condition", "title": "馬場状態", "what": "発走前の公式馬場と、同じ馬場での近走成績で補正します。", "research": {"href": "baba-models.html", "label": "馬場状態予測の研究"}, "entry": "競馬場ごとに、芝・ダートの両方が「検証済み」になったら、その競馬場を改善案として登録します（競馬場ごとに順番に進めます）。", "kind": "baba"}, {"id": "field_experience", "title": "若駒・経験不足", "what": "走った経験が少ない馬ほど予想が外れやすいかを調べ、血統との組み合わせも見ます。", "research": {"href": "experience-regime.html", "label": "新馬・戦歴の少ない馬の予想研究"}, "entry": "0戦・1〜3戦・4戦以上のそれぞれで、勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録します。血統は、まず「実測できているか」を確認します。", "kind": "experience"}, {"id": "ticket_portfolio", "title": "購入セットと印の整合性", "what": "印と買い目がちぐはぐにならないよう、組み合わせを見直します。", "research": null, "entry": null}]};
+Promise.all([
+  Promise.resolve(THEME_CFG),
+  fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('data/jra_experiment_status_v1.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('data/baba_model_registry.json',{cache:'no-store'}).then(r=>r.json()).catch(()=>null),
+]).then(([cfg,cycle,status,baba])=>{
+  const hyp=Object.fromEntries(((cycle.formal||{}).hypotheses||[]).map(h=>[h.id,h]));
+  const exps=status.experiments||[];
+  const stLabel={validated:'検証済み',backtesting:'検証中',candidate:'候補',pilot:'試作'};
+  const html=cfg.themes.map(t=>{
+    const h=hyp[t.id]||{}; const ids=((h.next_decision||{}).formal_comparison||{}).registered_experiment_ids||[];
+    const ex=exps.filter(e=>(e.hypothesis_ids||[]).includes(t.id)||ids.includes(e.id));
+    const ready=((h.next_decision||{}).screening||{}).ready_to_design_experiment;
+    const decided=ex.some(e=>['approved','rejected'].includes(e.status));
+    const cur=decided?3:ex.length?2:(t.entry?(ready?1:0):(ready?1:0));
+    const names=['研究','登録','比較','判定'];
+    const stg=names.map((n,i)=>`<span class="${i<cur?'done':i===cur?'now':''}">${i===cur?'▶ ':''}${n}</span>`).join('');
+    let extra='';
+    if(t.kind==='baba'&&baba){
+      const by={};baba.models.forEach(m=>{(by[m.track_ja]=by[m.track_ja]||{})[m.surface]=m});
+      const rows=Object.entries(by).map(([tr,v])=>{const f=s=>v[s]?`${stLabel[v[s].status]||v[s].status}`:'—';
+        const ok=v.turf&&v.dirt&&v.turf.status==='validated'&&v.dirt.status==='validated';
+        return `<tr><td>${esc(tr)}</td><td>${f('turf')}</td><td>${f('dirt')}</td><td class="${ok?'ok':'wip'}">${ok?'条件に届いています':'研究中'}</td></tr>`}).join('');
+      const nOk=Object.values(by).filter(v=>v.turf&&v.dirt&&v.turf.status==='validated'&&v.dirt.status==='validated').length;
+      extra=`<p class="prog"><b>研究の進み：</b>10競馬場のうち ${nOk} 競馬場が登録の条件に届いています。</p><table><tr><th>競馬場</th><th>芝</th><th>ダート</th><th>登録の条件</th></tr>${rows}</table><p class="tiny">表は「馬場状態予測の研究」の記録から自動で作っています。</p>`;
+    }
+    if(t.kind==='experience'){
+      const regs=((cycle.research||{}).regimes||[]);
+      const nm={experience_e0:'0戦（新馬）',experience_e1:'1〜3戦',experience_e2:'4戦以上'};
+      const rows=regs.map(g=>{const rem=(g.next_decision||{}).win_probability_horse_records_remaining;const est=(g.next_decision||{}).additional_races_estimate;
+        return `<tr><td>${nm[g.id]||esc(g.title)}</td><td>${g.collected_prerace_horse_observations}頭</td><td>${rem==null?'—':`あと${rem}頭分（約${est}レース）`}</td></tr>`}).join('');
+      extra=`<p class="prog"><b>研究の進み：</b>発走前に集めた馬の数と、条件（勝つ確率を確かめられるデータ30頭分）までの残りです。</p><table><tr><th>戦歴</th><th>集めた馬</th><th>条件まで</th></tr>${rows}</table><p class="tiny"><b>血統との関連：</b>いまの正式予想では、血統は固定の評価で、実測していません。研究では血統の情報を集められているかを確認中で、集まれば「戦歴が少ない馬ほど血統の影響が大きいか」を調べます。</p>`;
+    }
+    const entry=t.entry?`<p class="entry"><b>登録の条件：</b>${esc(t.entry)}</p>`:'';
+    const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'';
+    const run=ex.length?`<p class="prog"><b>比較中：</b>${ex.map(e=>esc(e.id)).join('・')}（上の「いま比較中の改善案」を参照）</p>`:'';
+    return `<article class="tcard"><h3>${esc(t.title)}</h3><p class="what">${esc(t.what)}</p><div class="stg">${stg}</div>${run}${entry}${extra}${link}</article>`;
+  }).join('');
+  $('themeList').innerHTML=html;
+}).catch(()=>{$('themeList').innerHTML='<div class="empty">データを読み込めませんでした。</div>'});
 })();
 </script>
 <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
