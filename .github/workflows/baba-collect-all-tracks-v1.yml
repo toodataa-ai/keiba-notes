@@ -1,0 +1,79 @@
+name: Baba research - collect official observations for the remaining tracks (research only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_year:
+        description: 'First year'
+        default: '2018'
+      to_year:
+        description: 'Last year'
+        default: '2026'
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        track: [sapporo, hakodate, fukushima, niigata, chukyo, kokura]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf
+      - name: Collect JRA official morning-moisture observations
+        run: python baba_models_v2/jra_observations.py --track ${{ matrix.track }} --from-year ${{ inputs.from_year }} --to-year ${{ inputs.to_year }} --output tmp/baba/${{ matrix.track }}_observations.csv
+      - name: Summarise coverage (does not gate)
+        run: |
+          python - <<'PY'
+          import csv, json, collections
+          p='tmp/baba/${{ matrix.track }}_observations.csv'
+          rows=list(csv.DictReader(open(p,encoding='utf-8')))
+          by=collections.Counter(r['year'] for r in rows)
+          print(json.dumps({'track':'${{ matrix.track }}','rows':len(rows),'race_days':sum(r['race_day'].lower() in {'true','1'} for r in rows),
+                'years':dict(sorted(by.items())),'formats':sorted(set(r['source_format'] for r in rows)),
+                'date_from':min(r['observed_date'] for r in rows) if rows else None,'date_to':max(r['observed_date'] for r in rows) if rows else None},ensure_ascii=False,indent=1))
+          PY
+      - name: Baseline (persistence) per surface
+        run: |
+          for surface in turf dirt; do
+            python baba_models_v2/stage_a_baseline.py --input tmp/baba/${{ matrix.track }}_observations.csv --surface ${surface} \
+              --metrics tmp/baba/${{ matrix.track }}_${surface}_baseline_metrics.json --pairs tmp/baba/${{ matrix.track }}_${surface}_baseline_pairs.csv || echo "baseline failed for ${surface}"
+            cat tmp/baba/${{ matrix.track }}_${surface}_baseline_metrics.json 2>/dev/null || true
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: baba-${{ matrix.track }}-observations
+          path: tmp/baba
+          if-no-files-found: warn
+          retention-days: 30
+
+  jma-stations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: List JMA AMeDAS/observatory stations for the prefectures of the 6 remaining racecourses
+        run: |
+          python - <<'PY'
+          import re, requests
+          from bs4 import BeautifulSoup
+          UA={'User-Agent':'keiba-notes track-condition research/1.0'}
+          targets={'札幌(石狩)':'14','函館(渡島)':'23','福島':'36','新潟':'54','中京(愛知)':'51','小倉(福岡)':'82'}
+          for name,prec in targets.items():
+              url=f'https://www.data.jma.go.jp/stats/etrn/select/prefecture.php?prec_no={prec}&block_no=&year=&month=&day=&view='
+              r=requests.get(url,headers=UA,timeout=30); r.encoding=r.apparent_encoding
+              soup=BeautifulSoup(r.text,'html.parser')
+              print('=====',name,prec,r.status_code)
+              for a in soup.select('area'):
+                  href=a.get('href','')
+                  m=re.search(r'prec_no=(\d+)&block_no=(\d+)',href)
+                  kind='s1' if 'hourly_s1' in href else ('a1' if 'hourly_a1' in href else '?')
+                  if m: print(a.get('alt'),m.group(1),m.group(2),kind)
+          PY
