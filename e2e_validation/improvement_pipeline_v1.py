@@ -182,7 +182,37 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
     }
 
 
-def issue_drafts(result: dict):
+SITE = "https://toodataa-ai.github.io/keiba-notes/"
+
+
+def material_lines(unit: dict, cycle: dict) -> list[str]:
+    """判断の材料。Issue だけ読めば A/B/C を決められるようにする。"""
+    lines = ["## 判断の材料"]
+    theme = unit["theme"]
+    h = next((x for x in ((cycle or {}).get("formal") or {}).get("hypotheses", []) if x["id"] == theme), None)
+    if h:
+        plan = h.get("public_plan") or {}
+        scr = (h.get("next_decision") or {}).get("screening") or {}
+        rows = [("何を確かめたいか", plan.get("question")), ("比べる案", plan.get("considering")),
+                ("必要なデータ", plan.get("data_needed")), ("良し悪しの見方", plan.get("success_metric")),
+                ("調べ方", h.get("investigation"))]
+        lines += [f"- **{k}**：{v}" for k, v in rows if v]
+        lines.append(f"- **回顧で同じ課題が出た回数**：{h.get('race_observation_count')}レース／{h.get('meeting_observation_count')}開催"
+                     f"（基準は{scr.get('minimum_qualifying_race_reviews', 3)}レース・{scr.get('minimum_completed_meetings', 2)}開催）")
+        races = h.get("observation_races") or []
+        if races:
+            lines.append("- **課題が出たレース**：" + "、".join(f"{r['date']} {r['race_id'].split('-', 3)[-1]}" for r in races))
+    d = unit.get("detail") or {}
+    if d:
+        lines.append(f"- **単位の詳細**：{json.dumps(d, ensure_ascii=False)}")
+    lines += ["", "## 見る場所",
+              f"- 予想の改善状況（段階と条件）：{SITE}improvement-cycle.html",
+              f"- 過去の結果・回顧（課題の出たレースの振り返り）：{SITE}results.html",
+              f"- 判定データ（機械用）：docs/data/jra_improvement_pipeline_v1.json、docs/data/jra_improvement_cycle_v1.json"]
+    return lines
+
+
+def issue_drafts(result: dict, cycle: dict | None = None):
     for u in result["units"]:
         if u["state"] != "ready_to_register":
             continue
@@ -192,10 +222,12 @@ def issue_drafts(result: dict):
             f"- 条件：{u['criteria_text']}",
             f"- いまの状況：{u['text']}",
             "",
-            "## 次に何が起きるか",
+            *material_lines(u, cycle or {}),
+            "",
+            "## どう答えるか（コメントで A / B / C）",
             "- **A（登録する）**：Claude が、この単位用の比較プログラム（正式 v3.13 STEP1 だけから決定的に計算する関数）を書き、"
-            "別の実験IDとして登録します。登録後に発走するレースから、今の予想と20レースで比べます。",
-            "- **B（もう少し待つ）**：条件は満たしているが、データを増やしてから登録したい場合。",
+            "別の実験IDとして登録します。登録後に発走するレースから、今の予想と20レースで比べます（約4週間）。",
+            "- **B（もう少し待つ）**：条件は満たしているが、いま走っている比較（EXP-001・EXP-002）の結果を見てからにしたい場合など。",
             "- **C（登録しない）**：この単位は改善の対象にしない場合。",
             "",
             "※ このIssueは通知だけです。何も自動では登録・採用されません。",
@@ -207,9 +239,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--issues", action="store_true", help="print JSON lines of Issue drafts instead of writing the status file")
     args = ap.parse_args(argv)
-    result = build(load(POLICY), load(REGISTRY, {}), load(EXP_STATUS, {}), load(CYCLE, {}), load(BABA, {}), load(EXPERIENCE_EVIDENCE, {}))
+    cycle = load(CYCLE, {})
+    result = build(load(POLICY), load(REGISTRY, {}), load(EXP_STATUS, {}), cycle, load(BABA, {}), load(EXPERIENCE_EVIDENCE, {}))
     if args.issues:
-        for d in issue_drafts(result):
+        for d in issue_drafts(result, cycle):
             print(json.dumps(d, ensure_ascii=False))
         return 0
     OUT.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
