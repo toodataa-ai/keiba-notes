@@ -67,7 +67,7 @@
 <div class="portal">
 <section class="portal-section" aria-labelledby="mainTitle"><div class="portal-head"><span class="portal-kicker">このサイトの中心</span><h2 id="mainTitle">JRAメインレース予想</h2><p>今週の予想、これからの予定、過去の成績をここから確認できます。</p></div>
 <div class="portal-grid main-grid">
-<a class="portal-card main-card" href="this-week.html"><span><span class="portal-title">今週のAI予想</span><span class="portal-desc">今週の対象レースと、発走前に公開したAI予想</span></span><span class="portal-arrow">→</span></a>
+<a class="portal-card main-card" href="this-week.html"><span><span class="portal-title">今週のAI予想</span><span class="portal-desc">今週の対象レースと、発走前に公開したAI予想</span><span id="nextPublish" style="display:none;margin-top:5px;font-size:12px;font-weight:700;color:#b5172a"></span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card main-card" href="schedule.html"><span><span class="portal-title">今後のAI予想スケジュール</span><span class="portal-desc">次回以降の対象レースと、予想・振り返りの予定</span></span><span class="portal-arrow">→</span></a>
 <a class="portal-card main-card" href="results.html"><span><span class="portal-title">過去の成績</span><span class="portal-desc">結果・振り返り・的中率・回収率</span></span><span class="portal-arrow">→</span></a>
 </div>
@@ -113,6 +113,28 @@ fetch('data/production-releases.json',{cache:'no-store'}).then(r=>{if(!r.ok)thro
   row.append(note);list.append(row)
  }
 }).catch(()=>{document.getElementById('releaseHistoryList').textContent='履歴の取得に失敗しました。'});
+</script>
+<script>
+(async()=>{try{
+ const el=document.getElementById('nextPublish');if(!el)return;
+ const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
+ const [sr,rr,pr]=await Promise.all([fetch('data/upcoming_schedule.json',{cache:'no-store'}),fetch('data/races.json',{cache:'no-store'}),fetch('data/prediction_publication_policy.json',{cache:'no-store'}).catch(()=>null)]);
+ if(!sr.ok||!rr.ok)return;
+ const sch=await sr.json(),db=await rr.json(),pol=pr&&pr.ok?await pr.json():{};
+ const label=(pol.publish_window&&pol.publish_window.label)||'午前中めど';
+ const rows=(db.races||[]).filter(r=>r.scope==='jra-main'&&(r.status==='predicted'||r.status==='reviewed'));
+ const nice=(s,w)=>{const [,m,d]=s.split('-').map(Number);return m+'/'+d+(w?'（'+w+'）':'')};
+ for(const day of (sch.days||[]).filter(d=>d.date>=today).sort((a,b)=>a.date.localeCompare(b.date))){
+  const total=(day.races||[]).length;if(!total)continue;
+  const pub=rows.filter(r=>r.date===day.date).length;
+  if(pub>=total)continue;
+  let t;
+  if(day.date>today)t='次回の公開予定：'+nice(day.date,day.weekday)+' '+label;
+  else if(pub===0)t='本日の公開予定：'+label;
+  else t='本日分を順次公開中（'+pub+'/'+total+'レース）';
+  el.textContent=t;el.style.display='block';return;
+ }
+}catch(e){}})();
 </script>
 <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 <script src="assets/usage-summary.js?v=20261031-1" defer></script>
