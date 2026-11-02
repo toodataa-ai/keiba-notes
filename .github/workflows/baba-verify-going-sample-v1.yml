@@ -1,0 +1,33 @@
+name: Baba research - spot-check ChatGPT-collected going labels (read only, few requests)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Fetch a handful of cited pages and compare
+        run: |
+          python - <<'PY'
+          import csv, re, time, requests
+          from bs4 import BeautifulSoup
+          rows=list(csv.DictReader(open('baba_models_v2/going_labels/tokyo_2025_part1_unverified.csv',encoding='utf-8')))
+          pick=[0,4,13,17,25,29,36,47]
+          for i in pick:
+              r=rows[i]; url=r['出典URL']
+              try:
+                  resp=requests.get(url,headers={'User-Agent':'keiba-notes going-label spot check/1.0'},timeout=40)
+                  resp.encoding=resp.apparent_encoding
+                  txt=BeautifulSoup(resp.text,'html.parser').get_text(' ',strip=True)
+                  ms=[txt[max(0,m.start()-25):m.end()+25] for m in re.finditer('馬場',txt)][:3]
+                  print('##',r['日付'],r['レース番号'],'R',r['芝かダートか'],'claimed',r['馬場状態'],r['天候'],'| HTTP',resp.status_code,len(txt),'| head:',txt[:80].replace('\n',' '))
+                  for m in ms: print('   ...',m)
+              except Exception as e:
+                  print('##',r['日付'],r['レース番号'],'ERROR',e)
+              time.sleep(3)
+          PY
