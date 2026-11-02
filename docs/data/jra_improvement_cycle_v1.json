@@ -193,7 +193,7 @@
         "completed_meetings_with_observation": 3,
         "completed_meeting_review_mentions": 9,
         "next_decision": {
-          "stage": "plan_challenger",
+          "stage": "collect_challenger_pairs",
           "screening": {
             "minimum_qualifying_race_reviews": 3,
             "qualifying_race_reviews": 9,
@@ -206,8 +206,10 @@
           "formal_comparison": {
             "minimum_paired_races_per_registered_challenger": 20,
             "remaining_paired_races": 20,
-            "challenger_not_yet_registered": true,
-            "registered_experiment_ids": [],
+            "challenger_not_yet_registered": false,
+            "registered_experiment_ids": [
+              "EXP-002"
+            ],
             "minimum_not_promise_of_approval": true
           }
         },
@@ -722,6 +724,21 @@
       "remaining_prospective_pairs": 20,
       "replay_support_only_pairs": 18,
       "auto_approved": false
+    },
+    {
+      "id": "EXP-002",
+      "title": "馬場状態補正（発走前の公式馬場と各馬の良/道悪実績で勝率を補正）",
+      "hypothesis_ids": [
+        "track_condition"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13+going_v1",
+      "status": "collecting",
+      "prestart_pairing_required": true,
+      "prospective_pairs": 0,
+      "remaining_prospective_pairs": null,
+      "replay_support_only_pairs": 0,
+      "auto_approved": false
     }
   ],
   "public_roadmap": {
@@ -749,8 +766,8 @@
       "approval": "A/B/C explicit manual approval"
     },
     "prioritized_topics": 4,
-    "registered_challenger_count": 1,
-    "experiments_with_prestart_comparison": 1,
+    "registered_challenger_count": 2,
+    "experiments_with_prestart_comparison": 2,
     "next_checkpoint": "計画済みの比較実験について必要な発走前ペアを蓄積する",
     "evaluation_timing": "日付は未確定。各候補に同一条件の厳格E2E 20レース以上と独立週・条件の監査が必要",
     "research_note": "研究の初期診断は各群の勝率・3着内予測と結果がそれぞれ30頭以上、3レース・2週を暫定目安とする。正式採用の基準ではない"
@@ -760,7 +777,7 @@
     "a_b_c_manual_approval_required": true,
     "automated_prompt_change": false,
     "past_prediction_immutability": true,
-    "pending_experiments": 1,
+    "pending_experiments": 2,
     "required_next_steps": [
       "週次の全正式メイン回顧を完了して調査テーマを蓄積",
       "E0/E1/E2は発走前研究証拠とカテゴリ別予測確率の欠損を解消",
