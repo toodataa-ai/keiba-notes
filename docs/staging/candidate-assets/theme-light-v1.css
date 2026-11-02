@@ -65,3 +65,11 @@ body.ic-light .empty{background:#fff;color:#6d6e75;border-color:#e1e1e4}
 .method-hero .method-nav a{display:inline-flex!important;width:auto!important;flex:0 0 auto!important;padding:6px 14px!important;font-size:13px!important;border-radius:999px!important}
 .article a:not([class]),.callout a{color:#9f1022}
 .light-main .portal{margin-left:auto;margin-right:auto}
+/* 改善の流れ：タグを下そろえ・ライト用の色 */
+.flow li{display:flex;flex-direction:column}
+.flow li p{flex:1 1 auto}
+.flow li .tag{align-self:flex-start;margin-top:auto}
+.flow li::before{background:#3b3341}
+.tag.ai{background:#e8f0fb;color:#1d4f91;border:1px solid #b9cfee}
+.tag.auto{background:#e6f4ec;color:#167a52;border:1px solid #a9d6bd}
+.tag.hand{background:#fbf1de;color:#8a5a00;border:1px solid #e5cf9d}
