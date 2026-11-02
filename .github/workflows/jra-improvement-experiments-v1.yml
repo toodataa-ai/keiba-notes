@@ -48,20 +48,20 @@ jobs:
           for e in x['experiments']:
               print('EXPERIMENT', e['id'], 'prospective', e['prospective'].get('pairs'), 'remaining', e['remaining_prospective_pairs'], 'replay', e['replay_support_only'].get('pairs'))
           PY
-      - name: Commit derived experiment records only
+      - name: Commit derived experiment records only (regenerate on latest main, never rebase derived files)
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/data/jra_experiment_status_v1.json docs/data/jra_improvement_cycle_v1.json e2e_validation/experiments/
-          if git diff --cached --quiet; then
-            echo 'No experiment changes'
-          else
-            git commit -m 'Score pre-registered JRA challenger experiments (research only)'
-            for i in 1 2 3 4; do
-              git pull --rebase origin main
-              if git push origin HEAD:main; then break; fi
-              if [ "$i" = 4 ]; then echo 'Could not push experiment records'; exit 1; fi
-              sleep 2
-            done
-          fi
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            python e2e_validation/experiment_runner_v1.py
+            python e2e_validation/improvement_cycle_v1.py
+            git add docs/data/jra_experiment_status_v1.json docs/data/jra_improvement_cycle_v1.json e2e_validation/experiments/
+            if git diff --cached --quiet; then echo 'No experiment changes'; exit 0; fi
+            git commit -q -m 'Score pre-registered JRA challenger experiments (research only)'
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((i*3))
+          done
+          echo 'Could not push experiment records'; exit 1
