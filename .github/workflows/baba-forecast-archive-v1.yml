@@ -1,0 +1,32 @@
+name: Baba forecast archive v1
+# Record-only: saves JMA forecasts and the JRA going page as they are issued (twice a day).
+on:
+  schedule:
+    - cron: '10 9 * * *'    # 18:10 JST (day before)
+    - cron: '10 21 * * *'   # 06:10 JST (race morning)
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: baba-forecast-archive-v1
+  cancel-in-progress: false
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Save forecasts
+        run: python3 baba_models_v2/forecast_archive.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baba_models_v2/forecast_archive
+          git diff --cached --quiet && echo "nothing new" && exit 0
+          git commit -m "馬場研究: 気象庁の予報とJRA馬場情報ページを保存（研究用データ）"
+          git pull --rebase origin main && git push origin HEAD:main
