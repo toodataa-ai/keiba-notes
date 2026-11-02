@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
 <link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
 <style>.themes{list-style:none;padding:0;margin:0}.themes li{background:var(--panel);border:1px solid #3a404c;border-radius:12px;padding:12px 14px;margin-bottom:10px}.themes b{display:block}.themes .st{display:inline-block;margin:6px 0 4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #6b7686}.themes .st.on{border-color:#c61d31;color:#ff9aa6}.themes p{margin:4px 0 0;font-size:13px;color:var(--muted)}.themes a{font-size:13px}.stg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.stg span{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid #d3d5db;color:#6d6e75;background:#fff}.stg span.done{background:#f0f1f3}.stg span.now{border-color:#c61d31;color:#9f1022;font-weight:800;background:#fff5f6}
-.tcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}.tcard h3{margin:0 0 2px}.tcard .what{font-size:14px;margin:4px 0}.tcard .entry{font-size:13px;margin:8px 0 0;padding:8px 10px;border-left:3px solid #c61d31;background:#faf7f7;border-radius:4px}.tcard .prog{font-size:13px;margin:8px 0 0}.tcard table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.tcard th,.tcard td{padding:4px 6px;border-bottom:1px solid #ececef;text-align:left}.tcard th{color:#6d6e75;font-weight:600}.tcard .ok{color:#167a52;font-weight:700}.tcard .wip{color:#8a5a00}.steps{list-style:none;margin:12px 0 0;padding:0;position:relative}.steps>li{display:flex;gap:12px;padding:0 0 14px;position:relative}.steps>li:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:0;width:2px;background:#dcdee3}.st-dot{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:#e6e7ea;color:#6d6e75}.st-now .st-dot{background:#c61d31;color:#fff}.st-done .st-dot{background:#3b3341;color:#fff}.st-body{flex:1;min-width:0}.st-body>b{display:block;font-size:15px}.st-body p{margin:4px 0;font-size:13px}.st-wait .st-body>b{color:#6d6e75}.steps .card{box-shadow:none;margin:8px 0 0}.muted{color:#6d6e75}.tcard .tiny{font-size:12px;color:#6d6e75;margin-top:6px}
+.tcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}.tcard h3{margin:0 0 2px}.tcard .what{font-size:14px;margin:4px 0}.tcard .entry{font-size:13px;margin:8px 0 0;padding:8px 10px;border-left:3px solid #c61d31;background:#faf7f7;border-radius:4px}.tcard .prog{font-size:13px;margin:8px 0 0}.tcard table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.tcard th,.tcard td{padding:4px 6px;border-bottom:1px solid #ececef;text-align:left}.tcard th{color:#6d6e75;font-weight:600}.tcard .ok{color:#167a52;font-weight:700}.tcard .wip{color:#8a5a00}.pr,.ph{display:grid;grid-template-columns:92px minmax(0,1fr);gap:3px 10px;align-items:center;margin:7px 0}.pr .pt{grid-column:2;font-size:12px;color:#6d6e75;line-height:1.4}.ph{margin:10px 0 2px}.ph>span:last-child{display:none}.ph{grid-template-columns:92px minmax(0,1fr)}.pl{font-size:13px;font-weight:700}.pb{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.pb i{display:block;height:10px;border-radius:5px;background:#e6e7ea;overflow:hidden}.pb i.d{background:#3b3341}.pb i.n{outline:1.5px solid #c61d31;outline-offset:0;background:#fff}.pb i.n b{display:block;height:100%;background:#c61d31}.ph-n i{height:auto;background:none;font-style:normal;font-size:11px;color:#6d6e75;text-align:center}.tdet{margin-top:10px}.tdet summary{cursor:pointer;font-size:13px;font-weight:700}.steps{list-style:none;margin:12px 0 0;padding:0;position:relative}.steps>li{display:flex;gap:12px;padding:0 0 14px;position:relative}.steps>li:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:0;width:2px;background:#dcdee3}.st-dot{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:#e6e7ea;color:#6d6e75}.st-now .st-dot{background:#c61d31;color:#fff}.st-done .st-dot{background:#3b3341;color:#fff}.st-body{flex:1;min-width:0}.st-body>b{display:block;font-size:15px}.st-body p{margin:4px 0;font-size:13px}.st-wait .st-body>b{color:#6d6e75}.steps .card{box-shadow:none;margin:8px 0 0}.muted{color:#6d6e75}.tcard .tiny{font-size:12px;color:#6d6e75;margin-top:6px}
 </style>
 </head>
 <body class="ic-light">
@@ -40,7 +40,7 @@
 
 <section aria-labelledby="themesTitle" id="themes">
 <h2 id="themesTitle">改善テーマ（研究から判定まで）</h2>
-<p class="sub">改善テーマごとに、「研究 → 登録 → 比較 → 判定」の4段階を上から順に並べています。赤い丸が、いまいる段階です。数字は自動で更新されます。</p>
+<p class="sub">1行が1つの管理単位（競馬場・戦歴など）です。バーは左から「研究 → 登録 → 比較 → 判定」の4段階で、濃い色は完了、赤い枠がいまの段階、枠の中の赤は進み具合です。数字は自動で更新されます。</p>
 <div id="themeList"><div class="empty">読み込み中…</div></div>
 </section>
 
@@ -139,41 +139,46 @@ Promise.all([
   const hyp=Object.fromEntries(((cycle.formal||{}).hypotheses||[]).map(h=>[h.id,h]));
   const exps=status.experiments||[];
   const stLabel={validated:'検証済み',backtesting:'検証中',candidate:'候補',pilot:'試作'};
-  const html=cfg.themes.map(t=>{
-    const h=hyp[t.id]||{}; const ids=((h.next_decision||{}).formal_comparison||{}).registered_experiment_ids||[];
+  const score={validated:1,backtesting:.5,candidate:.5,pilot:0};
+  const names=['研究','登録','比較','判定'];
+  // 1行 = 1つの管理単位（競馬場・戦歴区分など）。stage: 0研究 1登録 2比較 3判定、frac: その段階の進み(0〜1)
+  const bar=(stage,frac)=>`<div class="pb" aria-hidden="true">${names.map((n,i)=>i<stage?'<i class="d"></i>':i===stage?`<i class="n"><b style="width:${Math.max(0,Math.min(1,frac))*100}%"></b></i>`:'<i></i>').join('')}</div>`;
+  const row=(label,stage,frac,text)=>`<div class="pr"><span class="pl">${esc(label)}</span>${bar(stage,frac)}<span class="pt">${text}</span></div>`;
+  const expRow=(label,e)=>{const p=e.prospective||{},n=p.pairs||0,need=e.minimum_prospective_pairs||20;const decided=['approved','rejected'].includes(e.status);return row(label,decided?3:2,n/need,`比較 ${n}/${need}レース（${esc(e.id)}）`)};
+  const groups=cfg.themes.map(t=>{
+    const h=hyp[t.id]||{}; const nd=h.next_decision||{};
+    const ids=((nd.formal_comparison||{}).registered_experiment_ids||[]);
     const ex=exps.filter(e=>(e.hypothesis_ids||[]).includes(t.id)||ids.includes(e.id));
-    const ready=((h.next_decision||{}).screening||{}).ready_to_design_experiment;
-    const decided=ex.some(e=>['approved','rejected'].includes(e.status));
-    const cur=decided?3:ex.length?2:(t.entry?(ready?1:0):(ready?1:0));
-    let research='', reg='';
-    const step=(n,title,state,inner)=>`<li class="st-${state}"><span class="st-dot">${n}</span><div class="st-body"><b>${title}</b>${inner}</div></li>`;
+    const ready=(nd.screening||{}).ready_to_design_experiment;
+    let rows='';
     if(t.kind==='baba'&&baba){
+      rows+=ex.map(e=>expRow('公式馬場補正',e)).join('');
       const by={};baba.models.forEach(m=>{(by[m.track_ja]=by[m.track_ja]||{})[m.surface]=m});
-      const okTr=v=>v.turf&&v.dirt&&v.turf.status==='validated'&&v.dirt.status==='validated';
-      const rows=Object.entries(by).map(([tr,v])=>{const f=s=>v[s]?(stLabel[v[s].status]||v[s].status):'—';
-        return `<tr><td>${esc(tr)}</td><td>${f('turf')}</td><td>${f('dirt')}</td><td class="${okTr(v)?'ok':'wip'}">${okTr(v)?'届いた':'研究中'}</td></tr>`}).join('');
-      const nOk=Object.values(by).filter(okTr).length;
-      research=`<p>競馬場ごと・芝とダートごとに、馬場の傾向を読めるか調べています。</p><table><tr><th>競馬場</th><th>芝</th><th>ダート</th><th>登録の条件</th></tr>${rows}</table><p class="tiny"><a href="${t.research.href}">${esc(t.research.label)}を見る →</a></p>`;
-      reg=`<p>${esc(t.entry)}</p><p class="prog">いま条件に届いているのは10競馬場のうち<b>${nOk}</b>つです。</p>`;
+      Object.entries(by).forEach(([tr,v])=>{
+        const sc=((score[(v.turf||{}).status]||0)+(score[(v.dirt||{}).status]||0))/2;
+        const ok=sc>=1;
+        const f=k=>v[k]?(stLabel[v[k].status]||v[k].status):'—';
+        rows+=row(tr,ok?1:0,ok?0:sc,ok?'研究の条件に届いた（登録待ち）':`芝：${f('turf')} ／ ダート：${f('dirt')}`);
+      });
     } else if(t.kind==='experience'){
-      const regs=((cycle.research||{}).regimes||[]);
       const nm={experience_e0:'0戦（新馬）',experience_e1:'1〜3戦',experience_e2:'4戦以上'};
-      const rows=regs.map(g=>{const rem=(g.next_decision||{}).win_probability_horse_records_remaining;const est=(g.next_decision||{}).additional_races_estimate;
-        return `<tr><td>${nm[g.id]||esc(g.title)}</td><td>${g.collected_prerace_horse_observations}頭</td><td>${rem==null?'—':`あと${rem}頭分（約${est}レース）`}</td></tr>`}).join('');
-      research=`<p>戦歴の少ない馬が、通常の馬より予想を外しやすいかを調べています。</p><table><tr><th>戦歴</th><th>集めた馬</th><th>条件まで</th></tr>${rows}</table><p class="tiny"><b>血統との関連：</b>いまの正式予想では血統は固定の評価で、実測していません。研究では血統の情報を集められているかを確認中で、集まれば「戦歴が少ない馬ほど血統の影響が大きいか」を調べます。</p><p class="tiny"><a href="${t.research.href}">${esc(t.research.label)}を見る →</a></p>`;
-      reg=`<p>${esc(t.entry)}</p>`;
+      ((cycle.research||{}).regimes||[]).forEach(g=>{const d=g.next_decision||{};const rem=d.win_probability_horse_records_remaining;const need=30;
+        const fr=rem==null?0:(need-rem)/need;
+        rows+=row(nm[g.id]||g.title,rem===0?1:0,rem===0?0:fr,rem==null?'—':rem===0?'研究の条件に届いた（登録待ち）':`あと${rem}頭分（約${d.additional_races_estimate}レース）`)});
+      rows+=row('血統との関連',0,0,'血統の情報を実測できているか確認中');
+    } else if(ex.length){
+      rows+=ex.map(e=>expRow(t.title,e)).join('');
     } else {
-      research=`<p>${t.research?'':'専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。'}</p>`;
-      reg=`<p>回顧で3レース以上・2開催以上で同じ課題が出たら、改善案として登録できます。${ready?'<b>この条件には届いています。</b>':''}</p>`;
+      rows+=row(t.title,ready?1:0,0,ready?'研究の条件に届いた（登録待ち）':'研究中');
     }
-    const note=t.kind==='baba'?'<p class="tiny">いま比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場モデルを使う案は、競馬場が条件に届いたあと、別の改善案として登録して比べます。</p>':t.kind==='experience'?'<p class="tiny">登録されると、戦歴の少ない馬の勝つ確率を補正する案（血統の扱いも含めて検討）を、今の予想と20レースで比べます。</p>':'';
-    const cmp=note+(ex.length?ex.map(expCard).join(''):'<p class="muted">まだ比較は始まっていません。登録されると、20レースの比較が始まります。</p>');
-    const st=[cur>0?'done':'now',cur>1?'done':cur===1?'now':'wait',cur>2?'done':cur===2?'now':'wait',cur>3?'done':cur===3?'now':'wait'];
-    const state=i=>cur>i?'done':cur===i?'now':'wait';
-    const link='';
-    return `<article class="tcard"><h3>${esc(t.title)}</h3><p class="what">${esc(t.what)}</p><ol class="steps">${step(1,'研究',state(0),research)}${step(2,'改善案として登録',state(1),reg)}${step(3,'比較（20レース）',state(2),cmp)}${step(4,'判定',state(3),'<p>20レースたまったら、成績を見てA（採用）・B（追加検証）・C（見送り）を決めます。</p>')}</ol></article>`;
+    const cmp=ex.map(expCard).join('');
+    const det=cmp?`<details class="tdet"><summary>比較中の詳しい経過を見る</summary>${cmp}</details>`:'';
+    const entry=t.entry?`<p class="entry"><b>登録の条件：</b>${esc(t.entry)}</p>`:'';
+    const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'<p class="tiny">専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。</p>';
+    const note=t.kind==='baba'?'<p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場モデルを使う案は、競馬場ごとに条件に届いたあと、別の改善案として登録して比べます。</p>':t.kind==='experience'?'<p class="tiny">登録されると、戦歴の少ない馬の勝つ確率を補正する案（血統の扱いも含めて検討）を、今の予想と20レースで比べます。</p>':'';
+    return `<article class="tcard"><h3>${esc(t.title)}</h3><p class="what">${esc(t.what)}</p><div class="ph"><span></span><div class="pb ph-n">${names.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>${rows}${entry}${note}${link}${det}</article>`;
   }).join('');
-  $('themeList').innerHTML=html;
+  $('themeList').innerHTML=groups;
 }).catch(()=>{$('themeList').innerHTML='<div class="empty">データを読み込めませんでした。</div>'});
 })();
 </script>
