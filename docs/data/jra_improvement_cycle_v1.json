@@ -70,7 +70,7 @@
         "completed_meetings_with_observation": 4,
         "completed_meeting_review_mentions": 16,
         "next_decision": {
-          "stage": "plan_challenger",
+          "stage": "collect_challenger_pairs",
           "screening": {
             "minimum_qualifying_race_reviews": 3,
             "qualifying_race_reviews": 16,
@@ -83,7 +83,10 @@
           "formal_comparison": {
             "minimum_paired_races_per_registered_challenger": 20,
             "remaining_paired_races": 20,
-            "challenger_not_yet_registered": true,
+            "challenger_not_yet_registered": false,
+            "registered_experiment_ids": [
+              "EXP-001"
+            ],
             "minimum_not_promise_of_approval": true
           }
         },
@@ -204,6 +207,7 @@
             "minimum_paired_races_per_registered_challenger": 20,
             "remaining_paired_races": 20,
             "challenger_not_yet_registered": true,
+            "registered_experiment_ids": [],
             "minimum_not_promise_of_approval": true
           }
         },
@@ -289,6 +293,7 @@
             "minimum_paired_races_per_registered_challenger": 20,
             "remaining_paired_races": 20,
             "challenger_not_yet_registered": true,
+            "registered_experiment_ids": [],
             "minimum_not_promise_of_approval": true
           }
         },
@@ -434,6 +439,7 @@
             "minimum_paired_races_per_registered_challenger": 20,
             "remaining_paired_races": 20,
             "challenger_not_yet_registered": true,
+            "registered_experiment_ids": [],
             "minimum_not_promise_of_approval": true
           }
         },
@@ -701,7 +707,23 @@
     "automatic_promotion": false,
     "quality_warning": "研究の結果集計だけでは予測精度・因果効果を証明できない。発走前の固定予測が必要"
   },
-  "experiments": [],
+  "experiments": [
+    {
+      "id": "EXP-001",
+      "title": "展開・位置取り補正（ペース予想で先行/差しの勝率を補正）",
+      "hypothesis_ids": [
+        "pace_positioning"
+      ],
+      "baseline": "v3.13",
+      "challenger": "v3.13+pace_v1",
+      "status": "collecting",
+      "prestart_pairing_required": true,
+      "prospective_pairs": 0,
+      "remaining_prospective_pairs": null,
+      "replay_support_only_pairs": 0,
+      "auto_approved": false
+    }
+  ],
   "public_roadmap": {
     "policy": {
       "description": "研究着手の目安は暫定の運用上の目標。正式予想への採用可否を保証する統計的閾値ではない。",
@@ -727,9 +749,9 @@
       "approval": "A/B/C explicit manual approval"
     },
     "prioritized_topics": 4,
-    "registered_challenger_count": 0,
-    "experiments_with_prestart_comparison": 0,
-    "next_checkpoint": "計画登録前。正式回顧から優先テーマを選び、現行版との発走前比較計画を登録する",
+    "registered_challenger_count": 1,
+    "experiments_with_prestart_comparison": 1,
+    "next_checkpoint": "計画済みの比較実験について必要な発走前ペアを蓄積する",
     "evaluation_timing": "日付は未確定。各候補に同一条件の厳格E2E 20レース以上と独立週・条件の監査が必要",
     "research_note": "研究の初期診断は各群の勝率・3着内予測と結果がそれぞれ30頭以上、3レース・2週を暫定目安とする。正式採用の基準ではない"
   },
@@ -738,7 +760,7 @@
     "a_b_c_manual_approval_required": true,
     "automated_prompt_change": false,
     "past_prediction_immutability": true,
-    "pending_experiments": 0,
+    "pending_experiments": 1,
     "required_next_steps": [
       "週次の全正式メイン回顧を完了して調査テーマを蓄積",
       "E0/E1/E2は発走前研究証拠とカテゴリ別予測確率の欠損を解消",
