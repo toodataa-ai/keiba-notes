@@ -3,8 +3,8 @@
   "kind": "design_and_audited_shadow_runtime",
   "formal_baseline": "v3.13",
   "experiment_count": 7,
-  "registered_design_count": 3,
-  "awaiting_evidence_count": 4,
+  "registered_design_count": 4,
+  "awaiting_evidence_count": 3,
   "strict_paired_cases_total": 0,
   "never_infer_cases_from_observations": true,
   "candidate_execution_implemented": true,
@@ -16,7 +16,7 @@
       "family": "formal_jra",
       "stage": "design",
       "observation_or_probability_gate_ready": true,
-      "qualified_observations": 7,
+      "qualified_observations": 9,
       "remaining_required_observations": 0,
       "candidate_runner_ready": false,
       "prospective_strict_paired_cases": 0,
@@ -34,7 +34,7 @@
       "family": "formal_jra",
       "stage": "design",
       "observation_or_probability_gate_ready": true,
-      "qualified_observations": 14,
+      "qualified_observations": 16,
       "remaining_required_observations": 0,
       "candidate_runner_ready": false,
       "prospective_strict_paired_cases": 0,
@@ -52,7 +52,7 @@
       "family": "formal_jra",
       "stage": "design",
       "observation_or_probability_gate_ready": true,
-      "qualified_observations": 17,
+      "qualified_observations": 21,
       "remaining_required_observations": 0,
       "candidate_runner_ready": false,
       "prospective_strict_paired_cases": 0,
@@ -68,10 +68,10 @@
       "id": "field_experience",
       "title": "若駒・経験不足：E0/E1/E2の不確実性評価",
       "family": "formal_jra",
-      "stage": "awaiting_evidence",
-      "observation_or_probability_gate_ready": false,
-      "qualified_observations": 2,
-      "remaining_required_observations": 1,
+      "stage": "design",
+      "observation_or_probability_gate_ready": true,
+      "qualified_observations": 3,
+      "remaining_required_observations": 0,
       "candidate_runner_ready": false,
       "prospective_strict_paired_cases": 0,
       "minimum_paired_cases": 20,
@@ -152,19 +152,15 @@
         "runner_ready": true,
         "observation": {
           "minimum_qualifying_race_reviews": 3,
-          "qualifying_race_reviews": 14,
+          "qualifying_race_reviews": 16,
           "remaining_qualifying_race_reviews": 0,
           "minimum_completed_meetings": 2,
           "remaining_completed_meetings": 0,
-          "pending_week_mentions_not_yet_qualifying": 1,
+          "pending_week_mentions_not_yet_qualifying": 0,
           "ready_to_design_experiment": true
         },
         "observation_gate_ready": true,
-        "latest_attempt": {
-          "theme": "pace_positioning",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
+        "latest_attempt": null,
         "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": 20,
@@ -282,7 +278,6 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
           "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
@@ -296,19 +291,15 @@
         "runner_ready": true,
         "observation": {
           "minimum_qualifying_race_reviews": 3,
-          "qualifying_race_reviews": 7,
+          "qualifying_race_reviews": 9,
           "remaining_qualifying_race_reviews": 0,
           "minimum_completed_meetings": 2,
           "remaining_completed_meetings": 0,
-          "pending_week_mentions_not_yet_qualifying": 1,
+          "pending_week_mentions_not_yet_qualifying": 0,
           "ready_to_design_experiment": true
         },
         "observation_gate_ready": true,
-        "latest_attempt": {
-          "theme": "track_condition",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
+        "latest_attempt": null,
         "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": 20,
@@ -426,7 +417,6 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
           "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
@@ -440,19 +430,15 @@
         "runner_ready": true,
         "observation": {
           "minimum_qualifying_race_reviews": 3,
-          "qualifying_race_reviews": 17,
+          "qualifying_race_reviews": 21,
           "remaining_qualifying_race_reviews": 0,
           "minimum_completed_meetings": 2,
           "remaining_completed_meetings": 0,
-          "pending_week_mentions_not_yet_qualifying": 2,
+          "pending_week_mentions_not_yet_qualifying": 0,
           "ready_to_design_experiment": true
         },
         "observation_gate_ready": true,
-        "latest_attempt": {
-          "theme": "ticket_portfolio",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
+        "latest_attempt": null,
         "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": 20,
@@ -570,7 +556,6 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
           "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
@@ -584,19 +569,15 @@
         "runner_ready": true,
         "observation": {
           "minimum_qualifying_race_reviews": 3,
-          "qualifying_race_reviews": 2,
-          "remaining_qualifying_race_reviews": 1,
+          "qualifying_race_reviews": 3,
+          "remaining_qualifying_race_reviews": 0,
           "minimum_completed_meetings": 2,
           "remaining_completed_meetings": 0,
-          "pending_week_mentions_not_yet_qualifying": 1,
-          "ready_to_design_experiment": false
+          "pending_week_mentions_not_yet_qualifying": 0,
+          "ready_to_design_experiment": true
         },
-        "observation_gate_ready": false,
-        "latest_attempt": {
-          "theme": "field_experience",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
+        "observation_gate_ready": true,
+        "latest_attempt": null,
         "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": 20,
@@ -714,9 +695,7 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
-          "no_valid_prospective_comparisons",
-          "observation_gate_not_met"
+          "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
       },
@@ -729,37 +708,8 @@
         "runner_ready": true,
         "observation": null,
         "observation_gate_ready": true,
-        "latest_attempt": {
-          "theme": "E0",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
-        "data_collection_gaps": [
-          {
-            "theme": "E0",
-            "race_id": "2026-11-01-kyoto-01",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E0",
-            "race_id": "2026-11-01-kyoto-05",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E0",
-            "race_id": "2026-11-01-tokyo-04",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E0",
-            "race_id": "2026-11-01-tokyo-05",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          }
-        ],
+        "latest_attempt": null,
+        "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": null,
         "probability_horses": 0,
@@ -876,9 +826,7 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
           "diagnostic_requires_30_horses_3_races_2_weeks",
-          "fixed_sample_missing_full_field_probabilities:4",
           "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
@@ -892,31 +840,8 @@
         "runner_ready": true,
         "observation": null,
         "observation_gate_ready": true,
-        "latest_attempt": {
-          "theme": "E1",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
-        "data_collection_gaps": [
-          {
-            "theme": "E1",
-            "race_id": "2026-11-01-kyoto-01",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E1",
-            "race_id": "2026-11-01-kyoto-02",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E1",
-            "race_id": "2026-11-01-tokyo-07",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          }
-        ],
+        "latest_attempt": null,
+        "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": null,
         "probability_horses": 0,
@@ -1033,9 +958,7 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
           "diagnostic_requires_30_horses_3_races_2_weeks",
-          "fixed_sample_missing_full_field_probabilities:3",
           "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
@@ -1049,55 +972,8 @@
         "runner_ready": true,
         "observation": null,
         "observation_gate_ready": true,
-        "latest_attempt": {
-          "theme": "E2",
-          "state": "blocked",
-          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
-        },
-        "data_collection_gaps": [
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-kyoto-09",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-kyoto-10",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-kyoto-11",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-kyoto-12",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-tokyo-07",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-tokyo-10",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          },
-          {
-            "theme": "E2",
-            "race_id": "2026-11-01-tokyo-11",
-            "state": "blocked",
-            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
-          }
-        ],
+        "latest_attempt": null,
+        "data_collection_gaps": [],
         "valid_pairs": 0,
         "paired_target": null,
         "probability_horses": 0,
@@ -1214,9 +1090,7 @@
         },
         "evidence_races": [],
         "blockers": [
-          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
           "diagnostic_requires_30_horses_3_races_2_weeks",
-          "fixed_sample_missing_full_field_probabilities:7",
           "no_valid_prospective_comparisons"
         ],
         "next_action": "collect missing inputs before next start, seal and reconcile official results"
