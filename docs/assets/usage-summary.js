@@ -4,6 +4,8 @@
   const ids={today:document.getElementById('siteUsageToday'),total:document.getElementById('siteUsageTotal')};
   const note=document.getElementById('siteUsageNote');
   if(!ids.today||!ids.total||!note)return;
+  let OWNER=false;try{OWNER=localStorage.getItem('keiba-notes-owner')==='1'}catch(_){}
+  const OWNER_NOTE='このブラウザの閲覧は集計に含めていません。';
   const KEYS=['page_home','page_this_week','page_results','page_schedule','page_methodology','page_research','page_other'];
   const ROOT='https://tokyo-family-events-metrics.tooda-t-aa.workers.dev/keiba';
   const controller=new AbortController();
@@ -28,10 +30,11 @@
       },0);
       ids.today.textContent=sum(data.today).toLocaleString('ja-JP');
       ids.total.textContent=sum(data.totals).toLocaleString('ja-JP');
-      note.textContent='PV（ページ表示回数）。新方式の計測開始以降のデータです。';
+      note.textContent=OWNER?OWNER_NOTE:'';
+      ids.today.parentElement.title=ids.total.parentElement.title='PV（ページ表示回数）。新方式の計測開始以降のデータです。';
     }catch(_){
       ids.today.textContent='—';ids.total.textContent='—';
-      note.textContent='アクセス集計を取得できません。予想・回顧の閲覧には影響しません。';
+      note.textContent=OWNER?OWNER_NOTE:'集計を取得できません。';
     }finally{clearTimeout(timer)}
   })();
 })();

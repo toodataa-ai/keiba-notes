@@ -1,10 +1,10 @@
-/* Public visitor-count summary under the main site portal. */
-.site-usage{margin:22px auto 12px;padding:12px 15px;border:1px solid #8b788066;background:rgba(17,20,28,.78);border-radius:12px;text-align:left;max-width:1040px;font:12px/1.6 "Meiryo UI",Meiryo,"Yu Gothic UI",sans-serif;color:#e8e9ee}
-.site-usage-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-.site-usage-title{font-weight:800;letter-spacing:.04em;color:#f4f5fa}
-.site-usage-values{display:flex;gap:10px 20px;align-items:center;flex-wrap:wrap}
-.site-usage-value{display:inline-flex;gap:7px;align-items:baseline;color:#d2d7e1}
-.site-usage-value b{font-size:18px;line-height:1.2;font-weight:800;font-variant-numeric:tabular-nums;color:#fff}
-.site-usage a{color:#e1c5ca;text-decoration:underline;text-underline-offset:3px;font-weight:700}
-.site-usage-notice{margin:5px 0 0;color:#b7bbc6;font-size:11px}
-@media(max-width:540px){.site-usage{padding:10px 12px;margin-top:16px}.site-usage-top{align-items:flex-start;gap:8px}.site-usage-values{gap:5px 15px}.site-usage-value b{font-size:17px}.site-usage a{display:inline-block}}
+/* Public visitor-count summary under the main site portal. 控えめな1行表示（2026-11-02）。 */
+.site-usage{margin:18px auto 8px;padding:0;border:0;background:none;max-width:1040px;text-align:left;font:12px/1.6 "Meiryo UI",Meiryo,"Yu Gothic UI",sans-serif;color:#8f95a3}
+.site-usage-top{display:flex;gap:4px 14px;align-items:baseline;flex-wrap:wrap}
+.site-usage-title{font-weight:600;color:#a4a9b6;letter-spacing:0}
+.site-usage-values{display:flex;gap:4px 14px;align-items:baseline;flex-wrap:wrap}
+.site-usage-value{color:#8f95a3}
+.site-usage-value b{font-size:12px;line-height:1.6;font-weight:600;font-variant-numeric:tabular-nums;color:#c3c7d1}
+.site-usage a{color:#a4a9b6;text-decoration:underline;text-underline-offset:3px;font-weight:400}
+.site-usage-notice{margin:2px 0 0;color:#7e8493;font-size:12px}
+.site-usage-notice:empty{display:none}

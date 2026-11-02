@@ -21,6 +21,13 @@
   const pathname=location.pathname;
   if(location.origin!=='https://toodataa-ai.github.io'||
      !Object.prototype.hasOwnProperty.call(pages,pathname))return;
+  // 管理者のブラウザは集計に含めない。?owner=1 で設定、?owner=0 で解除（そのブラウザだけ）。
+  try{
+    const flag=new URLSearchParams(location.search).get('owner');
+    if(flag==='1')localStorage.setItem('keiba-notes-owner','1');
+    else if(flag==='0')localStorage.removeItem('keiba-notes-owner');
+    if(localStorage.getItem('keiba-notes-owner')==='1')return;
+  }catch(_){/* 保存領域が使えない場合は通常どおり数える */}
 
   function jstDay(){
     const p=new Intl.DateTimeFormat('en-US',{

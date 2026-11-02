@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="E0/E1/E2 Experience RegimeのShadow検証。JRA1R〜12Rを母集団にカテゴリ別で抽出し、経験量による予測誤差と不確実性を本番予想へ影響させずに検証します。">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>経験の少ない馬の予想研究 | 競馬予想精度向上AI</title>
+  <title>新馬・戦歴の少ない馬の予想研究 | AIによる競馬予想研究所</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
   <link rel="stylesheet" href="assets/roadmap.css?v=20261006-2">
 <style id="simple-home-navigation-style">
@@ -40,6 +40,8 @@
  #e012-live-collection #e012-commit{font-size:12px;word-break:break-all}
 }
 </style>
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+<link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
 </head>
 <body>
 <header class="method-hero roadmap-hero">
@@ -60,6 +62,7 @@
 </header>
 
 <main class="wrap article">
+  <section class="chapter" aria-label="つながる改善テーマ"><div class="callout"><b>つながる改善テーマ：若駒・経験不足。</b>戦歴ごと（0戦・1〜3戦・4戦以上）に勝つ確率を確かめられるデータが30頭分たまったら、改善案として登録します。血統との関連も、この研究のデータで調べていきます。進み具合は<a href="improvement-cycle.html#themes">予想の改善状況の「改善テーマ」</a>で自動で確認できます。</div></section>
   <section class="chapter">
     <div class="chapter-head"><div class="chapter-no">01</div><div><h2>E0 / E1 / E2とは</h2><p class="chapter-lead">発走前の通算出走数だけで機械分類します。</p></div></div>
     <div class="axioms">
@@ -91,7 +94,7 @@
 
   <section class="chapter">
     <div class="chapter-head"><div class="chapter-no">03</div><div><h2>なぜ最初から補正しないのか</h2><p class="chapter-lead">もっともらしい固定加点・減点を避けるためです。</p></div></div>
-    <p>現段階ではE0だから減点、E1だから加点、といったルールを作りません。v3.1のSTEP1順位・◎○▲△×・ABC評価・STEP2・買い目はそのまま保存し、結果確定後にRegime別の誤差を観測します。</p>
+    <p>現段階ではE0だから減点、E1だから加点、といったルールを作りません。正式予想のSTEP1順位・◎○▲△×・ABC評価・STEP2・買い目はそのまま保存し、結果確定後にRegime別の誤差を観測します。</p>
     <div class="callout"><b>Shadow原則：</b>観測 → カテゴリ×Regimeで誤差分解 → 十分なサンプル → μ/σやshrinkageのChallenger設計 → E2E比較 → 承認、の順で進めます。</div>
   </section>
 
@@ -149,7 +152,7 @@
 <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 
-<footer class="wrap foot">E0/E1/E2 経験量研究 — シャドー観測専用。 JRA 1R–12R are the population; production ranking and betting decisions are unchanged.</footer>
+<footer class="wrap foot">E0/E1/E2 経験量研究 — 観測専用です。母集団はJRAの1R〜12R全レースで、本番の順位・印・買い目は変わりません。</footer>
 <script>
 async function load(){
   try{
