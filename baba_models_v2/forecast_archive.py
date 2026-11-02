@@ -11,10 +11,12 @@ JST = timezone(timedelta(hours=9))
 AREA_URL = "https://www.jma.go.jp/bosai/common/const/area.json"
 FC_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
 # JMA forecast office name -> racecourses covered
-OFFICES = {"石狩地方": ["sapporo"], "渡島地方": ["hakodate"], "福島県": ["fukushima"], "新潟県": ["niigata"],
+OFFICES = {"石狩": ["sapporo"], "渡島": ["hakodate"], "福島県": ["fukushima"], "新潟県": ["niigata"],
            "愛知県": ["chukyo"], "福岡県": ["kokura"], "東京都": ["tokyo"], "千葉県": ["nakayama"],
            "京都府": ["kyoto"], "兵庫県": ["hanshin"]}
-JRA_PAGES = {"jra_baba_top": "https://www.jra.go.jp/keiba/baba/"}
+JRA_PAGES = {"jra_baba_condition": "https://www.jra.go.jp/keiba/baba/condition/",
+             "jra_baba_moist": "https://www.jra.go.jp/keiba/baba/moist/",
+             "jra_baba_cushion": "https://www.jra.go.jp/keiba/baba/cushion/"}
 
 
 def get(s, url, as_json):
@@ -22,7 +24,7 @@ def get(s, url, as_json):
     for i in range(3):
         try:
             r = s.get(url, timeout=30, headers={"User-Agent": UA}); r.raise_for_status()
-            return r.json() if as_json else r.text
+            return r.json() if as_json else r.content.decode("cp932", errors="replace")
         except Exception as e:
             last = e; time.sleep(2 * (i + 1))
     raise RuntimeError(f"{url}: {last}")
@@ -38,7 +40,7 @@ def main(out_dir="baba_models_v2/forecast_archive"):
     except Exception as e:
         rec["errors"].append(str(e)); code_by_name = {}
     for name, tracks in OFFICES.items():
-        code = code_by_name.get(name)
+        code = next((c for n, c in code_by_name.items() if name in n), None)
         if not code:
             rec["errors"].append(f"office not found: {name}"); continue
         try:
