@@ -32,8 +32,10 @@ class AllExperimentDesignTests(unittest.TestCase):
         errors, status = self.run_validation()
         self.assertEqual(errors, [])
         self.assertEqual(status["experiment_count"], 7)
-        self.assertEqual(status["registered_design_count"], 3)
-        self.assertEqual(status["awaiting_evidence_count"], 4)
+        expected_designs=sum(h["next_decision"]["screening"]["ready_to_design_experiment"] is True
+                            for h in self.evidence["formal"]["hypotheses"])
+        self.assertEqual(status["registered_design_count"], expected_designs)
+        self.assertEqual(status["awaiting_evidence_count"], 7-expected_designs)
         self.assertEqual(status["strict_paired_cases_total"], 0)
         self.assertFalse(status["candidate_execution_implemented"])
 
@@ -59,11 +61,16 @@ class AllExperimentDesignTests(unittest.TestCase):
         registry["experiments"][0]["runner_ready"] = True
         self.assertTrue(self.run_validation(registry=registry)[0])
 
-    def test_cannot_advance_weak_observation_theme(self):
+    def test_observation_gate_follows_latest_verified_evidence(self):
         registry = copy.deepcopy(self.registry)
         plan = next(x for x in registry["experiments"] if x["id"] == "field_experience")
+        evidence = copy.deepcopy(self.evidence)
+        topic = next(h for h in evidence["formal"]["hypotheses"] if h["id"] == "field_experience")
+        topic["next_decision"]["screening"]["ready_to_design_experiment"] = False
         plan["status"] = "design"
-        self.assertTrue(self.run_validation(registry=registry)[0])
+        self.assertTrue(self.run_validation(registry=registry, evidence=evidence)[0])
+        plan["status"] = "awaiting_evidence"
+        self.assertFalse(self.run_validation(registry=registry, evidence=evidence)[0])
 
     def test_prestart_proof_required(self):
         registry = copy.deepcopy(self.registry)
