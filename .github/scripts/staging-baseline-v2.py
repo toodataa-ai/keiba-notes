@@ -86,13 +86,13 @@ def render(prod,*,candidate=False,assets=()):
     if 'id="mainTitle"' in out and '<p class="photo-credit">' in out:
         preview=(
             '<section class="stage-usage" aria-labelledby="stageUsageTitle">'
-            '<div class="stage-usage-top"><strong id="stageUsageTitle" class="stage-usage-title">サイト利用状況</strong>'
+            '<div class="stage-usage-top"><strong id="stageUsageTitle" class="stage-usage-title">閲覧数</strong>'
             '<div class="stage-usage-values">'
-            '<span class="stage-usage-value">今日のPV <b id="stageUsageToday" aria-live="polite">—</b></span>'
-            '<span class="stage-usage-value">累計PV <b id="stageUsageTotal" aria-live="polite">—</b></span>'
-            '<a href="staging/usage-analytics.html">過去の閲覧推移を見る</a>'
+            '<span class="stage-usage-value">今日 <b id="stageUsageToday" aria-live="polite">—</b></span>'
+            '<span class="stage-usage-value">累計 <b id="stageUsageTotal" aria-live="polite">—</b></span>'
+            '<a href="staging/usage-analytics.html">推移を見る</a>'
             '</div></div><p class="stage-usage-notice" id="stageUsageNote" role="status">'
-            '競馬専用の実測データを確認中…</p></section>\n'
+            '</p></section>\n'
         )
         assert out.count('<p class="photo-credit">')==1
         out=out.replace('<p class="photo-credit">',preview+'<p class="photo-credit">',1)

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<title>予想の改善状況｜keiba-notes</title>
+<link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="ページ移動"><a href="index.html">← トップページ</a><a href="roadmap.html">改善の考え方・履歴</a><a href="e2e.html">正式比較の詳細</a></nav>
+
+<header>
+<p class="eyebrow">予想の改善状況</p>
+<h1>AI予想は、いまこう改善しています</h1>
+<p class="lead">新しい予想方法は、いきなり本番に入れません。実際のレースで<strong>今の予想と並べて比べ</strong>、成績が良かったものだけを採用します。</p>
+<div class="status" id="status" aria-live="polite">
+  <div class="status-row"><span>いまの正式な予想</span><b id="sVersion">—</b></div>
+  <div class="status-row"><span>比較中の改善案</span><b id="sCount">—</b></div>
+  <div class="status-row"><span>最初の判定まで</span><b id="sEta">—</b></div>
+</div>
+</header>
+
+<section aria-labelledby="flowTitle">
+<h2 id="flowTitle">改善の流れ</h2>
+<p class="sub">毎週の予想と結果から、改善案の良し悪しを自動で採点しています。</p>
+<ol class="flow">
+  <li><b>予想する</b><p>発走前に予想を確定し、あとから変えられない形で保存</p><span class="tag ai">AIが実行</span></li>
+  <li><b>結果を記録</b><p>レース後に公式の着順を記録して振り返り</p><span class="tag ai">AIが実行</span></li>
+  <li><b>新旧を比べる</b><p>同じレースで「今の予想」と「改善案」を採点</p><span class="tag auto">自動</span></li>
+  <li><b>判定・採用</b><p>20レースたまったら、成績を見て採用するか決める</p><span class="tag hand">人が判断</span></li>
+</ol>
+<div class="note">改善案はあくまで研究用です。比較中も、サイトで公開している<strong>印・買い目は今の予想のまま</strong>です。</div>
+</section>
+
+<section aria-labelledby="expTitle">
+<h2 id="expTitle">いま比較中の改善案</h2>
+<p class="sub">20レース分の比較がたまると判定します。途中の成績だけで採用することはありません。</p>
+<div id="experiments"><div class="empty">読み込み中…</div></div>
+</section>
+
+<section aria-labelledby="nextTitle">
+<h2 id="nextTitle">次に試す予定</h2>
+<p class="sub">これまでの振り返りで、何度も課題に挙がったテーマです。</p>
+<ul class="next-list" id="nextList"><li>読み込み中…</li></ul>
+</section>
+
+<section aria-labelledby="doneTitle">
+<h2 id="doneTitle">これまでの判定</h2>
+<div id="decided" class="empty">読み込み中…</div>
+</section>
+
+<section aria-labelledby="glossTitle">
+<details>
+<summary id="glossTitle">成績の見方（くわしく知りたい方へ）</summary>
+<dl>
+<dt>勝つ確率の見積もり</dt>
+<dd>AIは各馬が勝つ確率を数字で出しています。実際に勝った馬に高い確率を付けていたほど「見積もりが正確」です（専門的には log loss という指標で、小さいほど良い）。採用判定はこの指標を一番重視します。</dd>
+<dt>◎の3着内率</dt>
+<dd>本命（◎）の馬が3着以内に入った割合です。改善案を採用しても、ここが悪くならないことを条件にしています。</dd>
+<dt>過去のレースでの試算</dt>
+<dd>改善案を作る前のレースに当てはめた参考値です。後から当てはめたものなので、判定の件数には数えません。</dd>
+</dl>
+</details>
+</section>
+
+<footer>この画面は自動で集計されたデータ（data/jra_experiment_status_v1.json）を表示しています。既存の正式予想・買い目・PDF原本は変更しません。</footer>
+</div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const RACES_PER_WEEK = 5; // 直近の開催週の正式メイン数（4〜6）の目安
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shortTitle = t => String(t || '').split('（')[0];
+function word(delta, lowerIsBetter) {
+  if (delta == null) return ['—', 'even'];
+  const d = lowerIsBetter ? -delta : delta;
+  if (Math.abs(delta) < 0.005) return ['ほぼ同じ', 'even'];
+  return d > 0 ? ['改善案のほうが良い', 'good'] : ['今の予想のほうが良い', 'bad'];
+}
+function weeks(n) { return n <= 0 ? '判定できます' : `あと約${Math.ceil(n / RACES_PER_WEEK)}週`; }
+
+Promise.all([
+  fetch('data/jra_experiment_status_v1.json', {cache: 'no-store'}).then(r => r.json()),
+  fetch('data/jra_improvement_cycle_v1.json', {cache: 'no-store'}).then(r => r.json()),
+]).then(([status, cycle]) => {
+  const exps = (status.experiments || []);
+  const active = exps.filter(e => ['collecting', 'comparing', 'reviewing'].includes(e.status));
+  $('sVersion').textContent = cycle.latest_formal_prompt_version || '—';
+  $('sCount').textContent = `${active.length}件`;
+  const minLeft = active.length ? Math.min(...active.map(e => e.remaining_prospective_pairs)) : null;
+  $('sEta').textContent = minLeft == null ? '比較中の案はありません'
+    : minLeft <= 0 ? '判定できる案があります'
+    : `あと${minLeft}レース（${weeks(minLeft)}）`;
+
+  $('experiments').innerHTML = active.length ? active.map(e => {
+    const p = e.prospective || {}, r = e.replay_support_only || {};
+    const n = p.pairs || 0, need = e.minimum_prospective_pairs || 20;
+    const pct = Math.min(100, Math.round(n / need * 100));
+    const [now, nowCls] = n ? word((p.win_log_loss || {}).delta, true) : ['まだ比較したレースはありません', 'even'];
+    const [ref, refCls] = r.pairs ? word((r.win_log_loss || {}).delta, true) : ['—', 'even'];
+    return `<article class="card">
+      <h3>${esc(shortTitle(e.title))}</h3>
+      <p class="what">${esc(e.plain_summary || e.title)}</p>
+      <div class="bar-label"><span>比較したレース</span><b>${n} / ${need}レース</b></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${n}"><i style="width:${pct}%"></i></div>
+      <div class="facts">
+        <div class="fact"><span>途中経過（勝つ確率の見積もり）</span><b class="${nowCls}">${esc(now)}</b></div>
+        <div class="fact"><span>判定の目安</span><b>${esc(weeks(e.remaining_prospective_pairs))}</b></div>
+        <div class="fact"><span>参考：過去${r.pairs || 0}レースでの試算（判定には数えません）</span><b class="${refCls}">${esc(ref)}</b></div>
+        <div class="fact"><span>比較の開始</span><b>${esc((e.effective_prospective_from || '').slice(0, 10).replace(/-/g, '/'))} 以降のレース</b></div>
+      </div>
+    </article>`;
+  }).join('') : '<div class="empty">いま比較中の改善案はありません。</div>';
+
+  const taken = new Set(exps.flatMap(e => e.hypothesis_ids || []));
+  const next = ((cycle.formal || {}).hypotheses || []).filter(h => !taken.has(h.id));
+  $('nextList').innerHTML = next.length ? next.map(h =>
+    `<li><b>${esc(h.title)}</b><span>${esc((h.public_plan || {}).question || '')}</span></li>`).join('')
+    : '<li>いまのところ予定はありません。</li>';
+
+  const done = exps.filter(e => ['approved', 'rejected'].includes(e.status));
+  $('decided').innerHTML = done.length
+    ? done.map(e => `<p>${esc(shortTitle(e.title))}：${e.status === 'approved' ? '採用' : '見送り'}</p>`).join('')
+    : 'まだ判定した改善案はありません。最初の判定は、上の「判定の目安」のころになる見込みです。';
+}).catch(() => {
+  $('experiments').innerHTML = '<div class="empty">データを読み込めませんでした。時間をおいて再読み込みしてください。</div>';
+});
+})();
+</script>
+<script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+</body>
+</html>

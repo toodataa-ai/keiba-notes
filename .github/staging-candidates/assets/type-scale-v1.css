@@ -1,0 +1,44 @@
+/* 文字サイズの統一ルール v1（2026-11-02）
+   画面タイトルを最大の大きさとし、それより大きい文字は使わない。
+   タイトル24px（スマホ22px）／節の見出し17px／小見出し15px／補足は12px以上。
+   （各ページの既存指定より必ず優先させるため、セレクタに :not(#_t) を付けている） */
+:root{--fs-title:24px;--fs-h2:17px;--fs-h3:15px;--fs-min:12px}
+@media(max-width:640px){:root{--fs-title:22px}}
+html body h1:not(#_t),
+html body .hero h1:not(#_t),
+html body .hero-copy h1:not(#_t),
+html body .page-hero h1:not(#_t),
+html body .brand-title.brand-lockup:not(#_t),
+html body .hero .brand-title.brand-lockup:not(#_t),
+html body .cum-card strong:not(#_t){font-size:var(--fs-title)!important;line-height:1.35!important}
+html body h2:not(#_t),
+html body .rd-conclusion:not(#_t){font-size:var(--fs-h2)!important;line-height:1.5!important}
+html body h3:not(#_t){font-size:var(--fs-h3)!important;line-height:1.5!important}
+html body small:not(#_t),
+html body .portal-desc:not(#_t),
+html body .portal-kicker:not(#_t),
+html body .lab-signature-cycle:not(#_t),
+html body .site-usage-notice:not(#_t),
+html body .schedule-chip:not(#_t),
+html body .spoiler-warning:not(#_t),
+html body .payout-hit:not(#_t),
+html body .bet-money:not(#_t),
+html body .bet-type:not(#_t),
+html body .bet-status:not(#_t),
+html body .bet-panel-head span:not(#_t),
+html body .shadow-badge:not(#_t),
+html body .cum-panel p:not(#_t),
+html body .cum-card span:not(#_t),
+html body .model-factor-weight:not(#_t),
+html body .live-label:not(#_t),
+html body .tag:not(#_t),
+html body .phase-label:not(#_t),
+html body .priority-tag:not(#_t),
+html body .rd-proof:not(#_t),
+html body .rd-chip:not(#_t),
+html body .publish-estimate small:not(#_t),
+html body .label:not(#_t),
+html body .photo-credit:not(#_t),
+html body .bet-best:not(#_t),
+html body .photo-credit a:not(#_t){font-size:var(--fs-min)!important}
+html body span:not([class]){font-size:max(var(--fs-min),1em)}
