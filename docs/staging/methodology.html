@@ -4,79 +4,181 @@
 <meta name="robots" content="noindex,nofollow"><base href="../">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="競馬予想精度向上AIが、馬場・展開・上がり・能力・期待値をどう分解し、発走前スナップショットとE2E検証で改善しているかを解説します。">
+  <meta name="description" content="AIによる競馬予想研究所が、馬場・展開・時計・期待値をどう分けて考え、発走前に予想を固定して検証しているかを、図と表で解説します。">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>予想ロジックと検証思想 | 競馬予想精度向上AI</title>
+  <title>AI予想のしくみ | AIによる競馬予想研究所</title>
   <link rel="stylesheet" href="assets/methodology.css?v=20261006-2">
-<style id="model-importance-integrated-v1">
-
-/* STAGING display-only: consolidate role-weight map and input notes in chapter 02. */
-#axes .model-importance{margin:23px 0 24px}
-#axes .model-importance h3,#axes .model-factor-heading{margin:0 0 6px;font-size:19px;line-height:1.45;letter-spacing:-.01em;color:#253045}
-#axes .model-importance-caption,#axes .model-factor-lead{margin:0 0 14px;color:#667085;font-size:13px;line-height:1.65}
-#axes .model-weight-map{display:grid;gap:10px}
-#axes .model-weight-row{display:grid;grid-template-columns:155px minmax(0,1fr);border:1px solid #d8dee8;border-radius:13px;overflow:hidden;background:#fff}
-#axes .model-weight-head{padding:14px 12px;display:flex;justify-content:center;flex-direction:column;gap:3px;border-right:1px solid #d8dee8}
-#axes .model-weight-head strong{font-size:14px;line-height:1.4}
-#axes .model-weight-head small{font-size:11px;opacity:.84}
-#axes .model-weight-body{padding:12px 14px}
-#axes .model-weight-pills{display:flex;gap:7px;flex-wrap:wrap}
-#axes .model-weight-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border:1px solid #d4dce8;border-radius:8px;font-size:12px;font-weight:800;background:#f7f8fa;color:#253045}
-#axes .model-weight-pill b{font-size:16px}
-#axes .model-weight-body p{margin:8px 0 0;font-size:12px;color:#536074;line-height:1.6}
-#axes .model-weight-core{border-color:#cc889a}
-#axes .model-weight-core .model-weight-head{background:#a72c48;color:#fff;border-right-color:#a72c48}
-#axes .model-weight-core .model-weight-pill{background:#fff2f5;border-color:#ebc4cd;color:#862440}
-#axes .model-weight-emphasis .model-weight-head{background:#ffe6c5;color:#875019;border-right-color:#efc597}
-#axes .model-weight-emphasis .model-weight-pill{background:#fff7ed;border-color:#e9d1b3;color:#855019}
-#axes .model-weight-variable .model-weight-head{background:#e5effb;color:#335b88;border-right-color:#cfdfef}
-#axes .model-weight-variable .model-weight-pill{background:#f4f8fe;border-color:#d1dfee;color:#315c8c}
-#axes .model-weight-support .model-weight-head{background:#eff1f4;color:#535e70;border-right-color:#d9dfe6}
-#axes .model-weight-support .model-weight-pill{background:#f8f9fa;border-color:#dce1e7;color:#4d5a6e}
-#axes .model-weight-caution{margin:13px 0 0;border:1px dashed #bbc7d8;border-radius:10px;padding:12px 13px;background:#f8f9fc;color:#4c5b70;font-size:12px;line-height:1.75}
-#axes .model-weight-caution strong{color:#25354a}
-#axes .model-factor-heading{margin-top:26px;padding-top:19px;border-top:1px solid #e1e5ec}
-#axes .model-factor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0 20px}
-#axes .model-factor{background:#fcfcfd;border:1px solid #d9dee6;border-radius:11px;min-width:0;overflow:hidden}
-#axes .model-factor summary{cursor:pointer;list-style:none;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-#axes .model-factor summary::-webkit-details-marker{display:none}
-#axes .model-factor summary::after{content:"⌄";color:#627187;font-size:18px;flex:0 0 auto}
-#axes .model-factor[open] summary::after{content:"⌃"}
-#axes .model-factor-title{display:flex;align-items:center;gap:8px;min-width:0}
-#axes .model-factor-title b{font-size:20px;color:#a12a46;flex:0 0 auto}
-#axes .model-factor-title strong{font-size:13px;line-height:1.4}
-#axes .model-factor-weight{background:#eef0f4;border-radius:999px;padding:4px 8px;color:#45536b;font-size:10px;font-weight:800;white-space:nowrap}
-#axes .model-factor-inner{padding:10px 13px 13px;border-top:1px solid #e7eaf0}
-#axes .model-factor-inner p{font-size:12px;color:#455268;margin:0 0 9px;line-height:1.75}
-#axes .model-factor-inner p:last-child{margin-bottom:0}
-#axes .model-factor-inner strong{color:#263c5b}
-#axes .model-factor-core .model-factor-weight{background:#f8e5ea;color:#922c46}
-#axes .model-factor-emphasis .model-factor-weight{background:#fff0dc;color:#8f4f16}
-#axes .model-factor-variable .model-factor-weight{background:#eaf2fe;color:#315d90}
-#axes .model-factor-support .model-factor-weight{background:#eef0f2;color:#5c6877}
-#axes .model-link-note{padding:13px 15px;border-radius:12px;background:#f5f7fa;border:1px solid #e2e7ed;font-size:13px;line-height:1.7}
-#axes .model-link-note a{font-weight:800;color:#a12c46;text-underline-offset:3px}
-@media(max-width:720px){
-#axes .model-weight-row{grid-template-columns:1fr}
-#axes .model-weight-head{padding:10px 13px;border-right:0;border-bottom:1px solid #d8dee8;flex-direction:row;justify-content:flex-start;align-items:center;gap:12px}
-#axes .model-weight-core .model-weight-head{border-right:0;border-bottom-color:#a72c48}
-#axes .model-weight-emphasis .model-weight-head{border-right:0;border-bottom-color:#efc597}
-#axes .model-weight-variable .model-weight-head{border-right:0;border-bottom-color:#cfdfef}
-#axes .model-weight-support .model-weight-head{border-right:0;border-bottom-color:#d9dfe6}
-#axes .model-weight-body{padding:11px 12px}
-#axes .model-weight-pills{gap:6px}
-#axes .model-weight-pill{font-size:11px;padding:5px 7px}
-#axes .model-factor-grid{grid-template-columns:1fr}
-#axes .model-factor summary{padding:11px}
-}
-
-</style>
 <style id="simple-home-navigation-style">
 .simple-home-nav{display:flex!important;justify-content:flex-start!important;align-items:center!important;gap:0!important;margin-bottom:18px!important}
 .simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{display:inline-flex!important;align-items:center!important;gap:6px!important;padding:10px 14px!important;border-radius:999px!important;background:#fff!important;color:#17171a!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 1px 4px rgba(0,0,0,.08)!important;text-decoration:none!important;font-size:14px!important;font-weight:800!important;line-height:1.2!important}
 .simple-home-bottom{display:flex;justify-content:center;margin:34px 0 8px}
 .simple-home-bottom a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:11px 20px;border-radius:999px;background:#17171a;color:#fff!important;text-decoration:none;font-weight:800;border:1px solid #17171a}
 @media(max-width:640px){.simple-home-nav .method-brand,.simple-home-nav a,.simple-home-link{width:100%;justify-content:center;min-height:48px}.simple-home-bottom a{width:100%}}
+</style>
+<style id="methodology-v2">
+/* 文字サイズは共通の type-scale-v1.css に任せる。ここでは色・余白・線だけを指定する。 */
+:root{--m-red:#a72c48;--m-orange:#b8671a;--m-blue:#2f5f94;--m-gray:#5b6573;--m-green:#167a52;--m-navy:#17171a}
+.m-wrap-text{overflow-wrap:anywhere}
+.m-tag{display:inline-block;padding:2px 9px;border-radius:999px;border:1px solid transparent;font-weight:800;white-space:nowrap;line-height:1.6}
+.m-tag-rule{background:var(--m-navy);color:#fff}
+.m-tag-site{background:#fff;color:var(--m-gray);border-color:#b9c0cb}
+.m-tag-note{background:#fdf0f2;color:#862440;border-color:#ebc4cd}
+
+/* 1 流れ図 */
+.m-flow{display:grid;grid-template-columns:4fr 2fr;gap:14px;margin:20px 0}
+.m-phase{border:1px solid var(--line);border-radius:16px;padding:12px 12px 14px;background:#fbfbfc;min-width:0}
+.m-phase-pre{border-color:#e3b9c2;background:#fff8f9}
+.m-phase-post{border-color:#bcd9cc;background:#f4fbf8}
+.m-phase-label{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-weight:800;color:#3b2a2e}
+.m-phase-post .m-phase-label{color:#17503a}
+.m-steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.m-phase-pre .m-steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+.m-phase-post .m-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+.m-step{position:relative;min-width:0;padding:12px 11px;border-radius:12px;background:#fff;border:1px solid var(--line);border-top:4px solid var(--m-gray)}
+.m-step b{display:block;margin-bottom:3px;line-height:1.45}
+.m-step p{margin:0;color:#4d5663;line-height:1.55}
+.m-step .m-n{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;background:var(--m-navy);color:#fff;font-weight:800;margin-bottom:6px}
+.m-step-collect{border-top-color:var(--m-gray)}
+.m-step-1{border-top-color:var(--m-red)}
+.m-step-2{border-top-color:var(--m-orange)}
+.m-step-save{border-top-color:var(--m-navy)}
+.m-step-result{border-top-color:var(--m-blue)}
+.m-step-improve{border-top-color:var(--m-green)}
+.m-step:not(:last-child)::after{content:"";position:absolute;right:-10px;top:50%;width:8px;height:8px;border-top:2px solid #8b929e;border-right:2px solid #8b929e;transform:translateY(-50%) rotate(45deg)}
+.m-phase-pre .m-steps .m-step:last-child::after{display:none}
+.m-flow-notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:6px 0 0}
+.m-flow-notes>div{padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:#fff}
+.m-flow-notes b{display:block;margin-bottom:3px}
+
+/* 2 一覧表 */
+.m-legend{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:14px 0 10px;color:#4d5663}
+.m-axes{display:grid;gap:8px;margin:8px 0 14px}
+.m-axis{display:grid;grid-template-columns:170px minmax(0,1.1fr) minmax(0,1.3fr) 150px;gap:0;border:1px solid #d8dee8;border-left:6px solid var(--m-gray);border-radius:12px;background:#fff;overflow:hidden}
+.m-axis>div{padding:11px 13px;min-width:0}
+.m-axis>div+div{border-left:1px solid #edf0f4}
+.m-axis-core{border-left-color:var(--m-red)}
+.m-axis-emph{border-left-color:var(--m-orange)}
+.m-axis-var{border-left-color:var(--m-blue)}
+.m-axis-sup{border-left-color:#9aa3af}
+.m-axis-name{display:flex;align-items:center;gap:9px;font-weight:800}
+.m-axis-name i{font-style:normal;display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:8px;background:var(--m-navy);color:#fff;flex:0 0 auto}
+.m-axis-core .m-axis-name i{background:var(--m-red)}
+.m-axis-emph .m-axis-name i{background:var(--m-orange)}
+.m-axis-var .m-axis-name i{background:var(--m-blue)}
+.m-axis-sup .m-axis-name i{background:#6b7480}
+.m-axis-head{background:#f3f4f6;border-style:solid;border-color:#d8dee8;border-left-color:#d8dee8;font-weight:800;color:#4d5663}
+.m-axis-head>div{padding:8px 13px}
+.m-axis-weight{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.m-axis-weight b{line-height:1.4}
+.m-axis .m-k{display:none}
+.m-rule-note{margin:12px 0 0;padding:13px 15px;border:1px dashed #bbc7d8;border-radius:12px;background:#f8f9fc;color:#3f4b5e}
+
+/* 3 カード */
+.m-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}
+.m-card{padding:16px;border:1px solid var(--line);border-top:4px solid var(--m-gray);border-radius:14px;background:#fbfbfc;min-width:0}
+.m-card h3{margin:0 0 6px}
+.m-card p{margin:6px 0}
+.m-card-a{border-top-color:var(--m-blue)}
+.m-card-b{border-top-color:var(--m-orange)}
+.m-card-c{border-top-color:var(--m-red)}
+.m-vs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.m-vs>div{padding:8px 10px;border-radius:10px;background:#fff;border:1px solid var(--line)}
+.m-vs b{display:block}
+.m-fact{margin:10px 0 0;padding:9px 11px;border-radius:10px;background:#faf5f6;border:1px solid #eed7db;color:#4d5663}
+
+/* 4 馬場 */
+.m-bar{display:flex;height:26px;border-radius:8px;overflow:hidden;border:1px solid #cfd5de;margin:10px 0 8px}
+.m-bar span{display:block;height:100%}
+.m-bar .b1{background:#2f7d5b}.m-bar .b2{background:#6aa86f}.m-bar .b3{background:#c28a3c}.m-bar .b4{background:#8a5a2b}
+.m-bar-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 6px;list-style:none;padding:0}
+.m-bar-legend li{display:flex;align-items:center;gap:6px}
+.m-bar-legend i{display:inline-block;width:12px;height:12px;border-radius:3px}
+.m-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+.m-two>div{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fbfbfc;min-width:0}
+.m-two h3{margin:0 0 6px}
+.m-two ul{margin:6px 0 0;padding-left:1.2em}
+.m-two li{margin:3px 0}
+.m-bias{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}
+.m-bias>div{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:#fff;text-align:center}
+.m-bias b{display:block}
+
+/* 5 買い目 */
+.m-ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.m-ladder>div{padding:14px;border:1px solid var(--line);border-left:5px solid var(--m-gray);border-radius:13px;background:#fbfbfc;min-width:0}
+.m-ladder .l1{border-left-color:var(--m-red)}
+.m-ladder .l2{border-left-color:#7b8794}
+.m-ladder .l3{border-left-color:var(--m-orange)}
+.m-ladder b{display:block;margin-bottom:3px}
+.m-quota{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.m-quota>div{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;min-width:0}
+.m-quota b{display:block;margin-bottom:3px}
+.m-quota .q-total{background:var(--m-navy);color:#fff;border-color:var(--m-navy)}
+
+/* 6 証拠 */
+.m-rail{list-style:none;margin:16px 0;padding:0 0 0 6px;position:relative}
+.m-rail::before{content:"";position:absolute;left:19px;top:14px;bottom:14px;width:2px;background:#d4d9e1}
+.m-rail li{position:relative;display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;margin:0 0 12px;align-items:start}
+.m-rail .m-dot{position:relative;z-index:1;display:flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;background:var(--m-navy);color:#fff;font-weight:800}
+.m-rail b{display:block}
+.m-rail p{margin:0;color:#4d5663}
+.m-grades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}
+.m-grades>div{padding:14px;border-radius:13px;border:1px solid var(--line);min-width:0}
+.m-grades .ga{background:#f2fbf7;border-color:#b9dfcf}
+.m-grades .gb{background:#fff6f7;border-color:#ead1d5}
+.m-grades .gs{background:#f6f7f9}
+.m-grades b{display:block;margin-bottom:3px}
+.m-judge{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.m-judge>div{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;min-width:0}
+.m-judge .j{display:inline-flex;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-weight:900;margin-bottom:4px}
+.m-judge .ja{background:var(--m-green)}.m-judge .jb{background:var(--m-orange)}.m-judge .jc{background:#6b7480}
+.m-judge b{display:block}
+
+/* 7 課題 */
+.m-open{list-style:none;margin:14px 0;padding:0;display:grid;gap:8px}
+.m-open li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fbfbfc}
+.m-open .m-dot{display:flex;width:28px;height:28px;border-radius:8px;align-items:center;justify-content:center;background:#eceff3;color:#3b4350;font-weight:800}
+.m-open b{display:block}
+
+/* 8 用語集 */
+.m-gloss{border:1px solid var(--line);border-radius:14px;background:#fff}
+.m-gloss>summary{cursor:pointer;padding:14px 16px;font-weight:800;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.m-gloss>summary::-webkit-details-marker{display:none}
+.m-gloss>summary::after{content:"＋";color:#627187}
+.m-gloss[open]>summary::after{content:"－"}
+.m-gloss .glossary-grid{margin:0;padding:0 14px 14px}
+
+/* 上部リンク */
+.m-live-link{display:block;text-decoration:none;color:inherit}
+.m-live-link .live-value{color:#f8c9d0}
+
+@media(max-width:900px){
+.m-axis{grid-template-columns:150px minmax(0,1fr) minmax(0,1.2fr)}
+.m-axis>div.m-axis-weight{grid-column:1 / -1;border-left:0;border-top:1px solid #edf0f4;flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px}
+.m-axis-head{display:none}
+.m-quota{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:820px){
+.m-flow{grid-template-columns:1fr}
+.m-cards,.m-ladder,.m-grades,.m-judge{grid-template-columns:1fr}
+.m-two,.m-flow-notes{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+.m-phase-pre .m-steps,.m-phase-post .m-steps{grid-template-columns:1fr}
+.m-step:not(:last-child)::after{right:auto;left:50%;top:auto;bottom:-11px;transform:translateX(-50%) rotate(135deg)}
+.m-phase-pre .m-steps .m-step:last-child::after{display:block}
+.m-axis{grid-template-columns:1fr}
+.m-axis>div{padding:6px 13px}
+.m-axis>div+div{border-left:0;border-top:0}
+.m-axis>div.m-axis-name{padding-top:11px}
+.m-axis>div.m-axis-weight{padding-bottom:11px;border-top:0}
+.m-axis .m-k{display:inline;font-weight:800;color:var(--m-gray)}
+.m-axis .m-k::after{content:"：";}
+.m-bias{grid-template-columns:1fr}
+.m-vs{grid-template-columns:1fr}
+.m-quota{grid-template-columns:1fr}
+.m-live-strip-2{grid-template-columns:1fr!important}
+}
+.m-live-strip-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 </style>
 <link rel="stylesheet" href="staging/candidate-assets/type-scale-v1.css?v=20261102-1">
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
@@ -88,12 +190,11 @@
     <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="staging/index.html">← トップページに戻る</a></nav>
     <div class="hero-copy">
       <h1>予想を当てるより、<br>外れ方を説明できるか。</h1>
-      <p class="hero-deck">競馬は、強い馬を見つけるだけでは解けません。馬場、ペース、位置取り、斤量、コース、状態、末脚、そして価格。その一つひとつを分けて考え、レース後には「何を読み違えたか」まで検証する。このサイトは、その過程そのものを公開します。</p>
-      <div class="hero-thesis">目標は「もっともらしい予想」を作ることではなく、<strong>予想時点で再現でき、後から検証でき、改善効果を比較できる予想体系</strong>を作ることです。</div>
-      <div class="live-strip" aria-label="現在のシステム状態">
-        <div class="live-card"><span class="live-label">現行プロンプト</span><span class="live-value" id="livePrompt">確認中…</span></div>
-        <div class="live-card"><span class="live-label">Grade A 検証件数</span><span class="live-value" id="liveCases">確認中…</span></div>
-        <div class="live-card"><span class="live-label">E2E 比較状態</span><span class="live-value" id="liveExperiment">確認中…</span></div>
+      <p class="hero-deck">強い馬を見つけるだけでは、競馬は解けません。馬場・展開・斤量・時計・価格を一つずつ分けて考え、レース後には「何を読み違えたか」まで検証します。このサイトは、その過程をそのまま公開しています。</p>
+      <div class="hero-thesis">目標は、もっともらしい予想を作ることではなく、<strong>予想の時点で再現でき、後から検証でき、改善の効果を比べられる</strong>しくみを作ることです。</div>
+      <div class="live-strip m-live-strip-2" aria-label="現在の状態">
+        <div class="live-card"><span class="live-label">現行の予想プロンプト（能力評価）</span><span class="live-value" id="livePrompt">確認中…</span></div>
+        <a class="live-card m-live-link" href="staging/improvement-cycle.html"><span class="live-label">現在の改善の比較は</span><span class="live-value">「予想の改善状況」へ →</span></a>
       </div>
     </div>
   </div>
@@ -101,263 +202,265 @@
 <main class="wrap article">
   <section class="toc" aria-labelledby="tocTitle">
     <h2 id="tocTitle">このページの読み方</h2>
-    <p class="toc-note">競馬以外の統計・AI・開発用語は、初出で短く説明します。分からない言葉は <a href="#glossary">用語集</a> から引けます。</p>
+    <p class="toc-note">統計やAIの用語は、使うところで短く説明します。分からない言葉は <a href="#glossary">用語集</a> から引けます。</p>
     <div class="toc-grid">
-      <a href="#philosophy">01　強さと買いやすさを分ける</a><a href="#axes">02　①〜⑨の重視度と使う情報</a>
-      <a href="#track">03　馬場は「良・稍重」だけではない</a><a href="#time">04　時計をそのまま比べない</a>
-      <a href="#aci">05　33秒台を盲信しない ACI</a><a href="#repro">06　「ムラ馬」を心理で決めつけない</a>
-      <a href="#uncertainty">07　展開と不確実性を扱う</a><a href="#betting">08　強い馬と買う馬を分ける</a>
-      <a href="#new-purchase">08A　購入セットを最適化する</a><a href="#e2e">09　後出しを防ぐE2E検証</a><a href="#new-execution">09A　発走前に固定し公開検証</a><a href="#improve">10　改善そのものを管理する</a>
-      <a href="#limits">11　まだ解けていない問題</a><a href="#glossary">12　用語集</a>
+      <a href="#flow">01　全体の流れ</a><a href="#axes">02　①〜⑨の見方</a>
+      <a href="#time">03　時計・上がり・ムラ</a><a href="#track">04　馬場と展開</a>
+      <a href="#betting">05　強い馬と買う馬を分ける</a><a href="#proof">06　後出しを防ぐしくみ</a>
+      <a href="#limits">07　まだ解けていない問題</a><a href="#glossary">08　用語集</a>
     </div>
   </section>
 
-  <section class="chapter anchor" id="philosophy">
-    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>「強い馬」と「買いたい馬」は、同じではない</h2><p class="chapter-lead">STEP1とSTEP2を完全に分けるのは、予想の中に市場人気を逆流させないためです。</p></div></div>
-    <div class="question">人気を見ながら能力評価した方が、世間の情報も使えて合理的では？</div>
-    <p class="answer">一見そう見えます。しかし人気を見てから能力を評価すると、「強いから人気なのか」「人気だから強く見えたのか」が分からなくなります。そこで本システムは、まずオッズを原則見ずに能力と適性を評価し、◎○▲△×を固定します。その後で初めて価格を見ます。</p>
-    <div class="axioms">
-      <div class="axiom"><b>STEP1：能力・適性</b>この条件で誰が強いか。オッズから切り離して判断。</div>
-      <div class="axiom"><b>印を固定</b>◎○▲は価格を見ても変えない。能力判断の証拠を残す。</div>
-      <div class="axiom"><b>STEP2：価格・期待値</b>強さに対してオッズが高いか低いか。買うかは別問題。</div>
+  <section class="chapter anchor" id="flow">
+    <div class="chapter-head"><div class="chapter-no">01</div><div><h2>全体の流れ：発走前に固定して、結果と比べる</h2><p class="chapter-lead">予想は発走前に確定して保存し、結果が出てから初めて採点します。</p></div></div>
+    <div class="m-flow" role="group" aria-label="予想から改善までの流れ">
+      <div class="m-phase m-phase-pre">
+        <p class="m-phase-label">発走前に作って固定する</p>
+        <ol class="m-steps">
+          <li class="m-step m-step-collect"><span class="m-n">1</span><b>情報を集める</b><p>出走表・馬場・天気など、発走前に公開された情報だけを使う。</p></li>
+          <li class="m-step m-step-1"><span class="m-n">2</span><b>STEP1：印を固定</b><p>オッズを見ずに能力と適性を評価し、◎○▲△×を決める。</p></li>
+          <li class="m-step m-step-2"><span class="m-n">3</span><b>STEP2：買い目を固定</b><p>印を変えずに価格を見て、買う・見送るを決める。</p></li>
+          <li class="m-step m-step-save"><span class="m-n">4</span><b>発走前に保存</b><p>GitHubに記録し、後から書き換えられないようにする。</p></li>
+        </ol>
+      </div>
+      <div class="m-phase m-phase-post">
+        <p class="m-phase-label">発走後</p>
+        <ol class="m-steps">
+          <li class="m-step m-step-result"><span class="m-n">5</span><b>結果を別に記録</b><p>予想ファイルは触らず、結果だけを追加する。</p></li>
+          <li class="m-step m-step-improve"><span class="m-n">6</span><b>比べて改善</b><p>改善案と現行を同じレースで比べる。</p></li>
+        </ol>
+      </div>
     </div>
-    <div class="myth"><div class="myth-title">よくある混線</div><div class="myth-body">「この馬は人気薄だから面白い」を能力評価の根拠にすると、穴馬探しと能力判定が混ざります。本システムでは、人気薄の妙味はSTEP2で扱い、STEP1の強さの順番は守ります。</div></div>
+    <div class="m-flow-notes">
+      <div><b>なぜ印と買い目を分けるのか</b>人気を見てから能力を評価すると、「強いから人気」なのか「人気だから強く見える」のかが混ざります。だから先にオッズを見ずに印を固定し、価格はその後にだけ使います（STEP1の印はオッズを見ても変えません）。</div>
+      <div><b>「強い馬」と「買う馬」は別</b>◎でも単勝1.5倍なら、能力評価は◎のまま買わないことがあります。逆に△でも、価格が十分なら買い目の相手になります。詳しくは <a href="#betting">05章</a>。</div>
+    </div>
   </section>
 
   <section class="chapter anchor" id="axes">
-    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>一頭の馬を、①〜⑨に分解する</h2><p class="chapter-lead">何をどの程度重視するのか。まず「役割」を図で確認し、その下で使うデータを見られます。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>一頭の馬を、①〜⑨に分けて見る</h2><p class="chapter-lead">何を見て、どう扱うか。正式プロンプトの定めと、サイトの整理を分けて示します。</p></div></div>
+    <div class="m-legend">
+      <span><span class="m-tag m-tag-rule">定め</span> 正式プロンプトに書かれていること</span>
+      <span><span class="m-tag m-tag-site">サイトの整理</span> 読みやすくするための、サイト側の解釈</span>
+    </div>
+    <div class="m-axes" role="list" aria-label="①〜⑨の一覧">
+      <div class="m-axis m-axis-head" aria-hidden="true"><div>項目</div><div>何を見るか</div><div>扱い（正式プロンプトの定め）</div><div>重視度</div></div>
 
-    <div class="model-importance" id="relative-importance">
-      <h3>①〜⑨の重視のされ方</h3>
-      <p class="model-importance-caption">色は役割を区別するためのものです。赤が能力評価の中核、オレンジがルール上やや強め、青が条件依存、グレーが補助情報を示します。</p>
-      <div class="model-weight-map" role="group" aria-label="JRA STEP1の①〜⑨の重視のされ方">
-<div class="model-weight-row model-weight-core"><div class="model-weight-head"><strong>能力の中核</strong><small>基礎的な強さ</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>⑨</b> 基礎能力・クラス</span></div><p>地力・直接実績・補正時計を中心に能力の土台を評価</p></div></div>
-<div class="model-weight-row model-weight-emphasis"><div class="model-weight-head"><strong>やや強め</strong><small>ルールに明記</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>①</b> 斤量</span></div><p>前走からの負担重量差など、今回の再現性に注目</p></div></div>
-<div class="model-weight-row model-weight-variable"><div class="model-weight-head"><strong>条件によって変動</strong><small>一律の優先順位なし</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>②</b> 展開</span><span class="model-weight-pill"><b>③</b> 馬場</span><span class="model-weight-pill"><b>④</b> ローテ</span><span class="model-weight-pill"><b>⑤</b> コース</span><span class="model-weight-pill"><b>⑧</b> 騎手</span></div><p>雨・距離・ハナ争い・休養などで重要性が大きく変わる</p></div></div>
-<div class="model-weight-row model-weight-support"><div class="model-weight-head"><strong>補助的な根拠</strong><small>実戦実績を優先</small></div><div class="model-weight-body"><div class="model-weight-pills"><span class="model-weight-pill"><b>②</b> 血統</span><span class="model-weight-pill"><b>③</b> 調教</span></div><p>未経験条件や現在の仕上がりを補足する</p></div></div>
+      <div class="m-axis m-axis-emph" role="listitem">
+        <div class="m-axis-name"><i>①</i>斤量</div>
+        <div><span class="m-k">何を見るか</span>今回の斤量、前走との差、好走した時の斤量、3歳と古馬の差。</div>
+        <div><span class="m-k">扱い</span>前走から+2kg以上でも、能力そのものは消さず、「今回それを出せる確からしさ」に強く反映する。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-rule">定め</span><b>やや強め</b></div>
       </div>
-      <p class="model-weight-caution"><strong>これは配点表ではありません。</strong> 正式ルールに①〜⑨の固定係数や割合はなく、色や配置も「⑨が①の何倍」などの数値を意味しません。②③④⑤⑧は条件次第で決定的な材料になり得ます。</p>
+      <div class="m-axis m-axis-var" role="listitem">
+        <div class="m-axis-name"><i>②</i>ペース・展開</div>
+        <div><span class="m-k">何を見るか</span>逃げたい馬の数、ハナ争い、想定隊列、想定ペース（S/M/M-H/H）。</div>
+        <div><span class="m-k">扱い</span>「先行馬が多い＝ハイペース」とは決めない。想定隊列と競り合いの強さを整理して判断する。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+      </div>
+      <div class="m-axis m-axis-var" role="listitem">
+        <div class="m-axis-name"><i>③</i>馬場・バイアス</div>
+        <div><span class="m-k">何を見るか</span>発走時の馬場状態の確率、当日の時計の出方、位置取りと進路の有利不利。</div>
+        <div><span class="m-k">扱い</span>時計速度・位置取り・進路の3つを別々に見る。「高速＝前有利」とは決めない。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+      </div>
+      <div class="m-axis m-axis-var" role="listitem">
+        <div class="m-axis-name"><i>④</i>ローテーション</div>
+        <div><span class="m-k">何を見るか</span>レース間隔、休み明け、叩き何戦目、距離変更、前走の消耗。</div>
+        <div><span class="m-k">扱い</span>休み明けで好走した実績があれば、機械的に減点しない。実績が乏しい場合は、能力ではなく「確からしさ」を下げる。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+      </div>
+      <div class="m-axis m-axis-var" role="listitem">
+        <div class="m-axis-name"><i>⑤</i>コース適性</div>
+        <div><span class="m-k">何を見るか</span>同じ競馬場・距離での直接実績、直線の長さ、坂、枠と脚質の相性。</div>
+        <div><span class="m-k">扱い</span>初めてのコースは「不適性」ではなく「未知」。それだけで大きく下げない（減点は原則1段階まで）。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+      </div>
+      <div class="m-axis m-axis-sup" role="listitem">
+        <div class="m-axis-name"><i>⑥</i>血統</div>
+        <div><span class="m-k">何を見るか</span>距離、馬場、瞬発力・持続力などへの適性（父・母父の系統）。</div>
+        <div><span class="m-k">扱い</span>同じ走路での実戦の成績が、血統より上。血統だけで最高評価（A+）にはしない。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-rule">定め</span><b>実戦実績が優先</b></div>
+      </div>
+      <div class="m-axis m-axis-sup" role="listitem">
+        <div class="m-axis-name"><i>⑦</i>調教</div>
+        <div><span class="m-k">何を見るか</span>最終追い切り、1週前の時計、併せ馬、本数、過去の好走時との比較。</div>
+        <div><span class="m-k">扱い</span>主に「今の状態」と「確からしさ」の補助材料。調教だけで能力を上書きしない。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-rule">定め</span><b>補助材料</b></div>
+      </div>
+      <div class="m-axis m-axis-var" role="listitem">
+        <div class="m-axis-name"><i>⑧</i>騎手</div>
+        <div><span class="m-k">何を見るか</span>今回の競馬場・距離での成績、騎手の格言（適用条件つき）。</div>
+        <div><span class="m-k">扱い</span>「有名な騎手だから高評価」は禁止。今回のコースとの相性を見る。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+      </div>
+      <div class="m-axis m-axis-core" role="listitem">
+        <div class="m-axis-name"><i>⑨</i>基礎能力・クラス</div>
+        <div><span class="m-k">何を見るか</span>対戦相手とクラス、着差、レース内容、補正した時計、近3〜6走の再現性。</div>
+        <div><span class="m-k">扱い</span>「今回の条件に合うか」とは別に、「そもそもどれだけ強いか」を見る。G1実績だけで自動的に最高評価にはしない。</div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>能力の中核</b></div>
+      </div>
     </div>
-
-    <h3 class="model-factor-heading">①〜⑨は何のデータを見ている？</h3>
-    <p class="model-factor-lead">各項目を開くと、具体的な入力情報と評価への反映が確認できます。</p>
-    <div class="model-factor-grid">
-<details class="model-factor model-factor-emphasis" id="model-factor-01">
-<summary><span class="model-factor-title"><b>①</b><strong>斤量</strong></span><span class="model-factor-weight">やや強め</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>今回斤量、前走比、好走時の斤量、3歳と古馬の負担差、脚質や馬場との組み合わせ。</p><p><strong>評価への反映：</strong>斤量差が今回の能力の再現性にどう影響するかを確認します。前走比+2kg以上などの負担増も、ピーク能力そのものを消す理由にはしません。</p></div></details>
-<details class="model-factor model-factor-variable" id="model-factor-02">
-<summary><span class="model-factor-title"><b>②</b><strong>ペース・展開</strong></span><span class="model-factor-weight">条件で変動</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>逃げたい馬の数、ハナ争い、想定隊列、前半ラップ、スロー〜ハイペースの分岐。</p><p><strong>評価への反映：</strong>想定した展開で持ち味を発揮できるか。逃げ馬が多いだけでハイペースと決めません。</p></div></details>
-<details class="model-factor model-factor-variable" id="model-factor-03">
-<summary><span class="model-factor-title"><b>③</b><strong>馬場・バイアス</strong></span><span class="model-factor-weight">条件で変動</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>発走時の良・稍重・重・不良の確率、含水率、当日時計速度、位置取り・進路の有利不利。</p><p><strong>評価への反映：</strong>今回の馬場で過去の能力を再現できるか。時計速度と前・差し有利は別に判断します。</p></div></details>
-<details class="model-factor model-factor-variable" id="model-factor-04">
-<summary><span class="model-factor-title"><b>④</b><strong>ローテーション</strong></span><span class="model-factor-weight">条件で変動</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>レース間隔、休み明け、叩き何走目、距離変更、前走消耗、遠征、相手強化。</p><p><strong>評価への反映：</strong>状態や条件の変化を確認。主に現在値と再現信頼度へ反映します。</p></div></details>
-<details class="model-factor model-factor-variable" id="model-factor-05">
-<summary><span class="model-factor-title"><b>⑤</b><strong>コース適性</strong></span><span class="model-factor-weight">条件で変動</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>同場・同距離での直接実績、右左回り、坂、直線長、コーナー、枠と脚質の関係。</p><p><strong>評価への反映：</strong>今回のコースで能力を発揮できるか。初コースは未知であり、不適性と決めません。</p></div></details>
-<details class="model-factor model-factor-support" id="model-factor-06">
-<summary><span class="model-factor-title"><b>⑥</b><strong>血統</strong></span><span class="model-factor-weight">補助材料</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>父・母父などの系統からみた距離、芝・ダート、馬場、瞬発力、持続力。</p><p><strong>評価への反映：</strong>未経験条件を補足します。実戦の同条件成績を優先し、血統だけで最上位評価にしません。</p></div></details>
-<details class="model-factor model-factor-support" id="model-factor-07">
-<summary><span class="model-factor-title"><b>⑦</b><strong>調教</strong></span><span class="model-factor-weight">補助材料</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>最終追い、1週前の時計・ラップ、併せ馬、負荷、本数、過去好走時との比較。</p><p><strong>評価への反映：</strong>現在の仕上がりと再現信頼度の補助情報。調教だけでピーク能力を上書きしません。</p></div></details>
-<details class="model-factor model-factor-variable" id="model-factor-08">
-<summary><span class="model-factor-title"><b>⑧</b><strong>騎手</strong></span><span class="model-factor-weight">条件で変動</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>今回の競馬場・走路・距離・枠・脚質での実績、継続騎乗、条件付き騎手格言。</p><p><strong>評価への反映：</strong>今回の馬・コースとの相性を確認。有名騎手という理由だけで加点しません。</p></div></details>
-<details class="model-factor model-factor-core" id="model-factor-09">
-<summary><span class="model-factor-title"><b>⑨</b><strong>基礎能力・クラス</strong></span><span class="model-factor-weight">能力評価の中核</span></summary>
-<div class="model-factor-inner"><p><strong>使うデータ：</strong>対戦相手とクラス、着差、レース内容、補正した走破時計・上がり、直近3〜6走の再現性。</p><p><strong>評価への反映：</strong>そもそもどれだけ強い馬なのか。今回の適性とは切り分け、過去の1回の自己ベストに依存しません。</p></div></details>
-    </div>
-
-    <div class="model-link-note">例えば道悪の消耗戦なら②展開・③馬場の重要性が増し、芝直線1000mなら⑤コースと進路が重要になります。一方、全頭の能力の土台は⑨で確認します。<strong>9項目を単純平均することはありません。</strong> <a href="#time">時計の補正とTime Indexの詳しい説明は04章へ</a>。</div>
-  </section>
-
-  <section class="chapter anchor" id="track">
-    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>「稍重だから時計がかかる」とは限らない</h2><p class="chapter-lead">馬場は公式4区分と、実際の走りやすさを分けて考えます。</p></div></div>
-    <div class="question">同じ「稍重」なのに、なぜ高速決着の日と消耗戦の日があるのか？</div>
-    <p class="answer">含水量だけでは馬場の反発や傷み方を説明できないからです。そこで芝では、公式の良・稍重・重・不良に加えて、内部的に「高速乾燥型」「標準型」「高速湿潤型」「低反発湿潤型」「掘れ・荒れ型」を考えます。</p>
-    <div class="flow" aria-label="馬場予測フロー">
-      <div class="flow-step"><small>STAGE A</small><b>朝の状態を予測</b><br>前日含水率・降雨・気象から当日朝を推定する段階</div><div class="flow-arrow">→</div>
-      <div class="flow-step"><small>OFFICIAL ANCHOR</small><b>JRA実測で更新</b><br>当日含水率・クッション値を基準点にする</div><div class="flow-arrow">→</div>
-      <div class="flow-step"><small>STAGE B</small><b>発走時へ更新</b><br>朝の実測から雨・乾燥時間・風・日照で発走時を推定</div><div class="flow-arrow">→</div>
-      <div class="flow-step"><small>RACE-DAY EVIDENCE</small><b>当日実戦で監査</b><br>時計・位置・進路を分離</div>
-    </div>
-    <p>さらに「高速＝前有利」とも決めません。<strong>時計速度、位置取り、進路</strong>を別変数として扱います。ここでいう<strong>バイアス</strong>は「その日の馬場で、どんな位置・進路・時計の出方が有利だったかという偏り」のことです。高速馬場でも差しが届く日はあり、低速馬場でも前が止まらない日はあります。</p>
-    <div class="data-note"><strong>ここがポイント：</strong>馬場状態を1個のラベルに圧縮しないこと。水分、反発、走行による傷み、当日のレース傾向を分けることで、「稍重」の中身を読むことを目指します。</div>
+    <p class="m-rule-note"><span class="m-tag m-tag-rule">定め</span> 総合評価（A+〜C）は9項目の<strong>単純平均にはしません</strong>。①〜⑨に固定の配点や割合はなく、上の「重視度」の色や並びも点数の差を表すものではありません。<span class="m-tag m-tag-site">サイトの整理</span> 左の色は、赤＝能力の中核、オレンジ＝定めで「やや強め」、青＝条件しだいで重要度が変わる、グレー＝補助材料、を表します。<a href="staging/roadmap.html">これまでの経緯は「改善の歩み（履歴）」へ</a>。</p>
   </section>
 
   <section class="chapter anchor" id="time">
-    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>1分45秒0と1分45秒5。速い方が上とは限らない</h2><p class="chapter-lead">時計は条件を揃えて初めて意味を持ちます。</p></div></div>
-    <p class="answer">競馬場、走路、距離、馬場、当日の時計速度、斤量、ペース、位置取り、相手関係が違う生時計をそのまま並べると、簡単に誤判定します。そのため本システムは「同条件直接実績」をまず抽出し、その上で近似条件をまとめた内部指標 <a class="term" href="#term-time-index">「類似条件Time Index」</a> を使います。これは、条件差をならして「その走りがどの程度の水準だったか」を比較しやすくするための内部時計評価です。</p>
-    <div class="example-grid">
-      <div class="example warn"><h3>生時計だけなら</h3><p>A馬：東京芝1800m 1:44.8</p><p>B馬：中山芝1800m 1:45.4</p><p class="micro">→ A馬が0.6秒速い、と言いたくなる。</p></div>
-      <div class="example good"><h3>条件を分解すると</h3><p>A馬：高速馬場・軽斤量・スロー</p><p>B馬：低速馬場・重斤量・前傾戦</p><p class="micro">→ B馬の方が内容的に高水準という可能性がある。</p></div>
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>時計・上がり・ムラは、そのまま読まない</h2><p class="chapter-lead">数字は条件をそろえてから比べます。</p></div></div>
+    <div class="m-cards">
+      <div class="m-card m-card-a">
+        <h3>時計：条件をそろえて比べる</h3>
+        <p>競馬場・馬場・斤量・ペースが違う生の走破時計は、そのままでは比べられません。条件の近い過去走をまず選び、条件差をならした内部指標 <a class="term" href="#term-time-index">類似条件Time Index</a> で比べます。</p>
+        <div class="m-vs"><div><b>生時計</b>A馬 1:44.8 ／ B馬 1:45.4<br>→ A馬が速く見える</div><div><b>条件を見ると</b>Aは高速馬場・軽い斤量。Bは低速馬場・重い斤量<br>→ Bが上かもしれない</div></div>
+        <p>一度だけ速い馬より、近い条件で高い水準を<strong>何度も</strong>出した馬を重く見ます。</p>
+      </div>
+      <div class="m-card m-card-b">
+        <h3>上がり：期待以上の脚か</h3>
+        <p><a class="term" href="#term-aci">ACI（補正上がり3F指数）</a>は、同じレース内の上がりの差に、4角の位置による脚の温存差を補正した、このサイト独自の指標です。後方からの33.1秒と、先行しての33.6秒は、同じ強さとは限りません。</p>
+        <p>代表値は一発の最高ではなく、原則として直近3走の中央値です。</p>
+        <p class="m-fact">過去の検証（2015〜2018年で調整、2019〜2021年で確認。7,740レース）：直近3走ACIの中央値は、次走の3着内を見分ける <a class="term" href="#term-auc">AUC</a> が0.6611でした。</p>
+      </div>
+      <div class="m-card m-card-c">
+        <h3>ムラ：能力と確からしさを分ける</h3>
+        <p>「気分屋」と決めつけず、観測できる成績のばらつきとして扱います。<strong>ピーク能力</strong>（出せる上限）、<strong>現在値</strong>（今の状態）、<strong>再現信頼度</strong>（それを今回出せる確からしさ）の3つに分けます。</p>
+        <p>ムラが大きくても、ピーク能力そのものは削りません。</p>
+        <p class="m-fact">過去の検証：再現性が高い群の次走3着内率は44.76%、低い群は36.97%（約7.8ポイント差）。ただし勝率とは単純に比例しないため、再現信頼度を「勝つ確率」とは同じにしていません。</p>
+      </div>
     </div>
-    <p>しかも「一度だけ速かった馬」より、近い条件で高い水準を複数回出した馬を重視します。ベスト値だけではなく、2番目、直近、直近3〜6走の代表値を見るのはそのためです。</p>
   </section>
 
-  <section class="chapter anchor" id="aci">
-    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>上がり33.1秒を見ても、すぐには褒めない</h2><p class="chapter-lead"><a class="term" href="#term-aci">ACI（Adjusted Closing Index / 補正上がり3F指数）</a>は、「その状況で期待以上の脚を使ったか」を見る本プロジェクト独自の指標です。</p></div></div>
-    <div class="question">後方から上がり最速33.1秒の8着と、4角2番手から33.6秒の1着。末脚が強いのはどちら？</div>
-    <p class="answer">絶対時計だけでは答えられません。後方待機は道中で脚を温存しやすく、前で競馬した馬は早い段階から負荷を受けています。ACIは、同一レース内の上がり平均との差を<strong>外れ値の影響を受けにくい方法で標準化</strong>し、さらに4角位置による脚の温存差を補正して、末脚の「内容」を比較します。</p>
-    <div class="formula"><span class="dim">考え方：</span><br>ACI ≒ レース内での相対上がり性能 ＋ 4角位置補正<br><span class="dim">代表値：</span> 単発MAXではなく、原則として直近3走ACI中央値</div>
-    <p>さらに、競馬場・走路・距離帯によって、末脚に求められる性質が違うことも解釈します。現在は <b>sharp_closing</b>（鋭い末脚寄り）、<b>balanced</b>（中間型）、<b>sustained_position</b>（位置・持続力寄り）の3タイプを使います。</p>
-    <div class="myth"><div class="myth-title">重要：sustained_position ≠ 遅い上がりほど偉い</div><div class="myth-body">「上がりがかかるコースだから35秒台を高評価する」という意味ではありません。鋭い上がりの比重を下げ、前半の負荷を受けながら止まりにくかったか、位置を取りながら持続できたかを相対的に重く見る、という意味です。</div></div>
-    <div class="data-note"><strong>バックテスト：</strong>ACI系の検証は2015〜2018年をfit（係数などを決める学習期間）、2019〜2021年をtest（学習に使わず性能を確かめる検証期間）として、7,740レース・105,423走で実施。直近3走ACI中央値は次走Top3判別 <a class="term" href="#term-auc">AUC</a> 0.6611、ACI1位馬の次走勝率17.73%を記録しました。AUCは0.5前後ならランダムに近く、1.0に近いほど順位付けの識別力が高い指標です。一方、コース需要型で機械的に置換する方式は悪化したため不採用にしています。</div>
-  </section>
-
-  <section class="chapter anchor" id="repro">
-    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>「気分屋」と言う前に、ばらつきを測る</h2><p class="chapter-lead">馬の心理は推測せず、観測できるパフォーマンス変動を再現信頼度として扱います。</p></div></div>
-    <div class="example-grid">
-      <div class="example warn"><h3>ピークは高いがムラが大きい</h3><p><b>115 → 86 → 114 → 88 → 116 → 90</b></p><p class="micro">走れば強い。しかし今回その性能が出る確率には不確実性がある。</p></div>
-      <div class="example good"><h3>ピークは少し低いが安定</h3><p><b>106 → 108 → 107 → 105 → 109 → 107</b></p><p class="micro">上限は前者に劣っても、本命としての再現性は高い可能性がある。</p></div>
+  <section class="chapter anchor" id="track">
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>馬場と展開は、ひとつに決めず「確率」で持つ</h2><p class="chapter-lead">当てる対象であると同時に、外れる可能性のある変数だからです。</p></div></div>
+    <p class="answer">発走時の馬場は「良100%」と決め打ちせず、良・稍重・重・不良の確率を合計100%で持ちます。本線が良でも、稍重の可能性は捨てません。</p>
+    <p class="micro" style="margin:0">例（イメージ）：発走時の馬場の確率</p>
+    <div class="m-bar" role="img" aria-label="例：良55%、稍重35%、重9%、不良1%">
+      <span class="b1" style="width:55%"></span><span class="b2" style="width:35%"></span><span class="b3" style="width:9%"></span><span class="b4" style="width:1%"></span>
     </div>
-    <p>そこで「ピーク能力」「現在値」「再現信頼度」を分けます。重要なのは、ムラが大きいからといってピーク能力そのものを削らないことです。能力はある。しかし発揮確率に不確実性がある。この二つを混同しません。</p>
-    <div class="data-note"><strong>検証で見えたこと：</strong>再現性高群のACI上位馬は次走3着内率44.76%、低群は36.97%。約7.8ポイントの差がありました。ただし勝率は完全な単調関係ではないため、再現信頼度を「勝つ確率」と同一視はしていません。</div>
-  </section>
-
-  <section class="chapter anchor" id="uncertainty">
-    <div class="chapter-head"><div class="chapter-no">07</div><div><h2>競馬は、一つの未来だけを予想すると脆い</h2><p class="chapter-lead">馬場も展開も、当てる対象であると同時に「外れる可能性を持つ変数」です。</p></div></div>
-    <p class="answer">発走時馬場は「良100%」のように決め打ちせず、良・稍重・重・不良の確率を合計100%で持ちます。展開もS/M/M-H/Hで整理し、ハナ必須馬、番手可、譲歩可能性、競り合い確率を明示します。</p>
-    <div class="formula">例：発走時馬場予測<br>良 55% / 稍重 35% / 重 9% / 不良 1%<br><span class="dim">→ 本線は良でも、稍重シナリオを捨てない。</span></div>
-    <p>ここで大事なのが「未知＝不適性」にしないことです。初コース、初距離、初馬場は情報不足であって、弱い証拠ではありません。未知は主に再現信頼度へ反映し、経験がないだけで能力を大幅に下げないようにします。</p>
-    <div class="myth"><div class="myth-title">現在の課題</div><div class="myth-body">馬場は確率分布まで進んでいますが、展開はまだ完全な確率シナリオモデルにはなっていません。将来的にはS 15% / M 45% / M-H 30% / H 10%のように複数展開を重み付けし、各馬の「展開ロバスト性（展開が多少変わっても評価が崩れにくい度合い）」を測る余地があります。</div></div>
+    <ul class="m-bar-legend"><li><i style="background:#2f7d5b"></i>良 55%</li><li><i style="background:#6aa86f"></i>稍重 35%</li><li><i style="background:#c28a3c"></i>重 9%</li><li><i style="background:#8a5a2b"></i>不良 1%</li></ul>
+    <div class="m-two">
+      <div>
+        <h3>馬場：ラベルの中身を読む</h3>
+        <ul>
+          <li>同じ「稍重」でも、高速決着の日と消耗戦の日がある。</li>
+          <li>芝は公式の4区分に加え、内部で5分類（高速乾燥・標準・高速湿潤・低反発湿潤・掘れ荒れ）を考える。</li>
+          <li>朝の状態を予測し、JRAの実測値で更新し、発走時に合わせて見直す。</li>
+          <li>芝とダートの道悪実績は、直接は流用しない。</li>
+        </ul>
+        <p class="micro" style="margin:8px 0 0">詳しい研究は <a href="staging/baba-models.html">馬場状態予測の研究</a> へ。</p>
+      </div>
+      <div>
+        <h3>展開：先行馬が多い＝ハイペース、ではない</h3>
+        <ul>
+          <li>想定ペースは S（スロー）/ M / M-H / H（ハイ）で整理する。</li>
+          <li>ハナ必須の馬、番手でもよい馬、譲れる馬、競り合いの強さを分けて見る。</li>
+          <li>初コース・初距離・初めての馬場は「情報不足」であって「弱い証拠」ではない。主に確からしさに反映する。</li>
+        </ul>
+      </div>
+    </div>
+    <p>当日のバイアスは、次の3つを<strong>別々の変数</strong>として扱います。高速馬場でも差しが届く日はあり、低速でも前が止まらない日もあります。</p>
+    <div class="m-bias">
+      <div><b>時計速度</b>高速〜低速</div>
+      <div><b>位置取り</b>前有利〜差し有利</div>
+      <div><b>進路</b>内有利〜外有利</div>
+    </div>
   </section>
 
   <section class="chapter anchor" id="betting">
-    <div class="chapter-head"><div class="chapter-no">08</div><div><h2>◎だから買う、とは限らない</h2><p class="chapter-lead">能力本線と期待値追加を二層に分けます。</p></div></div>
-    <div class="layers">
-      <div class="layer"><h3>Layer 1　能力本線</h3><p>STEP1で高く評価した◎○▲を中心に、能力上位同士の組み合わせを検討します。価格だけを理由に能力上位を丸ごと消しません。</p></div>
-      <div class="layer"><h3>Layer 2　期待値追加</h3><p>条件一致馬、反発候補、直接実績がある低人気馬など、能力評価に対して市場価格がズレている候補を追加します。</p></div>
+    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>強い馬と買う馬を分ける（購入セット）</h2><p class="chapter-lead">◎を当てることと、価値のある買い方を設計することは別の判断です。</p></div></div>
+    <div class="m-ladder">
+      <div class="l1"><b>① 能力本線</b>STEP1で高く評価した◎○▲を中心に検討する。価格だけの理由で、能力上位をまるごと消さない。</div>
+      <div class="l2"><b>② 期待値の追加</b>能力に対して価格がズレている馬（条件が合う、巻き返し候補、直接実績のある低人気馬）を、本線を壊さない範囲で足す。</div>
+      <div class="l3"><b>③ セット全体で評価</b>1点ごとではなく、購入セット全体の期待される損益、1点でも当たる確率、損をする確率を分けて比べる。</div>
     </div>
-    <p>つまり、<strong>「最も勝つ可能性が高い馬」と「最も買いたい馬」は別</strong>です。◎が1.5倍なら能力評価は◎のままでも、単勝は見送ることがあります。逆に△でも価格が十分に高ければ、買い目の相手として価値が出ることがあります。</p>
-    <div class="myth"><div class="myth-title">ただし、まだ「真のEVモデル」ではない</div><div class="myth-body"><a class="term" href="#term-ev">EV（Expected Value / 期待値）</a>は、確率と配当を合わせた「長期的にどれくらい戻る見込みか」という考え方です。単勝なら概念上 <b>推定勝率 × オッズ</b> で見られ、1.0を上回れば理論上プラス期待です。現状は想定勝率の厳密な<a class="term" href="#term-calibration">確率校正</a>モデルが未完成なので、まだ完全な数理EVモデルではありません。</div></div>
-    <div class="data-note"><strong>過去版v3.4の改良履歴：根拠から三連単の確率まで。</strong>WIN5は対象外で、通常8券種を評価します。①〜⑨の全頭評価、同条件の直接実績、相手関係、馬場・展開、追切の確認状況から各馬の勝率を設定し、全頭の分布と条件付き着順モデルから三連単などの的中確率を計算します。独立勝率の掛け算や、単勝オッズからの連系オッズ捏造はしません。前有利・差し有利等の感応度、実オッズ、損益分岐的中確率、期待倍率、出所と時刻、未校正リスクを並べて購入を決めます。一部の券種が未確認でも他券種まで一律見送りにせず、正当な根拠が不十分な候補だけを除外します。高い試算EVだけで購入を決めず、旧予想や成績も変更しません。</div>
-    <div class="data-note"><strong>過去版v3.5の改良履歴：三連単にも対等な購入機会。</strong>v3.4までは券種ごと代表1点のみを比較していたため、◎→○→▲が割高なら、別順序が割安でも見落とす弱点がありました。v3.5では印を固定したあと、三連単の着順入替、三連複の組合せ違い、馬単の両順序など、根拠のある複数候補を8券種ごとに生成し、券種・組合せごとの実オッズ、的中確率の仮定・変動幅、損益分岐確率、レース条件の根拠を比較します。的中率が低い・未校正という理由だけで三連単を除外せず、条件と価格が見合えば最優先にできます。一方で高配当・計算上の高EVだけを根拠に購入しません。候補数や却下理由も表示し、旧予想とWIN5除外方針はそのまま維持します。</div>
+    <p>現在の正式な購入方式は <strong>v3.15</strong> です。印を決める STEP1（v3.13）の後に、発走前に取得した実際のオッズだけで購入セットを確定します。</p>
+    <div class="m-quota">
+      <div><b>通常：最大3操作</b>1操作にBOXや流しの複数点が入ることがある（3操作＝3点ではない）。</div>
+      <div><b>中穴：別枠で最大1操作</b>実測オッズ20倍以上100倍未満の候補。</div>
+      <div><b>大穴：別枠で最大1操作</b>実測オッズ100倍以上で、100円の的中払戻が1万円以上の候補。</div>
+      <div class="q-total"><b>1レース6,000円まで</b>購入単位は100円。合計で最大5操作。</div>
+    </div>
+    <div class="data-note"><strong>購入方式の版について：</strong>v3.16（購入額を可変にする方式）は、2026年10月25日の3レースだけで試験的に使われました。10月31日・11月1日は v3.15 に戻っています。これまでの経緯は <a href="staging/roadmap.html">改善の歩み（履歴）</a> に残しています。</div>
+    <div class="myth"><div class="myth-title">まだ「本物の期待値モデル」ではない</div><div class="myth-body"><a class="term" href="#term-ev">期待値</a>は「推定勝率 × オッズ」で見る考え方ですが、推定勝率の<a class="term" href="#term-calibration">確率校正</a>が未完成なので、数理的に完全なモデルとは言えません。購入セットの探索も、最善を保証するものではありません。</div></div>
   </section>
 
-  <!-- JRA_EDITORIAL_ADDITION_PURCHASE_20261012 -->
-  <section class="chapter anchor" id="new-purchase">
-    <div class="chapter-head"><div class="chapter-no">08A</div><div><h2>一つの買い目ではなく、セット全体を評価する</h2><p class="chapter-lead">◎の馬を当てることと、価値のある買い方を設計することは別の判断です。</p></div></div>
-    <div class="question">三連単の的中率が低いなら、最初から買わない方がよい？</div>
-    <p class="answer">必ずしもそうではありません。三連単1点が割高でも、フォーメーション・2頭軸マルチ等の複数点なら的中範囲を広げられる場合があります。ただし点数を増やすほど投資額も増えます。そこで<strong>購入セット全体の期待純利益、少なくとも1点的中する確率、投資額を回収できない確率</strong>を分けて比較します。着順を同時に扱うモデルで集合の的中率を計算し、個々の的中確率を単純に足しません。</p>
-    <div class="layers">
-      <div class="layer"><h3>通常8券種で候補を検証</h3><p>WIN5を除き、単勝・複勝・枠連・馬連・馬単・ワイド・三連複・三連単の単点や複数点購入を評価。BOX、軸流し、マルチ、フォーメーション等は、実際に買う馬番の集合へ展開して重複と点数を監査。完全に買わないBOXを完全BOXと偽って表示しません。</p></div>
-      <div class="layer"><h3>価格だけでも的中率だけでも決めない</h3><p>モデルの高EV候補でも損失リスクを見ます。的中率が上がっても期待純利益が大きく下がるなら不採用。各買い目のオッズは実測に限定し、未校正の勝率や購入後のオッズ変動という不確実性を残します。</p></div>
+  <section class="chapter anchor" id="proof">
+    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>後出しを防ぐしくみ</h2><p class="chapter-lead">「結果を知ってから賢くなったAI」にならないための約束です。</p></div></div>
+    <p class="answer">過去のレースで試して当たっても、結果を知らなかった証明にはなりません。そこで、予想を<strong>発走前に公開の場所へ保存</strong>し、その記録（コミットSHA＝内容を一意に表すID）で固定します。</p>
+    <ol class="m-rail">
+      <li><span class="m-dot">1</span><div><b>情報の時点をそろえる</b><p>発走前に公開された公式の資料だけを使い、結果や払戻は混ぜない。</p></div></li>
+      <li><span class="m-dot">2</span><div><b>オッズの新しさを確かめる</b><p>購入を確定する前の最も古いオッズは原則10分以内、収集にかけた幅は3分以内。確認できない価格は使わない。</p></div></li>
+      <li><span class="m-dot">3</span><div><b>Gitに保存して固定</b><p>発走前の予想・買い目・証跡を保存。結果を見てから書き換えられない。発走後の修正は認めない。</p></div></li>
+      <li><span class="m-dot">4</span><div><b>結果は別ファイルで追加</b><p>予想の原本には手を触れず、結果と回顧だけを別に追記する。</p></div></li>
+      <li><span class="m-dot">5</span><div><b>公開された内容を検品</b><p>HTML・PDFの全ページと、保存した内容が実際の公開ページと一致するかを確認する。</p></div></li>
+    </ol>
+    <div class="m-grades">
+      <div class="ga"><b>Grade A：正式な根拠</b>本当に発走前に保存した、未来のレースの予想。改善の判定に使う。</div>
+      <div class="gb"><b>Grade B：参考の再現</b>過去のレースを、発走前の情報だけで後から再現したもの。結果を知っている可能性があるので、判定には数えない。</div>
+      <div class="gs"><b>Synthetic：動作確認</b>人工データによる計算の試験。競馬の成績には数えない。</div>
     </div>
-    <div class="data-note"><strong>改良の道筋（過去版と現行版を区別）：</strong>v3.8〜v3.10では券種ごとの購入方式を拡張。v3.11では最大EVと、期待利益を一定水準守りながら的中範囲を広げる方式を比較。v3.12では8券種の実オッズと購入セットの照合を強化。v3.13では条件に合う単勝の金額を100円単位で調整する仕組みを正式化しました。<strong>現在の正式な購入確定は、これらを無条件に積み上げたものではなく、下記のv3.15購入専用ポリシーで行います。</strong></div>
-    <div class="proof-timeline">
-      <div class="proof-item"><b>通常の購入：最大3操作</b>1操作にBOXや流しの複数点が入ることがあります。3操作＝3点ではありません。</div>
-      <div class="proof-item"><b>中穴：別枠で最大1操作</b>実測オッズ20倍以上100倍未満の候補を採否評価します。</div>
-      <div class="proof-item"><b>大穴：別枠で最大1操作</b>実測オッズ100倍以上かつ100円の的中払戻1万円以上の候補を採否評価します。</div>
-      <div class="proof-item"><b>投資上限：1レース6,000円</b>通常・中穴・大穴を合わせた総額で管理。現行v3.15の購入単位は100円、最大で計5操作です。</div>
+    <h3>改善案は、研究用として別に比べる</h3>
+    <p>改善案は、固定した正式の予想（v3.13のSTEP1）から別に計算する「研究用」です。正式な印や買い目には一切反映せず、同じレースで現行と並べて比べます。比較の進み具合は <a href="staging/improvement-cycle.html">予想の改善状況</a> で見られます。</p>
+    <p>20レース分の比較がたまると、判定を求める依頼（Issue）が自動で立ち、<strong>人が</strong>次のどれかを選びます。自動で採用されることはありません。</p>
+    <div class="m-judge">
+      <div><span class="j ja">A</span><b>採用</b>改善案を正式な版に取り入れる。</div>
+      <div><span class="j jb">B</span><b>追加検証</b>判断できないので、さらにレースを重ねて確かめる。</div>
+      <div><span class="j jc">C</span><b>見送り</b>今回は採用しない。</div>
     </div>
-    <p>すべての券種や購入方法を採用するのではなく、<strong>比較・除外理由まで監査したうえで最終セットを確定</strong>します。探索アルゴリズムが厳密な大域最適解を保証するわけではありません。勝率の確率校正も完成途上です。<a href="https://github.com/toodataa-ai/keiba-notes/blob/main/docs/data/jra_purchase_command_policy_v315.json">現行購入ポリシーv3.15の原本</a>を参照できます。</p>
-  </section>
-
-  <section class="chapter anchor" id="e2e">
-    <div class="chapter-head"><div class="chapter-no">09</div><div><h2>「結果を知ってから賢くなったAI」を防ぐ</h2><p class="chapter-lead"><a class="term" href="#term-e2e">E2E（End-to-End）検証</a>は、情報収集→予想→買い目→結果→採点まで、予想システム全体を一本につないで検証する方法です。</p></div></div>
-    <div class="question">新しいプロンプトを過去レースに使って当たった。それで改善したと言える？</div>
-    <p class="answer">言い切れません。過去レースを知っているモデルが、結果を完全に忘れて再予想したことを証明するのは難しいからです。そこで正式比較では、レース前に予想ファイルをGitHubへ保存し、そのコミットSHA（その時点の内容を一意に識別するID）をproofとして固定します。</p>
-    <div class="proof-timeline">
-      <div class="proof-item"><b>1. 同じ発走前情報</b>比較する版に同じ<a class="term" href="#term-cutoff">cutoff</a>（情報を使ってよい締切時刻）とソース集合を与える。</div>
-      <div class="proof-item"><b>2. 版ごとに予想</b>v3.0とv3.1を<a class="term" href="#term-shadow">shadow</a>（公式予想に影響しない並走評価）で独立実行。</div>
-      <div class="proof-item"><b>3. Git proof</b>発走前コミットSHAで予想を凍結し、「レース前に存在した」ことを証明。</div>
-      <div class="proof-item"><b>4. 結果を別結合</b>予想ファイルは編集せず、結果だけ別ファイルで追加。</div>
-      <div class="proof-item"><b>5. 同条件で採点</b>命中・順位・Brier Score・ROI等を共通計算。</div>
-    </div>
-    <div class="grade-grid">
-      <div class="grade grade-a"><strong>Grade A</strong><p><b>prospective_strict</b>。未来のレースを本当に発走前に保存し、Git proofがあるもの。正式な版比較・改善根拠に使います。</p></div>
-      <div class="grade grade-b"><strong>Grade B</strong><p><b>historical_replay</b>。過去レースを発走前情報だけで後から再現したもの。研究材料には使いますが、モデルが結果を既知の可能性があるため単独では昇格根拠にしません。</p></div>
-      <div class="grade grade-s"><strong>Synthetic</strong><p>人工データで計算器やCI（自動テスト）の動作を確認するもの。競馬成績には数えません。</p></div>
-    </div>
-    <p>さらに、各プロンプト版が参照するbase promptやACI profile等をGit blob SHAで固定した<a class="term" href="#term-manifest">manifest</a>を持ちます。manifestは「この版がどのファイルの、どの内容を使ったか」を固定する部品表です。これにより、同じ「v3.1」という名前のまま依存ファイルだけ後から変わることも検出できます。</p>
-    <div class="data-note"><strong>採点対象：</strong>◎勝率、◎3着内率、◎○▲のTop3捕捉、勝ち馬捕捉、STEP1順位、確率がある場合の <a class="term" href="#term-brier">Brier Score</a> / <a class="term" href="#term-logloss">Log Loss</a>、馬場予測、展開予測、馬券<a class="term" href="#term-roi">ROI</a>。Brier Scoreは確率予測のズレを測り低いほど良く、Log Lossは「自信満々の外れ」を強く罰する指標です。ROIだけで優劣を決めないのも重要なルールです。</div>
-  </section>
-
-  <!-- JRA_EDITORIAL_ADDITION_EXECUTION_20261012 -->
-  <section class="chapter anchor" id="new-execution">
-    <div class="chapter-head"><div class="chapter-no">09A</div><div><h2>買える予想にするには、発走前の証拠が必要</h2><p class="chapter-lead">能力評価、実行補助、購入確定の版は同じではありません。</p></div></div>
-    <div class="layers">
-      <div class="layer"><h3>STEP1 v3.13：能力・適性を固定</h3><p>①〜⑨と◎○▲△×を原則オッズの影響から切り離して確定。買い目の都合で印を後から変えません。<code>latest_prompt.json</code>が示す予想本体の版です。</p></div>
-      <div class="layer"><h3>実行補助 v3.14：発売状況を区別</h3><p>開催有無、公式出走情報、発売開始を確認。「まだ発売前」と「取得に失敗した」は別の状態として扱い、存在しない資料や倍率を捏造しません。</p></div>
-      <div class="layer"><h3>STEP2 v3.15：購入セットを固定</h3><p>実際に取得した価格に基づく券種・方式・点数・金額とfinal_betsを発走前に確定。通常最大3操作＋中穴・大穴を監査し、予想本体v3.13とは別版として管理します。</p></div>
-    </div>
-    <div class="proof-timeline">
-      <div class="proof-item"><b>1. 情報の時点をそろえる</b>JRA公式発走前資料と対象馬の情報を確認し、後から公開された結果や払戻を混入させない。</div>
-      <div class="proof-item"><b>2. オッズの鮮度を確認</b>v3.15では購入確定前の最古オッズが原則10分以内、対象価格の収集幅が3分以内。未確認の価格は採用しない。</div>
-      <div class="proof-item"><b>3. Git証跡に保存</b>発走前のsnapshot・prediction・final_bets・proof_commitを固定し、結果で予想を書き換えられないようにする。</div>
-      <div class="proof-item"><b>4. 公開結果を検品</b>HTML・PDFの全ページ、購入方法の展開と金額、保存内容と実際の公開URLの一致まで確認する。</div>
-    </div>
-    <div class="myth"><div class="myth-title">現時点の未自動化部分も開示</div><div class="myth-body">v3.14の収集からv3.15の正式購入確定までは、実行者が2段階の処理を連結する必要があります。リマインドやGitHub Actionsの緑表示だけで「最後まで完了」とは判断しません。公式根拠や価格に不足があれば、理由を示して未完了とします。</div></div>
-    <p>レース後の公式結果・払戻・回顧は別ファイルへ追記し、発走前prediction、評価、印、final_betsの原本は保持します。地方競馬Shadowは独立研究系で、JRA本線の成績や購入結果には混ぜません。</p>
-  </section>
-
-  <section class="chapter anchor" id="improve">
-    <div class="chapter-head"><div class="chapter-no">10</div><div><h2>改善にも、暴走防止のルールがいる</h2><p class="chapter-lead">一度外れたから新ルールを足す、を繰り返すと過学習します。</p></div></div>
-    <p class="answer"><a class="term" href="#term-overfit">過学習</a>とは、過去の特定レースに合わせすぎて、その過去には強いが新しいレースでは弱くなることです。そこで週次改善はA/B/Cの承認クラスで管理しています。変更の大きさと証拠の強さを分け、弱い根拠で評価思想を変えないようにします。</p>
-    <div class="governance">
-      <div class="gov"><span class="badge">A</span><h3>自動承認</h3><p>誤字、説明、監査強化、非破壊的な微調整、可視化。</p></div>
-      <div class="gov"><span class="badge">B</span><h3>条件付き自動</h3><p>重み変更、新監査、モデル更新。複数レースやバックテスト等の再現性が必要。</p></div>
-      <div class="gov"><span class="badge">C</span><h3>人間承認</h3><p>評価思想、STEP構造、大幅重み変更、トレードオフのある変更。</p></div>
-    </div>
-    <div class="data-note"><strong>混同注意：</strong>ここでいう改善承認の「A/B/C」と、前章のE2Eデータ品質「Grade A / Grade B」は別制度です。前者は<strong>変更してよいか</strong>、後者は<strong>その検証データをどこまで信頼できるか</strong>を表します。</div>
-    <p>もう一つの原則は、<strong>「改善履歴は増やす。実行プロンプトは増やし続けない」</strong>です。同じ意味のルールは追記せず統合・置換し、旧版は履歴として残します。プロンプト自体が巨大化して重要ルールが埋もれるのを防ぎます。</p>
-    <div class="formula"><span class="dim">改善サイクル</span><br>予想 → 発走前固定 → 結果 → 回顧 → 改善候補 → 証拠評価 → 新版 / no_change（変更なし） → 次レースで再検証</div>
+    <p class="micro">この A/B/C は「改善案をどうするか」の選択で、上の Grade A/B（検証データの信頼度）とは別のものです。1回の外れで新しいルールを足す「過学習」を避けるため、判断には20レースの比較を使います。</p>
   </section>
 
   <section class="chapter anchor" id="limits">
-    <div class="chapter-head"><div class="chapter-no">11</div><div><h2>まだ解けていない問題も、公開する</h2><p class="chapter-lead">完成した予想法ではなく、検証可能な研究プロジェクトとして扱っています。</p></div></div>
-    <div class="limits">
-      <div class="limit"><b>① ①〜⑨から勝率への変換が未校正</b>評価は精密でも、A+が勝率何%かはまだ統計的に固定されていません。<a class="term" href="#term-calibration">Calibration（確率校正）</a>が次の大きな研究テーマです。</div>
-      <div class="limit"><b>② 展開の確率分布が未完成</b>S/M/M-H/Hは使っていますが、複数シナリオを確率加重するところまでは未完成です。</div>
-      <div class="limit"><b>③ ACIは相対指標</b>同一レース内での末脚比較には強い一方、弱いメンバー内の高ACIと強いメンバー内の高ACIを同じ絶対能力とはみなしません。Time Indexやクラス評価で補完しています。</div>
-      <div class="limit"><b>④ 成長曲線の明示モデルが弱い</b>特に2・3歳馬では「今の能力」だけでなく、能力がどの速度で伸びているかを別に捉える余地があります。</div>
-      <div class="limit"><b>⑤ E2Eはデータを貯めている途中</b>新しいGrade A比較は未来のレースでしか増やせません。20レース未満では「改善確認済み」とは判定しません。</div>
-    </div>
-    <p>弱点を隠さないのは、予想の信頼性を下げるためではありません。<strong>何が分かっていて、何がまだ仮説なのかを区別すること自体が、検証可能な予想の条件</strong>だと考えているからです。</p>
+    <div class="chapter-head"><div class="chapter-no">07</div><div><h2>まだ解けていない問題</h2><p class="chapter-lead">完成した予想法ではなく、検証できる研究として公開しています。</p></div></div>
+    <ul class="m-open">
+      <li><span class="m-dot">1</span><div><b>評価から勝率への変換が未校正</b>印や評価は丁寧でも、「A+なら勝率何%」はまだ統計的に固まっていません。<a class="term" href="#term-calibration">確率校正</a>が次の大きな課題です。</div></li>
+      <li><span class="m-dot">2</span><div><b>展開の確率分布が未完成</b>馬場は確率で持てていますが、展開はまだ主なシナリオが中心です。</div></li>
+      <li><span class="m-dot">3</span><div><b>ACIは相対的な指標</b>弱いメンバーの中の高ACIと、強いメンバーの中の高ACIを、同じ能力とは見なしません。Time Indexやクラス評価で補っています。</div></li>
+      <li><span class="m-dot">4</span><div><b>成長の速さを捉えるモデルが弱い</b>特に2・3歳馬では、「今の能力」だけでなく伸びる速さも別に見る余地があります。</div></li>
+      <li><span class="m-dot">5</span><div><b>改善の比較はデータをためている途中</b>正式な比較は未来のレースでしか増やせません。20レースに届くまでは「改善を確認できた」とは言いません。</div></li>
+    </ul>
+    <p>弱点を隠さないのは、信頼を下げるためではありません。<strong>分かっていることと仮説を分けること</strong>が、検証できる予想の条件だと考えているからです。</p>
   </section>
 
   <section class="chapter anchor glossary" id="glossary">
-    <div class="chapter-head"><div class="chapter-no">12</div><div><h2>用語集</h2><p class="chapter-lead">このサイト独自の用語と、統計・AI・開発で使う言葉を、競馬ファン向けに短く整理します。</p></div></div>
-    <div class="glossary-grid">
-      <div class="glossary-item" id="term-aci"><h3>ACI</h3><p><b>Adjusted Closing Index / 補正上がり3F指数。</b>単純な上がり秒数ではなく、同一レース内の相対上がりと4角位置を補正して末脚の内容を見る、本プロジェクト独自指標。</p></div>
-      <div class="glossary-item" id="term-time-index"><h3>Time Index</h3><p>競馬場・距離・馬場・斤量・ペースなど条件差を考慮し、生時計をそのまま比べないための内部時計評価。ACIとは別物で、レース全体の走破性能を見る側。</p></div>
-      <div class="glossary-item" id="term-auc"><h3>AUC</h3><p>順位付けの識別力を見る統計指標。ざっくり言えば「好走する馬を上に並べられているか」。0.5前後はランダムに近く、1.0に近いほど識別力が高い。</p></div>
-      <div class="glossary-item" id="term-e2e"><h3>E2E</h3><p><b>End-to-End。</b>一部分だけでなく、情報収集→予想→買い目→結果→採点までシステム全体を通して検証すること。</p></div>
-      <div class="glossary-item" id="term-cutoff"><h3>cutoff</h3><p>予想で使用してよい情報の締切時刻。たとえば「当日8:00 cutoff」なら、それより後に公開された情報は検証用予想へ入れない。</p></div>
-      <div class="glossary-item" id="term-shadow"><h3>shadow予想</h3><p>公式予想やユーザー向け買い目を変更せず、比較・研究のためだけに裏側で並走させる別バージョンの予想。</p></div>
-      <div class="glossary-item" id="term-manifest"><h3>manifest</h3><p>あるプロンプト版が、どの本体・設定・モデルを使ったかを固定する「部品表」。同じ版名の中身が後から変わることを防ぐ。</p></div>
-      <div class="glossary-item"><h3>commit SHA / blob SHA</h3><p>GitHub上の状態やファイル内容を一意に識別するID。発走前の予想をSHAで固定することで、後から書き換えた予想を同じものとして扱えなくする。</p></div>
-      <div class="glossary-item" id="term-brier"><h3>Brier Score</h3><p>確率予測と実際の結果のズレを測る指標。低いほど良い。「勝率70%」のような確率が本当に妥当だったかを評価する。</p></div>
-      <div class="glossary-item" id="term-logloss"><h3>Log Loss</h3><p>確率予測の誤りを測る指標で、低いほど良い。特に「95%で勝つ」と強く言ったのに負けたような、自信過剰の外れを大きく罰する。</p></div>
-      <div class="glossary-item" id="term-calibration"><h3>Calibration / 確率校正</h3><p>「勝率20%と予測した馬が、長期的に本当に約20%勝つ」状態へ確率を整えること。印の精度と、確率の正しさは別問題。</p></div>
-      <div class="glossary-item" id="term-ev"><h3>EV / 期待値</h3><p><b>Expected Value。</b>確率と配当を組み合わせた長期的な見込み。単勝なら概念上「推定勝率 × オッズ」で考え、1.0超なら理論上プラス期待。</p></div>
-      <div class="glossary-item" id="term-roi"><h3>ROI / 回収率</h3><p><b>Return on Investment。</b>投資額に対して何%戻ったか。競馬では「払戻 ÷ 投資 × 100」。100%超ならその期間はプラス収支。</p></div>
-      <div class="glossary-item" id="term-overfit"><h3>過学習</h3><p>過去の特定事例に合わせすぎて、未知のレースへの適応力が落ちること。一度の外れごとに専用ルールを増やすと起こりやすい。</p></div>
-      <div class="glossary-item"><h3>Grade A / Grade B</h3><p>E2E検証データの信頼度区分。Grade Aは本当に発走前に保存された未来予想、Grade Bは過去レースの再現。改善承認のA/B/Cとは別制度。</p></div>
-      <div class="glossary-item"><h3>S / M / M-H / H</h3><p>想定ペース。S=スロー、M=平均、M-H=平均より速め、H=ハイペース。現状は主シナリオ表示が中心で、将来は確率分布化を検討。</p></div>
-    </div>
+    <div class="chapter-head"><div class="chapter-no">08</div><div><h2>用語集</h2><p class="chapter-lead">このサイト独自の言葉と、統計・開発の言葉を短く説明します。</p></div></div>
+    <details class="m-gloss" id="glossary-box">
+      <summary>用語を開く（14語）</summary>
+      <div class="glossary-grid">
+        <div class="glossary-item" id="term-aci"><h3>ACI</h3><p><b>補正上がり3F指数。</b>同じレース内での上がりの差と、4角の位置を補正して、末脚の内容を見る独自の指標。</p></div>
+        <div class="glossary-item" id="term-time-index"><h3>類似条件Time Index</h3><p>競馬場・距離・馬場・斤量・ペースなどの条件差をならし、生の走破時計をそのまま比べないための内部の時計評価。</p></div>
+        <div class="glossary-item" id="term-auc"><h3>AUC</h3><p>順位づけの力を表す統計の指標。ざっくり言えば「好走する馬を上に並べられているか」。0.5前後はでたらめに近く、1.0に近いほど良い。</p></div>
+        <div class="glossary-item"><h3>ピーク能力・現在値・再現信頼度</h3><p>出せる上限／今の状態／今回それを出せる確からしさ。この3つを分けて評価する。</p></div>
+        <div class="glossary-item"><h3>STEP1 / STEP2</h3><p>STEP1は能力と適性の評価（オッズは見ない）、STEP2は価格を見て買い方を決める段階。</p></div>
+        <div class="glossary-item"><h3>commit SHA</h3><p>GitHub上の記録を一意に表すID。発走前の予想をこれで固定すると、後から書き換えた予想を同じものとして扱えない。</p></div>
+        <div class="glossary-item"><h3>cutoff</h3><p>予想に使ってよい情報の締め切り時刻。それより後に公開された情報は使わない。</p></div>
+        <div class="glossary-item"><h3>チャレンジャー</h3><p>現行の予想に対する改善案。研究用に別計算し、正式な印や買い目には反映しない。</p></div>
+        <div class="glossary-item"><h3>Brier Score / Log Loss</h3><p>確率予測のズレを測る指標で、どちらも低いほど良い。Log Lossは「95%で勝つ」と言って負けるような自信過剰の外れを特に重く見る。</p></div>
+        <div class="glossary-item" id="term-calibration"><h3>確率校正</h3><p>「勝率20%」と予測した馬が、長期的に本当に約20%勝つ状態へ確率を整えること。印の精度と、確率の正しさは別の問題。</p></div>
+        <div class="glossary-item" id="term-ev"><h3>期待値（EV）</h3><p>確率と配当を合わせた、長期的な見込み。単勝なら概念上「推定勝率 × オッズ」で、1.0を超えれば理論上プラス。</p></div>
+        <div class="glossary-item"><h3>ROI / 回収率</h3><p>投資額に対して何%戻ったか。「払戻 ÷ 投資 × 100」で、100%を超えればプラス収支。</p></div>
+        <div class="glossary-item"><h3>過学習</h3><p>過去の特定のレースに合わせすぎて、新しいレースに弱くなること。外れるたびに専用ルールを足すと起こりやすい。</p></div>
+        <div class="glossary-item"><h3>S / M / M-H / H</h3><p>想定ペース。S＝スロー、M＝平均、M-H＝平均よりやや速い、H＝ハイペース。</p></div>
+      </div>
+    </details>
   </section>
 
   <div class="simple-home-bottom"><a href="staging/index.html">トップページに戻る</a></div>
 </main>
-<footer class="wrap foot">競馬予想精度向上AI — JRAメインレースを対象に、予想・検証・改善の過程を公開しています。</footer>
+<footer class="wrap foot">AIによる競馬予想研究所 — JRAのメインレースを対象に、予想・検証・改善の過程を公開しています。</footer>
 <script>
-const stateLabel={waiting_for_candidate:'候補版待ち',insufficient_data:'Grade A収集中',ready_for_review:'比較レビュー可能'};
-Promise.all([
-  fetch('data/latest_prompt.json',{cache:'no-store'}).then(r=>r.json()),
-  fetch('data/e2e_status.json',{cache:'no-store'}).then(r=>r.json())
-]).then(([p,e])=>{
+fetch('data/latest_prompt.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(p){
   document.getElementById('livePrompt').textContent=p.version||'—';
-  const n=e.case_counts?.strict??0; document.getElementById('liveCases').textContent=n+' 件';
-  const c=e.comparison||{}; const pair=(c.baseline||'—')+' → '+(c.candidate||'—');
-  document.getElementById('liveExperiment').textContent=pair+' / '+(stateLabel[c.state]||c.state||'—');
-}).catch(()=>{
-  document.getElementById('livePrompt').textContent='—';document.getElementById('liveCases').textContent='—';document.getElementById('liveExperiment').textContent='—';
-});
+}).catch(function(){document.getElementById('livePrompt').textContent='—';});
+(function(){
+  function openFor(){
+    var h=location.hash; if(!h||h.length<2) return;
+    var el=null; try{el=document.getElementById(decodeURIComponent(h.slice(1)));}catch(e){}
+    if(!el) return;
+    var d=el.closest&&el.closest('details');
+    if(d){d.open=true; el.scrollIntoView();}
+  }
+  window.addEventListener('hashchange',openFor);
+  window.addEventListener('DOMContentLoaded',openFor);
+})();
 </script>
   <script src="staging/candidate-assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body>

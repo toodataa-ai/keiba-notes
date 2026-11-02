@@ -3,8 +3,8 @@
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
   "candidates": [
     {
-      "id": "ui-typescale-usage-v1",
-      "title": "文字サイズの統一・閲覧数の控えめ表示・自分の閲覧の除外",
+      "id": "ui-site-cleanup-v1",
+      "title": "サイト全体の整理（文字サイズ統一・閲覧数・ページ構成・AI予想ロジックの再構成）",
       "pages": [
         "index.html",
         "this-week.html",
@@ -27,7 +27,7 @@
       ],
       "status": "awaiting_user_approval",
       "created_at": "2026-11-02",
-      "summary": "全ページの画面タイトルを最大24px（スマホ22px）、節の見出し17px、補足12px以上に統一。トップの閲覧数を控えめな1行表示に。?owner=1 を開いたブラウザは閲覧数に数えない"
+      "summary": "全ページの文字を最大24px（スマホ22px）に統一。トップの閲覧数を控えめな1行にし、?owner=1 を開いたブラウザは数えない。トップのカードを「予想のしくみと改善／改善案を育てる研究／別の研究」に再編。旧比較検証は「旧方式の比較記録（参考）」に格下げ。「今後のブラッシュアップ思想」を「改善の歩み（履歴）」に改名。AI予想ロジックのページを重複を省いて再構成し、番号の誤り等を修正。サイト名を統一"
     }
   ]
 }
