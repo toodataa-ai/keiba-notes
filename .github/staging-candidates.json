@@ -1,5 +1,33 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-typescale-usage-v1",
+      "title": "文字サイズの統一・閲覧数の控えめ表示・自分の閲覧の除外",
+      "pages": [
+        "index.html",
+        "this-week.html",
+        "schedule.html",
+        "results.html",
+        "methodology.html",
+        "roadmap.html",
+        "e2e.html",
+        "baba-models.html",
+        "local-racing-shadow.html",
+        "experience-regime.html",
+        "release-history.html",
+        "improvement-cycle.html"
+      ],
+      "assets": [
+        "assets/type-scale-v1.css",
+        "assets/usage-summary.css",
+        "assets/usage-summary.js",
+        "assets/visitor-counter.js"
+      ],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-02",
+      "summary": "全ページの画面タイトルを最大24px（スマホ22px）、節の見出し17px、補足12px以上に統一。トップの閲覧数を控えめな1行表示に。?owner=1 を開いたブラウザは閲覧数に数えない"
+    }
+  ]
 }
