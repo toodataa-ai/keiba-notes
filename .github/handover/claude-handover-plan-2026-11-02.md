@@ -1,6 +1,9 @@
 # ChatGPT → Claude Code 引き継ぎ調査・移行計画（2026-11-02）
 
-状態: **調査・計画のみ**。mainマージ、本番リリース、Scheduled tasks有効化、ChatGPTリマインド停止はいずれも未実施で、利用者承認待ち。
+状態: **調査・計画のみ**。
+
+**スコープ（2026-11-02 利用者指示）: 今回の引き継ぎは競馬（keiba-notes）のみ。** §2・§3・タスクT4は参考記録として残し、移行作業の対象外（保留）。4タスク原文の提供は利用者側で準備中のため待機。
+mainマージ、本番リリース、Scheduled tasks有効化、ChatGPTリマインド停止はいずれも未実施で、利用者承認待ち。
 置き場所: `.github/handover/`（GitHub Pages公開対象の `docs/` 外。DATA/UI/LABのどれにも該当しない運用文書）。
 
 ---
@@ -56,7 +59,7 @@
 
 ---
 
-## 2. 東京23区子連れイベント toodataa-ai/tokyo-family-events-ai
+## 2. 【保留・今回対象外】東京23区子連れイベント toodataa-ai/tokyo-family-events-ai
 
 - **注意: このセッションでは読み取り専用（anonymous clone）**。PR/Issue操作・pushには `add_repo(access: push)` の追加承認が必要。
 - 環境: main=開発/staging、production=本番アプリ、data-staging/data-production=動的データ、release/*・data-release/*=不変スナップショット（AGENTS.md）。
@@ -67,7 +70,7 @@
 - 閲覧カウンター・管理画面: `site/admin.html`、`site/usage-*`、`analytics/`、metrics Worker系workflow（deploy-metrics-history-worker、diagnose-metrics-worker-403）。直近commitは「keiba metrics namespaceをWorkerに分離」→ 2リポジトリ共通カウンターの境界を引き継ぎ時に確認要。
 - Instagram/Canva: `site/canva.html`、`docs/CANVA_DRAFT_INTEGRATION.md`、`docs/canva_*`、`audit-canva-*`/`test-canva-golden-layout` workflow。
 
-## 3. その他の継続開発
+## 3. 【保留・今回対象外】その他の継続開発
 
 | 項目 | 確認結果 | 扱い |
 |---|---|---|
@@ -92,14 +95,14 @@
 | T1 | 地方競馬Shadow 朝予想・前日回顧 | `CRON_TZ=Asia/Tokyo 0 8 * * *` | 新規セッション/回 | 原文の指示文群をそのまま出力し通知 |
 | T2 | JRA正式予想・E0/E1/E2研究収集 | `CRON_TZ=Asia/Tokyo 0 8 * * 6,0,1` | 同上 | 同上 |
 | T3 | JRA正式回顧・研究回顧 | `CRON_TZ=Asia/Tokyo 0 19 * * 6,0,1` | 同上 | 同上 |
-| T4 | 東京23区イベント更新 | `CRON_TZ=Asia/Tokyo 0 8 * * 1-5` | 同上 | 下記休日判定で該当日のみ指示文を通知、非該当日は通知しない |
+| T4（保留） | 東京23区イベント更新 | `CRON_TZ=Asia/Tokyo 0 8 * * 1-5` | 同上 | 下記休日判定で該当日のみ指示文を通知、非該当日は通知しない |
 
 - 時刻は依頼どおり08:00/19:00。サーバ混雑で毎時0分は数分遅延し得る。許容できなければ07:4x等へずらす案もある（利用者判断）。
 - 通知: push通知を有効化（emailは依頼時のみ）。
 - 新規セッション方式を推奨（前回の会話状態に引きずられない、原文をそのまま出す用途に適する）。
 - T2/T3の月曜は、JRA月曜開催がない週も通知される（ChatGPT現行と同じ想定。原文で確認）。
 
-### 4.3 T4 休日判定
+### 4.3 T4 休日判定（保留・今回対象外）
 
 - 平日毎朝08:00に起動し、`tools/rolling_horizon.py --as-of <JST当日>`（read-only、内閣府祝日CSV）で `eligible` の日だけ指示文を出す。`skipped` は無通知、CSV取得失敗は「休日判定不能BLOCKER」として通知（黙って省略しない）。
 - 2026-11 実測: 11/2(月) eligible、11/4(水・文化の日翌日) eligible、11/9(月) eligible、11/24(火・11/21〜23 土日+勤労感謝の日の3連休明け) eligible。
@@ -124,10 +127,10 @@
 
 ## 6. 利用者に判断を求める事項
 
-1. ChatGPT 4タスクのプロンプト全文の提供（必須）
-2. T4休日判定の規則（案A/案B）
-3. PR #92 のマージ可否（マージ後もShadow実績は0から）
-4. production-releases.json 不一致の是正方針
-5. tokyo-family-events-ai / train-timer への push権限付与（add_repo access: push）
-6. CLAUDE.md案の配置承認
-7. 時刻ジッター（08:00厳守 or 数分前倒し）
+1. 競馬3タスク（T1〜T3）のプロンプト全文の提供（必須・利用者準備中のため待機）
+2. PR #92 のマージ可否（マージ後もShadow実績は0から）
+3. production-releases.json 不一致の是正方針
+4. CLAUDE.md案の配置承認
+5. 時刻ジッター（08:00/19:00厳守 or 数分前倒し）
+
+保留（今回対象外）: T4休日判定規則、tokyo-family-events-ai / train-timer のpush権限・引き継ぎ。
