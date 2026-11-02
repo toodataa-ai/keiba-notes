@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "generated_by": "e2e_validation/improvement_pipeline_v1.py",
+  "automatic_promotion": false,
+  "stages": [
+    "研究",
+    "登録",
+    "比較",
+    "判定"
+  ],
+  "owners": {
+    "baba": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。",
+    "experience": "若駒の観察は毎週の予想・回顧の実行で自動的にたまる。",
+    "registration": "登録できる通知（Issue）にユーザーが A/B/C で答え、A のとき Claude が比較用プログラムを書いて登録する。"
+  },
+  "themes": [
+    {
+      "id": "pace_positioning",
+      "title": "展開・位置取り"
+    },
+    {
+      "id": "track_condition",
+      "title": "馬場状態"
+    },
+    {
+      "id": "field_experience",
+      "title": "若駒・経験不足"
+    },
+    {
+      "id": "ticket_portfolio",
+      "title": "購入セットと印の整合性"
+    }
+  ],
+  "baba_registry_freshness": {
+    "updated_at": "2026-10-05",
+    "age_days": 28,
+    "is_stale": true,
+    "owner": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。"
+  },
+  "experience_evidence_week": "2026-10-31",
+  "units": [
+    {
+      "id": "pace_positioning:all",
+      "theme": "pace_positioning",
+      "label": "展開・位置取り",
+      "stage": 2,
+      "stage_name": "比較",
+      "frac": 0.0,
+      "state": "comparing",
+      "text": "比較 0/20レース（EXP-001）",
+      "criteria_text": "毎週の回顧で、3レース以上・2開催以上で同じ課題が出たら、改善案として登録できます。",
+      "criteria_met": true,
+      "experiment_id": "EXP-001",
+      "detail": {}
+    },
+    {
+      "id": "track_condition:official",
+      "theme": "track_condition",
+      "label": "公式馬場補正",
+      "stage": 2,
+      "stage_name": "比較",
+      "frac": 0.0,
+      "state": "comparing",
+      "text": "比較 0/20レース（EXP-002）",
+      "criteria_text": "毎週の回顧で、3レース以上・2開催以上で同じ課題が出たら、改善案として登録できます。",
+      "criteria_met": true,
+      "experiment_id": "EXP-002",
+      "detail": {}
+    },
+    {
+      "id": "track_condition:track:sapporo",
+      "theme": "track_condition",
+      "label": "札幌",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "芝：試作 ／ ダート：試作",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "pilot",
+        "dirt": "pilot",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:hakodate",
+      "theme": "track_condition",
+      "label": "函館",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "芝：試作 ／ ダート：試作",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "pilot",
+        "dirt": "pilot",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:fukushima",
+      "theme": "track_condition",
+      "label": "福島",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "芝：試作 ／ ダート：試作",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "pilot",
+        "dirt": "pilot",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:niigata",
+      "theme": "track_condition",
+      "label": "新潟",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "芝：試作 ／ ダート：試作",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "pilot",
+        "dirt": "pilot",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:tokyo",
+      "theme": "track_condition",
+      "label": "東京",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.5,
+      "state": "research",
+      "text": "芝：検証中 ／ ダート：検証中",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:nakayama",
+      "theme": "track_condition",
+      "label": "中山",
+      "stage": 3,
+      "stage_name": "判定",
+      "frac": 1.0,
+      "state": "in_production",
+      "text": "本番の予想で使用中（改善案としての比較は不要）",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "validated",
+        "dirt": "validated",
+        "in_production": true
+      }
+    },
+    {
+      "id": "track_condition:track:chukyo",
+      "theme": "track_condition",
+      "label": "中京",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "芝：試作 ／ ダート：試作",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "pilot",
+        "dirt": "pilot",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:kyoto",
+      "theme": "track_condition",
+      "label": "京都",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.5,
+      "state": "research",
+      "text": "芝：検証中 ／ ダート：検証中",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "backtesting",
+        "dirt": "backtesting",
+        "in_production": false
+      }
+    },
+    {
+      "id": "track_condition:track:hanshin",
+      "theme": "track_condition",
+      "label": "阪神",
+      "stage": 3,
+      "stage_name": "判定",
+      "frac": 1.0,
+      "state": "in_production",
+      "text": "本番の予想で使用中（改善案としての比較は不要）",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "validated",
+        "dirt": "validated",
+        "in_production": true
+      }
+    },
+    {
+      "id": "track_condition:track:kokura",
+      "theme": "track_condition",
+      "label": "小倉",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "芝：試作 ／ ダート：試作",
+      "criteria_text": "芝・ダートの両方が「候補」以上になったら、その競馬場を改善案として登録できます（すでに本番で使っている競馬場は対象外）。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "turf": "pilot",
+        "dirt": "pilot",
+        "in_production": false
+      }
+    },
+    {
+      "id": "field_experience:e0",
+      "theme": "field_experience",
+      "label": "0戦（新馬）",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "あと30頭分（約3レース）",
+      "criteria_text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "collected_prerace_horses": 120
+      }
+    },
+    {
+      "id": "field_experience:e1",
+      "theme": "field_experience",
+      "label": "1〜3戦",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "あと30頭分（約5レース）",
+      "criteria_text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "collected_prerace_horses": 134
+      }
+    },
+    {
+      "id": "field_experience:e2",
+      "theme": "field_experience",
+      "label": "4戦以上",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.0,
+      "state": "research",
+      "text": "あと30頭分（約3レース）",
+      "criteria_text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "collected_prerace_horses": 498
+      }
+    },
+    {
+      "id": "field_experience:pedigree",
+      "theme": "field_experience",
+      "label": "血統との関連",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.5,
+      "state": "research",
+      "text": "血統の情報 100%（目標90%）／0戦・1〜3戦の条件はこれから",
+      "criteria_text": "0戦と1〜3戦の条件に届き、かつ発走前に血統の情報が9割以上の馬で集まっていたら、血統との組み合わせを改善案として登録できます。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "pedigree_coverage": 1.0,
+        "requires_met": false
+      }
+    },
+    {
+      "id": "ticket_portfolio:all",
+      "theme": "ticket_portfolio",
+      "label": "購入セット・印",
+      "stage": 1,
+      "stage_name": "登録",
+      "frac": 0.0,
+      "state": "ready_to_register",
+      "text": "条件に届いた（登録待ち）",
+      "criteria_text": "毎週の回顧で、3レース以上・2開催以上で同じ課題が出たら、改善案として登録できます。",
+      "criteria_met": true,
+      "experiment_id": null,
+      "detail": {}
+    }
+  ]
+}
