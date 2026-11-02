@@ -10,11 +10,12 @@
 <link rel="stylesheet" href="assets/jra-inline-report.css?v=20261012-v103">
 </head>
 <body>
-<header class="page-hero"><div class="wrap"><a class="home-link" href="index.html">← トップページに戻る</a><h1>今週のAI予想</h1><p>直近のJRA開催予定と、まだ回顧前のAI予想をまとめています。</p></div></header>
+<header class="page-hero"><div class="wrap"><a class="home-link" href="index.html">← トップページに戻る</a><h1>今週のAI予想</h1><p>今週のJRAメインレースの予定と、AIが発走前に出した予想をまとめています。</p></div></header>
 <main class="wrap page-main">
+<p class="muted" style="margin:0 0 18px">予想は発走前に確定して保存し、あとから変えていません。結果が出たら「<a href="results.html">過去の成績</a>」に移ります。</p>
 <section class="page-section"><h2 id="scheduleTitle">次回の対象レース</h2><p id="weekPeriod" class="muted"></p><div id="weekSchedule"><p class="muted">読み込み中…</p></div></section>
 
-<section class="page-section" id="pendingReviewSection" hidden><h2>回顧待ちのAI予想</h2><p class="muted">開催日を過ぎても予想原本は保持します。公式結果・払戻とGrade A監査が完了すると、<a href="results.html">過去の成績</a>へ移ります。</p><div id="pendingReviewRaces" class="race-list"></div></section>
+<section class="page-section" id="pendingReviewSection" hidden><h2>結果の振り返り待ちのAI予想</h2><p class="muted">開催日を過ぎても、予想は変えずに保管します。公式の結果・払戻の確認が終わると、<a href="results.html">過去の成績</a>へ移ります。</p><div id="pendingReviewRaces" class="race-list"></div></section>
 <section class="page-section"><h2>公開中のAI予想</h2><div id="weekPredictions" class="race-list"><p class="muted">読み込み中…</p></div></section>
 </main>
 <script src="assets/week.js?v=20261102-pending-v1"></script>
