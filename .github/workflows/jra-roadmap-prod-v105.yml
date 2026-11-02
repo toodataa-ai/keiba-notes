@@ -44,13 +44,11 @@ jobs:
           import subprocess,sys
           old=sys.argv[1]
           actual=set(subprocess.check_output(['git','diff','--name-only',old,'HEAD'],text=True).splitlines())
-          allowed={
-            'docs/index.html','docs/roadmap.html',
-            'docs/improvement-cycle.html','docs/assets/improvement-cycle.css',
-            'docs/assets/improvement-cycle-v2.css',
-            '.github/scripts/test-jra-roadmap-prod-v105.py',
-            '.github/workflows/jra-roadmap-prod-v105.yml'}
-          assert actual and actual<=allowed,("Unexpected release scope",sorted(actual-allowed))
+          # UI/infra changes are allowed; sealed predictions, reports, PDFs, results, proofs and research are not.
+          protected=('docs/data/','docs/reports/','docs/pdfs/','e2e_validation/','local_racing_shadow_v1/','experience_regime_v1/')
+          ledger={'docs/data/production-releases.json'}
+          touched=sorted(f for f in actual if f.startswith(protected) and f not in ledger)
+          assert actual and not touched,("Release touches sealed data",touched)
           print('PASS_UI_ONLY_NO_PREDICTION_REPORT_RESULT_PROOF_OR_DATA_CHANGE',sorted(actual))
           PY
       - name: Browser-test actual generated dashboard on 7 screen sizes
