@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-improvement-note-v1",
-      "title": "改善状況ページ：試算は判定に数えない旨を明記",
-      "pages": [
-        "improvement-cycle.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-02",
-      "summary": "「参考：過去Nレースでの試算」の横に「（判定には数えません）」を追記"
-    }
-  ]
+  "candidates": []
 }

@@ -108,7 +108,7 @@ Promise.all([
       <div class="facts">
         <div class="fact"><span>途中経過（勝つ確率の見積もり）</span><b class="${nowCls}">${esc(now)}</b></div>
         <div class="fact"><span>判定の目安</span><b>${esc(weeks(e.remaining_prospective_pairs))}</b></div>
-        <div class="fact"><span>参考：過去${r.pairs || 0}レースでの試算</span><b class="${refCls}">${esc(ref)}</b></div>
+        <div class="fact"><span>参考：過去${r.pairs || 0}レースでの試算（判定には数えません）</span><b class="${refCls}">${esc(ref)}</b></div>
         <div class="fact"><span>比較の開始</span><b>${esc((e.effective_prospective_from || '').slice(0, 10).replace(/-/g, '/'))} 以降のレース</b></div>
       </div>
     </article>`;
