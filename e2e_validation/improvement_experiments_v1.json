@@ -39,7 +39,8 @@
         "honmei_top3"
       ],
       "decision_rule": "発走前登録後の同一レース20ペア以上で、win_log_lossとwin_brierがともに正式版より改善し、◎3着内率が悪化しない場合にA/B/C承認へ提出。どれかを満たさなければ棄却して次の案へ",
-      "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない"
+      "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない",
+      "plain_summary": "各馬の「前に行くか・後ろから行くか」と、レースが速い流れになりそうかを予想し、流れに合う馬の勝つ確率を少し上げます。"
     },
     {
       "id": "EXP-002",
@@ -69,7 +70,8 @@
       ],
       "decision_rule": "発走前登録後の同一レース20ペア以上で、win_log_lossとwin_brierがともに正式版より改善し、◎3着内率が悪化しない場合にA/B/C承認へ提出。道悪レースだけの成績も別に確認する",
       "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない",
-      "not_covered": "内外の有利不利（トラックバイアス）は発走前の根拠データが封印予想に無いため対象外。別の改善案で扱う"
+      "not_covered": "内外の有利不利（トラックバイアス）は発走前の根拠データが封印予想に無いため対象外。別の改善案で扱う",
+      "plain_summary": "その日の馬場（良・稍重・重・不良）と、各馬の良馬場・雨の馬場での過去の成績を見て、今日の馬場が得意な馬の勝つ確率を少し上げます。"
     }
   ],
   "note": "Registered challengers run as deterministic SHA-pinned overlays on the sealed formal STEP1. Only races starting after registration count as prospective pairs."
