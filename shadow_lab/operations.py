@@ -95,8 +95,10 @@ def discover(day):
     checkout_races=[r['id'] for r in rt.read(rt.ROOT/'docs/data/races.json')['races']
                     if r.get('scope')=='jra-main' and r.get('date')==day]
     main_only=[]
+    main_ref_checked=False
     try:
         main_registry=json.loads(rt.git('show','origin/main:docs/data/races.json'))['races']
+        main_ref_checked=True
         main_only=sorted(r['id'] for r in main_registry
                          if r.get('scope')=='jra-main' and r.get('date')==day
                          and r['id'] not in checkout_races)
@@ -104,7 +106,7 @@ def discover(day):
         # A missing remote ref cannot be treated as evidence of freshness.
         pass
     registry_audit={'checkout_races':checkout_races,'main_only_races':main_only,
-                    'main_ref_checked':'origin/main'}
+                    'main_ref':'origin/main','main_ref_checked':main_ref_checked}
     if not reports:
         reason=('stale_experiment_checkout_main_has_canonical_races:' if main_only else
                 'no_canonical_jra_main_races_in_checkout:' if not checkout_races else
