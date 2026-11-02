@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.07-20261102",
-  "current_public_version": "1.07",
+  "current_public_release": "release/jra-site-v1.08-20261102",
+  "current_public_version": "1.08",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -136,6 +136,26 @@
       "scope_files": [
         "docs/index.html",
         "docs/this-week.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.08-20261102",
+      "branch": "release/jra-site-v1.08-20261102",
+      "commit_sha": "4efc22495503b8f0cffa1187eb357c889f147d1c",
+      "deployed_at": "2026-11-02T14:33:44+09:00",
+      "workflow_run_id": 41394720812,
+      "validation_workflow_run_id": 41394720812,
+      "public_version": "1.08",
+      "note": "2026-11-02ユーザー明示承認済み。改善状況ページ：試算は判定に数えない旨を明記：「参考：過去Nレースでの試算」の横に「（判定には数えません）」を追記",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-improvement-note-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/improvement-cycle.html"
       ],
       "public_http_files_verified": null
     }
