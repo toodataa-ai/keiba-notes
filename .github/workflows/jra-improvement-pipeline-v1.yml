@@ -53,11 +53,11 @@ jobs:
           set -euo pipefail
           python e2e_validation/improvement_pipeline_v1.py --issues > "$RUNNER_TEMP/ready.jsonl"
           if [ ! -s "$RUNNER_TEMP/ready.jsonl" ]; then echo 'No unit ready to register'; exit 0; fi
-          gh label create registration-ready --color 1D76DB --description '改善案として登録できる条件に到達（A/B/C待ち・通知のみ）' 2>/dev/null || true
+          gh label create registration-ready --color 1D76DB --description '改善案の登録・採用の条件に到達（A/B/C待ち・通知のみ）' 2>/dev/null || true
           while IFS= read -r line; do
             title=$(printf '%s' "$line" | jq -r .title)
             id=$(printf '%s' "$line" | jq -r .unit_id)
-            existing=$(gh issue list --state all --label registration-ready --limit 300 --json title --jq "[.[]|select(.title|contains(\"($id)\"))]|length")
+            existing=$(gh issue list --state all --label registration-ready --limit 300 --json title --jq "[.[]|select(.title|contains(\"$id\"))]|length")
             if [ "$existing" != "0" ]; then echo "Issue already exists for $id"; continue; fi
             printf '%s' "$line" | jq -r .body > "$RUNNER_TEMP/body.md"
             gh issue create --title "$title" --label registration-ready --body-file "$RUNNER_TEMP/body.md"
