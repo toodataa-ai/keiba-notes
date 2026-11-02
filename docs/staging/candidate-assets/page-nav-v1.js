@@ -2,10 +2,7 @@
 (function(){
   try{
     var path=location.pathname||'';
-    var inStaging=path.indexOf('/staging/')>=0;
-    var file=path.split('/').pop()||'index.html';
-    var isHome=(file===''||file==='index.html');
-    var css=document.createElement('style');
+        var css=document.createElement('style');
     css.textContent=
       '.pgnav{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:50;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}'+
       '.pgnav.on{opacity:1;pointer-events:auto;transform:none}'+
@@ -16,12 +13,6 @@
     box.className='pgnav';
     box.setAttribute('role','navigation');
     box.setAttribute('aria-label','ページ移動');
-    if(!isHome){
-      var home=document.createElement('a');
-      home.href=inStaging?'staging/index.html':'index.html';
-      home.textContent='⌂ トップへ';
-      box.appendChild(home);
-    }
     var up=document.createElement('button');
     up.type='button';
     up.textContent='↑ 一番上へ';
