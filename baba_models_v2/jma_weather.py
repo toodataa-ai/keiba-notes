@@ -40,6 +40,15 @@ STATIONS = {
     "obu": {"ja": "大府", "prec_no": "51", "block_no": "1638", "elements": "full"},
     "yahata": {"ja": "八幡", "prec_no": "82", "block_no": "0780", "elements": "full"},
     "yukuhashi": {"ja": "行橋", "prec_no": "82", "block_no": "0782", "elements": "full"},
+    # Race-day dataset (Stage B). Staffed observatories give humidity for all years; most AMeDAS
+    # stations only report humidity from 2025, so humidity comes from the nearest observatory.
+    "funabashi": {"ja": "船橋", "prec_no": "45", "block_no": "1236", "elements": "full"},
+    "chiba_obs": {"ja": "千葉", "prec_no": "45", "block_no": "47682", "elements": "full", "page": "s1"},
+    "nishinomiya": {"ja": "西宮", "prec_no": "63", "block_no": "1588", "elements": "rain"},
+    "osaka_obs": {"ja": "大阪", "prec_no": "62", "block_no": "47772", "elements": "full", "page": "s1"},
+    "tokyo_obs": {"ja": "東京", "prec_no": "44", "block_no": "47662", "elements": "full", "page": "s1"},
+    "kyoto_obs": {"ja": "京都", "prec_no": "61", "block_no": "47759", "elements": "full", "page": "s1"},
+    "shimonoseki_obs": {"ja": "下関", "prec_no": "81", "block_no": "47762", "elements": "full", "page": "s1"},
 }
 TRACK_STATIONS = {
     "tokyo": {"rain_primary": "fuchu", "full": "fuchu", "rain_secondary": None},
@@ -50,6 +59,14 @@ TRACK_STATIONS = {
     "niigata": {"rain_primary": "matsuhama", "full": "niigata_obs", "rain_secondary": "niigata_obs"},
     "chukyo": {"rain_primary": "obu", "full": "obu", "rain_secondary": "nagoya_obs"},
     "kokura": {"rain_primary": "yahata", "full": "yahata", "rain_secondary": "yukuhashi"},
+    "nakayama": {"rain_primary": "funabashi", "full": "funabashi", "rain_secondary": None},
+    "hanshin": {"rain_primary": "nishinomiya", "full": "osaka_obs", "rain_secondary": None},
+}
+# Station whose humidity is used for each track (staffed observatory, humidity available for all years).
+HUMIDITY_STATION = {
+    "tokyo": "tokyo_obs", "nakayama": "chiba_obs", "kyoto": "kyoto_obs", "hanshin": "osaka_obs",
+    "sapporo": "sapporo_obs", "hakodate": "hakodate_obs", "fukushima": "fukushima_obs",
+    "niigata": "niigata_obs", "chukyo": "nagoya_obs", "kokura": "shimonoseki_obs",
 }
 
 
