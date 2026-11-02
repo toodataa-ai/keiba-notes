@@ -134,13 +134,29 @@ class ReadyIssueTests(unittest.TestCase):
         exp = {"id": "EXP-9", "title": "t", "baseline": "v3.13", "challenger": "c",
                "minimum_prospective_pairs": 20,
                "prospective": {"pairs": 20, "challenger_better_log_loss_races": 12,
-                               **{k: m for k in ("honmei_win", "honmei_top3", "win_brier",
-                                                 "win_log_loss", "top3_brier")}}}
+                               **{k: m for k in ("honmei_win", "win_brier",
+                                                 "win_log_loss", "top3_brier")},
+                               "honmei_top3": {"formal": .5, "challenger": .55, "delta": .05}}}
         b = body(exp, {"decision_rule": "rule"})
         self.assertIn("20件", b)
         self.assertIn("rule", b)
         self.assertIn("自動で採用・正式版変更は行いません", b)
         self.assertIn("EXP-9", title("EXP-9"))
+        self.assertIn("機械判定：採用条件をすべて満たしています", b)
+
+    def test_breakdown_flags_segment_that_got_worse(self):
+        from e2e_validation.experiment_ready_issue_v1 import body
+        good = {"formal": 2.3, "challenger": 2.2, "delta": -0.1}
+        bad = {"formal": 2.0, "challenger": 2.4, "delta": 0.4}
+        exp = {"id": "EXP-9", "title": "t", "baseline": "v3.13", "challenger": "c",
+               "minimum_prospective_pairs": 20,
+               "prospective": {"pairs": 20, "win_log_loss": good, "win_brier": good,
+                               "honmei_top3": {"delta": -0.05}},
+               "prospective_breakdown": {"surface": {"ダート": {"pairs": 5, "win_log_loss": bad,
+                                                              "honmei_top3": {"delta": 0}}}}}
+        b = body(exp, {})
+        self.assertIn("採用条件を満たしていません", b)
+        self.assertIn("芝ダート：ダート", b)
 
 
 if __name__ == "__main__":

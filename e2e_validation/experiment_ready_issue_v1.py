@@ -41,10 +41,44 @@ def body(exp: dict, registry_exp: dict) -> str:
         "",
         f"log lossで改善案が上回ったレース：{p.get('challenger_better_log_loss_races')} / {p['pairs']}",
         "",
+        "## 副作用の確認（条件別の勝率log loss。差がマイナスなら改善案が良い）",
+        "",
+        "| 区分 | 条件 | 件数 | 正式版 | 改善案 | 差 | ◎3着内率の差 |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    dims = {"surface": "芝ダート", "going": "馬場", "venue": "競馬場"}
+    worse = []
+    for dim, label in dims.items():
+        for key, m in (exp.get("prospective_breakdown") or {}).get(dim, {}).items():
+            ll, t3 = m.get("win_log_loss") or {}, m.get("honmei_top3") or {}
+            lines.append(f"| {label} | {key} | {m.get('pairs')} | {ll.get('formal')} | "
+                         f"{ll.get('challenger')} | {ll.get('delta')} | {t3.get('delta')} |")
+            if (ll.get("delta") or 0) > 0 and m.get("pairs", 0) >= 3:
+                worse.append(f"{label}：{key}")
+    lines += [
+        "",
+        "## 自動チェック（事前に決めた採用条件との照合）",
+    ]
+    ll, br, t3 = (p.get(k) or {} for k in ("win_log_loss", "win_brier", "honmei_top3"))
+    checks = [
+        ("勝率log lossが改善", (ll.get("delta") or 0) < 0),
+        ("勝率Brierが改善", (br.get("delta") or 0) < 0),
+        ("◎3着内率が悪化していない", (t3.get("delta") or 0) >= 0),
+    ]
+    lines += [f"- {'✅' if ok else '❌'} {name}" for name, ok in checks]
+    verdict = ("採用条件をすべて満たしています（A候補）" if all(ok for _, ok in checks)
+               else "採用条件を満たしていません（C候補）")
+    lines.append(f"- **機械判定：{verdict}**")
+    if worse:
+        lines.append(f"- ⚠️ 3件以上ある条件で悪化：{'、'.join(worse)}（Bで追加検証も検討）")
+    lines += [
+        "",
+        "これは機械的な照合です。最終判断はあなたが行います。",
+        "",
         "## 次の手順（手動）",
-        "1. Claudeのチャットで「このIssueの判定材料をまとめて」と依頼する（副作用の内訳と推奨を作成）",
-        "2. A（採用）／B（条件付き・追加検証）／C（見送り）を決めてこのIssueにコメントする",
-        "3. Aの場合のみ、Claudeが正式プロンプトの新しい版を作成する",
+        "1. 上の成績・副作用・自動チェックを見て、A（採用）／B（追加検証）／C（見送り）を決める",
+        "2. このIssueに A / B / C とコメントする",
+        "3. Aの場合のみ、Claudeのチャットで「EXP-xxxをAで反映して」と依頼する（正式プロンプトの新しい版を作成）",
         "",
         "この Issue は自動作成です。自動で採用・正式版変更は行いません。",
         "詳細：`docs/data/jra_experiment_status_v1.json`",
