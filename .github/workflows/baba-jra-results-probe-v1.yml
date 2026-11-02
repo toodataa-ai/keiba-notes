@@ -36,11 +36,5 @@ jobs:
           def uniq(a): 
               seen=[];[seen.append(c) for p,c in sacts(a) if c not in seen]; return seen
           r=post('/JRADB/accessS.html','pw01srl10052025041120251102/98'); h=r.text
-          raw=re.findall(r"doAction\(\s*'([^']+)'\s*,\s*'([^']*sde[^']*)'",h)
-          print('#### race links on day page:',len(raw),raw[:2])
-          for path,c in [raw[0],raw[-1]] if raw else []:
-              r=post(path,c); t=BeautifulSoup(r.text,'html.parser'); tx=t.get_text(' ',strip=True)
-              print('#### race page',c,r.status_code,len(tx),'title:',t.title.get_text(strip=True))
-              k=tx.find('天候'); print('  TXT',tx[max(0,k-150):k+250] if k>0 else 'no 天候')
-              for m in list(re.finditer(r'(芝|ダート)\s*[:：]?\s*(良|稍重|重|不良)',tx))[:3]: print('  GO',m.group(0))
+          for m in list(re.finditer('sde',h))[:3]: print('  RAWSDE',h[max(0,m.start()-200):m.end()+120].replace('\n',' '))
           PY
