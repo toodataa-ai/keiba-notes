@@ -1,0 +1,74 @@
+name: Baba research - hourly JMA weather for every race day and the 3 days before (manual, research only)
+on:
+  workflow_dispatch:
+    inputs:
+      tracks:
+        description: 'Tracks as JSON array'
+        required: true
+        default: '["tokyo","nakayama","kyoto","hanshin","chukyo","niigata","fukushima","kokura","sapporo","hakodate"]'
+permissions:
+  contents: write
+concurrency:
+  group: baba-race-weather-v1
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      max-parallel: 5
+      fail-fast: false
+      matrix:
+        track: ${{ fromJSON(inputs.tracks) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Preflight - every station answers with a full day
+        working-directory: baba_models_v2
+        run: |
+          python - <<'PY'
+          import requests
+          from datetime import date
+          import jma_weather as jw, jma_weather_racedays as rd
+          bad = []
+          with requests.Session() as s:
+              for st in rd.stations_for("${{ matrix.track }}"):
+                  try:
+                      rows = jw.fetch_day(s, st, date(2025, 6, 10)); print("ok", st, len(rows))
+                  except Exception as e:
+                      bad.append(st); print("BAD", st, e)
+          raise SystemExit(1 if bad else 0)
+          PY
+      - name: Collect
+        working-directory: baba_models_v2
+        run: python jma_weather_racedays.py --track ${{ matrix.track }} --labels-dir going_labels --out "$RUNNER_TEMP/w/jma_hourly_${{ matrix.track }}.csv"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: weather-${{ matrix.track }}
+          path: ${{ runner.temp }}/w
+          retention-days: 30
+  publish:
+    needs: collect
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: weather-*
+          path: collected
+          merge-multiple: true
+      - name: Commit research data
+        run: |
+          mkdir -p baba_models_v2/weather
+          cp collected/* baba_models_v2/weather/
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baba_models_v2/weather
+          git diff --cached --quiet && echo "nothing new" && exit 0
+          git commit -m "馬場研究: 気象庁の時間別データ（レース当日と前3日）を保存（研究用データ）"
+          git pull --rebase origin main && git push origin HEAD:main
