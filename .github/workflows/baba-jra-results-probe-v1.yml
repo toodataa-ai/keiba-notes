@@ -33,13 +33,17 @@ jobs:
               for m in list(re.finditer('馬場',txt))[:4]: print('  ...',txt[max(0,m.start()-30):m.end()+40])
               return a
           def sacts(a): return [x for x in a if x[0].endswith('accessS.html')]
-          r=post('/JRADB/accessS.html','pw01skl10202511/EC'); a=show('month 2025-11',r)
-          print('  month links:',[c for p,c in sacts(a) if c.startswith('pw01skl10')])
-          r=post('/JRADB/accessS.html','pw01srl10052026041120261101/E2'); a=show('meeting day Tokyo 2026-11-01',r)
-          rc=[c for p,c in sacts(a) if c.startswith('pw01sde')]
-          print('  race links',len(rc),rc[:3])
+          def uniq(a): 
+              seen=[];[seen.append(c) for p,c in sacts(a) if c not in seen]; return seen
+          r=post('/JRADB/accessS.html','pw01skl10202502/00'); 
+          print('#### month 2025-02 (checksum guess)',r.status_code,len(r.text))
+          r=post('/JRADB/accessS.html','pw01skl10202511/EC'); a=acts(r.text)
+          print('#### month 2025-11 cnames:',[c for c in uniq(a) if not c.startswith(('pw01sli','pw01skl0','pw01ide','pw03','pw01dli','pw15','pw01hli'))][:60])
+          r=post('/JRADB/accessS.html','pw01srl10052026041120261101/E2'); a=acts(r.text)
+          print('#### day page cnames:',[c for c in uniq(a) if not c.startswith(('pw01sli','pw01skl0','pw01ide','pw03','pw01dli','pw15','pw01hli'))][:40])
+          rc=[c for c in uniq(a) if c.startswith('pw01sde')]
           if rc:
-              r=post('/JRADB/accessS.html',rc[0]); s2=BeautifulSoup(r.text,'html.parser'); t=s2.get_text(' ',strip=True)
+              r=post('/JRADB/accessS.html',rc[0]); t=BeautifulSoup(r.text,'html.parser').get_text(' ',strip=True)
               print('#### race page',r.status_code,len(t))
-              for m in list(re.finditer(r'(芝|ダート)\s*[:：]?\s*(良|稍重|重|不良)|天候|馬場',t))[:8]: print('  ...',t[max(0,m.start()-30):m.end()+40])
+              for m in list(re.finditer(r'(芝|ダート)\s*[:：]?\s*(良|稍重|重|不良)|天候',t))[:6]: print('  ...',t[max(0,m.start()-30):m.end()+40])
           PY
