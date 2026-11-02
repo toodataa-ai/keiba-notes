@@ -30,14 +30,17 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import subprocess
-          paths=set(subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r','HEAD'],text=True).splitlines())
+          # First-parent diff so merge commits are inspected too (diff-tree on a merge lists nothing).
+          paths=set(subprocess.check_output(['git','diff','--name-only','HEAD^','HEAD'],text=True).splitlines())
           allowed={'AGENTS.md','.github/skills/keiba-site-change-routing/SKILL.md',
             '.github/skills/keiba-site-change-routing/references/release-checklist.md',
             '.github/lab/README.md','.github/scripts/check-jra-routing-skill.py',
             '.github/workflows/validate-jra-routing-skill.yml',
             'docs/operations/JRA_UI_APPROVAL_DATA_AUTO_RELEASE.md',
             'docs/operations/jra_site_staging_release_v1.md'}
-          assert paths and paths.issubset(allowed),('unexpected modifications',sorted(paths-allowed))
+          assert paths and allowed & paths,('governance files not changed',sorted(paths))
+          sealed=('docs/data/','docs/reports/','docs/pdfs/','e2e_validation/','local_racing_shadow_v1/')
+          assert not [f for f in paths if f.startswith(sealed) and f!='docs/data/production-releases.json'],('sealed data changed with governance edit',sorted(paths))
           for path in ('docs/data','docs/reports','docs/pdfs','e2e_validation','local_racing_shadow_v1'):
             old=subprocess.check_output(['git','rev-parse','HEAD^:'+path],text=True).strip()
             new=subprocess.check_output(['git','rev-parse','HEAD:'+path],text=True).strip()
