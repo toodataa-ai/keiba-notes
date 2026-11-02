@@ -1,0 +1,76 @@
+name: Baba research - collect official per-race going labels from JRA result pages (manual, low rate)
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: 'Years to collect as JSON array, e.g. ["2025"] or ["2018","2019"]'
+        required: true
+        default: '["2025"]'
+permissions:
+  contents: write
+concurrency:
+  group: baba-going-labels-v1
+  cancel-in-progress: false
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - run: python -m unittest test_jra_going_labels
+        working-directory: baba_models_v2
+      - name: List every meeting day (month pages)
+        working-directory: baba_models_v2
+        run: python jra_going_labels.py index --start 201801 --end 202611 --out "$RUNNER_TEMP/days.json"
+      - uses: actions/upload-artifact@v4
+        with: {name: going-days-index, path: '${{ runner.temp }}/days.json'}
+  collect:
+    needs: index
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      max-parallel: 2
+      fail-fast: false
+      matrix:
+        year: ${{ fromJSON(inputs.years) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - uses: actions/download-artifact@v4
+        with: {name: going-days-index, path: '${{ runner.temp }}/idx'}
+      - name: Collect the year
+        working-directory: baba_models_v2
+        run: python jra_going_labels.py collect --days "$RUNNER_TEMP/idx/days.json" --year "${{ matrix.year }}" --out "$RUNNER_TEMP/going_${{ matrix.year }}.csv"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: going-${{ matrix.year }}
+          path: |
+            ${{ runner.temp }}/going_${{ matrix.year }}.csv
+            ${{ runner.temp }}/going_${{ matrix.year }}.csv.summary.json
+  publish:
+    needs: collect
+    if: ${{ !cancelled() && needs.collect.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'going-20*', path: collected, merge-multiple: true}
+      - name: Commit collected labels (research data only)
+        run: |
+          mkdir -p baba_models_v2/going_labels
+          for f in collected/going_*.csv; do
+            y=$(basename "$f" .csv | sed 's/going_//')
+            cp "$f" "baba_models_v2/going_labels/jra_going_${y}.csv"
+            cp "$f.summary.json" "baba_models_v2/going_labels/jra_going_${y}.summary.json"
+          done
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baba_models_v2/going_labels
+          git diff --cached --quiet && echo "nothing new" && exit 0
+          git commit -m "馬場研究: JRA公式の結果ページから各レースの馬場状態を取得（研究用データ）"
+          git pull --rebase origin main && git push origin HEAD:main
