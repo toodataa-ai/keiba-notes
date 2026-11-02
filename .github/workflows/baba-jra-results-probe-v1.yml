@@ -1,0 +1,36 @@
+name: Baba research - probe how JRA race-result pages can be read (read only, a few requests)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: robots.txt and the path to results pages
+        run: |
+          python - <<'PY'
+          import re, time, requests
+          from bs4 import BeautifulSoup
+          H={'User-Agent':'keiba-notes track-condition research/1.0 (low rate, research only)'}
+          def get(u,**k):
+              time.sleep(3)
+              r=requests.get(u,headers=H,timeout=40,**k); r.encoding=r.apparent_encoding; return r
+          for host in ('https://www.jra.go.jp','https://www.jra.jp'):
+              try:
+                  r=get(host+'/robots.txt'); print('#### robots',host,r.status_code); print(r.text[:1500])
+              except Exception as e: print('robots err',host,e)
+          for u in ['https://www.jra.go.jp/datafile/seiseki/','https://www.jra.go.jp/keiba/','https://www.jra.jp/JRADB/accessS.html']:
+              try:
+                  r=get(u); print('####',u,r.status_code,len(r.text),r.url)
+                  s=BeautifulSoup(r.text,'html.parser')
+                  for a in s.find_all('a')[:80]:
+                      t=a.get_text(' ',strip=True)
+                      if any(k in t for k in ('結果','成績','過去','リプレイ','レース')) or 'seiseki' in (a.get('href') or ''):
+                          print('  A',t[:30],a.get('href'),a.get('onclick'))
+                  for m in re.findall(r"doAction\([^)]*\)",r.text)[:10]: print('  JS',m)
+              except Exception as e: print('err',u,e)
+          PY
