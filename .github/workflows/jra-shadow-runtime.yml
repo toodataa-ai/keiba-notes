@@ -48,7 +48,7 @@ jobs:
       - run: python -m pip install requests beautifulsoup4 playwright==1.56.0
       - name: Seven-theme trust boundaries and full candidate engine E2E
         run: |
-          python -m unittest shadow_lab.test_runtime -v
+          python -m unittest shadow_lab.test_runtime shadow_lab.test_operations -v
           node shadow_lab/test_candidate.mjs
           python -m unittest discover -s e2e_validation -p 'test_*.py'
           python e2e_validation/validate_manifests.py
