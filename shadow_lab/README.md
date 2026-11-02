@@ -13,7 +13,7 @@ After the ordinary manual morning / research / evening workflows finish,
 `jra-shadow-runtime.yml` runs separately via `workflow_run`. Formal completion
 does not depend on Shadow. Once the workflow exists on the default branch this
 hook is active; a Draft branch alone cannot activate default-branch events.
-Its only push destination is `experiment/jra-shadow-evidence-v1`, never main.
+Its only push destination is `experiment/jra-shadow-evidence-main-20261102`, never main. The older `experiment/jra-shadow-evidence-v1` branch is retained unchanged; its old baseline tree must not be merged into the newer main checkout.
 The workflow artifact is a staging preview, not a production Pages deployment.
 
 For a Draft checkout or a local manual instruction:
