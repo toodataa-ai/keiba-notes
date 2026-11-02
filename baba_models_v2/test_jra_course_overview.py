@@ -22,10 +22,12 @@ class T(unittest.TestCase):
         self.assertIsNone(c.expand('よく分からない', 8))
 
     def test_urls(self):
-        u = c.candidate_urls('2024', '東京', {1, 2, 3, 4, 5})
+        u = [x[1] for x in c.candidate_urls('2024', '東京', {1, 2, 3, 4, 5})]
         self.assertIn(c.BASE + '2024_2-3_tokyo.html', u)
         self.assertIn(c.BASE + '2024_4-5_tokyo.html', u)
         self.assertIn(c.BASE + '2024_1_tokyo.html', u)
+        self.assertIn(c.BASE + '2024_3-4-5_tokyo.html'.replace('3-4-5', '3-5'), u)
+        self.assertEqual(c.expand('全4日', None), [1, 2, 3, 4])
 
 
 if __name__ == '__main__':
