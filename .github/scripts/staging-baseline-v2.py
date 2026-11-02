@@ -46,7 +46,7 @@ def candidates():
 def candidate_assets():
     return sorted({a for c in candidates().values() for a in c.get('assets',[])})
 
-def render(prod,*,candidate=False,assets=()):
+def render(prod,*,candidate=False,assets=(),page=None):
     assert prod.count('<html lang="ja">')==1
     assert prod.count('<head>')==1 and prod.count('</head>')==1
     assert len(re.findall(r'<body(?:\s+[^>]*)?>',prod))==1 and prod.count('</body>')==1
@@ -67,6 +67,8 @@ def render(prod,*,candidate=False,assets=()):
         if hashsep>=0:
             plain,hashpart=base[:hashsep],base[hashsep:]
         else: plain,hashpart=base,''
+        # <base href="../"> would send same-page anchors (#x) to docs/; keep them on this staging page.
+        if plain=='' and len(hashpart)>1 and page: return 'href='+quote+'staging/'+page+hashpart+quote
         if plain in PAGES: return 'href='+quote+'staging/'+plain+hashpart+(sep+tail if sep else '')+quote
         return match.group(0)
     out=re.sub(r'href=(["\x27])([^"\x27]+)\1',fix,out)
@@ -115,8 +117,8 @@ def expected(name):
     """Exact staging HTML for a canonical page (candidate source if one is pending)."""
     cand=candidates()
     if name in cand:
-        return render((CANDIDATE_SRC/name).read_text(encoding='utf-8'),candidate=True,assets=candidate_assets())
-    return render((PROD/name).read_text(encoding='utf-8'))
+        return render((CANDIDATE_SRC/name).read_text(encoding='utf-8'),candidate=True,assets=candidate_assets(),page=name)
+    return render((PROD/name).read_text(encoding='utf-8'),page=name)
 
 def sync(*,check=False,only=None):
     names=[only] if only else PAGES
