@@ -1,0 +1,32 @@
+name: Validate seven JRA improvement experiment design gates
+
+on:
+  pull_request:
+    paths:
+      - 'shadow_lab/**'
+      - 'e2e_validation/improvement_experiments_v1.json'
+      - 'e2e_validation/validate_all_experiment_designs_v1.py'
+      - 'e2e_validation/test_all_experiment_designs_v1.py'
+      - 'docs/data/jra_shadow_experiment_status_v1.json'
+      - 'docs/data/jra_improvement_cycle_v1.json'
+      - '.github/workflows/validate-all-improvement-experiments-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  all-experiment-design:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify registered formal and research readiness
+        run: python e2e_validation/validate_all_experiment_designs_v1.py
+      - name: Ensure status file is derived, not hand-inflated
+        run: git diff --exit-code -- docs/data/jra_shadow_experiment_status_v1.json
+      - name: Unit tests for false promotions and false evidence
+        run: python -m unittest discover -s e2e_validation -p 'test_all_experiment_designs_v1.py' -v
+      - name: Preserve Tokyo Kyoto model-only design gate
+        run: python e2e_validation/validate_track_condition_design_v1.py

@@ -1,0 +1,143 @@
+name: Independent seven-theme JRA Shadow lifecycle
+on:
+  pull_request:
+    paths:
+      - 'shadow_lab/**'
+      - 'docs/staging/improvement-cycle.html'
+      - 'docs/data/jra_shadow_experiment_status_v1.json'
+      - '.github/workflows/jra-shadow-runtime.yml'
+  workflow_dispatch:
+    inputs:
+      phase:
+        type: choice
+        options: [morning, research, evening]
+        default: morning
+        description: 'Independent Shadow only; never modifies formal predictions'
+      packet:
+        type: string
+        required: false
+        description: 'Optional committed shadow_lab/requests/ packet'
+  workflow_run:
+    workflows:
+      - JRA generic v3.14 intake, v3.13 frozen STEP1 and fresh-odds audited publication
+      - JRA official v3.16 variable-stake prestart post-v3.15 promotion
+      - E012 JRA reusable strict prereace research collector
+      - Freeze genuine formal STEP1 for E012 research (no synthetic predictions)
+      - Publish postrace JRA Grade A evidence independently of E0/E1/E2 Shadow
+      - Proof-verified JRA E012 postrace research (generic week)
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: write
+  statuses: write
+concurrency:
+  group: independent-seven-theme-shadow
+  cancel-in-progress: false
+jobs:
+  validate-shadow:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install requests beautifulsoup4 playwright==1.56.0
+      - name: Seven-theme trust boundaries and full candidate engine E2E
+        run: |
+          python -m unittest shadow_lab.test_runtime shadow_lab.test_operations -v
+          node shadow_lab/test_candidate.mjs
+          python -m unittest discover -s e2e_validation -p 'test_*.py'
+          python e2e_validation/validate_manifests.py
+          python e2e_validation/validate_all_experiment_designs_v1.py
+          git diff --exit-code -- docs/data/jra_shadow_experiment_status_v1.json
+      - name: Staging mobile desktop data parity and error handling
+        run: python shadow_lab/browser_audit.py
+      - name: Staging screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadow-mobile-desktop-qa
+          path: /tmp/shadow-stage-*.png
+  shadow:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Select isolated evidence branch (never main)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c experiment/jra-shadow-evidence-v1
+          if git ls-remote --exit-code --heads origin experiment/jra-shadow-evidence-v1; then
+            git fetch origin experiment/jra-shadow-evidence-v1
+            git merge --no-edit FETCH_HEAD
+          fi
+      - name: Record protected original tree hashes
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          paths=['docs/reports','docs/pdfs','e2e_validation/predictions','e2e_validation/snapshots','e2e_validation/results','e2e_validation/proofs','docs/data/races.json','docs/data/latest_prompt.json']
+          json.dump({p:subprocess.check_output(['git','rev-parse','HEAD:'+p],text=True).strip() for p in paths},open('/tmp/shadow-protected.json','w'))
+          PY
+      - name: Execute independent collection and candidate generation
+        env:
+          PHASE: ${{ inputs.phase }}
+          PACKET: ${{ inputs.packet }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$PACKET" ]]; then
+            case "$PACKET" in shadow_lab/requests/*.json) ;; *) exit 1;; esac
+            python -m shadow_lab.runtime prepare --packet "$PACKET"
+          fi
+          python -m shadow_lab.operations "${PHASE:-morning}"
+          python -m shadow_lab.operations evening
+      - name: Publish prestart proof or expose blocked seal
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          python - <<'PY'
+          from shadow_lab import runtime as r
+          try:
+              r.seal('experiment/jra-shadow-evidence-v1')
+          except Exception as e:
+              if str(e)!='no_unsealed_pairs':
+                  r.dump(r.ROOT/r.DATA/'attempts'/(r.now().strftime('%Y%m%dT%H%M%S%f')+'-seal.json'),
+                      {'at':r.now().isoformat(),'reports':[{'theme':t,'state':'blocked','blocker':'seal:'+str(e)} for t in r.THEMES]},immutable=True)
+              print('SHADOW_SEAL_BLOCKER',e)
+          PY
+      - name: Audit pairs and update Git-derived progress
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: |
+          python -m shadow_lab.runtime status
+          python e2e_validation/validate_all_experiment_designs_v1.py
+          python - <<'PY'
+          import json,subprocess
+          for p,sha in json.load(open('/tmp/shadow-protected.json')).items():
+              assert subprocess.check_output(['git','rev-parse','HEAD:'+p],text=True).strip()==sha,p
+              assert not subprocess.check_output(['git','status','--porcelain','--',p],text=True),p
+          PY
+          git add -- shadow_lab/evidence docs/lab/data/shadow-runtime.json docs/data/jra_shadow_experiment_status_v1.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update seven-theme Shadow evidence, blockers and audited progress'
+          fi
+          git push origin HEAD:refs/heads/experiment/jra-shadow-evidence-v1
+      - name: Preserve reviewable staging preview (no Pages deployment)
+        uses: actions/upload-artifact@v4
+        with:
+          name: shadow-staging-preview
+          path: |
+            docs/staging/improvement-cycle.html
+            docs/staging/improvement-cycle.css
+            docs/data/jra_shadow_experiment_status_v1.json
+            docs/lab/data/shadow-runtime.json
+            shadow_lab/evidence

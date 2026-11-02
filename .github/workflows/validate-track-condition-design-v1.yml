@@ -1,0 +1,32 @@
+name: Validate Tokyo Kyoto track condition experimental design
+
+on:
+  pull_request:
+    paths:
+      - 'e2e_validation/improvement_experiments_v1.json'
+      - 'e2e_validation/validate_track_condition_design_v1.py'
+      - 'e2e_validation/test_track_condition_design_v1.py'
+      - 'e2e_validation/tokyo_kyoto_going_shadow_v1.py'
+      - 'e2e_validation/test_tokyo_kyoto_going_shadow_v1.py'
+      - 'baba_models_v2/model_registry.json'
+      - 'docs/data/latest_prompt.json'
+      - '.github/workflows/validate-track-condition-design-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fail-closed-design-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate strict design gates
+        run: python e2e_validation/validate_track_condition_design_v1.py
+      - name: Validate fail-closed design regression tests
+        run: python -m unittest discover -s e2e_validation -p 'test_track_condition_design_v1.py' -v
+      - name: Validate pilot capture prestart gate
+        run: python -m unittest discover -s e2e_validation -p 'test_tokyo_kyoto_going_shadow_v1.py' -v

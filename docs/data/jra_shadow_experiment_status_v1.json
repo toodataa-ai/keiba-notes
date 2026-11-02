@@ -1,0 +1,1226 @@
+{
+  "schema_version": 1,
+  "kind": "design_and_audited_shadow_runtime",
+  "formal_baseline": "v3.13",
+  "experiment_count": 7,
+  "registered_design_count": 3,
+  "awaiting_evidence_count": 4,
+  "strict_paired_cases_total": 0,
+  "never_infer_cases_from_observations": true,
+  "candidate_execution_implemented": true,
+  "formal_originals_unchanged": true,
+  "experiments": [
+    {
+      "id": "track_condition_tokyo_kyoto_20261101_v1",
+      "title": "東京・京都 馬場状態・トラックバイアス前向きShadow比較",
+      "family": "formal_jra",
+      "stage": "design",
+      "observation_or_probability_gate_ready": true,
+      "qualified_observations": 7,
+      "remaining_required_observations": 0,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": 20,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    },
+    {
+      "id": "pace_positioning",
+      "title": "展開・位置取り・先行力：STEP1②検証",
+      "family": "formal_jra",
+      "stage": "design",
+      "observation_or_probability_gate_ready": true,
+      "qualified_observations": 14,
+      "remaining_required_observations": 0,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": 20,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    },
+    {
+      "id": "ticket_portfolio",
+      "title": "購入セット・印との整合性：STEP2検証",
+      "family": "formal_jra",
+      "stage": "design",
+      "observation_or_probability_gate_ready": true,
+      "qualified_observations": 17,
+      "remaining_required_observations": 0,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": 20,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    },
+    {
+      "id": "field_experience",
+      "title": "若駒・経験不足：E0/E1/E2の不確実性評価",
+      "family": "formal_jra",
+      "stage": "awaiting_evidence",
+      "observation_or_probability_gate_ready": false,
+      "qualified_observations": 2,
+      "remaining_required_observations": 1,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": 20,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    },
+    {
+      "id": "experience_e0_probability_20261101_v1",
+      "title": "E0戦歴研究：発走前勝率・3着内確率の校正",
+      "family": "experience_regime_research",
+      "stage": "awaiting_evidence",
+      "observation_or_probability_gate_ready": false,
+      "qualified_observations": 0,
+      "remaining_required_observations": 30,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": null,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    },
+    {
+      "id": "experience_e1_probability_20261101_v1",
+      "title": "E1戦歴研究：発走前勝率・3着内確率の校正",
+      "family": "experience_regime_research",
+      "stage": "awaiting_evidence",
+      "observation_or_probability_gate_ready": false,
+      "qualified_observations": 0,
+      "remaining_required_observations": 30,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": null,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    },
+    {
+      "id": "experience_e2_probability_20261101_v1",
+      "title": "E2戦歴研究：発走前勝率・3着内確率の校正",
+      "family": "experience_regime_research",
+      "stage": "awaiting_evidence",
+      "observation_or_probability_gate_ready": false,
+      "qualified_observations": 0,
+      "remaining_required_observations": 30,
+      "candidate_runner_ready": false,
+      "prospective_strict_paired_cases": 0,
+      "minimum_paired_cases": null,
+      "can_promote": false,
+      "unresolved": [
+        "implement prospective candidate and immutable prestart proof",
+        "collect qualifying future outcomes after both forecasts sealed",
+        "validate accuracy, harmful regressions, and explicit A/B/C approval"
+      ]
+    }
+  ],
+  "runtime": {
+    "schema_version": 1,
+    "kind": "shadow_runtime",
+    "repository": "toodataa-ai/keiba-notes",
+    "automatic_promotion": false,
+    "experiments": [
+      {
+        "theme": "pace_positioning",
+        "id": "pace_positioning",
+        "title": "展開・位置取り・先行力：STEP1②検証",
+        "implemented": true,
+        "candidate_version": "v3.13-pace-positioning-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": {
+          "minimum_qualifying_race_reviews": 3,
+          "qualifying_race_reviews": 14,
+          "remaining_qualifying_race_reviews": 0,
+          "minimum_completed_meetings": 2,
+          "remaining_completed_meetings": 0,
+          "pending_week_mentions_not_yet_qualifying": 1,
+          "ready_to_design_experiment": true
+        },
+        "observation_gate_ready": true,
+        "latest_attempt": {
+          "theme": "pace_positioning",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [],
+        "valid_pairs": 0,
+        "paired_target": 20,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": null,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "no_valid_prospective_comparisons"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      },
+      {
+        "theme": "track_condition",
+        "id": "track_condition_tokyo_kyoto_20261101_v1",
+        "title": "東京・京都 馬場状態・トラックバイアス前向きShadow比較",
+        "implemented": true,
+        "candidate_version": "v3.13-tokyo-kyoto-track-condition-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": {
+          "minimum_qualifying_race_reviews": 3,
+          "qualifying_race_reviews": 7,
+          "remaining_qualifying_race_reviews": 0,
+          "minimum_completed_meetings": 2,
+          "remaining_completed_meetings": 0,
+          "pending_week_mentions_not_yet_qualifying": 1,
+          "ready_to_design_experiment": true
+        },
+        "observation_gate_ready": true,
+        "latest_attempt": {
+          "theme": "track_condition",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [],
+        "valid_pairs": 0,
+        "paired_target": 20,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": null,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "no_valid_prospective_comparisons"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      },
+      {
+        "theme": "ticket_portfolio",
+        "id": "ticket_portfolio",
+        "title": "購入セット・印との整合性：STEP2検証",
+        "implemented": true,
+        "candidate_version": "v3.13-ticket-portfolio-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": {
+          "minimum_qualifying_race_reviews": 3,
+          "qualifying_race_reviews": 17,
+          "remaining_qualifying_race_reviews": 0,
+          "minimum_completed_meetings": 2,
+          "remaining_completed_meetings": 0,
+          "pending_week_mentions_not_yet_qualifying": 2,
+          "ready_to_design_experiment": true
+        },
+        "observation_gate_ready": true,
+        "latest_attempt": {
+          "theme": "ticket_portfolio",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [],
+        "valid_pairs": 0,
+        "paired_target": 20,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": null,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "no_valid_prospective_comparisons"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      },
+      {
+        "theme": "field_experience",
+        "id": "field_experience",
+        "title": "若駒・経験不足：E0/E1/E2の不確実性評価",
+        "implemented": true,
+        "candidate_version": "v3.13-field-experience-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": {
+          "minimum_qualifying_race_reviews": 3,
+          "qualifying_race_reviews": 2,
+          "remaining_qualifying_race_reviews": 1,
+          "minimum_completed_meetings": 2,
+          "remaining_completed_meetings": 0,
+          "pending_week_mentions_not_yet_qualifying": 1,
+          "ready_to_design_experiment": false
+        },
+        "observation_gate_ready": false,
+        "latest_attempt": {
+          "theme": "field_experience",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [],
+        "valid_pairs": 0,
+        "paired_target": 20,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": null,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "no_valid_prospective_comparisons",
+          "observation_gate_not_met"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      },
+      {
+        "theme": "E0",
+        "id": "experience_e0_probability_20261101_v1",
+        "title": "E0戦歴研究：発走前勝率・3着内確率の校正",
+        "implemented": true,
+        "candidate_version": "experience-regime-e0-probability-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": null,
+        "observation_gate_ready": true,
+        "latest_attempt": {
+          "theme": "E0",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [
+          {
+            "theme": "E0",
+            "race_id": "2026-11-01-kyoto-01",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E0",
+            "race_id": "2026-11-01-kyoto-05",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E0",
+            "race_id": "2026-11-01-tokyo-04",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E0",
+            "race_id": "2026-11-01-tokyo-05",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          }
+        ],
+        "valid_pairs": 0,
+        "paired_target": null,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": false,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "diagnostic_requires_30_horses_3_races_2_weeks",
+          "fixed_sample_missing_full_field_probabilities:4",
+          "no_valid_prospective_comparisons"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      },
+      {
+        "theme": "E1",
+        "id": "experience_e1_probability_20261101_v1",
+        "title": "E1戦歴研究：発走前勝率・3着内確率の校正",
+        "implemented": true,
+        "candidate_version": "experience-regime-e1-probability-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": null,
+        "observation_gate_ready": true,
+        "latest_attempt": {
+          "theme": "E1",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [
+          {
+            "theme": "E1",
+            "race_id": "2026-11-01-kyoto-01",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E1",
+            "race_id": "2026-11-01-kyoto-02",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E1",
+            "race_id": "2026-11-01-tokyo-07",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          }
+        ],
+        "valid_pairs": 0,
+        "paired_target": null,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": false,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "diagnostic_requires_30_horses_3_races_2_weeks",
+          "fixed_sample_missing_full_field_probabilities:3",
+          "no_valid_prospective_comparisons"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      },
+      {
+        "theme": "E2",
+        "id": "experience_e2_probability_20261101_v1",
+        "title": "E2戦歴研究：発走前勝率・3着内確率の校正",
+        "implemented": true,
+        "candidate_version": "experience-regime-e2-probability-shadow-v0.1-runtime1",
+        "runner_ready": true,
+        "observation": null,
+        "observation_gate_ready": true,
+        "latest_attempt": {
+          "theme": "E2",
+          "state": "blocked",
+          "blocker": "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01"
+        },
+        "data_collection_gaps": [
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-kyoto-09",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-kyoto-10",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-kyoto-11",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-kyoto-12",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-tokyo-07",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-tokyo-10",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          },
+          {
+            "theme": "E2",
+            "race_id": "2026-11-01-tokyo-11",
+            "state": "blocked",
+            "blocker": "full_field_prerace_probabilities_required; fixed_sample_unchanged"
+          }
+        ],
+        "valid_pairs": 0,
+        "paired_target": null,
+        "probability_horses": 0,
+        "distinct_races": 0,
+        "independent_weeks": 0,
+        "diagnostic_ready": false,
+        "sealed_awaiting_result": 0,
+        "metrics": {
+          "baseline": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "candidate": {
+            "races": 0,
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          },
+          "deltas_candidate_minus_baseline": {
+            "stake_yen": 0,
+            "return_yen": 0,
+            "roi": null,
+            "honmei_top3_rate": null,
+            "top3_capture": null,
+            "win_brier": null,
+            "top3_brier": null,
+            "win_log_loss": null,
+            "calibration_gap": null,
+            "calibration_ece_10_bins": null,
+            "max_race_loss_yen": 0,
+            "mean_modeled_expected_net_yen": null
+          }
+        },
+        "condition_audit": {
+          "venue": {},
+          "surface": {},
+          "rain": {},
+          "meeting_week": {}
+        },
+        "regime_probability_audit": {
+          "E0": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E1": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          },
+          "E2": {
+            "baseline": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            },
+            "candidate": {
+              "horse_records": 0,
+              "win_brier": null,
+              "top3_brier": null,
+              "win_log_loss": null
+            }
+          }
+        },
+        "approval": "not_ready",
+        "manual_decision": null,
+        "adopted": false,
+        "automatic_promotion": false,
+        "validation": "collecting",
+        "overfit_review": {
+          "frozen_policy": true,
+          "independent_weeks": 0,
+          "holdout_review": "required_before_approval",
+          "multiple_testing": "seven_themes_report_all_no_winner_selection"
+        },
+        "evidence_races": [],
+        "blockers": [
+          "current_official_forecast_or_same_cutoff_input_not_available:2026-11-01",
+          "diagnostic_requires_30_horses_3_races_2_weeks",
+          "fixed_sample_missing_full_field_probabilities:7",
+          "no_valid_prospective_comparisons"
+        ],
+        "next_action": "collect missing inputs before next start, seal and reconcile official results"
+      }
+    ]
+  }
+}
