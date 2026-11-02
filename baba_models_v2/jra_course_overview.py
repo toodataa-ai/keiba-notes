@@ -40,6 +40,12 @@ def parse_overview(html, track_ja):
         note = tds[5].get_text(' ', strip=True) if len(tds) > 5 else ''
         for ln in lines:
             ln = ln.translate(Z2H)
+            mm = re.match(r'((?:第\d+回[・,、]?)+)' + re.escape(track_ja) + r'\s*全\d+日$', ln)
+            if mm:
+                for kk in re.findall(r'第(\d+)回', mm.group(1)):
+                    rows.append({'kai': int(kk), 'spec': '全日', 'course': course, 'lap': lap, 'straight': stra, 'width': wid, 'note': note})
+                last_kai = int(re.findall(r'第(\d+)回', mm.group(1))[-1])
+                continue
             m = re.match(r'第(\d+)回' + re.escape(track_ja) + r'\s*(.*)$', ln)
             if m:
                 last_kai, spec = int(m.group(1)), m.group(2).strip()
@@ -75,17 +81,19 @@ def load_meetings(labels_dir):
     return {k: {kai: max(v) for kai, v in d.items()} for k, d in seen.items()}
 
 
-def candidate_urls(year, track_ja, kais):
-    """Every contiguous range of meetings up to 3 wide, smallest first (the page name joins meetings)."""
+def candidate_urls(year, track_ja, kais, extra_next=0):
+    """Every contiguous range of meetings up to 3 wide, smallest first.
+    The page name joins every meeting number (2021_4-5-6_hanshin). extra_next lets a range
+    reach meetings that have not been held yet (the current year's last page is named that way)."""
     t = ROMAJI[track_ja]
-    ks = sorted(kais)
+    known = sorted(kais)
+    pool = set(known) | {max(known) + i for i in range(1, extra_next + 1)}
     out = []
     for width in (1, 2, 3):
-        for a in ks:
+        for a in known:
             rng = [a + i for i in range(width)]
-            if all(k in kais for k in rng):
-                name = str(a) if width == 1 else '%d-%d' % (a, rng[-1])
-                out.append((tuple(rng), '%s%s_%s_%s.html' % (BASE, year, name, t)))
+            if all(k in pool for k in rng):
+                out.append((tuple(rng), '%s%s_%s_%s.html' % (BASE, year, '-'.join(str(k) for k in rng), t)))
     return out
 
 
@@ -105,8 +113,8 @@ def main(argv=None):
         if want and year not in want:
             continue
         done_kai = set()
-        for rng, url in candidate_urls(year, track, kais):
-            if all(k in done_kai for k in rng):
+        for rng, url in candidate_urls(year, track, kais, extra_next=2 if year == max(y for y, _ in meetings) else 0):
+            if all(k in done_kai for k in rng if k in kais):
                 continue
             time.sleep(a.delay)
             try:

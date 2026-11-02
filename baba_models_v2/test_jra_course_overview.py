@@ -21,12 +21,21 @@ class T(unittest.TestCase):
         self.assertEqual(c.expand('後4日', 8), [5, 6, 7, 8])
         self.assertIsNone(c.expand('よく分からない', 8))
 
+    def test_combined_two_meetings(self):
+        h = '<h2>芝コース</h2><table><tbody><tr><td>第1回・第2回新潟 全14日</td><td>A</td><td>1</td><td>2</td><td>3</td><td>x</td></tr></tbody></table>'
+        rows, probs = c.parse_overview(h, '新潟')
+        self.assertEqual([(r['kai'], r['spec'], r['course']) for r in rows], [(1, '全日', 'A'), (2, '全日', 'A')])
+        self.assertEqual(c.expand('全日', 8), [1, 2, 3, 4, 5, 6, 7, 8])
+
     def test_urls(self):
         u = [x[1] for x in c.candidate_urls('2024', '東京', {1, 2, 3, 4, 5})]
         self.assertIn(c.BASE + '2024_2-3_tokyo.html', u)
         self.assertIn(c.BASE + '2024_4-5_tokyo.html', u)
         self.assertIn(c.BASE + '2024_1_tokyo.html', u)
-        self.assertIn(c.BASE + '2024_3-4-5_tokyo.html'.replace('3-4-5', '3-5'), u)
+        self.assertIn(c.BASE + '2024_3-4-5_tokyo.html', u)
+        u2 = [x[1] for x in c.candidate_urls('2026', '東京', {1, 2, 3, 4}, extra_next=2)]
+        self.assertIn(c.BASE + '2026_4-5_tokyo.html', u2)
+        self.assertIn(c.BASE + '2026_4-5-6_tokyo.html', u2)
         self.assertEqual(c.expand('全4日', None), [1, 2, 3, 4])
 
 
