@@ -35,15 +35,11 @@ jobs:
           def sacts(a): return [x for x in a if x[0].endswith('accessS.html')]
           def uniq(a): 
               seen=[];[seen.append(c) for p,c in sacts(a) if c not in seen]; return seen
-          r=post('/JRADB/accessS.html','pw01skl10202502/00'); 
-          print('#### month 2025-02 (checksum guess)',r.status_code,len(r.text))
-          r=post('/JRADB/accessS.html','pw01skl10202511/EC'); a=acts(r.text)
-          print('#### month 2025-11 cnames:',[c for c in uniq(a) if not c.startswith(('pw01sli','pw01skl0','pw01ide','pw03','pw01dli','pw15','pw01hli'))][:60])
-          r=post('/JRADB/accessS.html','pw01srl10052026041120261101/E2'); a=acts(r.text)
-          print('#### day page cnames:',[c for c in uniq(a) if not c.startswith(('pw01sli','pw01skl0','pw01ide','pw03','pw01dli','pw15','pw01hli'))][:40])
-          rc=[c for c in uniq(a) if c.startswith('pw01sde')]
-          if rc:
-              r=post('/JRADB/accessS.html',rc[0]); t=BeautifulSoup(r.text,'html.parser').get_text(' ',strip=True)
-              print('#### race page',r.status_code,len(t))
-              for m in list(re.finditer(r'(芝|ダート)\s*[:：]?\s*(良|稍重|重|不良)|天候',t))[:6]: print('  ...',t[max(0,m.start()-30):m.end()+40])
+          r=post('/JRADB/accessS.html','pw01srl10052025041120251102/98')
+          h=r.text; t=BeautifulSoup(h,'html.parser')
+          print('#### day page 2025-11-02 Tokyo',r.status_code,len(h),'title:',t.title.get_text(strip=True))
+          print('  count sde',h.count('sde'),'ses',h.count('ses'),'doAction',h.count('doAction'))
+          for m in list(re.finditer(r'sde|ses|1R|馬場',h))[:6]: print('  RAW',h[max(0,m.start()-120):m.end()+120].replace('\n',' '))
+          txt=t.get_text(' ',strip=True)
+          k=txt.find('1R'); print('  TXT',txt[k-200:k+400] if k>0 else txt[300:800])
           PY
