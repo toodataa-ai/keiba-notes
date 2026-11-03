@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.20-20261103",
-  "current_public_version": "1.20",
+  "current_public_release": "release/jra-site-v1.21-20261103",
+  "current_public_version": "1.21",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -431,6 +431,27 @@
         "docs/this-week.html",
         "docs/results.html",
         "docs/assets/claude-view-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.21-20261103",
+      "branch": "release/jra-site-v1.21-20261103",
+      "commit_sha": "75d5584238226f4c27757922aff72c029cbc072e",
+      "deployed_at": "2026-11-03T17:05:29+09:00",
+      "workflow_run_id": 41600688927,
+      "validation_workflow_run_id": 41600688927,
+      "public_version": "1.21",
+      "note": "2026-11-03ユーザー明示承認済み。Claudeだけで完結する比較の表示と、Claudeのタスクの実行記録：改善状況ページに『馬場の補正』『購入セット』『若駒の機械採点』を追加。自動運用の状況ページの実行記録に、Claudeのタスク（印と買い目・回顧）と若駒の機械採点の行を追加し、タイムラインにも若駒を追加。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-complete-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html",
+        "docs/improvement-cycle.html"
       ],
       "public_http_files_verified": null
     }
