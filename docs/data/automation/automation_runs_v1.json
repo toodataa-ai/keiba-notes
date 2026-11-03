@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "generated_at": "2026-11-03T05:34:52+00:00",
+ "generated_at": "2026-11-03T07:25:30+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。",
  "workflows": {
@@ -914,9 +914,44 @@
     }
    ]
   },
+  "claude-results-v1.yml": {
+   "label": "Claude用の結果取得",
+   "runs": [
+    {
+     "id": 41596171522,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-03T07:25:00Z",
+     "started_at": "2026-11-03T07:25:00Z",
+     "ended_at": "2026-11-03T07:25:16Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1
+    },
+    {
+     "id": 41595982331,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-03T07:23:19Z",
+     "started_at": "2026-11-03T07:23:19Z",
+     "ended_at": "2026-11-03T07:23:33Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1
+    }
+   ]
+  },
   "jra-improvement-experiments-v1.yml": {
    "label": "改善案と今の予想の採点",
    "runs": [
+    {
+     "id": 41596157870,
+     "event": "push",
+     "created_at": "2026-11-03T07:24:53Z",
+     "started_at": "2026-11-03T07:24:53Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1
+    },
     {
      "id": 41563577466,
      "event": "push",
@@ -1013,6 +1048,16 @@
    "label": "基準に届いたかの確認・通知",
    "runs": [
     {
+     "id": 41596157874,
+     "event": "push",
+     "created_at": "2026-11-03T07:24:53Z",
+     "started_at": "2026-11-03T07:24:53Z",
+     "ended_at": "2026-11-03T07:25:18Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1
+    },
+    {
      "id": 41564066160,
      "event": "push",
      "created_at": "2026-11-03T02:06:53Z",
@@ -1107,6 +1152,16 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 41596157568,
+     "event": "push",
+     "created_at": "2026-11-03T07:24:53Z",
+     "started_at": "2026-11-03T07:24:53Z",
+     "ended_at": "2026-11-03T07:25:07Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1
+    },
     {
      "id": 41576533304,
      "event": "workflow_dispatch",
