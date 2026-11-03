@@ -79,7 +79,11 @@
 - 方法：会話全体は `/model` で切り替え（ユーザー操作）。まとまった独立作業は助手（サブエージェント）にモデルを指定して任せる。数行の修正は助手を使わず直接行う（助手は文脈なしで始まるため、小さい作業では割に合わない）。
 - 使用量の確認：この会話の内訳は explain-usage スキル、プラン全体は claude.ai の設定の使用量画面（Claude Code では `/usage`）。スケジュールタスクの見直し（下記）の材料にする。
 
-## スケジュールタスク（Claude、通知文の表示のみ）
+## Claude予想の自動実行（2026-11-03）
+- 仕組み：`claude_track/`（予想の保存・採点・公開）。出馬表の取得＝`claude-race-data-v1.yml`（土日月 8:40 JST、価格なし）→ T2 が `claude_track/prompts/predict_v1.md` で印（STEP1）を保存・push → オッズを見て買い目（STEP2）を保存。T3 が `review_v1.md` で回顧・週次比較（Issue ラベル claude-review、A/B/C）。採点・公開＝`claude-track-publish-v1.yml`。上書き防止＝`claude-track-guard-v1.yml`。買い目は仮想。ChatGPT側は別管理で合算しない。
+- T2（土日月 9:10 JST）と T3（土日月 21:32 JST）は Claude の予想・回顧の実行に切り替え済み（旧：ChatGPT用指示文の表示）。権限設定は auto。初回の実走は 11/7〜8。スケジュール実行がリポジトリ取得・pushできるかは初回で確認。使用量は最初の1〜2週間で実測する。T1 は従来どおり通知文の表示のみ。
+
+## スケジュールタスク（旧：Claude、通知文の表示のみ。T2/T3 は上記に置き換え済み）
 - T1 地方競馬Shadow 毎日 7:52 JST（trig_01GCEqKctMCwULuPhm9oF5QK）
 - T2 JRA正式予想・研究収集 土日月 7:47 JST（trig_012Ybee7h38cvqziLjhiUvWo）
 - T3 JRA回顧 土日月 18:44 JST（trig_01ATLDvH94om4CoqoGeaEu5E）
