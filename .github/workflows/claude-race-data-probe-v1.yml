@@ -1,0 +1,29 @@
+name: Claude race data probe v1 (research only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: claude-race-data
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - name: Probe JRA race cards (public pages, 2.5 s apart)
+        run: python3 claude_track/jra_card_probe.py
+      - name: Commit probe output
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add claude_track/inputs/probe
+          if git diff --cached --quiet; then echo none; exit 0; fi
+          git commit -q -m 'Claude race data probe output (research only)'
+          for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1
