@@ -19,8 +19,8 @@
       "baseline": "v3.13",
       "challenger": "v3.13+pace_v1",
       "status": "collecting",
-      "effective_prospective_from": "2026-11-02T13:50:09+09:00",
-      "registration_commit_at": "2026-11-02T13:50:09+09:00",
+      "effective_prospective_from": "2026-11-02T13:00:00+09:00",
+      "registration_commit_at": "2026-11-02T12:32:59+09:00",
       "minimum_prospective_pairs": 20,
       "remaining_prospective_pairs": 20,
       "ready_for_manual_review": false,
@@ -862,8 +862,8 @@
       "baseline": "v3.13",
       "challenger": "v3.13+going_v1",
       "status": "collecting",
-      "effective_prospective_from": "2026-11-02T13:50:09+09:00",
-      "registration_commit_at": "2026-11-02T13:50:09+09:00",
+      "effective_prospective_from": "2026-11-02T13:00:00+09:00",
+      "registration_commit_at": "2026-11-02T12:43:48+09:00",
       "minimum_prospective_pairs": 20,
       "remaining_prospective_pairs": 20,
       "ready_for_manual_review": false,
@@ -1725,7 +1725,7 @@
       "challenger": "v3.15+ticket_div_v1",
       "status": "collecting",
       "effective_prospective_from": "2026-11-03T12:00:00+09:00",
-      "registration_commit_at": null,
+      "registration_commit_at": "2026-11-03T11:02:10+09:00",
       "minimum_prospective_pairs": 20,
       "remaining_prospective_pairs": 20,
       "ready_for_manual_review": false,
@@ -1734,30 +1734,30 @@
       },
       "prospective_breakdown": {},
       "replay_support_only": {
-        "pairs": 12,
+        "pairs": 11,
         "formal": {
-          "stake_yen": 48800,
-          "payout_yen": 28650,
-          "net_yen": -20150,
-          "roi": 0.5871,
-          "hit_races": 5,
-          "loss_races": 10,
-          "avg_max_exposure": 0.7349
+          "stake_yen": 43700,
+          "payout_yen": 28190,
+          "net_yen": -15510,
+          "roi": 0.6451,
+          "hit_races": 4,
+          "loss_races": 9,
+          "avg_max_exposure": 0.7287
         },
         "challenger": {
-          "stake_yen": 48800,
+          "stake_yen": 43700,
           "payout_yen": 1330,
-          "net_yen": -47470,
-          "roi": 0.0273,
+          "net_yen": -42370,
+          "roi": 0.0304,
           "hit_races": 1,
-          "loss_races": 12,
-          "avg_max_exposure": 0.5637
+          "loss_races": 11,
+          "avg_max_exposure": 0.5615
         },
-        "roi_delta": -0.5598,
-        "roi_delta_without_biggest_gap_race": -0.3803,
+        "roi_delta": -0.6147,
+        "roi_delta_without_biggest_gap_race": -0.4167,
         "biggest_gap_race": "2026-10-18-niigata-himba-stakes",
         "challenger_better_net_races": 0,
-        "challenger_worse_net_races": 5
+        "challenger_worse_net_races": 4
       },
       "replay_breakdown": {},
       "replay_caveat": "過去レースの再現。発走前に登録された比較ではないため採用判定の件数に数えない",
@@ -1822,24 +1822,6 @@
             "net_yen": -4700,
             "hit": 0,
             "max_exposure": 0.5957
-          }
-        },
-        {
-          "race_id": "2026-10-18-brazil-cup",
-          "grade": "replay_support_only",
-          "formal": {
-            "stake_yen": 5100,
-            "payout_yen": 460,
-            "net_yen": -4640,
-            "hit": 1,
-            "max_exposure": 0.8039
-          },
-          "challenger": {
-            "stake_yen": 5100,
-            "payout_yen": 0,
-            "net_yen": -5100,
-            "hit": 0,
-            "max_exposure": 0.5882
           }
         },
         {
@@ -2003,6 +1985,10 @@
         {
           "race_id": "2026-10-11-uzumasa-stakes",
           "reason": "sealed purchase file not found"
+        },
+        {
+          "race_id": "2026-10-18-brazil-cup",
+          "reason": "stored challenger set differs; refusing to overwrite"
         }
       ]
     }
