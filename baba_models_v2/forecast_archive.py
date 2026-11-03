@@ -14,9 +14,11 @@ FC_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
 OFFICES = {"石狩": ["sapporo"], "渡島": ["hakodate"], "福島県": ["fukushima"], "新潟県": ["niigata"],
            "愛知県": ["chukyo"], "福岡県": ["kokura"], "東京都": ["tokyo"], "千葉県": ["nakayama"],
            "京都府": ["kyoto"], "兵庫県": ["hanshin"]}
-JRA_PAGES = {"jra_baba_condition": "https://www.jra.go.jp/keiba/baba/condition/",
-             "jra_baba_moist": "https://www.jra.go.jp/keiba/baba/moist/",
-             "jra_baba_cushion": "https://www.jra.go.jp/keiba/baba/cushion/"}
+# NOTE: until 2026-11-03 this saved the "basic knowledge" explainer pages by mistake. These are the real current-going pages
+# (index.html = 1st meeting venue, index2/3 = 2nd/3rd; the venue order changes by week -> parse with jra_going_now.parse_going_page).
+JRA_PAGES = {"jra_going_1": "https://www.jra.go.jp/keiba/baba/index.html",
+             "jra_going_2": "https://www.jra.go.jp/keiba/baba/index2.html",
+             "jra_going_3": "https://www.jra.go.jp/keiba/baba/index3.html"}
 
 
 def get(s, url, as_json):
