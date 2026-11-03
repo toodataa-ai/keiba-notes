@@ -2,7 +2,7 @@ name: Claude race data v1 (price-blind race cards for Claude's independent predi
 on:
   schedule:
     # Sat/Sun 08:40 JST (= Fri/Sat 23:40 UTC): after the race-day weights are published, well before the 11R post time
-    - cron: '40 23 * * 5,6'
+    - cron: '40 23 * * 5,6,0'
   workflow_dispatch:
     inputs:
       dates:
