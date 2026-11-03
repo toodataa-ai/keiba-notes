@@ -116,6 +116,10 @@ def load_context():
     extra = sorted(glob.glob('going_labels/recent/*.csv'))
     if extra:
         e = pd.concat([pd.read_csv(f) for f in extra], ignore_index=True)
+        e = e.dropna(subset=['start_time']) if 'start_time' in e.columns else e.iloc[0:0]
+    else:
+        e = None
+    if e is not None and len(e):
         e['track'] = e['track'].map(sd.TRACK_RO); e['surface'] = e['surface'].map({'芝': 'turf', 'ダート': 'dirt'})
         e['going_n'] = e['going'].map(sd.GOING); e['date'] = pd.to_datetime(e['date'])
         t = e['start_time'].str.split(':', expand=True).astype(float); e['start_h'] = t[0] + t[1] / 60
