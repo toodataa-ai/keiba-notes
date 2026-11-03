@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-operations-times-v1",
+      "title": "自動運用の状況：Claude用の結果取得を追加し、回顧以降の時刻を18時台からに変更",
+      "pages": [
+        "operations.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-03",
+      "summary": "Claudeが公式結果を自分で取得するようになったので、回顧（18:17）以降の定時を30分間隔で18時台〜19時台に前倒し。流れと実行記録の表に『Claude用の結果取得』を追加。"
+    }
+  ]
 }
