@@ -1,20 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-claude-note-v1",
-      "title": "Claudeの予想の注記：対象レースの説明を実際の運用に合わせる",
-      "pages": [
-        "this-week.html",
-        "results.html"
-      ],
-      "assets": [
-        "assets/claude-view-v1.js"
-      ],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-03",
-      "summary": "『対象は ChatGPT と同じレースだけ』を、『JRAの毎開催日のメインレース（11R）』に直す。"
-    }
-  ]
+  "candidates": []
 }

@@ -38,7 +38,7 @@
       panel.dataset.loaded='1';panel.innerHTML='<p class="muted">読み込み中…</p>';
       fetch('data/predictors/claude_status_v1.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
         var rows=d.races||[];var s=d.summary||{};
-        var h='<p class="pv-note">これは <strong>Claude</strong> の予想です。ChatGPT の成績とは合算せず、別々に集計します。対象は ChatGPT と同じレースだけ。買い目は「もし買ったら」の仮想で、実際には購入しません。発走前に保存し、あとから変えません。</p>';
+        var h='<p class="pv-note">これは <strong>Claude</strong> の予想です。ChatGPT の成績とは合算せず、別々に集計します。対象は、JRAの毎開催日のメインレース（11R）です。買い目は「もし買ったら」の仮想で、実際には購入しません。発走前に保存し、あとから変えません。</p>';
         if(mode==='results'){
           h+='<details class="spoiler-summary"><summary>Claude の期間成績を見る<span class="spoiler-warning">的中率・払戻・回収率などの結果を表示します</span></summary><div class="pv-stats">'+
             '<div><span>評価済み</span><strong>'+esc(s.races||0)+'レース</strong></div><div><span>◎勝率 / 複勝率</span><strong>'+pct(s.honmei_win_rate)+' / '+pct(s.honmei_top3_rate)+'</strong></div>'+
