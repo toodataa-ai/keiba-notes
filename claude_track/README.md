@@ -3,10 +3,10 @@
 ChatGPT の予想（`e2e_validation/`）には一切触れない。ここは Claude 専用の保存場所と採点。
 
 ## ルール（比較を公平にするため）
-1. 対象は、ChatGPT が予想するレースと**同じレースだけ**。
+1. 対象は、JRAの毎開催日のメインレース（11R）。ChatGPT が予想するレースとは別に、Claude 自身が選ぶ。
 2. Claude は ChatGPT の予想を**見ずに**、オッズを見る前に全頭を独立評価し、発走前に保存（コミット）する。コミット時刻が証拠。
 3. 保存後は書き換えない（修正は新しいファイルとして追加し、最初のファイルを正とする）。
-4. レース結果は共有の `e2e_validation/results/<race_id>.json` を使う（結果は 1 回だけ取得し、2 人を同じ方法で採点）。
+4. レース結果は Claude 専用の取得処理（`claude-results-v1.yml`）が `claude_track/results/<race_id>.json` に保存する。ChatGPT 側の `e2e_validation/results/` は予備。
 5. Claude の買い目は「もし買ったら」の仮想。実際の購入には使わない前提で成績を測る。
 
 ## 置き場所
