@@ -92,6 +92,20 @@ def parse_horse(soup) -> dict:
            "sire_sire": g2[0] if len(g2) > 0 else None, "sire_dam": g2[1] if len(g2) > 1 else None,
            "dam_sire": g2[2] if len(g2) > 2 else None, "dam_dam": g2[3] if len(g2) > 3 else None,
            "gen3": g3}
+    prof = {}
+    for it in soup.select(".hr-profile__item"):
+        dt, dd = it.find("dt"), it.find("dd")
+        if dt and dd:
+            prof[_t(dt)] = _t(dd)
+            a_ = dd.find("a", href=True)
+            if a_:
+                mm = re.search(r"/directory/(trainer|jockey)/(\d+)/", a_["href"])
+                if mm:
+                    prof[_t(dt) + "_id"] = mm.group(2)
+    mp = re.search(r"本賞金 付加賞金 収得賞金 (.+?) 連対時の馬体重", txt)
+    prize = mp.group(1) if mp else None
+    ms = re.search(r"総合成績 (.+?) 出走レース", txt)
+    totals_text = ms.group(1)[:600] if ms else None
     hist = []
     for t in soup.select("table"):
         rows = t.select("tr")
@@ -115,20 +129,37 @@ def parse_horse(soup) -> dict:
             p = tds[1].find("p")
             loc = _t(p) if p else ""
             lm = re.match(r"(\S+) (芝|ダ|障)\S*?(\d+)m(?: (\d+)頭)?", loc)
-            odds_cell = _t(tds[5])
-            om = re.match(r"(\d+)\s*\(([\d.]+)\)", odds_cell)
+            lab = tds[1].find("span", class_=re.compile("hr-label"))
+            om = re.match(r"(\d+)\s*\(([\d.]+)\)", _t(tds[5]))
             fin = _t(tds[2])
+            jk = tds[4].find("a", href=True) if len(tds) > 4 else None
+            jm = re.search(r"/jockey/(\d+)/", jk["href"]) if jk else None
+            kg = re.search(r"\(([\d.]+)\)", _t(tds[4])) if len(tds) > 4 else None
+            wm = re.match(r"(\d+)\(([+-]?\d+)\)", _t(tds[6])) if len(tds) > 6 else None
+            tm = re.match(r"(\d+:\d+\.\d)(?: \(([+-]?[\d.]+)\))?", _t(tds[7])) if len(tds) > 7 else None
+            od = re.match(r"(\S+)(?: ([\d.]+))?", _t(tds[8])) if len(tds) > 8 else None
             hist.append({"date": "-".join(dm.groups()), "code": code,
-                         "race": _t(a) if a else _t(tds[1]), "loc": loc,
+                         "race": _t(a) if a else _t(tds[1]), "grade": _t(lab) if lab else None, "loc": loc,
                          "venue": lm.group(1) if lm else None,
                          "surface": {"芝": "芝", "ダ": "ダート", "障": "障害"}.get(lm.group(2)) if lm else None,
                          "dist": int(lm.group(3)) if lm else None,
                          "heads": int(lm.group(4)) if lm and lm.group(4) else None,
                          "finish": int(fin) if fin.isdigit() else fin,
+                         "horse_no": _t(tds[3]) if len(tds) > 3 else None,
+                         "jockey": _t(jk) if jk else (_t(tds[4]) if len(tds) > 4 else None),
+                         "jockey_id": jm.group(1) if jm else None,
+                         "carried": float(kg.group(1)) if kg else None,
                          "ninki": int(om.group(1)) if om else None,
-                         "odds": float(om.group(2)) if om else None})
+                         "odds": float(om.group(2)) if om else None,
+                         "body_weight": int(wm.group(1)) if wm else None,
+                         "body_weight_diff": int(wm.group(2)) if wm else None,
+                         "time": tm.group(1) if tm else None,
+                         "margin": tm.group(2) if tm and tm.group(2) else None,
+                         "passing": od.group(1) if od else None,
+                         "last3f": float(od.group(2)) if od and od.group(2) else None})
         break
-    return {"name": name, "sex": sex, "birth": birth, "ped": ped, "history": hist}
+    return {"name": name, "sex": sex, "birth": birth, "profile": prof, "prize_text": prize,
+            "totals_text": totals_text, "ped": ped, "history": hist}
 
 
 def known_ids() -> set[str]:

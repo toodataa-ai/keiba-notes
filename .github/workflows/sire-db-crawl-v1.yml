@@ -67,18 +67,20 @@ jobs:
           YEARS: ${{ inputs.years || '2026,2025,2024,2023,2022' }}
           MAXMIN: ${{ inputs.max_minutes || '100' }}
           MAXRACES: ${{ inputs.max_races || '0' }}
-          SIRE_DATA_DIR: ${{ github.workspace }}/private/data
+          SIRE_DATA_DIR: ${{ github.workspace }}/private/data_v2
         run: |
           set -euo pipefail
           cd private
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           cd ..
-          mkdir -p private/data
+          # 保存項目を全部に広げたので最初からやり直し（旧 data は不完全なので消す）
+          if [ -d private/data ]; then (cd private && git rm -q -r data && git commit -q -m 'remove incomplete first-version data' && git push -q origin HEAD) || true; fi
+          mkdir -p private/data_v2
           for round in 1 2 3; do
             python3 sire_db_v1/crawl.py --years "$YEARS" --max-minutes "$MAXMIN" --max-races "$MAXRACES" | tee "$RUNNER_TEMP/out.txt"
             cd private
-            git add data
+            git add data_v2
             if ! git diff --cached --quiet; then
               git commit -q -m "Sire DB: collected horses (round $round)"
               for i in 1 2 3 4 5; do
