@@ -31,6 +31,41 @@ def load(path: Path, default=None):
     except FileNotFoundError:
         return default
 
+CLAUDE_REVIEWS = ROOT / "claude_track/reviews"
+CLAUDE_WAKAKOMA = ROOT / "docs/data/predictors/claude_wakakoma_v1.json"
+# Claude の回顧の失敗分類（review_v1.md）→ 改善テーマ
+CLAUDE_FAILURE_TO_HYPOTHESIS = {"展開": "pace_positioning", "馬場予測": "track_condition", "購入戦略": "ticket_portfolio", "リスク集中": "ticket_portfolio"}
+
+
+def claude_screening(hypothesis_id: str, need_races: int, need_meetings: int):
+    """Claude 自身の回顧（claude_track/reviews/<race_id>.json）で同じ課題が出たレース数と週末数。ChatGPT 側とは別集計。"""
+    races, weeks = set(), set()
+    for f in sorted(CLAUDE_REVIEWS.glob("*.json")) if CLAUDE_REVIEWS.exists() else []:
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        if not any(CLAUDE_FAILURE_TO_HYPOTHESIS.get(t) == hypothesis_id for t in d.get("failure_types") or []):
+            continue
+        races.add(d.get("race_id") or f.stem)
+        try:
+            day = dt.date.fromisoformat((d.get("race_id") or f.stem)[:10])
+            if day.weekday() == 0:   # 祝日の月曜は、直前の土日と同じ開催週末に数える
+                day -= dt.timedelta(days=1)
+            weeks.add(day.isocalendar()[:2])
+        except ValueError:
+            pass
+    return {"races": len(races), "meetings": len(weeks), "met": len(races) >= need_races and len(weeks) >= need_meetings}
+
+
+def claude_experience(regime: str):
+    """若駒の機械採点（claude_wakakoma_v1.json）で、その区分が確認できる頭数に届いたか。"""
+    cat = {"experience_e0": "E0", "experience_e1": "E1", "experience_e2": "E2"}.get(regime)
+    d = load(CLAUDE_WAKAKOMA, {}) or {}
+    c = (d.get("categories") or {}).get(cat) or {}
+    need = d.get("confirm_horses_per_category") or 30
+    return {"horses": c.get("horses", 0), "need": need, "met": bool(c.get("confirmable"))}
+
 
 def matching_experiments(unit_id: str, hypothesis_id: str | None, registry: dict, status: dict):
     """Experiments that belong to this unit.
@@ -88,17 +123,21 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
             if kind == "screening":
                 h = hyp.get(u["hypothesis_id"], {})
                 scr = (h.get("next_decision") or {}).get("screening") or {}
-                met = bool(scr.get("ready_to_design_experiment"))
+                cl = claude_screening(u["hypothesis_id"], scr.get("minimum_qualifying_race_reviews", 3), scr.get("minimum_completed_meetings", 2))
+                met = bool(scr.get("ready_to_design_experiment")) or cl["met"]
                 exps = matching_experiments(u["id"], u["hypothesis_id"], registry, status)
                 if exps:
                     s, f, t, eid = comparison_state(exps)
                     finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, crit["screening"]["text"], True, eid))
                 elif met:
-                    finish(unit_record(tid, u["id"], u["label"], 1, 0.0, "ready_to_register", "条件に届いた（登録待ち）", crit["screening"]["text"], True))
+                    src = "Claudeの回顧" if cl["met"] and not scr.get("ready_to_design_experiment") else "ChatGPTの回顧"
+                    finish(unit_record(tid, u["id"], u["label"], 1, 0.0, "ready_to_register", f"条件に届いた（登録待ち・{src}）", crit["screening"]["text"], True))
                 else:
                     q = scr.get("qualifying_race_reviews", 0)
                     n = scr.get("minimum_qualifying_race_reviews", 3)
-                    finish(unit_record(tid, u["id"], u["label"], 0, min(1.0, q / n) if n else 0, "research", f"回顧で課題が出たレース {q}/{n}", crit["screening"]["text"], False))
+                    qc = cl["races"]
+                    finish(unit_record(tid, u["id"], u["label"], 0, min(1.0, max(q, qc) / n) if n else 0, "research",
+                                       f"回顧で課題が出たレース {q}/{n}（ChatGPT）" + (f"／{qc}/{n}（Claude）" if qc else ""), crit["screening"]["text"], False))
             elif kind == "baba_tracks":
                 models = (baba or {}).get("models", [])
                 by: dict[str, dict] = {}
@@ -147,17 +186,22 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
                 r = regimes.get(u["regime"], {})
                 need = crit["experience_regime"]["need_strict_records"]
                 rem = (r.get("next_decision") or {}).get("win_probability_horse_records_remaining")
-                met = rem == 0
+                ce = claude_experience(u["regime"])
+                met = rem == 0 or ce["met"]
                 exps = matching_experiments(u["id"], None, registry, status)
                 if exps:
                     s, f, t, eid = comparison_state(exps)
                     finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, crit["experience_regime"]["text"], True, eid))
                 elif met:
-                    finish(unit_record(tid, u["id"], u["label"], 1, 0.0, "ready_to_register", "条件に届いた（登録待ち）", crit["experience_regime"]["text"], True))
+                    src = "若駒の機械採点（Claude）" if ce["met"] and rem != 0 else "ChatGPTの収集"
+                    finish(unit_record(tid, u["id"], u["label"], 1, 0.0, "ready_to_register", f"条件に届いた（登録待ち・{src}）", crit["experience_regime"]["text"], True))
                 else:
                     est = (r.get("next_decision") or {}).get("additional_races_estimate")
                     frac = 0.0 if rem is None else max(0.0, (need - rem) / need)
                     txt = "データを確認中" if rem is None else f"あと{rem}頭分" + (f"（約{est}レース）" if est else "")
+                    if ce["horses"]:
+                        txt += f"／機械採点（Claude）{ce['horses']}/{ce['need']}頭"
+                        frac = max(frac, min(1.0, ce["horses"] / ce["need"]))
                     finish(unit_record(tid, u["id"], u["label"], 0, frac, "research", txt, crit["experience_regime"]["text"], False, None, {"collected_prerace_horses": r.get("collected_prerace_horse_observations")}))
             elif kind == "pedigree":
                 pc = crit["pedigree"]
