@@ -85,7 +85,7 @@
 - 仕組み：`claude_track/`（予想の保存・採点・公開）。出馬表の取得＝`claude-race-data-v1.yml`（土日月 8:40 JST、価格なし）→ T2 が `claude_track/prompts/predict_v1.md` で印（STEP1）を保存・push → オッズを見て買い目（STEP2）を保存。T3 が `review_v1.md` で回顧・週次比較（Issue ラベル claude-review、A/B/C）。採点・公開＝`claude-track-publish-v1.yml`。上書き防止＝`claude-track-guard-v1.yml`。買い目は仮想。ChatGPT側は別管理で合算しない。
 - T2（土日月 9:10 JST）と T3（土日月 21:32 JST）は Claude の予想・回顧の実行に切り替え済み（旧：ChatGPT用指示文の表示）。権限設定は auto。初回の実走は 11/7〜8。スケジュール実行がリポジトリ取得・pushできるかは初回で確認。使用量は最初の1〜2週間で実測する。T1 は停止済み（地方競馬は Actions で自動化）。
 
-- **Claude単独の改善比較（2026-11-03）**：`claude_track/experiments.py` → `docs/data/predictors/claude_experiments_v1.json`（`claude-track-publish-v1.yml` が自動生成）。①位置取り（pace_v1 と同じ固定ルール）をClaude自身のSTEP1勝率に当て、同じ公式結果で新旧のログ損失を比べる（20レースで判定、ChatGPT側とは混ぜない）。②若駒（E0/E1/E2）：出馬表の戦績（W-S-T-他）から出走数を読み、予想勝率と実際の勝ちを区分ごとに集計（30頭分で確認可）。**出馬表に戦績の括弧が載るかは未確認**（10/31の検証用カードには無かった。次の開催週のカードで `career_data_available` を見る）。判定の Issue・画面表示は未実装。
+- **Claude単独の改善比較（2026-11-03）**：`claude_track/experiments.py` → `docs/data/predictors/claude_experiments_v1.json`（`claude-track-publish-v1.yml` が自動生成）。①位置取り（pace_v1 と同じ固定ルール）をClaude自身のSTEP1勝率に当て、同じ公式結果で新旧のログ損失を比べる（20レースで判定、ChatGPT側とは混ぜない）。②若駒（E0/E1/E2）：出馬表の戦績（W-S-T-他）から出走数を読み、予想勝率と実際の勝ちを区分ごとに集計（30頭分で確認可）。**出馬表に戦績の括弧が載るかは未確認**（10/31の検証用カードには無かった。次の開催週のカードで `career_data_available` を見る）。判定の通知Issue（ラベル claude-experiment-ready、1件1回・`claude_track/open_ready_issues.py`、公開処理の最後で自動）は実装済み。画面表示は変更案（STAGING）で対応予定。承認はチャット。
 - **若駒（ChatGPT側）の収集**：`experience-regime-prestart-current.yml` は ChatGPT が `experience_regime_v1/requests/run-current.json` をpushして起動し、開催日ごとのURL（検証済みの種）と週のレース一覧を手で用意する作り。10/31の失敗は保存後のサイト反映確認(3分)のタイムアウトで、待ちを約10分に延長済み。「勝つ確率を確かめられる30頭分」は正式予想の勝率が元（現状あと30頭分、約3〜5レース）。完全自動化には収集の作り直しが必要（未着手）。
 
 ## 地方競馬Shadowの自動実行（2026-11-03）
