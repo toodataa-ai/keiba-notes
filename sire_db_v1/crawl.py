@@ -177,7 +177,7 @@ def main():
     import requests
     from bs4 import BeautifulSoup
     ap = argparse.ArgumentParser()
-    ap.add_argument("--years", default="2026,2025,2024,2023,2022")
+    ap.add_argument("--years", default="2026,2025,2024,2023,2022,2021,2020,2019,2018")
     ap.add_argument("--max-minutes", type=float, default=300)
     ap.add_argument("--max-races", type=int, default=0)
     ap.add_argument("--probe", default="", help="race code: parse only, print summary, save nothing")

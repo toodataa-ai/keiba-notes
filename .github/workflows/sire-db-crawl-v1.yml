@@ -7,7 +7,7 @@ on:
     inputs:
       years:
         description: 'Years, newest first'
-        default: '2026,2025,2024,2023,2022'
+        default: '2026,2025,2024,2023,2022,2021,2020,2019,2018'
       max_minutes:
         description: 'Minutes per round (3 rounds, each committed)'
         default: '100'
@@ -64,7 +64,7 @@ jobs:
       - name: Crawl in rounds (each round is committed to the private repository)
         if: ${{ inputs.probe == '' && !inputs.check_access }}
         env:
-          YEARS: ${{ inputs.years || '2026,2025,2024,2023,2022' }}
+          YEARS: ${{ inputs.years || '2026,2025,2024,2023,2022,2021,2020,2019,2018' }}
           MAXMIN: ${{ inputs.max_minutes || '100' }}
           MAXRACES: ${{ inputs.max_races || '0' }}
           SIRE_DATA_DIR: ${{ github.workspace }}/private/data_v2
