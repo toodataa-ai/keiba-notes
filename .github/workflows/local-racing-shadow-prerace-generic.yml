@@ -5,6 +5,8 @@ on:
     paths:
       - 'local_racing_shadow_v1/prerace_request.json'
   workflow_dispatch:
+  schedule:
+    - cron: '30 22 * * *' # 07:30 JST every day (automatic; no copy-paste needed)
 permissions:
   contents: write
 concurrency:
@@ -29,12 +31,14 @@ jobs:
         run: |
           python - <<'PY'
           import datetime, json, os
-          r=json.load(open('local_racing_shadow_v1/prerace_request.json',encoding='utf-8'))
           from datetime import timezone,timedelta
           today=datetime.datetime.now(timezone(timedelta(hours=9))).date().isoformat()
-          assert r.get('date')==today, f'Only same-day PRE-RACE allowed: {r.get("date")} != {today}'
-          assert r.get('scope')=='PRE-RACE'
-          assert r.get('production_effect') is False
+          if os.environ.get('GITHUB_EVENT_NAME') == 'push':
+              r=json.load(open('local_racing_shadow_v1/prerace_request.json',encoding='utf-8'))
+              assert r.get('date')==today, f'Only same-day PRE-RACE allowed: {r.get("date")} != {today}'
+              assert r.get('scope')=='PRE-RACE'
+              assert r.get('production_effect') is False
+          # schedule / manual dispatch: always the current JST day, research-only
           with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('date='+today+'\n')
           PY
       - name: Install isolated official parser dependencies
