@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.19-20261103",
-  "current_public_version": "1.19",
+  "current_public_release": "release/jra-site-v1.20-20261103",
+  "current_public_version": "1.20",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -409,6 +409,28 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.20-20261103",
+      "branch": "release/jra-site-v1.20-20261103",
+      "commit_sha": "e0ebde79388fe59c365df48a06f7859dd2697497",
+      "deployed_at": "2026-11-03T16:38:51+09:00",
+      "workflow_run_id": 41597681360,
+      "validation_workflow_run_id": 41597681360,
+      "public_version": "1.20",
+      "note": "2026-11-03ユーザー明示承認済み。Claudeの予想の注記：対象レースの説明を実際の運用に合わせる：『対象は ChatGPT と同じレースだけ』を、『JRAの毎開催日のメインレース（11R）』に直す。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-note-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/results.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
