@@ -47,7 +47,8 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add claude_track/odds
+          mkdir -p claude_track/odds
+          git add claude_track/odds || true
           if git diff --cached --quiet; then echo 'nothing new'; exit 0; fi
           git commit -q -m 'Claude odds: public odds captured before post time'
           for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
