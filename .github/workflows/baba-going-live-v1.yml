@@ -28,8 +28,8 @@ jobs:
       - name: Refresh the last few race days' official results (previous-day features)
         working-directory: baba_models_v2
         run: |
-          D="${{ inputs.date }}"; [ -z "$D" ] && D=$(TZ=Asia/Tokyo date +%F)
-          T="${{ inputs.track }}"; [ -z "$T" ] && T=fukushima
+          D="${{ inputs.date }}"; if [ -z "$D" ]; then D=$(TZ=Asia/Tokyo date +%F); fi
+          T="${{ inputs.track }}"; if [ -z "$T" ]; then T=fukushima; fi
           echo "DAY=$D" >> "$GITHUB_ENV"; echo "TRACK=$T" >> "$GITHUB_ENV"
           python - <<PY
           import datetime as dt
