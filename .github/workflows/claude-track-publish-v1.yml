@@ -27,6 +27,7 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
+      - run: python3 -m pip install --disable-pip-version-check requests beautifulsoup4
       - run: python3 -m unittest discover -s claude_track -t . -p 'test_*.py'
       - name: Commit derived Claude data only (regenerated on the latest main)
         run: |
