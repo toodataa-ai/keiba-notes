@@ -1,6 +1,8 @@
 name: Sire DB crawl v1 (past JRA races -> horses -> pedigree and history; research only, no Claude usage)
 on:
-  # schedule: enabled after the first check  (cron '23 */6 * * *')
+  schedule:
+    # every 6 hours until all races are done (a finished run exits immediately)
+    - cron: '23 */6 * * *'
   workflow_dispatch:
     inputs:
       years:
