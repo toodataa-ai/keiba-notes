@@ -189,7 +189,7 @@ jobs:
           assert not run['production_effect'] and not run['models_automatically_promoted']
           assert run['selected_today']==run['prerace_proof_valid_races']==run['complete_evidence_races'], 'Incomplete real research; do not report collected'
           PY
-          for attempt in $(seq 1 18);do
+          for attempt in $(seq 1 60);do
             if curl -fLsS --max-time 16 "https://toodataa-ai.github.io/keiba-notes/data/experience_regime_status.json?e012=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-status-live.json &&
               cmp -s docs/data/experience_regime_status.json /tmp/e012-status-live.json &&
               curl -fLsS --max-time 16 "https://toodataa-ai.github.io/keiba-notes/experience-regime.html?e012=$GITHUB_RUN_ID-$attempt" -o /tmp/e012-page-live.html &&
