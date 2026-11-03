@@ -1,0 +1,19 @@
+name: Sire DB probe v1 (test only, nothing saved)
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: 'Sportnavi race code of any past race, e.g. 2605041111'
+        required: true
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - run: python3 sire_db_v1/probe.py "${{ inputs.code }}"
