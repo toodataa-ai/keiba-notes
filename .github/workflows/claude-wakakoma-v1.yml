@@ -1,0 +1,54 @@
+name: Claude wakakoma v1 (machine check of low-experience horses, all races, no Claude usage)
+on:
+  schedule:
+    # Sat/Sun/Mon 17:57 JST (= 08:57 UTC): after results are confirmed (results capture runs at 17:17/17:47)
+    - cron: '57 8 * * 6,0,1'
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: 'Comma-separated YYYY-MM-DD (default: today and yesterday JST)'
+        required: false
+      probe_code:
+        description: 'test only: Sportnavi code of any past race, e.g. 2605041101 (nothing is saved)'
+        required: false
+      probe_date:
+        description: 'test only: that race date, YYYY-MM-DD'
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: claude-wakakoma
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - name: Test
+        run: python3 -m unittest claude_track.test_wakakoma claude_track.test_fetch_results -v
+      - name: Score all races of finished days (1.5 s apart)
+        env:
+          DATES: ${{ inputs.dates }}
+          PROBE_CODE: ${{ inputs.probe_code }}
+          PROBE_DATE: ${{ inputs.probe_date }}
+        run: |
+          args=()
+          if [ -n "${DATES:-}" ]; then IFS=',' read -ra ds <<< "$DATES"; for d in "${ds[@]}"; do args+=(--date "$d"); done; fi
+          if [ -n "${PROBE_CODE:-}" ]; then args+=(--probe-code "$PROBE_CODE" --probe-date "$PROBE_DATE"); fi
+          python3 -m claude_track.wakakoma "${args[@]}"
+      - name: Commit new data only (never overwrites)
+        if: ${{ inputs.probe_code == '' }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          mkdir -p claude_track/wakakoma
+          git add claude_track/wakakoma docs/data/predictors/claude_wakakoma_v1.json || true
+          if git diff --cached --quiet; then echo 'nothing new'; exit 0; fi
+          git commit -q -m 'Claude wakakoma: low-experience horses scored (machine check)'
+          for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1

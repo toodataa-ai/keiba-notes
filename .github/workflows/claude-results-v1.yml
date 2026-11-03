@@ -9,9 +9,6 @@ on:
       dates:
         description: 'Comma-separated YYYY-MM-DD (default: today and yesterday JST)'
         required: false
-      dump_urls:
-        description: 'test only: space-separated public URLs whose table structure is printed'
-        required: false
       probe_code:
         description: 'test only: parse the result page of any past race, e.g. 2605041111 (nothing is saved)'
         required: false
@@ -30,11 +27,6 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
       - run: pip install requests beautifulsoup4
-      - name: Dump page structure (test only)
-        if: ${{ inputs.dump_urls != '' }}
-        env:
-          URLS: ${{ inputs.dump_urls }}
-        run: python3 claude_track/dump_page.py $URLS
       - name: Test the parser
         run: python3 -m unittest claude_track.test_fetch_results -v
       - name: Capture official results of finished races

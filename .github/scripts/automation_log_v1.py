@@ -14,6 +14,7 @@ TRACKED = [  # workflow file, label
     ("baba-going-live-v1.yml", "馬場の朝の予測"),
     ("claude-odds-v1.yml", "Claude用のオッズ取得"),
     ("claude-results-v1.yml", "Claude用の結果取得"),
+    ("claude-wakakoma-v1.yml", "若駒の機械採点（全レース）"),
     ("jra-improvement-experiments-v1.yml", "改善案と今の予想の採点"),
     ("jra-improvement-pipeline-v1.yml", "基準に届いたかの確認・通知"),
     ("claude-track-publish-v1.yml", "Claudeの予想の採点・公開"),
