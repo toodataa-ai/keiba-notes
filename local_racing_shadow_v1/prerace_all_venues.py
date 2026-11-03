@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import re
 import sys
@@ -67,6 +68,9 @@ def run(date):
         raise ValueError(f"Refusing late/retrospective/future predictions: request={date}, today(JST)={dt.datetime.now(JST).date()}")
     cfg=load_json(ROOT/"config.json")
     request=load_json(ROOT/"prerace_request.json")
+    if os.environ.get("GITHUB_EVENT_NAME") in ("schedule","workflow_dispatch") and request.get("date")!=date:
+        # Automatic daily run: build today's research-only request in memory (file untouched).
+        request={"schema_version":1,"scope":"PRE-RACE","date":date,"production_effect":False,"expected_races_by_venue":{}}
     if cfg.get("production_effect") is not False or request.get("production_effect") is not False:
         raise ValueError("JRA isolation guard failed")
     if request.get("date")!=date or request.get("scope")!="PRE-RACE":
