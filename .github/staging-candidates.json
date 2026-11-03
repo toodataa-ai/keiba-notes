@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-automation-log-v1",
+      "title": "改善状況ページ：自動処理の実行記録（実際の開始・終了時刻と成否）を時間軸に表示",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-03",
+      "summary": "時間軸の各処理に、きょうの実際の開始・完了時刻と成功/失敗、直近7日の結果を表示。各処理の終了後に自動で記録。"
+    }
+  ]
 }

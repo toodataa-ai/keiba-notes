@@ -1,0 +1,44 @@
+name: Automation log v1 (record when each automation really ran and how it ended)
+on:
+  workflow_run:
+    workflows:
+      - Baba forecast archive v1
+      - Local Racing Shadow POST-RACE (NAR)
+      - Local Racing Shadow PRE-RACE All NAR Venues
+      - "Claude race data v1 (price-blind race cards for Claude's independent prediction)"
+      - Baba going prediction - race-day morning (record only)
+      - "Claude odds v1 (Claude's own pre-post odds capture, no ChatGPT files)"
+      - JRA pre-registered challenger experiments (research only, no promotion)
+      - "JRA improvement pipeline status (research -> registration -> comparison -> decision; notify only)"
+      - "Claude track publish v1 (scores + public data for Claude's predictions)"
+    types: [completed]
+  schedule:
+    - cron: '7 * * * *'   # hourly safety net (also catches runs that never started or are still running)
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: automation-log
+  cancel-in-progress: false
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - name: Build the run record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/automation_log_v1.py
+      - name: Commit the record (only when it changed)
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/data/automation
+          if git diff --cached --quiet; then echo 'no change'; exit 0; fi
+          git commit -q -m 'Automation log: update run record'
+          for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1
