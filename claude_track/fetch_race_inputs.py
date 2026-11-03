@@ -120,12 +120,13 @@ def run(dates: list[str], out_root: Path, delay: float) -> int:
     c = Client(delay)
     dli = decode(c.post("pw01dli00/F3"))
     drl = sorted({cn for cn in CNAME_RE.findall(dli) if cn.startswith("pw01drl") and any(cn[-11:-3] == d.replace("-", "") for d in dates)})
-    written = 0
+    written, done = 0, set()
     for cn in drl:
         page = decode(c.post(cn))
         for m in DDE_RE.finditer(page):
-            if m.group(6) != "11" or m.group(7) not in {d.replace("-", "") for d in dates}:
+            if m.group(6) != "11" or m.group(7) not in {d.replace("-", "") for d in dates} or m.group(0) in done:
                 continue
+            done.add(m.group(0))
             raw = c.post(m.group(0))
             card = parse_card(decode(raw))
             now = datetime.now(JST)
