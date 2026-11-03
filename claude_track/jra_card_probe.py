@@ -70,6 +70,13 @@ def main():
             if l.startswith(("pw01drl", "pw01dli", "pw01dde")) and l not in seen:
                 queue.append(("/JRADB/accessD.html", l))
     log["race_cards_found"] = found_dde
+    for cn, meta in sorted(found_dde.items()):
+        if meta["race_no"] != "11" or cn in seen:
+            continue
+        seen.add(cn)
+        r = c.post("/JRADB/accessD.html", cn)
+        sha = save(out, "card_" + re.sub(r"[^0-9A-Za-z]", "_", cn), r.content)
+        log["steps"].append({"card": cn, "status": r.status_code, "bytes": len(r.content), "sha256": sha})
     log["finished_at"] = datetime.now(JST).isoformat(); log["requests"] = c.n
     (out / "probe_log.json").write_text(json.dumps(log, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print("probe done: pages", len(seen), "race cards found", len(found_dde))
