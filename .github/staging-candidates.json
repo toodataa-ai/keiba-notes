@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-automation-log-tag-v1",
+      "title": "実行記録の表：手動・ファイル更新で動いた分に『手』の印",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-03",
+      "summary": "定時の自動実行と見分けがつくよう、手動やpushで動いた回のマスに小さく『手』を添える。"
+    }
+  ]
 }

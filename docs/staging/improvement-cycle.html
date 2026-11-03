@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -72,7 +72,7 @@
 <p class="sub">各処理が終わった直後に、実際に動いた時刻と結果を自動で記録しています（GitHubで動く処理のみ）。きょうの列の数字は実際の開始時刻です。マスをタップすると、その回の詳細（開始・完了時刻と結果）が開きます。</p>
 <div class="rt-sum" id="rtSum">実行記録を読み込み中…</div>
 <table class="mx"><colgroup><col class="c0"><col><col><col><col><col><col><col class="ct"></colgroup><thead id="mxHead"></thead><tbody id="mxBody"></tbody></table>
-<p class="rt-note">✅成功　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。薄い表示は手動で動かした分で、集計には数えません。Claude（印・買い目・回顧）とChatGPTの実行は含みません。</p>
+<p class="rt-note">✅成功　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。薄い表示と「手」の印は、定時の自動実行ではなく、手動またはファイルの更新（push）で動いた分で、集計には数えません。Claude（印・買い目・回顧）とChatGPTの実行は含みません。</p>
 </section>
 
 <section aria-labelledby="themesTitle" id="themes">
@@ -277,7 +277,7 @@ function cellFor(r,manual,showTime){
  var a=Date.parse(r.started_at||r.created_at),ic,cls='',tip;
  if(r.status!=='completed'){ic='⏳';tip=hms(a)+' 開始（実行中）'}
  else{var ok=r.conclusion==='success',b=Date.parse(r.ended_at);ic=ok?'✅':'❌';cls=ok?'':'ng';tip=hms(a)+' 開始 → '+hms(b)+' 完了（'+dur(a,b)+'）'+(ok?' 成功':' 失敗：'+(r.conclusion||'不明'))}
- return '<a href="'+url(r.id)+'" title="'+tip+(manual?'（手動）':'')+'" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+(showTime?'<span class="tm">'+hm(a)+'</span>':'')+'</a>'}
+ return '<a href="'+url(r.id)+'" title="'+tip+(manual?'（手動）':'')+'" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+(showTime?'<span class="tm">'+hm(a)+(manual?' 手':'')+'</span>':(manual?'<span class="tm">手</span>':''))+'</a>'}
 function render(d){
  var sum=document.getElementById('rtSum'),head=document.getElementById('mxHead'),body=document.getElementById('mxBody');
  if(!d){sum.textContent='実行記録を読み込めませんでした。';return}
