@@ -130,9 +130,17 @@ def main():
     ap.add_argument("--inputs", default="claude_track/inputs")
     ap.add_argument("--out", default="claude_track/odds")
     ap.add_argument("--delay", type=float, default=2.5)
+    ap.add_argument("--probe-code", help="test only: Sportnavi race code of any (past) race; fetch and parse, write nothing")
     ap.add_argument("--probe", action="store_true", help="test only: ignore the post-time check and write nothing")
     a = ap.parse_args()
     dates = a.date or [datetime.now(JST).date().isoformat()]
+    if a.probe_code:
+        fake = {"race_id": "probe-" + a.probe_code, "source_cname": "pw01dde10%s2026%s%s%s20260101" % (a.probe_code[2:4], a.probe_code[4:6], a.probe_code[6:8], a.probe_code[8:10]),
+                "start_at": "2099-01-01T00:00:00+09:00"}
+        s0 = requests.Session(); s0.headers["User-Agent"] = UA
+        out = capture_race(fake, s0, datetime.now(JST), a.delay, True)
+        print("PROBE ok", a.probe_code, {k: v["count"] for k, v in out["sources"].items()})
+        return
     s = requests.Session(); s.headers["User-Agent"] = UA
     n = 0
     for doc in latest_cards(Path(a.inputs), dates):
