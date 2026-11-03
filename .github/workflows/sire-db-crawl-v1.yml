@@ -1,0 +1,58 @@
+name: Sire DB crawl v1 (past JRA races -> horses -> pedigree and history; research only, no Claude usage)
+on:
+  # schedule: enabled after the first check  (cron '23 */6 * * *')
+  workflow_dispatch:
+    inputs:
+      years:
+        description: 'Years, newest first'
+        default: '2026,2025,2024,2023,2022'
+      max_minutes:
+        description: 'Minutes per round (3 rounds, each committed)'
+        default: '100'
+      max_races:
+        description: 'Test: stop after N races per round (0 = no limit)'
+        default: '0'
+      probe:
+        description: 'Test: race code (e.g. 2605041111): parse and print only, save nothing'
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: sire-db-crawl
+  cancel-in-progress: false
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - run: python3 -m unittest sire_db_v1.test_crawl -v
+      - name: Probe (parse only)
+        if: ${{ inputs.probe != '' }}
+        run: python3 sire_db_v1/crawl.py --probe "${{ inputs.probe }}"
+      - name: Crawl in rounds (each round is committed so progress is never lost)
+        if: ${{ inputs.probe == '' }}
+        env:
+          YEARS: ${{ inputs.years || '2026,2025,2024,2023,2022' }}
+          MAXMIN: ${{ inputs.max_minutes || '100' }}
+          MAXRACES: ${{ inputs.max_races || '0' }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for round in 1 2 3; do
+            python3 sire_db_v1/crawl.py --years "$YEARS" --max-minutes "$MAXMIN" --max-races "$MAXRACES" | tee "$RUNNER_TEMP/out.txt"
+            git add sire_db_v1/data
+            if ! git diff --cached --quiet; then
+              git commit -q -m "Sire DB: collected horses (round $round, research data only)"
+              for i in 1 2 3 4 5; do
+                if git pull -q --rebase origin main && git push -q origin HEAD:main; then break; fi
+                sleep $((i*3))
+              done
+            fi
+            grep -q 'remaining races 0$' "$RUNNER_TEMP/out.txt" && break
+            if [ "$MAXRACES" != "0" ]; then break; fi
+          done
