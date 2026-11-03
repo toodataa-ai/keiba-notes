@@ -58,7 +58,8 @@
 - ユーザーの明示承認（「本番リリースOK」など）を得たら、`.github/workflows/jra-ui-promote-v1.yml` を `candidate_id` と承認の原文 `approval_quote` で実行（この環境では下の「作業上の注意」の REST 起動を使う）。本番へバイト一致コピー → ステージング再同期 → リリース台帳に自動採番で記録 → 保護データ不変・ガード・公開HTTP一致を確認。
 - ガード：`.github/scripts/jra-release-guard-v1.py`（全リリース共通の不変条件＋過去リリースの固定値）。
 
-### 承認待ちの変更案（2026-11-03時点で、サイト変更案の承認待ちはなし。承認待ちは阪神の馬場予測採用の A/B/C のみ。承認はチャットで受ける）
+### 承認待ちの変更案（承認はチャットで受ける）
+- `ui-claude-exp-v1`（improvement-cycle.html）：「Claudeの予想だけで進めている比較」（位置取り・若駒）を表示。STAGING 反映済み。**ユーザーの「本番リリースOK」待ち**。
 - `ui-portfolio-card-v1`（improvement-cycle.html）：購入セットの比較カードを回収率の表示にする。**v1.13 として本番リリース済み（2026-11-03）**。
 （以下は以前の記録。直近：v1.11 ui-claude-view-v1、v1.12 ui-baba-progress-v1 をリリース済み）
 - `ui-baba-progress-v1`（baba-models.html・improvement-cycle.html）：馬場の研究ページに「最新の進捗」章（比較表・競馬場×芝ダートの状態一覧（registry の going_status を表示）・分かったこと・データ集めの状況）を追加、詳細カードは折りたたみ。改善状況ページの馬場は「芝◯／ダ◯」の3状態表示（研究段階のとき）。**v1.12 として本番リリース済み（2026-11-03）**。
