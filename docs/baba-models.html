@@ -46,10 +46,46 @@
     <div class="rd-note"><strong>見方：</strong>「候補」や「検証中」は、まだ自動的に本番AI予想へ採用される状態ではありません。十分な検証と承認を経たものだけ接続します。</div>
   </section>
 
+  <section class="chapter" id="stage-b">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>最新の進捗：発走時の馬場をどこまで当てられるか</h2><p class="chapter-lead">2026年11月3日時点。過去約3万レース（2018〜2026年）で、2023年以降を「未来のレース」として当てさせた結果です。</p></div></div>
+    <h3>いまの結論</h3>
+    <p class="rd-conclusion-text">含水率と天気を使うと、馬場状態の予測は大きく良くなります。特にダートは、天気予報がなくても今のやり方（朝の馬場がそのまま続くと見なす）より良くなりました。芝は予報がないと同じ程度で、<b>天気予報がどれだけ当たるか</b>が決め手です。まだ本番の予想には使っていません。</p>
+    <h3 style="margin-top:24px">今のやり方との比較（外れ具合。小さいほど良い）</h3>
+    <div class="rd-tablewrap"><table class="rd-table"><thead><tr><th></th><th>芝（全体）</th><th>ダート（全体）</th><th>芝（馬場が途中で変わった日）</th><th>ダート（馬場が途中で変わった日）</th></tr></thead><tbody>
+      <tr><td>今のやり方（朝の馬場が続く）</td><td>0.295</td><td>0.284</td><td>1.635</td><td>1.467</td></tr>
+      <tr><td>新しいモデル（予報なし）</td><td>0.297</td><td>0.242</td><td>1.531</td><td>1.090</td></tr>
+      <tr><td>新しいモデル（天気が完全に当たった場合）</td><td>0.165</td><td>0.154</td><td>0.751</td><td>0.642</td></tr>
+    </tbody></table></div>
+    <p class="rd-small">「天気が完全に当たった場合」は上限の目安です。過去の天気予報は残っていないため、実際の天気で代用しています。本当の精度は、この行と「予報なし」の行のあいだになります。</p>
+    <h3 style="margin-top:24px" id="overview">競馬場ごとの一覧（ひと目で見る）</h3>
+    <p class="rd-small">競馬場ごと・芝ダートごとに、今の状態を3つで表します。<b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5％以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない。<b>まだ足りない</b>＝予報が当たっても基準に届かない。小さい数字は、外れ具合が何％減ったかです（左が予報なし、右が予報が当たった場合の上限）。</p>
+    <style>#ovTable th,#ovTable td{padding:9px 6px;font-size:13px;text-align:center;vertical-align:top}#ovTable td:first-child,#ovTable th:first-child{text-align:left}#ovTable small{display:block;color:#666;font-size:11px;margin-top:2px;white-space:nowrap}</style>
+    <div class="rd-tablewrap"><table class="rd-table" id="ovTable"><thead><tr><th>競馬場</th><th>芝</th><th>ダート</th></tr></thead><tbody id="ovBody"><tr><td colspan="3">読み込み中…</td></tr></tbody></table></div>
+    <p class="rd-small">「本番で使用中」は、馬場の研究結果をすでに本番の予想に使っている競馬場です。朝の馬場状態は、その日最初のレースの馬場で代用しています。</p>
+    <h3 style="margin-top:24px">分かったこと</h3>
+    <ul>
+      <li>当日朝の含水率が、いちばん効く情報の一つです。</li>
+      <li>前日から当日早朝までの天気（雨・気温・湿度）を足すと、さらに良くなります。</li>
+      <li>内回り・外回りやA〜Dのコース区分は、いまのデータでは差が見えませんでした（芝のA〜Dは2021年以降のみ取得）。</li>
+      <li>競馬場による差があります。東京・京都・中山・阪神・福島は改善が大きく、小倉と新潟は難しいままです。</li>
+    </ul>
+    <h3 style="margin-top:24px">データ集めの状況</h3>
+    <div class="rd-tablewrap"><table class="rd-table"><thead><tr><th>データ</th><th>状況</th></tr></thead><tbody>
+      <tr><td>レースごとの公式の馬場状態</td><td>2018年〜2026年11月1日の30,537レース（取得できなかった日はなし）</td></tr>
+      <tr><td>含水率・クッション値</td><td>全10競馬場。クッション値は2025年以降のみ</td></tr>
+      <tr><td>気象庁の実際の天気（時間別）</td><td>レース当日と前3日分、全10競馬場</td></tr>
+      <tr><td>天気予報の毎日保存</td><td>2026年11月3日に開始。毎日2回（前日18時台と当日朝6時台）、全10競馬場の予報を保存中</td></tr>
+      <tr><td>朝に発表される公式の馬場状態</td><td>JRAのページの保存を開始。取り出し方を確認中</td></tr>
+    </tbody></table></div>
+    <div class="rd-note"><strong>次にやること：</strong>予報がたまったら、予報込みの本当の精度で今のやり方と比べ直します。基準を満たした競馬場から順に、改善案として登録する流れです。</div>
+  </section>
+
   <section class="chapter">
-    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>競馬場別の整備状況</h2><p class="chapter-lead">競馬場ごとに、芝・ダートの研究状況と精度を確認できます。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>競馬場別の詳しい数字</h2><p class="chapter-lead">上の一覧の元になる、競馬場ごとの詳しい数字です。必要なときだけ開いてください。</p></div></div>
+    <details class="rd-tech"><summary>競馬場ごとの詳しい数字を開く（専門的な内容です）</summary>
     <div class="rd-chips" style="margin:18px 0 12px"><span class="rd-chip validated">検証済み</span><span class="rd-chip candidate">候補</span><span class="rd-chip backtesting">検証中</span><span class="rd-chip pilot">試験運用</span><span class="rd-chip degraded">要改善</span></div>
     <div id="cards" class="rd-model-grid"><p class="rd-small">モデルレジストリを読み込み中…</p></div>
+  </details>
   </section>
 
   <details class="rd-tech">
@@ -79,6 +115,20 @@
 
   <div class="rd-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
+<script>
+(function(){
+const col={usable:'#1a6b3a',waiting_forecast:'#8a5a00',insufficient:'#666'};
+const sg=v=>v==null?'—':(v>0?'+':'')+Math.round(v)+'%';
+fetch('data/baba_model_registry.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{
+ const by={},order=[];
+ for(const m of d.models){if(!by[m.track]){by[m.track]={ja:m.track_ja};order.push(m.track)}by[m.track][m.surface]=m}
+ document.getElementById('ovBody').innerHTML=order.map(t=>{
+  const x=by[t],prod=(x.turf&&x.turf.routing&&x.turf.routing.production)?'<small>本番で使用中</small>':'';
+  const cell=m=>{const g=m&&m.going_status;if(!g)return '<td>—</td>';return `<td><b style="color:${col[g.state]||'#666'}">${g.label}</b><small>${sg(g.without_forecast.logloss_gain_pct)} / ${sg(g.perfect_forecast.logloss_gain_pct)}</small></td>`};
+  return `<tr><td><b>${x.ja}</b>${prod}</td>${cell(x.turf)}${cell(x.dirt)}</tr>`}).join('');
+}).catch(()=>{document.getElementById('ovBody').innerHTML='<tr><td colspan="3">一覧を読み込めませんでした。</td></tr>'});
+})();
+</script>
 <script>
 const th=[['札幌','≤15','14–18','17–21','≥20'],['函館','≤15','14–18','17–21','≥20'],['福島','≤15','13–17','15–19','≥17'],['新潟','≤15','13–17','15–19','≥17'],['中山','≤13','11–15','14–18','≥17'],['東京','≤19','17–21','18–23','≥20'],['中京','≤14','12–16','14–17','≥16'],['京都','≤13','11–14','13–16','≥14'],['阪神','≤14','12–16','14–18','≥16'],['小倉','≤10','8–12','10–14','≥12']];
 document.querySelector('#thresholds').innerHTML=th.map(r=>'<tr>'+r.map(x=>`<td>${x}</td>`).join('')+'</tr>').join('');

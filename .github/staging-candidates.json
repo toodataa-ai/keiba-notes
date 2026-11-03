@@ -1,18 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-baba-progress-v1",
-      "title": "馬場モデルの最新の進捗と、状況のシンプル表示（使える見込み／予報待ち／まだ足りない）",
-      "pages": [
-        "baba-models.html",
-        "improvement-cycle.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-03",
-      "summary": "馬場の研究ページに比較結果・競馬場ごとの一覧・データ集めの状況を追加し、改善状況ページの馬場は「芝◯／ダート◯」の3つの状態だけで表す（Stage A/B の表記をやめる）。"
-    }
-  ]
+  "candidates": []
 }
