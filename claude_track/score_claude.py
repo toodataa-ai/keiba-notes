@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ORDERED = {"馬単", "三連単"}
 MARKS = ["◎", "○", "▲", "△", "×"]
+VENUE_CODES = {"01": "札幌", "02": "函館", "03": "福島", "04": "新潟", "05": "東京", "06": "中山", "07": "中京", "08": "京都", "09": "阪神", "10": "小倉"}
 
 
 def bet_key(btype: str, selection: list[int]) -> str:
@@ -50,7 +51,14 @@ def score_prediction(pred: dict, result: dict) -> dict:
         out["brier"] = sum((p[n] - (1.0 if n == order[0] else 0.0)) ** 2 for n in p)
     else:
         out["log_loss"] = out["brier"] = None
-    sets = [settle_bet(b, result) for b in pred.get("bets", [])]
+    bets = pred.get("bets", [])
+    if bets and "bets_generated_at" in pred:
+        try:
+            if not datetime.fromisoformat(pred["bets_generated_at"]) < datetime.fromisoformat(result["scheduled_start_at"]):
+                bets = []
+        except Exception:
+            bets = []
+    sets = [settle_bet(b, result) for b in bets]
     out["bets"] = sets
     out["stake_yen"] = sum(b["stake_yen"] for b in sets)
     out["payout_yen"] = sum(b["payout_yen"] for b in sets)
@@ -76,21 +84,51 @@ def aggregate(entries: list[dict]) -> dict:
             "stake_yen": stake, "payout_yen": pay, "roi": (pay / stake) if stake else None, "by_bet_type": by_type}
 
 
+def resolve_result(race_id: str, results_dir: Path):
+    """Result file for a Claude race id. Accepts ChatGPT's slug (file exists) or '<date>-<venue_code>-11'."""
+    direct = results_dir / f"{race_id}.json"
+    if direct.exists():
+        return direct
+    parts = race_id.split("-")
+    if len(parts) == 5 and parts[3] in VENUE_CODES:  # YYYY-MM-DD-VV-11
+        date, venue = "-".join(parts[:3]), VENUE_CODES[parts[3]]
+        for f in sorted(results_dir.glob(f"{date}-*.json")):
+            r = json.loads(f.read_text(encoding="utf-8"))
+            if r.get("date") == date and r.get("venue") == venue:
+                return f
+    return None
+
+
+def load_race_files(pred_dir: Path) -> dict:
+    """{race_id: {'step1': dict, 'step2': dict|None, 'files': [...]}} using the FIRST saved file of each stage."""
+    out: dict = {}
+    for f in sorted(pred_dir.glob("*/*.json")):
+        p = json.loads(f.read_text(encoding="utf-8"))
+        stage = p.get("stage") or ("step1" if p.get("horses") else "step2")
+        slot = out.setdefault(p["race_id"], {"step1": None, "step2": None, "files": []})
+        slot["files"].append(str(f.relative_to(pred_dir)))
+        if slot.get(stage) is None:
+            slot[stage] = p
+        if stage == "step1" and p.get("bets") and slot["step2"] is None:   # legacy combined file
+            slot["step2"] = {"bets": p["bets"], "generated_at": p["generated_at"]}
+    return out
+
+
 def run(pred_dir: Path, results_dir: Path) -> dict:
     entries = []
-    for f in sorted(pred_dir.glob("*/*.json")):
-        pred = json.loads(f.read_text(encoding="utf-8"))
-        rf = results_dir / f"{pred['race_id']}.json"
-        if not rf.exists():
+    for rid, slot in load_race_files(pred_dir).items():
+        rf = resolve_result(rid, results_dir)
+        if rf is None or slot["step1"] is None:
             continue
+        pred = dict(slot["step1"])
+        pred["bets"] = []
+        if slot["step2"]:
+            pred["bets"] = slot["step2"].get("bets", [])
+            pred["bets_generated_at"] = slot["step2"].get("generated_at")
         e = score_prediction(pred, json.loads(rf.read_text(encoding="utf-8")))
-        e["prediction_file"] = str(f.relative_to(pred_dir)); entries.append(e)
-    # only the first saved file per race counts (later ones are corrections)
-    seen, first = set(), []
-    for e in entries:
-        if e["race_id"] in seen: continue
-        seen.add(e["race_id"]); first.append(e)
-    return {"schema_version": 1, "predictor": "claude", "summary": aggregate(first), "races": first}
+        e["prediction_files"] = slot["files"]; e["result_file"] = rf.name
+        entries.append(e)
+    return {"schema_version": 1, "predictor": "claude", "summary": aggregate(entries), "races": entries}
 
 
 def main(argv=None):

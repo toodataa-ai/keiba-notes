@@ -59,3 +59,25 @@ class PublicTest(unittest.TestCase):
             (d / "res/r1.json").write_text(json.dumps(RESULT), encoding="utf-8")
             r = bp.build(d / "p", d / "res")
             self.assertEqual(r["races"][0]["result"]["payout_yen"], 19450)
+
+
+class TwoStageTest(unittest.TestCase):
+    def test_two_stage_and_resolver(self):
+        res = dict(RESULT, race_id="2026-11-08-test-s", date="2026-11-08", venue="東京")
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d); (d / "p/2026-11-08-05-11").mkdir(parents=True); (d / "res").mkdir()
+            (d / "res/2026-11-08-test-s.json").write_text(json.dumps(res), encoding="utf-8")
+            s1 = pred(race_id="2026-11-08-05-11", stage="step1", bets=[])
+            s2 = {"race_id": "2026-11-08-05-11", "stage": "step2", "generated_at": "2026-11-08T08:50:00+09:00",
+                  "bets": [{"type": "三連複", "selection": [5, 8, 10], "stake_yen": 100}]}
+            (d / "p/2026-11-08-05-11/step1-a.json").write_text(json.dumps(s1), encoding="utf-8")
+            (d / "p/2026-11-08-05-11/step2-a.json").write_text(json.dumps(s2), encoding="utf-8")
+            r = sc.run(d / "p", d / "res")
+            self.assertEqual(r["summary"]["races"], 1)
+            self.assertEqual(r["summary"]["payout_yen"], 19450)
+            # bets saved after the start do not count
+            s2["generated_at"] = "2026-11-08T16:00:00+09:00"
+            (d / "p/2026-11-08-05-11/step2-a.json").write_text(json.dumps(s2), encoding="utf-8")
+            r = sc.run(d / "p", d / "res")
+            self.assertEqual(r["summary"]["payout_yen"], 0)
+            self.assertEqual(r["summary"]["races"], 1)
