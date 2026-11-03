@@ -16,13 +16,29 @@ on:
         required: false
         default: ''
         type: string
+  schedule:
+    - cron: '30 21 * * *' # 06:30 JST every day: yesterday's NAR results (automatic)
 permissions:
   contents: write
 concurrency:
   group: local-racing-shadow-publish
   cancel-in-progress: false
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.g.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: g
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          y=$(TZ=Asia/Tokyo date -d 'yesterday' +%F)
+          if ls local_racing_shadow_v1/predictions/$y/*.json >/dev/null 2>&1; then echo "run=true" >> "$GITHUB_OUTPUT"; else echo "No saved predictions for $y: skip"; echo "run=false" >> "$GITHUB_OUTPUT"; fi
   official-postrace:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

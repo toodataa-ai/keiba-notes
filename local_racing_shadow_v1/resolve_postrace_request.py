@@ -63,7 +63,7 @@ def main():
             previous = json.loads(older)
             if record["request_seq"] <= previous["request_seq"]:
                 raise ValueError("request_seq must increase on every retry")
-    elif event == "workflow_dispatch":
+    elif event in ("workflow_dispatch", "schedule"):
         date = os.environ.get("POSTRACE_INPUT_DATE") or (
             dt.datetime.now(JST).date() - dt.timedelta(days=1)
         ).isoformat()
