@@ -14,14 +14,15 @@ JST = timezone(timedelta(hours=9))
 
 def build(pred_dir: Path, results_dir: Path, now: datetime | None = None) -> dict:
     scored = {e["race_id"]: e for e in sc.run(pred_dir, results_dir)["races"]}
-    items, seen = [], set()
-    for f in sorted(pred_dir.glob("*/*.json")):
-        p = json.loads(f.read_text(encoding="utf-8"))
-        if p["race_id"] in seen:  # 最初に保存した版だけが正
+    items = []
+    for rid, slot in sc.load_race_files(pred_dir).items():
+        p = dict(slot["step1"] or {})
+        if not p:
             continue
-        seen.add(p["race_id"])
-        rf = results_dir / f"{p['race_id']}.json"
-        res = json.loads(rf.read_text(encoding="utf-8")) if rf.exists() else None
+        s2 = slot["step2"] or {}
+        p["bets"] = s2.get("bets", []); p["total_stake_yen"] = s2.get("total_stake_yen", sum(b["stake_yen"] for b in p["bets"]))
+        rf = sc.resolve_result(rid, results_dir)
+        res = json.loads(rf.read_text(encoding="utf-8")) if rf else None
         marks = sorted([{"no": h["no"], "name": h.get("name", ""), "mark": h["mark"], "reason": h.get("reason", "")}
                         for h in p.get("horses", []) if h.get("mark")], key=lambda m: sc.MARKS.index(m["mark"]))
         item = {"race_id": p["race_id"], "race_name": p.get("race_name") or (res or {}).get("race_name", p["race_id"]),
