@@ -148,6 +148,7 @@ Promise.all([
       return `<div class="pr"><span class="pl">${esc(u.label)}</span><span class="pt">${gchip('芝',g.turf)}${gchip('ダート',g.dirt)}${note?`<br><span class="tiny" style="color:#555">${note}</span>`:''}</span></div>`;
     }
     return `<div class="pr"><span class="pl">${esc(u.label)}</span>${bar(u)}<span class="pt">${esc(u.text)}</span></div>`};
+  const offNote=us=>{const o=us.find(u=>u.id.endsWith(':official'));return o?`<p class="tiny" style="margin-top:10px"><b>別の実験：公式馬場補正</b>（勝つ確率の微調整。競馬場ごとの馬場予測とは別もの）　${esc(o.text)}</p>`:''};
   const groups=cfg.themes.map(t=>{
     const us=pipe.units.filter(u=>u.theme===t.id);
     const ids=new Set(us.map(u=>u.experiment_id).filter(Boolean));
@@ -165,7 +166,7 @@ Promise.all([
     const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'<p class="tiny">専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。</p>';
     const cmp=ex.map(expCard).join('');
     const det=cmp?`<details class="tdet"><summary>比較中の詳しい経過を見る</summary>${cmp}</details>`:'';
-    return `<article class="tcard"><h3>${esc(t.title)}</h3><p class="what">${esc(t.what)}</p><div class="ph"><span></span><div class="pb ph-n">${names.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>${us.map(row).join('')}${entry}${extra}${link}${det}</article>`;
+    return `<article class="tcard"><h3>${esc(t.title)}</h3><p class="what">${esc(t.what)}</p>${t.id==='track_condition'?'':`<div class="ph"><span></span><div class="pb ph-n">${names.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>`}${us.filter(u=>!u.id.endsWith(':official')).map(row).join('')}${entry}${extra}${offNote(us)}${link}${det}</article>`;
   }).join('');
   $('themeList').innerHTML=groups;
 }).catch(()=>{$('themeList').innerHTML='<div class="empty">データを読み込めませんでした。</div>'});
