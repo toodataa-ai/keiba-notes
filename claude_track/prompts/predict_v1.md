@@ -48,3 +48,8 @@
 
 ## 終わったら
 `python3 -m claude_track.build_public` と `python3 -m claude_track.score_claude` は **実行しない**（自動処理が行う）。日本語で、保存したレース・◎・見送りの有無だけを短く報告する。成績の話はしない。
+
+## 実行記録（最後に必ず）
+終わったら（開催なし・失敗・見送りの場合も）、自分の実行記録を残して push する。サイトの「自動運用の状況」に出る。
+`python3 -m claude_track.record_run --task T2 --status <ok|fail|skipped> --note "<短い日本語の説明（例：3レース保存、開催なし、結果未取得で回顧0件）>" --started-at "<最初に実行を始めた時刻 ISO>"`
+その後 `git add docs/data/automation/claude_task_runs_v1.json` → commit → `git pull --rebase origin main` → push（失敗したら少し待って再試行）。記録を残せないほど早く失敗した場合は、記録なしでよい（記録がないこと自体が、サイトに「記録なし」と出る）。

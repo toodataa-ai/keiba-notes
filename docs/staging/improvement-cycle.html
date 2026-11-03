@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -182,7 +182,7 @@ Promise.all([
 <script>
 (function(){
   const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  fetch('data/predictors/claude_experiments_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+  fetch('data/predictors/claude_wakakoma_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null).then(w=>{window.__wakakoma=w;return fetch('data/predictors/claude_experiments_v1.json',{cache:'no-store'})}).then(r=>r.ok?r.json():null).then(d=>{
     if(!d)return;
     const p=d.pace||{},e=(d.experience||{}),rg=e.regimes||{};
     const n=p.pairs||0,need=p.need_pairs||20,pct=Math.min(100,Math.round(n/need*100));
@@ -198,7 +198,27 @@ Promise.all([
       <p class="what">経験の少ない馬で、Claudeの予想した勝つ数と実際の勝ちがどれだけずれるかを集めます。</p>
       <table><tr><th>区分</th><th>集まった馬</th><th>勝ちの数</th></tr>${rows}</table>
       <p class="tiny">${e.career_data_available?'出馬表の戦績から出走数を読み取っています。':'出馬表から出走数を読み取れるか、次の開催週に確認します。'}</p></article>`;
-    document.getElementById('claudeExpBody').innerHTML=pace+exp; document.getElementById('claudeExp').hidden=false;
+    const g=d.going||{},gn=g.pairs||0,gneed=g.need_pairs||20,gp=Math.min(100,Math.round(gn/gneed*100));
+    const going=`<article class="tcard"><h3>馬場の補正（Claudeの予想）</h3>
+      <p class="what">発走前の公式の馬場状態と、各馬の良馬場・道悪での近走成績から、Claudeの勝つ確率を補正した場合と、しない場合を比べます。</p>
+      <p class="prog">比較したレース：<b>${gn} / ${gneed}レース</b></p>
+      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${gp}%"></b></i></div>
+      <p class="tiny">${gn?`外れ具合（小さいほど良い）：補正なし ${f(g.mean_log_loss_base)} → 補正あり ${f(g.mean_log_loss_going)}／良くなったレース ${g.races_improved}・悪くなったレース ${g.races_worse}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
+    const pf=d.portfolio||{},pn=pf.pairs||0,pneed=pf.need_pairs||20,pp=Math.min(100,Math.round(pn/pneed*100)),ps=pf.summary;
+    const pct1=x=>x==null?'—':(x*100).toFixed(0)+'%';
+    const port=`<article class="tcard"><h3>購入セット（Claudeの予想）</h3>
+      <p class="what">Claude自身が作った買い目と、同じ予想・同じオッズから機械ルールで作り直した買い目を、同じ公式払戻で比べます（仮想で、購入はしません）。</p>
+      <p class="prog">比較したレース：<b>${pn} / ${pneed}レース</b></p>
+      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${pp}%"></b></i></div>
+      <p class="tiny">${ps?`回収率：Claude自身 ${pct1(ps.claude_own.roi)} ／ 機械ルール ${pct1(ps.mechanical_rule.roi)}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
+    const wk=window.__wakakoma;
+    let wkc='';
+    if(wk&&wk.categories){const wr=['E0','E1','E2'].map(k=>{const r=wk.categories[k]||{};return `<tr><td>${r.label||k}</td><td>${r.horses||0} / ${wk.confirm_horses_per_category||30}頭</td><td>${r.horses?`${r.expected_wins}（オッズ上）／${r.actual_wins}（実際）`:'—'}</td></tr>`}).join('');
+      wkc=`<article class="tcard"><h3>若駒の機械採点（全レース・Claudeの使用量なし）</h3>
+      <p class="what">全レースの公開オッズから勝つ確率を機械的に出し、経験の少ない馬が過大・過小に評価されていないかを集めます。</p>
+      <table><tr><th>区分</th><th>集まった馬</th><th>勝ちの数</th></tr>${wr}</table>
+      <p class="tiny">対象：${wk.races_scored||0}レース。ChatGPTの予想もClaudeの予想も使いません。</p></article>`}
+    document.getElementById('claudeExpBody').innerHTML=pace+going+port+exp+wkc; document.getElementById('claudeExp').hidden=false;
   }).catch(()=>{});
 })();
 </script>
