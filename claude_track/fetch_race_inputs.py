@@ -80,6 +80,8 @@ def parse_card(html: str) -> dict:
         clean = ODDS_RE.sub("", ht_)           # price-blind: drop current win odds and popularity
         sire = re.search(r"父：\s*(\S+)", clean); dam = re.search(r"母：\s*(\S+)", clean)
         damsire = re.search(r"母の父：\s*([^)）]+)", clean)
+        wsto = re.findall(r"\(\s*(\d+)\s*\.\s*(\d+)\s*\.\s*(\d+)\s*\.\s*(\d+)\s*\)", clean)   # JRA career summary, only if shown
+        career = [int(v) for v in wsto[0]] if len(wsto) == 1 else None
         jt = text(jockey)
         sexage = re.search(r"([牡牝セ])\s*(\d+)", jt); wt = re.search(r"(\d{2}(?:\.\d)?)\s*kg", jt)
         jname = re.sub(r"^.*?kg\s*", "", jt)
@@ -91,6 +93,7 @@ def parse_card(html: str) -> dict:
                        "body_weight_change": body.group(2) if body else None,
                        "sire": sire.group(1) if sire else None, "dam": dam.group(1) if dam else None,
                        "dam_sire": damsire.group(1).strip() if damsire else None,
+                       "career_wsto": career, "starts_before_race": sum(career) if career else None,
                        "past": [past_run(c) for c in tr.select("td.past")]})
     if len(horses) < 5:
         raise ValueError("too few horses parsed")
