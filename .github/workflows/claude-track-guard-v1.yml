@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
+      - name: Install test dependencies
+        run: python3 -m pip install -q requests beautifulsoup4
       - name: Tests
         run: python3 -m pytest -q claude_track || python3 -m unittest discover -s claude_track -t . -p 'test_*.py'
       - name: Immutable predictions (PR)
