@@ -16,8 +16,8 @@ on:
       - 'e2e_validation/improvement_cycle_v1.py'
       - 'e2e_validation/test_experiment_runner_v1.py'
   schedule:
-    # 22:23 JST daily: picks up results and E2E entries committed by bot workflows
-    - cron: '23 13 * * *'
+    # 18:47 JST daily: picks up results and E2E entries committed by bot workflows
+    - cron: '47 9 * * *'
   workflow_dispatch:
 permissions:
   contents: write

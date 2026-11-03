@@ -5,13 +5,14 @@ on:
     paths:
       - 'claude_track/predictions/**'
       - 'claude_track/reviews/**'
+      - 'claude_track/results/**'
       - 'e2e_validation/results/**'
       - 'claude_track/build_public.py'
       - 'claude_track/score_claude.py'
       - 'claude_track/experiments.py'
       - 'claude_track/inputs/**'
   schedule:
-    - cron: '50 13 * * *'   # 22:50 JST: picks up results committed by other bots
+    - cron: '47 10 * * *'   # 19:47 JST: picks up results committed by other bots
   workflow_dispatch:
 permissions:
   contents: write

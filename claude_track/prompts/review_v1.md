@@ -3,7 +3,8 @@
 報告は日本語・平易に。リポジトリは toodataa-ai/keiba-notes（main）。
 
 ## 前提
-- 結果は `e2e_validation/results/<ChatGPT側のレース名>.json`（公式の着順・払戻。ChatGPT の回顧が書く共有の結果ファイル）。まだ無いレースは、無いと報告して終わり（結果を推測しない）。
+- 結果は `claude_track/results/<race_id>.json`（公式の着順・払戻。Claude 用の自動処理 `claude-results-v1.yml` が、レース後（土日月の 17:17・17:47 JST）に Sportnavi の結果ページから保存する）。無いときは `e2e_validation/results/<ChatGPT側のレース名>.json`（ChatGPT の回顧が書く共有の結果ファイル）を使ってよい。どちらも無いレースは、無いと報告して終わり（結果を推測しない）。
+- 最初に `git pull` で最新を取る。結果ファイルが無く、レースが終わって30分以上たっているときは、GitHub Actions の `claude-results-v1.yml` を手動起動（REST: `gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-results-v1.yml/dispatches -f ref=main`）して、1〜2分後にもう一度 pull する。
 - Claude の予想は `claude_track/predictions/<race_id>/`。**保存済みの予想は書き換えない。**
 - ChatGPT の予想・回顧は、**Claude 自身の回顧を保存したあと**に、比較のためにだけ読んでよい。
 

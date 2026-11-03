@@ -5,6 +5,8 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+CLAUDE_RESULTS = ROOT / "claude_track/results"
+DEFAULT_RESULTS = ROOT / "e2e_validation/results"
 ORDERED = {"馬単", "三連単"}
 MARKS = ["◎", "○", "▲", "△", "×"]
 VENUE_CODES = {"01": "札幌", "02": "函館", "03": "福島", "04": "新潟", "05": "東京", "06": "中山", "07": "中京", "08": "京都", "09": "阪神", "10": "小倉"}
@@ -86,6 +88,9 @@ def aggregate(entries: list[dict]) -> dict:
 
 def resolve_result(race_id: str, results_dir: Path):
     """Result file for a Claude race id. Accepts ChatGPT's slug (file exists) or '<date>-<venue_code>-11'."""
+    own = CLAUDE_RESULTS / f"{race_id}.json"      # Claude's own capture (fetch_results.py) comes first
+    if own.exists() and results_dir == DEFAULT_RESULTS:
+        return own
     direct = results_dir / f"{race_id}.json"
     if direct.exists():
         return direct
