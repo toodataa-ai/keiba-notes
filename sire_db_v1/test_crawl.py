@@ -24,6 +24,12 @@ class T(unittest.TestCase):
         self.assertEqual((r["date"], r["venue"], r["surface"], r["dist"], r["heads"], r["finish"], r["ninki"], r["odds"]),
                          ("2026-11-01", "東京", "芝", 2000, 17, 5, 1, 2.3))
 
+    def test_denma_only_runners(self):
+        html = """<table><tr><th>枠番</th><th>馬番</th><th>馬名 性齢/毛色</th></tr>
+        <tr><td>1</td><td>1</td><td><a href="/keiba/directory/horse/2022105102/">A</a> 牡4 <a href="/keiba/directory/horse/2012102013/">父</a></td></tr></table>
+        <a href="/keiba/directory/horse/1999999999/">other</a>"""
+        self.assertEqual(c.parse_denma_horses(BeautifulSoup(html, "html.parser")), ["2022105102"])
+
     def test_race_code(self):
         codes = dict((d, k) for d, k in c.race_codes(["2026"]) if d == "2026-10-31" and k.endswith("11"))
         self.assertEqual(codes["2026-10-31"][:2], "26")

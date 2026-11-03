@@ -43,11 +43,26 @@ def race_codes(years) -> list[tuple[str, str]]:
 
 
 def parse_denma_horses(soup) -> list[str]:
+    """出走表の馬だけ（ページには各馬の父などの血統リンクも載るので、表の行の馬名セルだけを見る）。"""
     ids = []
-    for a in soup.find_all("a", href=True):
-        m = re.fullmatch(r"/keiba/directory/horse/(\d+)/", a["href"])
-        if m and m.group(1) not in ids:
-            ids.append(m.group(1))
+    for t in soup.select("table"):
+        rows = t.select("tr")
+        if not rows:
+            continue
+        head = [_t(c) for c in rows[0].find_all(["th", "td"], recursive=False)]
+        if "馬番" not in head:
+            continue
+        ix = next((i for i, h in enumerate(head) if h.startswith("馬名")), None)
+        for tr in rows[1:]:
+            cells = tr.find_all(["th", "td"], recursive=False)
+            if ix is None or len(cells) <= ix:
+                continue
+            a = cells[ix].find("a", href=re.compile(r"^/keiba/directory/horse/\d+/$"))
+            if a:
+                hid = re.search(r"(\d+)/$", a["href"]).group(1)
+                if hid not in ids:
+                    ids.append(hid)
+        break
     return ids
 
 
