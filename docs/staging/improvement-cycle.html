@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -30,15 +30,19 @@
 </header>
 
 <section aria-labelledby="flowTitle">
-<h2 id="flowTitle">改善の流れ</h2>
-<p class="sub">毎週の予想と結果から、改善案の良し悪しを自動で採点しています。</p>
+<h2 id="flowTitle">何が自動で、何が手動か</h2>
+<p class="sub">2026-11-03 時点。人が必ずやるのは「ChatGPTへの指示文の貼り付け」と「承認・A/B/Cの回答」だけです。承認や回答はチャットで行い、通知（Issue）は知らせるだけです。</p>
 <ol class="flow">
-  <li><b>予想する</b><p>発走前に予想を確定し、あとから変えられない形で保存</p><span class="tag ai">AIが実行</span></li>
-  <li><b>結果を記録</b><p>レース後に公式の着順を記録して振り返り</p><span class="tag ai">AIが実行</span></li>
-  <li><b>新旧を比べる</b><p>同じレースで「今の予想」と「改善案」を採点</p><span class="tag auto">自動</span></li>
-  <li><b>判定・採用</b><p>20レースたまったら、成績を見て採用するか決める</p><span class="tag hand">人が判断</span></li>
+  <li><b>ChatGPTの予想・回顧</b><p>朝と夜に、通知の指示文をChatGPTに貼って実行（正式予想はこちら）</p><span class="tag hand">手動</span></li>
+  <li><b>Claudeの予想・回顧</b><p>土日月の朝に予想、夜に回顧。保存と採点・公開まで（ChatGPTとは合算しない）</p><span class="tag auto">自動</span></li>
+  <li><b>地方競馬（研究）</b><p>毎朝の予想の固定と前日の回顧まで、すべて自動</p><span class="tag auto">自動</span></li>
+  <li><b>新旧の比較・集計</b><p>結果が入るたび、改善案と今の予想を同じレースで採点</p><span class="tag auto">自動</span></li>
+  <li><b>馬場の朝の予測</b><p>福島・阪神は毎朝、記録だけを自動で保存（正式予想にはまだ使わない）</p><span class="tag auto">自動</span></li>
+  <li><b>基準に届いたかの確認と通知</b><p>毎日調べ、届くと通知（Issue）が立つ</p><span class="tag auto">自動</span></li>
+  <li><b>判定・採用・本番リリース</b><p>A/B/Cの回答と「本番リリースOK」はチャットで人が行う</p><span class="tag hand">人が判断</span></li>
+  <li><b>採用後の反映</b><p>Aと答えたら、Claudeが比較用プログラムの登録や新しい版づくりを行う</p><span class="tag ai">Claudeが実行</span></li>
 </ol>
-<div class="note">改善案はあくまで研究用です。比較中も、サイトで公開している<strong>印・買い目は今の予想のまま</strong>です。</div>
+<div class="note">改善案はあくまで研究用です。比較中も、サイトで公開している<strong>印・買い目は今の予想のまま</strong>です。若駒の収集（ChatGPT側）は、いまは手動の起動です。</div>
 </section>
 
 <section aria-labelledby="themesTitle" id="themes">
