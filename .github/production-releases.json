@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.17-20261103",
-  "current_public_version": "1.17",
+  "current_public_release": "release/jra-site-v1.18-20261103",
+  "current_public_version": "1.18",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -367,6 +367,28 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.18-20261103",
+      "branch": "release/jra-site-v1.18-20261103",
+      "commit_sha": "6c03fba14cfb1eda5fce67cf93ea40dae511ca81",
+      "deployed_at": "2026-11-03T15:07:54+09:00",
+      "workflow_run_id": 41587910054,
+      "validation_workflow_run_id": 41587910054,
+      "public_version": "1.18",
+      "note": "2026-11-03ユーザー明示承認済み。新ページ『自動運用の状況』（手動/自動・1日の流れ・実行記録）を作り、改善状況ページから移す：自動・手動の一覧、1日の流れ、実行記録は改善だけでなくサイト全体の運用の話なので、専用ページに移し、トップから入れるようにする。実行記録の表には、手動・push で動いた回に『手』の印を付ける。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-page-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html",
+        "docs/improvement-cycle.html",
+        "docs/index.html"
       ],
       "public_http_files_verified": null
     }
