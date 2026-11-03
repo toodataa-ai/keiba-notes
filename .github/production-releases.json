@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.13-20261103",
-  "current_public_version": "1.13",
+  "current_public_release": "release/jra-site-v1.14-20261103",
+  "current_public_version": "1.14",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -281,6 +281,26 @@
       "note": "2026-11-03ユーザー明示承認済み。改善状況ページ：購入セットの比較を回収率で表示し、登録ずみの単位は登録の条件の代わりに「登録ずみ」を表示：購入セットの比較は買い目の回収率で比べるため、比較カードの文言を回収率にする。登録ずみ（比較中）の単位には「登録の条件」を出さず「登録ずみ」と表示する。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-portfolio-card-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.14-20261103",
+      "branch": "release/jra-site-v1.14-20261103",
+      "commit_sha": "041e9de3bc59226f1698929f76734acadb5a88d4",
+      "deployed_at": "2026-11-03T13:15:56+09:00",
+      "workflow_run_id": 41577078063,
+      "validation_workflow_run_id": 41577078063,
+      "public_version": "1.14",
+      "note": "2026-11-03ユーザー明示承認済み。改善状況ページ：Claudeの予想だけで進めている比較を表示：位置取りと若駒の、Claudeの予想だけの比較（ChatGPTとは混ぜない）の進み具合を、改善状況ページに表示する。データがまだ無いときは非表示ではなく、ゼロ件で表示。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-exp-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
