@@ -36,7 +36,7 @@ jobs:
           d=dt.date.fromisoformat("$D"); a=(d.replace(day=1)-dt.timedelta(days=1)).strftime('%Y%m'); b=d.strftime('%Y%m')
           open('/tmp/range','w').write(a+' '+b)
           PY
-          read A B < /tmp/range
+          read A B < /tmp/range || true
           python jra_going_labels.py index --start $A --end $B --out /tmp/days.json
           python - <<PY
           import json, datetime as dt
