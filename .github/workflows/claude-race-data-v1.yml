@@ -1,0 +1,43 @@
+name: Claude race data v1 (price-blind race cards for Claude's independent prediction)
+on:
+  schedule:
+    # Sat/Sun 08:40 JST (= Fri/Sat 23:40 UTC): after the race-day weights are published, well before the 11R post time
+    - cron: '40 23 * * 5,6'
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: 'Comma-separated YYYY-MM-DD (default: today and tomorrow, JST)'
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: claude-race-data
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - name: Test the parser on the saved real card
+        run: python3 -m unittest claude_track.test_fetch_race_inputs -v
+      - name: Fetch price-blind race cards (public JRA pages, 2.5 s apart)
+        env:
+          DATES: ${{ inputs.dates }}
+        run: |
+          args=()
+          if [ -n "${DATES:-}" ]; then IFS=',' read -ra ds <<< "$DATES"; for d in "${ds[@]}"; do args+=(--date "$d"); done; fi
+          python3 claude_track/fetch_race_inputs.py "${args[@]}"
+      - name: Commit new race cards only (never overwrites)
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add claude_track/inputs
+          if git diff --cached --quiet; then echo 'nothing new'; exit 0; fi
+          git commit -q -m 'Claude race data: price-blind race cards (before post time)'
+          for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1
