@@ -31,17 +31,25 @@
 
 <section aria-labelledby="flowTitle">
 <h2 id="flowTitle">何が自動で、何が手動か</h2>
-<p class="sub">2026-11-03 時点。人が必ずやるのは「ChatGPTへの指示文の貼り付け」と「承認・A/B/Cの回答」だけです。承認や回答はチャットで行い、通知（Issue）は知らせるだけです。</p>
+<p class="sub">2026-11-03 時点。自動のうち、Claudeの使用量を使わないもの（GitHubだけで動く）と、使うものを分けています。人が必ずやるのは「ChatGPTへの指示文の貼り付け」と「承認・A/B/Cの回答」だけです。承認や回答はチャットで行い、通知（Issue）は知らせるだけです。</p>
+<h3>手動（人が行う）</h3>
 <ol class="flow">
   <li><b>ChatGPTの予想・回顧</b><p>朝と夜に、通知の指示文をChatGPTに貼って実行（正式予想はこちら）</p><span class="tag hand">手動</span></li>
-  <li><b>Claudeの予想・回顧</b><p>土日月の朝に予想、夜に回顧。保存と採点・公開まで（ChatGPTとは合算しない）</p><span class="tag auto">自動</span></li>
-  <li><b>地方競馬（研究）</b><p>毎朝の予想の固定と前日の回顧まで、すべて自動</p><span class="tag auto">自動</span></li>
-  <li><b>新旧の比較・集計</b><p>結果が入るたび、改善案と今の予想を同じレースで採点</p><span class="tag auto">自動</span></li>
-  <li><b>馬場の朝の予測</b><p>福島・阪神は毎朝、記録だけを自動で保存（正式予想にはまだ使わない）</p><span class="tag auto">自動</span></li>
-  <li><b>基準に届いたかの確認と通知</b><p>毎日調べ、届くと通知（Issue）が立つ</p><span class="tag auto">自動</span></li>
   <li><b>判定・採用・本番リリース</b><p>A/B/Cの回答と「本番リリースOK」はチャットで人が行う</p><span class="tag hand">人が判断</span></li>
-  <li><b>採用後の反映</b><p>Aと答えたら、Claudeが比較用プログラムの登録や新しい版づくりを行う</p><span class="tag ai">Claudeが実行</span></li>
 </ol>
+<h3>自動：GitHubだけで動く（Claudeの使用量を使わない・無料）</h3>
+<ol class="flow">
+  <li><b>地方競馬（研究）</b><p>毎朝の予想の固定と前日の回顧まで</p><span class="tag auto">自動</span></li>
+  <li><b>新旧の比較・集計</b><p>結果が入るたび、改善案と今の予想を同じレースで採点（Claudeの予想の採点・公開も含む）</p><span class="tag auto">自動</span></li>
+  <li><b>馬場の朝の予測</b><p>福島・阪神は毎朝、記録だけを保存（正式予想にはまだ使わない）。気象庁の予報なども毎日保存</p><span class="tag auto">自動</span></li>
+  <li><b>基準に届いたかの確認と通知</b><p>毎日調べ、届くと通知（Issue）が立つ</p><span class="tag auto">自動</span></li>
+</ol>
+<h3>自動：Claudeの使用量を使う</h3>
+<ol class="flow">
+  <li><b>Claudeの予想</b><p>土日月の朝に印と買い目を保存（ChatGPTとは合算しない）</p><span class="tag ai">自動・使用量あり</span></li>
+  <li><b>Claudeの回顧</b><p>土日月の夜に回顧と週次比較</p><span class="tag ai">自動・使用量あり</span></li>
+</ol>
+<p class="tiny">Aと答えたあとの反映（比較用プログラムの登録、新しい版づくり）は、チャットでClaudeに頼んだときだけ動きます（使用量あり）。</p>
 <div class="note">改善案はあくまで研究用です。比較中も、サイトで公開している<strong>印・買い目は今の予想のまま</strong>です。若駒の収集（ChatGPT側）は、いまは手動の起動です。</div>
 </section>
 
