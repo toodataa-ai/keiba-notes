@@ -72,6 +72,40 @@
       "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない",
       "not_covered": "内外の有利不利（トラックバイアス）は発走前の根拠データが封印予想に無いため対象外。別の改善案で扱う",
       "plain_summary": "その日の馬場（良・稍重・重・不良）と、各馬の良馬場・雨の馬場での過去の成績を見て、今日の馬場が得意な馬の勝つ確率を少し上げます。"
+    },
+    {
+      "id": "EXP-003",
+      "kind": "portfolio",
+      "title": "購入セットの分散（1頭に金額が偏りすぎない買い目を作り直して比べる）",
+      "hypothesis_ids": [
+        "ticket_portfolio"
+      ],
+      "unit_ids": [
+        "ticket_portfolio:all"
+      ],
+      "baseline": "v3.15",
+      "challenger": "v3.15+ticket_div_v1",
+      "status": "collecting",
+      "registered_by": "Claude (user-approved A on Issue #121, 2026-11-03)",
+      "prospective_from": "2026-11-03T12:00:00+09:00",
+      "change_scope": "買い目の組み方だけ。印・STEP1・正式の買い目には一切反映しない研究用shadow（実際には購入しない）",
+      "inputs": "発走前に固定した正式の購入セット（予算）、正式STEP1の勝率、発走前に保存済みのオッズ表（単勝・馬連・馬単・ワイド・三連複）だけ。結果・発走後の情報は使わない",
+      "method": "買い目が10点以上のレースだけ対象。STEP1の勝率から組番ごとの的中確率を計算し、期待値（確率×オッズ−1）がプラスの組番を期待値の高い順に100円ずつ追加。合計は正式の購入額以内、1頭に絡む金額は購入額の60%まで。ワイドは低い側のオッズで計算。三連単・枠連・複勝は対象外",
+      "code": {
+        "path": "e2e_validation/challengers/ticket_div_v1.py",
+        "module": "e2e_validation.challengers.ticket_div_v1",
+        "git_blob_sha": "a3e47d816df75ef17eb8561a56d47ab66e16bc6c"
+      },
+      "primary_metric": "回収率（払戻合計÷購入合計。高いほど良い）",
+      "secondary_metrics": [
+        "収支の合計",
+        "的中レース数",
+        "損失レース数",
+        "1頭への集中度"
+      ],
+      "decision_rule": "発走前登録後の対象レース20ペア以上で、回収率が正式版より高く、最大の差が出た1レースを除いても回収率が正式版より高く、的中レース率の低下が10ポイント以内の場合にA/B/C承認へ提出。どれかを満たさなければ棄却。1レースの高額払戻だけでは採用しない",
+      "stop_rule": "20ペア到達時点で判定。途中経過での採用はしない",
+      "plain_summary": "買い目が1頭に偏りすぎているレースだけ、偏りを抑えた買い目を作り直し、本番の買い目と回収率・損失になる回数を比べます（実際には購入しません）。"
     }
   ],
   "note": "Registered challengers run as deterministic SHA-pinned overlays on the sealed formal STEP1. Only races starting after registration count as prospective pairs."

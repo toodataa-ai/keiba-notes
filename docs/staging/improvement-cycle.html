@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -92,15 +92,20 @@ function weeks(n) { return n <= 0 ? '判定できます' : `あと約${Math.ceil
     const p = e.prospective || {}, r = e.replay_support_only || {};
     const n = p.pairs || 0, need = e.minimum_prospective_pairs || 20;
     const pct = Math.min(100, Math.round(n / need * 100));
-    const [now, nowCls] = n ? word((p.win_log_loss || {}).delta, true) : ['まだ比較したレースはありません', 'even'];
-    const [ref, refCls] = r.pairs ? word((r.win_log_loss || {}).delta, true) : ['—', 'even'];
+    const pf = e.kind === 'portfolio';
+    const roi = x => x && x.roi != null ? Math.round(x.roi * 100) + '%' : '—';
+    const pword = x => !x || !x.pairs ? ['—', 'even'] : x.roi_delta == null || Math.abs(x.roi_delta) < 0.005 ? ['ほぼ同じ', 'even']
+      : x.roi_delta > 0 ? ['改善案のほうが回収率が高い', 'good'] : ['今の買い目のほうが回収率が高い', 'bad'];
+    const [now, nowCls] = pf ? (n ? pword(p) : ['まだ比較したレースはありません', 'even']) : n ? word((p.win_log_loss || {}).delta, true) : ['まだ比較したレースはありません', 'even'];
+    const [ref0, refCls] = pf ? pword(r) : r.pairs ? word((r.win_log_loss || {}).delta, true) : ['—', 'even'];
+    const ref = pf && r.pairs ? `${ref0}（回収率 今の買い目${roi(r.formal)}／改善案${roi(r.challenger)}）` : ref0;
     return `<article class="card">
       <h3>${esc(shortTitle(e.title))}</h3>
       <p class="what">${esc(e.plain_summary || e.title)}</p>
       <div class="bar-label"><span>比較したレース</span><b>${n} / ${need}レース</b></div>
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${n}"><i style="width:${pct}%"></i></div>
       <div class="facts">
-        <div class="fact"><span>途中経過（勝つ確率の見積もり）</span><b class="${nowCls}">${esc(now)}</b></div>
+        <div class="fact"><span>${pf ? '途中経過（買い目の回収率）' : '途中経過（勝つ確率の見積もり）'}</span><b class="${nowCls}">${esc(now)}</b></div>
         <div class="fact"><span>判定の目安</span><b>${esc(weeks(e.remaining_prospective_pairs))}</b></div>
         <div class="fact"><span>参考：過去${r.pairs || 0}レースでの試算（判定には数えません）</span><b class="${refCls}">${esc(ref)}</b></div>
         <div class="fact"><span>比較の開始</span><b>${esc((e.effective_prospective_from || '').slice(0, 10).replace(/-/g, '/'))} 以降のレース</b></div>

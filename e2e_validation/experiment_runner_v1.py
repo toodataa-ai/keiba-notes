@@ -169,6 +169,10 @@ def run(write: bool = True) -> dict:
         module = importlib.import_module(exp["code"]["module"])
         reg_commit = registration_commit_time(exp["id"])
         effective = max(ts(exp["prospective_from"]), ts(reg_commit)) if reg_commit else ts(exp["prospective_from"])
+        if exp.get("kind") == "portfolio":
+            report["experiments"].append(importlib.import_module("e2e_validation.portfolio_eval_v1").evaluate(
+                ROOT, exp, module, entries, effective, ts, reg_commit, minimum, write, OUT_DIR))
+            continue
         rows, skipped = [], []
         for entry in sorted(entries, key=lambda x: x["race_id"]):
             rid = entry["race_id"]

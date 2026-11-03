@@ -9,6 +9,9 @@ on:
       - 'e2e_validation/predictions/**'
       - 'e2e_validation/improvement_experiments_v1.json'
       - 'e2e_validation/experiment_runner_v1.py'
+      - 'e2e_validation/portfolio_eval_v1.py'
+      - 'e2e_validation/test_portfolio_v1.py'
+      - 'e2e_validation/quote-evidence/**'
       - 'e2e_validation/challengers/**'
       - 'e2e_validation/improvement_cycle_v1.py'
       - 'e2e_validation/test_experiment_runner_v1.py'
@@ -36,6 +39,7 @@ jobs:
         run: |
           python -m unittest e2e_validation.test_experiment_runner_v1 -v
           python -m unittest e2e_validation.test_improvement_cycle_v1 -v
+          python -m unittest e2e_validation.test_portfolio_v1 -v
       - name: Score registered challengers against the sealed formal STEP1
         run: |
           python e2e_validation/experiment_runner_v1.py
