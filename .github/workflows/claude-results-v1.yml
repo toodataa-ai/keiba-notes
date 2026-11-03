@@ -1,0 +1,21 @@
+name: Claude results v1 (Claude's own official results capture)
+on:
+  workflow_dispatch:
+    inputs:
+      dump_code:
+        description: 'test only: print the structure of a Sportnavi result page, e.g. 2605041111'
+        required: false
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - name: Dump page structure (test only)
+        if: ${{ inputs.dump_code != '' }}
+        run: python3 claude_track/dump_result_page.py "${{ inputs.dump_code }}"
