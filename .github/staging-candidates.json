@@ -1,19 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-operations-page-v1",
-      "title": "新ページ『自動運用の状況』（手動/自動・1日の流れ・実行記録）を作り、改善状況ページから移す",
-      "pages": [
-        "operations.html",
-        "improvement-cycle.html",
-        "index.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-03",
-      "summary": "自動・手動の一覧、1日の流れ、実行記録は改善だけでなくサイト全体の運用の話なので、専用ページに移し、トップから入れるようにする。実行記録の表には、手動・push で動いた回に『手』の印を付ける。"
-    }
-  ]
+  "candidates": []
 }
