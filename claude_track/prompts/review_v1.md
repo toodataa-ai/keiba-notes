@@ -20,3 +20,8 @@
 
 ## 週の比較（週末分がそろったら1回だけ）
 `claude_track/reviews/weekly-<週の月曜の日付>.md` に、同じレースについて ChatGPT と Claude の違いを書く：◎の着順、3着内に入れた印の数、買い目の収支、できたこと／できなかったことの対比、次に試す改善案（承認が必要なので提案だけ）。成績は合算しない。push したら、改善案があれば GitHub に Issue（ラベル `claude-review`、題名「[Claudeの回顧] 週の比較 <日付>」）を1件立て、ユーザーが A（反映）／B（保留）／C（採用しない）で答えられるようにする。反映は A のときだけ。
+
+## 実行記録（最後に必ず）
+終わったら（開催なし・失敗・見送りの場合も）、自分の実行記録を残して push する。サイトの「自動運用の状況」に出る。
+`python3 -m claude_track.record_run --task T3 --status <ok|fail|skipped> --note "<短い日本語の説明（例：3レース保存、開催なし、結果未取得で回顧0件）>" --started-at "<最初に実行を始めた時刻 ISO>"`
+その後 `git add docs/data/automation/claude_task_runs_v1.json` → commit → `git pull --rebase origin main` → push（失敗したら少し待って再試行）。記録を残せないほど早く失敗した場合は、記録なしでよい（記録がないこと自体が、サイトに「記録なし」と出る）。
