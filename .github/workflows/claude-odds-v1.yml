@@ -1,0 +1,49 @@
+name: Claude odds v1 (Claude's own pre-post odds capture, no ChatGPT files)
+on:
+  schedule:
+    # Sat/Sun/Mon 09:30 and 10:00 JST (= 00:30 / 01:00 UTC): right after Claude's STEP1 (T2 starts 09:10 JST), well before the 11R post time
+    - cron: '30 0 * * 6,0,1'
+    - cron: '0 1 * * 6,0,1'
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: 'Comma-separated YYYY-MM-DD (default: today JST)'
+        required: false
+      probe:
+        description: 'true = test only (past races allowed, nothing is saved)'
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: claude-odds
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - name: Test the parser
+        run: python3 -m unittest claude_track.test_fetch_odds -v
+      - name: Capture public odds before the post time (2.5 s apart)
+        env:
+          DATES: ${{ inputs.dates }}
+          PROBE: ${{ inputs.probe }}
+        run: |
+          args=()
+          if [ -n "${DATES:-}" ]; then IFS=',' read -ra ds <<< "$DATES"; for d in "${ds[@]}"; do args+=(--date "$d"); done; fi
+          if [ "${PROBE:-}" = "true" ]; then args+=(--probe); fi
+          python3 claude_track/fetch_odds.py "${args[@]}"
+      - name: Commit new odds only (never overwrites)
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add claude_track/odds
+          if git diff --cached --quiet; then echo 'nothing new'; exit 0; fi
+          git commit -q -m 'Claude odds: public odds captured before post time'
+          for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && exit 0; sleep $((i*3)); done
+          exit 1

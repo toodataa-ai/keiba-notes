@@ -35,11 +35,13 @@
 保存したら **すぐ commit して main へ push**（コミット時刻が「発走前に固定した」証拠）。push に成功するまで STEP2 に進まない。
 
 ## STEP2：買い目（STEP1 を push したあと）
-- オッズは、発走前に保存済みの表 `e2e_validation/quote-evidence/<ChatGPT側のレース名>/<種別>.json`（単勝 tfw・馬連 ur・馬単 ut・ワイド wide・三連複 sf）を使ってよい（公開オッズの表で、評価ではない）。レース名の対応は、同じ日付・競馬場の `e2e_validation/quote-evidence/` 配下のフォルダ。**見つからない・取得時刻が発走後なら、買い目は作らず「見送り（オッズ未取得）」と保存**する。
+- オッズは、Claude専用の取得処理（GitHub Actions、土日月 9:30 と 10:00 JST）が保存する `claude_track/odds/<race_id>/<UTC日時>.json` を使う（公開オッズの表で、評価ではない。ChatGPT側のファイルは使わない）。中身は `entries`（`type`・`selection`・`market_odds`）で、ワイドのオッズは幅（[下限, 上限]）のことがあり、その場合は**下限**で期待値を計算する。
+  - STEP1 を push した**あとに**取得された（`captured_at` が STEP1 のコミット時刻より後）、かつ発走前（`captured_at` < `start_at`）の**一番新しいファイル**だけを使う。
+  - まだ無いときは、`git pull` をしながら2分おきに最大30分待つ（STEP1 の push 前に保存されたファイルは開かない）。それでも無い・発走後しかない場合は、買い目は作らず**「見送り（オッズ未取得）」と保存**する。
 - 自分の `win_prob` から、期待値（的中確率×オッズ−1）がプラスの組番を選ぶ。1頭に絡む金額が購入額の60%を超えないようにする。合計は3,000円以内、1点100円単位。見送りもよい（理由を書く）。
 - 保存先：`claude_track/predictions/<race_id>/step2-<UTC日時>.json`
 ```json
-{"schema_version":1,"predictor":"claude","stage":"step2","race_id":"…","generated_at":"<JST>","decision":"buy","odds_source":"e2e_validation/quote-evidence/…","odds_observed_at":"…",
+{"schema_version":1,"predictor":"claude","stage":"step2","race_id":"…","generated_at":"<JST>","decision":"buy","odds_source":"claude_track/odds/<race_id>/<UTC日時>.json","odds_observed_at":"…",
  "bets":[{"type":"三連複","selection":[1,5,9],"stake_yen":100,"market_odds":42.5,"reason":"妙味：…（馬名と数値で）"}],"total_stake_yen":600,"skip_reason":null}
 ```
 見送りのときは `decision":"skip"`, `bets":[]`, `skip_reason` を書く。保存したら commit して push。
