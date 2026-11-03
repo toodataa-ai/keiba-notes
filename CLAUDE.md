@@ -42,7 +42,7 @@
 - **馬場予測は比較を挟まず採用（ユーザー決定 2026-11-03）**：芝・ダートとも「使える見込み」になった競馬場は state=`ready_to_adopt`（Issue「[採用できます]」、ラベル registration-ready）。A＝採用（Claude が毎朝の馬場予測を自動生成して正式予想へつなぐ。本番に出す前に再確認）／B＝予報がたまるまで待つ／C＝採用しない。20レース比較（登録→比較→判定）は馬場予測には使わない。採用の実装（毎朝の予測の自動生成）は未着手。公式馬場補正（EXP-002）は勝つ確率の微調整で、別物。Issue 重複の不具合（全角かっこの照合ミス）を修正済み。
 - **中山・阪神は2026-11-03にユーザー判断で過去の判定を破棄**（status=backtesting、routing.production=false、`reset_note` 付き）。正式プロンプト v3.13 に馬場予測モデルを使う記述は無かった。他の競馬場と同じ基準で評価：阪神＝芝・ダートとも使える見込み（採用できる状態）、中山＝芝が予報待ち。福島はユーザーが A（採用）と回答済み＝実装は未着手（朝の公式馬場状態の取得元が未確定）。
 
-- `ui-claude-view-v1`（results.html のみ、新資産 `assets/claude-view-v1.js`）：「ChatGPTの予想／Claudeの予想」の切り替えを追加。Claude 側は `docs/data/predictors/claude_status_v1.json`（`python3 -m claude_track.build_public` で作る）を表示、合算しない。**ユーザーの「本番リリースOK」待ち**（Claude 予想の保存・採点は `claude_track/`、上書き防止検査 `claude-track-guard-v1.yml`）。
+- `ui-claude-view-v1`（this-week.html・results.html、新資産 `assets/claude-view-v1.js`）：「ChatGPTの予想／Claudeの予想」の切り替えを追加。Claude 側は `docs/data/predictors/claude_status_v1.json`（`python3 -m claude_track.build_public` で作る）を表示、合算しない。**ユーザーの「本番リリースOK」待ち**（Claude 予想の保存・採点は `claude_track/`、上書き防止検査 `claude-track-guard-v1.yml`）。
 
 ### 登録中の改善案（どちらも 2026-11-02 13:00 JST 以降のレースから計上、各20ペアで判定）
 - **EXP-001 展開・位置取り補正** `e2e_validation/challengers/pace_v1.py`（近4走の1角通過順位→脚質、先行馬の数→ペースS/M/H、勝率に倍率）。参考：過去18レースで log loss 2.317→2.301（14/18で改善）、ダート・新潟で悪化警告。
