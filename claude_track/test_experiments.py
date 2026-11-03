@@ -40,3 +40,22 @@ class T(unittest.TestCase):
             self.assertEqual(r["experience"]["regimes"]["E0"]["actual_wins"], 1)   # horse 5 won
             self.assertEqual(r["pace"]["state"], "collecting")
 if __name__ == "__main__": unittest.main()
+
+
+class TestGoingAndPortfolio(unittest.TestCase):
+    def test_going_overlay(self):
+        from claude_track import experiments as ex
+        card = {"surface": "ダート", "horses": [
+            {"number": 1, "past": [{"surface": "ダート", "going": "重", "finish": 1, "field_size": 10},
+                                   {"surface": "ダート", "going": "良", "finish": 8, "field_size": 10}]},
+            {"number": 2, "past": []}]}
+        probs, adj = ex.going_overlay(card, {1: 0.5, 2: 0.5}, "重")
+        self.assertEqual(adj, 1); self.assertGreater(probs[1], probs[2]); self.assertAlmostEqual(sum(probs.values()), 1.0)
+        self.assertIsNone(ex.going_overlay(card, {1: 0.5, 2: 0.5}, None))
+
+    def test_mechanical_set_cap(self):
+        from claude_track import experiments as ex
+        odds = {("単勝", (1,)): 2.5, ("単勝", (2,)): 3.0, ("馬連", (1, 2)): 6.0}
+        kept = ex.mechanical_set({1: 0.6, 2: 0.4}, odds, 300)
+        self.assertTrue(all(b["stake_yen"] == 100 for b in kept))
+        self.assertLessEqual(sum(b["stake_yen"] for b in kept), 300)

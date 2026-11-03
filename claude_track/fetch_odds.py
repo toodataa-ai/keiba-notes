@@ -136,7 +136,7 @@ def capture_race(doc: dict, session, now: datetime, delay: float, probe: bool = 
     if not probe and now.isoformat() >= doc["start_at"]:
         print("skip (post time passed)", doc["race_id"]); return None
     code = race_code(doc["source_cname"])
-    entries, sources = [], {}
+    entries, sources, going = [], {}, None
     for kind in list(KINDS) + ["st"]:
         url = ODDS_URL.format(kind=kind, code=code)
         if kind == "st":
@@ -147,6 +147,9 @@ def capture_race(doc: dict, session, now: datetime, delay: float, probe: bool = 
             if len(r.content) < 1500:
                 raise RuntimeError("empty page " + url)
             pages = [r]
+        if kind == "tfw":
+            gm = re.search(r"馬場：\s*(良|稍重|重|不良)", _text(BeautifulSoup(pages[0].content, "html.parser")))
+            going = gm.group(1) if gm else None
         got = {}
         for r in pages:
             got.update(parse_odds(kind, BeautifulSoup(r.content, "html.parser")))
@@ -160,7 +163,7 @@ def capture_race(doc: dict, session, now: datetime, delay: float, probe: bool = 
         print("skip (post time passed during capture)", doc["race_id"]); return None
     return {"schema_version": 1, "race_id": doc["race_id"], "race_code": code, "start_at": doc["start_at"],
             "captured_at": done.isoformat(timespec="seconds"), "source": "Sportnavi public odds pages",
-            "sources": sources, "entries": entries}
+            "going": going, "sources": sources, "entries": entries}
 
 
 def latest_cards(inputs_root: Path, dates: list[str]):
@@ -188,7 +191,7 @@ def main():
                 "start_at": "2099-01-01T00:00:00+09:00"}
         s0 = requests.Session(); s0.headers["User-Agent"] = UA
         out = capture_race(fake, s0, datetime.now(JST), a.delay, True)
-        print("PROBE ok", a.probe_code, {k: v["count"] for k, v in out["sources"].items()})
+        print("PROBE ok", a.probe_code, {k: v["count"] for k, v in out["sources"].items()}, "going=", out.get("going"))
         return
     s = requests.Session(); s.headers["User-Agent"] = UA
     n = 0

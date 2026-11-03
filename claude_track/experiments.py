@@ -13,6 +13,8 @@ from pathlib import Path
 from statistics import mean
 
 from claude_track import score_claude as sc
+from e2e_validation import portfolio_eval_v1 as pe
+from e2e_validation.challengers import ticket_div_v1 as td   # fixed rule from EXP-003 (unchanged file, reused as-is)
 
 ROOT = Path(__file__).resolve().parents[1]
 PARAMS = {"max_runs": 4, "front_max_ratio": 0.33, "closer_min_ratio": 0.67, "leader_max_ratio": 0.20,
@@ -67,8 +69,96 @@ def load_card(step1: dict, root: Path):
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
+
+# ---- going overlay (same fixed rule as ChatGPT-side EXP-002, applied to Claude's STEP1) ----
+GOING = {"wet_goings": ["稍重", "重", "不良"], "k_wet_race": 0.8, "k_dry_race": 0.4, "min_multiplier": 0.80, "max_multiplier": 1.25}
+
+
+def going_overlay(card: dict, probs: dict[int, float], going: str):
+    """Returns (new probs, adjusted_runner_count) or None when going/surface are unknown."""
+    surface = {"ダート": "ダート", "芝": "芝"}.get(card.get("surface"))
+    if going not in ("良", *GOING["wet_goings"]) or not surface:
+        return None
+    race_wet = going in GOING["wet_goings"]
+    k = GOING["k_wet_race"] if race_wet else GOING["k_dry_race"]
+    by_no = {h["number"]: h for h in card["horses"]}
+    raw, adj = {}, 0
+    for no, p in probs.items():
+        runs = [r for r in (by_no.get(no, {}).get("past") or [])
+                if r.get("surface") == surface and r.get("going") and r.get("finish") and (r.get("field_size") or 0) >= 2
+                and 1 <= r["finish"] <= r["field_size"]]
+        score = lambda r: 1 - (r["finish"] - 1) / (r["field_size"] - 1)
+        wet = [score(r) for r in runs if r["going"] in GOING["wet_goings"]]
+        dry = [score(r) for r in runs if r["going"] not in GOING["wet_goings"]]
+        mult = 1.0
+        if wet and dry:
+            same, other = (wet, dry) if race_wet else (dry, wet)
+            diff = mean(same) - mean(other)
+            mult = min(GOING["max_multiplier"], max(GOING["min_multiplier"], math.exp(k * diff))); adj += 1
+        raw[no] = p * mult
+    t = sum(raw.values())
+    return {k_: v / t for k_, v in raw.items()}, adj
+
+
+# ---- purchase set: Claude's own STEP2 vs the mechanical rule (EXP-003 rule) on the SAME STEP1 probabilities and odds ----
+def mechanical_set(probs: dict[int, float], odds: dict, budget: int) -> list[dict]:
+    horses = {h for key in odds for h in key[1]}
+    raw = {h: v for h, v in probs.items() if h in horses}
+    t = sum(raw.values()); p = {h: v / t for h, v in raw.items()}
+    cands = []
+    for (typ, sel), o in odds.items():
+        if typ not in td.PARAMS["types"] or not set(sel) <= set(p):
+            continue
+        ev = td.combo_prob(p, typ, sel) * o - 1.0
+        if ev > 0:
+            cands.append((-ev, td.PARAMS["types"].index(typ), sel, typ, o))
+    cands.sort()
+    unit, cap_yen = td.PARAMS["unit_yen"], td.PARAMS["cap"] * budget
+    kept, used = [], {}
+    for _, _, sel, typ, o in cands:
+        if sum(b["stake_yen"] for b in kept) + unit > budget:
+            break
+        if any(used.get(h, 0) + unit > cap_yen for h in set(sel)):
+            continue
+        kept.append({"type": typ, "selection": list(sel), "stake_yen": unit, "market_odds": o})
+        for h in set(sel):
+            used[h] = used.get(h, 0) + unit
+    return kept
+
+
+def odds_table(path: Path) -> dict:
+    out = {}
+    for e in json.loads(path.read_text(encoding="utf-8")).get("entries", []):
+        typ = e.get("type")
+        if typ not in td.PARAMS["types"]:
+            continue
+        o = e["market_odds"]; o = min(o) if isinstance(o, list) else o
+        if isinstance(o, (int, float)) and o > 0:
+            out[(typ, tuple(e["selection"]) if typ == "馬単" else tuple(sorted(e["selection"])))] = float(o)
+    return out
+
+
+def captured_going(race_id: str, root: Path):
+    d = root / "claude_track/odds" / race_id
+    for f in sorted(d.glob("*.json"), reverse=True) if d.exists() else []:
+        g = json.loads(f.read_text(encoding="utf-8")).get("going")
+        if g:
+            return g
+    return None
+
+
+def _port_summary(rows):
+    if not rows:
+        return None
+    def side(k):
+        st = sum(r[k]["stake_yen"] for r in rows); py = sum(r[k]["payout_yen"] for r in rows)
+        return {"stake_yen": st, "payout_yen": py, "roi": round(py / st, 4) if st else None, "hit_races": sum(r[k]["hit"] for r in rows)}
+    return {"claude_own": side("claude"), "mechanical_rule": side("mechanical")}
+
+
 def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
-    pairs, exp = [], {k: {"horses": 0, "pred_wins": 0.0, "actual_wins": 0, "races": set()} for k in ("E0", "E1", "E2")}
+    pairs, going_pairs, port_rows = [], [], []
+    exp = {k: {"horses": 0, "pred_wins": 0.0, "actual_wins": 0, "races": set()} for k in ("E0", "E1", "E2")}
     career_seen = 0
     for rid, slot in sc.load_race_files(pred_dir).items():
         rf = sc.resolve_result(rid, results_dir)
@@ -83,8 +173,20 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
         if len(probs) != len(horses) or winner not in probs:
             continue
         base = _norm(probs)
+        s2 = slot.get("step2")
+        if s2 and s2.get("bets") and s2.get("odds_source") and (root / s2["odds_source"]).exists():
+            budget = int(sum(b["stake_yen"] for b in s2["bets"]))
+            mech = mechanical_set(base, odds_table(root / s2["odds_source"]), budget)
+            if mech and result.get("official_payouts_yen_per_100"):
+                pay = result["official_payouts_yen_per_100"]
+                port_rows.append({"race_id": rid, "claude": pe.settle(s2["bets"], pay), "mechanical": pe.settle(mech, pay),
+                                  "claude_tickets": len(s2["bets"]), "mechanical_tickets": len(mech)})
         card = load_card(step1, root)
         if card:
+            gv = captured_going(rid, root)
+            go = going_overlay(card, base, gv) if gv else None
+            if go:
+                gp = _norm(go[0]); going_pairs.append({"race_id": rid, "base_ll": -math.log(base[winner]), "going_ll": -math.log(gp[winner]), "adjusted": go[1], "going": gv})
             ch = _norm(overlay(card["horses"], base))
             pairs.append({"race_id": rid, "base_ll": -math.log(base[winner]), "pace_ll": -math.log(ch[winner])})
             for h in card["horses"]:
@@ -101,6 +203,16 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
                     "mean_log_loss_pace": mean(p["pace_ll"] for p in pairs) if n else None,
                     "races_improved": sum(1 for d in deltas if d < 0), "races_worse": sum(1 for d in deltas if d > 0),
                     "state": "collecting" if n < NEED_PAIRS else "ready_for_decision"},
+           "going": {"id": "claude+going_v1", "pairs": len(going_pairs), "need_pairs": NEED_PAIRS,
+                     "adjusted_runners": sum(p["adjusted"] for p in going_pairs),
+                     "mean_log_loss_base": mean(p["base_ll"] for p in going_pairs) if going_pairs else None,
+                     "mean_log_loss_going": mean(p["going_ll"] for p in going_pairs) if going_pairs else None,
+                     "races_improved": sum(1 for p in going_pairs if p["going_ll"] < p["base_ll"]),
+                     "races_worse": sum(1 for p in going_pairs if p["going_ll"] > p["base_ll"]),
+                     "state": "collecting" if len(going_pairs) < NEED_PAIRS else "ready_for_decision"},
+           "portfolio": {"id": "claude+ticket_div_rule", "pairs": len(port_rows), "need_pairs": NEED_PAIRS,
+                         "summary": _port_summary(port_rows),
+                         "state": "collecting" if len(port_rows) < NEED_PAIRS else "ready_for_decision"},
            "experience": {"career_data_available": career_seen > 0, "need_horses": NEED_HORSES,
                           "regimes": {k: {"horses": v["horses"], "races": len(v["races"]),
                                           "predicted_wins": round(v["pred_wins"], 3), "actual_wins": v["actual_wins"],
