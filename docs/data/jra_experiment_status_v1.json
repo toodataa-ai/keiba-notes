@@ -19,8 +19,8 @@
       "baseline": "v3.13",
       "challenger": "v3.13+pace_v1",
       "status": "collecting",
-      "effective_prospective_from": "2026-11-02T13:00:00+09:00",
-      "registration_commit_at": "2026-11-02T12:32:59+09:00",
+      "effective_prospective_from": "2026-11-02T13:50:09+09:00",
+      "registration_commit_at": "2026-11-02T13:50:09+09:00",
       "minimum_prospective_pairs": 20,
       "remaining_prospective_pairs": 20,
       "ready_for_manual_review": false,
@@ -862,8 +862,8 @@
       "baseline": "v3.13",
       "challenger": "v3.13+going_v1",
       "status": "collecting",
-      "effective_prospective_from": "2026-11-02T13:00:00+09:00",
-      "registration_commit_at": "2026-11-02T12:43:48+09:00",
+      "effective_prospective_from": "2026-11-02T13:50:09+09:00",
+      "registration_commit_at": "2026-11-02T13:50:09+09:00",
       "minimum_prospective_pairs": 20,
       "remaining_prospective_pairs": 20,
       "ready_for_manual_review": false,
@@ -1710,6 +1710,299 @@
         {
           "race_id": "2026-10-11-uzumasa-stakes",
           "reason": "baseline is v3.12"
+        }
+      ]
+    },
+    {
+      "id": "EXP-003",
+      "kind": "portfolio",
+      "title": "購入セットの分散（1頭に金額が偏りすぎない買い目を作り直して比べる）",
+      "plain_summary": "買い目が1頭に偏りすぎているレースだけ、偏りを抑えた買い目を作り直し、本番の買い目と回収率・損失になる回数を比べます（実際には購入しません）。",
+      "hypothesis_ids": [
+        "ticket_portfolio"
+      ],
+      "baseline": "v3.15",
+      "challenger": "v3.15+ticket_div_v1",
+      "status": "collecting",
+      "effective_prospective_from": "2026-11-03T12:00:00+09:00",
+      "registration_commit_at": null,
+      "minimum_prospective_pairs": 20,
+      "remaining_prospective_pairs": 20,
+      "ready_for_manual_review": false,
+      "prospective": {
+        "pairs": 0
+      },
+      "prospective_breakdown": {},
+      "replay_support_only": {
+        "pairs": 12,
+        "formal": {
+          "stake_yen": 48800,
+          "payout_yen": 28650,
+          "net_yen": -20150,
+          "roi": 0.5871,
+          "hit_races": 5,
+          "loss_races": 10,
+          "avg_max_exposure": 0.7349
+        },
+        "challenger": {
+          "stake_yen": 48800,
+          "payout_yen": 1330,
+          "net_yen": -47470,
+          "roi": 0.0273,
+          "hit_races": 1,
+          "loss_races": 12,
+          "avg_max_exposure": 0.5637
+        },
+        "roi_delta": -0.5598,
+        "roi_delta_without_biggest_gap_race": -0.3803,
+        "biggest_gap_race": "2026-10-18-niigata-himba-stakes",
+        "challenger_better_net_races": 0,
+        "challenger_worse_net_races": 5
+      },
+      "replay_breakdown": {},
+      "replay_caveat": "過去レースの再現。発走前に登録された比較ではないため採用判定の件数に数えない",
+      "not_applicable_races": [
+        "2026-10-17-fuji-stakes",
+        "2026-10-17-tourmaline-stakes",
+        "2026-10-24-uonuma-stakes",
+        "2026-10-25-kannazuki-stakes",
+        "2026-10-25-kikka-sho",
+        "2026-10-31-fantasy-stakes"
+      ],
+      "races": [
+        {
+          "race_id": "2026-10-12-october-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 1800,
+            "payout_yen": 0,
+            "net_yen": -1800,
+            "hit": 0,
+            "max_exposure": 0.5
+          },
+          "challenger": {
+            "stake_yen": 1800,
+            "payout_yen": 0,
+            "net_yen": -1800,
+            "hit": 0,
+            "max_exposure": 0.5556
+          }
+        },
+        {
+          "race_id": "2026-10-12-swan-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 2400,
+            "payout_yen": 9380,
+            "net_yen": 6980,
+            "hit": 1,
+            "max_exposure": 0.5833
+          },
+          "challenger": {
+            "stake_yen": 2400,
+            "payout_yen": 0,
+            "net_yen": -2400,
+            "hit": 0,
+            "max_exposure": 0.5833
+          }
+        },
+        {
+          "race_id": "2026-10-17-hokuriku-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 4700,
+            "payout_yen": 0,
+            "net_yen": -4700,
+            "hit": 0,
+            "max_exposure": 0.7872
+          },
+          "challenger": {
+            "stake_yen": 4700,
+            "payout_yen": 0,
+            "net_yen": -4700,
+            "hit": 0,
+            "max_exposure": 0.5957
+          }
+        },
+        {
+          "race_id": "2026-10-18-brazil-cup",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 5100,
+            "payout_yen": 460,
+            "net_yen": -4640,
+            "hit": 1,
+            "max_exposure": 0.8039
+          },
+          "challenger": {
+            "stake_yen": 5100,
+            "payout_yen": 0,
+            "net_yen": -5100,
+            "hit": 0,
+            "max_exposure": 0.5882
+          }
+        },
+        {
+          "race_id": "2026-10-18-niigata-himba-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 3000,
+            "payout_yen": 11230,
+            "net_yen": 8230,
+            "hit": 1,
+            "max_exposure": 1.0
+          },
+          "challenger": {
+            "stake_yen": 3000,
+            "payout_yen": 1330,
+            "net_yen": -1670,
+            "hit": 1,
+            "max_exposure": 0.6
+          }
+        },
+        {
+          "race_id": "2026-10-18-shuka-sho",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 5600,
+            "payout_yen": 3520,
+            "net_yen": -2080,
+            "hit": 1,
+            "max_exposure": 0.8036
+          },
+          "challenger": {
+            "stake_yen": 5600,
+            "payout_yen": 0,
+            "net_yen": -5600,
+            "hit": 0,
+            "max_exposure": 0.4821
+          }
+        },
+        {
+          "race_id": "2026-10-24-artemis-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 5900,
+            "payout_yen": 0,
+            "net_yen": -5900,
+            "hit": 0,
+            "max_exposure": 0.6949
+          },
+          "challenger": {
+            "stake_yen": 5900,
+            "payout_yen": 0,
+            "net_yen": -5900,
+            "hit": 0,
+            "max_exposure": 0.5932
+          }
+        },
+        {
+          "race_id": "2026-10-24-cassiopeia-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 5200,
+            "payout_yen": 0,
+            "net_yen": -5200,
+            "hit": 0,
+            "max_exposure": 0.6731
+          },
+          "challenger": {
+            "stake_yen": 5200,
+            "payout_yen": 0,
+            "net_yen": -5200,
+            "hit": 0,
+            "max_exposure": 0.5769
+          }
+        },
+        {
+          "race_id": "2026-10-25-lumiere-autumn-dash",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 3200,
+            "payout_yen": 0,
+            "net_yen": -3200,
+            "hit": 0,
+            "max_exposure": 0.4375
+          },
+          "challenger": {
+            "stake_yen": 3200,
+            "payout_yen": 0,
+            "net_yen": -3200,
+            "hit": 0,
+            "max_exposure": 0.4688
+          }
+        },
+        {
+          "race_id": "2026-10-31-perseus-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 4100,
+            "payout_yen": 0,
+            "net_yen": -4100,
+            "hit": 0,
+            "max_exposure": 1.0
+          },
+          "challenger": {
+            "stake_yen": 4100,
+            "payout_yen": 0,
+            "net_yen": -4100,
+            "hit": 0,
+            "max_exposure": 0.5854
+          }
+        },
+        {
+          "race_id": "2026-11-01-mahoroba-stakes",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 5000,
+            "payout_yen": 4060,
+            "net_yen": -940,
+            "hit": 1,
+            "max_exposure": 1.0
+          },
+          "challenger": {
+            "stake_yen": 5000,
+            "payout_yen": 0,
+            "net_yen": -5000,
+            "hit": 0,
+            "max_exposure": 0.6
+          }
+        },
+        {
+          "race_id": "2026-11-01-tenno-sho-autumn",
+          "grade": "replay_support_only",
+          "formal": {
+            "stake_yen": 2800,
+            "payout_yen": 0,
+            "net_yen": -2800,
+            "hit": 0,
+            "max_exposure": 0.5357
+          },
+          "challenger": {
+            "stake_yen": 2800,
+            "payout_yen": 0,
+            "net_yen": -2800,
+            "hit": 0,
+            "max_exposure": 0.5357
+          }
+        }
+      ],
+      "skipped": [
+        {
+          "race_id": "2026-10-10-mimuro-stakes",
+          "reason": "sealed purchase file not found"
+        },
+        {
+          "race_id": "2026-10-10-saudi-arabia-royal-cup",
+          "reason": "sealed purchase file not found"
+        },
+        {
+          "race_id": "2026-10-11-ireland-trophy",
+          "reason": "sealed purchase file not found"
+        },
+        {
+          "race_id": "2026-10-11-uzumasa-stakes",
+          "reason": "sealed purchase file not found"
         }
       ]
     }
