@@ -9,8 +9,10 @@ on:
       - 'e2e_validation/improvement_experiments_v1.json'
       - 'docs/data/baba_model_registry.json'
       - 'docs/data/experience_regime_factor_evidence_status.json'
+      - 'docs/data/predictors/claude_wakakoma_v1.json'
+      - 'claude_track/reviews/**'
   schedule:
-    # 22:40 JST daily: 17 minutes after the experiment scoring job
+    # 19:17 JST daily: 30 minutes after the experiment scoring job
     - cron: '17 10 * * *'
   workflow_dispatch:
 permissions:

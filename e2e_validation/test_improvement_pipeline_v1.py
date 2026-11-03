@@ -126,3 +126,21 @@ class GoingAdoptTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestClaudeEvidence(unittest.TestCase):
+    def test_claude_screening_counts_races_and_weeks(self):
+        import tempfile, json
+        from pathlib import Path
+        import e2e_validation.improvement_pipeline_v1 as ip
+        with tempfile.TemporaryDirectory() as t:
+            old = ip.CLAUDE_REVIEWS; ip.CLAUDE_REVIEWS = Path(t)
+            try:
+                for rid in ("2026-11-01-05-11", "2026-11-02-09-11", "2026-11-08-05-11", "2026-11-09-09-11"):
+                    (Path(t) / f"{rid}.json").write_text(json.dumps({"race_id": rid, "failure_types": ["展開"]}))
+                (Path(t) / "x.json").write_text(json.dumps({"race_id": "2026-11-08-06-11", "failure_types": ["能力"]}))
+                r = ip.claude_screening("pace_positioning", 3, 2)
+                self.assertEqual((r["races"], r["meetings"], r["met"]), (4, 2, True))
+                self.assertFalse(ip.claude_screening("track_condition", 3, 2)["met"])
+            finally:
+                ip.CLAUDE_REVIEWS = old

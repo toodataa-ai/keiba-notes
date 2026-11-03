@@ -18,6 +18,7 @@
 - 近走の内容（着順・頭数・クラス・上がり）、今回と同じ競馬場・距離・馬場での実績、斤量とその増減（斤量はやや強めに評価。3歳馬の軽斤量・前走からの増減。ただし斤量だけで決めない）
 - 脚質（近走の通過順位）と、メンバーから見たペース、枠・進路の影響
 - 当日の馬場（出馬表の馬場状態）。馬場の変化の可能性は不確実性として書く
+- **馬場の予測（福島・阪神のみ。ファイルがあるときだけ）**：`git pull` のあと `baba_models_v2/live/<日付>_<競馬場>.json`（朝8:45 JST に自動で保存される、オッズを使わない馬場予測）を読む。`surfaces` のうち今回の芝/ダ（turf/dirt）の `races` から `race_no`=11 を探し、`probs`（良・稍重・重・不良の確率）と `most_likely`、`p_change_from_morning`（朝から変わる確率）を、**馬場の変化の見込みとして**評価に使う（道悪の確率が高いときは、道悪の実績を重く見る）。発走時刻は直近2年の中央値で代用しているので、確率は目安。ファイルが無い競馬場・日は使わず、従来どおり出馬表の馬場状態だけで評価する。使ったときは STEP1 の保存内容に `"going_forecast":{"file":"baba_models_v2/live/…","probs":{…},"most_likely":"…"}` を足す（使わなかったときは `null`）。
 - 若駒・休み明けは減点せず、不確実性として明記する
 - 個別の好材料は、必ず総合順位へ反映する（書くだけで終わらせない）
 - 人気ではなく、能力・適性を評価する（オッズは見ていないので自然にそうなる）
@@ -30,6 +31,7 @@
  "race_name":"…","venue":"東京","date":"2026-11-08","prompt_version":"claude-v1.0","model":"<実行したモデル名>",
  "generated_at":"<JSTの現在時刻 ISO>","information_cutoff_at":"<入力ファイルの captured_at>","odds_seen_before_step1":false,
  "input_file":"claude_track/inputs/<race_id>/<ファイル名>","input_sha256":"<そのファイルのsha256>",
+ "going_forecast":null,
  "horses":[{"no":1,"name":"…","mark":"◎","ability":"A","win_prob":0.2,"top3_prob":0.5,"reason":"…"}]}
 ```
 保存したら **すぐ commit して main へ push**（コミット時刻が「発走前に固定した」証拠）。push に成功するまで STEP2 に進まない。
