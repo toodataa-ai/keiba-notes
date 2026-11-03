@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.10-20261103",
-  "current_public_version": "1.10",
+  "current_public_release": "release/jra-site-v1.11-20261103",
+  "current_public_version": "1.11",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -224,6 +224,28 @@
         "docs/release-history.html",
         "docs/improvement-cycle.html",
         "docs/assets/page-nav-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.11-20261103",
+      "branch": "release/jra-site-v1.11-20261103",
+      "commit_sha": "a53e482f880b557a8c0c63d6e87779f8e6424de0",
+      "deployed_at": "2026-11-03T10:40:07+09:00",
+      "workflow_run_id": 41561202283,
+      "validation_workflow_run_id": 41561202283,
+      "public_version": "1.11",
+      "note": "2026-11-03ユーザー明示承認済み。ChatGPT／Claude の予想・成績を別々に見られる切り替え（今週のAI予想・過去の成績）：各ページの上に「ChatGPTの予想／Claudeの予想」の切り替えを追加。ChatGPT側は今のまま。次回の対象レースの予定は共通で出す。Claude側は別データ(data/predictors/claude_status_v1.json)を表示し、成績は合算しない。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-view-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/results.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
