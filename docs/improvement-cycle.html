@@ -45,6 +45,12 @@
 </section>
 
 
+<section aria-labelledby="claudeExpTitle" id="claudeExp" hidden>
+<h2 id="claudeExpTitle">Claudeの予想だけで進めている比較</h2>
+<p class="sub">ChatGPTの予想とは混ぜずに、Claudeの予想だけで改善を試しています。研究用で、購入はしません。</p>
+<div id="claudeExpBody"></div>
+</section>
+
 <section aria-labelledby="doneTitle">
 <h2 id="doneTitle">これまでの判定</h2>
 <div id="decided" class="empty">読み込み中…</div>
@@ -176,6 +182,29 @@ Promise.all([
   }).join('');
   $('themeList').innerHTML=groups;
 }).catch(()=>{$('themeList').innerHTML='<div class="empty">データを読み込めませんでした。</div>'});
+})();
+</script>
+<script>
+(function(){
+  const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  fetch('data/predictors/claude_experiments_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d)return;
+    const p=d.pace||{},e=(d.experience||{}),rg=e.regimes||{};
+    const n=p.pairs||0,need=p.need_pairs||20,pct=Math.min(100,Math.round(n/need*100));
+    const f=x=>x==null?'—':Number(x).toFixed(3);
+    const pace=`<article class="tcard"><h3>展開・位置取り（Claudeの予想）</h3>
+      <p class="what">Claudeが付けた勝つ確率に、位置取りの補正を足した場合と足さない場合を、同じ結果で比べます。</p>
+      <p class="prog">比較したレース：<b>${n} / ${need}レース</b></p>
+      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${pct}%"></b></i></div>
+      <p class="tiny">${n?`外れ具合（小さいほど良い）：補正なし ${f(p.mean_log_loss_base)} → 補正あり ${f(p.mean_log_loss_pace)}／良くなったレース ${p.races_improved}・悪くなったレース ${p.races_worse}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
+    const names={E0:'0戦',E1:'1〜3戦',E2:'4戦以上'};
+    const rows=['E0','E1','E2'].map(k=>{const r=rg[k]||{horses:0};return `<tr><td>${names[k]}</td><td>${r.horses||0} / ${e.need_horses||30}頭</td><td>${r.horses?`${r.predicted_wins}（予想）／${r.actual_wins}（実際）`:'—'}</td></tr>`}).join('');
+    const exp=`<article class="tcard"><h3>若駒・経験不足（Claudeの予想）</h3>
+      <p class="what">経験の少ない馬で、Claudeの予想した勝つ数と実際の勝ちがどれだけずれるかを集めます。</p>
+      <table><tr><th>区分</th><th>集まった馬</th><th>勝ちの数</th></tr>${rows}</table>
+      <p class="tiny">${e.career_data_available?'出馬表の戦績から出走数を読み取っています。':'出馬表から出走数を読み取れるか、次の開催週に確認します。'}</p></article>`;
+    document.getElementById('claudeExpBody').innerHTML=pace+exp; document.getElementById('claudeExp').hidden=false;
+  }).catch(()=>{});
 })();
 </script>
 <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
