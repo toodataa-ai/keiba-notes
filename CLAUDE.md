@@ -39,6 +39,7 @@
 - **Stage B v2（朝の馬場状態を入力に追加・2026-11-03）**：`baba_models_v2/stage_b_model_v2.py` → `stage_b/model_v2.json`。朝の馬場＝その日最初のレースの馬場で代用（朝の公式発表は未保存）。ログ損失 芝/ダ（全レース）：基準0.295/0.284、G2予報なし0.297/0.242、G3完全予報（上限）0.165/0.154。馬場が途中で変わった日：基準1.635/1.467、G2 1.531/1.090、G3 0.751/0.642。結論：ダートは予報なしでも基準に勝つ。芝は予報なしだと基準と同等で、**予報の精度が決め手**。コース（内外・A〜D）は引き続き効果なし。次：気象庁の予報と朝の公式馬場状態を毎日自動保存→予報込みで再評価。
 - **予報の毎日保存（2026-11-03 開始）**：`baba_models_v2/forecast_archive.py` ＋ `.github/workflows/baba-forecast-archive-v1.yml`（毎日 18:10 と 06:10 JST）→ `baba_models_v2/forecast_archive/<年>/<月>/<日時>.json.gz`。気象庁の予報（10競馬場の担当官署の生データ）と、JRAの馬場状態・含水率・クッション値ページ（生HTML）をそのまま保存。記録のみで予想には使わない。数週間たまったら、①予報の当たり具合 ②朝の公式馬場状態を使った公平な基準比較 をやる（保存HTMLの解析は未実装）。
 - **馬場の状態を3つで表す（2026-11-03・Stage A/B の表記をやめる）**：`baba_models_v2/stage_b_status.py` → `stage_b/status_v1.json`（競馬場×芝ダートごとに 使える見込み／予報待ち／まだ足りない。基準＝予報なしでログ損失・Brier とも5%以上改善、雨で変わる日のBrierが10%超悪化しない、80レース・12開催日・2年・雨天遷移6日以上）→ `apply_going_status.py` が `model_registry.json` に `going_status` を追加（旧 stage_a/stage_b は残す）→ `build_dashboard_data.py`。`improvement_pipeline_v1.py` の馬場の登録条件は、芝・ダートとも「使える見込み」に変更（`going_status` が無ければ旧条件）。detail.going / going_text を追加（旧 text は互換のため据え置き）。現状：使える見込み10／予報待ち7／まだ足りない3。**両方が使える見込み**は福島（登録待ち）と阪神（本番で使用中）。予報がたまったら `stage_b_status.py` を実予報で作り直す。再計算：`python3 stage_b_status.py && python3 apply_going_status.py && python3 build_dashboard_data.py`（baba_models_v2 内）→ `python3 e2e_validation/improvement_pipeline_v1.py`。
+- **朝の公式馬場状態の取得元（2026-11-03 判明）**：JRA `https://www.jra.go.jp/keiba/baba/index.html`（1番目の開催場）／`index2.html`／`index3.html`。開催場ごとに 芝・ダートの馬場状態、発表時刻（金曜正午〜当日朝）、天候、含水率、使用コースが載る（開催場の並びは週で変わる）。`baba_models_v2/jra_going_now.py`（`parse_going_page`、テスト付き）で読み取れる。**予報の毎日保存は11/3まで『基礎知識』の説明ページを誤って保存していた**ため上記に修正（土日月 8:40 JST の保存も追加）。11/3 以前の保存分に朝の公式発表は含まれない。福島の毎朝の馬場予測の実装は、この取得元が使えるため着手可能（未着手）。
 - **馬場予測は比較を挟まず採用（ユーザー決定 2026-11-03）**：芝・ダートとも「使える見込み」になった競馬場は state=`ready_to_adopt`（Issue「[採用できます]」、ラベル registration-ready）。A＝採用（Claude が毎朝の馬場予測を自動生成して正式予想へつなぐ。本番に出す前に再確認）／B＝予報がたまるまで待つ／C＝採用しない。20レース比較（登録→比較→判定）は馬場予測には使わない。採用の実装（毎朝の予測の自動生成）は未着手。公式馬場補正（EXP-002）は勝つ確率の微調整で、別物。Issue 重複の不具合（全角かっこの照合ミス）を修正済み。
 - **中山・阪神は2026-11-03にユーザー判断で過去の判定を破棄**（status=backtesting、routing.production=false、`reset_note` 付き）。正式プロンプト v3.13 に馬場予測モデルを使う記述は無かった。他の競馬場と同じ基準で評価：阪神＝芝・ダートとも使える見込み（採用できる状態）、中山＝芝が予報待ち。福島はユーザーが A（採用）と回答済み＝実装は未着手（朝の公式馬場状態の取得元が未確定）。
 
@@ -81,7 +82,7 @@
 
 ## Claude予想の自動実行（2026-11-03）
 - 仕組み：`claude_track/`（予想の保存・採点・公開）。出馬表の取得＝`claude-race-data-v1.yml`（土日月 8:40 JST、価格なし）→ T2 が `claude_track/prompts/predict_v1.md` で印（STEP1）を保存・push → オッズを見て買い目（STEP2）を保存。T3 が `review_v1.md` で回顧・週次比較（Issue ラベル claude-review、A/B/C）。採点・公開＝`claude-track-publish-v1.yml`。上書き防止＝`claude-track-guard-v1.yml`。買い目は仮想。ChatGPT側は別管理で合算しない。
-- T2（土日月 9:10 JST）と T3（土日月 21:32 JST）は Claude の予想・回顧の実行に切り替え済み（旧：ChatGPT用指示文の表示）。権限設定は auto。初回の実走は 11/7〜8。スケジュール実行がリポジトリ取得・pushできるかは初回で確認。使用量は最初の1〜2週間で実測する。T1 は従来どおり通知文の表示のみ。
+- T2（土日月 9:10 JST）と T3（土日月 21:32 JST）は Claude の予想・回顧の実行に切り替え済み（旧：ChatGPT用指示文の表示）。権限設定は auto。初回の実走は 11/7〜8。スケジュール実行がリポジトリ取得・pushできるかは初回で確認。使用量は最初の1〜2週間で実測する。T1 は停止済み（地方競馬は Actions で自動化）。
 
 ## 地方競馬Shadowの自動実行（2026-11-03）
 - コピペ不要。GitHub Actions だけで毎日自動：予想の固定＝`local-racing-shadow-prerace-generic.yml`（毎朝 7:30 JST、当日分のリクエストは自動生成）／前日の回顧＝`local-racing-shadow-postrace.yml`（毎朝 6:30 JST、前日に保存済みの予想がなければ自動でスキップ）。Claude/ChatGPT の使用量は0。手動起動・従来のリクエストファイルpushも引き続き可。
