@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.14-20261103",
-  "current_public_version": "1.14",
+  "current_public_release": "release/jra-site-v1.15-20261103",
+  "current_public_version": "1.15",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -301,6 +301,26 @@
       "note": "2026-11-03ユーザー明示承認済み。改善状況ページ：Claudeの予想だけで進めている比較を表示：位置取りと若駒の、Claudeの予想だけの比較（ChatGPTとは混ぜない）の進み具合を、改善状況ページに表示する。データがまだ無いときは非表示ではなく、ゼロ件で表示。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-claude-exp-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.15-20261103",
+      "branch": "release/jra-site-v1.15-20261103",
+      "commit_sha": "1f5d5f90f9fa71ea964d308d0b3391adaac18946",
+      "deployed_at": "2026-11-03T13:29:35+09:00",
+      "workflow_run_id": 41578408151,
+      "validation_workflow_run_id": 41578408151,
+      "public_version": "1.15",
+      "note": "2026-11-03ユーザー明示承認済み。改善状況ページ：何が自動で何が手動かを最新の状態に更新：『改善の流れ』を、ChatGPT（手動）・Claude（自動）・地方競馬（自動）・馬場予測（記録のみ自動）・判定（人）の一覧に置き換える。 さらに『1日の流れ（時間軸）』を追加。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-auto-manual-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
