@@ -63,15 +63,15 @@ def _gen(soup, name):
 def parse_horse(soup) -> dict:
     """-> {name, sex, age_text, birth, ped:{sire,dam,damsire,...}, history:[...]}"""
     name = ""
-    h1 = soup.find("h1")
-    if h1:
-        name = _t(h1)
+    tm = re.match(r"競馬 - (.+?) データベース", _t(soup.title)) if soup.title else None
+    if tm:
+        name = tm.group(1)
     txt = _t(soup)
     m = re.search(r"性齢 (牡|牝|セ)", txt)
     sex = m.group(1) if m else None
     m = re.search(r"生年月日 (\d{4})年(\d{1,2})月(\d{1,2})日", txt)
     birth = f"{int(m.group(1)):04d}-{int(m.group(2)):02d}-{int(m.group(3)):02d}" if m else None
-    g1, g2, g3 = _gen(soup, "First"), _gen(soup, "Second"), _gen(soup, "Third")
+    g1, g2, g3 = _gen(soup, "1st"), _gen(soup, "Second"), _gen(soup, "Third")
     ped = {"sire": g1[0] if len(g1) > 0 else None, "dam": g1[1] if len(g1) > 1 else None,
            "sire_sire": g2[0] if len(g2) > 0 else None, "sire_dam": g2[1] if len(g2) > 1 else None,
            "dam_sire": g2[2] if len(g2) > 2 else None, "dam_dam": g2[3] if len(g2) > 3 else None,
@@ -151,9 +151,6 @@ def main():
     if a.probe:
         ids = parse_denma_horses(get(DENMA.format(code=a.probe)))
         print("horses in race:", len(ids))
-        hs0 = get(HORSE.format(hid=ids[0]))
-        for e in hs0.select('[class*="hr-horsePedigree"]'):
-            print("PEDEL", e.name, e.get("class"), "|", _t(e)[:40])
         h = parse_horse(get(HORSE.format(hid=ids[0])))
         print(json.dumps({k: h[k] for k in ("name", "sex", "birth", "ped")}, ensure_ascii=False))
         print("history rows:", len(h["history"])); print(h["history"][:2])

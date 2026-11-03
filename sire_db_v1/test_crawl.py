@@ -2,9 +2,9 @@ import unittest
 from bs4 import BeautifulSoup
 from sire_db_v1 import crawl as c
 
-PAGE = """<h1>クロワデュノール</h1><div>性齢 牡 4歳 生年月日 2022年3月21日 毛色</div>
-<div class="hr-horsePedigree__genFirst hr-horsePedigree__genFirst--sire">キタサンブラック</div>
-<div class="hr-horsePedigree__genFirst hr-horsePedigree__genFirst--dam">ライジングクロス</div>
+PAGE = """<title>競馬 - クロワデュノール データベース - スポーツナビ</title><div>性齢 牡 4歳 生年月日 2022年3月21日 毛色</div>
+<div class="hr-horsePedigree__gen1st hr-horsePedigree__gen1st--sire">キタサンブラック</div>
+<div class="hr-horsePedigree__gen1st hr-horsePedigree__gen1st--dam">ライジングクロス</div>
 <div class="hr-horsePedigree__genSecond hr-horsePedigree__genSecond--sire">ブラックタイド</div>
 <div class="hr-horsePedigree__genSecond hr-horsePedigree__genSecond--dam">シュガーハート</div>
 <div class="hr-horsePedigree__genSecond hr-horsePedigree__genSecond--sire">Cape Cross</div>
@@ -17,7 +17,7 @@ PAGE = """<h1>クロワデュノール</h1><div>性齢 牡 4歳 生年月日 202
 class T(unittest.TestCase):
     def test_parse_horse(self):
         h = c.parse_horse(BeautifulSoup(PAGE, "html.parser"))
-        self.assertEqual((h["sex"], h["birth"]), ("牡", "2022-03-21"))
+        self.assertEqual((h["name"], h["sex"], h["birth"]), ("クロワデュノール", "牡", "2022-03-21"))
         self.assertEqual((h["ped"]["sire"], h["ped"]["dam_sire"]), ("キタサンブラック", "Cape Cross"))
         self.assertEqual(len(h["history"]), 2)
         r = h["history"][0]
