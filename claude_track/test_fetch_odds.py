@@ -21,6 +21,10 @@ class T(unittest.TestCase):
         h2 = ("<table><tr><th>1</th></tr><tr><td>2</td><td>10.5</td></tr><tr><td>3</td><td>20.0</td></tr></table>")
         self.assertEqual(parse_odds("ur", BeautifulSoup(h2, "html.parser")), {("馬連", (1, 2)): 10.5, ("馬連", (1, 3)): 20.0})
 
+    def test_parse_st(self):
+        h = "<table><tr><th>組</th><th>オッズ</th></tr><tr><td>3 - 1 - 2</td><td>55.5</td></tr><tr><td>3-2-1</td><td>取消</td></tr></table>"
+        self.assertEqual(parse_odds("st", BeautifulSoup(h, "html.parser")), {("三連単", (3, 1, 2)): 55.5})
+
 
 if __name__ == "__main__":
     unittest.main()

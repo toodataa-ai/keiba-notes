@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Claude's own pre-post odds capture (no ChatGPT files used).
 
-Reads the public Sportnavi odds pages (単勝 tfw / 馬連 ur / 馬単 ut / ワイド wide / 三連複 sf) for the
+Reads the public Sportnavi odds pages (単勝 tfw / 馬連 ur / 馬単 ut / ワイド wide / 三連複 sf / 三連単 st) for the
 main race (11R) of each race card saved by fetch_race_inputs.py, and saves them as
 claude_track/odds/<race_id>/<captured_utc>.json. Never overwrites; never writes after the post time.
 The Sportnavi race code is YY + venue(2) + kai(2) + nichi(2) + race(2), built from the JRA card's cname.
@@ -86,7 +86,49 @@ def parse_odds(kind: str, soup) -> dict:
                 v = odds_value(row[1])
                 if v is not None:
                     res[(name, tuple(sel))] = v
+    elif kind == "st":
+        for t in tables:
+            for row in list(_rows(t))[1:]:
+                if len(row) < 2:
+                    continue
+                sel = [int(n) for n in re.findall(r"\d+", row[0])]
+                if len(sel) != 3 or len(set(sel)) != 3:
+                    continue
+                v = odds_value(row[1])
+                if v is not None:
+                    res[("三連単", tuple(sel))] = v
     return res
+
+
+def fetch_st_pages(session, code: str, delay: float):
+    """三連単: the base page lists a horse picker; each first-place horse has its own page
+    (link_base + ?umaBan=<n>&position=<value of 1着>), exactly as the page's own script defines it."""
+    from bs4 import BeautifulSoup
+    from urllib.parse import urljoin, urlparse
+    base = ODDS_URL.format(kind="st", code=code)
+    time.sleep(delay)
+    r = session.get(base, timeout=30); r.raise_for_status()
+    soup = BeautifulSoup(r.content, "html.parser")
+    inline = "\n".join(x.get_text() for x in soup.select("script") if "new window.sn.hr.searchBox" in x.get_text())
+    horse = soup.select_one("#js-umaBan"); pos = soup.select_one("#js-position")
+    m = re.search(r"link_base:\s*'([^']+)'", inline)
+    if not (m and horse is not None and pos is not None):
+        raise RuntimeError("三連単: odds picker not found on " + base)
+    action = urljoin(r.url, m.group(1))
+    if urlparse(action).hostname != "sports.yahoo.co.jp" or urlparse(action).path != "/keiba/race/odds/st/" + code:
+        raise RuntimeError("三連単: unexpected link_base " + action)
+    first = next((o for o in pos.select("option") if "1着" in o.get_text(" ", strip=True)), None)
+    if first is None or not first.get("value"):
+        raise RuntimeError("三連単: 1着 position value not found")
+    axes = [o.get("value") for o in horse.select("option") if (o.get("value") or "").isdigit()]
+    pages = [r]
+    for a in axes:
+        time.sleep(delay)
+        rr = session.get(action, params={"umaBan": a, "position": first["value"]}, timeout=30); rr.raise_for_status()
+        if urlparse(rr.url).hostname != "sports.yahoo.co.jp":
+            raise RuntimeError("三連単: redirected to foreign host")
+        pages.append(rr)
+    return pages
 
 
 def capture_race(doc: dict, session, now: datetime, delay: float, probe: bool = False) -> dict | None:
@@ -95,16 +137,23 @@ def capture_race(doc: dict, session, now: datetime, delay: float, probe: bool = 
         print("skip (post time passed)", doc["race_id"]); return None
     code = race_code(doc["source_cname"])
     entries, sources = [], {}
-    for kind in KINDS:
+    for kind in list(KINDS) + ["st"]:
         url = ODDS_URL.format(kind=kind, code=code)
-        time.sleep(delay)
-        r = session.get(url, timeout=30); r.raise_for_status()
-        if len(r.content) < 1500:
-            raise RuntimeError("empty page " + url)
-        got = parse_odds(kind, BeautifulSoup(r.content, "html.parser"))
+        if kind == "st":
+            pages = fetch_st_pages(session, code, delay)
+        else:
+            time.sleep(delay)
+            r = session.get(url, timeout=30); r.raise_for_status()
+            if len(r.content) < 1500:
+                raise RuntimeError("empty page " + url)
+            pages = [r]
+        got = {}
+        for r in pages:
+            got.update(parse_odds(kind, BeautifulSoup(r.content, "html.parser")))
         if not got:
             raise RuntimeError("no odds parsed from " + url)
-        sources[kind] = {"url": url, "sha256": hashlib.sha256(r.content).hexdigest(), "count": len(got)}
+        digest = hashlib.sha256(b"".join(r.content for r in pages)).hexdigest()
+        sources[kind] = {"url": url, "sha256": digest, "count": len(got), "pages": len(pages)}
         entries += [{"type": t, "selection": list(sel), "market_odds": v} for (t, sel), v in sorted(got.items())]
     done = datetime.now(JST)
     if not probe and done.isoformat() >= doc["start_at"]:
