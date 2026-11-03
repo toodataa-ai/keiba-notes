@@ -89,15 +89,20 @@ function weeks(n) { return n <= 0 ? '判定できます' : `あと約${Math.ceil
     const p = e.prospective || {}, r = e.replay_support_only || {};
     const n = p.pairs || 0, need = e.minimum_prospective_pairs || 20;
     const pct = Math.min(100, Math.round(n / need * 100));
-    const [now, nowCls] = n ? word((p.win_log_loss || {}).delta, true) : ['まだ比較したレースはありません', 'even'];
-    const [ref, refCls] = r.pairs ? word((r.win_log_loss || {}).delta, true) : ['—', 'even'];
+    const pf = e.kind === 'portfolio';
+    const roi = x => x && x.roi != null ? Math.round(x.roi * 100) + '%' : '—';
+    const pword = x => !x || !x.pairs ? ['—', 'even'] : x.roi_delta == null || Math.abs(x.roi_delta) < 0.005 ? ['ほぼ同じ', 'even']
+      : x.roi_delta > 0 ? ['改善案のほうが回収率が高い', 'good'] : ['今の買い目のほうが回収率が高い', 'bad'];
+    const [now, nowCls] = pf ? (n ? pword(p) : ['まだ比較したレースはありません', 'even']) : n ? word((p.win_log_loss || {}).delta, true) : ['まだ比較したレースはありません', 'even'];
+    const [ref0, refCls] = pf ? pword(r) : r.pairs ? word((r.win_log_loss || {}).delta, true) : ['—', 'even'];
+    const ref = pf && r.pairs ? `${ref0}（回収率 今の買い目${roi(r.formal)}／改善案${roi(r.challenger)}）` : ref0;
     return `<article class="card">
       <h3>${esc(shortTitle(e.title))}</h3>
       <p class="what">${esc(e.plain_summary || e.title)}</p>
       <div class="bar-label"><span>比較したレース</span><b>${n} / ${need}レース</b></div>
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${n}"><i style="width:${pct}%"></i></div>
       <div class="facts">
-        <div class="fact"><span>途中経過（勝つ確率の見積もり）</span><b class="${nowCls}">${esc(now)}</b></div>
+        <div class="fact"><span>${pf ? '途中経過（買い目の回収率）' : '途中経過（勝つ確率の見積もり）'}</span><b class="${nowCls}">${esc(now)}</b></div>
         <div class="fact"><span>判定の目安</span><b>${esc(weeks(e.remaining_prospective_pairs))}</b></div>
         <div class="fact"><span>参考：過去${r.pairs || 0}レースでの試算（判定には数えません）</span><b class="${refCls}">${esc(ref)}</b></div>
         <div class="fact"><span>比較の開始</span><b>${esc((e.effective_prospective_from || '').slice(0, 10).replace(/-/g, '/'))} 以降のレース</b></div>
@@ -153,7 +158,8 @@ Promise.all([
     const us=pipe.units.filter(u=>u.theme===t.id);
     const ids=new Set(us.map(u=>u.experiment_id).filter(Boolean));
     const ex=exps.filter(e=>ids.has(e.id));
-    const crit=[...new Set(us.filter(u=>u.state!=='in_production').map(u=>u.criteria_text))];
+    const crit=[...new Set(us.filter(u=>!['in_production','comparing','decided'].includes(u.state)).map(u=>u.criteria_text))];
+    const regd=us.filter(u=>u.state==='comparing').length;
     const ready=us.filter(u=>u.state==='ready_to_register').length;const adopt=us.filter(u=>u.state==='ready_to_adopt').length;
     let extra='';
     if(t.id==='track_condition'){
@@ -162,7 +168,7 @@ Promise.all([
       extra+='<p class="tiny"><b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5%以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない（予報を毎日保存していて、たまり次第、本当の精度で測り直します）。<b>まだ足りない</b>＝予報が当たっても基準に届かない。</p><p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場予測は、競馬場ごとに条件に届いたら、20レースの比較を挟まず採用できます（承認が必要）。中山・阪神も、他の競馬場と同じ基準で評価しています。</p>';
     }
     if(t.id==='field_experience') extra+=`<p class="tiny">血統：いまの正式予想では血統は固定の評価で、実測していません。研究では血統の情報を集めていて、条件に届けば「戦歴が少ない馬ほど血統の影響が大きいか」を比較で確かめます。</p><p class="tiny">${esc(pipe.owners.experience)}</p>`;
-    const entry=crit.length?`<div class="entry"><b>登録の条件：</b>${crit.map(c=>`<span class="eline">${esc(c)}</span>`).join('')}${ready?`<span class="eline"><b>いま登録できる状態：${ready}件。</b>通知（Issue）を出しています。</span>`:''}${adopt?`<span class="eline"><b>いま採用できる状態：${adopt}件。</b>通知（Issue）を出しています。</span>`:''}</div>`:'';
+    const entry=!crit.length&&regd?`<div class="entry"><b>登録ずみ：</b><span class="eline">登録の条件に届いたため、改善案として登録しました。いまは「比較」の段階です（下の「比較中の詳しい経過」で見られます）。</span></div>`:crit.length?`<div class="entry"><b>登録の条件：</b>${crit.map(c=>`<span class="eline">${esc(c)}</span>`).join('')}${ready?`<span class="eline"><b>いま登録できる状態：${ready}件。</b>通知（Issue）を出しています。</span>`:''}${adopt?`<span class="eline"><b>いま採用できる状態：${adopt}件。</b>通知（Issue）を出しています。</span>`:''}</div>`:'';
     const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'<p class="tiny">専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。</p>';
     const cmp=ex.map(expCard).join('');
     const det=cmp?`<details class="tdet"><summary>比較中の詳しい経過を見る</summary>${cmp}</details>`:'';
