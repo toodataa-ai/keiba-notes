@@ -12,7 +12,11 @@
 </style>
 <style>.tl{list-style:none;margin:8px 0 0;padding:0 0 0 14px;border-left:2px solid #dcdee3}.tl li{position:relative;display:grid;grid-template-columns:96px 52px minmax(0,1fr);gap:4px 8px;align-items:baseline;padding:6px 0}.tl li::before{content:"";position:absolute;left:-21px;top:12px;width:10px;height:10px;border-radius:50%;background:#2f9e6b;border:2px solid #fff}.tl li.tl-c::before{background:#2f6fd0}.tl li.tl-m::before{background:#d9902b}.tl-t{font-weight:800;font-size:14px}.tl-d{font-size:12px;color:#6d6e75}.tl-b{font-size:13px}.tl-b .tag{margin-left:4px;white-space:nowrap}@media(max-width:560px){.tl li{grid-template-columns:78px minmax(0,1fr)}.tl-b{grid-column:1/3}}</style>
 <style>.tl-b summary{cursor:pointer;list-style:none}.tl-b summary::-webkit-details-marker{display:none}.tl-b summary::before{content:"▸ ";color:#6d6e75}.tl-b[open] summary::before{content:"▾ "}.tl-b p{margin:6px 0 2px;font-size:13px;color:#4a4b52;line-height:1.6}</style>
-<style>.tl-run{grid-column:3;font-size:12px;color:#4a4b52;line-height:1.7}.tl-run .ok{color:#167a52;font-weight:700}.tl-run .ng{color:#b42318;font-weight:800}.tl-run .wt{color:#6d6e75}.tl-run .dots{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}.tl-run .dots i{width:9px;height:9px;border-radius:50%;background:#e6e7ea;display:inline-block}.tl-run .dots i.s{background:#2f9e6b}.tl-run .dots i.f{background:#c0392b}.tl-run .dots i.m{background:#fff;border:1.5px solid #c0392b}.tl-sum{margin:6px 0 4px;font-size:13px;line-height:1.7}.tl-sum b{font-size:15px}.tl-sum .ok{color:#167a52}.tl-sum .ng{color:#b42318}.tl-sum .wt{color:#6d6e75;font-size:12px}@media(max-width:560px){.tl-run{grid-column:1/3}}</style>
+<style>.rt-sum{margin:6px 0 10px;font-size:13px;line-height:1.7}.rt-sum b{font-size:15px}.rt-sum .ok{color:#167a52}.rt-sum .ng{color:#b42318}.rt-sum .wt{color:#6d6e75;font-size:12px}
+.rt{width:100%;border-collapse:collapse;font-size:13px}.rt th{text-align:left;font-size:12px;color:#6d6e75;font-weight:600;padding:6px 8px;border-bottom:2px solid #dcdee3;white-space:nowrap}.rt td{padding:8px;border-bottom:1px solid #ececef;vertical-align:top;line-height:1.6}.rt .t{font-weight:800;white-space:nowrap}.rt .nm{font-weight:700}.rt .sub{display:block;font-size:12px;color:#6d6e75;font-weight:400}.rt .ok{color:#167a52;font-weight:700}.rt .ng{color:#b42318;font-weight:800}.rt .wt{color:#6d6e75}.rt a{font-size:12px}
+.rt .dots{display:inline-flex;gap:3px;vertical-align:middle}.rt .dots i{width:9px;height:9px;border-radius:50%;background:#e6e7ea;display:inline-block}.rt .dots i.s{background:#2f9e6b}.rt .dots i.f{background:#c0392b}.rt .dots i.m{background:#fff;border:1.5px solid #c0392b}
+.rt-note{font-size:12px;color:#6d6e75;margin:8px 0 0}
+@media(max-width:620px){.rt thead{display:none}.rt,.rt tbody,.rt tr,.rt td{display:block;width:100%}.rt tr{padding:8px 0;border-bottom:1px solid #ececef}.rt td{border:0;padding:2px 0}.rt td.t{font-size:14px}}</style>
 </head>
 <body class="ic-light">
 <div class="wrap">
@@ -56,9 +60,16 @@
 <section aria-labelledby="tlTitle" id="timeline">
 <h2 id="tlTitle">1日の流れ（時間軸）</h2>
 <p class="sub">日本時間・2026-11-03 時点。上から下へ、朝から夜の順です。開催日は土日月です。各行をタップすると、具体的な処理内容が開きます。</p>
-<div class="tl-sum" id="tlSum">実行記録を読み込み中…</div>
-<ol class="tl"><li class="tl-g" data-wf="baba-forecast-archive-v1.yml" data-t="06:10" data-d="d"><span class="tl-t">06:10</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>予報・馬場ページの保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>気象庁の天気予報（10競馬場それぞれの担当官署の生データ）と、JRAの馬場状態・含水率・クッション値のページ（生のHTML）を、そのまま保存します。記録だけで、予想には使いません。数週間たまったら、予報の当たり具合と、朝の公式馬場状態を使った公平な比較に使います。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-g" data-wf="local-racing-shadow-postrace.yml" data-t="06:30" data-d="d"><span class="tl-t">06:30</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>地方競馬：前日の回顧</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>前日に固定済みの地方競馬の予想があるときだけ動きます（なければ自動でスキップ）。公式の結果と払戻を取り込み、予想とは別のファイルで照合・回顧を保存します。予想の書き換えはしません。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-g" data-wf="local-racing-shadow-prerace-generic.yml" data-t="07:30" data-d="d"><span class="tl-t">07:30</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>地方競馬：予想の固定</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>当日分の開催レースを自動で洗い出し、決まったルールの計算で発走前の予想を作って保存します。人気・オッズは混ぜず、結果が出たあとに書き換えません。Claudeは使いません。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-m"><span class="tl-t">朝（時刻は自由）</span><span class="tl-d">開催日</span><details class="tl-b"><summary><b>ChatGPT：正式予想（指示文を貼って実行）</b> <span class="tag hand">手動</span></summary><p>朝の通知に出る指示文をChatGPTに貼って実行します。発走前に、正式予想（印・買い目）を確定して保存します。サイトに載る正式な予想はこちらです。</p></details></li><li class="tl-g" data-wf="claude-race-data-v1.yml,baba-forecast-archive-v1.yml" data-t="08:40" data-d="w"><span class="tl-t">08:40</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>出馬表の取得／朝の公式馬場の保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>2つの処理が同じ時刻に動きます。①Claudeの予想用に、その日の出走表を取得して保存します。オッズと人気は、印を決める前に見ないよう、わざと入れません（オッズは9:30に別の処理で取ります）。②JRAが朝に発表する馬場状態・含水率・使用コースのページを保存します。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-g" data-wf="baba-going-live-v1.yml" data-t="08:45" data-d="w"><span class="tl-t">08:45</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>馬場の朝の予測（福島・阪神、記録のみ）</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>朝の公式馬場状態と含水率、前日の結果、気象庁の実測の気象から、各レースの「良・稍重・重・不良」の確率を計算して保存します。開催のある競馬場だけが対象です。いまは記録だけで、正式予想にはつなげていません。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-c"><span class="tl-t">09:10</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude：印と勝率の保存（STEP1）</b> <span class="tag ai">Claudeの使用量あり</span></summary><p>Claudeがセッションを開き、出走表を読んで印と勝つ確率を、オッズを見る前に保存・pushします。保存済みのファイルは上書きできない仕組みです。使用量がかかります。</p></details></li><li class="tl-g" data-wf="claude-odds-v1.yml" data-t="09:30" data-d="w"><span class="tl-t">09:30</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude用のオッズ取得（1回目）</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>メインレースの単勝・馬連・馬単・ワイド・三連複の公開オッズを取得して保存します（発走後は保存しません）。Claudeの買い目（STEP2）は、印と勝率（STEP1）を保存したあとに取れたこのオッズだけを使います。ChatGPT側のファイルは使いません。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-c"><span class="tl-t">09:35頃</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude：買い目の保存（STEP2）</b> <span class="tag ai">Claudeの使用量あり</span></summary><p>同じセッションの続きです。印と勝率を保存したあとに取れたオッズ（9:30、なければ10:00）を読み、期待値がプラスの組を仮想の買い目として保存します。オッズが取れなければ「見送り」にします。最大45分待ちます。</p></details></li><li class="tl-g" data-wf="claude-odds-v1.yml" data-t="10:00" data-d="w"><span class="tl-t">10:00</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude用のオッズ取得（2回目・予備）</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>1回目に取れなかったときの予備です。買い目はこのどちらかのオッズで、午前中に保存されます。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-g" data-wf="baba-forecast-archive-v1.yml" data-t="18:10" data-d="d"><span class="tl-t">18:10</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>予報・馬場ページの保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>朝（06:10）と同じ処理です。前日夕方の時点の予報と馬場ページを保存します。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-m"><span class="tl-t">夜（時刻は自由）</span><span class="tl-d">開催日</span><details class="tl-b"><summary><b>ChatGPT：結果と回顧の記録（指示文を貼って実行）</b> <span class="tag hand">手動</span></summary><p>夜の通知に出る指示文をChatGPTに貼って実行します。公式の結果を記録し、予想の振り返り（回顧）を保存します。</p></details></li><li class="tl-c"><span class="tl-t">21:32</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude：回顧と週次比較</b> <span class="tag ai">Claudeの使用量あり</span></summary><p>Claudeがセッションを開き、その日の結果とClaudeの予想を見比べて回顧を書きます。週次の比較もまとめ、確認が必要なときは通知（Issue）を立てます。使用量がかかります。</p></details></li><li class="tl-g" data-wf="jra-improvement-experiments-v1.yml" data-t="22:23" data-d="d"><span class="tl-t">22:23</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>改善案と今の予想の採点</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>登録済みの改善案（位置取り・馬場・購入セット）を、今の正式予想と同じレース・同じ公式結果で採点して新旧を比べます。20レースたまると、判定の通知が立ちます。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-g" data-wf="jra-improvement-pipeline-v1.yml" data-t="22:40" data-d="d"><span class="tl-t">22:40</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>基準に届いたかの確認・通知</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>展開・馬場・若駒・購入セットの各管理単位が、登録や採用の基準に届いたかを調べます。届いたものは通知（Issue）が1回だけ立ちます。登録や採用は自動ではしません。</p></details><div class="tl-run" aria-live="polite"></div></li><li class="tl-g" data-wf="claude-track-publish-v1.yml" data-t="22:50" data-d="d"><span class="tl-t">22:50</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>Claudeの予想の採点・公開</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>他の自動処理が入れた結果を拾い、Claudeの予想を公式結果で採点します。位置取りの比較と若駒の集計を更新し、サイトに出すデータを作ります。判定できる状態になったら通知（Issue）を立てます。</p></details><div class="tl-run" aria-live="polite"></div></li></ol>
+<ol class="tl"><li class="tl-g"><span class="tl-t">06:10</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>予報・馬場ページの保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>気象庁の天気予報（10競馬場それぞれの担当官署の生データ）と、JRAの馬場状態・含水率・クッション値のページ（生のHTML）を、そのまま保存します。記録だけで、予想には使いません。数週間たまったら、予報の当たり具合と、朝の公式馬場状態を使った公平な比較に使います。</p></details></li><li class="tl-g"><span class="tl-t">06:30</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>地方競馬：前日の回顧</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>前日に固定済みの地方競馬の予想があるときだけ動きます（なければ自動でスキップ）。公式の結果と払戻を取り込み、予想とは別のファイルで照合・回顧を保存します。予想の書き換えはしません。</p></details></li><li class="tl-g"><span class="tl-t">07:30</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>地方競馬：予想の固定</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>当日分の開催レースを自動で洗い出し、決まったルールの計算で発走前の予想を作って保存します。人気・オッズは混ぜず、結果が出たあとに書き換えません。Claudeは使いません。</p></details></li><li class="tl-m"><span class="tl-t">朝（時刻は自由）</span><span class="tl-d">開催日</span><details class="tl-b"><summary><b>ChatGPT：正式予想（指示文を貼って実行）</b> <span class="tag hand">手動</span></summary><p>朝の通知に出る指示文をChatGPTに貼って実行します。発走前に、正式予想（印・買い目）を確定して保存します。サイトに載る正式な予想はこちらです。</p></details></li><li class="tl-g"><span class="tl-t">08:40</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>出馬表の取得／朝の公式馬場の保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>2つの処理が同じ時刻に動きます。①Claudeの予想用に、その日の出走表を取得して保存します。オッズと人気は、印を決める前に見ないよう、わざと入れません（オッズは9:30に別の処理で取ります）。②JRAが朝に発表する馬場状態・含水率・使用コースのページを保存します。</p></details></li><li class="tl-g"><span class="tl-t">08:45</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>馬場の朝の予測（福島・阪神、記録のみ）</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>朝の公式馬場状態と含水率、前日の結果、気象庁の実測の気象から、各レースの「良・稍重・重・不良」の確率を計算して保存します。開催のある競馬場だけが対象です。いまは記録だけで、正式予想にはつなげていません。</p></details></li><li class="tl-c"><span class="tl-t">09:10</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude：印と勝率の保存（STEP1）</b> <span class="tag ai">Claudeの使用量あり</span></summary><p>Claudeがセッションを開き、出走表を読んで印と勝つ確率を、オッズを見る前に保存・pushします。保存済みのファイルは上書きできない仕組みです。使用量がかかります。</p></details></li><li class="tl-g"><span class="tl-t">09:30</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude用のオッズ取得（1回目）</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>メインレースの単勝・馬連・馬単・ワイド・三連複の公開オッズを取得して保存します（発走後は保存しません）。Claudeの買い目（STEP2）は、印と勝率（STEP1）を保存したあとに取れたこのオッズだけを使います。ChatGPT側のファイルは使いません。</p></details></li><li class="tl-c"><span class="tl-t">09:35頃</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude：買い目の保存（STEP2）</b> <span class="tag ai">Claudeの使用量あり</span></summary><p>同じセッションの続きです。印と勝率を保存したあとに取れたオッズ（9:30、なければ10:00）を読み、期待値がプラスの組を仮想の買い目として保存します。オッズが取れなければ「見送り」にします。最大45分待ちます。</p></details></li><li class="tl-g"><span class="tl-t">10:00</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude用のオッズ取得（2回目・予備）</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>1回目に取れなかったときの予備です。買い目はこのどちらかのオッズで、午前中に保存されます。</p></details></li><li class="tl-g"><span class="tl-t">18:10</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>予報・馬場ページの保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>朝（06:10）と同じ処理です。前日夕方の時点の予報と馬場ページを保存します。</p></details></li><li class="tl-m"><span class="tl-t">夜（時刻は自由）</span><span class="tl-d">開催日</span><details class="tl-b"><summary><b>ChatGPT：結果と回顧の記録（指示文を貼って実行）</b> <span class="tag hand">手動</span></summary><p>夜の通知に出る指示文をChatGPTに貼って実行します。公式の結果を記録し、予想の振り返り（回顧）を保存します。</p></details></li><li class="tl-c"><span class="tl-t">21:32</span><span class="tl-d">土日月</span><details class="tl-b"><summary><b>Claude：回顧と週次比較</b> <span class="tag ai">Claudeの使用量あり</span></summary><p>Claudeがセッションを開き、その日の結果とClaudeの予想を見比べて回顧を書きます。週次の比較もまとめ、確認が必要なときは通知（Issue）を立てます。使用量がかかります。</p></details></li><li class="tl-g"><span class="tl-t">22:23</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>改善案と今の予想の採点</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>登録済みの改善案（位置取り・馬場・購入セット）を、今の正式予想と同じレース・同じ公式結果で採点して新旧を比べます。20レースたまると、判定の通知が立ちます。</p></details></li><li class="tl-g"><span class="tl-t">22:40</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>基準に届いたかの確認・通知</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>展開・馬場・若駒・購入セットの各管理単位が、登録や採用の基準に届いたかを調べます。届いたものは通知（Issue）が1回だけ立ちます。登録や採用は自動ではしません。</p></details></li><li class="tl-g"><span class="tl-t">22:50</span><span class="tl-d">毎日</span><details class="tl-b"><summary><b>Claudeの予想の採点・公開</b> <span class="tag auto">GitHubのみ・使用量なし</span></summary><p>他の自動処理が入れた結果を拾い、Claudeの予想を公式結果で採点します。位置取りの比較と若駒の集計を更新し、サイトに出すデータを作ります。判定できる状態になったら通知（Issue）を立てます。</p></details></li></ol>
 </section>
+<section aria-labelledby="rtTitle" id="runlog">
+<h2 id="rtTitle">自動処理の実行記録</h2>
+<p class="sub">各処理が終わった直後に、実際に動いた時刻と結果を自動で記録しています（GitHubで動く処理のみ）。</p>
+<div class="rt-sum" id="rtSum">実行記録を読み込み中…</div>
+<table class="rt"><thead><tr><th>予定</th><th>処理</th><th>きょうの実際の実行</th><th>直近7日</th></tr></thead><tbody id="rtBody"></tbody></table>
+<p class="rt-note">緑の点＝成功、赤の点＝失敗、赤い枠＝予定どおりの実行の記録なし（定時の実行が始まった日の翌日から数えます）、灰色＝対象外の日または定時の実行が始まる前。数えるのは定時の自動実行だけで、手動で動かした分は注記にとどめます。Claude（印・買い目・回顧）とChatGPTの実行は、この記録に含みません。</p>
+</section>
+
 <section aria-labelledby="themesTitle" id="themes">
 <h2 id="themesTitle">改善テーマ（研究から判定まで）</h2>
 <p class="sub">1行が1つの管理単位（競馬場・戦歴など）です。毎日、基準に届いたかを自動で調べ、届くと通知（Issue）が立ちます。バーは左から「研究 → 登録 → 比較 → 判定」の4段階で、濃い色は完了、赤い枠がいまの段階、枠の中の赤は進み具合です。数字は自動で更新されます。</p>
@@ -232,6 +243,19 @@ Promise.all([
 <script src="assets/page-nav-v1.js?v=20261102-1" defer></script>
 <script>
 (function(){
+var ITEMS=[
+{t:'06:10',l:'予報・馬場ページの保存',w:'baba-forecast-archive-v1.yml',d:'d'},
+{t:'06:30',l:'地方競馬：前日の回顧',w:'local-racing-shadow-postrace.yml',d:'d'},
+{t:'07:30',l:'地方競馬：予想の固定',w:'local-racing-shadow-prerace-generic.yml',d:'d'},
+{t:'08:40',l:'出馬表の取得',w:'claude-race-data-v1.yml',d:'w'},
+{t:'08:40',l:'予報・馬場ページの保存（朝の公式馬場）',w:'baba-forecast-archive-v1.yml',d:'w'},
+{t:'08:45',l:'馬場の朝の予測（福島・阪神）',w:'baba-going-live-v1.yml',d:'w'},
+{t:'09:30',l:'Claude用のオッズ取得（1回目）',w:'claude-odds-v1.yml',d:'w'},
+{t:'10:00',l:'Claude用のオッズ取得（2回目・予備）',w:'claude-odds-v1.yml',d:'w'},
+{t:'18:10',l:'予報・馬場ページの保存',w:'baba-forecast-archive-v1.yml',d:'d'},
+{t:'22:23',l:'改善案と今の予想の採点',w:'jra-improvement-experiments-v1.yml',d:'d'},
+{t:'22:40',l:'基準に届いたかの確認・通知',w:'jra-improvement-pipeline-v1.yml',d:'d'},
+{t:'22:50',l:'Claudeの予想の採点・公開',w:'claude-track-publish-v1.yml',d:'d'}];
 var JST=9*3600000,DAYS=['日','月','火','水','木','金','土'];
 function jst(ms){return new Date(ms+JST)}
 function ymd(ms){var d=jst(ms);return d.getUTCFullYear()+'-'+('0'+(d.getUTCMonth()+1)).slice(-2)+'-'+('0'+d.getUTCDate()).slice(-2)}
@@ -240,54 +264,47 @@ function mins(ms){var d=jst(ms);return d.getUTCHours()*60+d.getUTCMinutes()}
 function tmin(t){var a=t.split(':');return +a[0]*60+ +a[1]}
 function dow(ms){return jst(ms).getUTCDay()}
 function dur(a,b){var s=Math.round((b-a)/1000);return s>=60?Math.floor(s/60)+'分'+('0'+s%60).slice(-2)+'秒':s+'秒'}
+function url(id){return 'https://github.com/toodataa-ai/keiba-notes/actions/runs/'+id}
 function load(){var u=['data/automation/automation_runs_v1.json','../data/automation/automation_runs_v1.json'];
  return fetch(u[0]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()}).catch(function(){return fetch(u[1]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null})}).catch(function(){return null})}
 function render(d){
- var sum=document.getElementById('tlSum');
+ var sum=document.getElementById('rtSum'),body=document.getElementById('rtBody');
  if(!d){sum.textContent='実行記録を読み込めませんでした。';return}
- var now=Date.now(),today=ymd(now),todayDow=dow(now);
- var rows=[].slice.call(document.querySelectorAll('.tl li[data-wf]'));
- var slots={};rows.forEach(function(li){li.getAttribute('data-wf').split(',').forEach(function(w){(slots[w]=slots[w]||[]).push(li)})});
- function rowFor(w,run){var ms=Date.parse(run.created_at),m=mins(ms),best=null,bd=1e9;
-  (slots[w]||[]).forEach(function(li){var diff=Math.abs(tmin(li.getAttribute('data-t'))-m);diff=Math.min(diff,1440-diff);if(diff<bd){bd=diff;best=li}});
+ var now=Date.now(),today=ymd(now),td=dow(now);
+ var slots={};ITEMS.forEach(function(it){(slots[it.w]=slots[it.w]||[]).push(it)});
+ function itemFor(it,run){var m=mins(Date.parse(run.created_at)),best=null,bd=1e9;
+  slots[it.w].forEach(function(o){var diff=Math.abs(tmin(o.t)-m);diff=Math.min(diff,1440-diff);if(diff<bd){bd=diff;best=o}});
   return bd<=180?best:null}
- var cnt={ok:0,ng:0,wait:0,miss:0};
- rows.forEach(function(li){
-  var out=li.querySelector('.tl-run'),t=li.getAttribute('data-t'),kind=li.getAttribute('data-d');
-  var wfs=li.getAttribute('data-wf').split(','),parts=[];
-  var expectToday=kind==='d'||[0,1,6].indexOf(todayDow)>=0;
-  wfs.forEach(function(w){
-   var wf=d.workflows[w];if(!wf){return}
-   var mine=wf.runs.filter(function(r){return rowFor(w,r)===li});
-   var sched=mine.filter(function(r){return r.event==='schedule'});
-   var tr=sched.filter(function(r){return ymd(Date.parse(r.created_at))===today});
-   var mt=mine.filter(function(r){return r.event!=='schedule'&&ymd(Date.parse(r.created_at))===today});
-   var mn=mt.length?' <span class="wt">（手動の実行 '+hms(Date.parse(mt[0].started_at||mt[0].created_at))+' '+(mt[0].status!=='completed'?'実行中':mt[0].conclusion==='success'?'成功':'失敗')+'）</span>':'';
-   var label=wfs.length>1?'<b>'+wf.label+'</b>：':'';
-   var line='';
-   if(tr.length){var r=tr[0],a=Date.parse(r.started_at||r.created_at);
-    if(r.status!=='completed'){line=label+'<span class="wt">きょう '+hms(a)+' 開始 → 実行中…</span>'}
-    else{var ok=r.conclusion==='success',b=Date.parse(r.ended_at);
-     line=label+'きょう '+hms(a)+' 開始 → '+hms(b)+' 完了（'+dur(a,b)+'） '+(ok?'<span class="ok">✅成功</span>':'<span class="ng">❌失敗（'+(r.conclusion||'不明')+'）</span>')+' <a href="https://github.com/toodataa-ai/keiba-notes/actions/runs/'+r.id+'">詳細</a>';
-     if(ok)cnt.ok++;else cnt.ng++}
-   }else if(expectToday){
-    var due=tmin(t),nowm=mins(now);
-    if(nowm<due+20){line=label+'<span class="wt">きょうの予定 '+t+'（まだ）</span>'+mn;cnt.wait++}
-    else if(!wf.runs.some(function(r){return r.event==='schedule'})){line=label+'<span class="wt">定時の自動実行は、まだ一度も始まっていません（最初の予定を待っています）</span>'+mn;cnt.wait++}
-    else{line=label+'<span class="ng">⚠ 予定の '+t+' を過ぎても、定時の自動実行の記録がありません</span>'+mn;cnt.miss++}
-   }else{
-    var last=sched[0]||mine[0];
-    line=label+'<span class="wt">きょうは対象外（土日月のみ）'+(last?'。前回 '+ymd(Date.parse(last.started_at||last.created_at)).slice(5)+' '+hms(Date.parse(last.started_at||last.created_at))+' '+(last.conclusion==='success'?'<span class="ok">成功</span>':last.status!=='completed'?'実行中':'<span class="ng">失敗</span>'):'。実行記録はまだありません')+'</span>'+mn}
-   var dots='';for(var k=6;k>=0;k--){var day=ymd(now-k*86400000),dw=dow(now-k*86400000),exp=kind==='d'||[0,1,6].indexOf(dw)>=0;
-    var rr=sched.filter(function(r){return ymd(Date.parse(r.created_at))===day});var c='';
-    if(rr.length){c=rr.every(function(r){return r.conclusion==='success'})?'s':(rr.some(function(r){return r.status!=='completed'})?'':'f')}
-    else if(exp&&day!==today){c='m'}
-    dots+='<i class="'+c+'" title="'+day+'"></i>'}
-   parts.push(line+'<span class="dots" title="直近7日（緑=成功・赤=失敗・赤枠=記録なし・灰=対象外）">'+dots+'</span>')
-  });
-  out.innerHTML=parts.join('<br>')
+ var cnt={ok:0,ng:0,wait:0,miss:0},html='';
+ ITEMS.forEach(function(it){
+  var wf=d.workflows[it.w],runs=wf?wf.runs.filter(function(r){return itemFor(it,r)===it}):[];
+  var sched=runs.filter(function(r){return r.event==='schedule'});
+  var tr=sched.filter(function(r){return ymd(Date.parse(r.created_at))===today});
+  var mt=runs.filter(function(r){return r.event!=='schedule'&&ymd(Date.parse(r.created_at))===today});
+  var exp=it.d==='d'||[0,1,6].indexOf(td)>=0,cell='';
+  if(tr.length){var r=tr[0],a=Date.parse(r.started_at||r.created_at);
+   if(r.status!=='completed'){cell='<span class="wt">'+hms(a)+' 開始 → 実行中…</span>'}
+   else{var ok=r.conclusion==='success',b=Date.parse(r.ended_at);
+    cell=hms(a)+' 開始 → '+hms(b)+' 完了（'+dur(a,b)+'）<br>'+(ok?'<span class="ok">✅ 成功</span>':'<span class="ng">❌ 失敗（'+(r.conclusion||'不明')+'）</span>')+' <a href="'+url(r.id)+'">詳細</a>';
+    if(ok)cnt.ok++;else cnt.ng++}
+  }else if(exp){
+   if(!(wf&&wf.runs.some(function(r){return r.event==='schedule'}))){cell='<span class="wt">定時の自動実行は、まだ一度も始まっていません（最初の予定を待っています）</span>';cnt.wait++}
+   else if(mins(now)<tmin(it.t)+20){cell='<span class="wt">予定 '+it.t+'（まだ）</span>';cnt.wait++}
+   else{cell='<span class="ng">⚠ 予定の '+it.t+' を過ぎても、定時の自動実行の記録がありません</span>';cnt.miss++}
+  }else{
+   var last=sched[0];
+   cell='<span class="wt">きょうは対象外（土日月のみ）'+(last?'。前回 '+ymd(Date.parse(last.started_at||last.created_at)).slice(5)+' '+hms(Date.parse(last.started_at||last.created_at))+' '+(last.conclusion==='success'?'<span class="ok">成功</span>':last.status!=='completed'?'実行中':'<span class="ng">失敗</span>'):'')+'</span>'}
+  if(mt.length){var m0=mt[0];cell+='<br><span class="wt">（手動の実行 '+hms(Date.parse(m0.started_at||m0.created_at))+' '+(m0.status!=='completed'?'実行中':m0.conclusion==='success'?'成功':'失敗')+'）</span>'}
+  var first=null;(wf?wf.runs:[]).forEach(function(r){if(r.event==='schedule'){var y=ymd(Date.parse(r.created_at));if(first===null||y<first)first=y}});
+  var dots='';for(var k=6;k>=0;k--){var day=ymd(now-k*86400000),dw=dow(now-k*86400000),e2=it.d==='d'||[0,1,6].indexOf(dw)>=0;
+   var rr=sched.filter(function(r){return ymd(Date.parse(r.created_at))===day}),c='';
+   if(rr.length){c=rr.every(function(r){return r.conclusion==='success'})?'s':(rr.some(function(r){return r.status!=='completed'})?'':'f')}
+   else if(e2&&day!==today&&first!==null&&day>first){c='m'}
+   dots+='<i class="'+c+'" title="'+day+'"></i>'}
+  html+='<tr><td class="t">'+it.t+'<span class="sub">'+(it.d==='d'?'毎日':'土日月')+'</span></td><td class="nm">'+it.l+'</td><td>'+cell+'</td><td><span class="dots">'+dots+'</span></td></tr>'
  });
- sum.innerHTML='きょう（'+today.slice(5).replace('-','/')+'・'+DAYS[todayDow]+'）の実行：<b class="ok">成功 '+cnt.ok+'</b>／<b class="'+(cnt.ng?'ng':'')+'">失敗 '+cnt.ng+'</b>／待ち '+cnt.wait+(cnt.miss?'／<b class="ng">記録なし '+cnt.miss+'</b>':'')+'<br><span class="wt">各処理の終了後に自動で記録します（最終更新 '+hms(Date.parse(d.generated_at))+'）。Claude（印・買い目・回顧）とChatGPTの実行は、この記録に含みません。</span>'}
+ body.innerHTML=html;
+ sum.innerHTML='きょう（'+today.slice(5).replace('-','/')+'・'+DAYS[td]+'）の定時の自動実行：<b class="ok">成功 '+cnt.ok+'</b>／<b class="'+(cnt.ng?'ng':'')+'">失敗 '+cnt.ng+'</b>／待ち '+cnt.wait+(cnt.miss?'／<b class="ng">記録なし '+cnt.miss+'</b>':'')+'<br><span class="wt">最終更新 '+hms(Date.parse(d.generated_at))+'（各処理の終了後と、毎時に更新）</span>'}
 load().then(render);
 })();
 </script>
