@@ -45,3 +45,17 @@ class T(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PublicTest(unittest.TestCase):
+    def test_public_build(self):
+        from claude_track import build_public as bp
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d); (d / "p/r1").mkdir(parents=True); (d / "res").mkdir()
+            (d / "p/r1/a.json").write_text(json.dumps(pred(race_name="テストS", venue="東京", date="2026-11-08")), encoding="utf-8")
+            r = bp.build(d / "p", d / "res")
+            self.assertEqual(r["races"][0]["race_name"], "テストS"); self.assertIsNone(r["races"][0]["result"])
+            self.assertEqual([m["mark"] for m in r["races"][0]["marks"]], ["◎", "○", "▲"])
+            (d / "res/r1.json").write_text(json.dumps(RESULT), encoding="utf-8")
+            r = bp.build(d / "p", d / "res")
+            self.assertEqual(r["races"][0]["result"]["payout_yen"], 19450)
