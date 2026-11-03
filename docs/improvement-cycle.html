@@ -10,6 +10,7 @@
 <style>.themes{list-style:none;padding:0;margin:0}.themes li{background:var(--panel);border:1px solid #3a404c;border-radius:12px;padding:12px 14px;margin-bottom:10px}.themes b{display:block}.themes .st{display:inline-block;margin:6px 0 4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #6b7686}.themes .st.on{border-color:#c61d31;color:#ff9aa6}.themes p{margin:4px 0 0;font-size:13px;color:var(--muted)}.themes a{font-size:13px}.stg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.stg span{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid #d3d5db;color:#6d6e75;background:#fff}.stg span.done{background:#f0f1f3}.stg span.now{border-color:#c61d31;color:#9f1022;font-weight:800;background:#fff5f6}
 .tcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}.tcard h3{margin:0 0 2px}.tcard .what{font-size:14px;margin:4px 0}.tcard .entry{font-size:13px;margin:8px 0 0;padding:8px 10px;border-left:3px solid #c61d31;background:#faf7f7;border-radius:4px}.tcard .prog{font-size:13px;margin:8px 0 0}.tcard table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.tcard th,.tcard td{padding:4px 6px;border-bottom:1px solid #ececef;text-align:left}.tcard th{color:#6d6e75;font-weight:600}.tcard .ok{color:#167a52;font-weight:700}.tcard .wip{color:#8a5a00}.pr,.ph{display:grid;grid-template-columns:92px minmax(0,1fr);gap:3px 10px;align-items:center;margin:7px 0}.pr .pt{grid-column:2;font-size:12px;color:#6d6e75;line-height:1.4}.ph{margin:10px 0 2px}.ph>span:last-child{display:none}.ph{grid-template-columns:92px minmax(0,1fr)}.pl{font-size:13px;font-weight:700}.pb{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.pb i{display:block;height:10px;border-radius:5px;background:#e6e7ea;overflow:hidden}.pb i.d{background:#3b3341}.pb i.n{outline:1.5px solid #c61d31;outline-offset:0;background:#fff}.pb i.n b{display:block;height:100%;background:#c61d31}.ph-n i{height:auto;background:none;font-style:normal;font-size:11px;color:#6d6e75;text-align:center}.tdet{margin-top:10px}.eline{display:block;margin-top:3px;font-size:13px}.tiny.warn{color:#a53737}.tdet summary{cursor:pointer;font-size:13px;font-weight:700}.steps{list-style:none;margin:12px 0 0;padding:0;position:relative}.steps>li{display:flex;gap:12px;padding:0 0 14px;position:relative}.steps>li:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:0;width:2px;background:#dcdee3}.st-dot{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:#e6e7ea;color:#6d6e75}.st-now .st-dot{background:#c61d31;color:#fff}.st-done .st-dot{background:#3b3341;color:#fff}.st-body{flex:1;min-width:0}.st-body>b{display:block;font-size:15px}.st-body p{margin:4px 0;font-size:13px}.st-wait .st-body>b{color:#6d6e75}.steps .card{box-shadow:none;margin:8px 0 0}.muted{color:#6d6e75}.tcard .tiny{font-size:12px;color:#6d6e75;margin-top:6px}
 </style>
+<style>.tl{list-style:none;margin:8px 0 0;padding:0 0 0 14px;border-left:2px solid #dcdee3}.tl li{position:relative;display:grid;grid-template-columns:96px 52px minmax(0,1fr);gap:4px 8px;align-items:baseline;padding:6px 0}.tl li::before{content:"";position:absolute;left:-21px;top:12px;width:10px;height:10px;border-radius:50%;background:#2f9e6b;border:2px solid #fff}.tl li.tl-c::before{background:#2f6fd0}.tl li.tl-m::before{background:#d9902b}.tl-t{font-weight:800;font-size:14px}.tl-d{font-size:12px;color:#6d6e75}.tl-b{font-size:13px}.tl-b .tag{margin-left:4px;white-space:nowrap}@media(max-width:560px){.tl li{grid-template-columns:78px minmax(0,1fr)}.tl-b{grid-column:1/3}}</style>
 </head>
 <body class="ic-light">
 <div class="wrap">
@@ -27,17 +28,34 @@
 </header>
 
 <section aria-labelledby="flowTitle">
-<h2 id="flowTitle">改善の流れ</h2>
-<p class="sub">毎週の予想と結果から、改善案の良し悪しを自動で採点しています。</p>
+<h2 id="flowTitle">何が自動で、何が手動か</h2>
+<p class="sub">2026-11-03 時点。自動のうち、Claudeの使用量を使わないもの（GitHubだけで動く）と、使うものを分けています。人が必ずやるのは「ChatGPTへの指示文の貼り付け」と「承認・A/B/Cの回答」だけです。承認や回答はチャットで行い、通知（Issue）は知らせるだけです。</p>
+<h3>手動（人が行う）</h3>
 <ol class="flow">
-  <li><b>予想する</b><p>発走前に予想を確定し、あとから変えられない形で保存</p><span class="tag ai">AIが実行</span></li>
-  <li><b>結果を記録</b><p>レース後に公式の着順を記録して振り返り</p><span class="tag ai">AIが実行</span></li>
-  <li><b>新旧を比べる</b><p>同じレースで「今の予想」と「改善案」を採点</p><span class="tag auto">自動</span></li>
-  <li><b>判定・採用</b><p>20レースたまったら、成績を見て採用するか決める</p><span class="tag hand">人が判断</span></li>
+  <li><b>ChatGPTの予想・回顧</b><p>朝と夜に、通知の指示文をChatGPTに貼って実行（正式予想はこちら）</p><span class="tag hand">手動</span></li>
+  <li><b>判定・採用・本番リリース</b><p>A/B/Cの回答と「本番リリースOK」はチャットで人が行う</p><span class="tag hand">人が判断</span></li>
 </ol>
-<div class="note">改善案はあくまで研究用です。比較中も、サイトで公開している<strong>印・買い目は今の予想のまま</strong>です。</div>
+<h3>自動：GitHubだけで動く（Claudeの使用量を使わない・無料）</h3>
+<ol class="flow">
+  <li><b>地方競馬（研究）</b><p>毎朝の予想の固定と前日の回顧まで</p><span class="tag auto">自動</span></li>
+  <li><b>新旧の比較・集計</b><p>結果が入るたび、改善案と今の予想を同じレースで採点（Claudeの予想の採点・公開も含む）</p><span class="tag auto">自動</span></li>
+  <li><b>馬場の朝の予測</b><p>福島・阪神は毎朝、記録だけを保存（正式予想にはまだ使わない）。気象庁の予報なども毎日保存</p><span class="tag auto">自動</span></li>
+  <li><b>基準に届いたかの確認と通知</b><p>毎日調べ、届くと通知（Issue）が立つ</p><span class="tag auto">自動</span></li>
+</ol>
+<h3>自動：Claudeの使用量を使う</h3>
+<ol class="flow">
+  <li><b>Claudeの予想</b><p>土日月の朝に印と買い目を保存（ChatGPTとは合算しない）</p><span class="tag ai">自動・使用量あり</span></li>
+  <li><b>Claudeの回顧</b><p>土日月の夜に回顧と週次比較</p><span class="tag ai">自動・使用量あり</span></li>
+</ol>
+<p class="tiny">Aと答えたあとの反映（比較用プログラムの登録、新しい版づくり）は、チャットでClaudeに頼んだときだけ動きます（使用量あり）。</p>
+<div class="note">改善案はあくまで研究用です。比較中も、サイトで公開している<strong>印・買い目は今の予想のまま</strong>です。若駒の収集（ChatGPT側）は、いまは手動の起動です。</div>
 </section>
 
+<section aria-labelledby="tlTitle" id="timeline">
+<h2 id="tlTitle">1日の流れ（時間軸）</h2>
+<p class="sub">日本時間・2026-11-03 時点。上から下へ、朝から夜の順です。開催日は土日月です。</p>
+<ol class="tl"><li class="tl-g"><span class="tl-t">06:10</span><span class="tl-d">毎日</span><span class="tl-b"><b>予報・馬場ページの保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-g"><span class="tl-t">06:30</span><span class="tl-d">毎日</span><span class="tl-b"><b>地方競馬：前日の回顧</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-g"><span class="tl-t">07:30</span><span class="tl-d">毎日</span><span class="tl-b"><b>地方競馬：予想の固定</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-m"><span class="tl-t">朝（時刻は自由）</span><span class="tl-d">開催日</span><span class="tl-b"><b>ChatGPT：正式予想（指示文を貼って実行）</b> <span class="tag hand">手動</span></span></li><li class="tl-g"><span class="tl-t">08:40</span><span class="tl-d">土日月</span><span class="tl-b"><b>出馬表の取得／朝の公式馬場の保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-g"><span class="tl-t">08:45</span><span class="tl-d">土日月</span><span class="tl-b"><b>馬場の朝の予測（福島・阪神、記録のみ）</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-c"><span class="tl-t">09:10</span><span class="tl-d">土日月</span><span class="tl-b"><b>Claude：印と買い目の保存</b> <span class="tag ai">Claudeの使用量あり</span></span></li><li class="tl-g"><span class="tl-t">18:10</span><span class="tl-d">毎日</span><span class="tl-b"><b>予報・馬場ページの保存</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-m"><span class="tl-t">夜（時刻は自由）</span><span class="tl-d">開催日</span><span class="tl-b"><b>ChatGPT：結果と回顧の記録（指示文を貼って実行）</b> <span class="tag hand">手動</span></span></li><li class="tl-c"><span class="tl-t">21:32</span><span class="tl-d">土日月</span><span class="tl-b"><b>Claude：回顧と週次比較</b> <span class="tag ai">Claudeの使用量あり</span></span></li><li class="tl-g"><span class="tl-t">22:23</span><span class="tl-d">毎日</span><span class="tl-b"><b>改善案と今の予想の採点</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-g"><span class="tl-t">22:40</span><span class="tl-d">毎日</span><span class="tl-b"><b>基準に届いたかの確認・通知</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li><li class="tl-g"><span class="tl-t">22:50</span><span class="tl-d">毎日</span><span class="tl-b"><b>Claudeの予想の採点・公開</b> <span class="tag auto">GitHubのみ・使用量なし</span></span></li></ol>
+</section>
 <section aria-labelledby="themesTitle" id="themes">
 <h2 id="themesTitle">改善テーマ（研究から判定まで）</h2>
 <p class="sub">1行が1つの管理単位（競馬場・戦歴など）です。毎日、基準に届いたかを自動で調べ、届くと通知（Issue）が立ちます。バーは左から「研究 → 登録 → 比較 → 判定」の4段階で、濃い色は完了、赤い枠がいまの段階、枠の中の赤は進み具合です。数字は自動で更新されます。</p>
