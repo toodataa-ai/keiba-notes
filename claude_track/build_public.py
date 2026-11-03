@@ -39,7 +39,7 @@ def build(pred_dir: Path, results_dir: Path, now: datetime | None = None) -> dic
     items.sort(key=lambda x: (x["date"], x["race_id"]), reverse=True)
     summary = sc.aggregate([e for e in scored.values()])
     return {"schema_version": 1, "predictor": "claude", "as_of": max([i["generated_at"] for i in items if i.get("generated_at")], default=None),
-            "note": "ChatGPT の成績とは合算しません。対象は ChatGPT と同じレースだけ。買い目は仮想で、実際には購入しません。",
+            "note": "ChatGPT の成績とは合算しません。対象は、JRAの毎開催日のメインレース（11R）です。買い目は仮想で、実際には購入しません。",
             "summary": summary, "races": items}
 
 
