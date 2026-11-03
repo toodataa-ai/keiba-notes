@@ -1,0 +1,23 @@
+name: Claude track guard v1
+on:
+  pull_request:
+    paths: ['claude_track/**', 'e2e_validation/results/**']
+  push:
+    branches: [main]
+    paths: ['claude_track/**']
+permissions:
+  contents: read
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Tests
+        run: python3 -m pytest -q claude_track || python3 -m unittest discover -s claude_track -t . -p 'test_*.py'
+      - name: Immutable predictions (PR)
+        if: github.event_name == 'pull_request'
+        run: python3 claude_track/guard_immutable.py "origin/${{ github.base_ref }}" HEAD
+      - name: Immutable predictions (push)
+        if: github.event_name == 'push'
+        run: python3 claude_track/guard_immutable.py "${{ github.event.before }}" HEAD

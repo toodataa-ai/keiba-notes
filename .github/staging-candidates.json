@@ -13,6 +13,20 @@
       "status": "awaiting_user_approval",
       "created_at": "2026-11-03",
       "summary": "馬場の研究ページに比較結果・競馬場ごとの一覧・データ集めの状況を追加し、改善状況ページの馬場は「芝◯／ダート◯」の3つの状態だけで表す（Stage A/B の表記をやめる）。"
+    },
+    {
+      "id": "ui-claude-view-v1",
+      "title": "ChatGPT／Claude の予想・成績を別々に見られる切り替え（今週のAI予想・過去の成績）",
+      "pages": [
+        "this-week.html",
+        "results.html"
+      ],
+      "assets": [
+        "assets/claude-view-v1.js"
+      ],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-03",
+      "summary": "各ページの上に「ChatGPTの予想／Claudeの予想」の切り替えを追加。ChatGPT側は今のまま。Claude側は別データ(data/predictors/claude_status_v1.json)を表示し、成績は合算しない。"
     }
   ]
 }
