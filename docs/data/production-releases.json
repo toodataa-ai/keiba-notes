@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.18-20261103",
-  "current_public_version": "1.18",
+  "current_public_release": "release/jra-site-v1.19-20261103",
+  "current_public_version": "1.19",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -389,6 +389,26 @@
         "docs/operations.html",
         "docs/improvement-cycle.html",
         "docs/index.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.19-20261103",
+      "branch": "release/jra-site-v1.19-20261103",
+      "commit_sha": "c2ff96ec3532e0f26cd9751ddbe1904d6211514b",
+      "deployed_at": "2026-11-03T16:37:47+09:00",
+      "workflow_run_id": 41597557914,
+      "validation_workflow_run_id": 41597557914,
+      "public_version": "1.19",
+      "note": "2026-11-03ユーザー明示承認済み。自動運用の状況：Claude用の結果取得を追加し、回顧以降の時刻を18時台からに変更：Claudeが公式結果を自分で取得するようになったので、回顧（18:17）以降の定時を30分間隔で18時台〜19時台に前倒し。流れと実行記録の表に『Claude用の結果取得』を追加。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-times-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
