@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-timeline-detail-v1",
+      "title": "改善状況ページ：1日の流れの各行を開くと処理内容が見える",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-03",
+      "summary": "時間軸の各行をタップすると、その処理の具体的な内容が開く。"
+    }
+  ]
 }
