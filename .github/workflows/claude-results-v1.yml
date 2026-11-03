@@ -1,12 +1,23 @@
 name: Claude results v1 (Claude's own official results capture)
 on:
+  schedule:
+    # Sat/Sun/Mon 17:17 and 17:47 JST (= 08:17 / 08:47 UTC): after the 11R is over and payouts are confirmed
+    - cron: '17 8 * * 6,0,1'
+    - cron: '47 8 * * 6,0,1'
   workflow_dispatch:
     inputs:
-      dump_code:
-        description: 'test only: print the structure of a Sportnavi result page, e.g. 2605041111'
+      dates:
+        description: 'Comma-separated YYYY-MM-DD (default: today and yesterday JST)'
+        required: false
+      probe_code:
+        description: 'test only: parse the result page of any past race, e.g. 2605041111 (nothing is saved)'
         required: false
 permissions:
   contents: write
+  actions: write
+concurrency:
+  group: claude-results
+  cancel-in-progress: false
 jobs:
   fetch:
     runs-on: ubuntu-latest
@@ -16,6 +27,31 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
       - run: pip install requests beautifulsoup4
-      - name: Dump page structure (test only)
-        if: ${{ inputs.dump_code != '' }}
-        run: python3 claude_track/dump_result_page.py "${{ inputs.dump_code }}"
+      - name: Test the parser
+        run: python3 -m unittest claude_track.test_fetch_results -v
+      - name: Capture official results of finished races
+        env:
+          DATES: ${{ inputs.dates }}
+          PROBE_CODE: ${{ inputs.probe_code }}
+        run: |
+          args=()
+          if [ -n "${DATES:-}" ]; then IFS=',' read -ra ds <<< "$DATES"; for d in "${ds[@]}"; do args+=(--date "$d"); done; fi
+          if [ -n "${PROBE_CODE:-}" ]; then args+=(--probe-code "$PROBE_CODE"); fi
+          python3 claude_track/fetch_results.py "${args[@]}"
+      - name: Commit new results only (never overwrites)
+        id: commit
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          mkdir -p claude_track/results
+          git add claude_track/results || true
+          if git diff --cached --quiet; then echo 'nothing new'; echo "pushed=no" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git commit -q -m 'Claude results: official results and payouts captured'
+          for i in 1 2 3 4 5; do git fetch -q origin main; git rebase -q origin/main && git push origin HEAD:main && echo "pushed=yes" >> "$GITHUB_OUTPUT" && exit 0; sleep $((i*3)); done
+          exit 1
+      - name: Start scoring and publishing right away (pushes by the workflow token do not trigger it)
+        if: steps.commit.outputs.pushed == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST repos/${{ github.repository }}/actions/workflows/claude-track-publish-v1.yml/dispatches -f ref=main
