@@ -152,10 +152,8 @@ def main():
         ids = parse_denma_horses(get(DENMA.format(code=a.probe)))
         print("horses in race:", len(ids))
         hs0 = get(HORSE.format(hid=ids[0]))
-        g = hs0.find("div", class_=lambda c: c and any("genSecond" in x for x in c))
-        top = g
-        for _ in range(3):
-            top = top.parent if top.parent else top
+        top = hs0.select_one('[class*="hr-horsePedigree"]')
+        top = top.parent.parent if top is not None and top.parent is not None and top.parent.parent is not None else top
         print("PEDHTML", str(top)[:3500])
         h = parse_horse(get(HORSE.format(hid=ids[0])))
         print(json.dumps({k: h[k] for k in ("name", "sex", "birth", "ped")}, ensure_ascii=False))
