@@ -7,12 +7,13 @@ GitHub だけで動く・Claude の使用量は 0。予想には使わない（�
 途中で止まっても続きから再開できる。
 """
 from __future__ import annotations
-import argparse, csv, json, re, sys, time
+import argparse, csv, json, os, re, sys, time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "sire_db_v1" / "data"
+# 馬ごとの生データは公開リポジトリに置かない：環境変数 SIRE_DATA_DIR（非公開リポジトリの中）に保存する
+DATA = Path(os.environ["SIRE_DATA_DIR"]) if os.environ.get("SIRE_DATA_DIR") else ROOT / "sire_db_v1" / "data"
 LABELS = ROOT / "baba_models_v2" / "going_labels"
 UA = "keiba-notes research/1.0 (low rate, research only; contact: github.com/toodataa-ai/keiba-notes)"
 VENUE = {"札幌": "01", "函館": "02", "福島": "03", "新潟": "04", "東京": "05",

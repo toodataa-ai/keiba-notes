@@ -17,6 +17,10 @@ on:
       probe:
         description: 'Test: race code (e.g. 2605041111): parse and print only, save nothing'
         required: false
+      check_access:
+        description: 'Test: only check that the private data repository can be written'
+        type: boolean
+        default: false
 permissions:
   contents: write
 concurrency:
@@ -35,26 +39,54 @@ jobs:
       - name: Probe (parse only)
         if: ${{ inputs.probe != '' }}
         run: python3 sire_db_v1/crawl.py --probe "${{ inputs.probe }}"
-      - name: Crawl in rounds (each round is committed so progress is never lost)
+      - name: Check the private data token exists
         if: ${{ inputs.probe == '' }}
+        env:
+          T: ${{ secrets.PRIVATE_DATA_TOKEN }}
+        run: test -n "$T" || { echo 'PRIVATE_DATA_TOKEN is not set'; exit 1; }
+      - name: Check out the PRIVATE data repository (raw horse data never goes into this public repository)
+        if: ${{ inputs.probe == '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - name: Check write access
+        if: ${{ inputs.probe == '' && inputs.check_access }}
+        run: |
+          set -euo pipefail
+          cd private
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          mkdir -p data && date -u +%FT%TZ > data/access_check.txt
+          git add data && git commit -q -m 'access check' && git push -q origin HEAD
+          echo 'private repository write OK'
+      - name: Crawl in rounds (each round is committed to the private repository)
+        if: ${{ inputs.probe == '' && !inputs.check_access }}
         env:
           YEARS: ${{ inputs.years || '2026,2025,2024,2023,2022' }}
           MAXMIN: ${{ inputs.max_minutes || '100' }}
           MAXRACES: ${{ inputs.max_races || '0' }}
+          SIRE_DATA_DIR: ${{ github.workspace }}/private/data
         run: |
           set -euo pipefail
+          cd private
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cd ..
+          mkdir -p private/data
           for round in 1 2 3; do
             python3 sire_db_v1/crawl.py --years "$YEARS" --max-minutes "$MAXMIN" --max-races "$MAXRACES" | tee "$RUNNER_TEMP/out.txt"
-            git add sire_db_v1/data
+            cd private
+            git add data
             if ! git diff --cached --quiet; then
-              git commit -q -m "Sire DB: collected horses (round $round, research data only)"
+              git commit -q -m "Sire DB: collected horses (round $round)"
               for i in 1 2 3 4 5; do
-                if git pull -q --rebase origin main && git push -q origin HEAD:main; then break; fi
+                if git pull -q --rebase origin HEAD && git push -q origin HEAD; then break; fi
                 sleep $((i*3))
               done
             fi
+            cd ..
             grep -q 'remaining races 0$' "$RUNNER_TEMP/out.txt" && break
             if [ "$MAXRACES" != "0" ]; then break; fi
           done
