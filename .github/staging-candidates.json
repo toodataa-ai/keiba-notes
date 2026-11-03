@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-operations-backup-v1",
+      "title": "GitHubの定時を「保険」と表示、遅れの表示",
+      "pages": [
+        "operations.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-04",
+      "summary": "自動運用の状況ページで、Claudeが先に起動するようにした処理（出馬表・オッズ・結果・若駒）のGitHub定時に「保険」の印と説明を追加。GitHubの定時が数時間遅れることの注記、実行記録の表で遅れた実行を正しい行に表示（予定からの遅れを表示）、きょうの『遅れ』表示を追加。"
+    }
+  ]
 }
