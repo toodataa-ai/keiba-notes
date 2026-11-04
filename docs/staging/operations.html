@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/improvement-cycle.html">予想の改善状況</a></nav>
 
@@ -124,7 +124,7 @@ function render(d){
  head.innerHTML='<tr><th></th>'+days.map(function(ms,i){var dd=jst(ms);return '<th'+(i===6?' class="td"':'')+'>'+dd.getUTCDate()+'<small>'+DAYS[dd.getUTCDay()]+'</small></th>'}).join('')+'</tr>';
  var slots={};ITEMS.forEach(function(it){(slots[it.w]=slots[it.w]||[]).push(it)});
  function itemFor(it,run){var m=mins(Date.parse(run.created_at)),best=null,bd=1e9;
-  slots[it.w].forEach(function(o){var diff=(m-tmin(o.t)+1440)%1440;if(diff>1435)diff=0;if(diff<bd){bd=diff;best=o}});
+  slots[it.w].forEach(function(o){var diff=(m-tmin(o.t)+1440)%1440;if(diff>1435)diff=0;var nd=jst(Date.parse(run.created_at)-diff*60000).getUTCDay();if(o.d==='w'&&[0,1,6].indexOf(nd)<0)return;if(diff<bd){bd=diff;best=o}});
   if(best&&bd<=660){run._nd=bd;return best}return null}
  function nday(r){return ymd(Date.parse(r.created_at)-(r._nd||0)*60000)}
  var cnt={ok:0,ng:0,wait:0,miss:0,late:0},html='';
