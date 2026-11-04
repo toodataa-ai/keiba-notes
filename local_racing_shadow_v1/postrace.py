@@ -29,9 +29,11 @@ HTTP = requests.Session()
 HTTP.headers.update({"User-Agent": "Mozilla/5.0 (compatible; LocalShadowPostRace/0.2; +official-sources)",
                      "Accept-Language": "ja-JP,ja;q=0.9"})
 
-# ユーザー判断（2026-11-05）で採点・回顧の対象から外すレース。理由つきで記録し、失敗扱いにはしない。
-OWNER_EXCLUDED = {
-    "20261103-kanazawa-01": "レース名が予想保存時と公式結果で違い、照合できないため。ユーザー判断で除外（誤差の範囲）",
+# ユーザーが手で許可したレース名の食い違い（ChatGPT時代と同じ運用）。
+# 公式の名前が下の文字列と完全に一致するときだけ許可する。日付・競馬場・R・距離・馬番と馬名の照合は通常どおり。
+MANUAL_NAME_ALLOW = {
+    "20261103-kanazawa-01": "能登復興ＪＢＣ２０２６金沢・門別開幕特別Ｃ１Ｃ２",  # 2026-11-05 ユーザー許可
+    "20261104-funabashi-11": "第７２回 平和賞（地方交流）（全日本２歳優駿ＴＲ）オープン",  # 2026-11-05 ユーザー許可
 }
 
 
@@ -233,7 +235,9 @@ def parse_official(soup, p):
             and (standard_name == card_name + ")"
                  or full_official_key == full_card_key + ")")
         )
-        if (standard_name != card_name and
+        if clean(MANUAL_NAME_ALLOW.get(p.get("race_id"), "")) == clean(official_name):
+            pass
+        elif (standard_name != card_name and
                 not clipped_final_paren and
                 not clipped_age_suffix and
                 (len(card_name) < 6 or card_name not in standard_name) and
@@ -410,10 +414,6 @@ def run(date, only_id):
     for path in pred_paths:
         p = jread(path)
         rid = path.stem
-        if rid in OWNER_EXCLUDED:
-            statuses[rid] = {"status": "EXCLUDED_BY_OWNER", "reason": OWNER_EXCLUDED[rid], "result_path": None, "review_path": None}
-            print(f"{rid}: EXCLUDED_BY_OWNER", flush=True)
-            continue
         if only_id and rid != only_id:
             statuses[rid] = {"status": "NOT_SELECTED", "reason": "Explicit single-race retry", "result_path": None, "review_path": None}
             continue
@@ -514,7 +514,7 @@ def run(date, only_id):
     pending = [x for x in statuses.values() if x["status"].startswith("PENDING")]
     valid_proof_count = len(validated) + sum(1 for x in blocked if x["status"] != "BLOCKED_PROOF" and x["status"] != "BLOCKED_JOIN")
     # Eligible category reconciliation follows mutually exclusive completion/blocked/pending.
-    eligible_ids = [rid for rid, x in statuses.items() if x["status"] not in ("BLOCKED_PROOF", "EXCLUDED_BY_OWNER")]
+    eligible_ids = [rid for rid, x in statuses.items() if x["status"] != "BLOCKED_PROOF"]
     for rid in eligible_ids:
         if statuses[rid]["status"] == "NOT_SELECTED":
             raise RuntimeError("NOT_SELECTED remained unresolved after retry")
@@ -531,7 +531,6 @@ def run(date, only_id):
                 "top3_rate": round(sum(m["top_pick_top3"] for m in metrics)/n,6) if n else None,
                 "mean_absolute_top_pick_rank_error": round(sum(m["top_pick_rank_error"] for m in metrics)/n,6) if n else None,
                 "small_sample_warning": n < 30}
-    excluded_ids = sorted(r for r, x in statuses.items() if x["status"] == "EXCLUDED_BY_OWNER")
     global_agg = agg([v["review"] for v in validated.values()])
     summary = {"schema_version": 1, "date": date, "scope": "predictions_with_valid_proof_only",
                "expected_predictions": len(pred_paths), "eligible_predictions": len(eligible_ids),
@@ -548,7 +547,7 @@ def run(date, only_id):
                "coverage_gaps": [], "reconciliation": {
                    "eligible_equals_categories": len(eligible_ids) == len(completed)+len(pending)+
                        len([x for x in blocked if x not in [] and x["status"] != "BLOCKED_PROOF"])+len(skipped),
-                   "review_ids": sorted(validated), "unresolved_ids": sorted(set(statuses) - set(validated) - set(excluded_ids)),
+                   "review_ids": sorted(validated), "unresolved_ids": sorted(set(statuses) - set(validated)),
                    "ineligible_proof_ids": sorted(rid for rid,x in statuses.items() if x["status"] == "BLOCKED_PROOF")}}
     analysis_path = ROOT / "analysis" / f"{date}-summary.json"
     if analysis_path.exists():
@@ -561,10 +560,9 @@ def run(date, only_id):
     write_distinct(analysis_path, summary, mutable=True)
     diagnostics = {"schema_version": 1, "date": date, "prompt": cfg["prompts"]["post_race"],
                    "expected_predictions": len(pred_paths), "completed_or_verified": len(validated),
-                   "total_unresolved": len(pred_paths)-len(validated)-len(excluded_ids), "races": statuses,
-                   "excluded_by_owner": excluded_ids,
-                   "retry_only_race_ids": sorted(set(statuses)-set(validated)-set(excluded_ids)),
-                   "status": "SUCCESS" if len(validated)+len(excluded_ids) == len(pred_paths) and summary["reconciliation"]["eligible_equals_categories"] else "PARTIAL"}
+                   "total_unresolved": len(pred_paths)-len(validated), "races": statuses,
+                   "retry_only_race_ids": sorted(set(statuses)-set(validated)),
+                   "status": "SUCCESS" if len(validated) == len(pred_paths) and summary["reconciliation"]["eligible_equals_categories"] else "PARTIAL"}
     diag_path = ROOT / "diagnostics" / f"{date}-postrace-run.json"
     if diag_path.exists():
         old_diag = jread(diag_path)
