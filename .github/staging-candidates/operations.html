@@ -10,9 +10,9 @@
 <style>.tl{list-style:none;margin:8px 0 0;padding:0 0 0 14px;border-left:2px solid #dcdee3}.tl li{position:relative;display:grid;grid-template-columns:96px 52px minmax(0,1fr);gap:4px 8px;align-items:baseline;padding:6px 0}.tl li::before{content:"";position:absolute;left:-21px;top:12px;width:10px;height:10px;border-radius:50%;background:#2f9e6b;border:2px solid #fff}.tl li.tl-c::before{background:#2f6fd0}.tl li.tl-m::before{background:#d9902b}.tl-t{font-weight:800;font-size:14px}.tl-d{font-size:12px;color:#6d6e75}.tl-b{font-size:13px}.tl-b .tag{margin-left:4px;white-space:nowrap}@media(max-width:560px){.tl li{grid-template-columns:78px minmax(0,1fr)}.tl-b{grid-column:1/3}}.tag.bk{background:#eef0f4;color:#3b4150;border:1px solid #b9bfcc}.bkn{display:inline-block;font-size:10px;font-weight:800;border-radius:20px;padding:1px 7px;margin-left:5px;background:#eef0f4;color:#3b4150;border:1px solid #b9bfcc;white-space:nowrap;font-style:normal}.lateinfo{margin:10px 0 0;padding:9px 12px;border-left:3px solid #d9902b;background:#fff7e8;font-size:13px;line-height:1.7}</style>
 <style>.tl-b summary{cursor:pointer;list-style:none}.tl-b summary::-webkit-details-marker{display:none}.tl-b summary::before{content:"▸ ";color:#6d6e75}.tl-b[open] summary::before{content:"▾ "}.tl-b p{margin:6px 0 2px;font-size:13px;color:#4a4b52;line-height:1.6}</style>
 <style>.rt-sum{margin:6px 0 10px;font-size:13px;line-height:1.7}.rt-sum b{font-size:15px}.rt-sum .ok{color:#167a52}.rt-sum .ng{color:#b42318}.rt-sum .wt{color:#6d6e75;font-size:12px}
-.mx{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.mx col.c0{width:34%}.mx col.ct{width:17%}.mx th,.mx td{padding:5px 1px;text-align:center;border-bottom:1px solid #ececef;line-height:1.3}
+.mx{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.mx col.c0{width:34%}.mx col.ct{width:17%}.mx th,.mx td{vertical-align:top;padding:5px 1px;text-align:center;border-bottom:1px solid #ececef;line-height:1.3}
 .mx thead th{font-weight:600;color:#6d6e75;border-bottom:2px solid #dcdee3;padding-bottom:6px}.mx thead th.td,.mx td.td{background:#fff5f6}.mx thead th small{display:block;font-weight:400;font-size:12px}
-.mx td.nm{text-align:left;padding:6px 6px 6px 2px;font-size:13px;font-weight:700;line-height:1.35}.mx td.nm span{display:block;font-size:12px;font-weight:400;color:#6d6e75}
+.mx td.nm{vertical-align:middle;text-align:left;padding:6px 6px 6px 2px;font-size:13px;font-weight:700;line-height:1.35}.mx td.nm span{display:block;font-size:12px;font-weight:400;color:#6d6e75}
 .mx a{text-decoration:none;color:inherit;display:block}.mx .ic{display:block;font-size:15px;line-height:1.2}.mx .tm{display:block;font-size:12px;color:#4a4b52}.mx .man{opacity:.45}.mx .na{color:#c3c5cb}.mx .ng{color:#b42318;font-weight:800}.mx .wt{color:#9a9ca3}
 .mx tr.grp td{border-top:0}
 .rt-note{font-size:12px;color:#6d6e75;margin:8px 0 0;line-height:1.7}</style>
@@ -112,7 +112,7 @@ function cellFor(r,manual,showTime,it){
  if(it&&!manual){var lm=(mins(Date.parse(r.created_at))-tmin(it.t)+1440)%1440;if(lm>1435)lm=0;if(lm>=30)late='（予定の'+(lm>=60?Math.floor(lm/60)+'時間':'')+(lm%60?lm%60+'分':'')+'後に開始）'}
  if(r.status!=='completed'){ic='⏳';tip=hms(a)+' 開始（実行中）'}
  else{var ok=r.conclusion==='success',b=Date.parse(r.ended_at);ic=ok?'✅':'❌';cls=ok?'':'ng';tip=hms(a)+' 開始'+late+' → '+hms(b)+' 完了（'+dur(a,b)+'）'+(ok?' 成功':' 失敗：'+(r.conclusion||'不明'))+(r.note?'：'+r.note:'')}
- return '<a href="'+url(r.id)+'" title="'+tip+(manual?'（手動）':'')+'" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+(showTime?'<span class="tm">'+hm(a)+(manual?' 手':'')+'</span>':(manual?'<span class="tm">手</span>':''))+'</a>'}
+ return '<a href="'+url(r.id)+'" title="'+tip+(manual?'（手動）':'')+'" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+(showTime?'<span class="tm">'+hm(a)+(manual?' 手':'')+'</span>':(manual?'<span class="tm">手</span>':'<span class="tm">&nbsp;</span>'))+'</a>'}
 function render(d){
  var sum=document.getElementById('rtSum'),head=document.getElementById('mxHead'),body=document.getElementById('mxBody');
  if(!d){sum.textContent='実行記録を読み込めませんでした。';return}
@@ -136,14 +136,14 @@ function render(d){
    var mm=man.filter(function(r){return nday(r)===day});
    var c='';
    if(rr.length){var r=rr[0];c=cellFor(r,false,i===6,it);if(isT){if(r.status==='completed'){if(r.conclusion==='success')cnt.ok++;else cnt.ng++}}}
-   else if(!exp){c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic na">－</span>'}
+   else if(!exp){c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
    else if(isT){
     if(mins(now)<tmin(it.t)+20||(first===null&&mins(now)-tmin(it.t)>660)){c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic wt">・</span><span class="tm wt">'+it.t+'</span>';cnt.wait++}
     else if(mins(now)-tmin(it.t)<=660){c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic wt">⏳</span><span class="tm wt">遅れ</span>';cnt.wait++;cnt.late++}
-    else{c='<span class="ic ng">⚠</span>'+(mm.length?'':'');cnt.miss++}
+    else{c='<span class="ic ng">⚠</span><span class="tm">&nbsp;</span>'+(mm.length?'':'');cnt.miss++}
    }
-   else if(first!==null&&day>first){c='<span class="ic ng">⚠</span>'}
-   else{c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic na">－</span>'}
+   else if(first!==null&&day>first){c='<span class="ic ng">⚠</span><span class="tm">&nbsp;</span>'}
+   else{c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
    row+='<td'+(i===6?' class="td"':'')+'>'+c+'</td>'});
   html+=row+'</tr>'
  });
