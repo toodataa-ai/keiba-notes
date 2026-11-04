@@ -32,6 +32,7 @@
       if(mode==='results'&&r.result){
         h+='<details class="spoiler-summary"><summary>結果を見る</summary><p class="pv-bets">3着内：'+r.result.finish_top3.join('・')+'　◎'+(r.result.honmei_win?'1着':r.result.honmei_top3?'3着内':'着外')+'　購入'+yen(r.result.stake_yen)+' → 払戻'+yen(r.result.payout_yen)+'</p></details>';
       }else if(mode==='results'){h+='<p class="pv-meta">結果の確認待ち</p>'}
+      if(mode==='results'&&r.review){var v=r.review;h+='<details class="spoiler-summary"><summary>Claudeの反省会を見る</summary><div class="pv-bets"><p>'+esc(v.summary)+'</p>'+(v.honmei_result?'<p>◎の結果：'+esc(v.honmei_result)+'</p>':'')+(v.failure_types&&v.failure_types.length?'<p>失敗の分類：'+v.failure_types.map(esc).join('、')+'</p>':'')+(v.lessons&&v.lessons.length?'<p>学んだこと：</p><ul>'+v.lessons.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>':'')+'</div></details>'}
       return h+'</article>';
     }
     function load(){

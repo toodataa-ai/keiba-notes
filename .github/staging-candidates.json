@@ -1,20 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-claude-review-v1",
-      "title": "Claudeの予想に「反省会」を表示",
-      "pages": [
-        "this-week.html",
-        "results.html"
-      ],
-      "assets": [
-        "assets/claude-view-v1.js"
-      ],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-04",
-      "summary": "過去の成績ページで「Claudeの予想」に切り替えると、結果の出たレースごとに「Claudeの反省会を見る」（要約・◎の結果・失敗の分類・学んだこと）が出る。ChatGPT側の表示は変えない。"
-    }
-  ]
+  "candidates": []
 }
