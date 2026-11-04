@@ -108,7 +108,7 @@ function load(){return Promise.all([getJ(['data/automation/automation_runs_v1.js
  var c=a[1];if(c&&c.runs){['T2','T3'].forEach(function(t){d.workflows['claude:'+t]={label:(c.tasks||{})[t]||t,runs:c.runs.filter(function(r){return r.task===t}).map(function(r){return {id:null,note:r.note,event:'schedule',created_at:r.started_at,started_at:r.started_at,ended_at:r.ended_at,status:'completed',conclusion:r.status==='fail'?'failure':'success',skipped:r.status==='skipped'}})}})}
  return d})}
 function h27(a,day){var mm=Math.round((a-Date.parse(day+'T00:00:00+09:00'))/60000);return ('0'+Math.floor(mm/60)).slice(-2)+':'+('0'+mm%60).slice(-2)}
-function miniFor(r){var ok=r.status==='completed'?(r.conclusion==='success'?'✅':'❌'):'⏳',man=r.event!=='schedule';return '<a href="'+url(r.id)+'" title="'+hm(Date.parse(r.started_at||r.created_at))+' 開始 '+(r.status==='completed'?(r.conclusion==='success'?'成功':'失敗'):'実行中')+(man?'（手動・起動役など）':'')+'">'+ok+'</a>'}
+function miniFor_unused(r){var ok=r.status==='completed'?(r.conclusion==='success'?'✅':'❌'):'⏳',man=r.event!=='schedule';return '<a href="'+url(r.id)+'" title="'+hm(Date.parse(r.started_at||r.created_at))+' 開始 '+(r.status==='completed'?(r.conclusion==='success'?'成功':'失敗'):'実行中')+(man?'（手動・起動役など）':'')+'">'+ok+'</a>'}
 function cellFor(r,manual,showTime,it,day){
  var a=Date.parse(r.started_at||r.created_at),ic,cls='',tip,late='',isLate=0;
  if(it&&!manual){var lm=(mins(Date.parse(r.created_at))-tmin(it.t)+1440)%1440;if(lm>1320)lm=0;if(lm>=30)isLate=1;if(lm>=30)late='（予定の'+(lm>=60?Math.floor(lm/60)+'時間':'')+(lm%60?lm%60+'分':'')+'後に開始）'}
@@ -146,8 +146,6 @@ function render(d){
    }
    else if(first!==null&&day>first){if(exp&&now-Date.parse(day+'T'+it.t+':00+09:00')<=660*60000){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic wt">⏳</span><span class="tm wt">遅れ</span>'}else{c='<span class="ic ng">⚠</span><span class="tm">&nbsp;</span>'}}
    else{c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
-   var ex=rr.concat(mm).filter(function(r){return r.id&&c.indexOf('/runs/'+r.id+'"')<0});
-   if(ex.length)c+='<span class="xs">'+ex.slice(0,4).map(miniFor).join('')+(ex.length>4?'+'+(ex.length-4):'')+'</span>';
    row+='<td'+(i===6?' class="td"':'')+'>'+c+'</td>'});
   html+=row+'</tr>'
  });
