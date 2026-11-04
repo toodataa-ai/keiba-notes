@@ -145,7 +145,7 @@ function render(d){
     else if(mins(now)-tmin(it.t)<=660){c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic wt">⏳</span><span class="tm wt">遅れ</span>';cnt.wait++;cnt.late++}
     else{c='<span class="ic ng">⚠</span><span class="tm">&nbsp;</span>'+(mm.length?'':'');cnt.miss++}
    }
-   else if(first!==null&&day>first){c='<span class="ic ng">⚠</span><span class="tm">&nbsp;</span>'}
+   else if(first!==null&&day>first){if(exp&&now-Date.parse(day+'T'+it.t+':00+09:00')<=660*60000){c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic wt">⏳</span><span class="tm wt">遅れ</span>'}else{c='<span class="ic ng">⚠</span><span class="tm">&nbsp;</span>'}}
    else{c=mm.length?cellFor(mm[0],true,i===6):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
    row+='<td'+(i===6?' class="td"':'')+'>'+c+'</td>'});
   html+=row+'</tr>'
