@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.24-20261104",
-  "current_public_version": "1.24",
+  "current_public_release": "release/jra-site-v1.25-20261105",
+  "current_public_version": "1.25",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -516,6 +516,26 @@
         "docs/this-week.html",
         "docs/results.html",
         "docs/assets/claude-view-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.25-20261105",
+      "branch": "release/jra-site-v1.25-20261105",
+      "commit_sha": "bc6e59daa62c0b4764fdbda0f79b8d14cc1945a9",
+      "deployed_at": "2026-11-05T01:07:56+09:00",
+      "workflow_run_id": 41864329233,
+      "validation_workflow_run_id": 41864329233,
+      "public_version": "1.25",
+      "note": "2026-11-05ユーザー明示承認済み。実行記録の表：定時の振り分けの誤りを修正：土日月だけの予定（朝の公式馬場の保存など）の行に、水曜など別の曜日の定時（遅れて動いた毎日の6:10の予報保存）が入ってしまう誤りを修正。土日月の枠は、その曜日に動いた実行だけを受け持つ。 あわせて、「手」の印が付いたマスだけ縦にずれる問題を修正（全マスで2段目の高さをそろえ、上寄せにする）。 また、昨日の分も、予定から11時間以内は「記録なし(⚠)」ではなく「遅れ(⏳)」と表示する。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-slotfix-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
