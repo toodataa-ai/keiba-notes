@@ -43,7 +43,7 @@ def build(pred_dir: Path, results_dir: Path, now: datetime | None = None) -> dic
                 "venue": p.get("venue") or (res or {}).get("venue", ""), "date": p.get("date") or (res or {}).get("date", ""),
                 "prompt_version": p.get("prompt_version"), "generated_at": p.get("generated_at"),
                 "marks": marks, "bets": p.get("bets", []), "total_stake_yen": p.get("total_stake_yen"),
-                "result": None, "review": load_review(rid)}
+                "result": None, "review": load_review(rid), "report": f"claude-reports/{rid}.html"}
         e = scored.get(p["race_id"])
         if res and e:
             item["result"] = {"finish_top3": res["finish_order"][:3], "prospective": e["prospective"],
