@@ -110,7 +110,7 @@ function load(){return Promise.all([getJ(['data/automation/automation_runs_v1.js
 function h27(a,day){var mm=Math.round((a-Date.parse(day+'T00:00:00+09:00'))/60000);return ('0'+Math.floor(mm/60)).slice(-2)+':'+('0'+mm%60).slice(-2)}
 function cellFor(r,manual,showTime,it,day){
  var a=Date.parse(r.started_at||r.created_at),ic,cls='',tip,late='',isLate=0;
- if(it&&!manual){var lm=(mins(Date.parse(r.created_at))-tmin(it.t)+1440)%1440;if(lm>1380)lm=0;if(lm>=30)isLate=1;if(lm>=30)late='（予定の'+(lm>=60?Math.floor(lm/60)+'時間':'')+(lm%60?lm%60+'分':'')+'後に開始）'}
+ if(it&&!manual){var lm=(mins(Date.parse(r.created_at))-tmin(it.t)+1440)%1440;if(lm>1320)lm=0;if(lm>=30)isLate=1;if(lm>=30)late='（予定の'+(lm>=60?Math.floor(lm/60)+'時間':'')+(lm%60?lm%60+'分':'')+'後に開始）'}
  if(r.status!=='completed'){ic='⏳';tip=hms(a)+' 開始（実行中）'}
  else{var ok=r.conclusion==='success',b=Date.parse(r.ended_at);ic=ok?'✅':'❌';cls=ok?'':'ng';tip=hms(a)+' 開始'+late+' → '+hms(b)+' 完了（'+dur(a,b)+'）'+(ok?' 成功':' 失敗：'+(r.conclusion||'不明'))+(r.note?'：'+r.note:'')}
  return '<a href="'+url(r.id)+'" title="'+tip+(manual?'（手動）':'')+'" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+((showTime||isLate)&&day?'<span class="tm">'+h27(a,day)+(manual?' 手':'')+'</span>':(manual?'<span class="tm">手</span>':'<span class="tm">&nbsp;</span>'))+'</a>'}
@@ -122,7 +122,7 @@ function render(d){
  head.innerHTML='<tr><th></th>'+days.map(function(ms,i){var dd=jst(ms);return '<th'+(i===6?' class="td"':'')+'>'+dd.getUTCDate()+'<small>'+DAYS[dd.getUTCDay()]+'</small></th>'}).join('')+'</tr>';
  var slots={};ITEMS.forEach(function(it){(slots[it.w]=slots[it.w]||[]).push(it)});
  function itemFor(it,run){var m=mins(Date.parse(run.created_at)),best=null,bd=1e9;
-  slots[it.w].forEach(function(o){var diff=(m-tmin(o.t)+1440)%1440;if(diff>1380)diff=0;var nd=jst(Date.parse(run.created_at)-diff*60000).getUTCDay();if(o.d==='w'&&[0,1,6].indexOf(nd)<0)return;if(diff<bd){bd=diff;best=o}});
+  slots[it.w].forEach(function(o){var diff=(m-tmin(o.t)+1440)%1440;if(diff>1320)diff=0;var nd=jst(Date.parse(run.created_at)-diff*60000).getUTCDay();if(o.d==='w'&&[0,1,6].indexOf(nd)<0)return;if(diff<bd){bd=diff;best=o}});
   if(best&&bd<=660){run._nd=bd;return best}return null}
  function nday(r){return ymd(Date.parse(r.created_at)-(r._nd||0)*60000)}
  var cnt={ok:0,ng:0,wait:0,miss:0,late:0},html='';
