@@ -29,6 +29,14 @@ HTTP = requests.Session()
 HTTP.headers.update({"User-Agent": "Mozilla/5.0 (compatible; LocalShadowPostRace/0.2; +official-sources)",
                      "Accept-Language": "ja-JP,ja;q=0.9"})
 
+# ユーザーが手で許可したレース名の食い違い（ChatGPT時代と同じ運用）。
+# 公式の名前が下の文字列と完全に一致するときだけ許可する。日付・競馬場・R・距離・馬番と馬名の照合は通常どおり。
+MANUAL_NAME_ALLOW = {
+    "20261103-kanazawa-01": "能登復興ＪＢＣ２０２６金沢・門別開幕特別Ｃ１Ｃ２",  # 2026-11-05 ユーザー許可
+    "20261104-funabashi-11": "第７２回 平和賞（地方交流）（全日本２歳優駿ＴＲ）オープン",  # 2026-11-05 ユーザー許可
+}
+
+
 class Blocked(Exception):
     def __init__(self, state, reason):
         super().__init__(reason)
@@ -227,7 +235,9 @@ def parse_official(soup, p):
             and (standard_name == card_name + ")"
                  or full_official_key == full_card_key + ")")
         )
-        if (standard_name != card_name and
+        if clean(MANUAL_NAME_ALLOW.get(p.get("race_id"), "")) == clean(official_name):
+            pass
+        elif (standard_name != card_name and
                 not clipped_final_paren and
                 not clipped_age_suffix and
                 (len(card_name) < 6 or card_name not in standard_name) and
