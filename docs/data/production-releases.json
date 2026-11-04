@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.21-20261103",
-  "current_public_version": "1.21",
+  "current_public_release": "release/jra-site-v1.22-20261104",
+  "current_public_version": "1.22",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -452,6 +452,26 @@
       "scope_files": [
         "docs/operations.html",
         "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.22-20261104",
+      "branch": "release/jra-site-v1.22-20261104",
+      "commit_sha": "a14a98b80e1c4facd01ee665fb9f55e24f2b02dd",
+      "deployed_at": "2026-11-04T12:46:10+09:00",
+      "workflow_run_id": 41769114855,
+      "validation_workflow_run_id": 41769114855,
+      "public_version": "1.22",
+      "note": "2026-11-04ユーザー明示承認済み。GitHubの定時を「保険」と表示、遅れの表示：自動運用の状況ページで、Claudeが先に起動するようにした処理（出馬表・オッズ・結果・若駒）のGitHub定時に「保険」の印と説明を追加。GitHubの定時が数時間遅れることの注記、実行記録の表で遅れた実行を正しい行に表示（予定からの遅れを表示）、きょうの『遅れ』表示を追加。 朝（06:03）・夕方（18:03）のClaudeの起動役の行と、毎日動く3処理（予報・地方の回顧・地方の予想の固定）の「保険」表示を追加。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-backup-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
