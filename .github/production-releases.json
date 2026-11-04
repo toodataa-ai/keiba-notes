@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.22-20261104",
-  "current_public_version": "1.22",
+  "current_public_release": "release/jra-site-v1.23-20261104",
+  "current_public_version": "1.23",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -472,6 +472,28 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.23-20261104",
+      "branch": "release/jra-site-v1.23-20261104",
+      "commit_sha": "18c81221624a05cd6ac87f8f5b7515e87ae97079",
+      "deployed_at": "2026-11-04T12:58:57+09:00",
+      "workflow_run_id": 41770366216,
+      "validation_workflow_run_id": 41770366216,
+      "public_version": "1.23",
+      "note": "2026-11-04ユーザー明示承認済み。Claudeの予想に「反省会」を表示：過去の成績ページで「Claudeの予想」に切り替えると、結果の出たレースごとに「Claudeの反省会を見る」（要約・◎の結果・失敗の分類・学んだこと）が出る。ChatGPT側の表示は変えない。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-review-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/results.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
