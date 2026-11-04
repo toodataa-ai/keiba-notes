@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.25-20261105",
-  "current_public_version": "1.25",
+  "current_public_release": "release/jra-site-v1.26-20261105",
+  "current_public_version": "1.26",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -530,6 +530,26 @@
       "note": "2026-11-05ユーザー明示承認済み。実行記録の表：定時の振り分けの誤りを修正：土日月だけの予定（朝の公式馬場の保存など）の行に、水曜など別の曜日の定時（遅れて動いた毎日の6:10の予報保存）が入ってしまう誤りを修正。土日月の枠は、その曜日に動いた実行だけを受け持つ。 あわせて、「手」の印が付いたマスだけ縦にずれる問題を修正（全マスで2段目の高さをそろえ、上寄せにする）。 また、昨日の分も、予定から11時間以内は「記録なし(⚠)」ではなく「遅れ(⏳)」と表示する。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-operations-slotfix-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.26-20261105",
+      "branch": "release/jra-site-v1.26-20261105",
+      "commit_sha": "019edbc68c7e9f2926623a50fc6707e5b154cde9",
+      "deployed_at": "2026-11-05T08:42:00+09:00",
+      "workflow_run_id": 41935748456,
+      "validation_workflow_run_id": 41935748456,
+      "public_version": "1.26",
+      "note": "2026-11-05ユーザー明示承認済み。実行記録の表：遅れて動いた回の開始時刻を表示、0時以降は27時表記：今日の列に加えて、予定より30分以上遅れて動いた回にも開始時刻を表示する。日付をまたいだ時刻は、その予定の日の続きとして26:19・27:05のように表す（表示のみ）。 時刻が重ならないよう列幅を調整。Claudeの起動役が予定の2時間以内に早く起動した回も、その予定の行に「手」として表示する。",
+      "user_approval_quote": "了解、本番リリースOK",
+      "staging_candidate_id": "ui-operations-time27-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
