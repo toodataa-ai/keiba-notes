@@ -12,6 +12,20 @@ ROOT = Path(__file__).resolve().parents[1]
 JST = timezone(timedelta(hours=9))
 
 
+def load_review(race_id: str) -> dict | None:
+    """Claude 自身の回顧（claude_track/reviews/<race_id>.json）から、表示に使う項目だけ取り出す。"""
+    f = ROOT / "claude_track/reviews" / f"{race_id}.json"
+    if not f.is_file():
+        return None
+    try:
+        r = json.loads(f.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return {"summary": r.get("summary", ""), "honmei_result": r.get("honmei_result", ""),
+            "failure_types": r.get("failure_types", []), "lessons": r.get("lessons", []),
+            "repeatable": r.get("repeatable"), "reviewed_at": r.get("reviewed_at")}
+
+
 def build(pred_dir: Path, results_dir: Path, now: datetime | None = None) -> dict:
     scored = {e["race_id"]: e for e in sc.run(pred_dir, results_dir)["races"]}
     items = []
@@ -29,7 +43,7 @@ def build(pred_dir: Path, results_dir: Path, now: datetime | None = None) -> dic
                 "venue": p.get("venue") or (res or {}).get("venue", ""), "date": p.get("date") or (res or {}).get("date", ""),
                 "prompt_version": p.get("prompt_version"), "generated_at": p.get("generated_at"),
                 "marks": marks, "bets": p.get("bets", []), "total_stake_yen": p.get("total_stake_yen"),
-                "result": None}
+                "result": None, "review": load_review(rid)}
         e = scored.get(p["race_id"])
         if res and e:
             item["result"] = {"finish_top3": res["finish_order"][:3], "prospective": e["prospective"],
