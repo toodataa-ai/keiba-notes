@@ -16,7 +16,7 @@
 .sm-seg button[aria-pressed="true"]{background:#17171a;color:#fff}
 .sm-seg button:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
 .sm-box{position:relative;border:1px solid #e3e4e8;border-radius:12px;background:#fff;padding:6px 4px 2px}
-.sm-svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.sm-box{display:flex;align-items:flex-start}.sm-yax{flex:none;display:block}.sm-scroll{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}.sm-svg{display:block;max-width:none;touch-action:pan-x pan-y}
 .sm-svg text{font-family:inherit}
 .sm-dot{cursor:pointer}
 .sm-dot:focus{outline:none}
@@ -40,7 +40,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/experience-regime.html">新馬・戦歴の少ない馬の研究</a></nav>
 
@@ -59,7 +59,8 @@
  <span class="sm-seg" role="group" aria-label="表示範囲"><button type="button" data-z="0" aria-pressed="true">全体</button><button type="button" data-z="1" aria-pressed="false">中心を拡大</button></span>
  <span class="sm-seg" role="group" aria-label="勝ち上がり頭数"><button type="button" data-m="15" aria-pressed="true">15頭以上</button><button type="button" data-m="40" aria-pressed="false">40頭以上</button><button type="button" data-m="100" aria-pressed="false">100頭以上</button></span>
 </div>
-<div class="sm-box"><svg class="sm-svg" id="smSvg" role="img" aria-label="父ごとの初勝利の平均月齢と平均距離の地図"></svg></div>
+<div class="sm-box"><svg class="sm-yax" id="smYax" aria-hidden="true"></svg><div class="sm-scroll" id="smScroll"><svg class="sm-svg" id="smSvg" role="img" aria-label="父ごとの初勝利の平均月齢と平均距離の地図"></svg></div></div>
+<p class="sm-note">横長の図です。左右になぞるとスクロールできます（最初は父が多く集まる中央あたりを表示）。</p>
 <div class="sm-legend"><span>色：ダート寄り<span class="sm-grad"></span>芝寄り</span><span>丸の大きさ：勝ち上がった頭数</span><span>名前は重ならない分だけ表示。丸をタップすると詳しく出ます。</span></div>
 <p class="sm-note" id="lvNote" hidden>オープン・重賞・G1は、その格のレースで初めて勝ったときの月齢と距離です。頭数の絞り込み（15頭以上など）は「初勝利」のときだけ効きます。重賞・G1は頭数が少ない父も載せています（丸が小さいほど頭数が少なく、平均がぶれやすい）。</p>
 <p class="sm-info" id="smInfo" aria-live="polite">丸をタップすると、その父の数字が出ます。</p>
@@ -103,19 +104,20 @@ function col(t){/* ダート(0)→中間→芝(1) */var a=[176,104,43],b=[201,17
 function el(n,a,parent){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e}
 function shown(){return DATA.filter(function(s){return (level!=='all'||s.winners>=minW)&&(filt==='all'||(filt==='turf'?s.turf_share>=.6:s.turf_share<=.4))})}
 function draw(){
- var W=Math.max(320,Math.min(svg.parentNode.clientWidth-8,940)),H=Math.round(W<520?W*1.35:Math.max(460,Math.min(W*0.72,640)));
- var m={l:58,r:10,t:16,b:40};svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.innerHTML='';
+ var sc=document.getElementById('smScroll'),yax=document.getElementById('smYax'),vw=sc.clientWidth,W=Math.max(1500,vw),H=700;
+ var m={l:14,r:16,t:16,b:44};svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width',W);svg.setAttribute('height',H);svg.innerHTML='';yax.innerHTML='';yax.setAttribute('width',54);yax.setAttribute('height',H);
  var S=shown();
  var xs=S.map(function(s){return s.mean_months}),ys=S.map(function(s){return s.mean_dist});if(!xs.length){svg.innerHTML='';document.getElementById('smMeta').textContent='この条件に当てはまる父がいません。';return}
  var x0=Math.floor(Math.min.apply(0,xs))-1,x1=Math.ceil(Math.max.apply(0,xs))+1,y0=Math.floor(Math.min.apply(0,ys)/100)*100-50,y1=Math.ceil(Math.max.apply(0,ys)/100)*100+50;
  if(zoom){var qs=function(a,p){a=a.slice().sort(function(x,y){return x-y});return a[Math.floor((a.length-1)*p)]};var sx=S.map(function(s){return s.mean_months}),sy=S.map(function(s){return s.mean_dist});x0=Math.floor(qs(sx,.12)*2)/2-0.5;x1=Math.ceil(qs(sx,.88)*2)/2+0.5;y0=Math.floor(qs(sy,.12)/50)*50-50;y1=Math.ceil(qs(sy,.88)/50)*50+50;S=S.filter(function(s){return s.mean_months>=x0&&s.mean_months<=x1&&s.mean_dist>=y0&&s.mean_dist<=y1})}
  var X=function(v){return m.l+(v-x0)/(x1-x0)*(W-m.l-m.r)},Y=function(v){return H-m.b-(v-y0)/(y1-y0)*(H-m.t-m.b)};
  var g=el('g',{},svg);
- var stp=[1,2,3,6,12,24].find(function(k){return (x1-x0)/k<=(W<520?7:11)})||24,yrPx=12/(x1-x0)*(W-m.l-m.r);
- for(var v=Math.ceil(x0);v<=x1;v++){if(v%stp&&v%12)continue;if(v%stp&&v%12===0){var xa=X(v);el('line',{x1:xa,x2:xa,y1:m.t,y2:H-m.b,stroke:'#c9cbd2','stroke-width':1},g);if(yrPx>44){var ta=el('text',{x:xa+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);ta.textContent=(v/12)+'歳'}continue}var xx=X(v);el('line',{x1:xx,x2:xx,y1:m.t,y2:H-m.b,stroke:v%12===0?'#c9cbd2':'#eef0f3','stroke-width':1},g);var t=el('text',{x:xx,y:H-m.b+15,'text-anchor':'middle','font-size':11,fill:'#6d6e75'},g);t.textContent=v;if(v%12===0&&x0<v&&yrPx>44){var t3=el('text',{x:xx+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);t3.textContent=(v/12)+'歳'}}
- for(var d=Math.ceil(y0/(zoom?100:200))*(zoom?100:200);d<=y1;d+=(zoom?100:200)){var yy=Y(d);el('line',{x1:m.l,x2:W-m.r,y1:yy,y2:yy,stroke:'#eef0f3','stroke-width':1},g);var t2=el('text',{x:m.l-5,y:yy+4,'text-anchor':'end','font-size':11,fill:'#6d6e75'},g);t2.textContent=d+'m'}
- var tx=el('text',{x:(m.l+W-m.r)/2,y:H-6,'text-anchor':'middle','font-size':12,fill:'#4a4b52'},g);tx.textContent='初勝利の月齢（平均・か月）→ 遅い';
- var ty=el('text',{x:11,y:(m.t+H-m.b)/2,'text-anchor':'middle','font-size':12,fill:'#4a4b52',transform:'rotate(-90 12 '+((m.t+H-m.b)/2)+')'},g);ty.textContent='初勝利の距離（平均）→ 長い';
+ var key=[filt,minW,zoom,level].join('|');if(key!==window.__smKey){window.__smKey=key;var mid=xs.slice().sort(function(a,b){return a-b})[Math.floor(xs.length/2)];sc.scrollLeft=Math.max(0,X(mid)-vw/2)}
+ var stp=[1,2,3,6,12,24].find(function(k){return (x1-x0)/k<=20})||24,yrPx=0;
+ for(var v=Math.ceil(x0);v<=x1;v++){if(v%stp&&v%12)continue;if(v%stp&&v%12===0){var xa=X(v);el('line',{x1:xa,x2:xa,y1:m.t,y2:H-m.b,stroke:'#c9cbd2','stroke-width':1},g);if(yrPx>44){var ta=el('text',{x:xa+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);ta.textContent=(v/12)+'歳'}continue}var xx=X(v);el('line',{x1:xx,x2:xx,y1:m.t,y2:H-m.b,stroke:v%12===0?'#c9cbd2':'#eef0f3','stroke-width':1},g);var t=el('text',{x:xx,y:H-m.b+15,'text-anchor':'middle','font-size':11,fill:'#6d6e75'},g);t.textContent=(v%12===0?(v/12)+'歳':Math.floor(v/12)+'歳'+(v%12)+'か月');if(v%12===0&&x0<v&&yrPx>44){var t3=el('text',{x:xx+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);t3.textContent=(v/12)+'歳'}}
+ for(var d=Math.ceil(y0/(zoom?100:200))*(zoom?100:200);d<=y1;d+=(zoom?100:200)){var yy=Y(d);el('line',{x1:m.l,x2:W-m.r,y1:yy,y2:yy,stroke:'#eef0f3','stroke-width':1},g);var t2=el('text',{x:50,y:yy+4,'text-anchor':'end','font-size':11,fill:'#6d6e75'},yax);t2.textContent=d+'m'}
+ var tx=el('text',{x:m.l+4,y:H-6,'text-anchor':'start','font-size':12,fill:'#4a4b52'},g);tx.textContent='初勝利の月齢（平均・何歳何か月）→ 遅い';
+ var ty=el('text',{x:11,y:(m.t+H-m.b)/2,'text-anchor':'middle','font-size':12,fill:'#4a4b52',transform:'rotate(-90 12 '+((m.t+H-m.b)/2)+')'},yax);ty.textContent='初勝利の距離（平均）→ 長い';
  var mxW=Math.max.apply(0,S.map(function(s){return s.winners})),R=function(s){return (zoom?3.5:2.6)+Math.sqrt(s.winners/mxW)*(zoom?16:12)};
  var dots=S.map(function(s){return {s:s,x:X(s.mean_months),y:Y(s.mean_dist),r:R(s)}});
  var dg=el('g',{},svg),lg=el('g',{},svg);
