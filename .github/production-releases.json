@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.26-20261105",
-  "current_public_version": "1.26",
+  "current_public_release": "release/jra-site-v1.27-20261106",
+  "current_public_version": "1.27",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -556,6 +556,27 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.27-20261106",
+      "branch": "release/jra-site-v1.27-20261106",
+      "commit_sha": "df1f5254777937d20c210644249a725fd2bb85b9",
+      "deployed_at": "2026-11-06T02:11:24+09:00",
+      "workflow_run_id": 42072102171,
+      "validation_workflow_run_id": 42072102171,
+      "public_version": "1.27",
+      "note": "2026-11-06ユーザー明示承認済み。新ページ『種牡馬の初勝利マップ』とトップのカード：父ごとの産駒の初勝利（平均月齢×平均距離、丸の大きさ＝勝ち上がり頭数、色＝芝の割合）の地図と並べ替えできる一覧。名前は重ならない分だけ表示し、芝寄り・ダート寄り・頭数で絞り込める。データは data/sire_firstwin_v1.json（父ごとの集計のみ）。トップの「別の研究」にカードを追加。",
+      "user_approval_quote": "本番リリースし",
+      "staging_candidate_id": "ui-sire-map-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/sire-map.html",
+        "docs/index.html"
       ],
       "public_http_files_verified": null
     }
