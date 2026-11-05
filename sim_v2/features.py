@@ -99,7 +99,8 @@ def load_runs(data_dir: Path, labels: dict):
                              "time": t, "last3f": r.get("last3f"), "first_pos": pas[0] if pas else None, "pas": pas,
                              "carried": r.get("carried"), "odds": r.get("odds"), "ninki": r.get("ninki"), "body_weight": r.get("body_weight"),
                              "going": (lb or {}).get("going"), "layout": (lb or {}).get("layout", "single"), "race_name": (lb or {}).get("race_name") or r.get("race"),
-                             "margin": margin_sec(r.get("margin")), "level": class_level((lb or {}).get("class"), r.get("grade"))})
+                             "margin": margin_sec(r.get("margin")), "level": class_level((lb or {}).get("class"), r.get("grade")),
+                             "jockey_id": r.get("jockey_id"), "bw_diff": r.get("body_weight_diff")})
     return runs, horses
 
 
@@ -209,3 +210,46 @@ def rating(hist, on_date, surface, dist, going):
             "lninki3": round(sum(ninki) / len(ninki), 3) if ninki else None,
             "level_last": max(lv) if lv else None,
             "days_since": dsl, "runs_total": len(prior)}
+
+
+class JockeyTable:
+    """騎手の「その日より前」の勝ちやすさ（頭数から見た期待に対する実際の勝ち数、縮小つき）。"""
+    def __init__(self, runs, k=40.0):
+        import bisect
+        self.k = k; self.by = {}
+        tmp = collections.defaultdict(list)
+        for r in runs:
+            if r.get("jockey_id") and r.get("finish") and r.get("heads"):
+                tmp[r["jockey_id"]].append((r["date"], 1 if r["finish"] == 1 else 0, 1.0 / r["heads"]))
+        for j, v in tmp.items():
+            v.sort(); dates = [x[0] for x in v]; cw = [0]; ce = [0.0]
+            for _, w, e in v:
+                cw.append(cw[-1] + w); ce.append(ce[-1] + e)
+            self.by[j] = (dates, cw, ce)
+        self._bisect = bisect
+
+    def ae(self, jid, on_date):
+        t = self.by.get(jid)
+        if not t:
+            return 0.0
+        dates, cw, ce = t; i = self._bisect.bisect_left(dates, on_date)
+        return math.log((cw[i] + self.k) / (ce[i] + self.k))
+
+
+class GroupTable(JockeyTable):
+    """任意のまとまり（父など）の、その日より前の勝ちやすさ。key_fn で1走ごとのキーを決める。"""
+    def __init__(self, runs, key_fn, k=60.0, only=None):
+        import bisect
+        self.k = k; self.by = {}; self._bisect = bisect
+        tmp = collections.defaultdict(list)
+        for r in runs:
+            if only and not only(r):
+                continue
+            key = key_fn(r)
+            if key and r.get("finish") and r.get("heads"):
+                tmp[key].append((r["date"], 1 if r["finish"] == 1 else 0, 1.0 / r["heads"]))
+        for j, v in tmp.items():
+            v.sort(); dates = [x[0] for x in v]; cw = [0]; ce = [0.0]
+            for _, w, e in v:
+                cw.append(cw[-1] + w); ce.append(ce[-1] + e)
+            self.by[j] = (dates, cw, ce)

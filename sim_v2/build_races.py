@@ -17,6 +17,16 @@ def months(birth, d):
     return (x.year - b.year) * 12 + x.month - b.month - (1 if x.day < b.day else 0)
 
 
+def change(hist, lb):
+    """前走からの変化：距離の延長・短縮、芝ダの替わり。"""
+    prior = [r for r in hist if r["date"] < lb["date"]]
+    if not prior:
+        return {"dist_change": 0.0, "surf_switch": 0}
+    last = prior[-1]
+    return {"dist_change": round(math.log(lb["dist"] / last["dist"]), 3) if last.get("dist") else 0.0,
+            "surf_switch": 1 if last["surface"] != lb["surface"] else 0}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=os.environ.get("SIRE_DATA_DIR"))
@@ -31,6 +41,14 @@ def main():
     train = [r for r in runs if r["date"] < a.cutoff]
     std = F.standards(train)
     F.run_figures(runs, std)
+    JT = F.JockeyTable(runs)
+    sire_of = {h: v.get("sire") for h, v in horses.items()}
+    # 父×芝ダの勝ちやすさ（全走）と、父の初出走での勝ちやすさ
+    first = {}
+    for r in sorted(runs, key=lambda r: r["date"]):
+        first.setdefault(r["hid"], r["code"])
+    ST = F.GroupTable(runs, lambda r: (sire_of.get(r["hid"]), r["surface"]))
+    SD = F.GroupTable(runs, lambda r: sire_of.get(r["hid"]), only=lambda r: first.get(r["hid"]) == r["code"])
     byh = collections.defaultdict(list)
     for r in runs:
         byh[r["hid"]].append(r)
@@ -58,7 +76,8 @@ def main():
             runners.append({"no": r["horse_no"], "name": h.get("name"), "sire": h.get("sire"), "sex": h.get("sex"),
                             "age_m": months(h["birth"], lb["date"]) if h.get("birth") else None,
                             "carried": r["carried"], "bw": r["body_weight"], "finish": r["finish"], "odds": r["odds"], "ninki": r["ninki"],
-                            "time": r["time"], "last3f": r["last3f"], "pas": r["pas"], **rt})
+                            "time": r["time"], "last3f": r["last3f"], "pas": r["pas"], **rt,
+                            "jockey": round(JT.ae(r.get("jockey_id"), lb["date"]), 3), "sire_surf": round(ST.ae((h.get("sire"), lb["surface"]), lb["date"]), 3), "sire_debut": round(SD.ae(h.get("sire"), lb["date"]), 3), "bw_diff": r.get("bw_diff"), **change(byh[r["hid"]], lb)})
         if len(runners) < 5:
             continue
         grade = None

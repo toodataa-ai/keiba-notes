@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 FEATS = ["speed", "peak", "kick", "early", "wet_power", "stamina_fit", "debut", "log_runs", "finpct3", "margin3", "lninki3",
-         "level_diff", "log_days", "carried_diff", "draw", "age_diff", "sd"]
+         "level_diff", "log_days", "carried_diff", "draw", "age_diff", "sd", "jockey", "dist_up", "dist_down", "surf_switch", "bw_diff_abs", "bw_diff", "sire_surf", "sire_debut_x_debut", "sire_surf_x_young"]
 
 
 def feats(race):
@@ -26,7 +26,10 @@ def feats(race):
             x["lninki3"] if x.get("lninki3") is not None else math.log(max(1, H / 2)),
             ((x["level_last"] - lvl) if (x.get("level_last") is not None and lvl is not None) else 0.0),
             math.log1p(x["days_since"]) if x.get("days_since") is not None else 0.0,
-            (x["carried"] or cm) - cm, (x["no"] - 1) / max(1, H - 1), ((x["age_m"] or am) - am) / 12.0, x["sd"]])
+            (x["carried"] or cm) - cm, (x["no"] - 1) / max(1, H - 1), ((x["age_m"] or am) - am) / 12.0, x["sd"],
+            x.get("jockey", 0.0), max(0.0, x.get("dist_change", 0.0)), max(0.0, -x.get("dist_change", 0.0)), x.get("surf_switch", 0),
+            min(20, abs(x.get("bw_diff") or 0)) / 10.0, max(-20, min(20, x.get("bw_diff") or 0)) / 10.0,
+            x.get("sire_surf", 0.0), x.get("sire_debut", 0.0) * deb, x.get("sire_surf", 0.0) * (1.0 if (x.get("runs_total") or 0) <= 3 else 0.0)])
     return np.array(X, dtype=float)
 
 
