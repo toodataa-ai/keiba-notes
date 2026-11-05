@@ -1,18 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-sire-map-v1",
-      "title": "新ページ『種牡馬の初勝利マップ』とトップのカード",
-      "pages": [
-        "sire-map.html",
-        "index.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-06",
-      "summary": "父ごとの産駒の初勝利（平均月齢×平均距離、丸の大きさ＝勝ち上がり頭数、色＝芝の割合）の地図と並べ替えできる一覧。名前は重ならない分だけ表示し、芝寄り・ダート寄り・頭数で絞り込める。データは data/sire_firstwin_v1.json（父ごとの集計のみ）。トップの「別の研究」にカードを追加。"
-    }
-  ]
+  "candidates": []
 }
