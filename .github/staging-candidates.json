@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-sire-map-levels-v1",
-      "title": "初勝利マップ：オープン・重賞・G1の初勝利でも見られるように",
-      "pages": [
-        "sire-map.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-06",
-      "summary": "地図の上に「初勝利／オープン／重賞／G1」の切り替えを追加。その格で初めて勝ったときの平均月齢・距離を父ごとに表示（丸の大きさ＝その格で勝った頭数）。表示範囲は表示中の父に合わせて自動で決める。"
-    }
-  ]
+  "candidates": []
 }

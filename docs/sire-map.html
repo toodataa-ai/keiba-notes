@@ -51,12 +51,14 @@
 <h2 id="mapTitle">全体の地図</h2>
 <p class="sub" id="smMeta">読み込み中…</p>
 <div class="sm-ctrl">
+ <span class="sm-seg" role="group" aria-label="どの初勝利か"><button type="button" data-l="all" aria-pressed="true">初勝利</button><button type="button" data-l="open" aria-pressed="false">オープン</button><button type="button" data-l="graded" aria-pressed="false">重賞</button><button type="button" data-l="g1" aria-pressed="false">G1</button></span>
  <span class="sm-seg" role="group" aria-label="表示する父"><button type="button" data-f="all" aria-pressed="true">全部</button><button type="button" data-f="turf" aria-pressed="false">芝寄り</button><button type="button" data-f="dirt" aria-pressed="false">ダート寄り</button></span>
  <span class="sm-seg" role="group" aria-label="表示範囲"><button type="button" data-z="0" aria-pressed="true">全体</button><button type="button" data-z="1" aria-pressed="false">中心を拡大</button></span>
  <span class="sm-seg" role="group" aria-label="勝ち上がり頭数"><button type="button" data-m="15" aria-pressed="true">15頭以上</button><button type="button" data-m="40" aria-pressed="false">40頭以上</button><button type="button" data-m="100" aria-pressed="false">100頭以上</button></span>
 </div>
 <div class="sm-box"><svg class="sm-svg" id="smSvg" role="img" aria-label="父ごとの初勝利の平均月齢と平均距離の地図"></svg></div>
 <div class="sm-legend"><span>色：ダート寄り<span class="sm-grad"></span>芝寄り</span><span>丸の大きさ：勝ち上がった頭数</span><span>名前は重ならない分だけ表示。丸をタップすると詳しく出ます。</span></div>
+<p class="sm-note" id="lvNote" hidden>オープン・重賞・G1は、その格のレースで初めて勝ったときの月齢と距離です。頭数の絞り込み（15頭以上など）は「初勝利」のときだけ効きます。重賞・G1は頭数が少ない父も載せています（丸が小さいほど頭数が少なく、平均がぶれやすい）。</p>
 <p class="sm-info" id="smInfo" aria-live="polite">丸をタップすると、その父の数字が出ます。</p>
 </section>
 
@@ -65,7 +67,7 @@
 <p class="sub">見出しを押すと並べ替えます。行を押すと、地図の丸が強調されます。</p>
 <div class="sm-tbl"><table><thead><tr>
 <th><button type="button" data-k="sire">父</button></th>
-<th><button type="button" data-k="winners">勝ち上がり</button></th>
+<th><button type="button" data-k="winners">頭数</button></th>
 <th><button type="button" data-k="mean_months">初勝利の月齢</button></th>
 <th><button type="button" data-k="mean_dist">距離</button></th>
 <th><button type="button" data-k="turf_share">芝で初勝利</button></th>
@@ -75,7 +77,7 @@
 
 <section aria-labelledby="noteTitle">
 <h2 id="noteTitle">見るときの注意</h2>
-<p class="sm-note">データは JRA のレースに出走した馬と、その馬の全出走履歴です（2018年以降を新しい年から順に取得中）。勝ち上がった馬の、最初の1着だけを数えています。月齢は誕生日からの月数で、デビューからではありません。</p>
+<p class="sm-note">データは JRA のレースに出走した馬と、その馬の全出走履歴です（2018年以降を新しい年から順に取得中）。勝ち上がった馬の、最初の1着だけを数えています。オープン・重賞・G1は、その格での最初の1着です（障害は除く）。月齢は誕生日からの月数で、デビューからではありません。</p>
 <p class="sm-note">取得が新しい年から進んでいるため、いまは若い世代が多めです。遅くに初勝利する馬は、取得が進むと増える見込みです。勝ち上がりが15頭以上の父だけを載せています。</p>
 <p class="sm-note">この地図は傾向を見るためのもので、予想には使っていません。過去の検証では、全出走ではオッズにすでに織り込まれていて、差は出ませんでした（デビュー戦だけは差が出る可能性があり、データがたまってから確かめます）。</p>
 </section>
@@ -89,26 +91,29 @@
 (function(){
 var NS='http://www.w3.org/2000/svg';
 var svg=document.getElementById('smSvg'),info=document.getElementById('smInfo'),body=document.getElementById('smBody');
-var DATA=[],filt='all',minW=15,sortK='winners',sortDir=-1,hi=null,zoom=0;
+var RAW=[],DATA=[],level='all',filt='all',minW=15,sortK='winners',sortDir=-1,hi=null,zoom=0;
+var LVL={all:'初勝利',open:'オープン初勝利',graded:'重賞初勝利',g1:'G1初勝利'};
+function applyLevel(){DATA=RAW.map(function(r){var x=level==='all'?r:Object.assign({sire:r.sire,horses:r.horses},r.levels&&r.levels[level]||{});return x}).filter(function(x){return x.mean_months!=null});DATA.sort(function(a,b){return b.winners-a.winners})}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function ym(m){var y=Math.floor(m/12),mo=Math.round(m-y*12);if(mo===12){y++;mo=0}return y+'歳'+mo+'か月'}
 function col(t){/* ダート(0)→中間→芝(1) */var a=[176,104,43],b=[201,178,90],c=[47,125,59],p,q,u;if(t<.5){p=a;q=b;u=t/.5}else{p=b;q=c;u=(t-.5)/.5}return 'rgb('+p.map(function(v,i){return Math.round(v+(q[i]-v)*u)}).join(',')+')'}
 function el(n,a,parent){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e}
-function shown(){return DATA.filter(function(s){return s.winners>=minW&&(filt==='all'||(filt==='turf'?s.turf_share>=.6:s.turf_share<=.4))})}
+function shown(){return DATA.filter(function(s){return (level!=='all'||s.winners>=minW)&&(filt==='all'||(filt==='turf'?s.turf_share>=.6:s.turf_share<=.4))})}
 function draw(){
  var W=Math.max(320,Math.min(svg.parentNode.clientWidth-8,940)),H=Math.round(W<520?W*1.35:Math.max(460,Math.min(W*0.72,640)));
  var m={l:58,r:10,t:16,b:40};svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.innerHTML='';
  var S=shown();
- var xs=DATA.map(function(s){return s.mean_months}),ys=DATA.map(function(s){return s.mean_dist});
+ var xs=S.map(function(s){return s.mean_months}),ys=S.map(function(s){return s.mean_dist});if(!xs.length){svg.innerHTML='';document.getElementById('smMeta').textContent='この条件に当てはまる父がいません。';return}
  var x0=Math.floor(Math.min.apply(0,xs))-1,x1=Math.ceil(Math.max.apply(0,xs))+1,y0=Math.floor(Math.min.apply(0,ys)/100)*100-50,y1=Math.ceil(Math.max.apply(0,ys)/100)*100+50;
- if(zoom){x0=32;x1=37.5;y0=1350;y1=1900;S=S.filter(function(s){return s.mean_months>=x0&&s.mean_months<=x1&&s.mean_dist>=y0&&s.mean_dist<=y1})}
+ if(zoom){var qs=function(a,p){a=a.slice().sort(function(x,y){return x-y});return a[Math.floor((a.length-1)*p)]};var sx=S.map(function(s){return s.mean_months}),sy=S.map(function(s){return s.mean_dist});x0=Math.floor(qs(sx,.12)*2)/2-0.5;x1=Math.ceil(qs(sx,.88)*2)/2+0.5;y0=Math.floor(qs(sy,.12)/50)*50-50;y1=Math.ceil(qs(sy,.88)/50)*50+50;S=S.filter(function(s){return s.mean_months>=x0&&s.mean_months<=x1&&s.mean_dist>=y0&&s.mean_dist<=y1})}
  var X=function(v){return m.l+(v-x0)/(x1-x0)*(W-m.l-m.r)},Y=function(v){return H-m.b-(v-y0)/(y1-y0)*(H-m.t-m.b)};
  var g=el('g',{},svg);
- for(var v=Math.ceil(x0);v<=x1;v++){if(!zoom&&v%2)continue;var xx=X(v);el('line',{x1:xx,x2:xx,y1:m.t,y2:H-m.b,stroke:v%12===0?'#c9cbd2':'#eef0f3','stroke-width':1},g);var t=el('text',{x:xx,y:H-m.b+15,'text-anchor':'middle','font-size':11,fill:'#6d6e75'},g);t.textContent=v;if(v%12===0){var t3=el('text',{x:xx+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);t3.textContent=(v/12)+'歳になる月'}}
+ var stp=[1,2,3,6,12,24].find(function(k){return (x1-x0)/k<=(W<520?7:11)})||24,yrPx=12/(x1-x0)*(W-m.l-m.r);
+ for(var v=Math.ceil(x0);v<=x1;v++){if(v%stp&&v%12)continue;if(v%stp&&v%12===0){var xa=X(v);el('line',{x1:xa,x2:xa,y1:m.t,y2:H-m.b,stroke:'#c9cbd2','stroke-width':1},g);if(yrPx>44){var ta=el('text',{x:xa+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);ta.textContent=(v/12)+'歳'}continue}var xx=X(v);el('line',{x1:xx,x2:xx,y1:m.t,y2:H-m.b,stroke:v%12===0?'#c9cbd2':'#eef0f3','stroke-width':1},g);var t=el('text',{x:xx,y:H-m.b+15,'text-anchor':'middle','font-size':11,fill:'#6d6e75'},g);t.textContent=v;if(v%12===0&&x0<v&&yrPx>44){var t3=el('text',{x:xx+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);t3.textContent=(v/12)+'歳'}}
  for(var d=Math.ceil(y0/(zoom?100:200))*(zoom?100:200);d<=y1;d+=(zoom?100:200)){var yy=Y(d);el('line',{x1:m.l,x2:W-m.r,y1:yy,y2:yy,stroke:'#eef0f3','stroke-width':1},g);var t2=el('text',{x:m.l-5,y:yy+4,'text-anchor':'end','font-size':11,fill:'#6d6e75'},g);t2.textContent=d+'m'}
  var tx=el('text',{x:(m.l+W-m.r)/2,y:H-6,'text-anchor':'middle','font-size':12,fill:'#4a4b52'},g);tx.textContent='初勝利の月齢（平均・か月）→ 遅い';
  var ty=el('text',{x:11,y:(m.t+H-m.b)/2,'text-anchor':'middle','font-size':12,fill:'#4a4b52',transform:'rotate(-90 12 '+((m.t+H-m.b)/2)+')'},g);ty.textContent='初勝利の距離（平均）→ 長い';
- var R=function(s){return (zoom?3.5:2.6)+Math.sqrt(s.winners)*(zoom?0.7:0.5)};
+ var mxW=Math.max.apply(0,S.map(function(s){return s.winners})),R=function(s){return (zoom?3.5:2.6)+Math.sqrt(s.winners/mxW)*(zoom?16:12)};
  var dots=S.map(function(s){return {s:s,x:X(s.mean_months),y:Y(s.mean_dist),r:R(s)}});
  var dg=el('g',{},svg),lg=el('g',{},svg);
  dots.slice().sort(function(a,b){return b.r-a.r}).forEach(function(p){
@@ -138,10 +143,10 @@ function draw(){
   if(best.ring>0){var cx=Math.max(best.bx[0],Math.min(p.x,best.bx[2])),cy=Math.max(best.bx[1],Math.min(p.y,best.bx[3]));el('line',{x1:p.x,y1:p.y,x2:cx,y2:cy,stroke:'#8a8c94','stroke-width':0.8,'pointer-events':'none'},lg)}
   var t=el('text',{x:best.bx[0],y:best.bx[3]-3,'font-size':fs,'font-weight':p.s.sire===hi?800:600,fill:p.s.sire===hi?'#17171a':'#2b2c31','paint-order':'stroke',stroke:'#fff','stroke-width':3.2,'stroke-linejoin':'round','pointer-events':'none'},lg);t.textContent=p.s.sire;
  });
- document.getElementById('smMeta').textContent=(zoom?'中心の範囲に ':'表示中 ')+S.length+'頭の父（うち名前を表示 '+labelled+'頭）。取得済み '+META.races_fetched.toLocaleString()+'レース（全体の約'+Math.round(META.races_fetched/META.races_total_estimate*100)+'%）・'+META.horses_fetched.toLocaleString()+'頭、'+META.generated_on+' 時点。';
+ document.getElementById('smMeta').textContent=LVL[level]+'：'+(zoom?'中心の範囲に ':'表示中 ')+S.length+'頭の父（うち名前を表示 '+labelled+'頭）。取得済み '+META.races_fetched.toLocaleString()+'レース（全体の約'+Math.round(META.races_fetched/META.races_total_estimate*100)+'%）・'+META.horses_fetched.toLocaleString()+'頭、'+META.generated_on+' 時点。';
 }
 function pick(n){hi=hi===n?null:n;var s=DATA.find(function(x){return x.sire===n});
- info.innerHTML=hi&&s?'<b>'+esc(s.sire)+'</b>　勝ち上がり '+s.winners+'頭（取得 '+s.horses+'頭）<br>初勝利の月齢：平均 '+ym(s.mean_months)+'（半数が '+ym(s.q1_months)+'〜'+ym(s.q3_months)+'）<br>距離：平均 '+s.mean_dist+'m（半数が '+Math.round(s.q1_dist)+'〜'+Math.round(s.q3_dist)+'m）・芝で初勝利 '+Math.round(s.turf_share*100)+'%':'丸をタップすると、その父の数字が出ます。';
+ info.innerHTML=hi&&s?'<b>'+esc(s.sire)+'</b>　'+LVL[level]+'した産駒 '+s.winners+'頭（取得 '+s.horses+'頭）<br>'+LVL[level]+'の月齢：平均 '+ym(s.mean_months)+'（半数が '+ym(s.q1_months)+'〜'+ym(s.q3_months)+'）<br>距離：平均 '+s.mean_dist+'m（半数が '+Math.round(s.q1_dist)+'〜'+Math.round(s.q3_dist)+'m）・芝で初勝利 '+Math.round(s.turf_share*100)+'%':'丸をタップすると、その父の数字が出ます。';
  draw();table()}
 function table(){
  var S=shown().slice().sort(function(a,b){var x=a[sortK],y=b[sortK];return (typeof x==='string'?x.localeCompare(y,'ja'):x-y)*sortDir});
@@ -153,8 +158,9 @@ Array.prototype.forEach.call(document.querySelectorAll('.sm-tbl th button'),func
 Array.prototype.forEach.call(document.querySelectorAll('[data-f]'),function(b){b.onclick=function(){filt=b.getAttribute('data-f');Array.prototype.forEach.call(document.querySelectorAll('[data-f]'),function(x){x.setAttribute('aria-pressed',x===b)});draw();table()}});
 Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(b){b.onclick=function(){minW=+b.getAttribute('data-m');Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(x){x.setAttribute('aria-pressed',x===b)});draw();table()}});
 Array.prototype.forEach.call(document.querySelectorAll('[data-z]'),function(b){b.onclick=function(){zoom=+b.getAttribute('data-z');Array.prototype.forEach.call(document.querySelectorAll('[data-z]'),function(x){x.setAttribute('aria-pressed',x===b)});draw()}});
+Array.prototype.forEach.call(document.querySelectorAll('[data-l]'),function(b){b.onclick=function(){level=b.getAttribute('data-l');Array.prototype.forEach.call(document.querySelectorAll('[data-l]'),function(x){x.setAttribute('aria-pressed',x===b)});hi=null;info.textContent='丸をタップすると、その父の数字が出ます。';applyLevel();draw();table();document.getElementById('lvNote').hidden=level==='all'}});
 var META={};
-fetch('data/sire_firstwin_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){META=d;DATA=d.sires||[];draw();table()}).catch(function(){document.getElementById('smMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。'});
+fetch('data/sire_firstwin_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){META=d;RAW=d.sires||[];applyLevel();draw();table()}).catch(function(){document.getElementById('smMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。'});
 var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(draw,150)});
 })();
 </script>
