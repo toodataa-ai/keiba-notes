@@ -67,6 +67,15 @@ def margin_sec(m):
     return max(0.0, v)
 
 
+def norm_name(s):
+    """騎手名などの表記ゆれをそろえる（空白・見習いの記号を除く）。"""
+    import re, unicodedata
+    if not s:
+        return None
+    s = unicodedata.normalize("NFKC", str(s))
+    return re.sub(r"[\s▲△☆◇★◎○]", "", s) or None
+
+
 def tsec(t):
     try:
         if ":" in t:
@@ -100,7 +109,7 @@ def load_runs(data_dir: Path, labels: dict):
                              "carried": r.get("carried"), "odds": r.get("odds"), "ninki": r.get("ninki"), "body_weight": r.get("body_weight"),
                              "going": (lb or {}).get("going"), "layout": (lb or {}).get("layout", "single"), "race_name": (lb or {}).get("race_name") or r.get("race"),
                              "margin": margin_sec(r.get("margin")), "level": class_level((lb or {}).get("class"), r.get("grade")),
-                             "jockey_id": r.get("jockey_id"), "bw_diff": r.get("body_weight_diff")})
+                             "jockey_id": r.get("jockey_id"), "jockey_name": norm_name(r.get("jockey")), "bw_diff": r.get("body_weight_diff")})
     return runs, horses
 
 

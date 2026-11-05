@@ -14,6 +14,7 @@
 GitHub Actions の定時実行は、数時間遅れることがある（2026-11-03 に実測：予定の約7〜8時間後）。この手順書を動かしている Claude の定時は遅れないので、**Claude 自身が先に起動する**。GitHub の定時（出馬表 8:40・オッズ 9:30/10:00）は「保険」。
 0. 先に、朝の公式馬場の保存と福島・阪神の馬場予測を起動する（順番に、各1〜2分）：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/baba-forecast-archive-v1.yml/dispatches -f ref=main` → 完了を待って `baba-going-live-v1.yml`（同じ形式）。失敗しても続行し、record_run の note に書く。
 1. `git pull` のあと、今日の `claude_track/inputs/<今日>-*-11/` に出馬表が無ければ、出馬表の取得を起動する：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-race-data-v1.yml/dispatches -f ref=main`（約2分かかる）。1分おきに `git pull` して、最大10分待つ。
+   出馬表がそろったら、LABのシミュレータ用の能力値づくりも起動する（待たなくてよい・失敗しても予想は続ける）：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/sim-v2-upcoming-v1.yml/dispatches -f ref=main`。
 2. 起動のコマンドが失敗しても（権限なし・gh が使えないなど）、止まらずに従来どおり進める（GitHub の定時が動くのを待つ）。失敗したことは、最後の実行記録の `--note` に書く。
 
 ## 対象
