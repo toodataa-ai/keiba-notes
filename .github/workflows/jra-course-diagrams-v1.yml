@@ -1,0 +1,41 @@
+name: JRA course diagrams (private, for tracing course shapes; never published)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - name: Fetch course pages and plan images
+        run: |
+          set -u
+          mkdir -p private/course_diagrams
+          cd private/course_diagrams
+          for v in sapporo hakodate fukushima niigata tokyo nakayama chukyo kyoto hanshin kokura; do
+            mkdir -p $v
+            curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "https://www.jra.go.jp/facilities/race/$v/course/index.html" -o $v/index.html || true
+            sleep 2
+            grep -oE 'src="[^"]+\.(png|gif|jpg|svg)"' $v/index.html | sed 's/src="//;s/"$//' | sort -u > $v/imgs.txt || true
+            while read -r s; do
+              case "$s" in http*) u="$s";; /*) u="https://www.jra.go.jp$s";; *) u="https://www.jra.go.jp/facilities/race/$v/course/$s";; esac
+              f=$(echo "$s" | sed 's#.*/##')
+              curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "$u" -o "$v/$f" || true
+              sleep 1
+            done < $v/imgs.txt
+            echo "$v: $(wc -l < $v/imgs.txt) images"; ls $v | head -40
+          done
+      - name: Commit to private repo
+        run: |
+          cd private
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add course_diagrams
+          git diff --cached --quiet && exit 0
+          git commit -qm "JRA コース平面図（形のトレース用・非公開）"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
