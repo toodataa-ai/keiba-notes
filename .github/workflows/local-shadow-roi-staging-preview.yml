@@ -67,11 +67,11 @@ jobs:
           node - <<'JS'
           const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
           const h=fs.readFileSync('docs/staging/local-racing-shadow.html','utf8');
-          assert(h.includes("fetchJson('staging/data/local-shadow-roi-preview.json')"));
-          assert(!h.includes("fetchJson('data/local_shadow_roi.json')"));
+          // 2026-11-02 のステージング作り直し後、ステージングは「本番＋承認待ちの変更案」になった。
+          // 旧方式（独立プレビューのJSONを読む）の検査は廃止し、ページのJSが壊れていないことだけを見る。
           const script=h.match(/<script>\s*([\s\S]*?)<\/script>/)?.[1];
           assert(script);new vm.Script(script);
-          console.log('PASS: staging UI uses independent preview, valid JS');
+          console.log('PASS: staging page has valid JS');
           JS
           git status --short
           git status --porcelain --untracked-files=all | sed 's/^...//' | python -c 'import sys; p=[x.strip() for x in sys.stdin if x.strip()]; assert set(p)<={"docs/staging/data/local-shadow-roi-preview.json"},p'
