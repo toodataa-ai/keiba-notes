@@ -27,7 +27,42 @@
 
   // ---------- コース ----------
   // route: {venue, surface, layout, turn:'left'|'right', lap_m, straight_m, width_m:[a,b], elevation_m}
-  function buildCourse(route, dist) {
+  // 公式の平面図をなぞった形（ゴールから走る向きの順の点列、メートル）があれば、それを使う
+  function shapeCourse(route, dist, pts) {
+    const n = pts.length, cum = [0];
+    for (let i = 1; i <= n; i++) { const a = pts[i - 1], b = pts[i % n]; cum.push(cum[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+    const per = cum[n], f = route.lap_m / per;               // 公式の一周に合わせる倍率
+    let cx = 0, cy = 0; pts.forEach(p => { cx += p[0]; cy += p[1]; }); cx /= n; cy /= n;
+    const tan = [], nor = [], kap = [];
+    for (let i = 0; i < n; i++) {
+      const a = pts[(i - 1 + n) % n], b = pts[(i + 1) % n];
+      let tx = b[0] - a[0], ty = b[1] - a[1]; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
+      let nx = ty, ny = -tx; if (nx * (pts[i][0] - cx) + ny * (pts[i][1] - cy) < 0) { nx = -nx; ny = -ny; }
+      tan.push([tx, ty]); nor.push([nx, ny]);
+    }
+    for (let i = 0; i < n; i++) {   // 曲がり具合（1/半径）。前後数点の向きの変化から
+      const a = tan[(i - 4 + n) % n], b = tan[(i + 4) % n];
+      const ang = Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1])));
+      const len = (cum[i + 4 > n ? n : i + 4] - cum[Math.max(0, i - 4)]) || 1;
+      kap.push(ang / (len * f));
+    }
+    // なぞった線の細かいでこぼこをならす（前後±12点の平均）。JRAのコーナーの半径はおよそ80m以上なので上限をかける
+    const k2 = kap.map((_, i) => { let t = 0; for (let d = -12; d <= 12; d++) t += kap[(i + d + n) % n]; return Math.min(1 / 75, t / 25); });
+    kap.splice(0, n, ...k2);
+    const width = (route.width_m && route.width_m[0]) || (route.surface === 'dirt' ? 20 : 25);
+    return { shaped: true, straightOnly: false, pts, cum, per, f, tan, nor, kap, lap: route.lap_m, dist, goalParam: 0, width,
+      turn: route.turn, elevation: route.elevation_m || 0, home: route.straight_m, Ls: 0, R: 0 };
+  }
+  function shapeAt(c, u) {
+    let sR = (c.lap - (u % c.lap)) % c.lap;               // ゴールから走る向きに何m先か
+    const sp = sR / c.f; let lo = 0, hi = c.pts.length;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (c.cum[m] <= sp) lo = m; else hi = m; }
+    const i = lo, j = (lo + 1) % c.pts.length, w = (sp - c.cum[i]) / ((c.cum[i + 1] - c.cum[i]) || 1);
+    return { i, j, w };
+  }
+
+  function buildCourse(route, dist, shapePts) {
+    if (shapePts && shapePts.length > 20 && route.layout !== 'straight') return shapeCourse(route, dist, shapePts);
     const straightOnly = route.layout === 'straight';
     const width = (route.width_m && route.width_m[0]) || (route.surface === 'dirt' ? 20 : 25);
     if (straightOnly) {
@@ -57,6 +92,14 @@
   }
   // 画面用の座標（メートル）。ホームストレッチを下側に置く。lane = 内ラチから外へのメートル
   function xy(course, u, lane) {
+    if (course.shaped) {
+      const { i, j, w } = shapeAt(course, u); const P = course.pts, N = course.nor, T = course.tan;
+      const x = P[i][0] + (P[j][0] - P[i][0]) * w, y = P[i][1] + (P[j][1] - P[i][1]) * w;
+      const nx = N[i][0] + (N[j][0] - N[i][0]) * w, ny = N[i][1] + (N[j][1] - N[i][1]) * w, l = Math.hypot(nx, ny) || 1;
+      const tx = T[i][0] + (T[j][0] - T[i][0]) * w, ty = T[i][1] + (T[j][1] - T[i][1]) * w;
+      // 図の座標は1画素＝m_per_px で、形の長さは公式の一周に合わせて伸縮（f）
+      return { x: x * course.f + nx / l * lane, y: y * course.f + ny / l * lane, heading: Math.atan2(ty, tx) };
+    }
     const p = loopParam(course, u);
     const L = course.Ls, R = course.R, sign = course.turn === 'left' ? 1 : -1; // 左回り：下の直線を左→右へ
     if (course.straightOnly) {
@@ -77,7 +120,16 @@
     const a = -Math.PI / 2 - seg.t / R; const r = R + lane;
     return { x: sign * (-L / 2 + r * Math.cos(a)), y: r * Math.sin(a), heading: sign > 0 ? a - Math.PI / 2 : Math.PI - (a - Math.PI / 2) };
   }
-  function inCurve(course, u) { return !course.straightOnly && segmentAt(course, loopParam(course, u)).kind === 'curve'; }
+  function inCurve(course, u) {
+    if (course.shaped) { const { i } = shapeAt(course, u); return course.kap[i] > 1 / 400; }
+    return !course.straightOnly && segmentAt(course, loopParam(course, u)).kind === 'curve';
+  }
+  // 外を回るロス：ラチ沿いに進む距離 ＝ 走った距離 × この倍率
+  function laneFactor(course, u, lane) {
+    if (course.straightOnly) return 1;
+    if (course.shaped) { const { i } = shapeAt(course, u); return 1 / (1 + lane * course.kap[i]); }
+    return inCurve(course, u) ? course.R / (course.R + lane) : 1;
+  }
   // ゴールまで u の地点から、最後の直線に入るまでの距離（最後の直線の中なら0）
   function toFinalStraight(course, u) { return Math.max(0, u - course.home); }
 
@@ -119,7 +171,7 @@
   function simulate(race, opts = {}) {
     const o = Object.assign({}, DEFAULT, opts);
     const R = rng(o.seed || 1);
-    const course = race._course || buildCourse(race.route, race.dist);
+    const course = race._course || buildCourse(race.route, race.dist, race.shape);
     const H = race.runners.length, D = race.dist;
     const PL = plan(race, o, R, course), P = PL.horses;
     const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * 1.05, done: false, t: null, blocked: 0, effort: 0, bank: 0 }));
@@ -178,7 +230,7 @@
         const lat = run < 400 ? 1.4 : (final ? 1.3 : 1.0);
         if (free) s.lane += Math.max(-lat * dt, Math.min(lat * dt, want - s.lane));
         s.lane = Math.max(0.5, Math.min(course.width - 1, s.lane));
-        const k = inCurve(course, s.u) ? course.R / (course.R + s.lane) : 1;
+        const k = laneFactor(course, s.u, s.lane);
         let adv = v * k * dt;
         // 前の馬にぶつからない（同じ進路で約2.1m以内には入れない）
         let wall = -Infinity, wj = -1;
@@ -209,7 +261,7 @@
   function monteCarlo(race, n = 300, opts = {}) {
     const H = race.runners.length;
     const win = new Array(H).fill(0), top3 = new Array(H).fill(0), avgPos = new Array(H).fill(0);
-    race._course = race._course || buildCourse(race.route, race.dist);
+    race._course = race._course || buildCourse(race.route, race.dist, race.shape);
     for (let k = 0; k < n; k++) {
       const r = simulate(race, Object.assign({}, opts, { seed: (opts.seed || 7) * 7919 + k * 104729 + 13, record: false }));
       r.results.forEach(x => { if (x.pos === 1) win[x.i]++; if (x.pos <= 3) top3[x.i]++; avgPos[x.i] += x.pos; });
@@ -217,5 +269,5 @@
     return race.runners.map((x, i) => ({ no: x.no, win: win[i] / n, top3: top3[i] / n, avgPos: avgPos[i] / n }));
   }
 
-  return { rng, buildCourse, xy, loopParam, segmentAt, inCurve, simulate, monteCarlo, frameOf, DEFAULT };
+  return { rng, buildCourse, xy, loopParam, segmentAt, inCurve, laneFactor, simulate, monteCarlo, frameOf, DEFAULT };
 });
