@@ -136,8 +136,10 @@ def parse_horse(soup) -> dict:
             jm = re.search(r"/jockey/(\d+)/", jk["href"]) if jk else None
             kg = re.search(r"\(([\d.]+)\)", _t(tds[4])) if len(tds) > 4 else None
             wm = re.match(r"(\d+)\(([+-]?\d+)\)", _t(tds[6])) if len(tds) > 6 else None
-            tm = re.match(r"(\d+:\d+\.\d)(?: \(([+-]?[\d.]+)\))?", _t(tds[7])) if len(tds) > 7 else None
+            tm = re.match(r"((?:\d+:)?\d+\.\d)(?: \(([+-]?[\d.]+)\))?", _t(tds[7])) if len(tds) > 7 else None  # 直線1000mなどは「55.0」のように分が無い
             od = re.match(r"(\S+)(?: ([\d.]+))?", _t(tds[8])) if len(tds) > 8 else None
+            if od and not od.group(2) and re.fullmatch(r"\d{2}\.\d", od.group(1)):
+                od = re.match(r"()(?:)?([\d.]+)", od.group(1))  # 通過順の無いレース（直線）は上がりだけ
             hist.append({"date": "-".join(dm.groups()), "code": code,
                          "race": _t(a) if a else _t(tds[1]), "grade": _t(lab) if lab else None, "loc": loc,
                          "venue": lm.group(1) if lm else None,
