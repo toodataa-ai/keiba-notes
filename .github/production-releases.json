@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.27-20261106",
-  "current_public_version": "1.27",
+  "current_public_release": "release/jra-site-v1.28-20261106",
+  "current_public_version": "1.28",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -577,6 +577,26 @@
       "scope_files": [
         "docs/sire-map.html",
         "docs/index.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.28-20261106",
+      "branch": "release/jra-site-v1.28-20261106",
+      "commit_sha": "197ba83f18ad093335bd8f7fe753019ee6b0a6e2",
+      "deployed_at": "2026-11-06T02:40:38+09:00",
+      "workflow_run_id": 42076918455,
+      "validation_workflow_run_id": 42076918455,
+      "public_version": "1.28",
+      "note": "2026-11-06ユーザー明示承認済み。初勝利マップ：オープン・重賞・G1の初勝利でも見られるように：地図の上に「初勝利／オープン／重賞／G1」の切り替えを追加。その格で初めて勝ったときの平均月齢・距離を父ごとに表示（丸の大きさ＝その格で勝った頭数）。表示範囲は表示中の父に合わせて自動で決める。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-sire-map-levels-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/sire-map.html"
       ],
       "public_http_files_verified": null
     }
