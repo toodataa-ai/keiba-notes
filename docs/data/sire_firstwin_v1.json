@@ -1,10 +1,32 @@
 {
  "schema": "sire_firstwin_v1",
  "generated_on": "2026-11-06",
- "source_note": "JRAのレース（2018年以降を新しい年から順に取得中）に出走した馬と、その馬の全出走履歴。初勝利＝その馬の最初の1着。月齢は誕生日からの月数。",
+ "source_note": "JRAのレース（2018年以降を新しい年から順に取得中）に出走した馬と、その馬の全出走履歴。初勝利＝その格で最初の1着。月齢は誕生日からの月数。障害は除く。",
  "races_fetched": 10625,
  "races_total_estimate": 30537,
  "horses_fetched": 21488,
+ "levels": [
+  {
+   "key": "all",
+   "label": "初勝利",
+   "min_winners": 15
+  },
+  {
+   "key": "open",
+   "label": "オープン初勝利",
+   "min_winners": 5
+  },
+  {
+   "key": "graded",
+   "label": "重賞初勝利",
+   "min_winners": 3
+  },
+  {
+   "key": "g1",
+   "label": "G1初勝利",
+   "min_winners": 1
+  }
+ ],
  "min_winners": 15,
  "sires": [
   {
@@ -19,7 +41,45 @@
    "q3_months": 37.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.696
+   "turf_share": 0.696,
+   "levels": {
+    "open": {
+     "winners": 49,
+     "mean_months": 46.37,
+     "mean_dist": 1773,
+     "median_months": 38,
+     "median_dist": 1800,
+     "q1_months": 35.0,
+     "q3_months": 56.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.776
+    },
+    "graded": {
+     "winners": 28,
+     "mean_months": 42.86,
+     "mean_dist": 1857,
+     "median_months": 37.0,
+     "median_dist": 1800.0,
+     "q1_months": 34.0,
+     "q3_months": 46.2,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.893
+    },
+    "g1": {
+     "winners": 5,
+     "mean_months": 49.8,
+     "mean_dist": 1800,
+     "median_months": 51,
+     "median_dist": 1800,
+     "q1_months": 43.0,
+     "q3_months": 58.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.8
+    }
+   }
   },
   {
    "sire": "ロードカナロア",
@@ -33,7 +93,45 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.661
+   "turf_share": 0.661,
+   "levels": {
+    "open": {
+     "winners": 55,
+     "mean_months": 52.42,
+     "mean_dist": 1525,
+     "median_months": 51,
+     "median_dist": 1400,
+     "q1_months": 37.0,
+     "q3_months": 64.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1650.0,
+     "turf_share": 0.745
+    },
+    "graded": {
+     "winners": 30,
+     "mean_months": 51.23,
+     "mean_dist": 1567,
+     "median_months": 50.0,
+     "median_dist": 1600.0,
+     "q1_months": 37.2,
+     "q3_months": 62.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.833
+    },
+    "g1": {
+     "winners": 5,
+     "mean_months": 51.6,
+     "mean_dist": 1720,
+     "median_months": 47,
+     "median_dist": 1600,
+     "q1_months": 43.0,
+     "q3_months": 58.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.8
+    }
+   }
   },
   {
    "sire": "エピファネイア",
@@ -47,7 +145,45 @@
    "q3_months": 37.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.881
+   "turf_share": 0.881,
+   "levels": {
+    "open": {
+     "winners": 28,
+     "mean_months": 42.25,
+     "mean_dist": 1821,
+     "median_months": 37.0,
+     "median_dist": 1800.0,
+     "q1_months": 33.0,
+     "q3_months": 50.2,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.964
+    },
+    "graded": {
+     "winners": 19,
+     "mean_months": 45.63,
+     "mean_dist": 1789,
+     "median_months": 42,
+     "median_dist": 1800,
+     "q1_months": 35.0,
+     "q3_months": 55.5,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 4,
+     "mean_months": 52.25,
+     "mean_dist": 1950,
+     "median_months": 49.0,
+     "median_dist": 1900.0,
+     "q1_months": 37.0,
+     "q3_months": 64.2,
+     "q1_dist": 1600.0,
+     "q3_dist": 2250.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "モーリス",
@@ -61,7 +197,45 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.782
+   "turf_share": 0.782,
+   "levels": {
+    "open": {
+     "winners": 29,
+     "mean_months": 45.31,
+     "mean_dist": 1648,
+     "median_months": 40,
+     "median_dist": 1600,
+     "q1_months": 33.0,
+     "q3_months": 55.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.793
+    },
+    "graded": {
+     "winners": 17,
+     "mean_months": 43.35,
+     "mean_dist": 1765,
+     "median_months": 40,
+     "median_dist": 1800,
+     "q1_months": 33.0,
+     "q3_months": 52.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.941
+    },
+    "g1": {
+     "winners": 4,
+     "mean_months": 46.5,
+     "mean_dist": 1750,
+     "median_months": 47.0,
+     "median_dist": 1800.0,
+     "q1_months": 38.2,
+     "q3_months": 55.2,
+     "q1_dist": 1500.0,
+     "q3_dist": 2050.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ドゥラメンテ",
@@ -75,7 +249,45 @@
    "q3_months": 39.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.648
+   "turf_share": 0.648,
+   "levels": {
+    "open": {
+     "winners": 28,
+     "mean_months": 42.43,
+     "mean_dist": 1882,
+     "median_months": 37.0,
+     "median_dist": 1800.0,
+     "q1_months": 35.0,
+     "q3_months": 47.8,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.893
+    },
+    "graded": {
+     "winners": 19,
+     "mean_months": 40.68,
+     "mean_dist": 1900,
+     "median_months": 37,
+     "median_dist": 1800,
+     "q1_months": 36.0,
+     "q3_months": 43.5,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 9,
+     "mean_months": 40.89,
+     "mean_dist": 2111,
+     "median_months": 41,
+     "median_dist": 2000,
+     "q1_months": 37.0,
+     "q3_months": 44.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 3000.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ドレフォン",
@@ -89,7 +301,45 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.209
+   "turf_share": 0.209,
+   "levels": {
+    "open": {
+     "winners": 21,
+     "mean_months": 48.52,
+     "mean_dist": 1576,
+     "median_months": 50,
+     "median_dist": 1600,
+     "q1_months": 38.0,
+     "q3_months": 58.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.333
+    },
+    "graded": {
+     "winners": 6,
+     "mean_months": 44.83,
+     "mean_dist": 1700,
+     "median_months": 42.0,
+     "median_dist": 1700.0,
+     "q1_months": 35.0,
+     "q3_months": 49.8,
+     "q1_dist": 1600.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.667
+    },
+    "g1": {
+     "winners": 2,
+     "mean_months": 35.5,
+     "mean_dist": 1800,
+     "median_months": 35.5,
+     "median_dist": 1800.0,
+     "q1_months": 34.8,
+     "q3_months": 36.2,
+     "q1_dist": 1700.0,
+     "q3_dist": 1900.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ルーラーシップ",
@@ -103,7 +353,45 @@
    "q3_months": 38.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.599
+   "turf_share": 0.599,
+   "levels": {
+    "open": {
+     "winners": 18,
+     "mean_months": 46.56,
+     "mean_dist": 1994,
+     "median_months": 46.0,
+     "median_dist": 1900.0,
+     "q1_months": 35.2,
+     "q3_months": 58.8,
+     "q1_dist": 1625.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.944
+    },
+    "graded": {
+     "winners": 11,
+     "mean_months": 43.91,
+     "mean_dist": 2127,
+     "median_months": 40,
+     "median_dist": 2000,
+     "q1_months": 34.0,
+     "q3_months": 51.5,
+     "q1_dist": 1700.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 3,
+     "mean_months": 53.33,
+     "mean_dist": 2133,
+     "median_months": 48,
+     "median_dist": 1600,
+     "q1_months": 40.5,
+     "q3_months": 63.5,
+     "q1_dist": 1600.0,
+     "q3_dist": 2400.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "キタサンブラック",
@@ -117,7 +405,45 @@
    "q3_months": 37.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.743
+   "turf_share": 0.743,
+   "levels": {
+    "open": {
+     "winners": 20,
+     "mean_months": 45.1,
+     "mean_dist": 1820,
+     "median_months": 41.5,
+     "median_dist": 1800.0,
+     "q1_months": 32.8,
+     "q3_months": 55.2,
+     "q1_dist": 1750.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.9
+    },
+    "graded": {
+     "winners": 14,
+     "mean_months": 41.29,
+     "mean_dist": 1843,
+     "median_months": 34.5,
+     "median_dist": 1800.0,
+     "q1_months": 32.0,
+     "q3_months": 48.0,
+     "q1_dist": 1800.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 3,
+     "mean_months": 37.33,
+     "mean_dist": 2000,
+     "median_months": 36,
+     "median_dist": 2000,
+     "q1_months": 34.5,
+     "q3_months": 39.5,
+     "q1_dist": 2000.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "シルバーステート",
@@ -131,7 +457,36 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.748
+   "turf_share": 0.748,
+   "levels": {
+    "open": {
+     "winners": 12,
+     "mean_months": 47.25,
+     "mean_dist": 1717,
+     "median_months": 46.0,
+     "median_dist": 1700.0,
+     "q1_months": 35.8,
+     "q3_months": 60.5,
+     "q1_dist": 1400.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 6,
+     "mean_months": 49.33,
+     "mean_dist": 1833,
+     "median_months": 53.0,
+     "median_dist": 1900.0,
+     "q1_months": 39.8,
+     "q3_months": 55.8,
+     "q1_dist": 1650.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "リアルスティール",
@@ -145,7 +500,36 @@
    "q3_months": 37.0,
    "q1_dist": 1500.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.575
+   "turf_share": 0.575,
+   "levels": {
+    "open": {
+     "winners": 12,
+     "mean_months": 42.83,
+     "mean_dist": 1800,
+     "median_months": 40.0,
+     "median_dist": 1800.0,
+     "q1_months": 33.8,
+     "q3_months": 50.2,
+     "q1_dist": 1550.0,
+     "q3_dist": 2025.0,
+     "turf_share": 0.583
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 39.0,
+     "mean_dist": 1860,
+     "median_months": 38,
+     "median_dist": 1900,
+     "q1_months": 33.0,
+     "q3_months": 42.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.8
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ハーツクライ",
@@ -159,7 +543,45 @@
    "q3_months": 37.0,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.752
+   "turf_share": 0.752,
+   "levels": {
+    "open": {
+     "winners": 18,
+     "mean_months": 47.5,
+     "mean_dist": 1867,
+     "median_months": 41.0,
+     "median_dist": 1800.0,
+     "q1_months": 33.0,
+     "q3_months": 62.8,
+     "q1_dist": 1800.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 13,
+     "mean_months": 46.77,
+     "mean_dist": 1785,
+     "median_months": 46,
+     "median_dist": 1800,
+     "q1_months": 34.0,
+     "q3_months": 59.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 31.0,
+     "mean_dist": 1600,
+     "median_months": 31,
+     "median_dist": 1600,
+     "q1_months": 31.0,
+     "q3_months": 31.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "リオンディーズ",
@@ -173,7 +595,45 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.545
+   "turf_share": 0.545,
+   "levels": {
+    "open": {
+     "winners": 14,
+     "mean_months": 47.64,
+     "mean_dist": 1700,
+     "median_months": 49.0,
+     "median_dist": 1600.0,
+     "q1_months": 34.2,
+     "q3_months": 57.8,
+     "q1_dist": 1450.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.857
+    },
+    "graded": {
+     "winners": 6,
+     "mean_months": 49.83,
+     "mean_dist": 2033,
+     "median_months": 48.0,
+     "median_dist": 1800.0,
+     "q1_months": 47.0,
+     "q3_months": 55.8,
+     "q1_dist": 1650.0,
+     "q3_dist": 1950.0,
+     "turf_share": 0.833
+    },
+    "g1": {
+     "winners": 2,
+     "mean_months": 56.0,
+     "mean_dist": 2600,
+     "median_months": 56.0,
+     "median_dist": 2600.0,
+     "q1_months": 47.5,
+     "q3_months": 64.5,
+     "q1_dist": 2300.0,
+     "q3_dist": 2900.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ディープインパクト",
@@ -187,7 +647,45 @@
    "q3_months": 37.0,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.899
+   "turf_share": 0.899,
+   "levels": {
+    "open": {
+     "winners": 39,
+     "mean_months": 51.46,
+     "mean_dist": 1908,
+     "median_months": 48,
+     "median_dist": 1800,
+     "q1_months": 35.0,
+     "q3_months": 62.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2200.0,
+     "turf_share": 0.974
+    },
+    "graded": {
+     "winners": 18,
+     "mean_months": 52.94,
+     "mean_dist": 1983,
+     "median_months": 51.0,
+     "median_dist": 2000.0,
+     "q1_months": 35.2,
+     "q3_months": 65.8,
+     "q1_dist": 1600.0,
+     "q3_dist": 2200.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 4,
+     "mean_months": 45.25,
+     "mean_dist": 2400,
+     "median_months": 42.5,
+     "median_dist": 2200.0,
+     "q1_months": 36.5,
+     "q3_months": 51.2,
+     "q1_dist": 2000.0,
+     "q3_dist": 2600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ヘニーヒューズ",
@@ -201,7 +699,36 @@
    "q3_months": 36.0,
    "q1_dist": 1200.0,
    "q3_dist": 1700.0,
-   "turf_share": 0.014
+   "turf_share": 0.014,
+   "levels": {
+    "open": {
+     "winners": 15,
+     "mean_months": 52.53,
+     "mean_dist": 1620,
+     "median_months": 51,
+     "median_dist": 1700,
+     "q1_months": 37.5,
+     "q3_months": 69.5,
+     "q1_dist": 1600.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.133
+    },
+    "graded": {
+     "winners": 4,
+     "mean_months": 41.0,
+     "mean_dist": 1575,
+     "median_months": 42.5,
+     "median_dist": 1650.0,
+     "q1_months": 37.0,
+     "q3_months": 46.5,
+     "q1_dist": 1500.0,
+     "q3_dist": 1725.0,
+     "turf_share": 0.25
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ハービンジャー",
@@ -215,7 +742,45 @@
    "q3_months": 38.0,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.856
+   "turf_share": 0.856,
+   "levels": {
+    "open": {
+     "winners": 16,
+     "mean_months": 45.12,
+     "mean_dist": 1888,
+     "median_months": 34.0,
+     "median_dist": 1900.0,
+     "q1_months": 32.8,
+     "q3_months": 59.5,
+     "q1_dist": 1750.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 11,
+     "mean_months": 44.0,
+     "mean_dist": 1764,
+     "median_months": 35,
+     "median_dist": 1800,
+     "q1_months": 32.5,
+     "q3_months": 44.5,
+     "q1_dist": 1600.0,
+     "q3_dist": 1800.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 3,
+     "mean_months": 42.67,
+     "mean_dist": 1867,
+     "median_months": 39,
+     "median_dist": 1600,
+     "q1_months": 36.0,
+     "q3_months": 47.5,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "シニスターミニスター",
@@ -229,7 +794,45 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.0
+   "turf_share": 0.0,
+   "levels": {
+    "open": {
+     "winners": 11,
+     "mean_months": 50.73,
+     "mean_dist": 1618,
+     "median_months": 50,
+     "median_dist": 1700,
+     "q1_months": 44.5,
+     "q3_months": 58.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.0
+    },
+    "graded": {
+     "winners": 3,
+     "mean_months": 47.33,
+     "mean_dist": 1733,
+     "median_months": 47,
+     "median_dist": 1800,
+     "q1_months": 43.5,
+     "q3_months": 51.0,
+     "q1_dist": 1700.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.0
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 55.0,
+     "mean_dist": 1800,
+     "median_months": 55,
+     "median_dist": 1800,
+     "q1_months": 55.0,
+     "q3_months": 55.0,
+     "q1_dist": 1800.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.0
+    }
+   }
   },
   {
    "sire": "オルフェーヴル",
@@ -243,7 +846,45 @@
    "q3_months": 39.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.566
+   "turf_share": 0.566,
+   "levels": {
+    "open": {
+     "winners": 16,
+     "mean_months": 53.56,
+     "mean_dist": 2175,
+     "median_months": 54.5,
+     "median_dist": 2000.0,
+     "q1_months": 42.2,
+     "q3_months": 60.8,
+     "q1_dist": 1700.0,
+     "q3_dist": 2300.0,
+     "turf_share": 0.812
+    },
+    "graded": {
+     "winners": 8,
+     "mean_months": 51.75,
+     "mean_dist": 2500,
+     "median_months": 45.0,
+     "median_dist": 2200.0,
+     "q1_months": 36.8,
+     "q3_months": 64.2,
+     "q1_dist": 1750.0,
+     "q3_dist": 3450.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 38.0,
+     "mean_dist": 2400,
+     "median_months": 38,
+     "median_dist": 2400,
+     "q1_months": 38.0,
+     "q3_months": 38.0,
+     "q1_dist": 2400.0,
+     "q3_dist": 2400.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ダイワメジャー",
@@ -257,7 +898,45 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1700.0,
-   "turf_share": 0.67
+   "turf_share": 0.67,
+   "levels": {
+    "open": {
+     "winners": 11,
+     "mean_months": 44.09,
+     "mean_dist": 1455,
+     "median_months": 35,
+     "median_dist": 1600,
+     "q1_months": 31.0,
+     "q3_months": 54.0,
+     "q1_dist": 1300.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.909
+    },
+    "graded": {
+     "winners": 6,
+     "mean_months": 35.17,
+     "mean_dist": 1533,
+     "median_months": 32.5,
+     "median_dist": 1600.0,
+     "q1_months": 30.2,
+     "q3_months": 34.8,
+     "q1_dist": 1450.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.833
+    },
+    "g1": {
+     "winners": 2,
+     "mean_months": 38.5,
+     "mean_dist": 1600,
+     "median_months": 38.5,
+     "median_dist": 1600.0,
+     "q1_months": 35.8,
+     "q3_months": 41.2,
+     "q1_dist": 1600.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ゴールドシップ",
@@ -271,7 +950,45 @@
    "q3_months": 38.0,
    "q1_dist": 1800.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.861
+   "turf_share": 0.861,
+   "levels": {
+    "open": {
+     "winners": 10,
+     "mean_months": 44.7,
+     "mean_dist": 2310,
+     "median_months": 40.5,
+     "median_dist": 2000.0,
+     "q1_months": 35.0,
+     "q3_months": 55.8,
+     "q1_dist": 2000.0,
+     "q3_dist": 2875.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 6,
+     "mean_months": 48.0,
+     "mean_dist": 2017,
+     "median_months": 48.0,
+     "median_dist": 2000.0,
+     "q1_months": 35.8,
+     "q3_months": 59.5,
+     "q1_dist": 1850.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 49.0,
+     "mean_dist": 2200,
+     "median_months": 49,
+     "median_dist": 2200,
+     "q1_months": 49.0,
+     "q3_months": 49.0,
+     "q1_dist": 2200.0,
+     "q3_dist": 2200.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ミッキーアイル",
@@ -285,7 +1002,36 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.481
+   "turf_share": 0.481,
+   "levels": {
+    "open": {
+     "winners": 9,
+     "mean_months": 44.78,
+     "mean_dist": 1356,
+     "median_months": 48,
+     "median_dist": 1200,
+     "q1_months": 37.0,
+     "q3_months": 53.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1400.0,
+     "turf_share": 0.556
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 48.2,
+     "mean_dist": 1360,
+     "median_months": 52,
+     "median_dist": 1200,
+     "q1_months": 30.0,
+     "q3_months": 59.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1400.0,
+     "turf_share": 0.8
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ホッコータルマエ",
@@ -299,7 +1045,27 @@
    "q3_months": 37.0,
    "q1_dist": 1600.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.01
+   "turf_share": 0.01,
+   "levels": {
+    "open": {
+     "winners": 7,
+     "mean_months": 51.57,
+     "mean_dist": 1800,
+     "median_months": 51,
+     "median_dist": 1800,
+     "q1_months": 49.5,
+     "q3_months": 57.5,
+     "q1_dist": 1750.0,
+     "q3_dist": 1900.0,
+     "turf_share": 0.0
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "サートゥルナーリア",
@@ -313,7 +1079,45 @@
    "q3_months": 38.0,
    "q1_dist": 1575.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.827
+   "turf_share": 0.827,
+   "levels": {
+    "open": {
+     "winners": 12,
+     "mean_months": 36.08,
+     "mean_dist": 1683,
+     "median_months": 33.5,
+     "median_dist": 1600.0,
+     "q1_months": 31.8,
+     "q3_months": 37.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1800.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 7,
+     "mean_months": 36.71,
+     "mean_dist": 1686,
+     "median_months": 37,
+     "median_dist": 1600,
+     "q1_months": 33.0,
+     "q3_months": 37.0,
+     "q1_dist": 1500.0,
+     "q3_dist": 1900.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 2,
+     "mean_months": 35.0,
+     "mean_dist": 1600,
+     "median_months": 35.0,
+     "median_dist": 1600.0,
+     "q1_months": 34.0,
+     "q3_months": 36.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ジャスタウェイ",
@@ -327,7 +1131,45 @@
    "q3_months": 37.0,
    "q1_dist": 1600.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.437
+   "turf_share": 0.437,
+   "levels": {
+    "open": {
+     "winners": 9,
+     "mean_months": 54.33,
+     "mean_dist": 1789,
+     "median_months": 46,
+     "median_dist": 1700,
+     "q1_months": 35.0,
+     "q3_months": 69.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.778
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 50.4,
+     "mean_dist": 1880,
+     "median_months": 46,
+     "median_dist": 1800,
+     "q1_months": 33.0,
+     "q3_months": 49.0,
+     "q1_dist": 1700.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.8
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 34.0,
+     "mean_dist": 2000,
+     "median_months": 34,
+     "median_dist": 2000,
+     "q1_months": 34.0,
+     "q3_months": 34.0,
+     "q1_dist": 2000.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "レイデオロ",
@@ -341,7 +1183,36 @@
    "q3_months": 37.0,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.735
+   "turf_share": 0.735,
+   "levels": {
+    "open": {
+     "winners": 9,
+     "mean_months": 43.11,
+     "mean_dist": 2033,
+     "median_months": 44,
+     "median_dist": 2000,
+     "q1_months": 39.0,
+     "q3_months": 49.0,
+     "q1_dist": 1800.0,
+     "q3_dist": 2200.0,
+     "turf_share": 0.889
+    },
+    "graded": {
+     "winners": 7,
+     "mean_months": 48.86,
+     "mean_dist": 2171,
+     "median_months": 49,
+     "median_dist": 2000,
+     "q1_months": 46.5,
+     "q3_months": 50.0,
+     "q1_dist": 1800.0,
+     "q3_dist": 2500.0,
+     "turf_share": 0.857
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "イスラボニータ",
@@ -355,7 +1226,36 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.622
+   "turf_share": 0.622,
+   "levels": {
+    "open": {
+     "winners": 13,
+     "mean_months": 45.92,
+     "mean_dist": 1585,
+     "median_months": 44,
+     "median_dist": 1600,
+     "q1_months": 35.0,
+     "q3_months": 55.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.846
+    },
+    "graded": {
+     "winners": 7,
+     "mean_months": 47.71,
+     "mean_dist": 1686,
+     "median_months": 49,
+     "median_dist": 1800,
+     "q1_months": 36.0,
+     "q3_months": 57.5,
+     "q1_dist": 1500.0,
+     "q3_dist": 1900.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "サトノダイヤモンド",
@@ -369,7 +1269,36 @@
    "q3_months": 38.8,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.724
+   "turf_share": 0.724,
+   "levels": {
+    "open": {
+     "winners": 10,
+     "mean_months": 48.9,
+     "mean_dist": 1760,
+     "median_months": 52.5,
+     "median_dist": 1800.0,
+     "q1_months": 37.0,
+     "q3_months": 55.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.9
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 53.8,
+     "mean_dist": 1880,
+     "median_months": 54,
+     "median_dist": 2000,
+     "q1_months": 51.0,
+     "q3_months": 55.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "マジェスティックウォリアー",
@@ -383,7 +1312,36 @@
    "q3_months": 38.8,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.032
+   "turf_share": 0.032,
+   "levels": {
+    "open": {
+     "winners": 8,
+     "mean_months": 54.12,
+     "mean_dist": 1625,
+     "median_months": 52.5,
+     "median_dist": 1700.0,
+     "q1_months": 47.0,
+     "q3_months": 66.8,
+     "q1_dist": 1500.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.0
+    },
+    "graded": {
+     "winners": 4,
+     "mean_months": 49.25,
+     "mean_dist": 1800,
+     "median_months": 46.0,
+     "median_dist": 1850.0,
+     "q1_months": 37.5,
+     "q3_months": 57.8,
+     "q1_dist": 1750.0,
+     "q3_dist": 1900.0,
+     "turf_share": 0.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ルヴァンスレーヴ",
@@ -397,7 +1355,18 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.022
+   "turf_share": 0.022,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ブリックスアンドモルタル",
@@ -411,7 +1380,27 @@
    "q3_months": 38.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.67
+   "turf_share": 0.67,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 3,
+     "mean_months": 36.33,
+     "mean_dist": 1800,
+     "median_months": 31,
+     "median_dist": 1600,
+     "q1_months": 31.0,
+     "q3_months": 39.0,
+     "q1_dist": 1500.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "マインドユアビスケッツ",
@@ -425,7 +1414,18 @@
    "q3_months": 37.5,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.172
+   "turf_share": 0.172,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ナダル",
@@ -439,7 +1439,18 @@
    "q3_months": 36.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.035
+   "turf_share": 0.035,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "パイロ",
@@ -453,7 +1464,27 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.012
+   "turf_share": 0.012,
+   "levels": {
+    "open": {
+     "winners": 9,
+     "mean_months": 60.56,
+     "mean_dist": 1689,
+     "median_months": 59,
+     "median_dist": 1700,
+     "q1_months": 55.0,
+     "q3_months": 75.0,
+     "q1_dist": 1700.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.0
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ニューイヤーズデイ",
@@ -467,7 +1498,18 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.21
+   "turf_share": 0.21,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "デクラレーションオブウォー",
@@ -481,7 +1523,36 @@
    "q3_months": 36.5,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.467
+   "turf_share": 0.467,
+   "levels": {
+    "open": {
+     "winners": 6,
+     "mean_months": 39.67,
+     "mean_dist": 1633,
+     "median_months": 33.5,
+     "median_dist": 1800.0,
+     "q1_months": 31.5,
+     "q3_months": 46.8,
+     "q1_dist": 1500.0,
+     "q3_dist": 1800.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 48.0,
+     "mean_dist": 1760,
+     "median_months": 52,
+     "median_dist": 1800,
+     "q1_months": 34.0,
+     "q3_months": 61.0,
+     "q1_dist": 1800.0,
+     "q3_dist": 1800.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ビッグアーサー",
@@ -495,7 +1566,36 @@
    "q3_months": 36.0,
    "q1_dist": 1200.0,
    "q3_dist": 1350.0,
-   "turf_share": 0.784
+   "turf_share": 0.784,
+   "levels": {
+    "open": {
+     "winners": 8,
+     "mean_months": 39.12,
+     "mean_dist": 1225,
+     "median_months": 32.0,
+     "median_dist": 1200.0,
+     "q1_months": 31.5,
+     "q3_months": 38.5,
+     "q1_dist": 1200.0,
+     "q3_dist": 1250.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 4,
+     "mean_months": 46.25,
+     "mean_dist": 1250,
+     "median_months": 49.0,
+     "median_dist": 1200.0,
+     "q1_months": 38.8,
+     "q3_months": 56.5,
+     "q1_dist": 1200.0,
+     "q3_dist": 1250.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "スクリーンヒーロー",
@@ -509,7 +1609,45 @@
    "q3_months": 38.0,
    "q1_dist": 1600.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.611
+   "turf_share": 0.611,
+   "levels": {
+    "open": {
+     "winners": 15,
+     "mean_months": 56.33,
+     "mean_dist": 1827,
+     "median_months": 60,
+     "median_dist": 1800,
+     "q1_months": 46.5,
+     "q3_months": 62.0,
+     "q1_dist": 1650.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.867
+    },
+    "graded": {
+     "winners": 6,
+     "mean_months": 53.17,
+     "mean_dist": 1800,
+     "median_months": 52.5,
+     "median_dist": 1900.0,
+     "q1_months": 39.0,
+     "q3_months": 63.0,
+     "q1_dist": 1650.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 101.0,
+     "mean_dist": 1200,
+     "median_months": 101,
+     "median_dist": 1200,
+     "q1_months": 101.0,
+     "q3_months": 101.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1200.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "キンシャサノキセキ",
@@ -523,7 +1661,18 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.366
+   "turf_share": 0.366,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ディスクリートキャット",
@@ -537,7 +1686,27 @@
    "q3_months": 36.0,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.197
+   "turf_share": 0.197,
+   "levels": {
+    "open": {
+     "winners": 6,
+     "mean_months": 35.5,
+     "mean_dist": 1433,
+     "median_months": 34.0,
+     "median_dist": 1500.0,
+     "q1_months": 32.2,
+     "q3_months": 35.8,
+     "q1_dist": 1250.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.5
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "キングカメハメハ",
@@ -551,7 +1720,45 @@
    "q3_months": 39.0,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.629
+   "turf_share": 0.629,
+   "levels": {
+    "open": {
+     "winners": 23,
+     "mean_months": 54.3,
+     "mean_dist": 1983,
+     "median_months": 55,
+     "median_dist": 2000,
+     "q1_months": 41.5,
+     "q3_months": 61.5,
+     "q1_dist": 1700.0,
+     "q3_dist": 2100.0,
+     "turf_share": 0.609
+    },
+    "graded": {
+     "winners": 13,
+     "mean_months": 54.46,
+     "mean_dist": 2085,
+     "median_months": 55,
+     "median_dist": 2000,
+     "q1_months": 41.0,
+     "q3_months": 62.0,
+     "q1_dist": 1800.0,
+     "q3_dist": 2000.0,
+     "turf_share": 0.769
+    },
+    "g1": {
+     "winners": 2,
+     "mean_months": 56.5,
+     "mean_dist": 1800,
+     "median_months": 56.5,
+     "median_dist": 1800.0,
+     "q1_months": 50.2,
+     "q3_months": 62.8,
+     "q1_dist": 1700.0,
+     "q3_dist": 1900.0,
+     "turf_share": 0.5
+    }
+   }
   },
   {
    "sire": "コントレイル",
@@ -565,7 +1772,36 @@
    "q3_months": 37.0,
    "q1_dist": 1800.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.833
+   "turf_share": 0.833,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 3,
+     "mean_months": 38.67,
+     "mean_dist": 2133,
+     "median_months": 39,
+     "median_dist": 2200,
+     "q1_months": 38.0,
+     "q3_months": 39.5,
+     "q1_dist": 2000.0,
+     "q3_dist": 2300.0,
+     "turf_share": 0.667
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 43.0,
+     "mean_dist": 3000,
+     "median_months": 43,
+     "median_dist": 3000,
+     "q1_months": 43.0,
+     "q3_months": 43.0,
+     "q1_dist": 3000.0,
+     "q3_dist": 3000.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ダノンレジェンド",
@@ -579,7 +1815,27 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1700.0,
-   "turf_share": 0.077
+   "turf_share": 0.077,
+   "levels": {
+    "open": {
+     "winners": 5,
+     "mean_months": 56.4,
+     "mean_dist": 1430,
+     "median_months": 63,
+     "median_dist": 1400,
+     "q1_months": 45.0,
+     "q3_months": 64.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.0
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "モズアスコット",
@@ -593,7 +1849,27 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.338
+   "turf_share": 0.338,
+   "levels": {
+    "open": {
+     "winners": 5,
+     "mean_months": 37.2,
+     "mean_dist": 1480,
+     "median_months": 35,
+     "median_dist": 1400,
+     "q1_months": 31.0,
+     "q3_months": 36.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.8
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "スワーヴリチャード",
@@ -607,7 +1883,45 @@
    "q3_months": 38.0,
    "q1_dist": 1450.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.746
+   "turf_share": 0.746,
+   "levels": {
+    "open": {
+     "winners": 10,
+     "mean_months": 34.4,
+     "mean_dist": 1840,
+     "median_months": 34.5,
+     "median_dist": 2000.0,
+     "q1_months": 29.8,
+     "q3_months": 36.5,
+     "q1_dist": 1650.0,
+     "q3_dist": 2000.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 7,
+     "mean_months": 36.43,
+     "mean_dist": 1914,
+     "median_months": 35,
+     "median_dist": 2000,
+     "q1_months": 33.0,
+     "q3_months": 39.5,
+     "q1_dist": 1800.0,
+     "q3_dist": 2100.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 2,
+     "mean_months": 37.5,
+     "mean_dist": 2500,
+     "median_months": 37.5,
+     "median_dist": 2500.0,
+     "q1_months": 34.8,
+     "q3_months": 40.2,
+     "q1_dist": 2250.0,
+     "q3_dist": 2750.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "マクフィ",
@@ -621,7 +1935,36 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1775.0,
-   "turf_share": 0.306
+   "turf_share": 0.306,
+   "levels": {
+    "open": {
+     "winners": 5,
+     "mean_months": 44.6,
+     "mean_dist": 1560,
+     "median_months": 35,
+     "median_dist": 1600,
+     "q1_months": 30.0,
+     "q3_months": 56.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.8
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 52.0,
+     "mean_dist": 1520,
+     "median_months": 49,
+     "median_dist": 1600,
+     "q1_months": 39.0,
+     "q3_months": 59.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.8
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "サトノアラジン",
@@ -635,7 +1978,18 @@
    "q3_months": 39.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.41
+   "turf_share": 0.41,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "アジアエクスプレス",
@@ -649,7 +2003,36 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.103
+   "turf_share": 0.103,
+   "levels": {
+    "open": {
+     "winners": 7,
+     "mean_months": 58.29,
+     "mean_dist": 1414,
+     "median_months": 60,
+     "median_dist": 1200,
+     "q1_months": 48.5,
+     "q3_months": 65.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1750.0,
+     "turf_share": 0.429
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 67.0,
+     "mean_dist": 1200,
+     "median_months": 67,
+     "median_dist": 1200,
+     "q1_months": 67.0,
+     "q3_months": 67.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1200.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "サンダースノー",
@@ -663,7 +2046,18 @@
    "q3_months": 38.0,
    "q1_dist": 1325.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.172
+   "turf_share": 0.172,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "アメリカンペイトリオット",
@@ -677,7 +2071,18 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.456
+   "turf_share": 0.456,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "リアルインパクト",
@@ -691,7 +2096,18 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.393
+   "turf_share": 0.393,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "カリフォルニアクローム",
@@ -705,7 +2121,18 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.241
+   "turf_share": 0.241,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ブラックタイド",
@@ -719,7 +2146,27 @@
    "q3_months": 39.0,
    "q1_dist": 1600.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.566
+   "turf_share": 0.566,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 37.0,
+     "mean_dist": 2400,
+     "median_months": 37,
+     "median_dist": 2400,
+     "q1_months": 37.0,
+     "q3_months": 37.0,
+     "q1_dist": 2400.0,
+     "q3_dist": 2400.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "コパノリッキー",
@@ -733,7 +2180,18 @@
    "q3_months": 38.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.04
+   "turf_share": 0.04,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "カレンブラックヒル",
@@ -747,7 +2205,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1700.0,
-   "turf_share": 0.306
+   "turf_share": 0.306,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "アドマイヤマーズ",
@@ -761,7 +2230,27 @@
    "q3_months": 37.0,
    "q1_dist": 1600.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.694
+   "turf_share": 0.694,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 38.0,
+     "mean_dist": 1600,
+     "median_months": 38,
+     "median_dist": 1600,
+     "q1_months": 38.0,
+     "q3_months": 38.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "サトノクラウン",
@@ -775,7 +2264,27 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1825.0,
-   "turf_share": 0.688
+   "turf_share": 0.688,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 38.0,
+     "mean_dist": 2400,
+     "median_months": 38,
+     "median_dist": 2400,
+     "q1_months": 38.0,
+     "q3_months": 38.0,
+     "q1_dist": 2400.0,
+     "q3_dist": 2400.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "エスポワールシチー",
@@ -789,7 +2298,18 @@
    "q3_months": 36.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.0
+   "turf_share": 0.0,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ダノンバラード",
@@ -803,7 +2323,27 @@
    "q3_months": 38.2,
    "q1_dist": 1600.0,
    "q3_dist": 1850.0,
-   "turf_share": 0.795
+   "turf_share": 0.795,
+   "levels": {
+    "open": {
+     "winners": 5,
+     "mean_months": 32.4,
+     "mean_dist": 1540,
+     "median_months": 28,
+     "median_dist": 1500,
+     "q1_months": 28.0,
+     "q3_months": 29.0,
+     "q1_dist": 1400.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ファインニードル",
@@ -817,7 +2357,36 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1400.0,
-   "turf_share": 0.614
+   "turf_share": 0.614,
+   "levels": {
+    "open": {
+     "winners": 8,
+     "mean_months": 39.75,
+     "mean_dist": 1275,
+     "median_months": 34.5,
+     "median_dist": 1200.0,
+     "q1_months": 29.0,
+     "q3_months": 53.8,
+     "q1_dist": 1200.0,
+     "q3_dist": 1250.0,
+     "turf_share": 1.0
+    },
+    "graded": {
+     "winners": 5,
+     "mean_months": 41.6,
+     "mean_dist": 1240,
+     "median_months": 38,
+     "median_dist": 1200,
+     "q1_months": 29.0,
+     "q3_months": 57.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1200.0,
+     "turf_share": 1.0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "シャンハイボビー",
@@ -831,7 +2400,18 @@
    "q3_months": 36.0,
    "q1_dist": 1200.0,
    "q3_dist": 1625.0,
-   "turf_share": 0.182
+   "turf_share": 0.182,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "グレーターロンドン",
@@ -845,7 +2425,27 @@
    "q3_months": 36.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.707
+   "turf_share": 0.707,
+   "levels": {
+    "open": {
+     "winners": 6,
+     "mean_months": 44.0,
+     "mean_dist": 1433,
+     "median_months": 36.0,
+     "median_dist": 1400.0,
+     "q1_months": 31.8,
+     "q3_months": 50.0,
+     "q1_dist": 1250.0,
+     "q3_dist": 1550.0,
+     "turf_share": 0.833
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "タワーオブロンドン",
@@ -859,7 +2459,27 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1400.0,
-   "turf_share": 0.512
+   "turf_share": 0.512,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 38.0,
+     "mean_dist": 1600,
+     "median_months": 38,
+     "median_dist": 1600,
+     "q1_months": 38.0,
+     "q3_months": 38.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ヴィクトワールピサ",
@@ -873,7 +2493,18 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.744
+   "turf_share": 0.744,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "エイシンフラッシュ",
@@ -887,7 +2518,27 @@
    "q3_months": 39.0,
    "q1_dist": 1350.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.615
+   "turf_share": 0.615,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 70.0,
+     "mean_dist": 2400,
+     "median_months": 70,
+     "median_dist": 2400,
+     "q1_months": 70.0,
+     "q3_months": 70.0,
+     "q1_dist": 2400.0,
+     "q3_dist": 2400.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ディーマジェスティ",
@@ -901,7 +2552,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.436
+   "turf_share": 0.436,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ラブリーデイ",
@@ -915,7 +2577,18 @@
    "q3_months": 39.0,
    "q1_dist": 1400.0,
    "q3_dist": 1875.0,
-   "turf_share": 0.553
+   "turf_share": 0.553,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "シスキン",
@@ -929,7 +2602,27 @@
    "q3_months": 36.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.811
+   "turf_share": 0.811,
+   "levels": {
+    "open": {
+     "winners": 6,
+     "mean_months": 31.5,
+     "mean_dist": 1617,
+     "median_months": 30.0,
+     "median_dist": 1650.0,
+     "q1_months": 28.2,
+     "q3_months": 32.5,
+     "q1_dist": 1425.0,
+     "q3_dist": 1800.0,
+     "turf_share": 0.833
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "アルアイン",
@@ -943,7 +2636,18 @@
    "q3_months": 36.2,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.75
+   "turf_share": 0.75,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ゴールドドリーム",
@@ -957,7 +2661,18 @@
    "q3_months": 37.2,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.028
+   "turf_share": 0.028,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "レッドファルクス",
@@ -971,7 +2686,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.314
+   "turf_share": 0.314,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "クリソベリル",
@@ -985,7 +2711,18 @@
    "q3_months": 37.0,
    "q1_dist": 1700.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.0
+   "turf_share": 0.0,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "タリスマニック",
@@ -999,7 +2736,18 @@
    "q3_months": 39.0,
    "q1_dist": 1250.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.206
+   "turf_share": 0.206,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ダンカーク",
@@ -1013,7 +2761,18 @@
    "q3_months": 39.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.152
+   "turf_share": 0.152,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "フォーウィールドライブ",
@@ -1027,7 +2786,18 @@
    "q3_months": 36.0,
    "q1_dist": 1150.0,
    "q3_dist": 1300.0,
-   "turf_share": 0.273
+   "turf_share": 0.273,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "フィエールマン",
@@ -1041,7 +2811,18 @@
    "q3_months": 39.0,
    "q1_dist": 1800.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.939
+   "turf_share": 0.939,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "American Pharoah",
@@ -1055,7 +2836,18 @@
    "q3_months": 37.8,
    "q1_dist": 1200.0,
    "q3_dist": 1775.0,
-   "turf_share": 0.167
+   "turf_share": 0.167,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "モーニン",
@@ -1069,7 +2861,18 @@
    "q3_months": 36.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.0
+   "turf_share": 0.0,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ミスターメロディ",
@@ -1083,7 +2886,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.448
+   "turf_share": 0.448,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "バゴ",
@@ -1097,7 +2911,18 @@
    "q3_months": 37.0,
    "q1_dist": 1550.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.75
+   "turf_share": 0.75,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "エイシンヒカリ",
@@ -1111,7 +2936,18 @@
    "q3_months": 40.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.5
+   "turf_share": 0.5,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ワールドエース",
@@ -1125,7 +2961,18 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.593
+   "turf_share": 0.593,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ディープブリランテ",
@@ -1139,7 +2986,18 @@
    "q3_months": 36.0,
    "q1_dist": 1250.0,
    "q3_dist": 1775.0,
-   "turf_share": 0.577
+   "turf_share": 0.577,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ザファクター",
@@ -1153,7 +3011,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1775.0,
-   "turf_share": 0.192
+   "turf_share": 0.192,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "Into Mischief",
@@ -1167,7 +3036,27 @@
    "q3_months": 33.0,
    "q1_dist": 1200.0,
    "q3_dist": 1700.0,
-   "turf_share": 0.08
+   "turf_share": 0.08,
+   "levels": {
+    "open": {
+     "winners": 8,
+     "mean_months": 39.88,
+     "mean_dist": 1400,
+     "median_months": 38.0,
+     "median_dist": 1400.0,
+     "q1_months": 34.0,
+     "q3_months": 46.2,
+     "q1_dist": 1200.0,
+     "q3_dist": 1600.0,
+     "turf_share": 0.125
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ロジャーバローズ",
@@ -1181,7 +3070,18 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.56
+   "turf_share": 0.56,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ベンバトル",
@@ -1195,7 +3095,18 @@
    "q3_months": 37.0,
    "q1_dist": 1400.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.76
+   "turf_share": 0.76,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ジョーカプチーノ",
@@ -1209,7 +3120,27 @@
    "q3_months": 39.8,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.542
+   "turf_share": 0.542,
+   "levels": {
+    "open": {
+     "winners": 5,
+     "mean_months": 46.4,
+     "mean_dist": 1400,
+     "median_months": 51,
+     "median_dist": 1400,
+     "q1_months": 30.0,
+     "q3_months": 56.0,
+     "q1_dist": 1200.0,
+     "q3_dist": 1400.0,
+     "turf_share": 0.6
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "トーセンラー",
@@ -1223,7 +3154,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.826
+   "turf_share": 0.826,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "リーチザクラウン",
@@ -1237,7 +3179,18 @@
    "q3_months": 36.5,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.478
+   "turf_share": 0.478,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ロゴタイプ",
@@ -1251,7 +3204,18 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.565
+   "turf_share": 0.565,
+   "levels": {
+    "open": {
+     "winners": 4
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "シュヴァルグラン",
@@ -1265,7 +3229,18 @@
    "q3_months": 40.0,
    "q1_dist": 1300.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.522
+   "turf_share": 0.522,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ロージズインメイ",
@@ -1279,7 +3254,18 @@
    "q3_months": 38.8,
    "q1_dist": 1325.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.091
+   "turf_share": 0.091,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ノヴェリスト",
@@ -1293,7 +3279,18 @@
    "q3_months": 38.0,
    "q1_dist": 1450.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.682
+   "turf_share": 0.682,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ストロングリターン",
@@ -1307,7 +3304,18 @@
    "q3_months": 40.5,
    "q1_dist": 1200.0,
    "q3_dist": 1600.0,
-   "turf_share": 0.182
+   "turf_share": 0.182,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ウインブライト",
@@ -1321,7 +3329,18 @@
    "q3_months": 37.0,
    "q1_dist": 1450.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.818
+   "turf_share": 0.818,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "インディチャンプ",
@@ -1335,7 +3354,18 @@
    "q3_months": 36.0,
    "q1_dist": 1325.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.773
+   "turf_share": 0.773,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "Frankel",
@@ -1349,7 +3379,27 @@
    "q3_months": 39.2,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.9
+   "turf_share": 0.9,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 1,
+     "mean_months": 34.0,
+     "mean_dist": 1600,
+     "median_months": 34,
+     "median_dist": 1600,
+     "q1_months": 34.0,
+     "q3_months": 34.0,
+     "q1_dist": 1600.0,
+     "q3_dist": 1600.0,
+     "turf_share": 1.0
+    }
+   }
   },
   {
    "sire": "ダノンスマッシュ",
@@ -1363,7 +3413,18 @@
    "q3_months": 37.2,
    "q1_dist": 1200.0,
    "q3_dist": 1625.0,
-   "turf_share": 0.65
+   "turf_share": 0.65,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "メイショウボーラー",
@@ -1377,7 +3438,18 @@
    "q3_months": 38.5,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.105
+   "turf_share": 0.105,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ビーチパトロール",
@@ -1391,7 +3463,18 @@
    "q3_months": 36.5,
    "q1_dist": 1300.0,
    "q3_dist": 1900.0,
-   "turf_share": 0.684
+   "turf_share": 0.684,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ダノンプレミアム",
@@ -1405,7 +3488,18 @@
    "q3_months": 37.0,
    "q1_dist": 1200.0,
    "q3_dist": 1650.0,
-   "turf_share": 0.632
+   "turf_share": 0.632,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "エフフォーリア",
@@ -1419,7 +3513,18 @@
    "q3_months": 29.8,
    "q1_dist": 1650.0,
    "q3_dist": 1800.0,
-   "turf_share": 1.0
+   "turf_share": 1.0,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "フリオーソ",
@@ -1433,7 +3538,18 @@
    "q3_months": 40.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.0
+   "turf_share": 0.0,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ラニ",
@@ -1447,7 +3563,18 @@
    "q3_months": 39.0,
    "q1_dist": 1600.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.059
+   "turf_share": 0.059,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "Justify",
@@ -1461,7 +3588,18 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.0
+   "turf_share": 0.0,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ミスチヴィアスアレックス",
@@ -1475,7 +3613,18 @@
    "q3_months": 34.0,
    "q1_dist": 1200.0,
    "q3_dist": 1400.0,
-   "turf_share": 0.059
+   "turf_share": 0.059,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "マツリダゴッホ",
@@ -1489,7 +3638,18 @@
    "q3_months": 35.2,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.625
+   "turf_share": 0.625,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "アドマイヤムーン",
@@ -1503,7 +3663,18 @@
    "q3_months": 39.0,
    "q1_dist": 1200.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.688
+   "turf_share": 0.688,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ポエティックフレア",
@@ -1517,7 +3688,18 @@
    "q3_months": 33.2,
    "q1_dist": 1600.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.875
+   "turf_share": 0.875,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "アイルハヴアナザー",
@@ -1531,7 +3713,18 @@
    "q3_months": 38.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.2
+   "turf_share": 0.2,
+   "levels": {
+    "open": {
+     "winners": 3
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "トゥザグローリー",
@@ -1545,7 +3738,18 @@
    "q3_months": 44.0,
    "q1_dist": 1400.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.333
+   "turf_share": 0.333,
+   "levels": {
+    "open": {
+     "winners": 2
+    },
+    "graded": {
+     "winners": 2
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ヴァンセンヌ",
@@ -1559,7 +3763,18 @@
    "q3_months": 37.0,
    "q1_dist": 1300.0,
    "q3_dist": 1800.0,
-   "turf_share": 0.6
+   "turf_share": 0.6,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "ミッキーロケット",
@@ -1573,7 +3788,18 @@
    "q3_months": 37.0,
    "q1_dist": 1700.0,
    "q3_dist": 2000.0,
-   "turf_share": 0.733
+   "turf_share": 0.733,
+   "levels": {
+    "open": {
+     "winners": 1
+    },
+    "graded": {
+     "winners": 1
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   },
   {
    "sire": "フィレンツェファイア",
@@ -1587,7 +3813,18 @@
    "q3_months": 35.0,
    "q1_dist": 1200.0,
    "q3_dist": 1550.0,
-   "turf_share": 0.333
+   "turf_share": 0.333,
+   "levels": {
+    "open": {
+     "winners": 0
+    },
+    "graded": {
+     "winners": 0
+    },
+    "g1": {
+     "winners": 0
+    }
+   }
   }
  ]
 }
