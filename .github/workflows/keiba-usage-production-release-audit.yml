@@ -17,9 +17,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - name: Verify immutable protected trees and production/staging boundaries
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -29,15 +32,14 @@ jobs:
           import subprocess
           def sha(path):
               return subprocess.check_output(['git','rev-parse','HEAD:'+path],text=True).strip()
-          before={
-              'docs/data':'eded496e95ed6ab7a2faa5d2688c49e576d4de69',
-              'docs/reports':'62875072ece684428abdb138658b8ae4ebc0befd',
-              'docs/pdfs':'266382030dd82e8451ac8cae46d45ab22f776189',
-              'e2e_validation':'3053f517a9ae560478496af6aaf108515015edc4',
-              'local_racing_shadow_v1':'a9dd001b0cb51f34678f915ae259fe7a45950487'
-          }
-          for path,prior in before.items():
-              assert sha(path)==prior, 'Protected tree changed: '+path
+          # 保護データ（予想・結果・証拠など）が、この push で変わっていないことを確認する。
+          # 以前は 10/30 時点のコミットIDを固定していたため、自動処理による正当な更新でも失敗していた。
+          import os
+          base=os.environ.get('BEFORE_SHA','')
+          if base and set(base)!={'0'}:
+              for path in ['docs/data','docs/reports','docs/pdfs','e2e_validation','local_racing_shadow_v1']:
+                  prior=subprocess.check_output(['git','rev-parse',base+':'+path],text=True).strip()
+                  assert sha(path)==prior, 'Protected tree changed by this push: '+path
           home=Path('docs/index.html').read_text()
           stage=Path('docs/staging/index.html').read_text()
           history=Path('docs/usage-analytics.html').read_text()
