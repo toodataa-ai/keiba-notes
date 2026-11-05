@@ -122,7 +122,7 @@ const E=window.RaceSimV2;
 const FRAME_BG=['#fff','#fff','#222','#e53935','#1e63d6','#f3d32a','#2e9d48','#f08a1c','#f39ac0'];
 const FRAME_FG=['#111','#111','#fff','#fff','#fff','#111','#fff','#111','#111'];
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-let RACES=[],CAT=null,META=null,race=null,sim=null,play=false,clock=0,speed=3,cam='lead',last=0,mode='real';
+let RACES=[],CAT=null,META=null,SHAPES=null,race=null,sim=null,play=false,clock=0,speed=3,cam='lead',last=0,mode='real';
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function fmtT(t){if(t==null)return '-';const m=Math.floor(t/60),s=t-m*60;return (m?m+':':'')+(m?s.toFixed(1).padStart(4,'0'):s.toFixed(1))}
@@ -131,7 +131,7 @@ const LJ={single:'',inner:'内回り',outer:'外回り',straight:'直線',outer_
 const SJ={turf:'芝',dirt:'ダート'};
 
 async function load(){
- const [r,c,m,up]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]}))]);
+ const [r,c,m,up,sh]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]})),fetch('sim-v2/course-shapes.json').then(x=>x.json()).catch(()=>null)]);SHAPES=sh;
  const upc=(up.races||[]).filter(x=>x.route);RACES=upc.concat(r.races.sort((a,b)=>b.date.localeCompare(a.date)||a.venue.localeCompare(b.venue)));CAT=c;META=m;
  const sel=$('selRace');let lastD='';let grp=null;
  RACES.forEach((x,i)=>{const key=(x.upcoming?'これから：':'')+x.date;if(key!==lastD){grp=document.createElement('optgroup');grp.label=x.upcoming?x.date+'（これから・結果前）':x.date;sel.appendChild(grp);lastD=key}
@@ -150,16 +150,18 @@ function stdTime(route,dist,going){// 基準タイムの近似：同じ芝ダの
 function current(){const src=RACES[+$('selRace').value];if(mode==='real')return src;
  const [s,l]=$('selRoute').value.split('|');const route=routeOf($('selVenue').value,s,l);const dist=+$('selDist').value;const going=$('selGoing').value;
  return Object.assign({},src,{route,dist,going,surface:SJ[s],venue:route.name,std_time:stdTime(route,dist,going),_course:null,free:true})}
-function pick(i){$('selRace').value=i;race=current();race._course=E.buildCourse(race.route,race.dist);sim=null;clock=0;play=false;
+function shapeFor(route){if(!SHAPES||!route)return null;const v=SHAPES.venues[route.venue];if(!v)return null;const k=(route.surface||'')+'|'+route.layout;const r=v.routes[k]||(route.layout==='outer_to_inner'?v.routes[route.surface+'|inner']:null);return r?r.pts:null}
+function pick(i){$('selRace').value=i;race=current();race.shape=shapeFor(race.route);race._course=E.buildCourse(race.route,race.dist,race.shape);sim=null;clock=0;play=false;
  const src=RACES[+$('selRace').value];
  $('raceInfo').innerHTML=(race.free?'<b>別のコースで：</b>'+esc(race.venue)+' '+esc(race.surface)+race.dist+'m（'+esc(race.going)+'）。出走馬は '+esc(src.date+' '+src.venue+src.race_no+'R '+(src.race_name||''))+' と同じです':
   esc(race.date)+' '+esc(race.venue)+race.race_no+'R '+esc(race.race_name||'')+'・'+esc(race.surface)+race.dist+'m'+(LJ[race.route.layout]?'（'+LJ[race.route.layout]+'）':'')+'・'+esc(race.going)+'・'+race.runners.length+'頭')+
-  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。';
+  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース'+(race._course.shaped?'（JRA公式の平面図をなぞった形）':'（楕円で近似）')+'：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。';
  table(null);draw(0);$('hOrder').innerHTML='';$('hRemain').textContent=race.dist+'m';$('hTime').textContent='0.0';$('hPace').textContent='';$('runNote').textContent='';}
 
 // ---------- 描画 ----------
 let view=null;
 function fitView(course){const W=course.width,L=course.Ls,R=course.R;
+ if(course.shaped){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const p of course.pts){x0=Math.min(x0,p[0]*course.f);x1=Math.max(x1,p[0]*course.f);y0=Math.min(y0,p[1]*course.f);y1=Math.max(y1,p[1]*course.f)}const m=W+22;return {x0:x0-m,x1:x1+m,y0:y0-m,y1:y1+m}}
  if(course.straightOnly)return {x0:-course.dist-40,x1:80,y0:-30,y1:R+W+30};
  return {x0:-L/2-R-W-24,x1:L/2+R+W+24,y0:-R-W-24,y1:R+W+24}}
 function setup(){const w=cv.clientWidth||1000;const dpr=Math.min(2,window.devicePixelRatio||1);const c=race._course;const v=fitView(c);const asp=(v.y1-v.y0)/(v.x1-v.x0);
@@ -208,7 +210,7 @@ function hud(fr,tt){const H=race.runners.length;const ord=fr.map((p,i)=>i).sort(
 function loop(ts){if(!play){last=0;return}if(!last)last=ts;const d=(ts-last)/1000;last=ts;clock+=d*speed;const end=sim.results[H()-1].time+1.5;if(clock>=end){clock=end;play=false;finish()}$('seek').value=Math.round(clock/end*1000);draw(clock);requestAnimationFrame(loop)}
 function H(){return race.runners.length}
 function finish(){const r=sim.results;const w=r[0];$('runNote').innerHTML='この1回の結果：'+r.slice(0,5).map((x,k)=>(k+1)+'着 '+x.no+' '+esc(race.runners[x.i].name)+'（'+fmtT(x.time)+(k?'・'+(x.time-w.time).toFixed(1)+'秒差':'')+'）').join('　')+'。ペース：'+(sim.pace>0.15?'速い':sim.pace<-0.15?'遅い':'ふつう')+(race.free||race.upcoming?'':'。実際の1着は '+(()=>{const a=race.runners.find(x=>x.finish===1);return a?a.no+' '+esc(a.name):'-'})());}
-function run(){race._course=race._course||E.buildCourse(race.route,race.dist);sim=E.simulate(race,{seed:(Math.random()*1e9)|0,record:true});
+function run(){race._course=race._course||E.buildCourse(race.route,race.dist,race.shape);sim=E.simulate(race,{seed:(Math.random()*1e9)|0,record:true});
  sim.lead1000=(()=>{const R=sim.record;for(const f of R){const m=Math.min(...f.h.map(x=>x[0]));if(race.dist-m>=1000)return f.t}return null})();
  $('hPace').textContent='';clock=0;play=true;last=0;requestAnimationFrame(loop)}
 // ---------- 表 ----------
