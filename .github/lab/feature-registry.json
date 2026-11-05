@@ -254,6 +254,23 @@
         "source_physics_audit": "docs/lab/TOKYO_2000_SOURCE_PHYSICS_AUDIT_V5.json",
         "visual_approval_pending": true
       }
+    },
+    {
+      "id": "race_sim_v2_all_courses",
+      "name": "レースシミュレータv2（全10場・実在馬の能力値）",
+      "phase": "lab_development",
+      "approval": "not_approved",
+      "preview_path": "lab/race-sim-v2.html",
+      "staging_paths": [],
+      "production_paths": [],
+      "lab_paths": [
+        "docs/lab/race-sim-v2.html",
+        "docs/lab/sim-v2/engine.js",
+        "docs/lab/sim-v2/races-public.json",
+        "docs/lab/sim-v2/meta.json"
+      ],
+      "data_note": "races-public.json は2026年9月以降の重賞・各開催日11Rだけ。馬名・能力値（0〜100）・着順・オッズ（ユーザーが2026-11-06に公開を許可）。生の出走履歴は置かない。作成は sim_v2/（非公開データから）。",
+      "next_action": "シミュの勝率は現状、能力値だけの確率より当たらない（検証は meta.json）。展開の再現として使い、予想には能力の勝率を参照。改善：コーナー形状の実寸化、脚質の推定精度、最後の直線の進路取り。正式予想には接続しない。"
     }
   ]
 }
