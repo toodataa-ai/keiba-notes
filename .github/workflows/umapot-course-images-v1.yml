@@ -27,10 +27,14 @@ jobs:
       - name: Convert PowerPoint to SVG and PNG (LibreOffice)
         run: |
           set -u
-          sudo apt-get -qq update >/dev/null && sudo apt-get -qq install -y libreoffice-impress >/dev/null
+          sudo apt-get -qq update >/dev/null && sudo apt-get -qq install -y libreoffice-impress fonts-noto-cjk poppler-utils >/dev/null
           cd private/umapot/pptx
-          find . -name "*.pptx" | while read -r f; do d=$(dirname "$f"); soffice --headless --convert-to svg --outdir "$d" "$f" >/dev/null 2>&1 || true; soffice --headless --convert-to png --outdir "$d" "$f" >/dev/null 2>&1 || true; done
-          find . -name "*.svg" -o -name "*.png" | head -40
+          for v in chukyo fukushima hakodate hanshin kokura kyoto nakayama nigata sapporo tokyo; do
+            f=$(find "$v" -name "*.pptx" | head -1); [ -n "$f" ] || continue
+            cp "$f" "$v/$v.pptx"
+            (cd "$v" && soffice --headless --convert-to pdf "$v.pptx" 2>&1 | tail -2 && pdftoppm -r 110 -png "$v.pdf" "$v" 2>&1 | tail -1 && soffice --headless --convert-to svg "$v.pptx" 2>&1 | tail -1) || true
+            ls -la "$v" | head -12
+          done
       - name: Push to the private branch
         run: |
           set -eu
