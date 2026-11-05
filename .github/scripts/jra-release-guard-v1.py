@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CANONICAL = ("index.html", "this-week.html", "schedule.html", "results.html", "methodology.html",
              "roadmap.html", "e2e.html", "baba-models.html", "local-racing-shadow.html",
-             "experience-regime.html", "release-history.html", "improvement-cycle.html", "operations.html")
+             "experience-regime.html", "release-history.html", "improvement-cycle.html", "operations.html", "sire-map.html")
 # Historical releases are immutable facts: (release_id, commit_sha, workflow_run_id)
 PINNED = {
     "release/jra-site-v1.01-20261012": ("632146ccb581847ae5d4cb9535fb868b8b4517d8", 38185706485),
