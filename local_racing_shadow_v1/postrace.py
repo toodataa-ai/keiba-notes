@@ -194,6 +194,12 @@ def parse_official(soup, p):
             name = re.sub(r"】2歳(?=オープン)", "】", name)
             # Verified 2026-10-15 Sonoda 5R official vs card abbreviation.
             name = name.replace("セレクションハンデ", "セレクショ")
+            # NAR official RaceList abbreviates Kanazawa 2026-11-03 1R,
+            # omitting the exact "開幕特別" segment printed in RaceMarkTable.
+            # Match only this verified proper-name variant; keep all other
+            # title, date, venue, distance, and horse identity gates intact.
+            name = name.replace("能登復興JBC2026金沢・門別開幕特別",
+                                "能登復興JBC2026金沢・門別")
             name = re.sub(r"3歳以上特(?:別)?$", "", name)
             return name
         standard_name, card_name = title_key(normalized), title_key(abbreviated)
