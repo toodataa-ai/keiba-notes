@@ -1,12 +1,22 @@
 {
  "schema_version": 1,
- "generated_at": "2026-11-04T22:48:01+00:00",
+ "generated_at": "2026-11-05T01:26:16+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 41948441801,
+     "event": "schedule",
+     "created_at": "2026-11-05T01:25:37Z",
+     "started_at": "2026-11-05T01:25:37Z",
+     "ended_at": "2026-11-05T01:26:00Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1
+    },
     {
      "id": 41912509340,
      "event": "workflow_dispatch",
@@ -341,16 +351,6 @@
      "status": "completed",
      "conclusion": "failure",
      "attempt": 1
-    },
-    {
-     "id": 39693723595,
-     "event": "push",
-     "created_at": "2026-10-21T23:29:14Z",
-     "started_at": "2026-10-21T23:29:14Z",
-     "ended_at": "2026-10-21T23:30:52Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1
     }
    ]
   },
@@ -553,26 +553,6 @@
      "created_at": "2026-10-22T23:35:39Z",
      "started_at": "2026-10-22T23:35:39Z",
      "ended_at": "2026-10-22T23:36:13Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1
-    },
-    {
-     "id": 39693859136,
-     "event": "push",
-     "created_at": "2026-10-21T23:30:34Z",
-     "started_at": "2026-10-21T23:30:34Z",
-     "ended_at": "2026-10-21T23:32:48Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1
-    },
-    {
-     "id": 39693648835,
-     "event": "push",
-     "created_at": "2026-10-21T23:28:32Z",
-     "started_at": "2026-10-21T23:28:32Z",
-     "ended_at": "2026-10-21T23:29:17Z",
      "status": "completed",
      "conclusion": "failure",
      "attempt": 1
