@@ -65,6 +65,14 @@
       seen.add(day);
       return {day:row.day,time:day,pv:pageViews(row.counts),sessions:sum(row.counts,['session_start'])};
     }).sort((a,b)=>a.time-b.time);
+    // 計測が始まった日（この期間で最初の記録日）から今日まで、記録の無い日は閲覧0件として表示する（計測開始前は空白のまま）。
+    if(entries.length){
+      const have=new Map(entries.map(e=>[e.time,e]));
+      for(let t=entries[0].time;t<=end;t+=DAY_MS){
+        if(!have.has(t))have.set(t,{day:new Date(t).toISOString().slice(0,10),time:t,pv:0,sessions:0,zero:true});
+      }
+      entries.splice(0,entries.length,...[...have.values()].sort((a,b)=>a.time-b.time));
+    }
     if(!entries.length){
       const tr=make('tr');
       const td=make('td','','この期間には、記録された日別データがありません。');
@@ -75,7 +83,7 @@
     }
     for(const item of [...entries].reverse()){
       const tr=make('tr');
-      for(const cell of [item.day,fmt(item.pv),fmt(item.sessions)])
+      for(const cell of [item.day+(item.zero?'（記録なし）':''),fmt(item.pv),fmt(item.sessions)])
         tr.append(make('td','',cell));
       table.append(tr);
     }
@@ -144,6 +152,7 @@
       svg.append(circle);
     }
     chart.append(svg);
+    chart.scrollLeft=chart.scrollWidth; // 最新の日付（右端）が見える位置から表示する
     if(entries.length===1)detail.textContent='現在は1日分の記録です。点を表示しています。2日以上蓄積すると折れ線になります。';
     else if(entries.some((e,i)=>i>0&&e.time-entries[i-1].time!==DAY_MS))
       detail.textContent='未計測の日付は線をつながず、空白として表示しています。点をタップすると日別の数値を確認できます。';
@@ -183,7 +192,7 @@
         if(data.site!=='keiba-notes'||data.schema_version!==1||data.days!==Number(days)||!Array.isArray(data.rows))
           throw Error('履歴形式が正しくありません');
         renderHistory(data.rows,Number(days),data.day_jst);
-        byId('historyStatus').textContent=data.recorded_days+'日分の実測記録を表示。記録開始前の日付は復元できません。';
+        byId('historyStatus').textContent=data.recorded_days+'日分の実測記録を表示。記録のない日は0件として表示します（記録開始前の日付は復元できません）。';
       }catch(e){byId('historyStatus').textContent='履歴データを検証できません：'+e.message}
     }else byId('historyStatus').textContent='履歴取得失敗：'+history.reason?.message;
     byId('refresh').disabled=false;
