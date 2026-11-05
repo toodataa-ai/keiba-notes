@@ -35,6 +35,12 @@ class T(unittest.TestCase):
         <a href="/keiba/directory/horse/1999999999/">other</a>"""
         self.assertEqual(c.parse_denma_horses(BeautifulSoup(html, "html.parser")), ["2022105102"])
 
+    def test_needs_refetch(self):
+        bad = {"history": [{"passing": "34.5", "time": None, "finish": 3}]}
+        self.assertTrue(c.needs_refetch(bad))
+        self.assertFalse(c.needs_refetch({**bad, "parse_v": c.PARSE_V}))
+        self.assertFalse(c.needs_refetch({"history": [{"passing": "3-3", "time": "1:10.0", "finish": 3}]}))
+
     def test_race_code(self):
         codes = dict((d, k) for d, k in c.race_codes(["2026"]) if d == "2026-10-31" and k.endswith("11"))
         self.assertEqual(codes["2026-10-31"][:2], "26")

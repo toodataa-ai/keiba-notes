@@ -175,6 +175,50 @@ def known_ids() -> set[str]:
     return s
 
 
+PARSE_V = 2   # 2 = 2026-11-06 の読み取り修正（直線レースのタイム・上がり）以後
+
+
+def needs_refetch(rec) -> bool:
+    """修正前に取った馬で、直線レースなどの欄がずれて取れた可能性のある履歴を持つもの"""
+    if rec.get("parse_v", 1) >= PARSE_V:
+        return False
+    for r in rec.get("history", []):
+        pas = r.get("passing") or ""
+        if re.fullmatch(r"\d{2}\.\d", pas) or (r.get("time") is None and isinstance(r.get("finish"), int)):
+            return True
+    return False
+
+
+def refetch(get, parse, max_minutes, t0) -> int:
+    """直す必要のある馬を取り直して、同じ行を置き換える。時間が来たら途中で終える（次回に続き）"""
+    n = 0
+    for p in sorted(DATA.glob("horses_*.jsonl")):
+        lines = p.read_text(encoding="utf-8").splitlines()
+        changed = False
+        for i, line in enumerate(lines):
+            try:
+                rec = json.loads(line)
+            except Exception:
+                continue
+            if not needs_refetch(rec):
+                continue
+            if (time.time() - t0) / 60 > max_minutes:
+                break
+            hs = get(HORSE.format(hid=rec["id"]))
+            if hs is None:
+                continue
+            h = parse(hs)
+            if not h["birth"] or not h["ped"]["sire"]:
+                continue
+            new = {"id": rec["id"], **h, "fetched": datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d"), "parse_v": PARSE_V}
+            if new["birth"][:4] != p.stem.split("_")[1]:
+                continue
+            lines[i] = json.dumps(new, ensure_ascii=False); changed = True; n += 1
+        if changed:
+            tmp = p.with_suffix(".tmp"); tmp.write_text("\n".join(lines) + "\n", encoding="utf-8"); tmp.replace(p)
+    return n
+
+
 def main():
     import requests
     from bs4 import BeautifulSoup
@@ -210,6 +254,8 @@ def main():
     done = set(done_p.read_text().split()) if done_p.exists() else set()
     seen = known_ids()
     t0 = time.time(); nr = nh = 0
+    nf = refetch(get, parse_horse, a.max_minutes, t0)
+    print("refetched horses (parse fix):", nf, flush=True)
     todo = [(d, c) for d, c in race_codes(a.years.split(",")) if c not in done]
     print("races todo:", len(todo), "horses known:", len(seen))
     for d, code in todo:
@@ -227,7 +273,7 @@ def main():
             h = parse_horse(hs)
             if not h["birth"] or not h["ped"]["sire"]:
                 print("skip (no birth/sire):", hid); continue
-            rec = {"id": hid, **h, "fetched": datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")}
+            rec = {"id": hid, **h, "fetched": datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d"), "parse_v": PARSE_V}
             with (DATA / f"horses_{h['birth'][:4]}.jsonl").open("a", encoding="utf-8") as f:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
             seen.add(hid); nh += 1
