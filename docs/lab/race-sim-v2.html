@@ -131,10 +131,10 @@ const LJ={single:'',inner:'内回り',outer:'外回り',straight:'直線',outer_
 const SJ={turf:'芝',dirt:'ダート'};
 
 async function load(){
- const [r,c,m]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null)]);
- RACES=r.races.sort((a,b)=>b.date.localeCompare(a.date)||a.venue.localeCompare(b.venue));CAT=c;META=m;
+ const [r,c,m,up]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]}))]);
+ const upc=(up.races||[]).filter(x=>x.route);RACES=upc.concat(r.races.sort((a,b)=>b.date.localeCompare(a.date)||a.venue.localeCompare(b.venue)));CAT=c;META=m;
  const sel=$('selRace');let lastD='';let grp=null;
- RACES.forEach((x,i)=>{if(x.date!==lastD){grp=document.createElement('optgroup');grp.label=x.date;sel.appendChild(grp);lastD=x.date}
+ RACES.forEach((x,i)=>{const key=(x.upcoming?'これから：':'')+x.date;if(key!==lastD){grp=document.createElement('optgroup');grp.label=x.upcoming?x.date+'（これから・結果前）':x.date;sel.appendChild(grp);lastD=key}
   const o=document.createElement('option');o.value=i;o.textContent=x.venue+x.race_no+'R '+(x.race_name||'')+(x.grade?'（'+x.grade.replace('GIII','G3').replace('GII','G2').replace('GI','G1')+'）':'')+'・'+(x.surface)+x.dist+'m';grp.appendChild(o)});
  const venues=CAT.venues;$('selVenue').innerHTML=venues.map(v=>'<option value="'+v.code+'">'+v.name+'</option>').join('');
  kpi();pick(0);
@@ -154,7 +154,7 @@ function pick(i){$('selRace').value=i;race=current();race._course=E.buildCourse(
  const src=RACES[+$('selRace').value];
  $('raceInfo').innerHTML=(race.free?'<b>別のコースで：</b>'+esc(race.venue)+' '+esc(race.surface)+race.dist+'m（'+esc(race.going)+'）。出走馬は '+esc(src.date+' '+src.venue+src.race_no+'R '+(src.race_name||''))+' と同じです':
   esc(race.date)+' '+esc(race.venue)+race.race_no+'R '+esc(race.race_name||'')+'・'+esc(race.surface)+race.dist+'m'+(LJ[race.route.layout]?'（'+LJ[race.route.layout]+'）':'')+'・'+esc(race.going)+'・'+race.runners.length+'頭')+
-  '。コース：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。';
+  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。';
  table(null);draw(0);$('hOrder').innerHTML='';$('hRemain').textContent=race.dist+'m';$('hTime').textContent='0.0';$('hPace').textContent='';$('runNote').textContent='';}
 
 // ---------- 描画 ----------
@@ -207,7 +207,7 @@ function hud(fr,tt){const H=race.runners.length;const ord=fr.map((p,i)=>i).sort(
  $('hOrder').innerHTML=ord.map(i=>{const f=E.frameOf(race.runners[i].no,H);return '<span style="background:'+FRAME_BG[f]+';color:'+FRAME_FG[f]+'">'+race.runners[i].no+'</span>'}).join('');}
 function loop(ts){if(!play){last=0;return}if(!last)last=ts;const d=(ts-last)/1000;last=ts;clock+=d*speed;const end=sim.results[H()-1].time+1.5;if(clock>=end){clock=end;play=false;finish()}$('seek').value=Math.round(clock/end*1000);draw(clock);requestAnimationFrame(loop)}
 function H(){return race.runners.length}
-function finish(){const r=sim.results;const w=r[0];$('runNote').innerHTML='この1回の結果：'+r.slice(0,5).map((x,k)=>(k+1)+'着 '+x.no+' '+esc(race.runners[x.i].name)+'（'+fmtT(x.time)+(k?'・'+(x.time-w.time).toFixed(1)+'秒差':'')+'）').join('　')+'。ペース：'+(sim.pace>0.15?'速い':sim.pace<-0.15?'遅い':'ふつう')+(race.free?'':'。実際の1着は '+(()=>{const a=race.runners.find(x=>x.finish===1);return a?a.no+' '+esc(a.name):'-'})());}
+function finish(){const r=sim.results;const w=r[0];$('runNote').innerHTML='この1回の結果：'+r.slice(0,5).map((x,k)=>(k+1)+'着 '+x.no+' '+esc(race.runners[x.i].name)+'（'+fmtT(x.time)+(k?'・'+(x.time-w.time).toFixed(1)+'秒差':'')+'）').join('　')+'。ペース：'+(sim.pace>0.15?'速い':sim.pace<-0.15?'遅い':'ふつう')+(race.free||race.upcoming?'':'。実際の1着は '+(()=>{const a=race.runners.find(x=>x.finish===1);return a?a.no+' '+esc(a.name):'-'})());}
 function run(){race._course=race._course||E.buildCourse(race.route,race.dist);sim=E.simulate(race,{seed:(Math.random()*1e9)|0,record:true});
  sim.lead1000=(()=>{const R=sim.record;for(const f of R){const m=Math.min(...f.h.map(x=>x[0]));if(race.dist-m>=1000)return f.t}return null})();
  $('hPace').textContent='';clock=0;play=true;last=0;requestAnimationFrame(loop)}
@@ -218,7 +218,7 @@ function table(mc){const H=race.runners.length;const z=race.runners.map(x=>x.str
  $('tb').innerHTML=rows.map(({x,m})=>{const f=E.frameOf(x.no,H);const a=x.ability||{};
   return '<tr><td class="l"><span class="fr" style="background:'+FRAME_BG[f]+';color:'+FRAME_FG[f]+'">'+x.no+'</span></td><td class="l">'+esc(x.name)+'<br><small style="color:var(--muted)">'+esc(x.sire||'')+(x.debut?'・初出走':'・'+x.runs+'戦')+'</small></td>'+
   '<td><span class="bar" style="width:'+Math.round(PM[x.no]*120)+'px"></span> '+(PM[x.no]*100).toFixed(1)+'%</td><td>'+(m?(m.win*100).toFixed(1)+'%':'-')+'</td><td>'+(m?(m.top3*100).toFixed(0)+'%':'-')+'</td><td>'+(m?m.avgPos.toFixed(1):'-')+'</td>'+
-  '<td>'+(race.free?'-':(x.finish===1?'<span class="win">1着</span>':x.finish+'着'))+'</td><td>'+(race.free?'-':(x.ninki||'-')+'（'+(x.odds??'-')+'）')+'</td>'+
+  '<td>'+(race.free||race.upcoming?'-':(x.finish===1?'<span class="win">1着</span>':x.finish+'着'))+'</td><td>'+(race.free||race.upcoming?'-':(x.ninki||'-')+'（'+(x.odds??'-')+'）')+'</td>'+
   '<td class="l"><div class="abil">'+keys.map(k=>'<div title="'+k+' '+(a[k]??'-')+'"><i><b style="width:'+(a[k]??0)+'%"></b></i><small>'+(a[k]??'-')+'</small></div>').join('')+'</div></td></tr>'}).join('');}
 function mc(){const t=performance.now();const r=E.monteCarlo(race,300,{seed:(Math.random()*1e9)|0});table(r);
  const top=r.map((m,i)=>({m,i})).sort((a,b)=>b.m.win-a.m.win)[0];$('mcNote').textContent='300回の結果（'+Math.round(performance.now()-t)+'ミリ秒）。いちばん勝ったのは '+race.runners[top.i].no+' '+race.runners[top.i].name+'（'+(top.m.win*100).toFixed(0)+'%）。'}
