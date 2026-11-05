@@ -6,7 +6,7 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,7 +22,7 @@ jobs:
             mkdir -p $v
             curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "https://www.jra.go.jp/facilities/race/$v/course/index.html" -o $v/index.html || true
             sleep 2
-            grep -oE 'src="[^"]+\.(png|gif|jpg|svg)"' $v/index.html | sed 's/src="//;s/"$//' | sort -u > $v/imgs.txt || true
+            grep -oE 'src="[^"]+\.(png|gif|jpg|svg)"' $v/index.html | sed 's/src="//;s/"$//' | grep -vE '/(icon_|logo_|btn_|footer_|bnr_|banner)' | sort -u > $v/imgs.txt || true
             while read -r s; do
               case "$s" in http*) u="$s";; /*) u="https://www.jra.go.jp$s";; *) u="https://www.jra.go.jp/facilities/race/$v/course/$s";; esac
               f=$(echo "$s" | sed 's#.*/##')
@@ -31,11 +31,14 @@ jobs:
             done < $v/imgs.txt
             echo "$v: $(wc -l < $v/imgs.txt) images"; ls $v | head -40
           done
-      - name: Commit to private repo
+      - name: Push to a separate branch of the private repo
         run: |
+          set -eu
           cd private
           git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan course-diagrams
+          git rm -rq --cached . >/dev/null 2>&1 || true
           git add course_diagrams
-          git diff --cached --quiet && exit 0
           git commit -qm "JRA コース平面図（形のトレース用・非公開）"
-          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+          git push -q -f origin HEAD:refs/heads/course-diagrams
+          echo pushed
