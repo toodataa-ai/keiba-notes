@@ -6,7 +6,7 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -14,28 +14,26 @@ jobs:
           token: ${{ secrets.PRIVATE_DATA_TOKEN }}
           path: private
           ref: course-diagrams
-      - name: Fetch category pages and the main course images
+      - name: Fetch blank course images and PowerPoint templates (all 10 venues)
         run: |
           set -u
-          mkdir -p private/umapot && cd private/umapot
-          for c in 76 77 78 79 80 81 82 83 84 85; do
-            curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "https://umapot.com/?cat=$c" -o cat_$c.html; sleep 2
-            grep -oE 'https://umapot.com/\?p=[0-9]+' cat_$c.html | sort -u > posts_$c.txt
-            while read -r u; do
-              id=${u##*=}; [ -f post_$id.html ] || { curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "$u" -o post_$id.html; sleep 2; }
-            done < posts_$c.txt
+          mkdir -p private/umapot/blank private/umapot/pptx && cd private/umapot
+          for v in tky nkm kyt hsn cky ngt fsm kkr spr hdt; do curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "https://umapot.com/web_sozai/lace2/$v.jpg" -o blank/$v.jpg; sleep 1; done
+          for v in chukyo fukushima hakodate hanshin kokura kyoto nakayama nigata sapporo tokyo; do
+            curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "https://umapot.com/data/powerpoint/${v}_couse/${v}_couse.zip" -o pptx/$v.zip; sleep 2
+            (cd pptx && mkdir -p $v && unzip -o -q $v.zip -d $v || true)
           done
-          cat post_*.html | grep -oE 'https://umapot.com/web_sozai/[^"'"'"' ]+\.(jpg|png|gif|svg)' | sort -u > imgs.txt
-          wc -l imgs.txt
-          # 距離の付いていない（コースだけの）画像を優先して取る
-          grep -vE '_[sd][0-9]{3,4}\.' imgs.txt > base.txt || true
-          wc -l base.txt; cat base.txt
-          mkdir -p img
-          while read -r u; do f=$(echo "$u" | sed 's#https://umapot.com/web_sozai/##; s#/#__#g'); curl -sSL -A "Mozilla/5.0 (research; keiba-notes)" "$u" -o "img/$f"; sleep 1; done < base.txt
-          ls -la img | head -60
+          find pptx -type f | head -40; ls -la blank
+      - name: Convert PowerPoint to SVG and PNG (LibreOffice)
+        run: |
+          set -u
+          sudo apt-get -qq update >/dev/null && sudo apt-get -qq install -y libreoffice-impress >/dev/null
+          cd private/umapot/pptx
+          find . -name "*.pptx" | while read -r f; do d=$(dirname "$f"); soffice --headless --convert-to svg --outdir "$d" "$f" >/dev/null 2>&1 || true; soffice --headless --convert-to png --outdir "$d" "$f" >/dev/null 2>&1 || true; done
+          find . -name "*.svg" -o -name "*.png" | head -40
       - name: Push to the private branch
         run: |
           set -eu
           cd private
           git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add umapot && git commit -qm "うまぽっと コース画像（確認・位置合わせ用・非公開）" && git push -q origin HEAD:course-diagrams && echo pushed
+          git add umapot && git commit -qm "うまぽっと コース画像・パワーポイント素材（確認・位置合わせ用・非公開）" && git push -q origin HEAD:course-diagrams && echo pushed
