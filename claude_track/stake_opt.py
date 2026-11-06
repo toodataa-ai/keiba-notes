@@ -4,7 +4,7 @@
   1. 確率：Claudeの勝つ確率と、単勝オッズが示す確率（控除分を補正して合計1）を、対数で重み w:(1-w) で混ぜる。
      （Claude の予想だけを信じて期待値を最大にすると、予想の誤差まで拾って過大評価しやすいため。w は実績がたまったら決め直す）
   2. 各組番の的中確率を Plackett-Luce（順位の出方）で出し、期待値 = 的中確率 × オッズ − 1 を作る（ワイドは下限オッズ）。
-  3. 期待値が min_ev を超える組番を、期待値の高い順に 100 円ずつ積む。制約：合計 budget 以内、
+  3. 的中確率が min_prob 以上で、期待値が min_ev を超える組番を、期待値の高い順に 100 円ずつ積む。制約：合計 budget 以内、
      1点 ticket_cap 以内、1頭に絡む金額 horse_cap×budget 以内。期待値がプラスの組番が無ければ見送り。
 決定的（同じ入力なら同じ結果）。"""
 from __future__ import annotations
@@ -14,7 +14,7 @@ import math
 from itertools import permutations
 from pathlib import Path
 
-PARAMS = {"w": 0.5, "budget": 3000, "unit": 100, "ticket_cap": 1000, "horse_cap": 0.60, "min_ev": 0.0,
+PARAMS = {"w": 0.5, "budget": 3000, "unit": 100, "ticket_cap": 1000, "horse_cap": 0.60, "min_ev": 0.0, "min_prob": 0.05,
           "types": ["単勝", "馬連", "馬単", "ワイド", "三連複", "三連単"]}
 TYPE_ORDER = {t: i for i, t in enumerate(PARAMS["types"])}
 ORDERED = {"馬単", "三連単"}
@@ -88,7 +88,7 @@ def optimize(model_win, entries, params=None):
             continue
         pr = combo_prob(p, typ, sel)
         ev = pr * o - 1.0
-        if ev > P["min_ev"]:
+        if ev > P["min_ev"] and pr >= P["min_prob"]:
             cands.append((-ev, TYPE_ORDER[typ], sel, typ, float(o), pr))
     cands.sort()
     unit, B = P["unit"], P["budget"]
