@@ -96,6 +96,16 @@ def main(out):
                 k = fail_kind(r["id"], cache)
                 if k is not None:
                     runs[-1]["fail_kind"] = k
+        # 公開確認だけ失敗した実行の後（6時間以内）に、同じ処理の成功があれば「再実行で確認済み」とする
+        for r in runs:
+            if r.get("fail_kind") == "publish_check":
+                t0 = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+                for o in runs:
+                    if o["conclusion"] == "success":
+                        t1 = datetime.fromisoformat(o["created_at"].replace("Z", "+00:00"))
+                        if timedelta(0) < t1 - t0 <= timedelta(hours=6):
+                            r["confirmed_by_rerun"] = True
+                            break
         wfs[fn] = {"label": label, "runs": sorted(runs, key=lambda x: x["created_at"], reverse=True)}
     doc = {"schema_version": 2, "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "keep_days": KEEP_DAYS, "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
