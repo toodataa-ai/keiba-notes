@@ -111,16 +111,18 @@ def optimize(model_win, entries, params=None):
 
 
 # ---------------------------------------------------------------------------
-# anchored_v1（2026-11-06 設計・Opus 案）：値段を基準に、自分の見方で傾ける。研究用の仮想の買い目。
+# anchored_v1（2026-11-06 設計・Opus 案。同日、ユーザー指示で「一発枠」をやめ純粋評価に統一）：
+#  値段を基準に、自分の見方で傾ける。券種は6つすべて同じ基準で評価する（除外も、無理な追加もしない）。研究用の仮想の買い目。
 #  1. 自分の勝率の「平らさ」を τ 乗で直す（τ は単勝オッズ由来の確率と散らばりが同じになる値）。
 #  2. 券種ごとに、その券種自身のオッズから q = (1/オッズ)÷合計 を作る（ワイドは合計3）。
+#     オッズ表が全組そろっていない券種は q がゆがむので、その券種だけ評価できない（データの検査。券種の除外ではない）。
 #  3. p = q × (自分の組番確率 ÷ 市場の組番確率)^w を券種ごとに割り直す。
-#  4. 主力：単勝・馬連・ワイド。p>=2%・オッズ<=50・期待値>0。金額は 1/4 ケリー（100円未満切り捨て）。
-#  5. 一発枠：馬単・三連複・三連単から期待値の高い順に最大3点、1点100円固定（p>=0.5%、期待値>0）。
-#  6. 合計6,000円・1点1,000円・1頭に絡む額60% を守る。条件を満たす組が無ければ見送り。
+#  4. p>=min_prob かつ 期待値 p×オッズ−1 > 0 の組番だけを候補にする。
+#  5. 金額は 1/4 ケリー（100円未満切り捨て、100円に届かない組は買わない）。1点1,000円・合計6,000円・1頭に絡む額60% を守る。
+#  条件を満たす組が無ければ見送り。
 A_PARAMS = {"w": 0.5, "budget": 6000, "unit": 100, "ticket_cap": 1000, "horse_cap": 0.60, "kelly": 0.25,
-            "bankroll": 60000, "main_types": ["単勝", "馬連", "ワイド"], "main_min_prob": 0.02, "main_max_odds": 50.0,
-            "long_types": ["馬単", "三連複", "三連単"], "long_min_prob": 0.005, "long_points": 3, "long_stake": 100}
+            "bankroll": 60000, "types": ["単勝", "馬連", "馬単", "ワイド", "三連複", "三連単"],
+            "min_prob": 0.005, "max_odds": None, "require_complete": True}
 
 
 def _entropy(p):
@@ -147,7 +149,13 @@ def sharpen(model, market):
     return at(t), t
 
 
-def _anchored_rows(entries, types, model, market, w):
+def expected_count(typ, n):
+    from math import comb
+    return {"単勝": n, "馬連": comb(n, 2), "ワイド": comb(n, 2), "馬単": n * (n - 1),
+            "三連複": comb(n, 3), "三連単": n * (n - 1) * (n - 2)}[typ]
+
+
+def _anchored_rows(entries, types, model, market, w, require_complete=True):
     by = {}
     for e in entries:
         typ = e.get("type")
@@ -160,9 +168,13 @@ def _anchored_rows(entries, types, model, market, w):
         sel = tuple(e["selection"]) if typ in ORDERED else tuple(sorted(e["selection"]))
         if not set(sel) <= set(model):
             continue
-        by.setdefault(typ, []).append((sel, float(o)))
-    rows = []
-    for typ, lst in by.items():
+        by.setdefault(typ, {})[sel] = float(o)
+    rows, incomplete = [], []
+    for typ, d in by.items():
+        if require_complete and len(d) < expected_count(typ, len(model)):
+            incomplete.append(typ)
+            continue
+        lst = list(d.items())
         tot = sum(1 / o for _, o in lst)
         norm = 3 if typ == "ワイド" else 1
         part = []
@@ -174,7 +186,7 @@ def _anchored_rows(entries, types, model, market, w):
         for x in part:
             x[4] *= norm / s
         rows += part
-    return rows
+    return rows, incomplete
 
 
 def optimize_anchored(model_win, entries, params=None):
@@ -185,50 +197,36 @@ def optimize_anchored(model_win, entries, params=None):
         return {"decision": "skip", "skip_reason": "単勝オッズから確率を作れない", "bets": [], "params": P}
     mod, tau = sharpen({h: model_win[h] for h in keys}, {h: market[h] for h in keys})
     mk = {h: market[h] for h in keys}
-    rows = _anchored_rows(entries, set(P["main_types"]) | set(P["long_types"]), mod, mk, P["w"])
+    rows, incomplete = _anchored_rows(entries, set(P["types"]), mod, mk, P["w"], P["require_complete"])
     cands = [{"type": t, "selection": list(sel), "market_odds": o, "q": round(q, 6), "p": round(p, 6),
-              "expected_value": round(p * o - 1, 4)} for t, sel, o, q, p in rows]
+              "expected_value": round(p * o - 1, 4)} for t, sel, o, q, p in rows if p * o - 1 > 0]
     B, unit = P["budget"], P["unit"]
-    expo, bets = {}, []
-
-    def room(sel, y):
-        for h in set(sel):
-            y = min(y, int((P["horse_cap"] * B - expo.get(h, 0)) // unit) * unit)
-        return y
-    long_c = sorted([r for r in rows if r[0] in P["long_types"] and r[4] >= P["long_min_prob"] and r[4] * r[2] - 1 > 0],
-                    key=lambda r: (-(r[4] * r[2] - 1), r[0], r[1]))[:P["long_points"]]
-    for t, sel, o, q, p in long_c:
-        y = room(sel, P["long_stake"])
-        if y < unit:
-            continue
-        for h in set(sel):
-            expo[h] = expo.get(h, 0) + y
-        bets.append({"slot": "longshot", "type": t, "selection": list(sel), "stake_yen": y, "market_odds": o,
-                     "model_prob": round(p, 5), "q": round(q, 5), "expected_value": round(p * o - 1, 4)})
-    long_total = sum(b["stake_yen"] for b in bets)
-    main = []
+    pick = []
     for t, sel, o, q, p in rows:
         ev = p * o - 1
-        if t in P["main_types"] and p >= P["main_min_prob"] and o <= P["main_max_odds"] and ev > 0:
+        if p >= P["min_prob"] and ev > 0 and (P["max_odds"] is None or o <= P["max_odds"]):
             f = ev / (o - 1)
-            main.append((ev, t, sel, o, q, p, min(P["ticket_cap"], P["kelly"] * P["bankroll"] * f)))
-    main.sort(key=lambda x: (-x[0], TYPE_ORDER[x[1]], x[2]))
-    raw_total = sum(x[6] for x in main)
-    scale = min(1.0, (B - long_total) / raw_total) if raw_total else 1.0
-    for ev, t, sel, o, q, p, s in main:
-        y = room(sel, int(s * scale // unit) * unit)
+            pick.append((ev, t, sel, o, q, p, min(P["ticket_cap"], P["kelly"] * P["bankroll"] * f)))
+    pick.sort(key=lambda x: (-x[0], TYPE_ORDER[x[1]], x[2]))
+    raw_total = sum(x[6] for x in pick)
+    scale = min(1.0, B / raw_total) if raw_total else 1.0
+    expo, bets = {}, []
+    for ev, t, sel, o, q, p, s in pick:
+        y = int(s * scale // unit) * unit
+        for h in set(sel):
+            y = min(y, int((P["horse_cap"] * B - expo.get(h, 0)) // unit) * unit)
         if y < unit:
             continue
         for h in set(sel):
             expo[h] = expo.get(h, 0) + y
-        bets.append({"slot": "main", "type": t, "selection": list(sel), "stake_yen": y, "market_odds": o,
+        bets.append({"type": t, "selection": list(sel), "stake_yen": y, "market_odds": o,
                      "model_prob": round(p, 5), "q": round(q, 5), "expected_value": round(ev, 4)})
     total = sum(b["stake_yen"] for b in bets)
     return {"decision": "buy" if bets else "skip", "skip_reason": None if bets else "市場を上回る組番なし",
             "stake_method": "anchored_v1", "tau": round(tau, 4), "w": P["w"], "bets": bets, "total_stake_yen": total,
             "expected_profit_yen": round(sum(b["stake_yen"] * b["expected_value"] for b in bets), 1),
             "max_horse_exposure_yen": max(expo.values()) if total else None,
-            "candidates": cands, "params": P}
+            "incomplete_odds_types": incomplete, "candidates": cands, "params": P}
 
 
 def main(argv=None):

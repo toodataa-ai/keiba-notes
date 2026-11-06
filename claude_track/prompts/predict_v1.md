@@ -51,10 +51,10 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
 - **買い目は自分で考えず、計算プログラムの結果をそのまま使う（版 anchored_v1、2026-11-06〜）**：
   `python3 -m claude_track.stake_opt --method anchored_v1 --step1 <STEP1のファイル> --odds <使うオッズファイル>`
   - 考え方：値段（オッズ）を基準に、自分の見方で傾ける。①自分の勝率の平らさを τ 乗で直す（τ は単勝オッズ由来の確率と散らばりが同じになる値）。②券種ごとに、その券種自身のオッズから q を作る。③ p = q ×（自分の組番確率÷市場の組番確率）^0.5 を券種ごとに割り直す。
-  - **主力**：単勝・馬連・ワイドのうち、p≥2%・オッズ≤50倍・期待値（p×オッズ−1）がプラスの組番。金額は4分の1ケリー（100円未満切り捨て、1点1,000円まで）。
-  - **一発枠**：馬単・三連複・三連単のうち、p≥0.5%で期待値の高い順に最大3点、1点100円固定（合計300円まで）。
+  - **券種は6つ（単勝・馬連・馬単・ワイド・三連複・三連単）すべて同じ基準で評価する**。券種の除外も、無理な追加もしない。p≥0.5%・期待値（p×オッズ−1）がプラスの組番だけが候補。金額は4分の1ケリー（100円未満切り捨て、100円に届かない組は買わない、1点1,000円まで）。
+  - オッズ表が全組そろっていない券種は、確率がゆがむのでその券種だけ評価できない（出力の `incomplete_odds_types`。データの検査であって券種の除外ではない）。
   - 合計6,000円以内（ChatGPT正式とそろえた上限。目標ではなく上限）、1頭に絡む金額は6,000円の60%まで。条件を満たす組番が無ければ見送り。
-  - 出力の `bets` を、そのまま step2 の `bets` に写す（`slot`・`model_prob`・`q`・`expected_value` も残す）。各買い目の `reason` に、p・q・期待値の数値と、STEP1 のその馬の根拠を1行で書く。
+  - 出力の `bets` を、そのまま step2 の `bets` に写す（`model_prob`・`q`・`expected_value` も残す）。各買い目の `reason` に、p・q・期待値の数値と、STEP1 のその馬の根拠を1行で書く。
   - **買い目を足す・金額を変えるのは禁止**。削除してよいのは出走取消などの事実があるときだけで、その理由を `skip_reason` かその買い目の `reason` に書く。
   - step2 に `"stake_method":"anchored_v1"`、`"tau"`、`"w"`、`"candidates"`（出力の候補全件）を保存する。
   - `bets` が空なら `decision":"skip"`、`skip_reason":"市場を上回る組番なし"`。
@@ -63,7 +63,7 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
 ```json
 {"schema_version":1,"predictor":"claude","stage":"step2","race_id":"…","generated_at":"<JST>","decision":"buy","odds_source":"claude_track/odds/<race_id>/<UTC日時>.json","odds_observed_at":"…",
  "stake_method":"anchored_v1","tau":1.2,"w":0.5,"candidates":[…],
- "bets":[{"slot":"main","type":"ワイド","selection":[1,5],"stake_yen":300,"market_odds":4.2,"model_prob":0.31,"q":0.27,"expected_value":0.30,"reason":"p=0.31・q=0.27・期待値+0.30。〇〇（馬名）は…（STEP1の根拠）"}],"total_stake_yen":300,"skip_reason":null}
+ "bets":[{"type":"ワイド","selection":[1,5],"stake_yen":300,"market_odds":4.2,"model_prob":0.31,"q":0.27,"expected_value":0.30,"reason":"p=0.31・q=0.27・期待値+0.30。〇〇（馬名）は…（STEP1の根拠）"}],"total_stake_yen":300,"skip_reason":null}
 ```
 見送りのときは `decision":"skip"`, `bets":[]`, `skip_reason` を書く。保存したら commit して push。
 
