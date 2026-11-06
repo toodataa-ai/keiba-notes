@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.32-20261106",
-  "current_public_version": "1.32",
+  "current_public_release": "release/jra-site-v1.33-20261107",
+  "current_public_version": "1.33",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -677,6 +677,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/methodology.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.33-20261107",
+      "branch": "release/jra-site-v1.33-20261107",
+      "commit_sha": "bfeab98b81c221ddd8cc54f6077a85680360d168",
+      "deployed_at": "2026-11-07T08:14:24+09:00",
+      "workflow_run_id": 42310498727,
+      "validation_workflow_run_id": 42310498727,
+      "public_version": "1.33",
+      "note": "2026-11-07ユーザー明示承認済み。自動運用の状況：公開確認だけ時間切れの回は、手動の再実行で確認済みなら✅（手）・未確認なら🟡で表示：データの保存は成功し、公開サイトの反映確認だけが時間切れになった回を、手動の再実行で公開まで確認できていれば『R』の薄い✅（説明つき・定時の成功とは別に数える）、未確認なら🟡にする。本物の失敗は従来どおり❌。 あわせて、『R』の回も色を薄くせず、他と同じ濃さで表示（「R」の文字で見分ける）。 出どころの印『手』は『R』（リカバリー）に改名し、他の印と同じ太字・同じ位置に表示。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-publishcheck-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
