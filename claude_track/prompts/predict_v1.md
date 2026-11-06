@@ -48,7 +48,7 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
   - **STEP1 を push した直後に、オッズ取得を自分で起動する**：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-odds-v1.yml/dispatches -f ref=main`（約1〜2分。起動に失敗したら、GitHub の定時 9:30・10:00 が動くのを待つ）。
   - STEP1 を push した**あとに**取得された（`captured_at` が STEP1 のコミット時刻より後）、かつ発走前（`captured_at` < `start_at`）の**一番新しいファイル**だけを使う。
   - まだ無いときは、`git pull` をしながら2分おきに最大45分待つ（STEP1 の push 前に保存されたファイルは開かない）。それでも無い・発走後しかない場合は、買い目は作らず**「見送り（オッズ未取得）」と保存**する。
-- 自分の `win_prob` から、期待値（的中確率×オッズ−1）がプラスの組番を選ぶ。1頭に絡む金額が購入額の60%を超えないようにする。合計は3,000円以内、1点100円単位。見送りもよい（理由を書く）。
+- 自分の `win_prob` から、期待値（的中確率×オッズ−1）がプラスの組番を選ぶ。1頭に絡む金額が購入額の60%を超えないようにする。合計は6,000円以内（ChatGPT正式とそろえた上限。目標ではなく上限）、1点100円単位。見送りもよい（理由を書く）。
 - 保存先：`claude_track/predictions/<race_id>/step2-<UTC日時>.json`
 ```json
 {"schema_version":1,"predictor":"claude","stage":"step2","race_id":"…","generated_at":"<JST>","decision":"buy","odds_source":"claude_track/odds/<race_id>/<UTC日時>.json","odds_observed_at":"…",

@@ -14,7 +14,7 @@ import math
 from itertools import permutations
 from pathlib import Path
 
-PARAMS = {"w": 0.5, "budget": 3000, "unit": 100, "ticket_cap": 1000, "horse_cap": 0.60, "min_ev": 0.0, "min_prob": 0.05,
+PARAMS = {"w": 0.5, "budget": 6000, "unit": 100, "ticket_cap": 1000, "horse_cap": 0.60, "min_ev": 0.0, "min_prob": 0.05,
           "types": ["単勝", "馬連", "馬単", "ワイド", "三連複", "三連単"]}
 TYPE_ORDER = {t: i for i, t in enumerate(PARAMS["types"])}
 ORDERED = {"馬単", "三連単"}
