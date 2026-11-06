@@ -101,7 +101,7 @@ function col(t){/* ダート(0)→中間→芝(1) */var a=[176,104,43],b=[201,17
 function el(n,a,parent){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e}
 function shown(){return DATA.filter(function(s){return (level!=='all'||s.winners>=minW)&&(filt==='all'||(filt==='turf'?s.turf_share>=.6:s.turf_share<=.4))})}
 function draw(){
- var sc=document.getElementById('smScroll'),yax=document.getElementById('smYax'),vw=sc.clientWidth,W=Math.max(1500,vw),H=700;
+ var sc=document.getElementById('smScroll'),yax=document.getElementById('smYax'),vw=sc.clientWidth,W=Math.max(1000,vw),H=700;
  var m={l:14,r:16,t:16,b:44};svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width',W);svg.setAttribute('height',H);svg.innerHTML='';yax.innerHTML='';yax.setAttribute('width',54);yax.setAttribute('height',H);
  var S=shown();
  var xs=S.map(function(s){return s.mean_months}),ys=S.map(function(s){return s.mean_dist});if(!xs.length){svg.innerHTML='';document.getElementById('smMeta').textContent='この条件に当てはまる父がいません。';return}
