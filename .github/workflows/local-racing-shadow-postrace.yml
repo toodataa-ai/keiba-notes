@@ -166,7 +166,7 @@ jobs:
       - name: Verify live published GitHub Pages files, not just Actions success
         env:
           RACE_DATE: ${{ steps.request.outputs.date }}
-        run: python local_racing_shadow_v1/postrace_verify_public.py --date "$RACE_DATE"
+        run: python local_racing_shadow_v1/postrace_verify_public.py --date "$RACE_DATE" --retries 50 --delay 12
       - name: Fail workflow if even one requested review is unresolved
         if: always() && steps.audit.outcome == 'success'
         env:
