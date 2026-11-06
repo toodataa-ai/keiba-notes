@@ -13,7 +13,7 @@
 .mx{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.mx col.c0{width:28%}.mx col.ct{width:15%}.mx th,.mx td{vertical-align:top;padding:5px 1px;text-align:center;border-bottom:1px solid #ececef;line-height:1.3}
 .mx thead th{font-weight:600;color:#6d6e75;border-bottom:2px solid #dcdee3;padding-bottom:6px}.mx thead th.td,.mx td.td{background:#fff5f6}.mx thead th small{display:block;font-weight:400;font-size:12px}
 .mx td.nm{vertical-align:middle;text-align:left;padding:6px 6px 6px 2px;font-size:13px;font-weight:700;line-height:1.35}.mx td.nm span{display:block;font-size:12px;font-weight:400;color:#6d6e75}
-.mx a{text-decoration:none;color:inherit;display:block}.mx .by{font-size:12px;font-weight:700;margin-left:2px;color:#4a4b52}.mx a.man .by{font-weight:400}.mx .ic{display:block;font-size:15px;line-height:1.2}.mx .xs{display:block;font-size:12px;line-height:1.2;white-space:nowrap}.mx .xs a{display:inline-block;margin:0 1px;opacity:.9}.mx .tm{display:block;font-size:12px;color:#4a4b52;white-space:nowrap;letter-spacing:-.04em}.mx .man{opacity:.45}.mx .na{color:#c3c5cb}.mx .ng{color:#b42318;font-weight:800}.mx .wt{color:#9a9ca3}
+.mx a{text-decoration:none;color:inherit;display:block}.mx .by{font-size:12px;font-weight:700;margin-left:2px;color:#4a4b52}.mx a.man .by{font-weight:400}.mx .ic{display:block;font-size:15px;line-height:1.2}.mx .xs{display:block;font-size:12px;line-height:1.2;white-space:nowrap}.mx .xs a{display:inline-block;margin:0 1px;opacity:.9}.mx .tm{display:block;font-size:12px;color:#4a4b52;white-space:nowrap;letter-spacing:-.04em}.mx .na{color:#c3c5cb}.mx .ng{color:#b42318;font-weight:800}.mx .wt{color:#9a9ca3}
 .mx tr.grp td{border-top:0}
 .rt-note{font-size:12px;color:#6d6e75;margin:8px 0 0;line-height:1.7}</style>
 </head>
@@ -32,7 +32,7 @@
 <p class="sub">各処理が終わった直後に、実際に動いた時刻と結果を自動で記録しています（Claudeの使用量を使うタスクは、終わりに自分で残した記録を表示します）。きょうの列の数字は実際の開始時刻です。マスをタップすると、その回の詳細（開始・完了時刻と結果）が開きます。</p>
 <div class="rt-sum" id="rtSum">実行記録を読み込み中…</div>
 <table class="mx"><colgroup><col class="c0"><col><col><col><col><col><col><col class="ct"></colgroup><thead id="mxHead"></thead><tbody id="mxBody"></tbody></table>
-<p class="rt-note">✅成功　🟡処理は成功・公開サイトへの反映の確認だけ時間切れで、再実行での確認がまだ　✅の「手」＝定時が時間切れ→手動の再実行で確認　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。各マスの小さな文字は<b>実行の出どころ</b>です：<b>G</b>＝GitHubの定時（遅れて動いた保険も含む）、<b>H</b>＝Haikuの起動役（朝6:03・夕18:03）、<b>O</b>＝Opusのタスク（予想・回顧）。G・H・Oは予定どおりの定時の実行として集計に数えます。<b>手</b>（薄い表示）は、手動・復旧のやり直し・ファイルの更新（push）で、集計には数えません。同じ日に複数回動いたときは、いちばん早く始まった定時の実行を表示します。起動役とOpusのタスクは同じ権限で起動するため、決まった時刻の窓と決まった処理で見分けています（窓の外の起動は「手」）。ChatGPTの手動実行は含みません。Claudeのタスクは、実行の終わりに自分で記録を残すため、途中で失敗すると「記録なし」（⚠）と出ます。</p>
+<p class="rt-note">✅成功　🟡処理は成功・公開サイトへの反映の確認だけ時間切れで、再実行での確認がまだ　✅の「手」＝定時が時間切れ→手動の再実行で確認　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。各マスの小さな文字は<b>実行の出どころ</b>です：<b>G</b>＝GitHubの定時（遅れて動いた保険も含む）、<b>H</b>＝Haikuの起動役（朝6:03・夕18:03）、<b>O</b>＝Opusのタスク（予想・回顧）。G・H・Oは予定どおりの定時の実行として集計に数えます。<b>手</b>は、手動・復旧のやり直し・ファイルの更新（push）で、定時の集計には数えません（色は他と同じで、「手」の文字で見分けます）。同じ日に複数回動いたときは、いちばん早く始まった定時の実行を表示します。起動役とOpusのタスクは同じ権限で起動するため、決まった時刻の窓と決まった処理で見分けています（窓の外の起動は「手」）。ChatGPTの手動実行は含みません。Claudeのタスクは、実行の終わりに自分で記録を残すため、途中で失敗すると「記録なし」（⚠）と出ます。</p>
 </section>
 <section aria-labelledby="flowTitle">
 <h2 id="flowTitle">何が自動で、何が手動か</h2>
