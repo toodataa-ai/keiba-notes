@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-06T17:29:49+00:00",
+ "generated_at": "2026-11-06T21:04:40+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 42293605899,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-06T21:04:02Z",
+     "started_at": "2026-11-06T21:04:02Z",
+     "ended_at": "2026-11-06T21:04:22Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 42254876776,
      "event": "schedule",
@@ -188,6 +199,17 @@
   "local-racing-shadow-postrace.yml": {
    "label": "地方競馬：前日の回顧",
    "runs": [
+    {
+     "id": 42293609370,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-06T21:04:03Z",
+     "started_at": "2026-11-06T21:04:03Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 42145422225,
      "event": "schedule",
@@ -468,6 +490,17 @@
   "local-racing-shadow-prerace-generic.yml": {
    "label": "地方競馬：予想の固定",
    "runs": [
+    {
+     "id": 42293613217,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-06T21:04:05Z",
+     "started_at": "2026-11-06T21:04:05Z",
+     "ended_at": null,
+     "status": "pending",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 42152263067,
      "event": "schedule",
@@ -1641,6 +1674,17 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 42263923188,
+     "event": "schedule",
+     "created_at": "2026-11-06T17:41:25Z",
+     "started_at": "2026-11-06T17:41:25Z",
+     "ended_at": "2026-11-06T17:41:45Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 42219477729,
      "event": "push",
