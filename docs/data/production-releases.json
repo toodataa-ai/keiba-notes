@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.28-20261106",
-  "current_public_version": "1.28",
+  "current_public_release": "release/jra-site-v1.29-20261106",
+  "current_public_version": "1.29",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -591,6 +591,26 @@
       "note": "2026-11-06ユーザー明示承認済み。初勝利マップ：オープン・重賞・G1の初勝利でも見られるように：地図の上に「初勝利／オープン／重賞／G1」の切り替えを追加。その格で初めて勝ったときの平均月齢・距離を父ごとに表示（丸の大きさ＝その格で勝った頭数）。表示範囲は表示中の父に合わせて自動で決める。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-sire-map-levels-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/sire-map.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.29-20261106",
+      "branch": "release/jra-site-v1.29-20261106",
+      "commit_sha": "609a17f90b3a3375e2fb82090acc8c5a0a56eba1",
+      "deployed_at": "2026-11-06T10:54:31+09:00",
+      "workflow_run_id": 42146870901,
+      "validation_workflow_run_id": 42146870901,
+      "public_version": "1.29",
+      "note": "2026-11-06ユーザー明示承認済み。初勝利マップ：何歳何か月表記・横長（左右スクロール）：横軸の目盛りを「2歳10か月」のような表記にし、図を横に長く（スクロール式）して名前や丸の重なりを減らす。縦軸の距離は左に固定。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-sire-map-wide-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
