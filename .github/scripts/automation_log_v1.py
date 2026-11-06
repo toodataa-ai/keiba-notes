@@ -54,9 +54,34 @@ def gh(path):
     return json.loads(p.stdout)
 
 
+def fail_kind(run_id, cache):
+    """失敗した実行のうち、公開サイトへの反映確認の段階だけが失敗したものを見分ける（データの保存は成功している）。"""
+    if str(run_id) in cache:
+        return cache[str(run_id)]
+    kind = None
+    try:
+        jobs = gh(f"repos/{REPO}/actions/runs/{run_id}/jobs?per_page=30").get("jobs", [])
+        failed = [st["name"] for j in jobs for st in j.get("steps", []) if st.get("conclusion") == "failure"]
+        if failed and all(n.startswith("Verify live published") for n in failed):
+            kind = "publish_check"
+    except RuntimeError as e:
+        print("jobs skip", run_id, e, file=sys.stderr)
+        return None
+    return kind or ""
+
+
 def main(out):
     since = (datetime.now(timezone.utc) - timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
     wfs = {}
+    cache = {}
+    if os.path.exists(out):
+        try:
+            for w in json.load(open(out, encoding="utf-8")).get("workflows", {}).values():
+                for r in w.get("runs", []):
+                    if r.get("conclusion") == "failure" and "fail_kind" in r:
+                        cache[str(r["id"])] = r["fail_kind"]
+        except (ValueError, OSError):
+            pass
     for fn, label in TRACKED:
         try:
             d = gh(f"repos/{REPO}/actions/workflows/{fn}/runs?per_page=60&created=%3E%3D{since}")
@@ -67,6 +92,10 @@ def main(out):
             runs.append({"id": r["id"], "event": r["event"], "created_at": r["created_at"],
                          "started_at": r.get("run_started_at"), "ended_at": r.get("updated_at") if r["status"] == "completed" else None,
                          "status": r["status"], "conclusion": r.get("conclusion"), "attempt": r.get("run_attempt", 1), "by": origin(fn, r)})
+            if r.get("conclusion") == "failure":
+                k = fail_kind(r["id"], cache)
+                if k is not None:
+                    runs[-1]["fail_kind"] = k
         wfs[fn] = {"label": label, "runs": sorted(runs, key=lambda x: x["created_at"], reverse=True)}
     doc = {"schema_version": 2, "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "keep_days": KEEP_DAYS, "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
