@@ -32,7 +32,7 @@ def load(path: Path, default=None):
         return default
 
 CLAUDE_REVIEWS = ROOT / "claude_track/reviews"
-CLAUDE_WAKAKOMA = ROOT / "docs/data/predictors/claude_wakakoma_v1.json"
+SIRE_RESEARCH = ROOT / "docs/data/sire_research_status_v1.json"
 # Claude の回顧の失敗分類（review_v1.md）→ 改善テーマ
 CLAUDE_FAILURE_TO_HYPOTHESIS = {"展開": "pace_positioning", "馬場予測": "track_condition", "購入戦略": "ticket_portfolio", "リスク集中": "ticket_portfolio"}
 
@@ -56,15 +56,6 @@ def claude_screening(hypothesis_id: str, need_races: int, need_meetings: int):
         except ValueError:
             pass
     return {"races": len(races), "meetings": len(weeks), "met": len(races) >= need_races and len(weeks) >= need_meetings}
-
-
-def claude_experience(regime: str):
-    """若駒の機械採点（claude_wakakoma_v1.json）で、その区分が確認できる頭数に届いたか。"""
-    cat = {"experience_e0": "E0", "experience_e1": "E1", "experience_e2": "E2"}.get(regime)
-    d = load(CLAUDE_WAKAKOMA, {}) or {}
-    c = (d.get("categories") or {}).get(cat) or {}
-    need = d.get("confirm_horses_per_category") or 30
-    return {"horses": c.get("horses", 0), "need": need, "met": bool(c.get("confirmable"))}
 
 
 def matching_experiments(unit_id: str, hypothesis_id: str | None, registry: dict, status: dict):
@@ -182,46 +173,18 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
                         # half of the progress is Stage A, half Stage B (the stage that matters at race time)
                         sc = sum(0.5 * score.get(sa[s], 0.0) + 0.5 * score.get(sb[s], 0.0) for s in st) / 2
                         finish(unit_record(tid, uid, ja, 0, sc, "research", text_st, crit["baba_track"]["text"], False, None, detail))
-            elif kind == "experience_regime":
-                r = regimes.get(u["regime"], {})
-                need = crit["experience_regime"]["need_strict_records"]
-                rem = (r.get("next_decision") or {}).get("win_probability_horse_records_remaining")
-                ce = claude_experience(u["regime"])
-                met = rem == 0 or ce["met"]
+            elif kind == "research_note":
+                # 若駒・新馬戦（父の血統データ）の研究。数字は sire_db_v1/research_status.py が書き出した集計だけを読む。
+                sr = load(SIRE_RESEARCH, {}) or {}
+                item = sr.get(u["key"]) or {}
                 exps = matching_experiments(u["id"], None, registry, status)
                 if exps:
                     s, f, t, eid = comparison_state(exps)
-                    finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, crit["experience_regime"]["text"], True, eid))
-                elif met:
-                    src = "若駒の機械採点（Claude）" if ce["met"] and rem != 0 else "ChatGPTの収集"
-                    finish(unit_record(tid, u["id"], u["label"], 1, 0.0, "ready_to_register", f"条件に届いた（登録待ち・{src}）", crit["experience_regime"]["text"], True))
+                    finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, crit["sire_research"]["text"], True, eid))
                 else:
-                    est = (r.get("next_decision") or {}).get("additional_races_estimate")
-                    frac = 0.0 if rem is None else max(0.0, (need - rem) / need)
-                    txt = "データを確認中" if rem is None else f"あと{rem}頭分" + (f"（約{est}レース）" if est else "")
-                    if ce["horses"]:
-                        txt += f"／機械採点（Claude）{ce['horses']}/{ce['need']}頭"
-                        frac = max(frac, min(1.0, ce["horses"] / ce["need"]))
-                    finish(unit_record(tid, u["id"], u["label"], 0, frac, "research", txt, crit["experience_regime"]["text"], False, None, {"collected_prerace_horses": r.get("collected_prerace_horse_observations")}))
-            elif kind == "pedigree":
-                pc = crit["pedigree"]
-                horses = (evidence or {}).get("horses") or 0
-                have = ((evidence or {}).get("factor_support_counts") or {}).get("6", 0)
-                cov = (have / horses) if horses else 0.0
-                reqs_met = all(done.get(x, False) or any(r["id"] == x and r["stage"] >= 1 for r in units) for x in pc["requires"])
-                met = reqs_met and cov >= pc["min_coverage"]
-                exps = matching_experiments(u["id"], None, registry, status)
-                detail = {"pedigree_coverage": round(cov, 4), "requires_met": reqs_met}
-                if exps:
-                    s, f, t, eid = comparison_state(exps)
-                    finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, pc["text"], True, eid, detail))
-                elif met:
-                    finish(unit_record(tid, u["id"], u["label"], 1, 0.0, "ready_to_register", "条件に届いた（登録待ち）", pc["text"], True, None, detail))
-                else:
-                    parts = [f"血統の情報 {int(cov*100)}%（目標{int(pc['min_coverage']*100)}%）"]
-                    if not reqs_met:
-                        parts.append("0戦・1〜3戦の条件はこれから")
-                    finish(unit_record(tid, u["id"], u["label"], 0, cov * 0.5 if not reqs_met else cov, "research", "／".join(parts), pc["text"], False, None, detail))
+                    frac = item.get("frac") or 0.0
+                    finish(unit_record(tid, u["id"], u["label"], 0, frac, "research", item.get("text") or "データを確認中",
+                                       crit["sire_research"]["text"], False, None, {"updated_at": sr.get("updated_at")}))
     updated = (baba or {}).get("updated_at")
     stale = None
     if updated:
