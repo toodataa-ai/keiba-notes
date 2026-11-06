@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-operations-publishcheck-v1",
-      "title": "自動運用の状況：公開確認だけ時間切れの回は、手動の再実行で確認済みなら✅（手）・未確認なら🟡で表示",
-      "pages": [
-        "operations.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-07",
-      "summary": "データの保存は成功し、公開サイトの反映確認だけが時間切れになった回を、手動の再実行で公開まで確認できていれば『R』の薄い✅（説明つき・定時の成功とは別に数える）、未確認なら🟡にする。本物の失敗は従来どおり❌。 あわせて、『R』の回も色を薄くせず、他と同じ濃さで表示（「R」の文字で見分ける）。 出どころの印『手』は『R』（リカバリー）に改名し、他の印と同じ太字・同じ位置に表示。"
-    }
-  ]
+  "candidates": []
 }
