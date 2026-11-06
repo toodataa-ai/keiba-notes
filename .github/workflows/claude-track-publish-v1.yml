@@ -10,6 +10,7 @@ on:
       - 'claude_track/build_public.py'
       - 'claude_track/score_claude.py'
       - 'claude_track/experiments.py'
+      - 'claude_track/head_to_head.py'
       - 'claude_track/inputs/**'
   schedule:
     - cron: '47 10 * * *'   # 19:47 JST: picks up results committed by other bots
@@ -43,8 +44,9 @@ jobs:
             python3 -m claude_track.build_public
             python3 -m claude_track.build_report
             python3 -m claude_track.experiments
+            python3 -m claude_track.head_to_head
             mkdir -p docs/claude-reports
-            git add claude_track/status_v1.json docs/data/predictors/claude_status_v1.json docs/data/predictors/claude_experiments_v1.json docs/claude-reports
+            git add claude_track/status_v1.json docs/data/predictors/claude_status_v1.json docs/data/predictors/claude_experiments_v1.json docs/data/predictors/head_to_head_v1.json docs/claude-reports
             if git diff --cached --quiet; then echo 'no change'; exit 0; fi
             git commit -q -m 'Update Claude track scores and public data (derived only)'
             if git push origin HEAD:main; then exit 0; fi
