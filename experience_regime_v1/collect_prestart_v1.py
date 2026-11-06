@@ -35,6 +35,9 @@ SEEDS = {
     "2026-10-31": {"東京": (1, 0x74), "京都": (1, 0x52)},
     # Verified against JRA PC 2026-11-01 1R official cards (Tokyo /54, Kyoto /32).
     "2026-11-01": {"東京": (1, 0x54), "京都": (1, 0x32)},
+    # Verified from JRA official PC entry cards, not derived from mobile check digits.
+    "2026-11-07": {"東京": (1, 0xE3), "京都": (1, 0xC1), "福島": (1, 0xED)},
+    "2026-11-08": {"東京": (1, 0x13), "京都": (1, 0xF1), "福島": (1, 0x1D)},
 }
 MEETING_DAY = {
     "2026-10-17": {"東京": "06", "京都": "06", "新潟": "01"},
@@ -43,8 +46,13 @@ MEETING_DAY = {
     "2026-10-25": {"東京": "09", "京都": "09", "新潟": "04"},
     "2026-10-31": {"東京": "10", "京都": "10"},
     "2026-11-01": {"東京": "11", "京都": "11"},
+    "2026-11-07": {"東京": "01", "京都": "01", "福島": "01"},
+    "2026-11-08": {"東京": "02", "京都": "02", "福島": "02"},
 }
-VENUES = {"東京":("05","04","06"),"京都":("08","04","06"),"新潟":("04","04","01")}
+VENUES = {"東京":("05","04","06"),"京都":("08","04","06"),"新潟":("04","04","01"),"福島":("03","03","01")}
+# Do not overwrite past meeting codes: historical proof URLs remain byte-stable.
+CURRENT_MEETINGS = {"2026-11-07":{"東京":("05","05"),"京都":("08","05"),"福島":("03","03")},
+                    "2026-11-08":{"東京":("05","05"),"京都":("08","05"),"福島":("03","03")}}
 
 def jst_now():
     return datetime.now(JST)
@@ -56,7 +64,10 @@ def official_card_url(item):
     known,base=SEEDS[day][venue]
     # JRA URL two decimal race digits; ones coefficient -75, tens +82 (mod 256).
     v=(base-75*((num%10)-(known%10))+82*((num//10)-(known//10)))%256
-    cc,meet,_legacy_meeting_day=VENUES[venue]
+    if day in CURRENT_MEETINGS:
+        cc,meet=CURRENT_MEETINGS[day][venue]
+    else:
+        cc,meet,_legacy_meeting_day=VENUES[venue]
     meeting_day=MEETING_DAY[day][venue]
     code=f"pw01dde01{cc}{day[:4]}{meet}{meeting_day}{num:02d}{day.replace('-','')}/{v:02X}"
     return "https://www.jra.go.jp/JRADB/accessD.html?CNAME="+quote(code,safe="")
@@ -77,6 +88,10 @@ def fetch_race_card(session,item):
     visible=soup.get_text(" ",strip=True)
     # JRA displays unpadded calendar days (e.g. 1日, never 01日).
     identity=f"{int(item['date'][-2:])}日"
+    # Source must still be the official prereace racecard; fail closed on time changes.
+    time_match=re.search(r"発走時刻\s*[:：]\s*(\d{1,2})時\s*(\d{1,2})分",visible)
+    if not time_match or f"{int(time_match.group(1)):02d}:{int(time_match.group(2)):02d}"!=item["start_at"][11:16]:
+        raise ValueError("official_racecard_start_time_missing_or_changed")
     match_venue=(item["venue"] in visible)
     match_race=re.search(rf"(?:^|\s){item['race_no']}\s*レース",visible) is not None
     if not (match_venue and match_race and (identity in visible)):
