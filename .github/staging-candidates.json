@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-methodology-wording-v1",
-      "title": "予想のしくみ：①〜⑨の表を「重視度」の1軸（最重視／重視／状況しだい／控えめ）に",
-      "pages": [
-        "methodology.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-06",
-      "summary": "2種類のタグ（定め／サイトの整理）をやめ、重視度の4段階だけで示す。最終判断はすべてAIがレースごとに行うこと、段階は計算式ではなく目安であることを明記。"
-    }
-  ]
+  "candidates": []
 }
