@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-sire-map-wide-v1",
-      "title": "初勝利マップ：何歳何か月表記・横長（左右スクロール）",
-      "pages": [
-        "sire-map.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-06",
-      "summary": "横軸の目盛りを「2歳10か月」のような表記にし、図を横に長く（スクロール式）して名前や丸の重なりを減らす。縦軸の距離は左に固定。"
-    }
-  ]
+  "candidates": []
 }
