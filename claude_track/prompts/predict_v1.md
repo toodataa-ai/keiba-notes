@@ -48,11 +48,22 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
   - **STEP1 を push した直後に、オッズ取得を自分で起動する**：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-odds-v1.yml/dispatches -f ref=main`（約1〜2分。起動に失敗したら、GitHub の定時 9:30・10:00 が動くのを待つ）。
   - STEP1 を push した**あとに**取得された（`captured_at` が STEP1 のコミット時刻より後）、かつ発走前（`captured_at` < `start_at`）の**一番新しいファイル**だけを使う。
   - まだ無いときは、`git pull` をしながら2分おきに最大45分待つ（STEP1 の push 前に保存されたファイルは開かない）。それでも無い・発走後しかない場合は、買い目は作らず**「見送り（オッズ未取得）」と保存**する。
-- 自分の `win_prob` から、期待値（的中確率×オッズ−1）がプラスの組番を選ぶ。1頭に絡む金額が購入額の60%を超えないようにする。合計は6,000円以内（ChatGPT正式とそろえた上限。目標ではなく上限）、1点100円単位。見送りもよい（理由を書く）。
+- **買い目は自分で考えず、計算プログラムの結果をそのまま使う（版 anchored_v1、2026-11-06〜）**：
+  `python3 -m claude_track.stake_opt --method anchored_v1 --step1 <STEP1のファイル> --odds <使うオッズファイル>`
+  - 考え方：値段（オッズ）を基準に、自分の見方で傾ける。①自分の勝率の平らさを τ 乗で直す（τ は単勝オッズ由来の確率と散らばりが同じになる値）。②券種ごとに、その券種自身のオッズから q を作る。③ p = q ×（自分の組番確率÷市場の組番確率）^0.5 を券種ごとに割り直す。
+  - **主力**：単勝・馬連・ワイドのうち、p≥2%・オッズ≤50倍・期待値（p×オッズ−1）がプラスの組番。金額は4分の1ケリー（100円未満切り捨て、1点1,000円まで）。
+  - **一発枠**：馬単・三連複のうち、p≥0.5%で期待値の高い順に最大3点、1点100円固定（合計300円まで）。
+  - 合計6,000円以内（ChatGPT正式とそろえた上限。目標ではなく上限）、1頭に絡む金額は6,000円の60%まで。条件を満たす組番が無ければ見送り。
+  - 出力の `bets` を、そのまま step2 の `bets` に写す（`slot`・`model_prob`・`q`・`expected_value` も残す）。各買い目の `reason` に、p・q・期待値の数値と、STEP1 のその馬の根拠を1行で書く。
+  - **買い目を足す・金額を変えるのは禁止**。削除してよいのは出走取消などの事実があるときだけで、その理由を `skip_reason` かその買い目の `reason` に書く。
+  - step2 に `"stake_method":"anchored_v1"`、`"tau"`、`"w"`、`"candidates"`（出力の候補全件）を保存する。
+  - `bets` が空なら `decision":"skip"`、`skip_reason":"市場を上回る組番なし"`。
+  - 計算の中身を変えるときは、版名（anchored_v2 …）を上げる。成績で係数を調整しない（見直しは20レース・40レースの時点で、勝つ確率の当たり具合を見て行う）。
 - 保存先：`claude_track/predictions/<race_id>/step2-<UTC日時>.json`
 ```json
 {"schema_version":1,"predictor":"claude","stage":"step2","race_id":"…","generated_at":"<JST>","decision":"buy","odds_source":"claude_track/odds/<race_id>/<UTC日時>.json","odds_observed_at":"…",
- "bets":[{"type":"三連複","selection":[1,5,9],"stake_yen":100,"market_odds":42.5,"reason":"妙味：…（馬名と数値で）"}],"total_stake_yen":600,"skip_reason":null}
+ "stake_method":"anchored_v1","tau":1.2,"w":0.5,"candidates":[…],
+ "bets":[{"slot":"main","type":"ワイド","selection":[1,5],"stake_yen":300,"market_odds":4.2,"model_prob":0.31,"q":0.27,"expected_value":0.30,"reason":"p=0.31・q=0.27・期待値+0.30。〇〇（馬名）は…（STEP1の根拠）"}],"total_stake_yen":300,"skip_reason":null}
 ```
 見送りのときは `decision":"skip"`, `bets":[]`, `skip_reason` を書く。保存したら commit して push。
 
