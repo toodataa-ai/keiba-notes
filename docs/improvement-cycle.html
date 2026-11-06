@@ -132,13 +132,14 @@ Promise.all([
 });
 
 // ---- 改善テーマと研究の連動 ----
-const THEME_CFG={"note": "改善テーマと研究の連動の設定。数字そのものは data/*.json から読み、ここには条件と説明だけを置く。", "themes": [{"id": "pace_positioning", "title": "展開・位置取り", "what": "逃げ・先行馬の数から、レースのペースを読んで勝率を補正します。", "research": null, "entry": null}, {"id": "track_condition", "title": "馬場状態", "what": "発走前の公式馬場と、同じ馬場での近走成績で補正します。", "research": {"href": "baba-models.html", "label": "馬場状態予測の研究"}, "entry": "競馬場ごとに、芝・ダートの両方が「検証済み」になったら、その競馬場を改善案として登録します（競馬場ごとに順番に進めます）。", "kind": "baba"}, {"id": "field_experience", "title": "若駒・経験不足", "what": "走った経験が少ない馬ほど予想が外れやすいかを調べ、血統との組み合わせも見ます。", "research": {"href": "experience-regime.html", "label": "新馬・戦歴の少ない馬の予想研究"}, "entry": "0戦・1〜3戦・4戦以上のそれぞれで、勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録します。血統は、まず「実測できているか」を確認します。", "kind": "experience"}, {"id": "ticket_portfolio", "title": "購入セットと印の整合性", "what": "印と買い目がちぐはぐにならないよう、組み合わせを見直します。", "research": null, "entry": null}]};
+const THEME_CFG={"note": "改善テーマと研究の連動の設定。数字そのものは data/*.json から読み、ここには条件と説明だけを置く。", "themes": [{"id": "pace_positioning", "title": "展開・位置取り", "what": "逃げ・先行馬の数から、レースのペースを読んで勝率を補正します。", "research": null, "entry": null}, {"id": "track_condition", "title": "馬場状態", "what": "発走前の公式馬場と、同じ馬場での近走成績で補正します。", "research": {"href": "baba-models.html", "label": "馬場状態予測の研究"}, "entry": "競馬場ごとに、芝・ダートの両方が「検証済み」になったら、その競馬場を改善案として登録します（競馬場ごとに順番に進めます）。", "kind": "baba"}, {"id": "field_experience", "title": "若駒・新馬戦（父の血統データ）", "what": "経験の少ない新馬戦で、父の血統の傾向を使うと、オッズだけより勝つ馬を当てやすくなるかを、過去の全レースのデータで確かめます。", "research": {"href": "sire-map.html", "label": "種牡馬の初勝利マップ"}, "entry": "過去レースの取得がそろい、同じ検証をやり直して、新馬戦の外れ具合の改善が偶然と区別できたら、新馬戦だけの小さな補正として登録します。", "kind": "experience"}, {"id": "ticket_portfolio", "title": "購入セットと印の整合性", "what": "印と買い目がちぐはぐにならないよう、組み合わせを見直します。", "research": null, "entry": null}]};
 Promise.all([
   Promise.resolve(THEME_CFG),
   fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/jra_experiment_status_v1.json',{cache:'no-store'}).then(r=>r.json()),
   fetch('data/jra_improvement_pipeline_v1.json',{cache:'no-store'}).then(r=>r.json()),
-]).then(([cfg,cycle,status,pipe])=>{
+  fetch('data/sire_research_status_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+]).then(([cfg,cycle,status,pipe,sire])=>{
   const exps=status.experiments||[];
   const names=pipe.stages||['研究','登録','比較','判定'];
   const bar=(u)=>{const st=u.state==='in_production'?4:u.stage;return `<div class="pb" aria-hidden="true">${names.map((n,i)=>i<st?'<i class="d"></i>':i===st?`<i class="n"><b style="width:${Math.max(0,Math.min(1,u.frac))*100}%"></b></i>`:'<i></i>').join('')}</div>`};
@@ -165,7 +166,7 @@ Promise.all([
       if(f) extra+=`<p class="tiny ${f.is_stale?'warn':''}">馬場モデルの記録の最終更新：${esc(f.updated_at)}（${f.age_days}日前）。${f.is_stale?'更新が止まっています。':''}${esc(f.owner)}</p>`;
       extra+='<p class="tiny"><b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5%以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない（予報を毎日保存していて、たまり次第、本当の精度で測り直します）。<b>まだ足りない</b>＝予報が当たっても基準に届かない。</p><p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場予測は、競馬場ごとに条件に届いたら、20レースの比較を挟まず採用できます（承認が必要）。中山・阪神も、他の競馬場と同じ基準で評価しています。</p>';
     }
-    if(t.id==='field_experience') extra+=`<p class="tiny">血統：いまの正式予想では血統は固定の評価で、実測していません。研究では血統の情報を集めていて、条件に届けば「戦歴が少ない馬ほど血統の影響が大きいか」を比較で確かめます。</p><p class="tiny">${esc(pipe.owners.experience)}</p>`;
+    if(t.id==='field_experience'&&sire){extra+=`<p class="tiny"><b>これまでに分かったこと</b>（${esc(sire.debut_sire.verified_at)}時点）</p><ul class="tiny" style="margin:4px 0 8px 18px;padding:0">${(sire.findings||[]).map(x=>`<li style="margin:3px 0">${esc(x)}</li>`).join('')}</ul><p class="tiny">${esc(sire.race_pages.text)}　（${esc(sire.updated_at)}時点）</p><p class="tiny">${esc(sire.stopped)}</p>`}
     const entry=!crit.length&&regd?`<div class="entry"><b>登録ずみ：</b><span class="eline">登録の条件に届いたため、改善案として登録しました。いまは「比較」の段階です（下の「比較中の詳しい経過」で見られます）。</span></div>`:crit.length?`<div class="entry"><b>登録の条件：</b>${crit.map(c=>`<span class="eline">${esc(c)}</span>`).join('')}${ready?`<span class="eline"><b>いま登録できる状態：${ready}件。</b>通知（Issue）を出しています。</span>`:''}${adopt?`<span class="eline"><b>いま採用できる状態：${adopt}件。</b>通知（Issue）を出しています。</span>`:''}</div>`:'';
     const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'<p class="tiny">専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。</p>';
     const cmp=ex.map(expCard).join('');
@@ -179,9 +180,9 @@ Promise.all([
 <script>
 (function(){
   const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  fetch('data/predictors/claude_wakakoma_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null).then(w=>{window.__wakakoma=w;return fetch('data/predictors/claude_experiments_v1.json',{cache:'no-store'})}).then(r=>r.ok?r.json():null).then(d=>{
+  fetch('data/predictors/claude_experiments_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
     if(!d)return;
-    const p=d.pace||{},e=(d.experience||{}),rg=e.regimes||{};
+    const p=d.pace||{};
     const n=p.pairs||0,need=p.need_pairs||20,pct=Math.min(100,Math.round(n/need*100));
     const f=x=>x==null?'—':Number(x).toFixed(3);
     const pace=`<article class="tcard"><h3>展開・位置取り（Claudeの予想）</h3>
@@ -189,12 +190,6 @@ Promise.all([
       <p class="prog">比較したレース：<b>${n} / ${need}レース</b></p>
       <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${pct}%"></b></i></div>
       <p class="tiny">${n?`外れ具合（小さいほど良い）：補正なし ${f(p.mean_log_loss_base)} → 補正あり ${f(p.mean_log_loss_pace)}／良くなったレース ${p.races_improved}・悪くなったレース ${p.races_worse}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
-    const names={E0:'0戦',E1:'1〜3戦',E2:'4戦以上'};
-    const rows=['E0','E1','E2'].map(k=>{const r=rg[k]||{horses:0};return `<tr><td>${names[k]}</td><td>${r.horses||0} / ${e.need_horses||30}頭</td><td>${r.horses?`${r.predicted_wins}（予想）／${r.actual_wins}（実際）`:'—'}</td></tr>`}).join('');
-    const exp=`<article class="tcard"><h3>若駒・経験不足（Claudeの予想）</h3>
-      <p class="what">経験の少ない馬で、Claudeの予想した勝つ数と実際の勝ちがどれだけずれるかを集めます。</p>
-      <table><tr><th>区分</th><th>集まった馬</th><th>勝ちの数</th></tr>${rows}</table>
-      <p class="tiny">${e.career_data_available?'出馬表の戦績から出走数を読み取っています。':'出馬表から出走数を読み取れるか、次の開催週に確認します。'}</p></article>`;
     const g=d.going||{},gn=g.pairs||0,gneed=g.need_pairs||20,gp=Math.min(100,Math.round(gn/gneed*100));
     const going=`<article class="tcard"><h3>馬場の補正（Claudeの予想）</h3>
       <p class="what">発走前の公式の馬場状態と、各馬の良馬場・道悪での近走成績から、Claudeの勝つ確率を補正した場合と、しない場合を比べます。</p>
@@ -208,14 +203,7 @@ Promise.all([
       <p class="prog">比較したレース：<b>${pn} / ${pneed}レース</b></p>
       <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${pp}%"></b></i></div>
       <p class="tiny">${ps?`回収率：Claude自身 ${pct1(ps.claude_own.roi)} ／ 機械ルール ${pct1(ps.mechanical_rule.roi)}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
-    const wk=window.__wakakoma;
-    let wkc='';
-    if(wk&&wk.categories){const wr=['E0','E1','E2'].map(k=>{const r=wk.categories[k]||{};return `<tr><td>${r.label||k}</td><td>${r.horses||0} / ${wk.confirm_horses_per_category||30}頭</td><td>${r.horses?`${r.expected_wins}（オッズ上）／${r.actual_wins}（実際）`:'—'}</td></tr>`}).join('');
-      wkc=`<article class="tcard"><h3>若駒の機械採点（全レース・Claudeの使用量なし）</h3>
-      <p class="what">全レースの公開オッズから勝つ確率を機械的に出し、経験の少ない馬が過大・過小に評価されていないかを集めます。</p>
-      <table><tr><th>区分</th><th>集まった馬</th><th>勝ちの数</th></tr>${wr}</table>
-      <p class="tiny">対象：${wk.races_scored||0}レース。ChatGPTの予想もClaudeの予想も使いません。</p></article>`}
-    document.getElementById('claudeExpBody').innerHTML=pace+going+port+exp+wkc; document.getElementById('claudeExp').hidden=false;
+    document.getElementById('claudeExpBody').innerHTML=pace+going+port; document.getElementById('claudeExp').hidden=false;
   }).catch(()=>{});
 })();
 </script>
