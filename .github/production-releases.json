@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.30-20261106",
-  "current_public_version": "1.30",
+  "current_public_release": "release/jra-site-v1.31-20261106",
+  "current_public_version": "1.31",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -637,6 +637,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/sire-map.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.31-20261106",
+      "branch": "release/jra-site-v1.31-20261106",
+      "commit_sha": "5ede9205dee4b4f7ea6d73f991cefc5a80c1b26c",
+      "deployed_at": "2026-11-06T18:57:05+09:00",
+      "workflow_run_id": 42198857385,
+      "validation_workflow_run_id": 42198857385,
+      "public_version": "1.31",
+      "note": "2026-11-06ユーザー明示承認済み。自動運用の状況：実行の出どころ（G・H・O・手）を表示：実行記録の表に、出どころの印を付ける。G＝GitHubの定時（遅れた保険を含む）、H＝Haikuの起動役、O＝Opusのタスク。G・H・Oは予定どおりの実行として数え、手＝手動・復旧だけを薄く表示する。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-origin-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
