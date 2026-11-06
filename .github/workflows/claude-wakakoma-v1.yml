@@ -1,8 +1,6 @@
 name: Claude wakakoma v1 (machine check of low-experience horses, all races, no Claude usage)
 on:
-  schedule:
-    # Sat/Sun/Mon 17:57 JST (= 08:57 UTC): after results are confirmed (results capture runs at 17:17/17:47)
-    - cron: '57 8 * * 6,0,1'
+  # 2026-11-07 stopped by user (E0/E1/E2 research abolished; sire-database method instead). Manual run only.
   workflow_dispatch:
     inputs:
       dates:

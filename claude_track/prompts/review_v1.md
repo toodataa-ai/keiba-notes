@@ -6,10 +6,9 @@
 - 結果は `claude_track/results/<race_id>.json`（公式の着順・払戻。Claude 用の自動処理 `claude-results-v1.yml` が、レース後（土日月の 17:17・17:47 JST）に Sportnavi の結果ページから保存する）。無いときは `e2e_validation/results/<ChatGPT側のレース名>.json`（ChatGPT の回顧が書く共有の結果ファイル）を使ってよい。どちらも無いレースは、無いと報告して終わり（結果を推測しない）。
 - **最初にやること：GitHub の定時が遅れる保険（2026-11-04 追加）**。GitHub Actions の定時実行は数時間遅れることがある（2026-11-03 に実測）。この手順書を動かしている Claude の定時は遅れないので、**Claude 自身が先に起動する**。GitHub の定時（結果 17:17/17:47・若駒 17:57）は「保険」。
   1. 結果の取得を起動：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-results-v1.yml/dispatches -f ref=main`（結果が保存されると、採点・公開も自動で続く）。
-  2. 続けて若駒の機械採点を起動：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-wakakoma-v1.yml/dispatches -f ref=main`（約1時間かかるが、待たなくてよい）。
-  3. 1〜2分おきに `git pull` して、結果ファイルが出るまで最大15分待つ。それでも無いレース（発走30分未満・払戻未確定など）は、無いと報告する。
-  4. 結果の保存を確認したら、順番に起動して各回の完了を待つ（失敗しても次へ進み、record_run の note に書く）：`claude-track-publish-v1.yml`（採点・公開）→ `jra-improvement-experiments-v1.yml`（改善案の採点）→ `jra-improvement-pipeline-v1.yml`（基準の確認）。起動の形式は上と同じ（`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>/dispatches -f ref=main`）。GitHub の定時は保険。
-  5. 起動のコマンドが失敗しても（権限なし・gh が使えないなど）、止まらずに従来どおり進める。失敗したことは、最後の実行記録の `--note` に書く。
+  2. 1〜2分おきに `git pull` して、結果ファイルが出るまで最大15分待つ。それでも無いレース（発走30分未満・払戻未確定など）は、無いと報告する。
+  3. 結果の保存を確認したら、順番に起動して各回の完了を待つ（失敗しても次へ進み、record_run の note に書く）：`claude-track-publish-v1.yml`（採点・公開）→ `jra-improvement-experiments-v1.yml`（改善案の採点）→ `jra-improvement-pipeline-v1.yml`（基準の確認）。起動の形式は上と同じ（`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>/dispatches -f ref=main`）。GitHub の定時は保険。
+  4. 起動のコマンドが失敗しても（権限なし・gh が使えないなど）、止まらずに従来どおり進める。失敗したことは、最後の実行記録の `--note` に書く。
 - `git pull` で最新を取る。
 - Claude の予想は `claude_track/predictions/<race_id>/`。**保存済みの予想は書き換えない。**
 - ChatGPT の予想・回顧は、**Claude 自身の回顧を保存したあと**に、比較のためにだけ読んでよい。
