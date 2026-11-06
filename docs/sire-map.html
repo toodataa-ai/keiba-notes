@@ -15,7 +15,7 @@
 .sm-seg button[aria-pressed="true"]{background:#17171a;color:#fff}
 .sm-seg button:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
 .sm-box{position:relative;border:1px solid #e3e4e8;border-radius:12px;background:#fff;padding:6px 4px 2px}
-.sm-box{display:flex;align-items:flex-start}.sm-yax{flex:none;display:block}.sm-scroll{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}.sm-svg{display:block;max-width:none;touch-action:pan-x pan-y}
+.sm-box{display:flex;align-items:flex-start}.sm-yax{flex:none;display:block}.sm-scroll{flex:1;min-width:0;overflow:auto;touch-action:none;-webkit-overflow-scrolling:touch;cursor:grab;overscroll-behavior:contain}.sm-svg{display:block;max-width:none;touch-action:none;user-select:none;-webkit-user-select:none}.sm-ywrap{flex:none;overflow:hidden;position:relative;width:54px}.sm-ytitle{position:absolute;left:1px;top:50%;writing-mode:vertical-rl;transform:translateY(-50%) rotate(180deg);font-size:12px;color:#4a4b52;white-space:nowrap}
 .sm-svg text{font-family:inherit}
 .sm-dot{cursor:pointer}
 .sm-dot:focus{outline:none}
@@ -56,8 +56,8 @@
  <span class="sm-seg" role="group" aria-label="表示範囲"><button type="button" data-z="0" aria-pressed="true">全体</button><button type="button" data-z="1" aria-pressed="false">中心を拡大</button></span>
  <span class="sm-seg" role="group" aria-label="勝ち上がり頭数"><button type="button" data-m="15" aria-pressed="true">15頭以上</button><button type="button" data-m="40" aria-pressed="false">40頭以上</button><button type="button" data-m="100" aria-pressed="false">100頭以上</button></span>
 </div>
-<div class="sm-box"><svg class="sm-yax" id="smYax" aria-hidden="true"></svg><div class="sm-scroll" id="smScroll"><svg class="sm-svg" id="smSvg" role="img" aria-label="父ごとの初勝利の平均月齢と平均距離の地図"></svg></div></div>
-<p class="sm-note">横長の図です。左右になぞるとスクロールできます（最初は父が多く集まる中央あたりを表示）。</p>
+<div class="sm-box"><div class="sm-ywrap" id="smYw"><svg class="sm-yax" id="smYax" aria-hidden="true"></svg><span class="sm-ytitle">初勝利の距離（平均）→ 長い</span></div><div class="sm-scroll" id="smScroll"><svg class="sm-svg" id="smSvg" role="img" aria-label="父ごとの初勝利の平均月齢と平均距離の地図"></svg></div></div>
+<p class="sm-note">図は指でつまんで拡大・縮小、1本指でドラッグして動かせます（パソコンは Ctrl＋ホイールで拡大）。<span class="sm-seg" role="group" aria-label="拡大縮小"><button type="button" data-zz="in" aria-label="拡大">＋</button><button type="button" data-zz="out" aria-label="縮小">－</button><button type="button" data-zz="reset">表示を戻す</button></span></p>
 <div class="sm-legend"><span>色：ダート寄り<span class="sm-grad"></span>芝寄り</span><span>丸の大きさ：勝ち上がった頭数</span><span>名前は重ならない分だけ表示。丸をタップすると詳しく出ます。</span></div>
 <p class="sm-note" id="lvNote" hidden>オープン・重賞・G1は、その格のレースで初めて勝ったときの月齢と距離です。頭数の絞り込み（15頭以上など）は「初勝利」のときだけ効きます。重賞・G1は頭数が少ない父も載せています（丸が小さいほど頭数が少なく、平均がぶれやすい）。</p>
 <p class="sm-info" id="smInfo" aria-live="polite">丸をタップすると、その父の数字が出ます。</p>
@@ -100,9 +100,10 @@ function ym(m){var y=Math.floor(m/12),mo=Math.round(m-y*12);if(mo===12){y++;mo=0
 function col(t){/* ダート(0)→中間→芝(1) */var a=[176,104,43],b=[201,178,90],c=[47,125,59],p,q,u;if(t<.5){p=a;q=b;u=t/.5}else{p=b;q=c;u=(t-.5)/.5}return 'rgb('+p.map(function(v,i){return Math.round(v+(q[i]-v)*u)}).join(',')+')'}
 function el(n,a,parent){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(parent)parent.appendChild(e);return e}
 function shown(){return DATA.filter(function(s){return (level!=='all'||s.winners>=minW)&&(filt==='all'||(filt==='turf'?s.turf_share>=.6:s.turf_share<=.4))})}
+var Z=1,ZMAX=4;
 function draw(){
- var sc=document.getElementById('smScroll'),yax=document.getElementById('smYax'),vw=sc.clientWidth,W=Math.max(1000,vw),H=700;
- var m={l:14,r:16,t:16,b:44};svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width',W);svg.setAttribute('height',H);svg.innerHTML='';yax.innerHTML='';yax.setAttribute('width',54);yax.setAttribute('height',H);
+ var sc=document.getElementById('smScroll'),yax=document.getElementById('smYax'),vw=sc.clientWidth,W=Math.max(1000,vw)*Z,H=Math.round(700*Z);
+ var m={l:14,r:16,t:16,b:44};svg.setAttribute('viewBox','0 0 '+W+' '+H);svg.setAttribute('width',W);svg.setAttribute('height',H);svg.style.width='';svg.style.height='';svg.innerHTML='';var bh=Math.min(H+2,Math.max(380,Math.round(window.innerHeight*0.72)));sc.style.height=bh+'px';document.getElementById('smYw').style.height=bh+'px';yax.style.transform='translateY('+(-sc.scrollTop)+'px)';yax.innerHTML='';yax.setAttribute('width',54);yax.setAttribute('height',H);
  var S=shown();
  var xs=S.map(function(s){return s.mean_months}),ys=S.map(function(s){return s.mean_dist});if(!xs.length){svg.innerHTML='';document.getElementById('smMeta').textContent='この条件に当てはまる父がいません。';return}
  var x0=Math.floor(Math.min.apply(0,xs))-1,x1=Math.ceil(Math.max.apply(0,xs))+1,y0=Math.floor(Math.min.apply(0,ys)/100)*100-50,y1=Math.ceil(Math.max.apply(0,ys)/100)*100+50;
@@ -114,14 +115,13 @@ function draw(){
  for(var v=Math.ceil(x0);v<=x1;v++){if(v%stp&&v%12)continue;if(v%stp&&v%12===0){var xa=X(v);el('line',{x1:xa,x2:xa,y1:m.t,y2:H-m.b,stroke:'#c9cbd2','stroke-width':1},g);if(yrPx>44){var ta=el('text',{x:xa+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);ta.textContent=(v/12)+'歳'}continue}var xx=X(v);el('line',{x1:xx,x2:xx,y1:m.t,y2:H-m.b,stroke:v%12===0?'#c9cbd2':'#eef0f3','stroke-width':1},g);var t=el('text',{x:xx,y:H-m.b+15,'text-anchor':'middle','font-size':11,fill:'#6d6e75'},g);t.textContent=(v%12===0?(v/12)+'歳':Math.floor(v/12)+'歳'+(v%12)+'か月');if(v%12===0&&x0<v&&yrPx>44){var t3=el('text',{x:xx+3,y:m.t+10,'font-size':11,fill:'#6d6e75'},g);t3.textContent=(v/12)+'歳'}}
  for(var d=Math.ceil(y0/(zoom?100:200))*(zoom?100:200);d<=y1;d+=(zoom?100:200)){var yy=Y(d);el('line',{x1:m.l,x2:W-m.r,y1:yy,y2:yy,stroke:'#eef0f3','stroke-width':1},g);var t2=el('text',{x:50,y:yy+4,'text-anchor':'end','font-size':11,fill:'#6d6e75'},yax);t2.textContent=d+'m'}
  var tx=el('text',{x:m.l+4,y:H-6,'text-anchor':'start','font-size':12,fill:'#4a4b52'},g);tx.textContent='初勝利の月齢（平均・何歳何か月）→ 遅い';
- var ty=el('text',{x:11,y:(m.t+H-m.b)/2,'text-anchor':'middle','font-size':12,fill:'#4a4b52',transform:'rotate(-90 12 '+((m.t+H-m.b)/2)+')'},yax);ty.textContent='初勝利の距離（平均）→ 長い';
- var mxW=Math.max.apply(0,S.map(function(s){return s.winners})),R=function(s){return (zoom?3.5:2.6)+Math.sqrt(s.winners/mxW)*(zoom?16:12)};
+ var mxW=Math.max.apply(0,S.map(function(s){return s.winners})),R=function(s){return ((zoom?3.5:2.6)+Math.sqrt(s.winners/mxW)*(zoom?16:12))*Math.max(.7,1+(Z-1)*.25)};
  var dots=S.map(function(s){return {s:s,x:X(s.mean_months),y:Y(s.mean_dist),r:R(s)}});
  var dg=el('g',{},svg),lg=el('g',{},svg);
  dots.slice().sort(function(a,b){return b.r-a.r}).forEach(function(p){
   var on=hi===p.s.sire;var a=el('g',{class:'sm-dot',tabindex:0,role:'button','aria-label':p.s.sire},dg);
   el('circle',{cx:p.x,cy:p.y,r:p.r,fill:col(p.s.turf_share),'fill-opacity':on?1:.78,stroke:on?'#17171a':'#fff','stroke-width':on?2.5:1},a);
-  a.addEventListener('click',function(){pick(p.s.sire)});a.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(p.s.sire)}});
+  a.addEventListener('click',function(){if(window.__smDrag)return;pick(p.s.sire)});a.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(p.s.sire)}});
  });
  /* 名前：勝ち上がりの多い順に置く。名前どうしは重ねない。丸の近くから少しずつ遠くを探し、
     離れた所に置いたときは細い線で丸とつなぐ。他の丸に重なる位置はなるべく避ける。 */
@@ -161,6 +161,38 @@ Array.prototype.forEach.call(document.querySelectorAll('[data-f]'),function(b){b
 Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(b){b.onclick=function(){minW=+b.getAttribute('data-m');Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(x){x.setAttribute('aria-pressed',x===b)});draw();table()}});
 Array.prototype.forEach.call(document.querySelectorAll('[data-z]'),function(b){b.onclick=function(){zoom=+b.getAttribute('data-z');Array.prototype.forEach.call(document.querySelectorAll('[data-z]'),function(x){x.setAttribute('aria-pressed',x===b)});draw()}});
 Array.prototype.forEach.call(document.querySelectorAll('[data-l]'),function(b){b.onclick=function(){level=b.getAttribute('data-l');Array.prototype.forEach.call(document.querySelectorAll('[data-l]'),function(x){x.setAttribute('aria-pressed',x===b)});hi=null;info.textContent='丸をタップすると、その父の数字が出ます。';applyLevel();draw();table();document.getElementById('lvNote').hidden=level==='all'}});
+
+(function(){
+var sc=document.getElementById('smScroll'),yax=document.getElementById('smYax');
+sc.addEventListener('scroll',function(){yax.style.transform='translateY('+(-sc.scrollTop)+'px)'});
+function zmin(){return sc.clientWidth/Math.max(1000,sc.clientWidth)}
+function clampZ(z){return Math.max(Math.min(1,zmin()),Math.min(ZMAX,z))}
+function commit(fx,fy,newZ,curScale){
+ var px=(sc.scrollLeft+fx)/curScale,py=(sc.scrollTop+fy)/curScale;
+ Z=clampZ(newZ);draw();sc.scrollLeft=px*Z-fx;sc.scrollTop=py*Z-fy;
+}
+var P={},g=null,moved=0,last=null;
+function cen(){var a=Object.keys(P).map(function(k){return P[k]}),r=sc.getBoundingClientRect();return {x:a.reduce(function(t,q){return t+q.x},0)/a.length-r.left,y:a.reduce(function(t,q){return t+q.y},0)/a.length-r.top,d:a.length>1?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0}}
+sc.addEventListener('pointerdown',function(e){P[e.pointerId]={x:e.clientX,y:e.clientY};if(Object.keys(P).length===1){moved=0;last={x:e.clientX,y:e.clientY}}
+ if(Object.keys(P).length===2){var c=cen();g={d0:c.d,z0:Z,f:1,c:c,sl:sc.scrollLeft,st:sc.scrollTop}}});
+sc.addEventListener('pointermove',function(e){if(!P[e.pointerId])return;P[e.pointerId]={x:e.clientX,y:e.clientY};var n=Object.keys(P).length;
+ if(n===1){var dx=e.clientX-last.x,dy=e.clientY-last.y;moved+=Math.abs(dx)+Math.abs(dy);if(moved>6){window.__smDrag=true;sc.scrollLeft-=dx;sc.scrollTop-=dy}last={x:e.clientX,y:e.clientY}}
+ else if(n>=2&&g&&g.d0>0){var c=cen();window.__smDrag=true;var f=clampZ(g.z0*c.d/g.d0)/g.z0;g.f=f;g.cur=c;
+  var svg=document.getElementById('smSvg'),bw=+svg.getAttribute('width'),bh=+svg.getAttribute('height');
+  if(!g.bw){g.bw=bw;g.bh=bh}
+  svg.style.width=(g.bw*f)+'px';svg.style.height=(g.bh*f)+'px';
+  sc.scrollLeft=(g.sl+g.c.x)*f-c.x;sc.scrollTop=(g.st+g.c.y)*f-c.y}});
+function up(e){if(!P[e.pointerId])return;delete P[e.pointerId];
+ if(g&&Object.keys(P).length<2){var gg=g;g=null;if(gg.f&&gg.f!==1&&gg.cur){var c=gg.cur;
+   var px=(sc.scrollLeft+c.x)/(gg.z0*gg.f),py=(sc.scrollTop+c.y)/(gg.z0*gg.f);Z=clampZ(gg.z0*gg.f);draw();sc.scrollLeft=px*Z-c.x;sc.scrollTop=py*Z-c.y}
+  P={};}
+ setTimeout(function(){window.__smDrag=false},60)}
+sc.addEventListener('pointerup',up);sc.addEventListener('pointercancel',up);sc.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse')up(e)});
+sc.addEventListener('wheel',function(e){if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();var r=sc.getBoundingClientRect();commit(e.clientX-r.left,e.clientY-r.top,Z*(e.deltaY<0?1.2:1/1.2),Z)},{passive:false});
+Array.prototype.forEach.call(document.querySelectorAll('[data-zz]'),function(b){b.onclick=function(){var k=b.getAttribute('data-zz');
+ if(k==='reset'){Z=1;window.__smKey=null;draw();return}
+ commit(sc.clientWidth/2,sc.clientHeight/2,Z*(k==='in'?1.4:1/1.4),Z)}});
+})();
 var META={};
 fetch('data/sire_firstwin_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){META=d;RAW=d.sires||[];applyLevel();draw();table()}).catch(function(){document.getElementById('smMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。'});
 var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(draw,150)});

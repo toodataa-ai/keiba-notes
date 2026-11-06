@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-sire-map-pinch-v1",
-      "title": "初勝利マップ：指でつまんで拡大・縮小、ドラッグで移動",
-      "pages": [
-        "sire-map.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-06",
-      "summary": "図を2本指のつまみ操作で自由に拡大・縮小でき、1本指で動かせる（＋／－／表示を戻すボタンつき）。拡大すると名前を描き直すので重なりが減る。縦軸の距離は左に固定。"
-    }
-  ]
+  "candidates": []
 }
