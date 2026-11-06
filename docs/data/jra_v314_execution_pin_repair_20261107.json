@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "date_jst": "2026-11-07",
+  "scope": "v3.14 orchestration SHA pin repair only; unchanged v3.13 predictor and v3.15 purchase",
+  "source_head_before": "551e876d324ac3f402b0677bfdad987f68af4a5c",
+  "source_latest_blob": "7210542fda797230ea0e02847da23fc9044072a2",
+  "approval": "Explicit user request to fix SHA mismatches and complete today's formal prestart JRA runs",
+  "changes": [
+    {
+      "path": ".github/scripts/jra-gather-live-v314.py",
+      "old_git_blob_sha": "dbf1c3d1f59c2593c1f4d732834dac6c80c9d2c2",
+      "new_git_blob_sha": "b1624ff0304b40fe34575f711023e3aceb2aa0d5",
+      "reviewed_diff": "Only strict race-name suffix comparison change to retain parentheses in race name, remove grade suffix."
+    },
+    {
+      "path": ".github/workflows/jra-generic-one-shot-v314.yml",
+      "old_git_blob_sha": "522ddf53ed7d97cbc28c3e483adc6c0acac43d5d",
+      "new_git_blob_sha": "d239b9a88a26330c74c262a209db596253f800d3",
+      "reviewed_diff": "Add separate E012 STEP1 research workflow dispatch and required actions write permission; formal STEP1, STEP2 and PDF unchanged."
+    }
+  ],
+  "invariants": {
+    "model_v313_unchanged": true,
+    "purchase_v315_unchanged": true,
+    "approved_reader_css_unchanged": true,
+    "prior_predictions_unchanged": true,
+    "local_shadow_unchanged": true
+  },
+  "risk_note": "Only execution descriptors repinned to audited existing main blobs; no runtime workflow execution is implied by this document."
+}
