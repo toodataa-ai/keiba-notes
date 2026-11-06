@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "week_id": "2026-11-07",
+  "date": "2026-11-07",
+  "observed_at": "2026-11-07T08:15:34+09:00",
+  "mode": "user_requested_single_article_source_metadata_review_only",
+  "stage": "NOT_CAPTURED_NO_WORKOUT_GIT_PROOF",
+  "source_found": {
+    "race_id": "2026-11-07-tokyo-11",
+    "venue": "東京",
+    "race_no": 11,
+    "start_at": "2026-11-07T15:35:00+09:00",
+    "publisher": "うましる",
+    "source_url": "https://umasiru.com/archives/22204",
+    "article_published_at_local_text": "2026年11月6日18:47",
+    "source_type": "free_public_article_with_per_horse_workout_time_tables",
+    "raw_html_sha256": null,
+    "html_bytes_saved": false,
+    "verified_horses": null,
+    "captured_workout_sessions": null,
+    "preliminary_article_available_before_start": true,
+    "article_horses_matched_against_frozen_JRA_roster": false,
+    "workout_factor_7_evaluated": false,
+    "first_git_source_proof": false,
+    "notes": "Article availability is not a verified prereace workout observation or a workout accuracy forecast."
+  },
+  "other_study_races": {
+    "statuses": "workout_source_not_researched_and_factor_7_not_evaluated",
+    "all_10_study_race_workout_factor_7_frozen": 0,
+    "num_study_races": 10
+  },
+  "blockers": [
+    "PR86_still_draft_unmerged_and_workout_dispatch_workflows_not_in_main",
+    "connector_no_workflow_dispatch_mutation_action",
+    "manual_single_article_git_proof_not_invoked_and_raw_html_SHA256_not_obtained",
+    "workout_first_commit_proof_absent",
+    "workout_7_score_calibration_not_available_even_if_clock_exists"
+  ],
+  "safeguard": {
+    "no_third_party_article_text_clocks_or_editor_grades_republished": true,
+    "no_new_prediction_created": true,
+    "production_prediction_step1_step2_final_bets_untouched": true,
+    "past_frozen_snapshots_untouched": true,
+    "no_scheduled_auto_harvest_started": true,
+    "production_effect": false
+  }
+}
