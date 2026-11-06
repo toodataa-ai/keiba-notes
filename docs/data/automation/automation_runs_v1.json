@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-06T09:05:22+00:00",
+ "generated_at": "2026-11-06T16:43:14+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 42254876776,
+     "event": "schedule",
+     "created_at": "2026-11-06T16:42:29Z",
+     "started_at": "2026-11-06T16:42:29Z",
+     "ended_at": "2026-11-06T16:42:53Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 42192286000,
      "event": "workflow_dispatch",
@@ -1608,6 +1619,17 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 42219477729,
+     "event": "push",
+     "created_at": "2026-11-06T12:40:30Z",
+     "started_at": "2026-11-06T12:40:30Z",
+     "ended_at": "2026-11-06T12:40:47Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 42082769893,
      "event": "schedule",
