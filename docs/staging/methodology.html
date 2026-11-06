@@ -185,7 +185,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body>
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <header class="method-hero">
   <div class="wrap">
     <nav class="method-nav simple-home-nav" aria-label="トップページへ戻る"><a class="method-brand" href="staging/index.html">← トップページに戻る</a></nav>
@@ -239,70 +239,70 @@
   </section>
 
   <section class="chapter anchor" id="axes">
-    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>一頭の馬を、①〜⑨に分けて見る</h2><p class="chapter-lead">何を見て、どう扱うか。正式プロンプトの定めと、サイトの整理を分けて示します。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">02</div><div><h2>一頭の馬を、①〜⑨に分けて見る</h2><p class="chapter-lead">何を見て、どう扱うか。<strong>最終的な判断は、すべてAIがレースごとに行います。</strong>プロンプトの書き方は判断の方向づけで、計算式ではありません。</p></div></div>
     <div class="m-legend">
-      <span><span class="m-tag m-tag-rule">定め</span> 正式プロンプトに書かれていること</span>
-      <span><span class="m-tag m-tag-site">サイトの整理</span> 読みやすくするための、サイト側の解釈</span>
+      <span><span class="m-tag m-tag-rule">方向づけあり</span> プロンプトに「こう扱う」と書かれている（それでも判断するのはAI）</span>
+      <span><span class="m-tag m-tag-site">指示なし</span> プロンプトは重みを決めていない（AIがレースごとに判断）</span>
     </div>
     <div class="m-axes" role="list" aria-label="①〜⑨の一覧">
-      <div class="m-axis m-axis-head" aria-hidden="true"><div>項目</div><div>何を見るか</div><div>扱い（正式プロンプトの定め）</div><div>重視度</div></div>
+      <div class="m-axis m-axis-head" aria-hidden="true"><div>項目</div><div>何を見るか</div><div>扱い（正式プロンプトの書き方）</div><div>重視度</div></div>
 
       <div class="m-axis m-axis-emph" role="listitem">
         <div class="m-axis-name"><i>①</i>斤量</div>
         <div><span class="m-k">何を見るか</span>今回の斤量、前走との差、好走した時の斤量、3歳と古馬の差。</div>
         <div><span class="m-k">扱い</span>前走から+2kg以上でも、能力そのものは消さず、「今回それを出せる確からしさ」に強く反映する。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-rule">定め</span><b>やや強め</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-rule">方向づけあり</span><b>やや強め</b></div>
       </div>
       <div class="m-axis m-axis-var" role="listitem">
         <div class="m-axis-name"><i>②</i>ペース・展開</div>
         <div><span class="m-k">何を見るか</span>逃げたい馬の数、ハナ争い、想定隊列、想定ペース（S/M/M-H/H）。</div>
         <div><span class="m-k">扱い</span>「先行馬が多い＝ハイペース」とは決めない。想定隊列と競り合いの強さを整理して判断する。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">指示なし</span><b>レースごとにAIが判断</b></div>
       </div>
       <div class="m-axis m-axis-var" role="listitem">
         <div class="m-axis-name"><i>③</i>馬場・バイアス</div>
         <div><span class="m-k">何を見るか</span>発走時の馬場状態の確率、当日の時計の出方、位置取りと進路の有利不利。</div>
         <div><span class="m-k">扱い</span>時計速度・位置取り・進路の3つを別々に見る。「高速＝前有利」とは決めない。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">指示なし</span><b>レースごとにAIが判断</b></div>
       </div>
       <div class="m-axis m-axis-var" role="listitem">
         <div class="m-axis-name"><i>④</i>ローテーション</div>
         <div><span class="m-k">何を見るか</span>レース間隔、休み明け、叩き何戦目、距離変更、前走の消耗。</div>
         <div><span class="m-k">扱い</span>休み明けで好走した実績があれば、機械的に減点しない。実績が乏しい場合は、能力ではなく「確からしさ」を下げる。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">指示なし</span><b>レースごとにAIが判断</b></div>
       </div>
       <div class="m-axis m-axis-var" role="listitem">
         <div class="m-axis-name"><i>⑤</i>コース適性</div>
         <div><span class="m-k">何を見るか</span>同じ競馬場・距離での直接実績、直線の長さ、坂、枠と脚質の相性。</div>
         <div><span class="m-k">扱い</span>初めてのコースは「不適性」ではなく「未知」。それだけで大きく下げない（減点は原則1段階まで）。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">指示なし</span><b>レースごとにAIが判断</b></div>
       </div>
       <div class="m-axis m-axis-sup" role="listitem">
         <div class="m-axis-name"><i>⑥</i>血統</div>
         <div><span class="m-k">何を見るか</span>距離、馬場、瞬発力・持続力などへの適性（父・母父の系統）。</div>
         <div><span class="m-k">扱い</span>同じ走路での実戦の成績が、血統より上。血統だけで最高評価（A+）にはしない。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-rule">定め</span><b>実戦実績が優先</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-rule">方向づけあり</span><b>実戦実績が優先</b></div>
       </div>
       <div class="m-axis m-axis-sup" role="listitem">
         <div class="m-axis-name"><i>⑦</i>調教</div>
         <div><span class="m-k">何を見るか</span>最終追い切り、1週前の時計、併せ馬、本数、過去の好走時との比較。</div>
         <div><span class="m-k">扱い</span>主に「今の状態」と「確からしさ」の補助材料。調教だけで能力を上書きしない。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-rule">定め</span><b>補助材料</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-rule">方向づけあり</span><b>補助材料</b></div>
       </div>
       <div class="m-axis m-axis-var" role="listitem">
         <div class="m-axis-name"><i>⑧</i>騎手</div>
         <div><span class="m-k">何を見るか</span>今回の競馬場・距離での成績、騎手の格言（適用条件つき）。</div>
         <div><span class="m-k">扱い</span>「有名な騎手だから高評価」は禁止。今回のコースとの相性を見る。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>条件で変わる</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">指示なし</span><b>レースごとにAIが判断</b></div>
       </div>
       <div class="m-axis m-axis-core" role="listitem">
         <div class="m-axis-name"><i>⑨</i>基礎能力・クラス</div>
         <div><span class="m-k">何を見るか</span>対戦相手とクラス、着差、レース内容、補正した時計、近3〜6走の再現性。</div>
         <div><span class="m-k">扱い</span>「今回の条件に合うか」とは別に、「そもそもどれだけ強いか」を見る。G1実績だけで自動的に最高評価にはしない。</div>
-        <div class="m-axis-weight"><span class="m-tag m-tag-site">サイトの整理</span><b>能力の中核</b></div>
+        <div class="m-axis-weight"><span class="m-tag m-tag-site">指示なし</span><b>能力の中核（サイトの見立て）</b></div>
       </div>
     </div>
-    <p class="m-rule-note"><span class="m-tag m-tag-rule">定め</span> 総合評価（A+〜C）は9項目の<strong>単純平均にはしません</strong>。①〜⑨に固定の配点や割合はなく、上の「重視度」の色や並びも点数の差を表すものではありません。<span class="m-tag m-tag-site">サイトの整理</span> 左の色は、赤＝能力の中核、オレンジ＝定めで「やや強め」、青＝条件しだいで重要度が変わる、グレー＝補助材料、を表します。<a href="staging/roadmap.html">これまでの経緯は「改善の歩み（履歴）」へ</a>。</p>
+    <p class="m-rule-note"><span class="m-tag m-tag-rule">方向づけあり</span> 総合評価（A+〜C）は9項目の<strong>単純平均にはしません</strong>。①〜⑨に固定の配点や割合はなく、<strong>どれをどれだけ重く見るかも、AIがレースごとに考えて決めます</strong>。「やや強め」「実戦実績が優先」などは、考える向きを示すもので、機械的に計算する決まりではありません。左の色は、赤＝能力の中核、オレンジ＝プロンプトが「やや強め」と書いている、青＝レースごとにAIが判断、グレー＝補助材料、を表します（色や並びは点数の差ではありません）。<a href="staging/roadmap.html">これまでの経緯は「改善の歩み（履歴）」へ</a>。</p>
   </section>
 
   <section class="chapter anchor" id="time">
