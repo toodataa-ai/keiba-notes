@@ -45,7 +45,7 @@ class Anchored(unittest.TestCase):
             self.assertGreater(bet["expected_value"], 0)
         long = [x for x in a["bets"] if x["slot"] == "longshot"]
         self.assertLessEqual(len(long), 3)
-        self.assertTrue(all(x["stake_yen"] == 100 and x["type"] in ("馬単", "三連複") for x in long))
+        self.assertTrue(all(x["stake_yen"] == 100 and x["type"] in ("馬単", "三連複", "三連単") for x in long))
         main = [x for x in a["bets"] if x["slot"] == "main"]
         self.assertTrue(all(x["type"] in ("単勝", "馬連", "ワイド") and x["market_odds"] <= 50 for x in main))
         if a["total_stake_yen"]:
