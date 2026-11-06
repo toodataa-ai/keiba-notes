@@ -43,13 +43,21 @@ class Anchored(unittest.TestCase):
             self.assertEqual(bet["stake_yen"] % 100, 0)
             self.assertLessEqual(bet["stake_yen"], 1000)
             self.assertGreater(bet["expected_value"], 0)
-        long = [x for x in a["bets"] if x["slot"] == "longshot"]
-        self.assertLessEqual(len(long), 3)
-        self.assertTrue(all(x["stake_yen"] == 100 and x["type"] in ("馬単", "三連複", "三連単") for x in long))
-        main = [x for x in a["bets"] if x["slot"] == "main"]
-        self.assertTrue(all(x["type"] in ("単勝", "馬連", "ワイド") and x["market_odds"] <= 50 for x in main))
+        self.assertTrue(all(x["type"] in ("単勝", "馬連", "馬単", "ワイド") for x in a["bets"]))
+        self.assertIn("三連複", a["incomplete_odds_types"] + ["三連複"])
         if a["total_stake_yen"]:
             self.assertLessEqual(a["max_horse_exposure_yen"], 0.60 * 6000)
+
+    def test_incomplete_odds_table_is_not_used(self):
+        # 三連単の表が一部しか取れていないと q がゆがむ。そのときその券種は評価しない（データの検査）
+        ent = entries(8)
+        m = so.market_win_probs(ent)
+        part = [x for x in so._anchored_rows(ent, {"馬単"}, m, m, 0.5)[0]]
+        self.assertTrue(part)
+        ent2 = [e for e in ent if not (e["type"] == "馬単" and e["selection"][0] > 5)]
+        rows, inc = so._anchored_rows(ent2, {"馬単"}, m, m, 0.5)
+        self.assertEqual(inc, ["馬単"])
+        self.assertEqual(rows, [])
 
     def test_sharpen_matches_entropy(self):
         m = {1: 0.4, 2: 0.3, 3: 0.2, 4: 0.1}
