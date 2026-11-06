@@ -10,7 +10,7 @@
   ],
   "owners": {
     "baba": "馬場モデルの記録（baba_models_v2/model_registry.json）はバックテストを実行したときに Claude が更新する（自動では更新されない）。",
-    "experience": "若駒の観察は毎週の予想・回顧の実行で自動的にたまる。",
+    "experience": "若駒・新馬戦の研究は、過去レースの取得（GitHub Actions・Claudeの使用量0）が進むたびに集計し直します。",
     "registration": "登録できる通知（Issue）にユーザーが A/B/C で答え、A のとき Claude が比較用プログラムを書いて登録する。"
   },
   "themes": [
@@ -24,7 +24,7 @@
     },
     {
       "id": "field_experience",
-      "title": "若駒・経験不足"
+      "title": "若駒・新馬戦（父の血統データ）"
     },
     {
       "id": "ticket_portfolio",
@@ -32,7 +32,7 @@
     }
   ],
   "baba_registry_freshness": null,
-  "experience_evidence_week": "2026-10-31",
+  "experience_evidence_week": "2026-11-07",
   "units": [
     {
       "id": "pace_positioning:all",
@@ -613,68 +613,35 @@
       }
     },
     {
-      "id": "field_experience:e0",
+      "id": "field_experience:sire_db",
       "theme": "field_experience",
-      "label": "0戦（新馬）",
+      "label": "父データベース（データ集め）",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.7219,
+      "state": "research",
+      "text": "過去レースの取得 72%（22,045/30,537レース・馬37,708頭）",
+      "criteria_text": "過去レースの取得がそろい、同じ検証をやり直して、新馬戦の外れ具合の改善が偶然と区別できたら（95%の幅が0より上）、新馬戦だけの小さな補正として改善案に登録できます。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "updated_at": "2026-11-07"
+      }
+    },
+    {
+      "id": "field_experience:debut_sire",
+      "theme": "field_experience",
+      "label": "新馬戦：父の傾向の補正",
       "stage": 0,
       "stage_name": "研究",
       "frac": 0.0,
       "state": "research",
-      "text": "あと30頭分（約3レース）",
-      "criteria_text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。",
+      "text": "父の傾向は新馬戦で統計的には効いているが、外れ具合の改善はまだ偶然と区別できない（改善 +0.004、95%の幅 −0.003〜+0.012）。取得がそろったら同じ検証をやり直す。",
+      "criteria_text": "過去レースの取得がそろい、同じ検証をやり直して、新馬戦の外れ具合の改善が偶然と区別できたら（95%の幅が0より上）、新馬戦だけの小さな補正として改善案に登録できます。",
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "collected_prerace_horses": 120
-      }
-    },
-    {
-      "id": "field_experience:e1",
-      "theme": "field_experience",
-      "label": "1〜3戦",
-      "stage": 0,
-      "stage_name": "研究",
-      "frac": 0.0,
-      "state": "research",
-      "text": "あと30頭分（約5レース）",
-      "criteria_text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。",
-      "criteria_met": false,
-      "experiment_id": null,
-      "detail": {
-        "collected_prerace_horses": 134
-      }
-    },
-    {
-      "id": "field_experience:e2",
-      "theme": "field_experience",
-      "label": "4戦以上",
-      "stage": 0,
-      "stage_name": "研究",
-      "frac": 0.0,
-      "state": "research",
-      "text": "あと30頭分（約3レース）",
-      "criteria_text": "勝つ確率を確かめられる馬のデータが30頭分たまったら、改善案として登録できます。",
-      "criteria_met": false,
-      "experiment_id": null,
-      "detail": {
-        "collected_prerace_horses": 498
-      }
-    },
-    {
-      "id": "field_experience:pedigree",
-      "theme": "field_experience",
-      "label": "血統との関連",
-      "stage": 0,
-      "stage_name": "研究",
-      "frac": 0.5,
-      "state": "research",
-      "text": "血統の情報 100%（目標90%）／0戦・1〜3戦の条件はこれから",
-      "criteria_text": "0戦と1〜3戦の条件に届き、かつ発走前に血統の情報が9割以上の馬で集まっていたら、血統との組み合わせを改善案として登録できます。",
-      "criteria_met": false,
-      "experiment_id": null,
-      "detail": {
-        "pedigree_coverage": 1.0,
-        "requires_met": false
+        "updated_at": "2026-11-07"
       }
     },
     {

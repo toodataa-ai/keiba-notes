@@ -65,20 +65,12 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(u["state"], "in_production")
         self.assertEqual(list(p.issue_drafts(run(i))), [])
 
-    def test_experience_regime_ready_at_zero_remaining(self):
-        i = base_inputs()
-        i["cycle"]["research"]["regimes"][0]["next_decision"]["win_probability_horse_records_remaining"] = 0
-        r = run(i)
-        self.assertEqual(unit(r, "field_experience:e0")["state"], "ready_to_register")
-        self.assertEqual(unit(r, "field_experience:e1")["state"], "research")
-
-    def test_pedigree_needs_regimes_and_coverage(self):
-        i = base_inputs()
-        for k in (0, 1):
-            i["cycle"]["research"]["regimes"][k]["next_decision"]["win_probability_horse_records_remaining"] = 0
-        self.assertEqual(unit(run(i), "field_experience:pedigree")["state"], "ready_to_register")
-        i["evidence"]["factor_support_counts"]["6"] = 50
-        self.assertEqual(unit(run(i), "field_experience:pedigree")["state"], "research")
+    def test_sire_research_units_stay_in_research_and_never_notify(self):
+        r = run(base_inputs())
+        for uid in ("field_experience:sire_db", "field_experience:debut_sire"):
+            self.assertEqual((unit(r, uid)["state"], unit(r, uid)["stage"]), ("research", 0))
+        self.assertEqual(list(p.issue_drafts(r)), [])
+        self.assertFalse(any(u["id"].startswith("field_experience:e") or u["id"] == "field_experience:pedigree" for u in r["units"]))
 
     def test_hypothesis_wide_experiment_does_not_leak_to_finer_units(self):
         i = base_inputs()
@@ -92,11 +84,11 @@ class PipelineTest(unittest.TestCase):
 
     def test_unit_ids_register_a_single_unit(self):
         i = base_inputs()
-        i["registry"]["experiments"].append({"id": "EXP-010", "hypothesis_ids": ["field_experience"], "unit_ids": ["field_experience:e0"], "status": "collecting"})
+        i["registry"]["experiments"].append({"id": "EXP-010", "hypothesis_ids": ["field_experience"], "unit_ids": ["field_experience:debut_sire"], "status": "collecting"})
         i["status"]["experiments"].append({"id": "EXP-010", "status": "collecting", "minimum_prospective_pairs": 20, "prospective": {"pairs": 0}})
         r = run(i)
-        self.assertEqual(unit(r, "field_experience:e0")["state"], "comparing")
-        self.assertEqual(unit(r, "field_experience:e1")["state"], "research")
+        self.assertEqual(unit(r, "field_experience:debut_sire")["state"], "comparing")
+        self.assertEqual(unit(r, "field_experience:sire_db")["state"], "research")
 
     def test_staleness(self):
         r = run(base_inputs(), dt.date(2026, 11, 2))

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<title>予想の改善状況 | AIによる競馬予想研究所</title>
+<link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+<link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
+<style>.themes{list-style:none;padding:0;margin:0}.themes li{background:var(--panel);border:1px solid #3a404c;border-radius:12px;padding:12px 14px;margin-bottom:10px}.themes b{display:block}.themes .st{display:inline-block;margin:6px 0 4px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid #6b7686}.themes .st.on{border-color:#c61d31;color:#ff9aa6}.themes p{margin:4px 0 0;font-size:13px;color:var(--muted)}.themes a{font-size:13px}.stg{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.stg span{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid #d3d5db;color:#6d6e75;background:#fff}.stg span.done{background:#f0f1f3}.stg span.now{border-color:#c61d31;color:#9f1022;font-weight:800;background:#fff5f6}
+.tcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}.tcard h3{margin:0 0 2px}.tcard .what{font-size:14px;margin:4px 0}.tcard .entry{font-size:13px;margin:8px 0 0;padding:8px 10px;border-left:3px solid #c61d31;background:#faf7f7;border-radius:4px}.tcard .prog{font-size:13px;margin:8px 0 0}.tcard table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}.tcard th,.tcard td{padding:4px 6px;border-bottom:1px solid #ececef;text-align:left}.tcard th{color:#6d6e75;font-weight:600}.tcard .ok{color:#167a52;font-weight:700}.tcard .wip{color:#8a5a00}.pr,.ph{display:grid;grid-template-columns:92px minmax(0,1fr);gap:3px 10px;align-items:center;margin:7px 0}.pr .pt{grid-column:2;font-size:12px;color:#6d6e75;line-height:1.4}.ph{margin:10px 0 2px}.ph>span:last-child{display:none}.ph{grid-template-columns:92px minmax(0,1fr)}.pl{font-size:13px;font-weight:700}.pb{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.pb i{display:block;height:10px;border-radius:5px;background:#e6e7ea;overflow:hidden}.pb i.d{background:#3b3341}.pb i.n{outline:1.5px solid #c61d31;outline-offset:0;background:#fff}.pb i.n b{display:block;height:100%;background:#c61d31}.ph-n i{height:auto;background:none;font-style:normal;font-size:11px;color:#6d6e75;text-align:center}.tdet{margin-top:10px}.eline{display:block;margin-top:3px;font-size:13px}.tiny.warn{color:#a53737}.tdet summary{cursor:pointer;font-size:13px;font-weight:700}.steps{list-style:none;margin:12px 0 0;padding:0;position:relative}.steps>li{display:flex;gap:12px;padding:0 0 14px;position:relative}.steps>li:not(:last-child)::before{content:"";position:absolute;left:12px;top:26px;bottom:0;width:2px;background:#dcdee3}.st-dot{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:#e6e7ea;color:#6d6e75}.st-now .st-dot{background:#c61d31;color:#fff}.st-done .st-dot{background:#3b3341;color:#fff}.st-body{flex:1;min-width:0}.st-body>b{display:block;font-size:15px}.st-body p{margin:4px 0;font-size:13px}.st-wait .st-body>b{color:#6d6e75}.steps .card{box-shadow:none;margin:8px 0 0}.muted{color:#6d6e75}.tcard .tiny{font-size:12px;color:#6d6e75;margin-top:6px}
+</style>
+</head>
+<body class="ic-light">
+<div class="wrap">
+<nav aria-label="ページ移動"><a href="index.html">← トップページに戻る</a><a href="roadmap.html">改善の歩み（履歴）</a></nav>
+
+<header>
+<p class="eyebrow">予想の改善状況</p>
+<h1>AI予想は、いまこう改善しています</h1>
+<p class="lead">新しい予想方法は、いきなり本番に入れません。実際のレースで<strong>今の予想と並べて比べ</strong>、成績が良かったものだけを採用します。</p>
+<div class="status" id="status" aria-live="polite">
+  <div class="status-row"><span>いまの正式な予想</span><b id="sVersion">—</b></div>
+  <div class="status-row"><span>比較中の改善案</span><b id="sCount">—</b></div>
+  <div class="status-row"><span>最初の判定まで</span><b id="sEta">—</b></div>
+</div>
+</header>
+
+<section aria-label="自動運用の状況へのリンク">
+<div class="note">いつ・何が自動で動いているか、実際の実行状況（成功・失敗）は、<a href="operations.html">自動運用の状況</a>のページにまとめました。</div>
+</section>
+
+<section aria-labelledby="themesTitle" id="themes">
+<h2 id="themesTitle">改善テーマ（研究から判定まで）</h2>
+<p class="sub">1行が1つの管理単位（競馬場・戦歴など）です。毎日、基準に届いたかを自動で調べ、届くと通知（Issue）が立ちます。バーは左から「研究 → 登録 → 比較 → 判定」の4段階で、濃い色は完了、赤い枠がいまの段階、枠の中の赤は進み具合です。数字は自動で更新されます。</p>
+<div id="themeList"><div class="empty">読み込み中…</div></div>
+</section>
+
+
+<section aria-labelledby="claudeExpTitle" id="claudeExp" hidden>
+<h2 id="claudeExpTitle">Claudeの予想だけで進めている比較</h2>
+<p class="sub">ChatGPTの予想とは混ぜずに、Claudeの予想だけで改善を試しています。研究用で、購入はしません。</p>
+<div id="claudeExpBody"></div>
+</section>
+
+<section aria-labelledby="doneTitle">
+<h2 id="doneTitle">これまでの判定</h2>
+<div id="decided" class="empty">読み込み中…</div>
+</section>
+
+<section aria-labelledby="glossTitle">
+<details>
+<summary id="glossTitle">成績の見方（くわしく知りたい方へ）</summary>
+<dl>
+<dt>勝つ確率の見積もり</dt>
+<dd>AIは各馬が勝つ確率を数字で出しています。実際に勝った馬に高い確率を付けていたほど「見積もりが正確」です（専門的には log loss という指標で、小さいほど良い）。採用判定はこの指標を一番重視します。</dd>
+<dt>◎の3着内率</dt>
+<dd>本命（◎）の馬が3着以内に入った割合です。改善案を採用しても、ここが悪くならないことを条件にしています。</dd>
+<dt>過去のレースでの試算</dt>
+<dd>改善案を作る前のレースに当てはめた参考値です。後から当てはめたものなので、判定の件数には数えません。</dd>
+</dl>
+</details>
+<details style="margin-top:12px">
+<summary>旧方式の比較記録（参考）</summary>
+<p>改良前と改良後のプロンプトを同じレースで走らせる、以前の方式の記録です。比較の設定が古い版（v3.0 と v3.1）のまま止まっているため、いまの判定には使っていません。<a href="e2e.html">旧方式の比較記録を見る</a></p>
+</details>
+</section>
+
+<footer>この画面は自動で集計されたデータ（data/jra_experiment_status_v1.json）を表示しています。既存の正式予想・買い目・PDF原本は変更しません。</footer>
+</div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const RACES_PER_WEEK = 5; // 直近の開催週の正式メイン数（4〜6）の目安
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shortTitle = t => String(t || '').split('（')[0];
+function word(delta, lowerIsBetter) {
+  if (delta == null) return ['—', 'even'];
+  const d = lowerIsBetter ? -delta : delta;
+  if (Math.abs(delta) < 0.005) return ['ほぼ同じ', 'even'];
+  return d > 0 ? ['改善案のほうが良い', 'good'] : ['今の予想のほうが良い', 'bad'];
+}
+function weeks(n) { return n <= 0 ? '判定できます' : `あと約${Math.ceil(n / RACES_PER_WEEK)}週`; }
+
+  const expCard = e => {
+    const p = e.prospective || {}, r = e.replay_support_only || {};
+    const n = p.pairs || 0, need = e.minimum_prospective_pairs || 20;
+    const pct = Math.min(100, Math.round(n / need * 100));
+    const pf = e.kind === 'portfolio';
+    const roi = x => x && x.roi != null ? Math.round(x.roi * 100) + '%' : '—';
+    const pword = x => !x || !x.pairs ? ['—', 'even'] : x.roi_delta == null || Math.abs(x.roi_delta) < 0.005 ? ['ほぼ同じ', 'even']
+      : x.roi_delta > 0 ? ['改善案のほうが回収率が高い', 'good'] : ['今の買い目のほうが回収率が高い', 'bad'];
+    const [now, nowCls] = pf ? (n ? pword(p) : ['まだ比較したレースはありません', 'even']) : n ? word((p.win_log_loss || {}).delta, true) : ['まだ比較したレースはありません', 'even'];
+    const [ref0, refCls] = pf ? pword(r) : r.pairs ? word((r.win_log_loss || {}).delta, true) : ['—', 'even'];
+    const ref = pf && r.pairs ? `${ref0}（回収率 今の買い目${roi(r.formal)}／改善案${roi(r.challenger)}）` : ref0;
+    return `<article class="card">
+      <h3>${esc(shortTitle(e.title))}</h3>
+      <p class="what">${esc(e.plain_summary || e.title)}</p>
+      <div class="bar-label"><span>比較したレース</span><b>${n} / ${need}レース</b></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${n}"><i style="width:${pct}%"></i></div>
+      <div class="facts">
+        <div class="fact"><span>${pf ? '途中経過（買い目の回収率）' : '途中経過（勝つ確率の見積もり）'}</span><b class="${nowCls}">${esc(now)}</b></div>
+        <div class="fact"><span>判定の目安</span><b>${esc(weeks(e.remaining_prospective_pairs))}</b></div>
+        <div class="fact"><span>参考：過去${r.pairs || 0}レースでの試算（判定には数えません）</span><b class="${refCls}">${esc(ref)}</b></div>
+        <div class="fact"><span>比較の開始</span><b>${esc((e.effective_prospective_from || '').slice(0, 10).replace(/-/g, '/'))} 以降のレース</b></div>
+      </div>
+    </article>`;
+  };
+
+Promise.all([
+  fetch('data/jra_experiment_status_v1.json', {cache: 'no-store'}).then(r => r.json()),
+  fetch('data/jra_improvement_cycle_v1.json', {cache: 'no-store'}).then(r => r.json()),
+]).then(([status, cycle]) => {
+  const exps = (status.experiments || []);
+  const active = exps.filter(e => ['collecting', 'comparing', 'reviewing'].includes(e.status));
+  $('sVersion').textContent = cycle.latest_formal_prompt_version || '—';
+  $('sCount').textContent = `${active.length}件`;
+  const minLeft = active.length ? Math.min(...active.map(e => e.remaining_prospective_pairs)) : null;
+  $('sEta').textContent = minLeft == null ? '比較中の案はありません'
+    : minLeft <= 0 ? '判定できる案があります'
+    : `あと${minLeft}レース（${weeks(minLeft)}）`;
+
+
+
+  const done = exps.filter(e => ['approved', 'rejected'].includes(e.status));
+  $('decided').innerHTML = done.length
+    ? done.map(e => `<p>${esc(shortTitle(e.title))}：${e.status === 'approved' ? '採用' : '見送り'}</p>`).join('')
+    : 'まだ判定した改善案はありません。最初の判定は、上の「判定の目安」のころになる見込みです。';
+}).catch(() => {
+  $('experiments').innerHTML = '<div class="empty">データを読み込めませんでした。時間をおいて再読み込みしてください。</div>';
+});
+
+// ---- 改善テーマと研究の連動 ----
+const THEME_CFG={"note": "改善テーマと研究の連動の設定。数字そのものは data/*.json から読み、ここには条件と説明だけを置く。", "themes": [{"id": "pace_positioning", "title": "展開・位置取り", "what": "逃げ・先行馬の数から、レースのペースを読んで勝率を補正します。", "research": null, "entry": null}, {"id": "track_condition", "title": "馬場状態", "what": "発走前の公式馬場と、同じ馬場での近走成績で補正します。", "research": {"href": "baba-models.html", "label": "馬場状態予測の研究"}, "entry": "競馬場ごとに、芝・ダートの両方が「検証済み」になったら、その競馬場を改善案として登録します（競馬場ごとに順番に進めます）。", "kind": "baba"}, {"id": "field_experience", "title": "若駒・新馬戦（父の血統データ）", "what": "経験の少ない新馬戦で、父の血統の傾向を使うと、オッズだけより勝つ馬を当てやすくなるかを、過去の全レースのデータで確かめます。", "research": {"href": "sire-map.html", "label": "種牡馬の初勝利マップ"}, "entry": "過去レースの取得がそろい、同じ検証をやり直して、新馬戦の外れ具合の改善が偶然と区別できたら、新馬戦だけの小さな補正として登録します。", "kind": "experience"}, {"id": "ticket_portfolio", "title": "購入セットと印の整合性", "what": "印と買い目がちぐはぐにならないよう、組み合わせを見直します。", "research": null, "entry": null}]};
+Promise.all([
+  Promise.resolve(THEME_CFG),
+  fetch('data/jra_improvement_cycle_v1.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('data/jra_experiment_status_v1.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('data/jra_improvement_pipeline_v1.json',{cache:'no-store'}).then(r=>r.json()),
+  fetch('data/sire_research_status_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+]).then(([cfg,cycle,status,pipe,sire])=>{
+  const exps=status.experiments||[];
+  const names=pipe.stages||['研究','登録','比較','判定'];
+  const bar=(u)=>{const st=u.state==='in_production'?4:u.stage;return `<div class="pb" aria-hidden="true">${names.map((n,i)=>i<st?'<i class="d"></i>':i===st?`<i class="n"><b style="width:${Math.max(0,Math.min(1,u.frac))*100}%"></b></i>`:'<i></i>').join('')}</div>`};
+  const gcol={usable:'#1a6b3a',waiting_forecast:'#8a5a00',insufficient:'#666'};
+  const gchip=(n,g)=>`<span style="margin-right:14px;white-space:nowrap">${n} <b style="color:${gcol[g.state]||'#666'}">${esc(g.label)}</b></span>`;
+  const row=u=>{
+    const g=u.detail&&u.detail.going;
+    if(g){
+      const note={ready_to_register:'登録できる状態（通知を出しています）',ready_to_adopt:'採用できる状態（承認待ち・通知を出しています）',in_production:'本番の予想で使用中',comparing:'改善案として比較中',decided:'判定済み'}[u.state]||'';
+      return `<div class="pr"><span class="pl">${esc(u.label)}</span><span class="pt">${gchip('芝',g.turf)}${gchip('ダート',g.dirt)}${note?`<br><span class="tiny" style="color:#555">${note}</span>`:''}</span></div>`;
+    }
+    return `<div class="pr"><span class="pl">${esc(u.label)}</span>${bar(u)}<span class="pt">${esc(u.text)}</span></div>`};
+  const offNote=us=>{const o=us.find(u=>u.id.endsWith(':official'));return o?`<p class="tiny" style="margin-top:10px"><b>別の実験：公式馬場補正</b>（勝つ確率の微調整。競馬場ごとの馬場予測とは別もの）　${esc(o.text)}</p>`:''};
+  const groups=cfg.themes.map(t=>{
+    const us=pipe.units.filter(u=>u.theme===t.id);
+    const ids=new Set(us.map(u=>u.experiment_id).filter(Boolean));
+    const ex=exps.filter(e=>ids.has(e.id));
+    const crit=[...new Set(us.filter(u=>!['in_production','comparing','decided'].includes(u.state)).map(u=>u.criteria_text))];
+    const regd=us.filter(u=>u.state==='comparing').length;
+    const ready=us.filter(u=>u.state==='ready_to_register').length;const adopt=us.filter(u=>u.state==='ready_to_adopt').length;
+    let extra='';
+    if(t.id==='track_condition'){
+      const f=pipe.baba_registry_freshness;
+      if(f) extra+=`<p class="tiny ${f.is_stale?'warn':''}">馬場モデルの記録の最終更新：${esc(f.updated_at)}（${f.age_days}日前）。${f.is_stale?'更新が止まっています。':''}${esc(f.owner)}</p>`;
+      extra+='<p class="tiny"><b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5%以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない（予報を毎日保存していて、たまり次第、本当の精度で測り直します）。<b>まだ足りない</b>＝予報が当たっても基準に届かない。</p><p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場予測は、競馬場ごとに条件に届いたら、20レースの比較を挟まず採用できます（承認が必要）。中山・阪神も、他の競馬場と同じ基準で評価しています。</p>';
+    }
+    if(t.id==='field_experience'&&sire){extra+=`<p class="tiny"><b>これまでに分かったこと</b>（${esc(sire.debut_sire.verified_at)}時点）</p><ul class="tiny" style="margin:4px 0 8px 18px;padding:0">${(sire.findings||[]).map(x=>`<li style="margin:3px 0">${esc(x)}</li>`).join('')}</ul><p class="tiny">${esc(sire.race_pages.text)}　（${esc(sire.updated_at)}時点）</p><p class="tiny">${esc(sire.stopped)}</p>`}
+    const entry=!crit.length&&regd?`<div class="entry"><b>登録ずみ：</b><span class="eline">登録の条件に届いたため、改善案として登録しました。いまは「比較」の段階です（下の「比較中の詳しい経過」で見られます）。</span></div>`:crit.length?`<div class="entry"><b>登録の条件：</b>${crit.map(c=>`<span class="eline">${esc(c)}</span>`).join('')}${ready?`<span class="eline"><b>いま登録できる状態：${ready}件。</b>通知（Issue）を出しています。</span>`:''}${adopt?`<span class="eline"><b>いま採用できる状態：${adopt}件。</b>通知（Issue）を出しています。</span>`:''}</div>`:'';
+    const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'<p class="tiny">専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。</p>';
+    const cmp=ex.map(expCard).join('');
+    const det=cmp?`<details class="tdet"><summary>比較中の詳しい経過を見る</summary>${cmp}</details>`:'';
+    return `<article class="tcard"><h3>${esc(t.title)}</h3><p class="what">${esc(t.what)}</p>${t.id==='track_condition'?'':`<div class="ph"><span></span><div class="pb ph-n">${names.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>`}${us.filter(u=>!u.id.endsWith(':official')).map(row).join('')}${entry}${extra}${offNote(us)}${link}${det}</article>`;
+  }).join('');
+  $('themeList').innerHTML=groups;
+}).catch(()=>{$('themeList').innerHTML='<div class="empty">データを読み込めませんでした。</div>'});
+})();
+</script>
+<script>
+(function(){
+  const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  fetch('data/predictors/claude_experiments_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d)return;
+    const p=d.pace||{};
+    const n=p.pairs||0,need=p.need_pairs||20,pct=Math.min(100,Math.round(n/need*100));
+    const f=x=>x==null?'—':Number(x).toFixed(3);
+    const pace=`<article class="tcard"><h3>展開・位置取り（Claudeの予想）</h3>
+      <p class="what">Claudeが付けた勝つ確率に、位置取りの補正を足した場合と足さない場合を、同じ結果で比べます。</p>
+      <p class="prog">比較したレース：<b>${n} / ${need}レース</b></p>
+      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${pct}%"></b></i></div>
+      <p class="tiny">${n?`外れ具合（小さいほど良い）：補正なし ${f(p.mean_log_loss_base)} → 補正あり ${f(p.mean_log_loss_pace)}／良くなったレース ${p.races_improved}・悪くなったレース ${p.races_worse}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
+    const g=d.going||{},gn=g.pairs||0,gneed=g.need_pairs||20,gp=Math.min(100,Math.round(gn/gneed*100));
+    const going=`<article class="tcard"><h3>馬場の補正（Claudeの予想）</h3>
+      <p class="what">発走前の公式の馬場状態と、各馬の良馬場・道悪での近走成績から、Claudeの勝つ確率を補正した場合と、しない場合を比べます。</p>
+      <p class="prog">比較したレース：<b>${gn} / ${gneed}レース</b></p>
+      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${gp}%"></b></i></div>
+      <p class="tiny">${gn?`外れ具合（小さいほど良い）：補正なし ${f(g.mean_log_loss_base)} → 補正あり ${f(g.mean_log_loss_going)}／良くなったレース ${g.races_improved}・悪くなったレース ${g.races_worse}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
+    const pf=d.portfolio||{},pn=pf.pairs||0,pneed=pf.need_pairs||20,pp=Math.min(100,Math.round(pn/pneed*100)),ps=pf.summary;
+    const pct1=x=>x==null?'—':(x*100).toFixed(0)+'%';
+    const port=`<article class="tcard"><h3>購入セット（Claudeの予想）</h3>
+      <p class="what">Claude自身が作った買い目と、同じ予想・同じオッズから機械ルールで作り直した買い目を、同じ公式払戻で比べます（仮想で、購入はしません）。</p>
+      <p class="prog">比較したレース：<b>${pn} / ${pneed}レース</b></p>
+      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${pp}%"></b></i></div>
+      <p class="tiny">${ps?`回収率：Claude自身 ${pct1(ps.claude_own.roi)} ／ 機械ルール ${pct1(ps.mechanical_rule.roi)}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
+    document.getElementById('claudeExpBody').innerHTML=pace+going+port; document.getElementById('claudeExp').hidden=false;
+  }).catch(()=>{});
+})();
+</script>
+<script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+<script src="assets/page-nav-v1.js?v=20261102-1" defer></script>
+</body>
+</html>

@@ -1,5 +1,17 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-wakakoma-sire-v1",
+      "title": "改善状況ページ：若駒の欄を、父の血統データを使う研究に更新",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-07",
+      "summary": "若駒・経験不足（0戦・1〜3戦・4戦以上）の3区分を外し、『若駒・新馬戦（父の血統データ）』に更新。父データベースの取得の進み具合、新馬戦での父の傾向の検証結果、これまでに分かったことを表示。Claudeの予想の欄にあった経験区分の2枚（若駒・経験不足／若駒の機械採点）も外した。"
+    }
+  ]
 }
