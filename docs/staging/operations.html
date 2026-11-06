@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/improvement-cycle.html">予想の改善状況</a></nav>
 
@@ -67,7 +67,7 @@
 <p class="sub">各処理が終わった直後に、実際に動いた時刻と結果を自動で記録しています（Claudeの使用量を使うタスクは、終わりに自分で残した記録を表示します）。きょうの列の数字は実際の開始時刻です。マスをタップすると、その回の詳細（開始・完了時刻と結果）が開きます。</p>
 <div class="rt-sum" id="rtSum">実行記録を読み込み中…</div>
 <table class="mx"><colgroup><col class="c0"><col><col><col><col><col><col><col class="ct"></colgroup><thead id="mxHead"></thead><tbody id="mxBody"></tbody></table>
-<p class="rt-note">✅成功　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。薄い表示と「手」の印は、定時の自動実行ではなく、手動・ファイルの更新（push）・<b>Claudeの起動役や回顧のタスクが起動した分</b>で、集計には数えません。ChatGPTの手動実行は含みません。Claudeのタスクは、実行の終わりに自分で記録を残すため、途中で失敗すると「記録なし」（⚠）と出ます。</p>
+<p class="rt-note">✅成功　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。各マスの小さな文字は<b>実行の出どころ</b>です：<b>G</b>＝GitHubの定時（遅れて動いた保険も含む）、<b>H</b>＝Haikuの起動役（朝6:03・夕18:03）、<b>O</b>＝Opusのタスク（予想・回顧）。G・H・Oは予定どおりの定時の実行として集計に数えます。<b>手</b>（薄い表示）は、手動・復旧のやり直し・ファイルの更新（push）で、集計には数えません。同じ日に複数回動いたときは、いちばん早く始まった定時の実行を表示します。起動役とOpusのタスクは同じ権限で起動するため、決まった時刻の窓と決まった処理で見分けています（窓の外の起動は「手」）。ChatGPTの手動実行は含みません。Claudeのタスクは、実行の終わりに自分で記録を残すため、途中で失敗すると「記録なし」（⚠）と出ます。</p>
 </section>
 
 <footer>この画面は自動で集計されたデータ（data/automation/automation_runs_v1.json）を表示しています。既存の正式予想・買い目・PDF原本は変更しません。</footer>
@@ -108,16 +108,18 @@ function url(id){if(!id)return '#';return 'https://github.com/toodataa-ai/keiba-
 function getJ(u){return fetch(u[0]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()}).catch(function(){return fetch(u[1]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null})}).catch(function(){return null})}
 function load(){return Promise.all([getJ(['data/automation/automation_runs_v1.json','../data/automation/automation_runs_v1.json']),getJ(['data/automation/claude_task_runs_v1.json','../data/automation/claude_task_runs_v1.json'])]).then(function(a){
  var d=a[0];if(!d)return null;
- var c=a[1];if(c&&c.runs){['T2','T3'].forEach(function(t){d.workflows['claude:'+t]={label:(c.tasks||{})[t]||t,runs:c.runs.filter(function(r){return r.task===t}).map(function(r){return {id:null,note:r.note,event:'schedule',created_at:r.started_at,started_at:r.started_at,ended_at:r.ended_at,status:'completed',conclusion:r.status==='fail'?'failure':'success',skipped:r.status==='skipped'}})}})}
+ var c=a[1];if(c&&c.runs){['T2','T3'].forEach(function(t){d.workflows['claude:'+t]={label:(c.tasks||{})[t]||t,runs:c.runs.filter(function(r){return r.task===t}).map(function(r){return {id:null,note:r.note,event:'schedule',by:'O',created_at:r.started_at,started_at:r.started_at,ended_at:r.ended_at,status:'completed',conclusion:r.status==='fail'?'failure':'success',skipped:r.status==='skipped'}})}})}
  return d})}
 function h27(a,day){var mm=Math.round((a-Date.parse(day+'T00:00:00+09:00'))/60000);return ('0'+Math.floor(mm/60)).slice(-2)+':'+('0'+mm%60).slice(-2)}
 function miniFor_unused(r){var ok=r.status==='completed'?(r.conclusion==='success'?'✅':'❌'):'⏳',man=r.event!=='schedule';return '<a href="'+url(r.id)+'" title="'+hm(Date.parse(r.started_at||r.created_at))+' 開始 '+(r.status==='completed'?(r.conclusion==='success'?'成功':'失敗'):'実行中')+(man?'（手動・起動役など）':'')+'">'+ok+'</a>'}
+var ORG={G:'GitHubの定時',H:'Haikuの起動役',O:'Opusのタスク','手':'手動・復旧'};
+function byOf(r){return r.by||(r.event==='schedule'?'G':'手')}
 function cellFor(r,manual,showTime,it,day){
  var a=Date.parse(r.started_at||r.created_at),ic,cls='',tip,late='',isLate=0;
  if(it&&!manual){var lm=(mins(Date.parse(r.created_at))-tmin(it.t)+1440)%1440;if(lm>1320)lm=0;if(lm>=30)isLate=1;if(lm>=30)late='（予定の'+(lm>=60?Math.floor(lm/60)+'時間':'')+(lm%60?lm%60+'分':'')+'後に開始）'}
  if(r.status!=='completed'){ic='⏳';tip=hms(a)+' 開始（実行中）'}
  else{var ok=r.conclusion==='success',b=Date.parse(r.ended_at);ic=ok?'✅':'❌';cls=ok?'':'ng';tip=hms(a)+' 開始'+late+' → '+hms(b)+' 完了（'+dur(a,b)+'）'+(ok?' 成功':' 失敗：'+(r.conclusion||'不明'))+(r.note?'：'+r.note:'')}
- return '<a href="'+url(r.id)+'" title="'+tip+(manual?'（手動）':'')+'" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+((showTime||isLate)&&day?'<span class="tm">'+h27(a,day)+(manual?' 手':'')+'</span>':(manual?'<span class="tm">手</span>':'<span class="tm">&nbsp;</span>'))+'</a>'}
+ return '<a href="'+url(r.id)+'" title="'+tip+'（'+ORG[byOf(r)]+'）" class="'+(manual?'man':'')+'"><span class="ic '+cls+'">'+ic+'</span>'+((showTime||isLate)&&day?'<span class="tm">'+h27(a,day)+' '+byOf(r)+'</span>':'<span class="tm">'+byOf(r)+'</span>')+'</a>'}
 function render(d){
  var sum=document.getElementById('rtSum'),head=document.getElementById('mxHead'),body=document.getElementById('mxBody');
  if(!d){sum.textContent='実行記録を読み込めませんでした。';return}
@@ -132,7 +134,7 @@ function render(d){
  var cnt={ok:0,ng:0,wait:0,miss:0,late:0},html='';
  ITEMS.forEach(function(it){
   var wf=d.workflows[it.w],runs=wf?wf.runs.filter(function(r){return itemFor(it,r)===it}):[];
-  var sched=runs.filter(function(r){return r.event==='schedule'}),man=runs.filter(function(r){return r.event!=='schedule'});
+  var sched=runs.filter(function(r){return byOf(r)!=='手'}).sort(function(x,y){return Date.parse(x.created_at)-Date.parse(y.created_at)}),man=runs.filter(function(r){return byOf(r)==='手'});
   var first=null;sched.forEach(function(r){var y=nday(r);if(first===null||y<first)first=y});
   var row='<tr><td class="nm">'+it.l+(it.b?'<i class="bkn">保険</i>':'')+'<span>'+it.t+(it.d==='w'?'・土日月':'・毎日')+'</span></td>';
   days.forEach(function(ms,i){
@@ -140,7 +142,7 @@ function render(d){
    var rr=sched.filter(function(r){return nday(r)===day});
    var mm=man.filter(function(r){return nday(r)===day});
    var c='';
-   if(rr.length){var r=rr[0];c=cellFor(r,false,i===6,it,day);if(isT){if(r.status==='completed'){if(r.conclusion==='success')cnt.ok++;else cnt.ng++}}}
+   if(rr.length){var r=rr[0];c=cellFor(r,byOf(r)==='手',i===6,it,day);if(isT){if(r.status==='completed'){if(r.conclusion==='success')cnt.ok++;else cnt.ng++}}}
    else if(!exp){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
    else if(isT){
     if(mins(now)<tmin(it.t)+20||(first===null&&mins(now)-tmin(it.t)>660)){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic wt">・</span><span class="tm wt">'+it.t+'</span>';cnt.wait++}

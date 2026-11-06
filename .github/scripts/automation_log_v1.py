@@ -21,6 +21,32 @@ TRACKED = [  # workflow file, label
 ]
 
 
+# 実行の出どころ：G=GitHubの定時（遅れて動いた保険を含む）／H=Haikuの起動役（D1 6:03・D2 18:03）／O=OpusのClaudeタスク（T2・T3）／手=手動・復旧・ファイル更新（push）
+# 起動役とClaudeタスクは同じ権限でAPIから起動するため、「決まった時刻の窓＋決まった処理」で見分ける（窓の外の起動は手動）。
+D1_SET = {"baba-forecast-archive-v1.yml", "local-racing-shadow-postrace.yml", "local-racing-shadow-prerace-generic.yml"}
+T2_SET = {"claude-race-data-v1.yml", "claude-odds-v1.yml", "baba-going-live-v1.yml"}
+T3_SET = {"claude-results-v1.yml", "claude-wakakoma-v1.yml", "claude-track-publish-v1.yml", "jra-improvement-experiments-v1.yml", "jra-improvement-pipeline-v1.yml"}
+
+
+def origin(fn, r):
+    if r["event"] == "schedule":
+        return "G"
+    if r["event"] != "workflow_dispatch":
+        return "手"
+    t = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00")).astimezone(timezone(timedelta(hours=9)))
+    m = t.hour * 60 + t.minute
+    wd = t.weekday()  # 月=0 … 土=5 日=6
+    if fn in D1_SET and 6 * 60 <= m < 6 * 60 + 30:
+        return "H"
+    if fn == "baba-forecast-archive-v1.yml" and 18 * 60 <= m < 18 * 60 + 30:
+        return "H"
+    if wd in (5, 6, 0) and fn in T2_SET and 9 * 60 + 10 <= m < 11 * 60 + 30:
+        return "O"
+    if wd in (5, 6, 0) and fn in T3_SET and 18 * 60 + 17 <= m < 21 * 60:
+        return "O"
+    return "手"
+
+
 def gh(path):
     p = subprocess.run(["gh", "api", path], capture_output=True, text=True)
     if p.returncode != 0:
@@ -40,10 +66,10 @@ def main(out):
         for r in d.get("workflow_runs", []):
             runs.append({"id": r["id"], "event": r["event"], "created_at": r["created_at"],
                          "started_at": r.get("run_started_at"), "ended_at": r.get("updated_at") if r["status"] == "completed" else None,
-                         "status": r["status"], "conclusion": r.get("conclusion"), "attempt": r.get("run_attempt", 1)})
+                         "status": r["status"], "conclusion": r.get("conclusion"), "attempt": r.get("run_attempt", 1), "by": origin(fn, r)})
         wfs[fn] = {"label": label, "runs": sorted(runs, key=lambda x: x["created_at"], reverse=True)}
-    doc = {"schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-           "keep_days": KEEP_DAYS, "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。",
+    doc = {"schema_version": 2, "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+           "keep_days": KEEP_DAYS, "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
            "workflows": wfs}
     os.makedirs(os.path.dirname(out), exist_ok=True)
     text = json.dumps(doc, ensure_ascii=False, indent=1) + "\n"
