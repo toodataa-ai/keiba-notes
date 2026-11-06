@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.31-20261106",
-  "current_public_version": "1.31",
+  "current_public_release": "release/jra-site-v1.32-20261106",
+  "current_public_version": "1.32",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -657,6 +657,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.32-20261106",
+      "branch": "release/jra-site-v1.32-20261106",
+      "commit_sha": "0896b1c2957e7e1a94557389b6b55dd8a4c9965e",
+      "deployed_at": "2026-11-06T20:01:45+09:00",
+      "workflow_run_id": 42207095714,
+      "validation_workflow_run_id": 42207095714,
+      "public_version": "1.32",
+      "note": "2026-11-06ユーザー明示承認済み。予想のしくみ：①〜⑨の表を「重視度」の1軸（最重視／重視／状況しだい／控えめ）に：2種類のタグ（定め／サイトの整理）をやめ、重視度の4段階だけで示す。最終判断はすべてAIがレースごとに行うこと、段階は計算式ではなく目安であることを明記。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-methodology-wording-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/methodology.html"
       ],
       "public_http_files_verified": null
     }
