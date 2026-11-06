@@ -1,0 +1,1833 @@
+{
+  "race_id": "2026-11-07-keio-hai-2yo-stakes",
+  "status": "shadow_comparison_only",
+  "formal_prompt_version": "v3.13",
+  "formal_purchase_decision_unchanged": true,
+  "formal_bets_selection_unchanged": true,
+  "formal_proof_commit": "7dc3fbe7d95b0f93a2ffad4e8b9cece75fed035b",
+  "formal_prediction_file": "e2e_validation/predictions/2026-11-07-keio-hai-2yo-stakes/v3.13-run42313655061-attempt1.json",
+  "formal_prediction_sha256": "c36a38b39ed732d9279f687b85cd3d8da24f89b025eac904e5e2a51f625e8b02",
+  "models_compared": "v3.12 100-yen selected-line baseline vs grouped complete-strategy counterfactual; not v3.13 WIN-stake-sized final",
+  "comparison": {
+    "algorithm": "set_preference_bounded_neighbourhood_v1",
+    "activated": false,
+    "status": "keep_formal_baseline",
+    "formal_prediction_unchanged": true,
+    "not_global_optimum": true,
+    "baseline": {
+      "total_stake_yen": 6000,
+      "ticket_count": 60,
+      "command_count": 60,
+      "hit_probability": 0.9629896012036451,
+      "net_loss_probability": 0.6832864766615951,
+      "expected_net_profit_yen": 6106.061831352461,
+      "expected_net_profit_low_yen": 6106.061831352459
+    },
+    "proposed": {
+      "total_stake_yen": 6000,
+      "ticket_count": 60,
+      "command_count": 60,
+      "hit_probability": 0.9629896012036451,
+      "net_loss_probability": 0.6832864766615951,
+      "expected_net_profit_yen": 6106.061831352461,
+      "expected_net_profit_low_yen": 6106.061831352459
+    },
+    "proposed_lines": [
+      {
+        "type": "ワイド",
+        "selection": [
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": [
+          11.5,
+          12.5
+        ],
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.858+00:00",
+        "market_selection_id": "ワイド:[5,8]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          2,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 396.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,2,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          5,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 516.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,5,2]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          5,
+          4
+        ],
+        "stake_yen": 100,
+        "market_odds": 496.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,5,4]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 595.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,5,8]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          5,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 326.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,5,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          8,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 512,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,8,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          8,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 199.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,8,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          10,
+          9,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 239.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=10&position=1",
+        "observed_at": "2026-11-06T23:43:01.125+00:00",
+        "market_selection_id": "三連単:[10,9,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          2,
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 384.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=2&position=1",
+        "observed_at": "2026-11-06T23:43:01.017+00:00",
+        "market_selection_id": "三連単:[2,5,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          10,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 597.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,10,2]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          10,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 805.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,10,8]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          10,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 356.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,10,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          2,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 541.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,2,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          2,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 514.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,2,8]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          4,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 339.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,4,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          8,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 796.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,8,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          8,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 618.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,8,2]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          8,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 415.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,8,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          9,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 281.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,9,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          9,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 199.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,9,2]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          9,
+          4
+        ],
+        "stake_yen": 100,
+        "market_odds": 283.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,9,4]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          5,
+          9,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 338,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=5&position=1",
+        "observed_at": "2026-11-06T23:43:01.060+00:00",
+        "market_selection_id": "三連単:[5,9,8]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          10,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 673,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,10,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          10,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 230.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,10,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          2,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 429.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,2,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 793.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,5,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          5,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 533.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,5,2]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          5,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 408.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,5,9]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          9,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 201.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,9,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          8,
+          9,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 294.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=8&position=1",
+        "observed_at": "2026-11-06T23:43:01.082+00:00",
+        "market_selection_id": "三連単:[8,9,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          9,
+          10,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 166,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=9&position=1",
+        "observed_at": "2026-11-06T23:43:01.104+00:00",
+        "market_selection_id": "三連単:[9,10,5]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          9,
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 199.1,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=9&position=1",
+        "observed_at": "2026-11-06T23:43:01.104+00:00",
+        "market_selection_id": "三連単:[9,5,10]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          9,
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 231,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=9&position=1",
+        "observed_at": "2026-11-06T23:43:01.104+00:00",
+        "market_selection_id": "三連単:[9,5,8]"
+      },
+      {
+        "type": "三連単",
+        "selection": [
+          9,
+          8,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 203.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/st/2605050111?umaBan=9&position=1",
+        "observed_at": "2026-11-06T23:43:01.104+00:00",
+        "market_selection_id": "三連単:[9,8,5]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          2,
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 71.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[2,5,10]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          2,
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 73.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[2,5,8]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          4,
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 88.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[4,5,10]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          4,
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 98.3,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[4,5,8]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          5,
+          8,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 104.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[5,8,10]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          5,
+          8,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 44.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[5,8,9]"
+      },
+      {
+        "type": "三連複",
+        "selection": [
+          5,
+          9,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 39.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/sf/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:42:59.145+00:00",
+        "market_selection_id": "三連複:[5,9,10]"
+      },
+      {
+        "type": "単勝",
+        "selection": [
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 13.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "単勝:[5]"
+      },
+      {
+        "type": "枠連",
+        "selection": [
+          2,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 34.4,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "枠連:[2,5]"
+      },
+      {
+        "type": "枠連",
+        "selection": [
+          5,
+          7
+        ],
+        "stake_yen": 100,
+        "market_odds": 39.7,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "枠連:[5,7]"
+      },
+      {
+        "type": "枠連",
+        "selection": [
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 15.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "枠連:[5,8]"
+      },
+      {
+        "type": "複勝",
+        "selection": [
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": [
+          2,
+          2.9
+        ],
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "複勝:[10]"
+      },
+      {
+        "type": "複勝",
+        "selection": [
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": [
+          1.5,
+          1.8
+        ],
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "複勝:[2]"
+      },
+      {
+        "type": "複勝",
+        "selection": [
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": [
+          1.4,
+          1.7
+        ],
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.374+00:00",
+        "market_selection_id": "複勝:[9]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          10,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 78.8,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[10,5]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 96.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[5,10]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          5,
+          2
+        ],
+        "stake_yen": 100,
+        "market_odds": 77.2,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[5,2]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 109.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[5,8]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          5,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 59.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[5,9]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          8,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 60.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[8,10]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          8,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 104.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[8,5]"
+      },
+      {
+        "type": "馬単",
+        "selection": [
+          9,
+          5
+        ],
+        "stake_yen": 100,
+        "market_odds": 34,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.694+00:00",
+        "market_selection_id": "馬単:[9,5]"
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          5,
+          10
+        ],
+        "stake_yen": 100,
+        "market_odds": 42.5,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.535+00:00",
+        "market_selection_id": "馬連:[5,10]"
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          5,
+          8
+        ],
+        "stake_yen": 100,
+        "market_odds": 52.6,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.535+00:00",
+        "market_selection_id": "馬連:[5,8]"
+      },
+      {
+        "type": "馬連",
+        "selection": [
+          5,
+          9
+        ],
+        "stake_yen": 100,
+        "market_odds": 20.9,
+        "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605050111?ninki=0",
+        "observed_at": "2026-11-06T23:43:01.535+00:00",
+        "market_selection_id": "馬連:[5,9]"
+      }
+    ],
+    "commands": [
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "ワイド",
+        "definition": {
+          "selection": [
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "ワイド:[5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            2,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,2,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            5,
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,5,2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            5,
+            4
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,5,4]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            5,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,5,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            8,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,8,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            8,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,8,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            10,
+            9,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[10,9,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            2,
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[2,5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            10,
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,10,2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            10,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,10,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            10,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,10,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            2,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,2,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            2,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,2,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            4,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,4,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            8,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,8,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            8,
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,8,2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            8,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,8,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            9,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,9,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            9,
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,9,2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            9,
+            4
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,9,4]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            5,
+            9,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[5,9,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            10,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,10,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            10,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,10,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            2,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,2,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            5,
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,5,2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            5,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,5,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            9,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,9,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            8,
+            9,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[8,9,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            9,
+            10,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[9,10,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            9,
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[9,5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            9,
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[9,5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連単",
+        "definition": {
+          "selection": [
+            9,
+            8,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連単:[9,8,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            2,
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[2,5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            2,
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[2,5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            4,
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[4,5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            4,
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[4,5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            5,
+            8,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[5,8,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            5,
+            8,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[5,8,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "三連複",
+        "definition": {
+          "selection": [
+            5,
+            9,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "三連複:[5,9,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "単勝",
+        "definition": {
+          "selection": [
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "単勝:[5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "枠連",
+        "definition": {
+          "selection": [
+            2,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "枠連:[2,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "枠連",
+        "definition": {
+          "selection": [
+            5,
+            7
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "枠連:[5,7]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "枠連",
+        "definition": {
+          "selection": [
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "枠連:[5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "複勝",
+        "definition": {
+          "selection": [
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "複勝:[10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "複勝",
+        "definition": {
+          "selection": [
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "複勝:[2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "複勝",
+        "definition": {
+          "selection": [
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "複勝:[9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            10,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[10,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            5,
+            2
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[5,2]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            5,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[5,9]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            8,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[8,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            8,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[8,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬単",
+        "definition": {
+          "selection": [
+            9,
+            5
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[9,5]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬連",
+        "definition": {
+          "selection": [
+            5,
+            10
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬連:[5,10]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬連",
+        "definition": {
+          "selection": [
+            5,
+            8
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬連:[5,8]"
+        ]
+      },
+      {
+        "method": "single",
+        "strategy_id": null,
+        "type": "馬連",
+        "definition": {
+          "selection": [
+            5,
+            9
+          ]
+        },
+        "tickets": 1,
+        "total_stake_yen": 100,
+        "ticket_keys": [
+          "馬連:[5,9]"
+        ]
+      }
+    ],
+    "preferred_strategy_ids": [],
+    "considered": 96,
+    "feasible": 0,
+    "candidate_group_count": 26,
+    "source_quote_universe_count": 171,
+    "rejected": {
+      "unpriced": 0,
+      "over_budget": 0,
+      "incomplete": 0,
+      "unsupported": 0
+    },
+    "guardrails": {
+      "minimum_central_profit_yen": 6006.061831352461,
+      "policy": {
+        "max_budget_yen": 6000,
+        "unit_yen": 100,
+        "max_group_candidates": 24,
+        "max_groups_per_portfolio": 2,
+        "min_saved_purchase_commands": 1,
+        "max_expected_profit_sacrifice_yen": 100,
+        "max_expected_profit_sacrifice_ratio": 0.02,
+        "max_union_hit_decrease": 0.005,
+        "max_net_loss_increase": 0.01,
+        "max_low_scenario_profit_sacrifice_yen": 200
+      }
+    },
+    "caveat": "Modeled win probabilities are uncalibrated; no actual-return guarantee. This sidecar never changes the official v3.13 final_bets."
+  }
+}
