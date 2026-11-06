@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.33-20261107",
-  "current_public_version": "1.33",
+  "current_public_release": "release/jra-site-v1.34-20261107",
+  "current_public_version": "1.34",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -697,6 +697,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.34-20261107",
+      "branch": "release/jra-site-v1.34-20261107",
+      "commit_sha": "5c629f37a32b4ddd6dd3448a573f850f33c50042",
+      "deployed_at": "2026-11-07T08:29:04+09:00",
+      "workflow_run_id": 42312176499,
+      "validation_workflow_run_id": 42312176499,
+      "public_version": "1.34",
+      "note": "2026-11-07ユーザー明示承認済み。改善状況ページ：若駒の欄を、父の血統データを使う研究に更新：若駒・経験不足（0戦・1〜3戦・4戦以上）の3区分を外し、『若駒・新馬戦（父の血統データ）』に更新。父データベースの取得の進み具合、新馬戦での父の傾向の検証結果、これまでに分かったことを表示。Claudeの予想の欄にあった経験区分の2枚（若駒・経験不足／若駒の機械採点）も外した。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-wakakoma-sire-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/improvement-cycle.html"
       ],
       "public_http_files_verified": null
     }
