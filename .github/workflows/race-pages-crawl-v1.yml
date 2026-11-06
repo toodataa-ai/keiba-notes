@@ -1,0 +1,77 @@
+name: Race pages crawl v1 (past JRA races -> result and card pages saved as-is; research only, no Claude usage)
+on:
+  schedule:
+    - cron: '41 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      years:
+        description: 'Years, newest first'
+        default: '2026,2025,2024,2023,2022,2021,2020,2019,2018'
+      max_minutes:
+        description: 'Minutes per round (3 rounds, each committed)'
+        default: '100'
+      max_races:
+        description: 'Test: stop after N races per round (0 = no limit)'
+        default: '0'
+      probe:
+        description: 'Test: race code (e.g. 2605041111): fetch and print the page structure only, save nothing'
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: race-pages-crawl
+  cancel-in-progress: false
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - run: python3 -m unittest sire_db_v1.test_race_crawl -v
+      - name: Probe (fetch and print only)
+        if: ${{ inputs.probe != '' }}
+        run: python3 sire_db_v1/race_crawl.py --probe "${{ inputs.probe }}"
+      - name: Check the private data token exists
+        if: ${{ inputs.probe == '' }}
+        env:
+          T: ${{ secrets.PRIVATE_DATA_TOKEN }}
+        run: test -n "$T" || { echo 'PRIVATE_DATA_TOKEN is not set'; exit 1; }
+      - name: Check out the PRIVATE data repository (raw data never goes into this public repository)
+        if: ${{ inputs.probe == '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - name: Crawl in rounds (each round is committed to the private repository)
+        if: ${{ inputs.probe == '' }}
+        env:
+          YEARS: ${{ inputs.years || '2026,2025,2024,2023,2022,2021,2020,2019,2018' }}
+          MAXMIN: ${{ inputs.max_minutes || '100' }}
+          MAXRACES: ${{ inputs.max_races || '0' }}
+          SIRE_DATA_DIR: ${{ github.workspace }}/private/data_v2
+        run: |
+          set -euo pipefail
+          cd private
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cd ..
+          mkdir -p private/data_v2
+          for round in 1 2 3; do
+            python3 sire_db_v1/race_crawl.py --years "$YEARS" --max-minutes "$MAXMIN" --max-races "$MAXRACES" | tee "$RUNNER_TEMP/out.txt"
+            cd private
+            git add data_v2
+            if ! git diff --cached --quiet; then
+              git commit -q -m "Race pages: collected (round $round)"
+              for i in 1 2 3 4 5; do
+                if git pull -q --rebase origin HEAD && git push -q origin HEAD; then break; fi
+                sleep $((i*3))
+              done
+            fi
+            cd ..
+            grep -q 'remaining races 0$' "$RUNNER_TEMP/out.txt" && break
+            if [ "$MAXRACES" != "0" ]; then break; fi
+          done
