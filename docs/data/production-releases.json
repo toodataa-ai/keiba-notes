@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.29-20261106",
-  "current_public_version": "1.29",
+  "current_public_release": "release/jra-site-v1.30-20261106",
+  "current_public_version": "1.30",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -611,6 +611,26 @@
       "note": "2026-11-06ユーザー明示承認済み。初勝利マップ：何歳何か月表記・横長（左右スクロール）：横軸の目盛りを「2歳10か月」のような表記にし、図を横に長く（スクロール式）して名前や丸の重なりを減らす。縦軸の距離は左に固定。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-sire-map-wide-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/sire-map.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.30-20261106",
+      "branch": "release/jra-site-v1.30-20261106",
+      "commit_sha": "17e4b31a63281dfb313198431f60b1b673d41d79",
+      "deployed_at": "2026-11-06T16:43:50+09:00",
+      "workflow_run_id": 42182754487,
+      "validation_workflow_run_id": 42182754487,
+      "public_version": "1.30",
+      "note": "2026-11-06ユーザー明示承認済み。初勝利マップ：指でつまんで拡大・縮小、ドラッグで移動：図を2本指のつまみ操作で自由に拡大・縮小でき、1本指で動かせる（＋／－／表示を戻すボタンつき）。拡大すると名前を描き直すので重なりが減る。縦軸の距離は左に固定。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-sire-map-pinch-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
