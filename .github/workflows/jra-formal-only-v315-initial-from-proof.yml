@@ -76,6 +76,7 @@ jobs:
           print('ORIGINAL_PROOF='+proof)
           print('ORIGINAL_SNAPSHOT='+snap)
           PY
+          RACE_ID=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["race_id"])' "$REQUEST")
           LABEL="v315-initial-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
           FRESH="e2e_validation/inputs/v315-initial-fresh/$RACE_ID-$LABEL.json"
           EVIDENCE="e2e_validation/quote-evidence/$RACE_ID/$LABEL"
