@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-01T23:06:37+00:00",
+  "generated_at": "2026-11-07T11:40:03+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 22,
+    "strict": 24,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 22
+    "prediction_entries": 24
   },
   "versions": {
     "v3.12": {
@@ -57,11 +57,11 @@
     },
     "v3.13": {
       "all_non_synthetic": {
-        "cases": 18,
-        "honmei_win_rate": 0.222222,
+        "cases": 20,
+        "honmei_win_rate": 0.25,
         "honmei_top3_rate": 0.5,
         "top3_marks_capture_rate": 0.5,
-        "winner_in_top3_marks_rate": 0.611111,
+        "winner_in_top3_marks_rate": 0.65,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -69,21 +69,21 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 51700,
-        "payout_yen": 59690,
-        "roi_pct": 115.455,
-        "bet_cases": 18,
+        "stake_yen": 62100,
+        "payout_yen": 62860,
+        "roi_pct": 101.224,
+        "bet_cases": 20,
         "probability_cases": {
           "win": 0,
           "top3": 0
         }
       },
       "strict": {
-        "cases": 18,
-        "honmei_win_rate": 0.222222,
+        "cases": 20,
+        "honmei_win_rate": 0.25,
         "honmei_top3_rate": 0.5,
         "top3_marks_capture_rate": 0.5,
-        "winner_in_top3_marks_rate": 0.611111,
+        "winner_in_top3_marks_rate": 0.65,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -91,10 +91,10 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 51700,
-        "payout_yen": 59690,
-        "roi_pct": 115.455,
-        "bet_cases": 18,
+        "stake_yen": 62100,
+        "payout_yen": 62860,
+        "roi_pct": 101.224,
+        "bet_cases": 20,
         "probability_cases": {
           "win": 0,
           "top3": 0
@@ -169,7 +169,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 22
+    "strict_bet_cases": 24
   },
   "errors": [],
   "entries": [
@@ -1042,6 +1042,86 @@
         "winner_rank": null,
         "winner_mrr": null,
         "stake_yen": 2800,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-11-07-keio-hai-2yo-stakes",
+      "date": "2026-11-07",
+      "venue": "東京",
+      "surface": "turf",
+      "race": "京王杯2歳ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-11-07-keio-hai-2yo-stakes/v3.15-run42313903722-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "0ea06f58880b4d9b7e9c7632c7f5def673a4c29d",
+        "proof_commit_at": "2026-11-06T23:46:11+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 1,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 5600,
+        "payout_yen": 3170,
+        "roi_pct": 56.607,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-11-07-muromachi-stakes",
+      "date": "2026-11-07",
+      "venue": "京都",
+      "surface": "dirt",
+      "race": "室町ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-11-07-muromachi-stakes/v3.15-run42315090109-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "89d9e1428ed2c9d7ae2056dcbb354aa970771032",
+        "proof_commit_at": "2026-11-06T23:57:38+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.333333,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 4800,
         "payout_yen": 0,
         "roi_pct": 0.0,
         "going_log_loss": null,
