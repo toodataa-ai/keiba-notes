@@ -209,6 +209,16 @@ def day_scores(races, base: dict):
                 score = _mean(vals)
                 z = round((score - mu.get(key, 0.0)) / sd[key], 2) if sd.get(key) else None   # 0＝ふだんどおり
                 cell[key] = {"score": round(score, 4), "z": z, "n": len(vals)}
+        # 1レースごとの位置（日の平均と同じ目盛りで。平均がどんな分布から出たかを見せるため）
+        def zof(v, key):
+            return None if v is None or not sd.get(key) else round((v - mu.get(key, 0.0)) / sd[key], 2)
+        per = []
+        for r in rs:
+            s1 = race_speed(r, base["time"])
+            fo1 = race_front_outer(r, base["ef"])
+            f1 = fo1["front"] if fo1 and (surf == "ダート" or r["dist"] >= TURF_FRONT_MIN_DIST) else None
+            per.append({"r": int(str(r["code"])[-2:]), "d": r["dist"], "speed": zof(s1, "speed"), "front": zof(f1, "front")})
+        cell["races"] = sorted(per, key=lambda x: x["r"])
         out["turf" if surf == "芝" else "dirt"] = cell
     return out
 

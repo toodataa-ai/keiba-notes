@@ -56,6 +56,9 @@ class T(unittest.TestCase):
         ds = core.day_scores(races[:6], {**base, "sd": {s: {"speed": 1, "front": 1, "outer": 1} for s in core.SURFACES}})
         self.assertIn("turf", ds)
         self.assertEqual(ds["turf"]["n_races"], 6)
+        per = ds["turf"]["races"]
+        self.assertEqual(len(per), 6)
+        self.assertEqual(set(per[0]), {"r", "d", "speed", "front"})
         self.assertNotIn("dirt", ds)
 
     def test_min_races(self):
