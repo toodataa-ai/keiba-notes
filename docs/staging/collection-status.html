@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta name="robots" content="noindex,nofollow"><base href="../">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<title>データ収集の状況 | AIによる競馬予想研究所</title>
+<link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+<link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
+<style>
+.cs-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px;margin:10px 0 0}
+.cs-tile{border:1px solid #e3e4e8;border-radius:12px;background:#fff;padding:12px 12px 10px}
+.cs-tile .cs-num{display:inline;font-size:24px;font-weight:800;line-height:1.25;color:#17171a;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+@media(max-width:640px){.cs-tile .cs-num{font-size:22px}}
+.cs-tile .cs-unit{font-size:13px;font-weight:700;color:#3a3d46;margin-left:3px}
+.cs-tile .cs-cap{display:block;font-size:12px;color:#6d6e75;line-height:1.55;margin-top:3px}
+.cs-tile.cs-main{border-color:#2f6fd0;box-shadow:0 0 0 1px #2f6fd0 inset}
+.cs-bar{margin:14px 0 0}
+.cs-bar-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 12px;font-size:13px}
+.cs-bar-head b{font-size:15px}
+.cs-bar-head span{color:#3a3d46;font-variant-numeric:tabular-nums;font-weight:700}
+.cs-track{height:12px;border-radius:7px;background:#e9ebef;overflow:hidden;margin-top:6px}
+.cs-fill{height:100%;border-radius:7px;width:0;transition:width .9s ease}
+@media(prefers-reduced-motion:reduce){.cs-fill{transition:none}}
+.cs-fill.a{background:#2f6fd0}.cs-fill.b{background:#2f7d3b}
+.cs-years{margin:12px 0 0;display:grid;gap:6px}
+.cs-yr{display:grid;grid-template-columns:44px 1fr 92px;gap:8px;align-items:center;font-size:12px;color:#3a3d46}
+.cs-yr .cs-track{height:8px;margin:0}
+.cs-yr em{font-style:normal;text-align:right;color:#6d6e75;font-variant-numeric:tabular-nums}
+.cs-seg{display:inline-flex;border:1px solid #dcdee3;border-radius:999px;overflow:hidden;margin:0 0 8px}
+.cs-seg button{font:inherit;font-size:13px;border:0;background:#fff;color:#2b2c31;padding:6px 12px;cursor:pointer}
+.cs-seg button+button{border-left:1px solid #dcdee3}
+.cs-seg button[aria-pressed="true"]{background:#17171a;color:#fff}
+.cs-seg button:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
+.cs-chart{border:1px solid #e3e4e8;border-radius:12px;background:#fff;padding:8px 6px 4px}
+.cs-chart svg{display:block;width:100%;height:auto}
+.cs-chart text{font-family:inherit;font-size:11px;fill:#6d6e75}
+.cs-pace{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:#f6f7f9;font-size:13px;line-height:1.75}
+.cs-list{margin:8px 0 0;padding-left:1.2em;font-size:14px;line-height:1.8}
+.cs-note{font-size:12px;color:#6d6e75;line-height:1.75;margin:8px 0 0}
+</style>
+<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+</head>
+<body class="ic-light">
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
+<div class="wrap">
+<nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/sire-map.html">種牡馬の初勝利マップ</a></nav>
+
+<header>
+<p class="eyebrow">研究の土台（予想には使っていません）</p>
+<h1>データ収集の状況</h1>
+<p class="lead">AIが学ぶための過去のレースデータを、<strong>毎日自動で集め続けています</strong>。集まった件数と、全体のどこまで進んだかを見られます。</p>
+</header>
+
+<section aria-labelledby="nowTitle">
+<h2 id="nowTitle">いま集まっているもの</h2>
+<p class="sub" id="csMeta">読み込み中…</p>
+<div class="cs-tiles" id="csTiles" aria-live="polite"></div>
+</section>
+
+<section aria-labelledby="progTitle">
+<h2 id="progTitle">どこまで進んだか</h2>
+<p class="sub">集める目標は、2018年以降にJRAが開催した全レースです。</p>
+<div class="cs-bar"><div class="cs-bar-head"><b>馬ごとの過去の成績（出走履歴）</b><span id="pPastTxt"></span></div><div class="cs-track"><div class="cs-fill a" id="pPastBar"></div></div></div>
+<div class="cs-years" id="csYears" aria-label="年ごとの進み具合"></div>
+<div class="cs-bar" style="margin-top:20px"><div class="cs-bar-head"><b>レースごとの詳細（ラップ・通過順位・払戻）</b><span id="pPageTxt"></span></div><div class="cs-track"><div class="cs-fill b" id="pPageBar"></div></div></div>
+<p class="cs-pace" id="csPace" hidden></p>
+</section>
+
+<section aria-labelledby="growTitle">
+<h2 id="growTitle">増え方</h2>
+<p class="sub" id="csGrowSub">毎日1回、その日の件数を記録しています。</p>
+<div class="cs-seg" role="group" aria-label="見る項目"><button type="button" data-k="run_rows" aria-pressed="true">出走履歴</button><button type="button" data-k="horses" aria-pressed="false">馬の頭数</button><button type="button" data-k="race_pages_done" aria-pressed="false">レースの詳細</button></div>
+<div class="cs-chart"><svg id="csChart" viewBox="0 0 600 170" role="img" aria-label="件数の推移"></svg></div>
+</section>
+
+<section aria-labelledby="whyTitle">
+<h2 id="whyTitle">このデータで調べていること</h2>
+<ul class="cs-list">
+<li>父（種牡馬）ごとの、得意な距離・芝かダート・成長の速さ（何か月齢で初めて勝つか）</li>
+<li>デビュー戦（新馬戦）で、父の傾向がオッズに足りない情報を持っているか</li>
+<li>ラップや通過順位など、レース展開の研究の材料</li>
+</ul>
+<p class="cs-note">いまのところ、予想には使っていません。研究の結果は<a href="staging/improvement-cycle.html">予想の改善状況</a>と<a href="staging/sire-map.html">種牡馬の初勝利マップ</a>で見られます。</p>
+</section>
+
+<section aria-labelledby="keepTitle">
+<h2 id="keepTitle">保管と更新について</h2>
+<p class="cs-note" id="csFoot">集めた生のデータ（馬名・1頭ずつの記録・レースの中身）は、非公開の保管場所に置いています。このページに出しているのは件数だけです。件数は6時間おきに自動で数え直します（Claudeの使用量は使いません）。</p>
+</section>
+</div>
+
+<script>
+(function(){
+var fmt=function(n){return Number(n).toLocaleString('ja-JP')};
+var $=function(id){return document.getElementById(id)};
+var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var S=null,H=null,KEY='run_rows';
+function bytes(n){return n>=1e9?(n/1e9).toFixed(1)+' GB':n>=1e6?Math.round(n/1e6)+' MB':Math.round(n/1e3)+' KB'}
+function countUp(el,to){
+  if(reduce||!window.requestAnimationFrame){el.textContent=fmt(to);return}
+  var t0=null,d=900;
+  function step(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(to*e));if(p<1)requestAnimationFrame(step)}
+  requestAnimationFrame(step);
+}
+function tiles(){
+  var rp=S.race_pages||{},per=S.horses?Math.round(S.run_rows/S.horses*10)/10:0;
+  var items=[
+    {n:S.run_rows,u:'件',t:'出走履歴',c:'馬ごとの全レースの成績。1頭あたり平均'+per+'走分',main:1},
+    {n:S.horses,u:'頭',t:'馬',c:'血統・成績をたどれる馬'},
+    {n:S.data_values+(rp.cells||0),u:'個',t:'データの項目の総数',c:'着順・タイム・オッズ・通過順位・払戻など、1つずつ数えた合計'},
+    {n:S.sires,u:'頭',t:'父（種牡馬）',c:'産駒の成績を比べられる父'},
+    {n:S.jockeys,u:'人',t:'騎手',c:'騎乗記録に登場した騎手'},
+    {n:S.past_races.done,u:'レース',t:'取得済みのレース',c:'全'+fmt(S.past_races.total)+'レースのうち'}
+  ];
+  var h='';
+  items.forEach(function(it,i){h+='<div class="cs-tile'+(it.main?' cs-main':'')+'"><span class="cs-cap" style="margin:0 0 2px;color:#3a3d46;font-weight:700">'+it.t+'</span><span><span class="cs-num" id="csN'+i+'">0</span><span class="cs-unit">'+it.u+'</span></span><span class="cs-cap">'+it.c+'</span></div>'});
+  h+='<div class="cs-tile"><span class="cs-cap" style="margin:0 0 2px;color:#3a3d46;font-weight:700">レースの詳細の保管量</span><span><span class="cs-num" id="csNB">'+bytes(rp.bytes||0)+'</span></span><span class="cs-cap">ラップ・通過順位・払戻などの表と文字</span></div>';
+  $('csTiles').innerHTML=h;
+  items.forEach(function(it,i){countUp($('csN'+i),it.n)});
+}
+function bar(id,txtId,done,total,frac){
+  var pct=total?Math.min(100,done/total*100):0;
+  $(txtId).textContent=(pct<10?pct.toFixed(1):Math.round(pct))+'%（'+fmt(done)+' / '+fmt(total)+'レース）';
+  var el=$(id);if(reduce){el.style.width=pct+'%'}else{requestAnimationFrame(function(){el.style.width=pct+'%'})}
+}
+function years(){
+  var h='';
+  (S.by_year||[]).slice().reverse().forEach(function(y){
+    var p=y.total?Math.min(100,y.done/y.total*100):0;
+    h+='<div class="cs-yr"><span>'+y.year+'年</span><div class="cs-track"><div class="cs-fill a" style="width:'+p+'%;transition:none"></div></div><em>'+fmt(y.done)+' / '+fmt(y.total)+'</em></div>';
+  });
+  $('csYears').innerHTML=h;
+}
+function pace(){
+  var g=S.growth,el=$('csPace');
+  if(!g){el.hidden=true;return}
+  var t='直近'+g.days+'日の平均で、<b>1日に約'+fmt(g.per_day.run_rows)+'件</b>（'+fmt(g.per_day.races_done)+'レース分）ずつ増えています。';
+  if(g.eta_days_past_races!=null)t+=' このペースなら、出走履歴の取得は<b>あと約'+fmt(g.eta_days_past_races)+'日</b>で全レースに届く見込みです。';
+  if(g.eta_days_race_pages!=null)t+=' レースの詳細は<b>あと約'+fmt(g.eta_days_race_pages)+'日</b>です。';
+  el.innerHTML=t;el.hidden=false;
+}
+function chart(){
+  var svg=$('csChart'),pts=(H&&H.points)||[],W=600,Hh=170,L=52,R=14,T=14,B=26;
+  if(pts.length<2){
+    svg.innerHTML='<text x="'+W/2+'" y="'+Hh/2+'" text-anchor="middle">2日分たまると、推移の線が出ます</text>';
+    return;
+  }
+  var vals=pts.map(function(p){return p[KEY]||0}),min=Math.min.apply(null,vals),max=Math.max.apply(null,vals);
+  if(max===min){max=min+1}
+  var x=function(i){return L+(W-L-R)*i/(pts.length-1)},y=function(v){return T+(Hh-T-B)*(1-(v-min)/(max-min))};
+  var d=vals.map(function(v,i){return (i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)}).join(' ');
+  var area=d+' L'+x(pts.length-1).toFixed(1)+' '+(Hh-B)+' L'+x(0).toFixed(1)+' '+(Hh-B)+' Z';
+  var s='<line x1="'+L+'" y1="'+(Hh-B)+'" x2="'+(W-R)+'" y2="'+(Hh-B)+'" stroke="#dcdee3"/>';
+  s+='<text x="'+(L-6)+'" y="'+(T+4)+'" text-anchor="end">'+fmt(max)+'</text><text x="'+(L-6)+'" y="'+(Hh-B)+'" text-anchor="end">'+fmt(min)+'</text>';
+  s+='<path d="'+area+'" fill="#2f6fd0" opacity=".12"/><path d="'+d+'" fill="none" stroke="#2f6fd0" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+  s+='<circle cx="'+x(pts.length-1).toFixed(1)+'" cy="'+y(vals[vals.length-1]).toFixed(1)+'" r="4" fill="#2f6fd0"/>';
+  s+='<text x="'+L+'" y="'+(Hh-8)+'">'+pts[0].date.slice(5).replace('-','/')+'</text><text x="'+(W-R)+'" y="'+(Hh-8)+'" text-anchor="end">'+pts[pts.length-1].date.slice(5).replace('-','/')+'</text>';
+  svg.innerHTML=s;
+}
+function meta(){
+  var g=new Date(S.generated_at),ok=!isNaN(g),txt='';
+  if(ok){txt='最終更新：'+(g.getMonth()+1)+'月'+g.getDate()+'日 '+('0'+g.getHours()).slice(-2)+':'+('0'+g.getMinutes()).slice(-2);
+    if(S.first_date&&S.last_date)txt+='　／　集めた成績の期間：'+S.first_date.replace(/-/g,'/')+' 〜 '+S.last_date.replace(/-/g,'/');
+    if(Date.now()-g.getTime()>36*3600*1000)txt+='　（更新が少し遅れています。GitHubの定時は遅れることがあります）'}
+  $('csMeta').textContent=txt||'';
+}
+function render(){
+  meta();tiles();
+  bar('pPastBar','pPastTxt',S.past_races.done,S.past_races.total);
+  bar('pPageBar','pPageTxt',S.race_pages.done,S.race_pages.total);
+  years();pace();chart();
+}
+Array.prototype.forEach.call(document.querySelectorAll('.cs-seg button'),function(b){b.onclick=function(){
+  KEY=b.getAttribute('data-k');
+  Array.prototype.forEach.call(document.querySelectorAll('.cs-seg button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+  chart()}});
+Promise.all([
+  fetch('data/collection_status_v1.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}),
+  fetch('data/collection_history_v1.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})
+]).then(function(a){S=a[0];H=a[1];render()}).catch(function(){$('csMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。'});
+})();
+</script>
+  <script src="../assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+</body>
+</html>
