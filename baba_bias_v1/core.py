@@ -27,6 +27,38 @@ MIN_PARSE_FIELD = 2      # 5頭立てなどの少頭数も「読めた」こと�
 MIN_USABLE_FIELD = 6
 
 
+_CORNER_TOK = re.compile(r"\(([\d,]+)\)|(\d+)")
+
+
+def corner_order(cell: str) -> dict:
+    """コーナー通過順位の文字列（例『2 (6,16)(1,7,11)18』）→ {馬番: 順位}。かっこの中は同じくらいの位置なので、その並びの平均の順位にする。"""
+    out, i = {}, 0
+    for m in _CORNER_TOK.finditer(cell.replace("=", "").replace("*", "")):
+        grp = [int(x) for x in (m.group(1) or m.group(2)).split(",") if x]
+        for k in grp:
+            out[k] = i + (len(grp) + 1) / 2
+        i += len(grp)
+    return out
+
+
+def _fill_from_alternates(page: dict, horses: list):
+    """結果の翌朝のページは、表に『通過順位』と『人気』が入らないことがある。人気はオッズの低い順で、通過順位は『コーナー』の表の最後の行から補う。"""
+    if all(h["pop"] is None for h in horses) and all(h.get("odds") for h in horses):
+        rank = {h["no"]: i + 1 for i, h in enumerate(sorted(horses, key=lambda h: h["odds"]))}
+        for h in horses:
+            h["pop"] = rank[h["no"]]
+    if any(h["pos"] for h in horses):
+        return
+    for tb in page.get("tables") or []:
+        if tb and tb[0][:2] == ["コーナー", "通過順位"] and len(tb) > 1:
+            order = corner_order(tb[-1][1])
+            if len(order) >= len(horses) - 1:
+                for h in horses:
+                    if h["no"] in order:
+                        h["pos"] = [order[h["no"]]]
+            return
+
+
 def clsgrp(c: str) -> str:
     for k in ("新馬", "未勝利", "1勝", "2勝", "3勝", "オープン", "G1", "G2", "G3", "リステッド", "L"):
         if k in c:
@@ -68,12 +100,15 @@ def parse_result_page(page: dict, code: str, date: str):
         tm = re.match(r"^(?:(\d+):)?(\d+\.\d)", row[4].strip())
         sec = (int(tm.group(1) or 0) * 60 + float(tm.group(2))) if tm else None
         pop = re.match(r"^(\d+)", row[7].strip())
+        od = re.search(r"\(([\d.]+)\)", row[7])
         try:
-            horses.append({"fin": fin, "no": int(row[2]), "pos": pos, "sec": sec, "pop": int(pop.group(1)) if pop else None})
+            horses.append({"fin": fin, "no": int(row[2]), "pos": pos, "sec": sec, "pop": int(pop.group(1)) if pop else None,
+                           "odds": float(od.group(1)) if od else None})
         except ValueError:
             continue
     if len(horses) < MIN_PARSE_FIELD:
         return None
+    _fill_from_alternates(page, horses)
     return {"code": code, "date": date, "kai": int(kai), "venue": venue, "day": int(day), "surf": surf, "dist": int(dist),
             "going": going, "cls": cls, "name": name, "n": len(horses), "horses": horses,
             "hurdle": surf == "障害" or "障害" in cls or "障害" in name}
