@@ -53,7 +53,7 @@
 <p class="sub" id="bbMeta">読み込み中…</p>
 <div class="bb-seg" id="bbDates" role="group" aria-label="開催日"></div>
 <div class="bb-box"><svg id="bbSvg" viewBox="0 0 360 366" role="img" aria-label="馬場の傾向を、横軸＝タフ〜高速、縦軸＝差し有利〜前残りで示した図"></svg></div>
-<div class="bb-legend"><span><i class="bb-dot" style="background:#3f8a6b"></i>芝（丸）</span><span><i class="bb-dot" style="background:#b4793f;border-radius:2px;transform:rotate(45deg) scale(.85)"></i>ダート（ひし形）</span><span>中心＝ふだんどおり。遠いほど、ふだんと違う傾向（目盛りは「ふだんのばらつきの何倍か」）</span></div>
+<div class="bb-legend"><span><i class="bb-dot" style="background:#3f8a6b"></i>芝</span><span><i class="bb-dot" style="background:#b4793f"></i>ダート</span><span>点＝その日の平均、うすい四角＝レースごとのばらつき。中心＝ふだんどおり。遠いほど、ふだんと違う傾向（目盛りは「ふだんのばらつきの何倍か」）</span></div>
 <div class="bb-seg" id="bbGroups" role="group" aria-label="競馬場を選んで、1レースごとの位置を見る" style="margin:10px 0 0"></div>
 <p class="bb-info" id="bbInfo">読み込み中…</p>
 </section>
@@ -156,7 +156,7 @@ function draw(doc){
     boxes.push({x:pick[0],y:pick[1],w:w,h:h});
     var tx=pick[2]==='start'?pick[0]+2:pick[2]==='end'?pick[0]+w-2:pick[0]+w/2;
     lbl+='<text x="'+tx.toFixed(1)+'" y="'+(pick[1]+12).toFixed(1)+'" text-anchor="'+pick[2]+'" class="bb-pl" opacity="'+(dim?.35:1)+'">'+p.n+'</text>';
-    pts+=(p.d?'<rect x="'+(p.x-6).toFixed(1)+'" y="'+(p.y-6).toFixed(1)+'" width="12" height="12" rx="2" transform="rotate(45 '+p.x.toFixed(1)+' '+p.y.toFixed(1)+')" fill="'+p.col+'" stroke="#fff" stroke-width="2"':'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="7" fill="'+p.col+'" stroke="#fff" stroke-width="2"')+' opacity="'+(dim?.35:1)+'"'+(p.d?'/>':'/>');
+    pts+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="6" fill="'+p.col+'" stroke="#fff" stroke-width="2" opacity="'+(dim?.35:1)+'"/>';
   });
   svg.innerHTML=s+rng+pts+dots+lbl;
   $('bbGroups').innerHTML='<button type="button" data-g="" aria-pressed="'+(!sel)+'">全体</button>'+G.map(function(g){return '<button type="button" data-g="'+g.key+'" aria-pressed="'+(sel===g.key)+'">'+g.key+'</button>'}).join('');
