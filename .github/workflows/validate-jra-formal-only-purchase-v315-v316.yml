@@ -1,0 +1,31 @@
+name: Verify isolated JRA formal-only v3.15 v3.16 purchases
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/jra-prerace-formal-3action-formal-only-v315.yml'
+      - '.github/workflows/jra-prerace-formal-stake-formal-only-v316.yml'
+      - '.github/scripts/test-jra-formal-only-purchase-v315-v316.py'
+      - '.github/workflows/validate-jra-formal-only-purchase-v315-v316.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-prerace-formal-3action-formal-only-v315.yml'
+      - '.github/workflows/jra-prerace-formal-stake-formal-only-v316.yml'
+      - '.github/scripts/test-jra-formal-only-purchase-v315-v316.py'
+      - '.github/workflows/validate-jra-formal-only-purchase-v315-v316.yml'
+permissions:
+  contents: read
+jobs:
+  purchase-isolation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python3 .github/scripts/test-jra-formal-only-purchase-v315-v316.py
+      - run: node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
