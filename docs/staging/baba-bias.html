@@ -41,7 +41,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/this-week.html">今週のAI予想</a></nav>
 
@@ -64,6 +64,7 @@
 <section aria-labelledby="listTitle">
 <h2 id="listTitle">競馬場ごとの一覧</h2>
 <div class="bb-tbl"><table><thead><tr><th>競馬場</th><th>速さ</th><th>前か差しか</th><th>外・内（参考）</th></tr></thead><tbody id="bbBody"><tr><td colspan="4">読み込み中…</td></tr></tbody></table></div>
+<p class="bb-note" id="bbCount"></p>
 <p class="bb-note">「ふつう」は、ふだんと大きな差がないという意味です。1日に最低4レース読めた芝・ダートだけを出しています。</p>
 </section>
 
@@ -173,9 +174,13 @@ function table(doc){
     var sf=doc.venues[v].surfaces;
     [['turf','芝'],['dirt','ダート']].forEach(function(t){
       var c=sf[t[0]];if(!c)return;
-      h+='<tr><td><b>'+v+'・'+t[1]+'</b><br><span style="color:#6d6e75;font-size:12px">'+c.n_races+'レース</span></td><td>'+tag('speed',c.speed)+'</td><td>'+tag('front',c.front)+'</td><td>'+tag('outer',c.outer)+'</td></tr>';
+      h+='<tr><td><b>'+v+'・'+t[1]+'</b><br><span style="color:#6d6e75;font-size:12px">'+t[1]+c.n_races+'レース</span></td><td>'+tag('speed',c.speed)+'</td><td>'+tag('front',c.front)+'</td><td>'+tag('outer',c.outer)+'</td></tr>';
     });
   });
+  var bl=Object.keys(doc.venues).map(function(v){var d=doc.venues[v],b=d.breakdown;if(!b)return '';
+    var parts=[];if(b.turf)parts.push('芝'+b.turf);if(b.dirt)parts.push('ダート'+b.dirt);if(b.hurdle)parts.push('障害'+b.hurdle);if(b.small)parts.push('少頭数'+b.small);
+    return v+'：'+parts.join('＋')+'＝'+d.races_read+'レース'}).filter(Boolean).join('　／　');
+  $('bbCount').textContent=bl?'その日の内訳　'+bl+'。障害と、6頭に満たないレースは、馬場の傾向には使いません。':'';
   $('bbBody').innerHTML=h||'<tr><td colspan="4">この日の数字はまだありません。</td></tr>';
 }
 function show(date){
