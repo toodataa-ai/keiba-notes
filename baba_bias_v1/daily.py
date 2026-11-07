@@ -103,6 +103,8 @@ def process_date(session, date, base, inputs, out_dir):
             race = core.parse_result_page(dump_page(soup, url), code, date)
             if race:
                 rs.append(race)
+                hs = race["horses"]
+                print("  診断", code, race["surf"], "頭数", race["n"], "通過順位あり", sum(1 for h in hs if h["pos"]), "人気あり", sum(1 for h in hs if h["pop"] is not None))
         venue_races[v] = rs
         print(date, v, "読めたレース", len(rs), "/ 12")
     doc = assemble(date, venue_races, base)
