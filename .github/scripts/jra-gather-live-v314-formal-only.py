@@ -384,7 +384,7 @@ def entry():
  parser.add_argument('--request',required=True)
  parser.add_argument('--validate-only',action='store_true')
  a=parser.parse_args()
- request_path=safe_path(a.request,'e2e_validation/requests/v314-formal-only/')
+ request_path=safe_path(a.request,'.github/requests/jra-formal-only-v314/')
  req=json.loads(request_path.read_text(encoding='utf-8'))
  race,preview=validate_request(req)
  if a.validate_only:
