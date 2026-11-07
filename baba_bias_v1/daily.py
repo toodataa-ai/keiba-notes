@@ -101,6 +101,14 @@ def process_date(session, date, base, inputs, out_dir):
             if soup is None:
                 continue
             race = core.parse_result_page(dump_page(soup, url), code, date)
+            if race and not any(h["pos"] for h in race["horses"]) and not getattr(process_date, "_shown", False):
+                process_date._shown = True
+                page = dump_page(soup, url)
+                for t in page["tables"]:
+                    if t and t[0][:3] == ["着順", "枠番", "馬番"]:
+                        print("  表の見出し", t[0], file=sys.stderr)
+                        for rw in t[1:3]:
+                            print("  表の行", rw, file=sys.stderr)
             if race:
                 rs.append(race)
                 hs = race["horses"]
