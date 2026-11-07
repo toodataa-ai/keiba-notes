@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-07",
+  "meeting_id": "2026-11-07-to-2026-11-08",
+  "observed_at": "2026-11-07T20:39:39.379+09:00",
+  "status": "PARTIAL_OFFICIAL_SETTLEMENTS_AND_GRADE_A_CASES_RECORDED_PENDING_VALIDATION_AND_PUBLIC_BYTE_PARITY",
+  "official_result_confirmed_races": [
+    "2026-11-07-keio-hai-2yo-stakes",
+    "2026-11-07-kibitaki-stakes",
+    "2026-11-07-muromachi-stakes"
+  ],
+  "grade_a_cases_created": [
+    "2026-11-07-keio-hai-2yo-stakes",
+    "2026-11-07-muromachi-stakes"
+  ],
+  "official_result_saved_unreviewed": [
+    "2026-11-07-kibitaki-stakes"
+  ],
+  "immutable_prerace_predictions": true,
+  "immutable_final_bets": true,
+  "immutable_original_html_pdf": true,
+  "source_publication_proof_commits": {
+    "2026-11-07-keio-hai-2yo-stakes": "87e319ec9e3891a2de3a75dafb3643ba2aec2d3a",
+    "2026-11-07-kibitaki-stakes": "cb9304d60aa33260f01444fb05d84f3584f1923b",
+    "2026-11-07-muromachi-stakes": "292ddc61e2960b81cfc75a2ec14d8e7472fd06de"
+  },
+  "purchase_publication_proof_commits": {
+    "2026-11-07-keio-hai-2yo-stakes": "0ea06f58880b4d9b7e9c7632c7f5def673a4c29d",
+    "2026-11-07-kibitaki-stakes": "a8e5261a4d199a6a1a07c41d3c70e7a9c669f821",
+    "2026-11-07-muromachi-stakes": "89d9e1428ed2c9d7ae2056dcbb354aa970771032"
+  },
+  "weekly_improvement_decision": "not_evaluated",
+  "weekly_reason": "2026-11-08 JRA meeting races have not yet completed results and Grade A review. No comparison or A/B/C approval may run.",
+  "improvement_policy": {
+    "approval_classes": "A/B/C manual authorization required",
+    "automatic_promotion": false,
+    "overfit_control": "Never tune from one day's results; require paired prospective strict E2E",
+    "historical_versions_preserved": true,
+    "inflight_e2e_comparison_preserved": true,
+    "prompt_changed": false
+  },
+  "publication_verification": {
+    "github_html_pdf_blob_existence_verified": true,
+    "git_blob_sha_observed": true,
+    "public_http_byte_parity_verified": false,
+    "github_actions_latest_run_unverified": true
+  },
+  "blockers": [
+    "2026-11-07-kibitaki-stakes: official result saved but zero-ticket formal pass cannot satisfy existing v3.15 E2E adapter, which rejects empty formal_bets; weekly gate also rejects empty settlements. No fabricated bets. Remains predicted pending separate validator/schema fix and test.",
+    "Two new Grade A cases require successful GitHub Actions prospective_strict evaluation against prestart proof commits and published public byte parity; currently unverified.",
+    "November 8 main races remain, so weekly improvement gate remains closed."
+  ],
+  "prerace_source_untouched": true,
+  "notes": "Never backfill missing prereace data or assume GitHub commit implies public HTTP parity."
+}
