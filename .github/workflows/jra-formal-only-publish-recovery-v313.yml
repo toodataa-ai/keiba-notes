@@ -1,0 +1,133 @@
+name: JRA formal-only v3.13 recovery publish from immutable prestart proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/requests/jra-formal-only-v313-publish-recovery/*.json'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  publish-from-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify request, immutable historical Git prestart proof and unpublished race
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mapfile -t ADDED < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- .github/requests/jra-formal-only-v313-publish-recovery)
+          [[ ${#ADDED[@]} -eq 1 ]] || { echo "::error::exactly one new recovery request"; exit 1; }
+          REQUEST="${ADDED[0]}"
+          [[ -f "$REQUEST" && ! -L "$REQUEST" ]] || exit 1
+          export REQUEST
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json,os,re,subprocess,datetime
+          from pathlib import Path
+          r=json.loads(Path(os.environ['REQUEST']).read_text(encoding='utf8'))
+          rid=r['race_id']
+          snap=r['original_snapshot_path']
+          proof=r['original_proof_commit']
+          assert re.fullmatch(r'20[0-9]{2}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+',rid)
+          assert re.fullmatch(r'[0-9a-f]{40}',proof)
+          assert snap.startswith('e2e_validation/snapshots/'+rid+'/v3.13-run') and snap.endswith('.json')
+          assert r.get('reason')=='recover-published-artifacts-after-verified-git-merge-conflict'
+          assert Path(snap).is_file()
+          expected=subprocess.check_output(['git','rev-parse',proof+':'+snap],text=True).strip()
+          observed=subprocess.check_output(['git','hash-object',snap],text=True).strip()
+          assert expected==observed,'immutable source snapshot is not byte-identical to original proof'
+          data=json.loads(Path(snap).read_text(encoding='utf8'))
+          assert data['stage']=='pending_git_proof' and data['proof_commit'] is None and data['prompt_version']=='v3.13'
+          assert data['race_id']==rid and data['step1_fixed_at']
+          assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat(data['race_context']['start_at']),'race started; cannot publish'
+          git_date=subprocess.check_output(['git','show','-s','--format=%cI',proof],text=True).strip()
+          assert datetime.datetime.fromisoformat(git_date)<datetime.datetime.fromisoformat(data['race_context']['start_at']),'source proof committed after start'
+          reg=json.loads(Path('docs/data/races.json').read_text(encoding='utf8'))
+          assert not any(x.get('id')==rid for x in reg['races']),'already has canonical published record'
+          label=Path(snap).name
+          pred='e2e_validation/predictions/'+rid+'/'+label
+          report='docs/reports/'+rid+'.html'
+          pdf='docs/pdfs/'+rid+'.pdf'
+          prefs='docs/data/jra-set-preference/'+rid+'.json'
+          for path in (pred,report,pdf,prefs):
+            assert not Path(path).exists(),('archive collision',path)
+          for k,v in dict(RACE_ID=rid,SNAPSHOT=snap,PREDICTION=pred,REPORT=report,PDF=pdf,JRA_SET_RESEARCH=prefs,PROOF=proof).items():
+            print(k+'='+v)
+          PY
+      - name: Rebuild sealed v3.13 prediction ONLY from unchanged prestart snapshot and proof
+        run: |
+          set -euo pipefail
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/jra-prestart-pipeline-v313.mjs --seal "$SNAPSHOT" --proof-commit "$PROOF" --output "$PREDICTION"
+          node .github/scripts/validate-jra-portfolio-v313.mjs "$PREDICTION"
+          node .github/scripts/jra-set-preference-v1.mjs --input "$PREDICTION" --output "$JRA_SET_RESEARCH"
+          node - "$JRA_SET_RESEARCH" "$PROOF" <<'JS'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+          if(d.status!=='shadow_comparison_only'||d.formal_bets_selection_unchanged!==true||
+             d.formal_proof_commit!==process.argv[3]||d.comparison.proposed.total_stake_yen>6000)
+            process.exit(1);
+          JS
+      - name: Generate entire historical-frozen reader-v1 A4 PDF in pinned engine and validate every page
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 .github/scripts/jra-render-live-v313.py "$PREDICTION" "$REPORT"
+          python3 .github/scripts/jra-pdf-presentation-overlay-v2.py "$REPORT" --prediction "$PREDICTION"
+          python3 -m weasyprint "$REPORT" "$PDF"
+          python3 .github/scripts/validate-jra-pdf-content-v313.py --html "$REPORT" --pdf "$PDF" --prediction "$PREDICTION"
+          python3 .github/scripts/validate-jra-pdf-layout.py --html "$REPORT" --pdf "$PDF" --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 .github/scripts/jra-publish-live-v313.py "$PREDICTION"
+      - name: Commit only recovered new artifacts and publish without touching old proof
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$PREDICTION" "$REPORT" "$PDF" "$JRA_SET_RESEARCH" docs/data/races.json
+          python3 - <<'PY'
+          import os,subprocess
+          expected={os.environ[x] for x in ('PREDICTION','REPORT','PDF','JRA_SET_RESEARCH')}|{'docs/data/races.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert actual==expected,('unexpected artifact delta',actual^expected)
+          PY
+          git commit -m "Recover existing sealed JRA v3.13 proof and publish unchanged full prediction PDF"
+          for n in 1 2 3;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then
+              git rebase --abort || true
+              echo '::error::Concurrent registry edit: cannot rebase, previous proof untouched';exit 1
+            fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$n" == 3 ]];then exit 1;fi
+          done
+      - name: Audit actual public HTTP registry, HTML and PDF bytes
+        run: |
+          set -euo pipefail
+          for n in $(seq 1 24);do
+            ok=1
+            for f in docs/data/races.json "$REPORT" "$PDF" "$JRA_SET_RESEARCH";do
+              url="https://toodataa-ai.github.io/keiba-notes/${f#docs/}"
+              if ! curl -LfsS --max-time 20 "$url" -o "/tmp/jra-recovery-$(basename "$f")" || ! cmp -s "$f" "/tmp/jra-recovery-$(basename "$f")";then
+                ok=0;break
+              fi
+            done
+            if [[ "$ok" == 1 ]];then
+              echo "PASS_JRA_FORMAL_RECOVERY_REAL_HTTP_AND_ORIGINAL_GIT_PROOF $RACE_ID $PROOF"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo '::error::Recovered Git objects exist but published bytes not verified'
+          exit 1
