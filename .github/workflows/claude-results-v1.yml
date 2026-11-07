@@ -37,7 +37,7 @@ jobs:
           args=()
           if [ -n "${DATES:-}" ]; then IFS=',' read -ra ds <<< "$DATES"; for d in "${ds[@]}"; do args+=(--date "$d"); done; fi
           if [ -n "${PROBE_CODE:-}" ]; then args+=(--probe-code "$PROBE_CODE"); fi
-          python3 claude_track/fetch_results.py "${args[@]}"
+          python3 -m claude_track.fetch_results "${args[@]}"
       - name: Commit new results only (never overwrites)
         id: commit
         run: |
