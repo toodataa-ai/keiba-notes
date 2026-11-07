@@ -34,6 +34,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/automation_log_v1.py
+      - name: Check what was really saved (files, not run status)
+        run: |
+          python3 .github/scripts/test_purpose_check_v1.py
+          python3 .github/scripts/purpose_check_v1.py
       - name: Commit the record (only when it changed)
         run: |
           set -euo pipefail
