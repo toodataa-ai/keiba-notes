@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 CANONICAL = ("index.html", "this-week.html", "schedule.html", "results.html", "methodology.html",
              "roadmap.html", "e2e.html", "baba-models.html", "local-racing-shadow.html",
-             "experience-regime.html", "release-history.html", "improvement-cycle.html", "operations.html", "sire-map.html")
+             "experience-regime.html", "release-history.html", "improvement-cycle.html", "operations.html", "sire-map.html", "collection-status.html")
 # Historical releases are immutable facts: (release_id, commit_sha, workflow_run_id)
 PINNED = {
     "release/jra-site-v1.01-20261012": ("632146ccb581847ae5d4cb9535fb868b8b4517d8", 38185706485),
@@ -60,7 +60,14 @@ def main() -> None:
     for f in latest["scope_files"]:
         assert (ROOT / f).is_file(), ("scope file missing", f)
 
+    pending_new = set()  # a brand-new page that exists only as an unapproved STAGING candidate is not in production yet
+    cand_file = ROOT / ".github" / "staging-candidates.json"
+    if cand_file.exists():
+        for c in json.loads(cand_file.read_text(encoding="utf-8")).get("candidates", []):
+            pending_new.update(p for p in c.get("pages", []) if not (ROOT / "docs" / p).exists())
     for name in CANONICAL:
+        if name in pending_new:
+            continue
         text = (ROOT / "docs" / name).read_text(encoding="utf-8")
         leaks = [s for s in STAGE_LEAKS if s in text]
         assert not leaks, ("staging artifacts leaked into production", name, leaks)
