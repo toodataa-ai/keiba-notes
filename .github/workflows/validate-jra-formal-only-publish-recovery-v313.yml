@@ -1,0 +1,28 @@
+name: Verify JRA formal-only immutable-proof publication recovery
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/jra-formal-only-publish-recovery-v313.yml'
+      - '.github/scripts/test-jra-formal-only-publish-recovery-v313.py'
+      - '.github/workflows/validate-jra-formal-only-publish-recovery-v313.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-formal-only-publish-recovery-v313.yml'
+      - '.github/scripts/test-jra-formal-only-publish-recovery-v313.py'
+      - '.github/workflows/validate-jra-formal-only-publish-recovery-v313.yml'
+permissions:
+  contents: read
+jobs:
+  recovery-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python3 .github/scripts/test-jra-formal-only-publish-recovery-v313.py
+      - run: node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
