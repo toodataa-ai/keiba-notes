@@ -35,9 +35,15 @@ jobs:
       - name: Assert this workflow is strictly formal JRA only
         run: |
           set -euo pipefail
-          if grep -En 'experience_regime|SHADOW_EVIDENCE|shadow-collection-audits|experience-regime-step1-freeze' .github/workflows/jra-generic-formal-only-v314.yml; then
-            echo "::error::E0/E1/E2 operation must not run from formal-only workflow"; exit 1
-          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('.github/workflows/jra-generic-formal-only-v314.yml').read_text()
+          forbidden=['experience'+'_'+'regime', 'SHADOW'+'_'+'EVIDENCE',
+                     'shadow-collection'+'-audits', 'experience-regime-step1'+'-freeze']
+          for word in forbidden:
+              assert word not in source, 'Research side-effect is prohibited: '+word
+          print('PASS: formal intake has no E0/E1/E2 audit or workflow dispatch')
+          PY
       - name: Assemble race-specific audited input without changing any STEP1 rules
         env:
           EVENT_NAME: ${{ github.event_name }}
