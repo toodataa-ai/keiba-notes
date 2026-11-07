@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/improvement-cycle.html">予想の改善状況</a></nav>
 
@@ -35,7 +35,7 @@
 <p class="sub">各処理が終わった直後に、実際に動いた時刻と結果を自動で記録しています（Claudeの使用量を使うタスクは、終わりに自分で残した記録を表示します）。きょうの列の数字は実際の開始時刻です。マスをタップすると、その回の詳細（開始・完了時刻と結果）が開きます。</p>
 <div class="rt-sum" id="rtSum">実行記録を読み込み中…</div>
 <table class="mx"><colgroup><col class="c0"><col><col><col><col><col><col><col class="ct"></colgroup><thead id="mxHead"></thead><tbody id="mxBody"></tbody></table>
-<p class="rt-note">✅成功　🟡処理は成功・公開サイトへの反映の確認だけ時間切れで、再実行での確認がまだ　✅の「R」＝定時が時間切れ→手動の再実行で確認　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。各マスの小さな文字は<b>実行の出どころ</b>です：<b>G</b>＝GitHubの定時（遅れて動いた保険も含む）、<b>H</b>＝Haikuの起動役（朝6:03・夕18:03）、<b>O</b>＝Opusのタスク（予想・回顧）。G・H・Oは予定どおりの定時の実行として集計に数えます。<b>R</b>（リカバリー）は、手動・復旧のやり直し・ファイルの更新（push）で、定時の集計には数えません（色は他と同じで、「R」の文字で見分けます）。<b>1行は、1つの目的</b>です（例：オッズ取得）。同じ目的の実行が同じ日に何回か動いたとき（Claudeの起動、GitHubの定時、予備など）は、<b>最初に成功した実行</b>をその日の結果として表示し。目的が達成できたかどうかだけを見ます（同じ目的の追加の実行は、行には出しません）。起動役とOpusのタスクは同じ権限で起動するため、決まった時刻の窓と決まった処理で見分けています（窓の外の起動は「R」）。ChatGPTの手動実行は含みません。Claudeのタスクは、実行の終わりに自分で記録を残すため、途中で失敗すると「記録なし」（⚠）と出ます。</p>
+<p class="rt-note">✅成功　🟡処理は成功・公開サイトへの反映の確認だけ時間切れで、再実行での確認がまだ　✅の「R」＝定時が時間切れ→手動の再実行で確認　🟡（保存の数つき）＝実行は成功したが、目的のデータが足りない　❌失敗　⏳実行中　⚠予定の実行の記録なし　・まだ（予定前）　－対象外の日、または定時の実行が始まる前。各マスの小さな文字は<b>実行の出どころ</b>です：<b>G</b>＝GitHubの定時（遅れて動いた保険も含む）、<b>H</b>＝Haikuの起動役（朝6:03・夕18:03）、<b>O</b>＝Opusのタスク（予想・回顧）。G・H・Oは予定どおりの定時の実行として集計に数えます。<b>R</b>（リカバリー）は、手動・復旧のやり直し・ファイルの更新（push）で、定時の集計には数えません（色は他と同じで、「R」の文字で見分けます）。<b>1行は、1つの目的</b>です（例：オッズ取得）。同じ目的の実行が同じ日に何回か動いたとき（Claudeの起動、GitHubの定時、予備など）は、<b>最初に成功した実行</b>をその日の結果として表示し。目的が達成できたかどうかだけを見ます。✅は、<b>実行が終わっただけでなく、データが実際に保存されたこと</b>を確かめたものです（結果取得なら、結果ファイルが出そろったか）（同じ目的の追加の実行は、行には出しません）。起動役とOpusのタスクは同じ権限で起動するため、決まった時刻の窓と決まった処理で見分けています（窓の外の起動は「R」）。ChatGPTの手動実行は含みません。Claudeのタスクは、実行の終わりに自分で記録を残すため、途中で失敗すると「記録なし」（⚠）と出ます。</p>
 </section>
 <section aria-labelledby="flowTitle">
 <h2 id="flowTitle">何が自動で、何が手動か</h2>
@@ -78,17 +78,17 @@
 <script>
 (function(){
 var ITEMS=[
-{t:'06:10',l:'予報・馬場の保存',w:'baba-forecast-archive-v1.yml',d:'d'},
-{t:'06:30',l:'地方：前日の回顧',w:'local-racing-shadow-postrace.yml',d:'d'},
-{t:'07:30',l:'地方：予想の固定',w:'local-racing-shadow-prerace-generic.yml',d:'d'},
-{t:'08:40',l:'出馬表の取得',w:'claude-race-data-v1.yml',d:'w'},
-{t:'08:40',l:'朝の公式馬場の保存',w:'baba-forecast-archive-v1.yml',d:'w'},
-{t:'08:45',l:'馬場の朝の予測',w:'baba-going-live-v1.yml',d:'w'},
-{t:'09:10',l:'Claude：印と買い目',w:'claude:T2',d:'w'},
-{t:'09:30',l:'オッズ取得',w:'claude-odds-v1.yml',d:'w'},
-{t:'17:17',l:'結果取得',w:'claude-results-v1.yml',d:'w'},
-{t:'18:10',l:'予報・馬場の保存',w:'baba-forecast-archive-v1.yml',d:'d'},
-{t:'18:17',l:'Claude：回顧',w:'claude:T3',d:'w'},
+{t:'06:10',l:'予報・馬場の保存',k:'forecast_am',w:'baba-forecast-archive-v1.yml',d:'d'},
+{t:'06:30',l:'地方：前日の回顧',k:'local_post',w:'local-racing-shadow-postrace.yml',d:'d'},
+{t:'07:30',l:'地方：予想の固定',k:'local_pre',w:'local-racing-shadow-prerace-generic.yml',d:'d'},
+{t:'08:40',l:'出馬表の取得',k:'race_cards',w:'claude-race-data-v1.yml',d:'w'},
+{t:'08:40',l:'朝の公式馬場の保存',k:'going_official',w:'baba-forecast-archive-v1.yml',d:'w'},
+{t:'08:45',l:'馬場の朝の予測',k:'going_live',w:'baba-going-live-v1.yml',d:'w'},
+{t:'09:10',l:'Claude：印と買い目',k:'predictions',w:'claude:T2',d:'w'},
+{t:'09:30',l:'オッズ取得',k:'odds',w:'claude-odds-v1.yml',d:'w'},
+{t:'17:17',l:'結果取得',k:'results',w:'claude-results-v1.yml',d:'w'},
+{t:'18:10',l:'予報・馬場の保存',k:'forecast_pm',w:'baba-forecast-archive-v1.yml',d:'d'},
+{t:'18:17',l:'Claude：回顧',k:'claude_review',w:'claude:T3',d:'w'},
 {t:'18:47',l:'改善案の採点',w:'jra-improvement-experiments-v1.yml',d:'d'},
 {t:'19:17',l:'基準の確認・通知',w:'jra-improvement-pipeline-v1.yml',d:'d'},
 {t:'19:47',l:'Claude予想の採点・公開',w:'claude-track-publish-v1.yml',d:'d'}];
@@ -103,13 +103,18 @@ function dow(ms){return jst(ms).getUTCDay()}
 function dur(a,b){var s=Math.round((b-a)/1000);return s>=60?Math.floor(s/60)+'分'+('0'+s%60).slice(-2)+'秒':s+'秒'}
 function url(id){if(!id)return '#';return 'https://github.com/toodataa-ai/keiba-notes/actions/runs/'+id}
 function getJ(u){return fetch(u[0]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():Promise.reject()}).catch(function(){return fetch(u[1]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null})}).catch(function(){return null})}
-function load(){return Promise.all([getJ(['data/automation/automation_runs_v1.json','../data/automation/automation_runs_v1.json']),getJ(['data/automation/claude_task_runs_v1.json','../data/automation/claude_task_runs_v1.json'])]).then(function(a){
+function load(){return Promise.all([getJ(['data/automation/automation_runs_v1.json','../data/automation/automation_runs_v1.json']),getJ(['data/automation/claude_task_runs_v1.json','../data/automation/claude_task_runs_v1.json']),getJ(['data/automation/purpose_status_v1.json','../data/automation/purpose_status_v1.json'])]).then(function(a){
  var d=a[0];if(!d)return null;
  var c=a[1];if(c&&c.runs){['T2','T3'].forEach(function(t){d.workflows['claude:'+t]={label:(c.tasks||{})[t]||t,runs:c.runs.filter(function(r){return r.task===t}).map(function(r){return {id:null,note:r.note,event:'schedule',by:'O',created_at:r.started_at,started_at:r.started_at,ended_at:r.ended_at,status:'completed',conclusion:r.status==='fail'?'failure':'success',skipped:r.status==='skipped'}})}})}
- return d})}
+ d.ps=(a[2]&&a[2].days)||{};return d})}
 function h27(a,day){var mm=Math.round((a-Date.parse(day+'T00:00:00+09:00'))/60000);return ('0'+Math.floor(mm/60)).slice(-2)+':'+('0'+mm%60).slice(-2)}
 function miniFor_unused(r){var ok=r.status==='completed'?(r.conclusion==='success'?'✅':'❌'):'⏳',man=r.event!=='schedule';return '<a href="'+url(r.id)+'" title="'+hm(Date.parse(r.started_at||r.created_at))+' 開始 '+(r.status==='completed'?(r.conclusion==='success'?'成功':'失敗'):'実行中')+(man?'（手動・起動役など）':'')+'">'+ok+'</a>'}
 var ORG={G:'GitHubの定時',H:'Haikuの起動役',O:'Opusのタスク','手':'R＝リカバリー（手動・復旧・ファイルの更新）'};
+function pst(it,day,d){var s=d.ps&&d.ps[day]&&it.k&&d.ps[day][it.k];if(!s)return null;var e=s.expected;if(e===0)return {na:1};var ok=e===null?s.done>0:s.done>=e;return {ok:ok,done:s.done,exp:e}}
+function fixCell(c,r,st,okRun){if(!st||st.na)return c;
+ if(okRun&&!st.ok){var t=st.exp===null?'保存なし':'保存'+st.done+'/'+st.exp;return c.replace('✅','🟡').replace(/title="/,'title="実行は成功しましたが、保存されたデータは '+(st.exp===null?'ありません':st.done+'/'+st.exp+' 件')+'です。').replace(/<span class="tm">[^<]*<\/span>/,'<span class="tm">'+t+'</span>')}
+ if(!okRun&&st.ok){return c.replace('❌','✅').replace(/title="/,'title="実行は失敗扱いですが、データは保存されています。').replace(' ng"','"')}
+ return c}
 function byOf(r){return r.by||(r.event==='schedule'?'G':'手')}
 function cellFor(r,manual,showTime,it,day,extra){
  var a=Date.parse(r.started_at||r.created_at),ic,cls='',tip,late='',isLate=0;
@@ -128,7 +133,7 @@ function render(d){
   slots[it.w].forEach(function(o){var diff=(m-tmin(o.t)+1440)%1440;if(diff>1320)diff=0;var nd=jst(Date.parse(run.created_at)-diff*60000).getUTCDay();if(o.d==='w'&&[0,1,6].indexOf(nd)<0)return;if(diff<bd){bd=diff;best=o}});
   if(best&&bd<=660){run._nd=bd;return best}return null}
  function nday(r){return ymd(Date.parse(r.created_at)-(r._nd||0)*60000)}
- var cnt={ok:0,ng:0,wait:0,miss:0,late:0,chk:0,rr:0},html='';
+ var cnt={part:0,ok:0,ng:0,wait:0,miss:0,late:0,chk:0,rr:0},html='';
  ITEMS.forEach(function(it){
   var wf=d.workflows[it.w],runs=wf?wf.runs.filter(function(r){return itemFor(it,r)===it}):[];
   var sched=runs.filter(function(r){return byOf(r)!=='手'}).sort(function(x,y){return Date.parse(x.created_at)-Date.parse(y.created_at)}),man=runs.filter(function(r){return byOf(r)==='手'});
@@ -140,8 +145,8 @@ function render(d){
    var mm=man.filter(function(r){return nday(r)===day});
    var c='';
    if(rr.length){var okr=rr.filter(function(x){return x.status==='completed'&&(x.conclusion==='success'||(x.fail_kind==='publish_check'&&x.confirmed_by_rerun))})[0],r=okr||rr[0],rm=null;if(r.fail_kind==='publish_check'&&r.confirmed_by_rerun)rm=mm.filter(function(m){return m.conclusion==='success'&&Date.parse(m.created_at)>Date.parse(r.created_at)})[0]||null;
-    c=rm?cellFor(rm,true,i===6,null,day,'定時（'+hms(Date.parse(r.started_at||r.created_at))+'）は公開サイトへの反映の確認が時間切れ→手動の再実行で公開まで確認済み'):cellFor(r,byOf(r)==='手',i===6,it,day);
-        if(isT){if(r.status==='completed'){if(r.conclusion==='success')cnt.ok++;else if(r.fail_kind==='publish_check'){cnt.ok++;if(rm)cnt.rr++;else if(!r.confirmed_by_rerun)cnt.chk++}else cnt.ng++}}}
+    c=rm?cellFor(rm,true,i===6,null,day,'定時（'+hms(Date.parse(r.started_at||r.created_at))+'）は公開サイトへの反映の確認が時間切れ→手動の再実行で公開まで確認済み'):fixCell(cellFor(r,byOf(r)==='手',i===6,it,day),r,pst(it,day,d),r.status==='completed'&&r.conclusion==='success');
+        if(isT){if(r.status==='completed'){if(r.conclusion==='success'){var sx=pst(it,day,d);if(sx&&!sx.na&&!sx.ok)cnt.part++;else cnt.ok++}else if(r.fail_kind==='publish_check'){cnt.ok++;if(rm)cnt.rr++;else if(!r.confirmed_by_rerun)cnt.chk++}else cnt.ng++}}}
    else if(!exp){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
    else if(isT){
     if(mins(now)<tmin(it.t)+20||(first===null&&mins(now)-tmin(it.t)>660)){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic wt">・</span><span class="tm wt">'+it.t+'</span>';cnt.wait++}
@@ -154,7 +159,7 @@ function render(d){
   html+=row+'</tr>'
  });
  body.innerHTML=html;
- sum.innerHTML='きょう（'+today.slice(5).replace('-','/')+'・'+DAYS[td]+'）の定時の自動実行：<b class="ok">成功 '+cnt.ok+'</b>'+(cnt.rr?'（うち公開確認が時間切れ→手動の再実行で確認 '+cnt.rr+'）':'')+(cnt.chk?'（うち公開確認のみ時間切れ '+cnt.chk+'・データは保存済み）':'')+'／<b class="'+(cnt.ng?'ng':'')+'">失敗 '+cnt.ng+'</b>／待ち '+cnt.wait+(cnt.late?'（うち予定より遅れ '+cnt.late+'）':'')+(cnt.miss?'／<b class="ng">記録なし '+cnt.miss+'</b>':'')+'<br><span class="wt">最終更新 '+hms(Date.parse(d.generated_at))+'（各処理の終了後と、毎時に更新。GitHubの都合で数時間遅れることがあります）</span>'}
+ sum.innerHTML='きょう（'+today.slice(5).replace('-','/')+'・'+DAYS[td]+'）の定時の自動実行：<b class="ok">成功 '+cnt.ok+'</b>'+(cnt.part?'（うち保存が不足 '+cnt.part+'）':'')+(cnt.rr?'（うち公開確認が時間切れ→手動の再実行で確認 '+cnt.rr+'）':'')+(cnt.chk?'（うち公開確認のみ時間切れ '+cnt.chk+'・データは保存済み）':'')+'／<b class="'+(cnt.ng?'ng':'')+'">失敗 '+cnt.ng+'</b>／待ち '+cnt.wait+(cnt.late?'（うち予定より遅れ '+cnt.late+'）':'')+(cnt.miss?'／<b class="ng">記録なし '+cnt.miss+'</b>':'')+'<br><span class="wt">最終更新 '+hms(Date.parse(d.generated_at))+'（各処理の終了後と、毎時に更新。GitHubの都合で数時間遅れることがあります）</span>'}
 load().then(render);
 })();
 </script>
