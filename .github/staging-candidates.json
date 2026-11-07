@@ -1,17 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-operations-saved-v1",
-      "title": "自動運用の状況：「データが保存されたか」で判定",
-      "pages": [
-        "operations.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-08",
-      "summary": "✅を「処理が終わった」から「目的のデータが実際に保存された」に変える。実行が成功でも保存が足りない日は🟡（保存の数つき）。"
-    }
-  ]
+  "candidates": []
 }
