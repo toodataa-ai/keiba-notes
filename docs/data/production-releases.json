@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.39-20261108",
-  "current_public_version": "1.39",
+  "current_public_release": "release/jra-site-v1.40-20261108",
+  "current_public_version": "1.40",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -819,6 +819,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/baba-bias.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.40-20261108",
+      "branch": "release/jra-site-v1.40-20261108",
+      "commit_sha": "07cf021520fcf79616e0c27f5e01cc34befaf03c",
+      "deployed_at": "2026-11-08T08:43:40+09:00",
+      "workflow_run_id": 42426533603,
+      "validation_workflow_run_id": 42426533603,
+      "public_version": "1.40",
+      "note": "2026-11-08ユーザー明示承認済み。自動運用の状況：「データが保存されたか」で判定：✅を「処理が終わった」から「目的のデータが実際に保存された」に変える。実行が成功でも保存が足りない日は🟡（保存の数つき）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-saved-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
