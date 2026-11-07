@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.37-20261108",
-  "current_public_version": "1.37",
+  "current_public_release": "release/jra-site-v1.38-20261108",
+  "current_public_version": "1.38",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -779,6 +779,26 @@
       "scope_files": [
         "docs/index.html",
         "docs/baba-bias.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.38-20261108",
+      "branch": "release/jra-site-v1.38-20261108",
+      "commit_sha": "b9d15318236b6a343cc99c9cabea162e54018614",
+      "deployed_at": "2026-11-08T08:35:32+09:00",
+      "workflow_run_id": 42425931671,
+      "validation_workflow_run_id": 42425931671,
+      "public_version": "1.38",
+      "note": "2026-11-08ユーザー明示承認済み。自動運用の状況：目的ごとに1行にまとめる：予備・保険の行をやめ、オッズ取得・結果取得を1行ずつにする。同じ日に何回動いても、最初に成功した実行をその日の結果にする（追加の実行は表に出さない）。",
+      "user_approval_quote": "運用ページの目的ごとの1行表示はOK",
+      "staging_candidate_id": "ui-operations-purpose-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
