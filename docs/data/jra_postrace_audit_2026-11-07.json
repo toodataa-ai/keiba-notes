@@ -2,8 +2,8 @@
   "schema_version": 1,
   "date": "2026-11-07",
   "meeting_id": "2026-11-07-to-2026-11-08",
-  "observed_at": "2026-11-07T20:39:39.379+09:00",
-  "status": "PARTIAL_OFFICIAL_SETTLEMENTS_AND_GRADE_A_CASES_RECORDED_PENDING_VALIDATION_AND_PUBLIC_BYTE_PARITY",
+  "observed_at": "2026-11-07T20:44:14.748+09:00",
+  "status": "PARTIAL_FORMAL_GRADE_A_VERIFIED_PUBLIC_HTTP_BYTES_MATCH_ZERO_TICKET_PASS_BLOCKED",
   "official_result_confirmed_races": [
     "2026-11-07-keio-hai-2yo-stakes",
     "2026-11-07-kibitaki-stakes",
@@ -42,14 +42,28 @@
   "publication_verification": {
     "github_html_pdf_blob_existence_verified": true,
     "git_blob_sha_observed": true,
-    "public_http_byte_parity_verified": false,
-    "github_actions_latest_run_unverified": true
+    "public_http_byte_parity_verified": true,
+    "github_actions_latest_run_unverified": false,
+    "verified_scope": "All reviewed JRA main artifacts including both new Grade A cases; excludes unreviewed 2026-11-07-kibitaki-stakes",
+    "successful_workflow_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/42369117874",
+    "e2e_strict_case_count_after_publication": 24
   },
   "blockers": [
-    "2026-11-07-kibitaki-stakes: official result saved but zero-ticket formal pass cannot satisfy existing v3.15 E2E adapter, which rejects empty formal_bets; weekly gate also rejects empty settlements. No fabricated bets. Remains predicted pending separate validator/schema fix and test.",
-    "Two new Grade A cases require successful GitHub Actions prospective_strict evaluation against prestart proof commits and published public byte parity; currently unverified.",
-    "November 8 main races remain, so weekly improvement gate remains closed."
+    "2026-11-07-kibitaki-stakes: official result saved; current v3.15 strict adapter rejects empty formal_bets for legitimate no-purchase pass, and weekly gate expects nonempty settlements. Original empty final_bets cannot be rewritten.",
+    "Separate E0/E1/E2 general CI integrity validator rejects two new strict Grade A case records as undisclosed original research-field omissions; formal postrace workflow passes independently. Review and SHA-pin new omissions without weakening guards.",
+    "2026-11-08 JRA mains are not settled and reviewed; weekly improvement gate remains not_evaluated."
   ],
   "prerace_source_untouched": true,
-  "notes": "Never backfill missing prereace data or assume GitHub commit implies public HTTP parity."
+  "notes": "Never backfill missing prereace data or assume GitHub commit implies public HTTP parity.",
+  "grade_a_verified_cases": [
+    "2026-11-07-keio-hai-2yo-stakes",
+    "2026-11-07-muromachi-stakes"
+  ],
+  "known_separate_ci_failure": {
+    "workflow_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/42369117907",
+    "job": "Validate E2E predictions",
+    "step": "Evaluate E0 E1 E2 shadow diagnostics",
+    "reason": "Missing exact SHA-pinned disclosure entries for newly added Nov 7 strict cases; archived research context not present in prestart records. Formal JRA Grade A independent and successful.",
+    "next_action": "Register only SHA-pinned actual deficiencies through a separately reviewed research-gap supplement without rewriting previous ledgers or adding postrace fields."
+  }
 }
