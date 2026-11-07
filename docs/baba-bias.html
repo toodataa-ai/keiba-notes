@@ -61,6 +61,7 @@
 <section aria-labelledby="listTitle">
 <h2 id="listTitle">競馬場ごとの一覧</h2>
 <div class="bb-tbl"><table><thead><tr><th>競馬場</th><th>速さ</th><th>前か差しか</th><th>外・内（参考）</th></tr></thead><tbody id="bbBody"><tr><td colspan="4">読み込み中…</td></tr></tbody></table></div>
+<p class="bb-note" id="bbCount"></p>
 <p class="bb-note">「ふつう」は、ふだんと大きな差がないという意味です。1日に最低4レース読めた芝・ダートだけを出しています。</p>
 </section>
 
@@ -68,7 +69,7 @@
 <h2 id="valTitle">前日の傾向は、翌日にどれくらい続くか</h2>
 <p class="sub">2022〜2026年の約1.5万レースで、連続した開催日どうしを比べました（1に近いほどよく続く、0は続かない）。</p>
 <div id="bbVal"></div>
-<p class="bb-note">速さは、日曜朝に公式発表される馬場状態（良・重など）だけでは分からない分まで、前日の傾向で分かります（予測力は0.40→芝0.62・ダート0.58）。前残りはダートでよく続き、芝は弱め（芝の短距離は続かない）。外・内は効果が小さいため、いまは表示だけで、予想には使いません。</p>
+<p class="bb-note">速さは、日曜朝に公式発表される馬場状態（良・重など）だけでは分からない分まで、前日の傾向で分かります（予測力は0.40→芝0.62・ダート0.58）。前残りはダートでよく続き、芝は弱めです。芝の短距離（1400m以下）の前残りも出していますが、翌日には続きにくいので、参考程度に見てください。外・内は効果が小さいため、いまは表示だけで、予想には使いません。</p>
 </section>
 
 <section aria-labelledby="useTitle">
@@ -173,6 +174,10 @@ function table(doc){
       h+='<tr><td><b>'+v+'・'+t[1]+'</b><br><span style="color:#6d6e75;font-size:12px">'+c.n_races+'レース</span></td><td>'+tag('speed',c.speed)+'</td><td>'+tag('front',c.front)+'</td><td>'+tag('outer',c.outer)+'</td></tr>';
     });
   });
+  var bl=Object.keys(doc.venues).map(function(v){var d=doc.venues[v],b=d.breakdown;if(!b)return '';
+    var parts=[];if(b.turf)parts.push('芝'+b.turf);if(b.dirt)parts.push('ダート'+b.dirt);if(b.hurdle)parts.push('障害'+b.hurdle);if(b.small)parts.push('少頭数'+b.small);
+    return v+'：'+parts.join('＋')+'＝'+d.races_read+'レース'}).filter(Boolean).join('　／　');
+  $('bbCount').textContent=bl?'その日の内訳　'+bl+'。障害と、6頭に満たないレースは、馬場の傾向には使いません。':'';
   $('bbBody').innerHTML=h||'<tr><td colspan="4">この日の数字はまだありません。</td></tr>';
 }
 function show(date){
@@ -200,6 +205,5 @@ fetch('data/baba_bias/index.json',{cache:'no-store'}).then(function(r){if(!r.ok)
 }).catch(function(){$('bbMeta').textContent='数字を読み込めませんでした。時間をおいて開き直してください。'});
 })();
 </script>
-  <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body>
 </html>
