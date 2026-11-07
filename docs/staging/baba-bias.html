@@ -17,9 +17,9 @@
 .bb-box{border:1px solid #e3e4e8;border-radius:12px;background:#fff;padding:8px}
 .bb-box svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
 .bb-box text{font-family:inherit}
-.bb-q{font-size:12px;font-weight:700;fill:#3a3d46}
-.bb-ax{font-size:11px;fill:#6d6e75}
-.bb-pt text{font-size:12px;font-weight:800;fill:#17171a;paint-order:stroke;stroke:#fff;stroke-width:3px}
+.bb-q{font-size:11px;font-weight:600;fill:#6a7080}
+.bb-ax{font-size:11px;fill:#8a909c}
+.bb-pl{font-size:12px;font-weight:700;fill:#23262d;paint-order:stroke;stroke:#f6f7f9;stroke-width:3px}
 .bb-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:#6d6e75;margin:8px 2px 0}
 .bb-dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:4px}
 .bb-tbl{overflow-x:auto;margin-top:10px}
@@ -47,15 +47,15 @@
 <header>
 <p class="eyebrow">予想の材料</p>
 <h1>馬場傾向（前日の傾向）</h1>
-<p class="lead">前の開催日の<strong>全12レースの結果</strong>から、その日の芝・ダートが「速い馬場か、タフな馬場か」「前の馬が残る馬場か、差しが届く馬場か」を数字にしています。日曜の予想は、この数字を読んで印に反映します。</p>
+<p class="lead">前の開催日の<strong>全12レースの結果</strong>から、その日の芝・ダートが「速い馬場か、タフな馬場か」「前の馬が残る馬場か、差しが届く馬場か」を数字にしています。日曜の予想は、この数字を読んで記録します（いまは印や勝率は変えません）。</p>
 </header>
 
 <section aria-labelledby="mapTitle">
 <h2 id="mapTitle">その日の馬場の位置</h2>
 <p class="sub" id="bbMeta">読み込み中…</p>
 <div class="bb-seg" id="bbDates" role="group" aria-label="開催日"></div>
-<div class="bb-box"><svg id="bbSvg" viewBox="0 0 380 380" role="img" aria-label="馬場の傾向を、横軸＝タフ〜高速、縦軸＝差し有利〜前残りで示した図"></svg></div>
-<div class="bb-legend"><span><i class="bb-dot" style="background:#2f7d3b"></i>芝</span><span><i class="bb-dot" style="background:#b0682b"></i>ダート</span><span>中心＝ふだんどおり。中心から遠いほど、ふだんと違う傾向（目盛りは「ふだんのばらつきの何倍か」）</span></div>
+<div class="bb-box"><svg id="bbSvg" viewBox="0 0 360 366" role="img" aria-label="馬場の傾向を、横軸＝タフ〜高速、縦軸＝差し有利〜前残りで示した図"></svg></div>
+<div class="bb-legend"><span><i class="bb-dot" style="background:#3f8a6b"></i>芝（丸）</span><span><i class="bb-dot" style="background:#b4793f;border-radius:2px;transform:rotate(45deg) scale(.85)"></i>ダート（ひし形）</span><span>中心＝ふだんどおり。遠いほど、ふだんと違う傾向（目盛りは「ふだんのばらつきの何倍か」）</span></div>
 <p class="bb-info" id="bbInfo">読み込み中…</p>
 </section>
 
@@ -76,9 +76,9 @@
 <h2 id="useTitle">予想での使い方</h2>
 <ul style="margin:8px 0 0;padding-left:1.2em;font-size:14px;line-height:1.8">
 <li>土曜の夜に、全12レースの結果から自動で数字にします（Claudeの使用量は使いません）。</li>
-<li>日曜の朝、Claudeの予想が前日の「速さ」と「前残り」を読み、タイプの合う馬を重く見ます。</li>
-<li>前日が同じ開催でないとき、雨などで馬場が大きく変わったときは、無理に使いません。</li>
-<li>効果は、これまでの改善と同じく、実際のレースで20レースかけて確かめてから本採用します。</li>
+<li>日曜の朝、Claudeの予想はこの数字を読んで<strong>記録します</strong>。いまは、印や勝率はこの数字で変えません（過去4年の検証で、前日の傾向に合わせて先行馬・差し馬の評価を変えても、予想の当たり具合は良くならなかったため）。</li>
+<li>前日が同じ開催でないときは使いません。朝の公式馬場状態が前日の最後と違う日（雨で重くなった・乾いたなど）は、続きにくい日です（相関が約半分に下がります）。</li>
+<li>効果は、実際のレースで少しずつ確かめます。確かめて意味があると分かったものだけを、予想に入れます。</li>
 </ul>
 <p class="bb-note" id="bbFoot">この図の数字は集計だけです。馬名や1頭ずつの記録は載せていません。</p>
 </section>
@@ -100,34 +100,47 @@ function tag(m,x){
   return '<span class="bb-tag '+c+'">'+l+'</span> <span style="color:#6d6e75;font-size:12px">('+(x.z>0?'+':'')+x.z.toFixed(1)+')</span>';
 }
 function draw(doc){
-  var svg=$('bbSvg'),W=380,L=34,R=346,T=30,B=336,cx=(L+R)/2,cy=(T+B)/2,sx=(R-L)/6,sy=(B-T)/6;
+  var svg=$('bbSvg'),L=30,R=330,T=34,B=334,cx=(L+R)/2,cy=(T+B)/2,M=2.5,sx=(R-L)/2/M,sy=(B-T)/2/M;
   var s='';
-  s+='<rect x="'+cx+'" y="'+T+'" width="'+(R-cx)+'" height="'+(cy-T)+'" fill="#fff3c4"/>';
-  s+='<rect x="'+L+'" y="'+T+'" width="'+(cx-L)+'" height="'+(cy-T)+'" fill="#f3e6c9"/>';
-  s+='<rect x="'+L+'" y="'+cy+'" width="'+(cx-L)+'" height="'+(B-cy)+'" fill="#dbe9f7"/>';
-  s+='<rect x="'+cx+'" y="'+cy+'" width="'+(R-cx)+'" height="'+(B-cy)+'" fill="#dcefd9"/>';
-  s+='<text class="bb-q" x="'+(R-6)+'" y="'+(T+16)+'" text-anchor="end">前が止まらない高速馬場</text>';
-  s+='<text class="bb-q" x="'+(L+6)+'" y="'+(T+16)+'">先行できるタフな馬場</text>';
-  s+='<text class="bb-q" x="'+(L+6)+'" y="'+(B-8)+'">差しが届くタフな馬場</text>';
-  s+='<text class="bb-q" x="'+(R-6)+'" y="'+(B-8)+'" text-anchor="end">上がり勝負の高速馬場</text>';
-  s+='<line x1="'+L+'" y1="'+cy+'" x2="'+R+'" y2="'+cy+'" stroke="#17171a" stroke-width="1.5"/><line x1="'+cx+'" y1="'+T+'" x2="'+cx+'" y2="'+B+'" stroke="#17171a" stroke-width="1.5"/>';
-  for(var k=-2;k<=2;k++){if(!k)continue;s+='<line x1="'+(cx+k*sx)+'" y1="'+(cy-3)+'" x2="'+(cx+k*sx)+'" y2="'+(cy+3)+'" stroke="#17171a"/><line x1="'+(cx-3)+'" y1="'+(cy+k*sy)+'" x2="'+(cx+3)+'" y2="'+(cy+k*sy)+'" stroke="#17171a"/>'}
-  s+='<text class="bb-ax" x="'+L+'" y="'+(cy-6)+'">← タフ・スタミナ</text><text class="bb-ax" x="'+R+'" y="'+(cy-6)+'" text-anchor="end">高速・スピード →</text>';
-  s+='<text class="bb-ax" x="'+(cx+6)+'" y="'+(T-8)+'">↑ 前残り</text><text class="bb-ax" x="'+(cx+6)+'" y="'+(B+16)+'">↓ 差し有利</text>';
-  var pts=[],info=[];
+  s+='<rect x="'+L+'" y="'+T+'" width="'+(R-L)+'" height="'+(B-T)+'" rx="10" fill="#f6f7f9"/>';
+  s+='<rect x="'+cx+'" y="'+T+'" width="'+(R-cx)+'" height="'+(cy-T)+'" fill="#eceff4"/>';
+  s+='<rect x="'+L+'" y="'+cy+'" width="'+(cx-L)+'" height="'+(B-cy)+'" fill="#eceff4"/>';
+  for(var k=-2;k<=2;k++){if(!k)continue;s+='<line x1="'+(cx+k*sx)+'" y1="'+T+'" x2="'+(cx+k*sx)+'" y2="'+B+'" stroke="#dfe2e8" stroke-width="1"/><line x1="'+L+'" y1="'+(cy+k*sy)+'" x2="'+R+'" y2="'+(cy+k*sy)+'" stroke="#dfe2e8" stroke-width="1"/>'}
+  s+='<line x1="'+L+'" y1="'+cy+'" x2="'+R+'" y2="'+cy+'" stroke="#9aa1ae" stroke-width="1.5"/><line x1="'+cx+'" y1="'+T+'" x2="'+cx+'" y2="'+B+'" stroke="#9aa1ae" stroke-width="1.5"/>';
+  s+='<text class="bb-q" x="'+(R-8)+'" y="'+(T+17)+'" text-anchor="end">前が止まらない高速馬場</text>';
+  s+='<text class="bb-q" x="'+(L+8)+'" y="'+(T+17)+'">先行できるタフな馬場</text>';
+  s+='<text class="bb-q" x="'+(L+8)+'" y="'+(B-9)+'">差しが届くタフな馬場</text>';
+  s+='<text class="bb-q" x="'+(R-8)+'" y="'+(B-9)+'" text-anchor="end">上がり勝負の高速馬場</text>';
+  s+='<text class="bb-ax" x="'+L+'" y="'+(T-12)+'">↑ 前残り</text><text class="bb-ax" x="'+R+'" y="'+(T-12)+'" text-anchor="end">高速 →</text>';
+  s+='<text class="bb-ax" x="'+L+'" y="'+(B+18)+'">↓ 差し有利</text><text class="bb-ax" x="'+R+'" y="'+(B+18)+'" text-anchor="end">← タフ</text>';
+  var P=[],info=[];
   Object.keys(doc.venues).forEach(function(v){
     var sf=doc.venues[v].surfaces;
-    [['turf','芝','#2f7d3b'],['dirt','ダ','#b0682b']].forEach(function(t){
+    [['turf','芝',0],['dirt','ダ',1]].forEach(function(t){
       var c=sf[t[0]];if(!c)return;
       var sp=c.speed&&c.speed.z,fr=c.front&&c.front.z;
-      if(sp==null&&fr==null){return}
-      var x=cx+zc(sp==null?0:sp)*sx,y=cy-zc(fr==null?0:fr)*sy;
-      pts.push('<g class="bb-pt"><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="'+t[2]+'" stroke="#fff" stroke-width="2"/><text x="'+(x+10).toFixed(1)+'" y="'+(y+4).toFixed(1)+'">'+v+t[1]+'</text></g>');
+      if(sp==null&&fr==null)return;
+      var zs=Math.max(-M,Math.min(M,sp==null?0:sp)),zf=Math.max(-M,Math.min(M,fr==null?0:fr));
+      P.push({x:cx+zs*sx,y:cy-zf*sy,n:v+t[1],d:t[2]});
       if(sp==null||fr==null)info.push(v+t[1]+'は'+(sp==null?'速さ':'前残り')+'を測れるレースが足りないため、中心に置いています。');
     });
   });
-  svg.innerHTML=s+pts.join('');
-  $('bbInfo').innerHTML=(info.join(' ')||'図の位置は、その日の結果から出した数字です。右上ほど高速で前が残り、左下ほどタフで差しが届きました。');
+  // 点どうしが近いときは少しずらす
+  for(var a=0;a<P.length;a++)for(var b=0;b<a;b++){var dx=P[a].x-P[b].x,dy=P[a].y-P[b].y;if(dx*dx+dy*dy<64){P[a].x+=9;P[a].y+=7}}
+  // 名前は、ほかの名前や点に重ならない位置（右・左・上・下）を順に探す
+  var boxes=[],pts='',lbl='';
+  function hit(r){for(var q=0;q<boxes.length;q++){var o=boxes[q];if(r.x<o.x+o.w&&r.x+r.w>o.x&&r.y<o.y+o.h&&r.y+r.h>o.y)return true}
+    for(var q2=0;q2<P.length;q2++){var p=P[q2];if(r.x<p.x+9&&r.x+r.w>p.x-9&&r.y<p.y+9&&r.y+r.h>p.y-9)return true}return false}
+  P.forEach(function(p){
+    var w=p.n.length*13+6,h=16,c=[[p.x+11,p.y-8,'start'],[p.x-11-w,p.y-8,'end'],[p.x-w/2,p.y-26,'middle'],[p.x-w/2,p.y+10,'middle'],[p.x+11,p.y-24,'start'],[p.x+11,p.y+8,'start']],pick=c[0];
+    for(var k2=0;k2<c.length;k2++){var r={x:c[k2][0],y:c[k2][1],w:w,h:h};if(r.x>=L&&r.x+w<=R+14&&r.y>=T-4&&r.y+h<=B+4&&!hit(r)){pick=c[k2];break}}
+    var r2={x:pick[0],y:pick[1],w:w,h:h};boxes.push(r2);
+    var tx=pick[2]==='start'?pick[0]+2:pick[2]==='end'?pick[0]+w-2:pick[0]+w/2;
+    lbl+='<text x="'+tx.toFixed(1)+'" y="'+(pick[1]+12).toFixed(1)+'" text-anchor="'+pick[2]+'" class="bb-pl">'+p.n+'</text>';
+    pts+=p.d?'<rect x="'+(p.x-6).toFixed(1)+'" y="'+(p.y-6).toFixed(1)+'" width="12" height="12" rx="2" transform="rotate(45 '+p.x.toFixed(1)+' '+p.y.toFixed(1)+')" fill="#b4793f" stroke="#fff" stroke-width="2"/>':'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="7" fill="#3f8a6b" stroke="#fff" stroke-width="2"/>';
+  });
+  svg.innerHTML=s+pts+lbl;
+  $('bbInfo').innerHTML=(info.join(' ')||'右上ほど高速で前が残り、左下ほどタフで差しが届いた日です。中心はふだんどおり。');
 }
 function table(doc){
   var h='';
