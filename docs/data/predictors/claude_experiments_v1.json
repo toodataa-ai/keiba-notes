@@ -4,34 +4,47 @@
  "research_only": true,
  "pace": {
   "id": "claude+pace_v1",
-  "pairs": 0,
+  "pairs": 3,
   "need_pairs": 20,
-  "mean_log_loss_base": null,
-  "mean_log_loss_pace": null,
-  "races_improved": 0,
-  "races_worse": 0,
+  "mean_log_loss_base": 2.095368033375754,
+  "mean_log_loss_pace": 2.0678209031621337,
+  "races_improved": 1,
+  "races_worse": 2,
   "state": "collecting"
  },
  "going": {
   "id": "claude+going_v1",
-  "pairs": 0,
+  "pairs": 3,
   "need_pairs": 20,
-  "adjusted_runners": 0,
-  "mean_log_loss_base": null,
-  "mean_log_loss_going": null,
+  "adjusted_runners": 17,
+  "mean_log_loss_base": 2.095368033375754,
+  "mean_log_loss_going": 2.1128729755945894,
   "races_improved": 0,
-  "races_worse": 0,
+  "races_worse": 3,
   "state": "collecting"
  },
  "portfolio": {
   "id": "claude+ticket_div_rule",
-  "pairs": 0,
+  "pairs": 2,
   "need_pairs": 20,
-  "summary": null,
+  "summary": {
+   "claude_own": {
+    "stake_yen": 4600,
+    "payout_yen": 4560,
+    "roi": 0.9913,
+    "hit_races": 2
+   },
+   "mechanical_rule": {
+    "stake_yen": 4600,
+    "payout_yen": 0,
+    "roi": 0.0,
+    "hit_races": 0
+   }
+  },
   "state": "collecting"
  },
  "experience": {
-  "career_data_available": false,
+  "career_data_available": true,
   "need_horses": 30,
   "regimes": {
    "E0": {
@@ -42,18 +55,18 @@
     "state": "collecting"
    },
    "E1": {
-    "horses": 0,
-    "races": 0,
-    "predicted_wins": 0.0,
-    "actual_wins": 0,
+    "horses": 9,
+    "races": 1,
+    "predicted_wins": 0.97,
+    "actual_wins": 1,
     "state": "collecting"
    },
    "E2": {
-    "horses": 0,
-    "races": 0,
-    "predicted_wins": 0.0,
-    "actual_wins": 0,
-    "state": "collecting"
+    "horses": 33,
+    "races": 3,
+    "predicted_wins": 2.03,
+    "actual_wins": 2,
+    "state": "ready_for_review"
    }
   }
  }
