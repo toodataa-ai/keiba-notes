@@ -35,8 +35,8 @@ def day_bases(date, inputs):
     return out
 
 
-def assemble(date, venue_races, base, now=None, min_read=12):
-    """{競馬場: [race,...]} → 保存する辞書。min_read 未満しか読めなかった競馬場（結果が途中）は出さない。"""
+def assemble(date, venue_races, base, now=None, min_read=11):
+    """{競馬場: [race,...]} → 保存する辞書。min_read（12レース中11）未満しか読めなかった競馬場（結果が途中）は出さない。"""
     now = now or dt.datetime.now(JST)
     venues = {}
     for v, rs in venue_races.items():
@@ -107,7 +107,7 @@ def process_date(session, date, base, inputs, out_dir):
         print(date, v, "読めたレース", len(rs), "/ 12")
     doc = assemble(date, venue_races, base)
     if not doc["venues"]:
-        print(f"{date}: 12レースそろった競馬場がありません（結果が未確定？）。保存しません", file=sys.stderr)
+        print(f"{date}: 結果がそろった競馬場がありません（結果が未確定？）。保存しません", file=sys.stderr)
         return False
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, f"{date}.json"), "w", encoding="utf-8") as f:

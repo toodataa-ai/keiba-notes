@@ -18,9 +18,13 @@ MIN_DAY_RACES = 4      # 1日に最低このレース数がないと傾向とは
 MIN_BASE_N = 12        # 勝ち時計の基準を作るのに必要なレース数
 TURF_FRONT_MIN_DIST = 1500   # 芝の短距離は前残りが続かなかったので、前残りの測定から外す
 
-_HEAD_RE = re.compile(
-    r"(\d+)回(\S{1,3}?)(\d+)日\s+(\d+):(\d+)発走\s+(\S.*?)\s+(芝|ダート)・?(右|左|直線)?[^\d]{0,8}?(\d{3,4})m"
-    r"\s+天気：\s*(\S+)\s+馬場：\s*(\S+)\s+(.*?)\s+本賞金")
+_HEAD = r"(\d+)回(\S{1,3}?)(\d+)日\s+(\d+):(\d+)发走\s+(\S.*?)\s+".replace("发","発")
+_TAIL = r"天気：\s*(\S+)\s+馬場：\s*(\S+)\s+(.*?)\s+本賞金"
+# 平地：「芝・右 2000m」「芝・右・内2周 3600m」「ダート・右 1200m」。障害：「障害・芝→ダート 2970m」
+_HEAD_RE = re.compile(_HEAD + r"(芝|ダート)(?:・\S{0,12})?\s+(\d{3,4})m\s+" + _TAIL)
+_HURDLE_RE = re.compile(_HEAD + r"(障害)(?:・\S{0,12})?\s+(\d{3,4})m\s+" + _TAIL)
+MIN_PARSE_FIELD = 2      # 5頭立てなどの少頭数も「読めた」ことにする（使えるかどうかは usable で決める）
+MIN_USABLE_FIELD = 6
 
 
 def clsgrp(c: str) -> str:
@@ -38,10 +42,10 @@ def agegrp(c: str) -> str:
 def parse_result_page(page: dict, code: str, date: str):
     """race_crawl.dump_page の形（text・tables）→ 1レースの辞書。読めない・障害・未確定なら None。"""
     txt = page.get("text") or ""
-    m = _HEAD_RE.search(txt)
+    m = _HEAD_RE.search(txt) or _HURDLE_RE.search(txt)
     if not m:
         return None
-    kai, venue, day, _hh, _mm, name, surf, turn, dist, _wx, going, cls = m.groups()
+    kai, venue, day, _hh, _mm, name, surf, dist, _wx, going, cls = m.groups()
     table = None
     for t in page.get("tables") or []:
         if t and t[0][:3] == ["着順", "枠番", "馬番"]:
@@ -68,11 +72,11 @@ def parse_result_page(page: dict, code: str, date: str):
             horses.append({"fin": fin, "no": int(row[2]), "pos": pos, "sec": sec, "pop": int(pop.group(1)) if pop else None})
         except ValueError:
             continue
-    if len(horses) < 6:
+    if len(horses) < MIN_PARSE_FIELD:
         return None
     return {"code": code, "date": date, "kai": int(kai), "venue": venue, "day": int(day), "surf": surf, "dist": int(dist),
             "going": going, "cls": cls, "name": name, "n": len(horses), "horses": horses,
-            "hurdle": "障害" in cls or "障害" in name}
+            "hurdle": surf == "障害" or "障害" in cls or "障害" in name}
 
 
 def _mean(x):
@@ -90,7 +94,7 @@ def time_key(r: dict) -> str:
 
 
 def usable(r: dict) -> bool:
-    return (not r["hurdle"]) and r["surf"] in SURFACES
+    return (not r["hurdle"]) and r["surf"] in SURFACES and r["n"] >= MIN_USABLE_FIELD
 
 
 def winner_time(r: dict):

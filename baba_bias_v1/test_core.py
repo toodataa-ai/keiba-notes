@@ -72,7 +72,7 @@ class T(unittest.TestCase):
         races = [core.parse_result_page(page(f"R{i}", "良", field(10, True)), f"{i:010d}", "2025-03-01") for i in range(6)]
         base = {"ef": [0.1 + 0.08 * i for i in range(10)], "time": {}, "sd": {s: {"speed": 1, "front": 1, "outer": 1} for s in core.SURFACES}, "source": {"races": 1}}
         doc = daily.assemble("2025-03-01", {"阪神": races}, base, min_read=1)
-        self.assertEqual(daily.assemble("2025-03-01", {"阪神": races}, base)["venues"], {})  # 12未満は出さない
+        self.assertEqual(daily.assemble("2025-03-01", {"阪神": races}, base)["venues"], {})  # 11未満は出さない
         s = str(doc)
         self.assertNotIn("馬1", s)
         self.assertIn("阪神", doc["venues"])
@@ -86,6 +86,20 @@ class T(unittest.TestCase):
             os.makedirs(os.path.join(d, n))
         open(os.path.join(o, "2026-11-06.json"), "w").write("{}")
         self.assertEqual(daily.pending_dates(d, o, dt.date(2026, 11, 8)), ["2026-11-07", "2026-11-08"])
+
+    def test_header_variants_and_hurdle(self):
+        def pg(h):
+            return {"text": h, "tables": [[["着順", "枠番", "馬番", "馬名", "タイム 着差", "通過順位 上がり3Fタイム", "騎手名 斤量", "人気 （オッズ）", "調教師"]] + [[str(i), "1", str(i), "馬", "1:34.0", "01-01 34.0", "騎 56", f"{i} (5.0)", "調"] for i in range(1, 8)]]}
+        tail = "天気： 晴 馬場： 良 3歳以上 オープン 定量 本賞金：1840万円 出馬表"
+        r = core.parse_result_page(pg("5回中山1日 15:45発走 ステイヤーズS GII 芝・右・内2周 3600m " + tail), "1", "2025-12-06")
+        self.assertEqual((r["surf"], r["dist"], r["hurdle"]), ("芝", 3600, False))
+        r = core.parse_result_page(pg("5回阪神8日 11:35発走 サラ系障害3歳上未勝利 障害・芝→ダート 2970m " + tail), "2", "2025-12-06")
+        self.assertTrue(r["hurdle"]); self.assertFalse(core.usable(r))
+        r = core.parse_result_page(pg("4回東京1日 11:00発走 未勝利 ダート・左 1400m " + tail), "3", "2025-12-06")
+        self.assertEqual((r["surf"], r["dist"]), ("ダート", 1400))
+        small = core.parse_result_page({"text": "4回阪神5日 10:50発走 未勝利 芝・右 2000m " + tail, "tables": [pg("")["tables"][0][:4] + [] ]}, "4", "2025-12-06")
+        self.assertIsNotNone(small)
+        self.assertFalse(core.usable(small))  # 少頭数は数えるが、傾向には使わない
 
 
 if __name__ == "__main__":
