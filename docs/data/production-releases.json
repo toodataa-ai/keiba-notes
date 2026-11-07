@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.34-20261107",
-  "current_public_version": "1.34",
+  "current_public_release": "release/jra-site-v1.35-20261107",
+  "current_public_version": "1.35",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -717,6 +717,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.35-20261107",
+      "branch": "release/jra-site-v1.35-20261107",
+      "commit_sha": "c4282b839037c9bb55fa2c6ddd5dc4c4d493aea9",
+      "deployed_at": "2026-11-07T21:45:40+09:00",
+      "workflow_run_id": 42373884801,
+      "validation_workflow_run_id": 42373884801,
+      "public_version": "1.35",
+      "note": "2026-11-07ユーザー明示承認済み。自動運用の状況：止めた『若駒の機械採点』の行を外す：若駒の機械採点の定時を止めたため、1日の流れと実行記録の表からその行を外す。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-ops-remove-wakakoma-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
