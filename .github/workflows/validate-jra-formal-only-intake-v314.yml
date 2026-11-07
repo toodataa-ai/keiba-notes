@@ -1,0 +1,35 @@
+name: Verify isolated JRA formal-only intake
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/jra-generic-formal-only-v314.yml'
+      - '.github/scripts/jra-gather-live-v314-formal-only.py'
+      - '.github/scripts/test-jra-formal-only-intake-v314.py'
+      - '.github/workflows/validate-jra-formal-only-intake-v314.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-generic-formal-only-v314.yml'
+      - '.github/scripts/jra-gather-live-v314-formal-only.py'
+      - '.github/scripts/test-jra-formal-only-intake-v314.py'
+      - '.github/workflows/validate-jra-formal-only-intake-v314.yml'
+permissions:
+  contents: read
+jobs:
+  formal-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify only the permitted formal intake adapter differs and research cannot trigger
+        run: python3 .github/scripts/test-jra-formal-only-intake-v314.py
+      - name: Confirm current v3.13 model and 104 historically SHA-pinned components
+        run: node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
