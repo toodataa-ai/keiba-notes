@@ -64,7 +64,7 @@ jobs:
           case "$REQUEST_PATH" in e2e_validation/requests/v314-formal-only/*.json) ;; *) echo "::error::Unsafe request path";exit 1;; esac
           [[ -f "$REQUEST_PATH" && ! -L "$REQUEST_PATH" ]] || { echo "::error::Request missing";exit 1; }
           python3 -m pip install -q requests beautifulsoup4
-          python3 .github/scripts/jra-gather-live-v314.py --request "$REQUEST_PATH"
+          python3 .github/scripts/jra-gather-live-v314-formal-only.py --request "$REQUEST_PATH"
           INPUT_PATH=$(python3 - "$REQUEST_PATH" <<'PY'
           import json,sys
           r=json.load(open(sys.argv[1]))
