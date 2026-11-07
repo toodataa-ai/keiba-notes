@@ -72,7 +72,7 @@
 <h2 id="valTitle">前日の傾向は、翌日にどれくらい続くか</h2>
 <p class="sub">2022〜2026年の約1.5万レースで、連続した開催日どうしを比べました（1に近いほどよく続く、0は続かない）。</p>
 <div id="bbVal"></div>
-<p class="bb-note">速さは、日曜朝に公式発表される馬場状態（良・重など）だけでは分からない分まで、前日の傾向で分かります（予測力は0.40→芝0.62・ダート0.58）。前残りはダートでよく続き、芝は弱め（芝の短距離は続かない）。外・内は効果が小さいため、いまは表示だけで、予想には使いません。</p>
+<p class="bb-note">速さは、日曜朝に公式発表される馬場状態（良・重など）だけでは分からない分まで、前日の傾向で分かります（予測力は0.40→芝0.62・ダート0.58）。前残りはダートでよく続き、芝は弱めです。芝の短距離（1400m以下）の前残りも出していますが、翌日には続きにくいので、参考程度に見てください。外・内は効果が小さいため、いまは表示だけで、予想には使いません。</p>
 </section>
 
 <section aria-labelledby="useTitle">
@@ -174,7 +174,7 @@ function table(doc){
     var sf=doc.venues[v].surfaces;
     [['turf','芝'],['dirt','ダート']].forEach(function(t){
       var c=sf[t[0]];if(!c)return;
-      h+='<tr><td><b>'+v+'・'+t[1]+'</b><br><span style="color:#6d6e75;font-size:12px">'+t[1]+c.n_races+'レース</span></td><td>'+tag('speed',c.speed)+'</td><td>'+tag('front',c.front)+'</td><td>'+tag('outer',c.outer)+'</td></tr>';
+      h+='<tr><td><b>'+v+'・'+t[1]+'</b><br><span style="color:#6d6e75;font-size:12px">'+c.n_races+'レース</span></td><td>'+tag('speed',c.speed)+'</td><td>'+tag('front',c.front)+'</td><td>'+tag('outer',c.outer)+'</td></tr>';
     });
   });
   var bl=Object.keys(doc.venues).map(function(v){var d=doc.venues[v],b=d.breakdown;if(!b)return '';
