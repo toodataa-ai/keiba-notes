@@ -1,0 +1,31 @@
+name: Validate first JRA v3.15 formal-only publication from prereace proof
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/jra-formal-only-v315-initial-from-proof.yml'
+      - '.github/scripts/jra-promote-formal-3action-v315-initial.py'
+      - '.github/scripts/test-jra-formal-only-v315-initial.py'
+      - '.github/workflows/validate-jra-formal-only-v315-initial.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/jra-formal-only-v315-initial-from-proof.yml'
+      - '.github/scripts/jra-promote-formal-3action-v315-initial.py'
+      - '.github/scripts/test-jra-formal-only-v315-initial.py'
+      - '.github/workflows/validate-jra-formal-only-v315-initial.yml'
+permissions:
+  contents: read
+jobs:
+  guarded-initial-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python3 .github/scripts/test-jra-formal-only-v315-initial.py
+      - run: node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+      - run: python3 -m py_compile .github/scripts/jra-promote-formal-3action-v315-initial.py

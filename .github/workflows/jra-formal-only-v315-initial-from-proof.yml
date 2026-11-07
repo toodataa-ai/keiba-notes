@@ -1,0 +1,235 @@
+name: JRA formal-only direct initial v3.15 from immutable prestart source and fresh odds
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/requests/jra-formal-only-v315-initial/*.json'
+permissions:
+  contents: write
+concurrency:
+  group: jra-canonical-prepost-revision
+  cancel-in-progress: false
+jobs:
+  initial-formal-purchase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0, persist-credentials: true}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify historic STEP1/source proof and live future race only
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          mapfile -t ADDED < <(git diff --diff-filter=A --name-only "$BEFORE" "$AFTER" -- .github/requests/jra-formal-only-v315-initial)
+          [[ ${#ADDED[@]} -eq 1 ]] || { echo "::error::Only one initial race request allowed";exit 1; }
+          REQUEST="${ADDED[0]}"
+          [[ "$REQUEST" == .github/requests/jra-formal-only-v315-initial/*.json && -f "$REQUEST" && ! -L "$REQUEST" ]] || exit 1
+          export REQUEST
+          node .github/scripts/validate-jra-v313-current-e2e-v1.mjs
+          node .github/scripts/test-jra-three-command-v1.mjs
+          node .github/scripts/test-jra-ticket-notation-v1.mjs
+          node .github/scripts/test-jra-three-plus-ana-v1.mjs
+          node --check .github/scripts/jra-build-formal-3action-v315.mjs
+          python3 -m py_compile .github/scripts/jra-promote-formal-3action-v315-initial.py
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          from pathlib import Path
+          import json,os,re,subprocess,datetime as dt
+          q=json.loads(Path(os.environ["REQUEST"]).read_text())
+          rid=q['race_id']
+          proof=q['original_proof_commit']
+          snap=q['original_snapshot_path']
+          assert q.get('mode')=='initial-v315-after-unpublished-source-proof','wrong recovery mode'
+          assert re.fullmatch(r'20[0-9]{2}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+',rid)
+          assert re.fullmatch(r'[0-9a-f]{40}',proof)
+          assert snap.startswith('e2e_validation/snapshots/'+rid+'/v3.13-run') and snap.endswith('.json')
+          assert Path(snap).is_file()
+          original_sha=subprocess.check_output(['git','rev-parse',proof+':'+snap],text=True).strip()
+          local_sha=subprocess.check_output(['git','hash-object',snap],text=True).strip()
+          assert original_sha==local_sha,'original prestart source snapshot SHA changed'
+          original=json.loads(Path(snap).read_text())
+          assert original['race_id']==rid and original['stage']=='pending_git_proof' and original['proof_commit'] is None
+          assert original['prompt_version']=='v3.13'
+          now=dt.datetime.now(dt.timezone.utc)
+          post=dt.datetime.fromisoformat(original['race_context']['start_at'])
+          assert now<post,'race already started: no fresh purchase possible'
+          proofdate=subprocess.check_output(['git','show','-s','--format=%cI',proof],text=True).strip()
+          assert dt.datetime.fromisoformat(proofdate)<post,'original proof was not before post'
+          reg=json.loads(Path('docs/data/races.json').read_text())['races']
+          assert not any(x['id']==rid for x in reg),'existing canonical detected; never overwrite'
+          inp='e2e_validation/inputs/v313/'+rid+'.json'
+          assert Path(inp).is_file()
+          original_inp=json.loads(Path(inp).read_text())
+          assert original_inp['race_id']==rid and original_inp['step1']['no_odds_used_to_change_marks'] is True
+          provenance=subprocess.check_output(['git','rev-parse',proof+':'+inp],text=True).strip()
+          assert subprocess.check_output(['git','hash-object',inp],text=True).strip()==provenance,'original research input changed'
+          by={int(x['horse_number']):(x['horse_name'],x['mark'],x['overall_grade']) for x in original['step1_ranking']}
+          live={int(x['horse_number']):(x['horse_name'],x['mark'],x['overall_grade']) for x in original_inp['step1']['runners']}
+          assert by==live,'existing all-horse STEP1 no longer equals frozen proof'
+          print('RACE_ID='+rid)
+          print('INPUT='+inp)
+          print('ORIGINAL_PROOF='+proof)
+          print('ORIGINAL_SNAPSHOT='+snap)
+          PY
+          RACE_ID=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["race_id"])' "$REQUEST")
+          LABEL="v315-initial-run${GITHUB_RUN_ID}-attempt${GITHUB_RUN_ATTEMPT}"
+          FRESH="e2e_validation/inputs/v315-initial-fresh/$RACE_ID-$LABEL.json"
+          EVIDENCE="e2e_validation/quote-evidence/$RACE_ID/$LABEL"
+          SRC_SNAPSHOT="e2e_validation/snapshots/$RACE_ID/v3.13-$LABEL.json"
+          SOURCE="e2e_validation/predictions/$RACE_ID/v3.13-$LABEL.json"
+          PLAN_SNAPSHOT="e2e_validation/snapshots/$RACE_ID/$LABEL.json"
+          PLAN="e2e_validation/predictions/$RACE_ID/$LABEL-sealed.json"
+          REPORT="docs/reports/$RACE_ID-$LABEL.html"
+          PDF="docs/pdfs/$RACE_ID-$LABEL.pdf"
+          MANIFEST="docs/data/jra-v315-initial-$RACE_ID-$LABEL.json"
+          for file in "$FRESH" "$SRC_SNAPSHOT" "$SOURCE" "$PLAN_SNAPSHOT" "$PLAN" "$REPORT" "$PDF" "$MANIFEST";do
+            [[ ! -e "$file" ]] || { echo "::error::Immutable artifact path collision $file"; exit 1; }
+          done
+          for k in LABEL FRESH EVIDENCE SRC_SNAPSHOT SOURCE PLAN_SNAPSHOT PLAN REPORT PDF MANIFEST;do echo "$k=${!k}" >> "$GITHUB_ENV";done
+      - name: Re-fetch all 8 types and every candidate quote from actually displayed market
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q requests beautifulsoup4
+          python3 .github/scripts/jra-odds-full-refresh-v313-exec.py \
+            --refresh-all --input "$INPUT" --output "$FRESH" --evidence-dir "$EVIDENCE" \
+            --max-capture-spread-seconds 180
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py \
+            --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+      - name: Recompute unchanged STEP1 with new source-verified odds and frozen marks
+        run: |
+          set -euo pipefail
+          node .github/scripts/jra-prestart-pipeline-v313.mjs --input "$FRESH" --output "$SRC_SNAPSHOT"
+          python3 - <<'PY'
+          import json,os
+          a=json.load(open(os.environ['SRC_SNAPSHOT']))
+          b=json.load(open(os.environ['ORIGINAL_SNAPSHOT']))
+          assert a['race_id']==b['race_id'] and a['prompt_version']==b['prompt_version']=='v3.13'
+          assert a['step1_fixed_at']==b['step1_fixed_at'],'STEP1 freeze timestamp changed'
+          x={str(v['horse_number']):(v['horse_name'],v['mark'],v['overall_grade']) for v in a['step1_ranking']}
+          y={str(v['horse_number']):(v['horse_name'],v['mark'],v['overall_grade']) for v in b['step1_ranking']}
+          assert x==y,'new odds must not alter STEP1 marks or grades'
+          assert a['stage']=='pending_git_proof' and a['proof_commit'] is None
+          assert a['total_stake_yen']<=6000
+          PY
+      - name: Freeze independent live-prices v3.13 source proof before any PDF
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py \
+            --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$FRESH" "$SRC_SNAPSHOT" "$EVIDENCE"
+          git commit -m 'Freeze real refreshed 8-type JRA price inputs with unchanged earlier STEP1'
+          for attempt in 1 2 3 4;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then git rebase --abort || true;exit 1;fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" == 4 ]];then exit 1;fi
+          done
+          echo "SOURCE_PROOF=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Seal source against immutable Git proof; compute real executable v3.15 purchase
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py \
+            --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+          node .github/scripts/jra-prestart-pipeline-v313.mjs \
+            --seal "$SRC_SNAPSHOT" --proof-commit "$SOURCE_PROOF" --output "$SOURCE"
+          node .github/scripts/validate-jra-portfolio-v313.mjs "$SOURCE"
+          node .github/scripts/jra-build-formal-3action-v315.mjs --source "$SOURCE" --output "$PLAN_SNAPSHOT"
+          python3 - <<'PY'
+          import json,os
+          p=json.load(open(os.environ['PLAN_SNAPSHOT']))
+          assert p['status']=='pending_git_proof' and p['proof_commit'] is None
+          assert p['purchase_strategy_version']=='v3.15' and p['source_prediction_proof']==os.environ['SOURCE_PROOF']
+          assert p['total_stake_yen']<=6000 and p['command_count']<=5
+          PY
+      - name: Freeze full v3.13 original and distinct v3.15 pending purchase proof
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+          git add -- "$SOURCE" "$PLAN_SNAPSHOT"
+          test "$(git diff --cached --name-only | wc -l)" -eq 2
+          git commit -m 'Freeze original v3.13 source and independently computed v3.15 purchase set before post'
+          for attempt in 1 2 3 4;do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main;then git rebase --abort || true;exit 1;fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" == 4 ]];then exit 1;fi
+          done
+          echo "PURCHASE_PROOF=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Seal only original v3.15 frozen purchase; reader-v1 full A4 strict PDF and value column
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-check-fresh-quotes-v313-exec.py --input "$FRESH" --fresh-seconds 600 --max-spread-seconds 180
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python3 -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+          python3 - <<'PY'
+          import os,json
+          from pathlib import Path
+          from datetime import datetime,timezone
+          s=Path(os.environ['PLAN_SNAPSHOT'])
+          obj=json.loads(s.read_text())
+          assert obj['status']=='pending_git_proof' and obj['proof_commit'] is None
+          assert datetime.now(timezone.utc)<datetime.fromisoformat(obj['race_context']['start_at'])
+          obj['status']='formal_prestart';obj['proof_commit']=os.environ['PURCHASE_PROOF']
+          t=Path(os.environ['PLAN']);t.parent.mkdir(parents=True,exist_ok=True)
+          t.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n')
+          PY
+          python3 .github/scripts/jra-render-formal-reader-v315.py \
+            --plan "$PLAN" --source "$SOURCE" --html "$REPORT" --pdf "$PDF"
+          VALUE_HTML="${REPORT%.html}-value-preflight.html"
+          VALUE_PDF="${PDF%.pdf}-value-preflight.pdf"
+          python3 .github/scripts/jra-v315-value-column-v1.py \
+            --plan "$PLAN" --source "$SOURCE" \
+            --html-input "$REPORT" --pdf-input "$PDF" \
+            --html-output "$VALUE_HTML" --pdf-output "$VALUE_PDF"
+          mv -- "$VALUE_HTML" "$REPORT"
+          mv -- "$VALUE_PDF" "$PDF"
+          python3 .github/scripts/validate-jra-pdf-layout.py \
+            --html "$REPORT" --pdf "$PDF" --policy docs/data/jra_pdf_layout_policy_v1.json
+          python3 .github/scripts/jra-promote-formal-3action-v315-initial.py \
+            "$PLAN" "$SOURCE" "$REPORT" "$PDF" "$MANIFEST"
+      - name: Publish only first current v3.15 canonical and original immutable sources
+        run: |
+          set -euo pipefail
+          git add -- "$PLAN" "$REPORT" "$PDF" "$MANIFEST" \
+            docs/data/races.json docs/data/jra_publication_revision_log.json
+          python3 - <<'PY'
+          import os,subprocess
+          expect={os.environ[k] for k in ('PLAN','REPORT','PDF','MANIFEST')}|{'docs/data/races.json','docs/data/jra_publication_revision_log.json'}
+          actual=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert actual==expect,('Unexpected file changes',actual^expect)
+          PY
+          git commit -m 'Publish first verified reader-v1 JRA v3.15 commands and full A4 without earlier source PDF'
+          # Preserve the already committed, independently verified original prestart proof.
+          for attempt in 1 2 3;do
+            git fetch --no-tags origin main
+            if ! git merge --no-edit origin/main;then
+              git merge --abort || true;echo "::error::cannot reconcile concurrent canonical";exit 1
+            fi
+            if git push origin HEAD:main;then break;fi
+            if [[ "$attempt" == 3 ]];then exit 1;fi
+          done
+      - name: Verify real public PDF, HTML, manifest, registry, and audit journal bytes
+        run: |
+          set -euo pipefail
+          for n in $(seq 1 32);do
+            ok=1
+            for file in docs/data/races.json docs/data/jra_publication_revision_log.json "$MANIFEST" "$REPORT" "$PDF";do
+              url="https://toodataa-ai.github.io/keiba-notes/${file#docs/}"
+              if ! curl -LfsS --max-time 25 "$url" -o "/tmp/jra-v315-direct-$(basename "$file")" ||
+                ! cmp -s "$file" "/tmp/jra-v315-direct-$(basename "$file")";then ok=0;break;fi
+            done
+            if [[ "$ok" == 1 ]];then
+              echo "PASS_JRA_V315_DIRECT_PUBLISHED_COMPLETE_A4_HTTP_AND_FRESH_PROOF $RACE_ID $PURCHASE_PROOF"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo '::error::Source/plan fixed but exact public bytes not yet verified';exit 1
