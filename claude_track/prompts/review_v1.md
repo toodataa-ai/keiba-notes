@@ -8,6 +8,7 @@
   1. 結果の取得を起動：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-results-v1.yml/dispatches -f ref=main`（結果が保存されると、採点・公開も自動で続く）。
   2. 1〜2分おきに `git pull` して、結果ファイルが出るまで最大15分待つ。それでも無いレース（発走30分未満・払戻未確定など）は、無いと報告する。
   3. 結果の保存を確認したら、順番に起動して各回の完了を待つ（失敗しても次へ進み、record_run の note に書く）：`claude-track-publish-v1.yml`（採点・公開）→ `jra-improvement-experiments-v1.yml`（改善案の採点）→ `jra-improvement-pipeline-v1.yml`（基準の確認）。起動の形式は上と同じ（`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>/dispatches -f ref=main`）。GitHub の定時は保険。
+  3b. **馬場傾向の計算も起動する**（翌日の予想が使う、その日の馬場の傾向。2026-11-08 追加）：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/baba-bias-v1.yml/dispatches -f ref=main`（日付は省略。出馬表があり、まだ計算していない直近3日を自動で処理する。全12レースの結果が出ている競馬場だけ保存される）。完了は待たなくてよい。失敗しても止まらず、record_run の note に書く。
   4. 起動のコマンドが失敗しても（権限なし・gh が使えないなど）、止まらずに従来どおり進める。失敗したことは、最後の実行記録の `--note` に書く。
 - `git pull` で最新を取る。
 - Claude の予想は `claude_track/predictions/<race_id>/`。**保存済みの予想は書き換えない。**

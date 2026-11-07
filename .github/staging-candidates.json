@@ -1,5 +1,18 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-baba-bias-v1",
+      "title": "馬場傾向（前日の傾向）ページを追加",
+      "pages": [
+        "index.html",
+        "baba-bias.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "created_at": "2026-11-08",
+      "summary": "前日の全12レースから出した馬場傾向（速さ・前残り・外内）を、4象限の図と競馬場ごとの一覧で見られる新ページと、トップのカード。"
+    }
+  ]
 }
