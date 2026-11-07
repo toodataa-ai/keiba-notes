@@ -80,6 +80,7 @@ class T(unittest.TestCase):
         self.assertNotIn("馬1", s)
         self.assertIn("阪神", doc["venues"])
         self.assertIn("label", doc["venues"]["阪神"]["surfaces"]["turf"]["front"])
+        self.assertEqual(doc["venues"]["阪神"]["breakdown"], {"turf": 6, "dirt": 0, "hurdle": 0, "small": 0})
 
 
     def test_pending_dates(self):
