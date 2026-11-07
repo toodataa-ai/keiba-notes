@@ -49,7 +49,10 @@ def assemble(date, venue_races, base, now=None, min_read=11):
             for m in ("speed", "front", "outer"):
                 if m in surf:
                     surf[m]["label"] = core.label(m, surf[m]["z"])
-        venues[v] = {"meeting": f"{rs[0]['kai']}回{v}{rs[0]['day']}日", "surfaces": sc, "races_read": len(rs)}
+        small = sum(1 for r in rs if not r["hurdle"] and r["surf"] in core.SURFACES and not core.usable(r))
+        bd = {"turf": sum(1 for r in rs if core.usable(r) and r["surf"] == "芝"), "dirt": sum(1 for r in rs if core.usable(r) and r["surf"] == "ダート"),
+              "hurdle": sum(1 for r in rs if r["hurdle"]), "small": small}
+        venues[v] = {"meeting": f"{rs[0]['kai']}回{v}{rs[0]['day']}日", "surfaces": sc, "races_read": len(rs), "breakdown": bd}
     return {"schema": "baba_bias_day_v1", "date": date, "generated_at": now.isoformat(timespec="seconds"),
             "baselines": base.get("source"), "venues": venues,
             "note": "speed＝勝ち時計が基準より何％速いか／front＝人気より前の馬が好走／outer＝人気より外の馬が好走。z＝ふだんのばらつきの何倍か。"}
