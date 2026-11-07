@@ -1,0 +1,57 @@
+name: Baba bias v1 (previous-day track bias from all 12 races, no Claude usage)
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'YYYY-MM-DD（省略時は、出馬表があり、まだ保存していない直近3日を自動で処理）'
+        required: false
+      rebuild_baselines:
+        description: '基準を非公開データから作り直す（月に1回ほど）'
+        type: boolean
+        default: false
+  schedule:
+    # 土日月 18:40 JST（最終レースのあと）。Claude の回顧（18:17）からも起動する。GitHub の定時は遅れることがあるので保険
+    - cron: '40 9 * * 6,0,1'
+permissions:
+  contents: write
+concurrency:
+  group: baba-bias
+  cancel-in-progress: false
+jobs:
+  bias:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install requests beautifulsoup4
+      - name: Test
+        run: python3 -m unittest baba_bias_v1.test_core -v
+      - name: Check private data token (only when rebuilding baselines)
+        if: ${{ github.event.inputs.rebuild_baselines == 'true' }}
+        env:
+          T: ${{ secrets.PRIVATE_DATA_TOKEN }}
+        run: test -n "$T" || { echo 'PRIVATE_DATA_TOKEN is not set'; exit 1; }
+      - uses: actions/checkout@v4
+        if: ${{ github.event.inputs.rebuild_baselines == 'true' }}
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - name: Rebuild baselines (numbers only)
+        if: ${{ github.event.inputs.rebuild_baselines == 'true' }}
+        run: python3 -m baba_bias_v1.baselines --data private/data_v2
+      - name: Compute the day's track bias (numbers only; no names or records are saved)
+        run: |
+          set -euo pipefail
+          D="${{ github.event.inputs.date }}"
+          if [ -n "$D" ]; then python3 -m baba_bias_v1.daily --date "$D"; else python3 -m baba_bias_v1.daily --auto; fi
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/baba_bias
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "馬場傾向：前日の傾向を更新（全12レースから自動計算）"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep $((i*3)); done
