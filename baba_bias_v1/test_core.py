@@ -101,6 +101,20 @@ class T(unittest.TestCase):
         self.assertIsNotNone(small)
         self.assertFalse(core.usable(small))  # 少頭数は数えるが、傾向には使わない
 
+    def test_next_morning_page(self):
+        hdr = ["着順", "枠番", "馬番", "馬名", "タイム 着差", "通過順位 上がり3Fタイム", "騎手名 斤量", "人気 （オッズ）", "調教師"]
+        rows = [[str(i), "1", str(i), "馬", "1:34.0", "34.0", "騎 56", f"- ({3.0 * i:.1f})", "調"] for i in range(1, 9)]
+        corner = [["コーナー", "通過順位"], ["4コーナー", "3 (1,2)(4,5)6,7,8"]]
+        tail = "天気： 晴 馬場： 良 3歳以上 オープン 定量 本賞金：1840万円 出馬表"
+        r = core.parse_result_page({"text": "4回東京1日 11:00発走 未勝利 ダート・左 1400m " + tail, "tables": [[hdr] + rows, corner]}, "9", "2025-12-06")
+        h = {x["no"]: x for x in r["horses"]}
+        self.assertEqual(h[1]["pop"], 1)
+        self.assertEqual(h[8]["pop"], 8)
+        self.assertEqual(h[3]["pos"], [1.0])
+        self.assertEqual(h[1]["pos"], [2.5])
+        self.assertEqual(h[8]["pos"], [8.0])
+        self.assertEqual(len(core.horse_rows(r)), 8)
+
 
 if __name__ == "__main__":
     unittest.main()
