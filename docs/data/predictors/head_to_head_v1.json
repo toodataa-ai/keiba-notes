@@ -1,18 +1,18 @@
 {
  "schema_version": 1,
- "races": 0,
+ "races": 2,
  "claude": {
-  "stake_yen": 0,
-  "payout_yen": 0,
-  "profit_yen": 0,
-  "roi": null,
+  "stake_yen": 3600,
+  "payout_yen": 1340,
+  "profit_yen": -2260,
+  "roi": 0.37222222222222223,
   "skipped_races": 0
  },
  "chatgpt": {
-  "stake_yen": 0,
-  "payout_yen": 0,
-  "profit_yen": 0,
-  "roi": null,
+  "stake_yen": 10400,
+  "payout_yen": 3170,
+  "profit_yen": -7230,
+  "roi": 0.30480769230769234,
   "skipped_races": 0
  },
  "verdict": "参考表示（回収率の優劣は100レースたまるまで結論を出さない）",
@@ -23,16 +23,6 @@
  ],
  "excluded": {
   "claude_only": [
-   {
-    "date": "2026-11-07",
-    "venue": "京都",
-    "race_name": "室町ステークス"
-   },
-   {
-    "date": "2026-11-07",
-    "venue": "東京",
-    "race_name": "京王杯2歳ステークス"
-   },
    {
     "date": "2026-11-07",
     "venue": "福島",
@@ -223,5 +213,36 @@
   ],
   "name_mismatch": []
  },
- "rows": []
+ "rows": [
+  {
+   "date": "2026-11-07",
+   "venue": "京都",
+   "race_name": "室町ステークス",
+   "claude": {
+    "stake_yen": 100,
+    "payout_yen": 0,
+    "skipped": false
+   },
+   "chatgpt": {
+    "stake_yen": 4800,
+    "payout_yen": 0,
+    "skipped": false
+   }
+  },
+  {
+   "date": "2026-11-07",
+   "venue": "東京",
+   "race_name": "京王杯2歳ステークス",
+   "claude": {
+    "stake_yen": 3500,
+    "payout_yen": 1340,
+    "skipped": false
+   },
+   "chatgpt": {
+    "stake_yen": 5600,
+    "payout_yen": 3170,
+    "skipped": false
+   }
+  }
+ ]
 }
