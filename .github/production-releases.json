@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.38-20261108",
-  "current_public_version": "1.38",
+  "current_public_release": "release/jra-site-v1.39-20261108",
+  "current_public_version": "1.39",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -799,6 +799,26 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.39-20261108",
+      "branch": "release/jra-site-v1.39-20261108",
+      "commit_sha": "d9f71b314a7f465ed50286ecf14b78a02f6fe5f4",
+      "deployed_at": "2026-11-08T08:42:46+09:00",
+      "workflow_run_id": 42426469445,
+      "validation_workflow_run_id": 42426469445,
+      "public_version": "1.39",
+      "note": "2026-11-08ユーザー明示承認済み。馬場傾向ページ：レース数の内訳を表示：競馬場ごとに、芝・ダート・障害・少頭数の内訳（合計12レース）を表の下に出す。芝の短距離も前残りを出す（参考程度の注記つき）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-baba-bias-count-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/baba-bias.html"
       ],
       "public_http_files_verified": null
     }
