@@ -3,11 +3,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'e2e_validation/requests/v314-formal-only/*.json'
+      - '.github/requests/jra-formal-only-v314/*.json'
   workflow_dispatch:
     inputs:
       request_path:
-        description: 'One immutable prereace request (e2e_validation/requests/v314-formal-only/*.json)'
+        description: 'One immutable prereace request (.github/requests/jra-formal-only-v314/*.json)'
         type: string
         required: true
 permissions:
@@ -53,7 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$EVENT_NAME" == "push" ]]; then
-            mapfile -t NEW_REQUESTS < <(git diff --diff-filter=A --name-only "$BEFORE_SHA" "$AFTER_SHA" -- e2e_validation/requests/v314-formal-only)
+            mapfile -t NEW_REQUESTS < <(git diff --diff-filter=A --name-only "$BEFORE_SHA" "$AFTER_SHA" -- .github/requests/jra-formal-only-v314)
             if [[ ${#NEW_REQUESTS[@]} -ne 1 ]]; then
               echo "::error::One immutable JRA request per commit is required";exit 1
             fi
@@ -61,7 +61,7 @@ jobs:
           else
             REQUEST_PATH="$REQUEST_FROM_UI"
           fi
-          case "$REQUEST_PATH" in e2e_validation/requests/v314-formal-only/*.json) ;; *) echo "::error::Unsafe request path";exit 1;; esac
+          case "$REQUEST_PATH" in .github/requests/jra-formal-only-v314/*.json) ;; *) echo "::error::Unsafe request path";exit 1;; esac
           [[ -f "$REQUEST_PATH" && ! -L "$REQUEST_PATH" ]] || { echo "::error::Request missing";exit 1; }
           python3 -m pip install -q requests beautifulsoup4
           python3 .github/scripts/jra-gather-live-v314-formal-only.py --request "$REQUEST_PATH"
