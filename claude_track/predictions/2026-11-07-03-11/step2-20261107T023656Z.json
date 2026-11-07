@@ -1,0 +1,2583 @@
+{
+ "schema_version": 1,
+ "predictor": "claude",
+ "stage": "step2",
+ "race_id": "2026-11-07-03-11",
+ "generated_at": "2026-11-07T11:36:56+09:00",
+ "decision": "buy",
+ "odds_source": "claude_track/odds/2026-11-07-03-11/20261107T023348Z.json",
+ "odds_observed_at": "2026-11-07T11:33:48+09:00",
+ "stake_method": "anchored_v1",
+ "tau": 1.209,
+ "w": 0.5,
+ "params": {
+  "w": 0.5,
+  "budget": 6000,
+  "unit": 100,
+  "ticket_cap": 1000,
+  "horse_cap": 0.6,
+  "kelly": 0.25,
+  "bankroll": 60000,
+  "types": [
+   "単勝",
+   "馬連",
+   "馬単",
+   "ワイド",
+   "三連複",
+   "三連単"
+  ],
+  "min_prob": 0.005,
+  "max_odds": null,
+  "require_complete": true
+ },
+ "incomplete_odds_types": [
+  "三連単"
+ ],
+ "candidates": [
+  {
+   "type": "単勝",
+   "selection": [
+    7
+   ],
+   "market_odds": 42.7,
+   "q": 0.018622,
+   "p": 0.026121,
+   "expected_value": 0.1154
+  },
+  {
+   "type": "単勝",
+   "selection": [
+    11
+   ],
+   "market_odds": 22.1,
+   "q": 0.03598,
+   "p": 0.063177,
+   "expected_value": 0.3962
+  },
+  {
+   "type": "単勝",
+   "selection": [
+    15
+   ],
+   "market_odds": 15.5,
+   "q": 0.051301,
+   "p": 0.070783,
+   "expected_value": 0.0971
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    1,
+    7
+   ],
+   "market_odds": 432.7,
+   "q": 0.001788,
+   "p": 0.002373,
+   "expected_value": 0.0268
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    1,
+    11
+   ],
+   "market_odds": 561.4,
+   "q": 0.001378,
+   "p": 0.002324,
+   "expected_value": 0.3045
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    1,
+    15
+   ],
+   "market_odds": 413.2,
+   "q": 0.001872,
+   "p": 0.002462,
+   "expected_value": 0.0173
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    2,
+    4
+   ],
+   "market_odds": 191.8,
+   "q": 0.004033,
+   "p": 0.005222,
+   "expected_value": 0.0015
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    2,
+    7
+   ],
+   "market_odds": 309.6,
+   "q": 0.002499,
+   "p": 0.003815,
+   "expected_value": 0.181
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    2,
+    11
+   ],
+   "market_odds": 237.1,
+   "q": 0.003263,
+   "p": 0.006327,
+   "expected_value": 0.5
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    2,
+    15
+   ],
+   "market_odds": 142.9,
+   "q": 0.005414,
+   "p": 0.008187,
+   "expected_value": 0.1699
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    3,
+    7
+   ],
+   "market_odds": 279.5,
+   "q": 0.002768,
+   "p": 0.003888,
+   "expected_value": 0.0866
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    3,
+    11
+   ],
+   "market_odds": 260.5,
+   "q": 0.00297,
+   "p": 0.005298,
+   "expected_value": 0.3802
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    3,
+    15
+   ],
+   "market_odds": 165.4,
+   "q": 0.004677,
+   "p": 0.006508,
+   "expected_value": 0.0764
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    4,
+    7
+   ],
+   "market_odds": 416.8,
+   "q": 0.001856,
+   "p": 0.002875,
+   "expected_value": 0.1981
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    4,
+    11
+   ],
+   "market_odds": 320.4,
+   "q": 0.002415,
+   "p": 0.00475,
+   "expected_value": 0.5219
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    4,
+    15
+   ],
+   "market_odds": 257.4,
+   "q": 0.003005,
+   "p": 0.004611,
+   "expected_value": 0.1869
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    5,
+    11
+   ],
+   "market_odds": 150.4,
+   "q": 0.005144,
+   "p": 0.007102,
+   "expected_value": 0.0682
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    6,
+    7
+   ],
+   "market_odds": 73.8,
+   "q": 0.010483,
+   "p": 0.013988,
+   "expected_value": 0.0323
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    6,
+    11
+   ],
+   "market_odds": 37.8,
+   "q": 0.020466,
+   "p": 0.034647,
+   "expected_value": 0.3097
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    6,
+    15
+   ],
+   "market_odds": 20.0,
+   "q": 0.038681,
+   "p": 0.051101,
+   "expected_value": 0.022
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    7,
+    11
+   ],
+   "market_odds": 357.2,
+   "q": 0.002166,
+   "p": 0.005025,
+   "expected_value": 0.7948
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    7,
+    15
+   ],
+   "market_odds": 291.3,
+   "q": 0.002656,
+   "p": 0.004805,
+   "expected_value": 0.3996
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    8,
+    11
+   ],
+   "market_odds": 455.2,
+   "q": 0.0017,
+   "p": 0.00265,
+   "expected_value": 0.2065
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    9,
+    11
+   ],
+   "market_odds": 921.4,
+   "q": 0.00084,
+   "p": 0.001291,
+   "expected_value": 0.1897
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    10,
+    11
+   ],
+   "market_odds": 61.2,
+   "q": 0.012641,
+   "p": 0.020457,
+   "expected_value": 0.2519
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    11,
+    12
+   ],
+   "market_odds": 108.2,
+   "q": 0.00715,
+   "p": 0.011232,
+   "expected_value": 0.2153
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    11,
+    15
+   ],
+   "market_odds": 184.9,
+   "q": 0.004184,
+   "p": 0.009611,
+   "expected_value": 0.7771
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    11,
+    16
+   ],
+   "market_odds": 134.5,
+   "q": 0.005752,
+   "p": 0.008342,
+   "expected_value": 0.1221
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    1,
+    11
+   ],
+   "market_odds": 1092.7,
+   "q": 0.000685,
+   "p": 0.001139,
+   "expected_value": 0.2441
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    2,
+    7
+   ],
+   "market_odds": 883.2,
+   "q": 0.000848,
+   "p": 0.001299,
+   "expected_value": 0.1471
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    2,
+    11
+   ],
+   "market_odds": 415.9,
+   "q": 0.001801,
+   "p": 0.003453,
+   "expected_value": 0.4359
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    2,
+    15
+   ],
+   "market_odds": 280.3,
+   "q": 0.002672,
+   "p": 0.004026,
+   "expected_value": 0.1284
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    3,
+    7
+   ],
+   "market_odds": 708.5,
+   "q": 0.001057,
+   "p": 0.001486,
+   "expected_value": 0.053
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    3,
+    11
+   ],
+   "market_odds": 570.5,
+   "q": 0.001313,
+   "p": 0.00231,
+   "expected_value": 0.3181
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    3,
+    15
+   ],
+   "market_odds": 272.0,
+   "q": 0.002754,
+   "p": 0.003808,
+   "expected_value": 0.0358
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    4,
+    7
+   ],
+   "market_odds": 1092.7,
+   "q": 0.000685,
+   "p": 0.001065,
+   "expected_value": 0.1632
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    4,
+    11
+   ],
+   "market_odds": 732.6,
+   "q": 0.001022,
+   "p": 0.001988,
+   "expected_value": 0.4561
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    4,
+    15
+   ],
+   "market_odds": 625.9,
+   "q": 0.001197,
+   "p": 0.001828,
+   "expected_value": 0.1442
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    5,
+    11
+   ],
+   "market_odds": 247.0,
+   "q": 0.003033,
+   "p": 0.004091,
+   "expected_value": 0.0104
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    6,
+    11
+   ],
+   "market_odds": 58.0,
+   "q": 0.012915,
+   "p": 0.021575,
+   "expected_value": 0.2513
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    1
+   ],
+   "market_odds": 1151.3,
+   "q": 0.000651,
+   "p": 0.00087,
+   "expected_value": 0.0022
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    2
+   ],
+   "market_odds": 1039.8,
+   "q": 0.00072,
+   "p": 0.001105,
+   "expected_value": 0.1487
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    3
+   ],
+   "market_odds": 1007.4,
+   "q": 0.000744,
+   "p": 0.001052,
+   "expected_value": 0.0593
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    4
+   ],
+   "market_odds": 1074.5,
+   "q": 0.000697,
+   "p": 0.001085,
+   "expected_value": 0.1659
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    6
+   ],
+   "market_odds": 238.7,
+   "q": 0.003138,
+   "p": 0.004222,
+   "expected_value": 0.0079
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    11
+   ],
+   "market_odds": 741.0,
+   "q": 0.001011,
+   "p": 0.00232,
+   "expected_value": 0.719
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    7,
+    15
+   ],
+   "market_odds": 1111.6,
+   "q": 0.000674,
+   "p": 0.001215,
+   "expected_value": 0.3508
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    8,
+    11
+   ],
+   "market_odds": 1039.8,
+   "q": 0.00072,
+   "p": 0.001105,
+   "expected_value": 0.1494
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    9,
+    11
+   ],
+   "market_odds": 2014.8,
+   "q": 0.000372,
+   "p": 0.000563,
+   "expected_value": 0.1341
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    10,
+    11
+   ],
+   "market_odds": 110.5,
+   "q": 0.006779,
+   "p": 0.010783,
+   "expected_value": 0.1915
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    1
+   ],
+   "market_odds": 883.2,
+   "q": 0.000848,
+   "p": 0.001462,
+   "expected_value": 0.2911
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    2
+   ],
+   "market_odds": 386.0,
+   "q": 0.001941,
+   "p": 0.003834,
+   "expected_value": 0.4798
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    3
+   ],
+   "market_odds": 519.9,
+   "q": 0.001441,
+   "p": 0.002625,
+   "expected_value": 0.3647
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    4
+   ],
+   "market_odds": 608.2,
+   "q": 0.001232,
+   "p": 0.00247,
+   "expected_value": 0.502
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    5
+   ],
+   "market_odds": 286.5,
+   "q": 0.002614,
+   "p": 0.003725,
+   "expected_value": 0.0673
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    6
+   ],
+   "market_odds": 100.5,
+   "q": 0.007453,
+   "p": 0.01292,
+   "expected_value": 0.2985
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    7
+   ],
+   "market_odds": 432.7,
+   "q": 0.001731,
+   "p": 0.004089,
+   "expected_value": 0.7691
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    8
+   ],
+   "market_odds": 716.3,
+   "q": 0.001046,
+   "p": 0.001669,
+   "expected_value": 0.1953
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    9
+   ],
+   "market_odds": 1216.4,
+   "q": 0.000616,
+   "p": 0.000968,
+   "expected_value": 0.1776
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    10
+   ],
+   "market_odds": 156.8,
+   "q": 0.004777,
+   "p": 0.007938,
+   "expected_value": 0.2447
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    12
+   ],
+   "market_odds": 198.3,
+   "q": 0.003777,
+   "p": 0.006086,
+   "expected_value": 0.2068
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    15
+   ],
+   "market_odds": 257.8,
+   "q": 0.002906,
+   "p": 0.00675,
+   "expected_value": 0.7402
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    11,
+    16
+   ],
+   "market_odds": 301.2,
+   "q": 0.002487,
+   "p": 0.003718,
+   "expected_value": 0.1198
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    12,
+    11
+   ],
+   "market_odds": 167.9,
+   "q": 0.004461,
+   "p": 0.006887,
+   "expected_value": 0.1563
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    15,
+    2
+   ],
+   "market_odds": 264.2,
+   "q": 0.002835,
+   "p": 0.004336,
+   "expected_value": 0.1456
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    15,
+    3
+   ],
+   "market_odds": 279.1,
+   "q": 0.002684,
+   "p": 0.003785,
+   "expected_value": 0.0564
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    15,
+    4
+   ],
+   "market_odds": 608.2,
+   "q": 0.001232,
+   "p": 0.001912,
+   "expected_value": 0.1627
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    15,
+    6
+   ],
+   "market_odds": 54.5,
+   "q": 0.013744,
+   "p": 0.018444,
+   "expected_value": 0.0052
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    15,
+    7
+   ],
+   "market_odds": 826.5,
+   "q": 0.000906,
+   "p": 0.001657,
+   "expected_value": 0.3696
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    15,
+    11
+   ],
+   "market_odds": 286.5,
+   "q": 0.002614,
+   "p": 0.005984,
+   "expected_value": 0.7144
+  },
+  {
+   "type": "馬単",
+   "selection": [
+    16,
+    11
+   ],
+   "market_odds": 247.0,
+   "q": 0.003033,
+   "p": 0.004303,
+   "expected_value": 0.0629
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    1,
+    11
+   ],
+   "market_odds": 103.1,
+   "q": 0.007207,
+   "p": 0.011822,
+   "expected_value": 0.2188
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    2,
+    7
+   ],
+   "market_odds": 59.2,
+   "q": 0.012552,
+   "p": 0.018861,
+   "expected_value": 0.1166
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    2,
+    11
+   ],
+   "market_odds": 47.8,
+   "q": 0.015545,
+   "p": 0.029188,
+   "expected_value": 0.3952
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    2,
+    15
+   ],
+   "market_odds": 35.5,
+   "q": 0.020931,
+   "p": 0.030895,
+   "expected_value": 0.0968
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    3,
+    7
+   ],
+   "market_odds": 73.2,
+   "q": 0.010151,
+   "p": 0.014066,
+   "expected_value": 0.0296
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    3,
+    11
+   ],
+   "market_odds": 57.7,
+   "q": 0.012878,
+   "p": 0.022308,
+   "expected_value": 0.2872
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    3,
+    15
+   ],
+   "market_odds": 40.0,
+   "q": 0.018576,
+   "p": 0.025294,
+   "expected_value": 0.0117
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    4,
+    7
+   ],
+   "market_odds": 89.2,
+   "q": 0.00833,
+   "p": 0.012707,
+   "expected_value": 0.1335
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    4,
+    11
+   ],
+   "market_odds": 70.1,
+   "q": 0.0106,
+   "p": 0.020213,
+   "expected_value": 0.4169
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    4,
+    15
+   ],
+   "market_odds": 65.9,
+   "q": 0.011275,
+   "p": 0.016899,
+   "expected_value": 0.1136
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    5,
+    11
+   ],
+   "market_odds": 36.3,
+   "q": 0.02047,
+   "p": 0.027713,
+   "expected_value": 0.006
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    6,
+    11
+   ],
+   "market_odds": 13.7,
+   "q": 0.054237,
+   "p": 0.088449,
+   "expected_value": 0.2118
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    7,
+    11
+   ],
+   "market_odds": 71.0,
+   "q": 0.010465,
+   "p": 0.023523,
+   "expected_value": 0.6702
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    7,
+    15
+   ],
+   "market_odds": 64.4,
+   "q": 0.011538,
+   "p": 0.020379,
+   "expected_value": 0.3124
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    8,
+    11
+   ],
+   "market_odds": 86.2,
+   "q": 0.00862,
+   "p": 0.013089,
+   "expected_value": 0.1283
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    9,
+    11
+   ],
+   "market_odds": 171.9,
+   "q": 0.004323,
+   "p": 0.006472,
+   "expected_value": 0.1125
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    10,
+    11
+   ],
+   "market_odds": 15.9,
+   "q": 0.046733,
+   "p": 0.073546,
+   "expected_value": 0.1694
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    11,
+    12
+   ],
+   "market_odds": 29.1,
+   "q": 0.025534,
+   "p": 0.039069,
+   "expected_value": 0.1369
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    11,
+    15
+   ],
+   "market_odds": 41.8,
+   "q": 0.017776,
+   "p": 0.039161,
+   "expected_value": 0.6369
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    11,
+    16
+   ],
+   "market_odds": 35.3,
+   "q": 0.02105,
+   "p": 0.029887,
+   "expected_value": 0.055
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    2,
+    7
+   ],
+   "market_odds": 918.2,
+   "q": 0.000816,
+   "p": 0.001217,
+   "expected_value": 0.1179
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    2,
+    11
+   ],
+   "market_odds": 2999.5,
+   "q": 0.00025,
+   "p": 0.000481,
+   "expected_value": 0.4428
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    2,
+    15
+   ],
+   "market_odds": 2499.6,
+   "q": 0.0003,
+   "p": 0.000446,
+   "expected_value": 0.116
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    3,
+    7
+   ],
+   "market_odds": 1150.4,
+   "q": 0.000651,
+   "p": 0.000892,
+   "expected_value": 0.026
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    3,
+    11
+   ],
+   "market_odds": 3139.1,
+   "q": 0.000239,
+   "p": 0.000422,
+   "expected_value": 0.3241
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    3,
+    15
+   ],
+   "market_odds": 3820.2,
+   "q": 0.000196,
+   "p": 0.000268,
+   "expected_value": 0.0243
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    4,
+    7
+   ],
+   "market_odds": 1824.0,
+   "q": 0.000411,
+   "p": 0.000621,
+   "expected_value": 0.1335
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    4,
+    11
+   ],
+   "market_odds": 4449.9,
+   "q": 0.000168,
+   "p": 0.000329,
+   "expected_value": 0.4629
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    4,
+    15
+   ],
+   "market_odds": 3319.2,
+   "q": 0.000226,
+   "p": 0.000341,
+   "expected_value": 0.1316
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    5,
+    11
+   ],
+   "market_odds": 1545.5,
+   "q": 0.000485,
+   "p": 0.000656,
+   "expected_value": 0.0138
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    6,
+    11
+   ],
+   "market_odds": 571.9,
+   "q": 0.00131,
+   "p": 0.0022,
+   "expected_value": 0.2581
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    7,
+    11
+   ],
+   "market_odds": 2515.1,
+   "q": 0.000298,
+   "p": 0.000687,
+   "expected_value": 0.7269
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    7,
+    15
+   ],
+   "market_odds": 3346.6,
+   "q": 0.000224,
+   "p": 0.000399,
+   "expected_value": 0.3359
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    8,
+    11
+   ],
+   "market_odds": 2664.1,
+   "q": 0.000281,
+   "p": 0.000433,
+   "expected_value": 0.1544
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    9,
+    11
+   ],
+   "market_odds": 6531.3,
+   "q": 0.000115,
+   "p": 0.000174,
+   "expected_value": 0.1391
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    10,
+    11
+   ],
+   "market_odds": 941.7,
+   "q": 0.000796,
+   "p": 0.001271,
+   "expected_value": 0.1965
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    11,
+    12
+   ],
+   "market_odds": 1680.2,
+   "q": 0.000446,
+   "p": 0.000691,
+   "expected_value": 0.1612
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    11,
+    15
+   ],
+   "market_odds": 2681.7,
+   "q": 0.000279,
+   "p": 0.000643,
+   "expected_value": 0.7243
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    1,
+    11,
+    16
+   ],
+   "market_odds": 1723.1,
+   "q": 0.000435,
+   "p": 0.000619,
+   "expected_value": 0.0666
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    3,
+    4
+   ],
+   "market_odds": 580.1,
+   "q": 0.001292,
+   "p": 0.00173,
+   "expected_value": 0.0034
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    3,
+    7
+   ],
+   "market_odds": 1051.8,
+   "q": 0.000712,
+   "p": 0.001126,
+   "expected_value": 0.1845
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    3,
+    11
+   ],
+   "market_odds": 1180.5,
+   "q": 0.000635,
+   "p": 0.001295,
+   "expected_value": 0.5288
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    3,
+    15
+   ],
+   "market_odds": 948.3,
+   "q": 0.00079,
+   "p": 0.001247,
+   "expected_value": 0.1826
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    4,
+    7
+   ],
+   "market_odds": 1575.6,
+   "q": 0.000476,
+   "p": 0.000831,
+   "expected_value": 0.3087
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    4,
+    11
+   ],
+   "market_odds": 1156.9,
+   "q": 0.000648,
+   "p": 0.00146,
+   "expected_value": 0.689
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    4,
+    15
+   ],
+   "market_odds": 1639.4,
+   "q": 0.000457,
+   "p": 0.000797,
+   "expected_value": 0.3065
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    5,
+    11
+   ],
+   "market_odds": 567.1,
+   "q": 0.001321,
+   "p": 0.002064,
+   "expected_value": 0.1705
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    6,
+    7
+   ],
+   "market_odds": 292.5,
+   "q": 0.002561,
+   "p": 0.003845,
+   "expected_value": 0.1247
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    6,
+    11
+   ],
+   "market_odds": 183.3,
+   "q": 0.004087,
+   "p": 0.007924,
+   "expected_value": 0.4524
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    6,
+    15
+   ],
+   "market_odds": 107.2,
+   "q": 0.006989,
+   "p": 0.010477,
+   "expected_value": 0.1231
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    7,
+    8
+   ],
+   "market_odds": 1701.4,
+   "q": 0.00044,
+   "p": 0.000607,
+   "expected_value": 0.0327
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    7,
+    9
+   ],
+   "market_odds": 2851.7,
+   "q": 0.000263,
+   "p": 0.000357,
+   "expected_value": 0.019
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    7,
+    10
+   ],
+   "market_odds": 681.7,
+   "q": 0.001099,
+   "p": 0.00157,
+   "expected_value": 0.07
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    7,
+    11
+   ],
+   "market_odds": 2287.8,
+   "q": 0.000327,
+   "p": 0.000872,
+   "expected_value": 0.9939
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    7,
+    12
+   ],
+   "market_odds": 971.0,
+   "q": 0.000772,
+   "p": 0.00107,
+   "expected_value": 0.0387
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    7,
+    15
+   ],
+   "market_odds": 1137.4,
+   "q": 0.000659,
+   "p": 0.001356,
+   "expected_value": 0.5423
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    8,
+    11
+   ],
+   "market_odds": 2142.5,
+   "q": 0.00035,
+   "p": 0.000622,
+   "expected_value": 0.3329
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    8,
+    15
+   ],
+   "market_odds": 1420.8,
+   "q": 0.000527,
+   "p": 0.000726,
+   "expected_value": 0.031
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    9,
+    11
+   ],
+   "market_odds": 4307.9,
+   "q": 0.000174,
+   "p": 0.000305,
+   "expected_value": 0.3152
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    9,
+    15
+   ],
+   "market_odds": 8098.9,
+   "q": 9.3e-05,
+   "p": 0.000126,
+   "expected_value": 0.0174
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    10,
+    11
+   ],
+   "market_odds": 325.7,
+   "q": 0.0023,
+   "p": 0.004241,
+   "expected_value": 0.3813
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    10,
+    15
+   ],
+   "market_odds": 209.4,
+   "q": 0.003578,
+   "p": 0.005102,
+   "expected_value": 0.0683
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    11,
+    12
+   ],
+   "market_odds": 699.3,
+   "q": 0.001071,
+   "p": 0.001917,
+   "expected_value": 0.3406
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    11,
+    14
+   ],
+   "market_odds": 10944.4,
+   "q": 6.8e-05,
+   "p": 9.2e-05,
+   "expected_value": 0.0121
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    11,
+    15
+   ],
+   "market_odds": 777.2,
+   "q": 0.000964,
+   "p": 0.002562,
+   "expected_value": 0.9908
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    11,
+    16
+   ],
+   "market_odds": 737.6,
+   "q": 0.001016,
+   "p": 0.001669,
+   "expected_value": 0.2314
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    2,
+    12,
+    15
+   ],
+   "market_odds": 365.4,
+   "q": 0.00205,
+   "p": 0.002838,
+   "expected_value": 0.037
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    4,
+    7
+   ],
+   "market_odds": 1768.3,
+   "q": 0.000424,
+   "p": 0.000679,
+   "expected_value": 0.2011
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    4,
+    11
+   ],
+   "market_odds": 1815.8,
+   "q": 0.000413,
+   "p": 0.000854,
+   "expected_value": 0.5501
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    4,
+    15
+   ],
+   "market_odds": 1799.7,
+   "q": 0.000416,
+   "p": 0.000666,
+   "expected_value": 0.1991
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    5,
+    11
+   ],
+   "market_odds": 784.7,
+   "q": 0.000955,
+   "p": 0.001369,
+   "expected_value": 0.0742
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    6,
+    7
+   ],
+   "market_odds": 443.5,
+   "q": 0.001689,
+   "p": 0.002327,
+   "expected_value": 0.0321
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    6,
+    11
+   ],
+   "market_odds": 226.9,
+   "q": 0.003302,
+   "p": 0.005875,
+   "expected_value": 0.333
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    6,
+    15
+   ],
+   "market_odds": 143.9,
+   "q": 0.005207,
+   "p": 0.007163,
+   "expected_value": 0.0308
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    7,
+    11
+   ],
+   "market_odds": 2484.3,
+   "q": 0.000302,
+   "p": 0.000737,
+   "expected_value": 0.8299
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    7,
+    15
+   ],
+   "market_odds": 2274.9,
+   "q": 0.000329,
+   "p": 0.000622,
+   "expected_value": 0.4155
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    8,
+    11
+   ],
+   "market_odds": 2313.9,
+   "q": 0.000324,
+   "p": 0.000529,
+   "expected_value": 0.2233
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    9,
+    11
+   ],
+   "market_odds": 5328.2,
+   "q": 0.000141,
+   "p": 0.000227,
+   "expected_value": 0.207
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    10,
+    11
+   ],
+   "market_odds": 391.6,
+   "q": 0.001913,
+   "p": 0.003237,
+   "expected_value": 0.2677
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    11,
+    12
+   ],
+   "market_odds": 762.6,
+   "q": 0.000982,
+   "p": 0.001613,
+   "expected_value": 0.2304
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    11,
+    15
+   ],
+   "market_odds": 1163.6,
+   "q": 0.000644,
+   "p": 0.00157,
+   "expected_value": 0.8271
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    3,
+    11,
+    16
+   ],
+   "market_odds": 798.7,
+   "q": 0.000938,
+   "p": 0.001415,
+   "expected_value": 0.1302
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    5,
+    11
+   ],
+   "market_odds": 1415.8,
+   "q": 0.000529,
+   "p": 0.000838,
+   "expected_value": 0.1869
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    6,
+    7
+   ],
+   "market_odds": 755.4,
+   "q": 0.000992,
+   "p": 0.00151,
+   "expected_value": 0.1404
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    6,
+    11
+   ],
+   "market_odds": 378.8,
+   "q": 0.001978,
+   "p": 0.003888,
+   "expected_value": 0.4728
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    6,
+    15
+   ],
+   "market_odds": 260.2,
+   "q": 0.002879,
+   "p": 0.004377,
+   "expected_value": 0.1389
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    7,
+    8
+   ],
+   "market_odds": 3067.7,
+   "q": 0.000244,
+   "p": 0.000341,
+   "expected_value": 0.0472
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    7,
+    9
+   ],
+   "market_odds": 5472.2,
+   "q": 0.000137,
+   "p": 0.000189,
+   "expected_value": 0.0333
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    7,
+    10
+   ],
+   "market_odds": 1088.5,
+   "q": 0.000688,
+   "p": 0.000997,
+   "expected_value": 0.085
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    7,
+    11
+   ],
+   "market_odds": 2664.1,
+   "q": 0.000281,
+   "p": 0.000759,
+   "expected_value": 1.0217
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    7,
+    12
+   ],
+   "market_odds": 2034.9,
+   "q": 0.000368,
+   "p": 0.000518,
+   "expected_value": 0.0532
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    7,
+    15
+   ],
+   "market_odds": 3648.1,
+   "q": 0.000205,
+   "p": 0.000429,
+   "expected_value": 0.5639
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    8,
+    11
+   ],
+   "market_odds": 4132.0,
+   "q": 0.000181,
+   "p": 0.000327,
+   "expected_value": 0.3515
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    8,
+    15
+   ],
+   "market_odds": 2773.5,
+   "q": 0.00027,
+   "p": 0.000377,
+   "expected_value": 0.0454
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    9,
+    11
+   ],
+   "market_odds": 5868.7,
+   "q": 0.000128,
+   "p": 0.000227,
+   "expected_value": 0.3335
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    9,
+    15
+   ],
+   "market_odds": 13062.7,
+   "q": 5.7e-05,
+   "p": 7.9e-05,
+   "expected_value": 0.0316
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    10,
+    11
+   ],
+   "market_odds": 560.8,
+   "q": 0.001336,
+   "p": 0.002498,
+   "expected_value": 0.4006
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    10,
+    15
+   ],
+   "market_odds": 424.9,
+   "q": 0.001763,
+   "p": 0.002549,
+   "expected_value": 0.0833
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    11,
+    12
+   ],
+   "market_odds": 1150.4,
+   "q": 0.000651,
+   "p": 0.001182,
+   "expected_value": 0.3593
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    11,
+    14
+   ],
+   "market_odds": 9876.7,
+   "q": 7.6e-05,
+   "p": 0.000104,
+   "expected_value": 0.0262
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    11,
+    15
+   ],
+   "market_odds": 1533.8,
+   "q": 0.000488,
+   "p": 0.001316,
+   "expected_value": 1.0186
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    11,
+    16
+   ],
+   "market_odds": 994.9,
+   "q": 0.000753,
+   "p": 0.001255,
+   "expected_value": 0.2486
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    4,
+    12,
+    15
+   ],
+   "market_odds": 669.3,
+   "q": 0.001119,
+   "p": 0.001571,
+   "expected_value": 0.0515
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    5,
+    6,
+    11
+   ],
+   "market_odds": 103.3,
+   "q": 0.007253,
+   "p": 0.009873,
+   "expected_value": 0.0198
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    5,
+    7,
+    11
+   ],
+   "market_odds": 1694.3,
+   "q": 0.000442,
+   "p": 0.000827,
+   "expected_value": 0.4011
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    5,
+    7,
+    15
+   ],
+   "market_odds": 664.9,
+   "q": 0.001127,
+   "p": 0.00163,
+   "expected_value": 0.0837
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    5,
+    11,
+    15
+   ],
+   "market_odds": 459.1,
+   "q": 0.001632,
+   "p": 0.003047,
+   "expected_value": 0.3989
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    7,
+    11
+   ],
+   "market_odds": 465.9,
+   "q": 0.001608,
+   "p": 0.003732,
+   "expected_value": 0.7388
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    7,
+    15
+   ],
+   "market_odds": 301.7,
+   "q": 0.002483,
+   "p": 0.004456,
+   "expected_value": 0.3445
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    8,
+    11
+   ],
+   "market_odds": 531.4,
+   "q": 0.00141,
+   "p": 0.002187,
+   "expected_value": 0.1623
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    9,
+    11
+   ],
+   "market_odds": 1760.6,
+   "q": 0.000426,
+   "p": 0.000652,
+   "expected_value": 0.1471
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    10,
+    11
+   ],
+   "market_odds": 45.9,
+   "q": 0.016323,
+   "p": 0.026209,
+   "expected_value": 0.203
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    11,
+    12
+   ],
+   "market_odds": 94.6,
+   "q": 0.00792,
+   "p": 0.012351,
+   "expected_value": 0.1684
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    11,
+    15
+   ],
+   "market_odds": 150.9,
+   "q": 0.004965,
+   "p": 0.011504,
+   "expected_value": 0.7359
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    6,
+    11,
+    16
+   ],
+   "market_odds": 99.0,
+   "q": 0.007568,
+   "p": 0.010837,
+   "expected_value": 0.0728
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    8,
+    11
+   ],
+   "market_odds": 2892.4,
+   "q": 0.000259,
+   "p": 0.000552,
+   "expected_value": 0.5954
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    8,
+    15
+   ],
+   "market_odds": 2664.1,
+   "q": 0.000281,
+   "p": 0.000463,
+   "expected_value": 0.2341
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    9,
+    11
+   ],
+   "market_odds": 4938.3,
+   "q": 0.000152,
+   "p": 0.000319,
+   "expected_value": 0.5742
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    9,
+    15
+   ],
+   "market_odds": 7940.1,
+   "q": 9.4e-05,
+   "p": 0.000153,
+   "expected_value": 0.2177
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    10,
+    11
+   ],
+   "market_odds": 841.8,
+   "q": 0.00089,
+   "p": 0.001964,
+   "expected_value": 0.6535
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    10,
+    15
+   ],
+   "market_odds": 571.9,
+   "q": 0.00131,
+   "p": 0.002236,
+   "expected_value": 0.2788
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    11,
+    12
+   ],
+   "market_odds": 1505.3,
+   "q": 0.000498,
+   "p": 0.001066,
+   "expected_value": 0.6047
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    11,
+    14
+   ],
+   "market_odds": 10383.2,
+   "q": 7.2e-05,
+   "p": 0.000117,
+   "expected_value": 0.2114
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    11,
+    15
+   ],
+   "market_odds": 1874.7,
+   "q": 0.0004,
+   "p": 0.001271,
+   "expected_value": 1.383
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    11,
+    16
+   ],
+   "market_odds": 1783.8,
+   "q": 0.00042,
+   "p": 0.000826,
+   "expected_value": 0.474
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    12,
+    15
+   ],
+   "market_odds": 612.6,
+   "q": 0.001223,
+   "p": 0.002026,
+   "expected_value": 0.2412
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    7,
+    15,
+    16
+   ],
+   "market_odds": 952.8,
+   "q": 0.000786,
+   "p": 0.001197,
+   "expected_value": 0.1402
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    8,
+    9,
+    11
+   ],
+   "market_odds": 7940.1,
+   "q": 9.4e-05,
+   "p": 0.000133,
+   "expected_value": 0.0523
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    8,
+    10,
+    11
+   ],
+   "market_odds": 768.3,
+   "q": 0.000975,
+   "p": 0.001439,
+   "expected_value": 0.1053
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    8,
+    11,
+    12
+   ],
+   "market_odds": 1372.6,
+   "q": 0.000546,
+   "p": 0.000782,
+   "expected_value": 0.0727
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    8,
+    11,
+    15
+   ],
+   "market_odds": 2087.3,
+   "q": 0.000359,
+   "p": 0.000763,
+   "expected_value": 0.593
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    9,
+    10,
+    11
+   ],
+   "market_odds": 2562.9,
+   "q": 0.000292,
+   "p": 0.000426,
+   "expected_value": 0.0908
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    9,
+    11,
+    12
+   ],
+   "market_odds": 4307.9,
+   "q": 0.000174,
+   "p": 0.000246,
+   "expected_value": 0.0585
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    9,
+    11,
+    15
+   ],
+   "market_odds": 5703.4,
+   "q": 0.000131,
+   "p": 0.000276,
+   "expected_value": 0.5719
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    10,
+    11,
+    12
+   ],
+   "market_odds": 141.4,
+   "q": 0.005299,
+   "p": 0.00786,
+   "expected_value": 0.1114
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    10,
+    11,
+    15
+   ],
+   "market_odds": 253.8,
+   "q": 0.002952,
+   "p": 0.006504,
+   "expected_value": 0.6507
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    10,
+    11,
+    16
+   ],
+   "market_odds": 168.0,
+   "q": 0.00446,
+   "p": 0.006076,
+   "expected_value": 0.0207
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    11,
+    12,
+    15
+   ],
+   "market_odds": 461.7,
+   "q": 0.001623,
+   "p": 0.00347,
+   "expected_value": 0.6022
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    11,
+    14,
+    15
+   ],
+   "market_odds": 5061.8,
+   "q": 0.000148,
+   "p": 0.000239,
+   "expected_value": 0.2097
+  },
+  {
+   "type": "三連複",
+   "selection": [
+    11,
+    15,
+    16
+   ],
+   "market_odds": 429.4,
+   "q": 0.001745,
+   "p": 0.003427,
+   "expected_value": 0.4717
+  }
+ ],
+ "bets": [
+  {
+   "type": "ワイド",
+   "selection": [
+    7,
+    11
+   ],
+   "stake_yen": 100,
+   "market_odds": 71.0,
+   "model_prob": 0.02352,
+   "q": 0.01047,
+   "expected_value": 0.6702,
+   "reason": "p=0.024・q=0.010・期待値+0.67。ドゥアムールは朱雀S（3勝）4着の実績はあるが、近2走は大敗／カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）"
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    11,
+    15
+   ],
+   "stake_yen": 200,
+   "market_odds": 41.8,
+   "model_prob": 0.03916,
+   "q": 0.01778,
+   "expected_value": 0.6369,
+   "reason": "p=0.039・q=0.018・期待値+0.64。カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）／メルトユアハートは夏の3勝クラスで2着2回（0.1・0.3差）"
+  },
+  {
+   "type": "単勝",
+   "selection": [
+    11
+   ],
+   "stake_yen": 200,
+   "market_odds": 22.1,
+   "model_prob": 0.06318,
+   "q": 0.03598,
+   "expected_value": 0.3962,
+   "reason": "p=0.063・q=0.036・期待値+0.40。カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）"
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    2,
+    11
+   ],
+   "stake_yen": 100,
+   "market_odds": 47.8,
+   "model_prob": 0.02919,
+   "q": 0.01554,
+   "expected_value": 0.3952,
+   "reason": "p=0.029・q=0.016・期待値+0.40。スマイルアップは福島芝1200の会津S（3勝）3着0.2差／カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）"
+  },
+  {
+   "type": "馬連",
+   "selection": [
+    6,
+    11
+   ],
+   "stake_yen": 100,
+   "market_odds": 37.8,
+   "model_prob": 0.03465,
+   "q": 0.02047,
+   "expected_value": 0.3097,
+   "reason": "p=0.035・q=0.020・期待値+0.31。カーヌスティは6-2-1-7／カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）"
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    6,
+    11
+   ],
+   "stake_yen": 200,
+   "market_odds": 13.7,
+   "model_prob": 0.08845,
+   "q": 0.05424,
+   "expected_value": 0.2118,
+   "reason": "p=0.088・q=0.054・期待値+0.21。カーヌスティは6-2-1-7／カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）"
+  },
+  {
+   "type": "ワイド",
+   "selection": [
+    10,
+    11
+   ],
+   "stake_yen": 100,
+   "market_odds": 15.9,
+   "model_prob": 0.07355,
+   "q": 0.04673,
+   "expected_value": 0.1694,
+   "reason": "p=0.074・q=0.047・期待値+0.17。アサクサグレースは前走道頓堀S（3勝）3着0.3差／カウンターセブンは福島芝1200の安達太良S（OP）3着0.4差（評価94）"
+  },
+  {
+   "type": "単勝",
+   "selection": [
+    15
+   ],
+   "stake_yen": 100,
+   "market_odds": 15.5,
+   "model_prob": 0.07078,
+   "q": 0.0513,
+   "expected_value": 0.0971,
+   "reason": "p=0.071・q=0.051・期待値+0.10。メルトユアハートは夏の3勝クラスで2着2回（0.1・0.3差）"
+  }
+ ],
+ "total_stake_yen": 1100,
+ "expected_profit_yen": 413.1,
+ "skip_reason": null
+}
