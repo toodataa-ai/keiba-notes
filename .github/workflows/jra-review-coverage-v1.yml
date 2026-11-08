@@ -1,0 +1,32 @@
+name: Check JRA review coverage including no-bet races
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/data/races.json'
+      - 'e2e_validation/results/**'
+      - '.github/scripts/jra-review-coverage-v1.py'
+      - '.github/scripts/test-jra-review-coverage-v1.py'
+      - '.github/workflows/jra-review-coverage-v1.yml'
+  pull_request:
+    paths:
+      - 'docs/data/races.json'
+      - 'e2e_validation/results/**'
+      - '.github/scripts/jra-review-coverage-v1.py'
+      - '.github/scripts/test-jra-review-coverage-v1.py'
+      - '.github/workflows/jra-review-coverage-v1.yml'
+  schedule:
+    - cron: '40 11 * * 6,0,1'
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  review-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Test no-bet review coverage
+        run: python3 .github/scripts/test-jra-review-coverage-v1.py
+      - name: Audit finalized official results against published reviews
+        run: python3 .github/scripts/jra-review-coverage-v1.py
