@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.43-20261108",
-  "current_public_version": "1.43",
+  "current_public_release": "release/jra-site-v1.44-20261109",
+  "current_public_version": "1.44",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -912,6 +912,27 @@
       "scope_files": [
         "docs/index.html",
         "docs/baba-bias.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.44-20261109",
+      "branch": "release/jra-site-v1.44-20261109",
+      "commit_sha": "d0b8f971102625215bea4f55a41dad77b170030d",
+      "deployed_at": "2026-11-09T06:03:56+09:00",
+      "workflow_run_id": 42523256470,
+      "validation_workflow_run_id": 42523256470,
+      "public_version": "1.44",
+      "note": "2026-11-09ユーザー明示承認済み。Claudeの成績をChatGPTと同じ表示に：過去の成績のClaudeタブを、ChatGPTタブと同じ部品（集計期間の選択・期間成績の並び・レース別カード・買い目ごとの的中/ハズレと払戻・反省会）で表示。今週のAI予想側の表示は変えず、キャッシュ更新用に版番号だけ上げる。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-results-same-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
