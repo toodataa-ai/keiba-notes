@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.40-20261108",
-  "current_public_version": "1.40",
+  "current_public_release": "release/jra-site-v1.41-20261108",
+  "current_public_version": "1.41",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -839,6 +839,37 @@
       "staging_identity_not_in_production": true,
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.41-20261108",
+      "branch": "release/jra-site-v1.41-20261108",
+      "commit_sha": "21a74db5ded0b8da4f27fb8e75180c88bd841cca",
+      "deployed_at": "2026-11-08T12:37:24+09:00",
+      "workflow_run_id": 42443484859,
+      "validation_workflow_run_id": 42443484859,
+      "public_version": "1.41",
+      "note": "2026-11-08ユーザー明示承認済み。黒い帯の下の灰色の線を、画面の端から端まで引く：枠線だと中身の幅で両端が切れて見えるため、画面幅いっぱいの線に変える。共通の見た目ファイルの変更で、黒い帯のある全ページに効く。ステージングでは、該当する11ページに適用して表示。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-nav-line-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/baba-bias.html",
+        "docs/collection-status.html",
+        "docs/improvement-cycle.html",
+        "docs/operations.html",
+        "docs/sire-map.html",
+        "docs/baba-models.html",
+        "docs/e2e.html",
+        "docs/experience-regime.html",
+        "docs/local-racing-shadow.html",
+        "docs/roadmap.html",
+        "docs/methodology.html",
+        "docs/assets/theme-light-v1.css"
       ],
       "public_http_files_verified": null
     }
