@@ -18,7 +18,8 @@
       var p = e.since.split('-'), days = Math.floor((today - Date.UTC(+p[0], +p[1] - 1, +p[2])) / 86400000);
       if (days < 0 || days >= NEW_DAYS) return;
       Array.prototype.forEach.call(document.querySelectorAll('a.portal-card'), function (a) {
-        if ((a.getAttribute('href') || '').split(/[?#]/)[0] !== e.href || a.querySelector('.new-badge')) return;
+        var h = (a.getAttribute('href') || '').split(/[?#]/)[0].split('/').pop(); /* ステージングでは staging/ が付くので、ページ名だけで比べる */
+        if (h !== e.href || a.querySelector('.new-badge')) return;
         if (getComputedStyle(a).position === 'static') a.style.position = 'relative';
         var b = document.createElement('span'); b.className = 'new-badge'; b.textContent = 'NEW'; b.setAttribute('aria-label', '新しく公開');
         a.appendChild(b);
