@@ -135,7 +135,20 @@ jobs:
           paths=['docs/staging/improvement-cycle.html','docs/staging/improvement-cycle.css','docs/data/jra_improvement_cycle_v1.json','docs/data/races.json','docs/data/e2e_status.json','docs/data/e2e_public.json','docs/data/jra_review_completion.json','docs/data/jra_postrace_audit_2026-10-11.json','docs/data/jra_postrace_audit_2026-10-12.json','docs/data/jra_postrace_audit_2026-10-17.json', 'docs/data/jra_postrace_audit_2026-10-18.json','docs/data/jra_postrace_audit_2026-10-24.json','docs/data/jra_postrace_audit_2026-10-25.json', 'docs/data/jra_postrace_audit_2026-10-31.json', 'docs/data/experience_regime_status.json']
           for r in reg['races']:
               if r['date'] >= '2026-10-10' and r['scope']=='jra-main' and r['status']=='reviewed':
-                  paths.extend(['docs/'+r['report'],'docs/'+r['pdf'],'docs/data/e2e-shadow/cases/'+r['id']+'/case.json','docs/data/e2e-shadow/results/'+r['id']+'.json'])
+                  # Every reviewed race must retain its originally published HTML/PDF.
+                  paths.extend(['docs/'+r['report'],'docs/'+r['pdf']])
+                  if r.get('purchase_decision') == 'pass':
+                      # A legitimate zero-ticket pass has no strict purchased-ticket Grade A case.
+                      # Verify the canonical no-bet settlement without inventing a purchase.
+                      perf = r.get('performance') or {}
+                      assert r.get('final_bets') == [] and r.get('settlements') == [], r['id']
+                      assert r.get('total_stake_yen') == 0 and perf.get('stake_yen') == 0, r['id']
+                      assert perf.get('payout_yen') == 0 and perf.get('roi_pct') is None, r['id']
+                      assert r.get('result') and r.get('review') and r.get('review_at'), r['id']
+                  else:
+                      # Purchased-ticket cases must have public immutable Grade A proof/results.
+                      paths.extend(['docs/data/e2e-shadow/cases/'+r['id']+'/case.json',
+                                    'docs/data/e2e-shadow/results/'+r['id']+'.json'])
           for p in paths:
               assert Path(p).is_file(),p
               print(p)
