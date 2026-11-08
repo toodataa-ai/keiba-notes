@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.42-20261108",
-  "current_public_version": "1.42",
+  "current_public_release": "release/jra-site-v1.43-20261108",
+  "current_public_version": "1.43",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -891,6 +891,27 @@
       "scope_files": [
         "docs/index.html",
         "docs/assets/new-badge-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.43-20261108",
+      "branch": "release/jra-site-v1.43-20261108",
+      "commit_sha": "7238795a085daf1dbdba601b7b2096add11b1382",
+      "deployed_at": "2026-11-08T14:36:15+09:00",
+      "workflow_run_id": 42451413617,
+      "validation_workflow_run_id": 42451413617,
+      "public_version": "1.43",
+      "note": "2026-11-08ユーザー明示承認済み。馬場傾向の説明文を、いまの運用（記録のみ）に合わせる：トップのカードと馬場傾向ページの「予想に使う」を、実際の運用（予想の参考に記録するだけ。印・勝率は変えない）に合わせて直す。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-baba-bias-wording-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/baba-bias.html"
       ],
       "public_http_files_verified": null
     }
