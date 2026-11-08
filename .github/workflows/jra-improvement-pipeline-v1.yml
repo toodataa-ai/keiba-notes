@@ -11,6 +11,7 @@ on:
       - 'docs/data/experience_regime_factor_evidence_status.json'
       - 'docs/data/predictors/claude_wakakoma_v1.json'
       - 'claude_track/reviews/**'
+      - 'claude_track/predictions/**'
   schedule:
     # 19:17 JST daily: 30 minutes after the experiment scoring job
     - cron: '17 10 * * *'
@@ -40,8 +41,9 @@ jobs:
           for i in 1 2 3 4 5; do
             git fetch -q origin main
             git reset -q --hard origin/main
+            python -m baba_bias_v1.research_status
             python e2e_validation/improvement_pipeline_v1.py
-            git add docs/data/jra_improvement_pipeline_v1.json
+            git add docs/data/jra_improvement_pipeline_v1.json docs/data/baba_bias/research_status_v1.json
             if git diff --cached --quiet; then echo 'No pipeline changes'; exit 0; fi
             git commit -q -m 'Update improvement pipeline status (derived, research only)'
             if git push origin HEAD:main; then exit 0; fi

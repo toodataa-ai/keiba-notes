@@ -613,6 +613,28 @@
       }
     },
     {
+      "id": "track_condition:prev_day_bias",
+      "theme": "track_condition",
+      "label": "前日の馬場傾向（前残り・速さ）",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.01,
+      "state": "research",
+      "text": "前日の傾向の記録 3/300レース（今週 +3）。過去データでの検証3回（全レース／脚質の予測を強めた／続く日に絞った）は、いずれも予想の当たり具合の改善が偶然と区別できませんでした。いまは記録のみで、印・勝率は変えません。",
+      "criteria_text": "前日の傾向で勝率を補正すると、過去データでも、Claude自身の予想でも、外れ具合の改善が偶然と区別できる（95%の幅が0より上）ようになったら、予想への反映を改善案として登録できます。いまは、過去データの検証3回とも改善が見えなかったため、記録のみです。",
+      "criteria_met": false,
+      "experiment_id": null,
+      "detail": {
+        "updated_at": "2026-11-08",
+        "weekly": [
+          {
+            "week": "2026-W45",
+            "races": 3
+          }
+        ]
+      }
+    },
+    {
       "id": "field_experience:sire_db",
       "theme": "field_experience",
       "label": "父データベース（データ集め）",
@@ -625,7 +647,8 @@
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "updated_at": "2026-11-07"
+        "updated_at": "2026-11-07",
+        "weekly": null
       }
     },
     {
@@ -641,7 +664,8 @@
       "criteria_met": false,
       "experiment_id": null,
       "detail": {
-        "updated_at": "2026-11-07"
+        "updated_at": "2026-11-07",
+        "weekly": null
       }
     },
     {

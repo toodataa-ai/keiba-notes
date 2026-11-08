@@ -33,6 +33,7 @@ def load(path: Path, default=None):
 
 CLAUDE_REVIEWS = ROOT / "claude_track/reviews"
 SIRE_RESEARCH = ROOT / "docs/data/sire_research_status_v1.json"
+BIAS_RESEARCH = ROOT / "docs/data/baba_bias/research_status_v1.json"
 # Claude の回顧の失敗分類（review_v1.md）→ 改善テーマ
 CLAUDE_FAILURE_TO_HYPOTHESIS = {"展開": "pace_positioning", "馬場予測": "track_condition", "購入戦略": "ticket_portfolio", "リスク集中": "ticket_portfolio"}
 
@@ -176,15 +177,18 @@ def build(policy, registry, status, cycle, baba, evidence, today=None):
             elif kind == "research_note":
                 # 若駒・新馬戦（父の血統データ）の研究。数字は sire_db_v1/research_status.py が書き出した集計だけを読む。
                 sr = load(SIRE_RESEARCH, {}) or {}
+                if u["key"] not in sr:
+                    sr = load(BIAS_RESEARCH, {}) or {}
                 item = sr.get(u["key"]) or {}
+                ckey = u.get("criteria", "sire_research")
                 exps = matching_experiments(u["id"], None, registry, status)
                 if exps:
                     s, f, t, eid = comparison_state(exps)
-                    finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, crit["sire_research"]["text"], True, eid))
+                    finish(unit_record(tid, u["id"], u["label"], s, f, "comparing" if s == 2 else "decided", t, crit[ckey]["text"], True, eid))
                 else:
                     frac = item.get("frac") or 0.0
                     finish(unit_record(tid, u["id"], u["label"], 0, frac, "research", item.get("text") or "データを確認中",
-                                       crit["sire_research"]["text"], False, None, {"updated_at": sr.get("updated_at")}))
+                                       crit[ckey]["text"], False, None, {"updated_at": sr.get("updated_at"), "weekly": item.get("weekly")}))
     updated = (baba or {}).get("updated_at")
     stale = None
     if updated:

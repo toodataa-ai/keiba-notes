@@ -119,6 +119,24 @@ class T(unittest.TestCase):
         self.assertEqual(h[8]["pos"], [8.0])
         self.assertEqual(len(core.horse_rows(r)), 8)
 
+    def test_research_status_counts_recorded_by_week(self):
+        import json, os, tempfile
+        from datetime import date
+        from baba_bias_v1 import research_status as rs
+        r = tempfile.mkdtemp()
+        def put(rid, doc):
+            os.makedirs(os.path.join(r, "claude_track", "predictions", rid), exist_ok=True)
+            json.dump(doc, open(os.path.join(r, "claude_track", "predictions", rid, "step1-x.json"), "w"))
+        put("2026-11-08-03-11", {"bias_used": {"speed_z": 0.1}})
+        put("2026-11-08-05-11", {"bias_used": None})      # 使わなかった（null）は数えない
+        put("2026-11-01-05-11", {"bias_used": {"speed_z": 0.2}})
+        w, total = rs.count_recorded(r)
+        self.assertEqual(total, 2)
+        self.assertEqual(w[rs.week_id(date(2026, 11, 8))], 1)
+        doc = rs.build(r, date(2026, 11, 8))["prev_day_bias"]
+        self.assertAlmostEqual(doc["frac"], 2 / rs.TARGET, places=3)
+        self.assertIn("今週 +1", doc["text"])
+
 
 if __name__ == "__main__":
     unittest.main()
