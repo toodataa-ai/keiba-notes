@@ -1,5 +1,18 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-jra-pass-review-v1",
+      "title": "JRA見送り回顧の表示修正",
+      "summary": "見送り回顧を的中・外れの母数に含めず、購入0円の回顧カードで『購入見送り』と表示。発走前予想は不変。",
+      "status": "awaiting_user_approval",
+      "pages": [
+        "results.html"
+      ],
+      "assets": [
+        "assets/results.js"
+      ]
+    }
+  ]
 }
