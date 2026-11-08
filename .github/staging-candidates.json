@@ -1,19 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-new-badge-v1",
-      "title": "新しく公開した入り口のボタンに「NEW」のワッペン",
-      "pages": [
-        "index.html"
-      ],
-      "assets": [
-        "assets/new-badge-v1.js"
-      ],
-      "status": "awaiting_user_approval",
-      "created_at": "2026-11-08",
-      "summary": "公開から7日間、トップの入り口のボタンの角に「NEW」を重ねて表示する。ボタンの大きさ・文字の並びは変えない。"
-    }
-  ]
+  "candidates": []
 }
