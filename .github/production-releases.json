@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.44-20261109",
-  "current_public_version": "1.44",
+  "current_public_release": "release/jra-site-v1.45-20261109",
+  "current_public_version": "1.45",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -933,6 +933,27 @@
       "scope_files": [
         "docs/this-week.html",
         "docs/assets/claude-view-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.45-20261109",
+      "branch": "release/jra-site-v1.45-20261109",
+      "commit_sha": "fd87495b7e153d175d5649357c62d420f2efc98d",
+      "deployed_at": "2026-11-09T06:51:46+09:00",
+      "workflow_run_id": 42527288872,
+      "validation_workflow_run_id": 42527288872,
+      "public_version": "1.45",
+      "note": "2026-11-09ユーザー明示承認済み。JRA見送り回顧の表示修正：見送り回顧を的中・外れの母数に含めず、購入0円の回顧カードで『購入見送り』と表示。発走前予想は不変。",
+      "user_approval_quote": "見送り表示も本番リリースOK",
+      "staging_candidate_id": "ui-jra-pass-review-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/results.html",
+        "docs/assets/results.js"
       ],
       "public_http_files_verified": null
     }
