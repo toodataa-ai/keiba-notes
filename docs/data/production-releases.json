@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.41-20261108",
-  "current_public_version": "1.41",
+  "current_public_release": "release/jra-site-v1.42-20261108",
+  "current_public_version": "1.42",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -870,6 +870,27 @@
         "docs/roadmap.html",
         "docs/methodology.html",
         "docs/assets/theme-light-v1.css"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.42-20261108",
+      "branch": "release/jra-site-v1.42-20261108",
+      "commit_sha": "1e20cfd910d7297d4e71b7644e8ab200e7b54738",
+      "deployed_at": "2026-11-08T12:38:29+09:00",
+      "workflow_run_id": 42443555478,
+      "validation_workflow_run_id": 42443555478,
+      "public_version": "1.42",
+      "note": "2026-11-08ユーザー明示承認済み。新しく公開した入り口のボタンに「NEW」のワッペン：公開から7日間、トップの入り口のボタンの角に「NEW」を重ねて表示する。ボタンの大きさ・文字の並びは変えない。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-new-badge-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/assets/new-badge-v1.js"
       ],
       "public_http_files_verified": null
     }
