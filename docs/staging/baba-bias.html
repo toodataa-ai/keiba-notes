@@ -41,7 +41,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/this-week.html">今週のAI予想</a></nav>
 
@@ -188,7 +188,7 @@ function show(date){
   Array.prototype.forEach.call(document.querySelectorAll('#bbDates button'),function(b){b.setAttribute('aria-pressed',b.getAttribute('data-d')===date?'true':'false')});
   var go=function(doc){
     var g=new Date(doc.generated_at),t=isNaN(g)?'':'（計算：'+(g.getMonth()+1)+'月'+g.getDate()+'日 '+('0'+g.getHours()).slice(-2)+':'+('0'+g.getMinutes()).slice(-2)+'）';
-    $('bbMeta').textContent=dl(date)+'の結果（全12レース）から。'+nxt(date)+'の予想に使います。'+t;
+    $('bbMeta').textContent=dl(date)+'の結果（全12レース）から。'+nxt(date)+'の予想の参考に記録します（いまは印・勝率は変えません）。'+t;
     draw(doc);table(doc);
   };
   if(cache[date])return go(cache[date]);
