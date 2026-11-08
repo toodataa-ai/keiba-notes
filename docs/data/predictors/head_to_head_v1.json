@@ -1,11 +1,11 @@
 {
  "schema_version": 1,
- "races": 2,
+ "races": 3,
  "claude": {
-  "stake_yen": 3600,
-  "payout_yen": 1340,
-  "profit_yen": -2260,
-  "roi": 0.37222222222222223,
+  "stake_yen": 4700,
+  "payout_yen": 4560,
+  "profit_yen": -140,
+  "roi": 0.9702127659574468,
   "skipped_races": 0
  },
  "chatgpt": {
@@ -13,7 +13,7 @@
   "payout_yen": 3170,
   "profit_yen": -7230,
   "roi": 0.30480769230769234,
-  "skipped_races": 0
+  "skipped_races": 1
  },
  "verdict": "参考表示（回収率の優劣は100レースたまるまで結論を出さない）",
  "rules": [
@@ -24,9 +24,19 @@
  "excluded": {
   "claude_only": [
    {
-    "date": "2026-11-07",
+    "date": "2026-11-08",
+    "venue": "京都",
+    "race_name": "みやこステークス"
+   },
+   {
+    "date": "2026-11-08",
+    "venue": "東京",
+    "race_name": "アルゼンチン共和国杯"
+   },
+   {
+    "date": "2026-11-08",
     "venue": "福島",
-    "race_name": "キビタキステークス"
+    "race_name": "みちのくステークス"
    }
   ],
   "chatgpt_only": [
@@ -242,6 +252,21 @@
     "stake_yen": 5600,
     "payout_yen": 3170,
     "skipped": false
+   }
+  },
+  {
+   "date": "2026-11-07",
+   "venue": "福島",
+   "race_name": "キビタキステークス",
+   "claude": {
+    "stake_yen": 1100,
+    "payout_yen": 3220,
+    "skipped": false
+   },
+   "chatgpt": {
+    "stake_yen": 0,
+    "payout_yen": 0,
+    "skipped": true
    }
   }
  ]

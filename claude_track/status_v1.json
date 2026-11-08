@@ -2,39 +2,39 @@
  "schema_version": 1,
  "predictor": "claude",
  "summary": {
-  "races": 3,
+  "races": 6,
   "excluded_not_prospective": 0,
-  "honmei_win_rate": 0.3333333333333333,
-  "honmei_top3_rate": 0.6666666666666666,
-  "avg_marked_in_top3": 1.6666666666666667,
-  "log_loss": 2.095368033375754,
-  "brier": 0.8375333333333331,
-  "stake_yen": 4700,
+  "honmei_win_rate": 0.16666666666666666,
+  "honmei_top3_rate": 0.3333333333333333,
+  "avg_marked_in_top3": 1.3333333333333333,
+  "log_loss": 2.3692517711068968,
+  "brier": 0.8671346666666665,
+  "stake_yen": 6600,
   "payout_yen": 4560,
-  "roi": 0.9702127659574468,
+  "roi": 0.6909090909090909,
   "by_bet_type": {
    "ワイド": {
-    "bets": 11,
+    "bets": 18,
     "hits": 2,
-    "stake_yen": 2700,
+    "stake_yen": 3800,
     "payout_yen": 4560
    },
    "単勝": {
-    "bets": 4,
+    "bets": 6,
     "hits": 0,
-    "stake_yen": 700,
+    "stake_yen": 900,
     "payout_yen": 0
    },
    "馬連": {
-    "bets": 5,
+    "bets": 9,
     "hits": 0,
-    "stake_yen": 600,
+    "stake_yen": 1000,
     "payout_yen": 0
    },
    "三連複": {
-    "bets": 4,
+    "bets": 6,
     "hits": 0,
-    "stake_yen": 500,
+    "stake_yen": 700,
     "payout_yen": 0
    },
    "馬単": {
@@ -362,6 +362,211 @@
     "2026-11-07-08-11/step2-20261107T023656Z.json"
    ],
    "result_file": "2026-11-07-08-11.json"
+  },
+  {
+   "race_id": "2026-11-08-03-11",
+   "prospective": true,
+   "honmei_no": 2,
+   "honmei_win": false,
+   "honmei_top3": false,
+   "marked_in_top3": 2,
+   "log_loss": 2.1202635362000914,
+   "brier": 0.8512,
+   "bets": [],
+   "stake_yen": 0,
+   "payout_yen": 0,
+   "prediction_files": [
+    "2026-11-08-03-11/step1-20261108T001555Z.json",
+    "2026-11-08-03-11/step2-20261108T001957Z.json"
+   ],
+   "result_file": "2026-11-08-03-11.json"
+  },
+  {
+   "race_id": "2026-11-08-05-11",
+   "prospective": true,
+   "honmei_no": 5,
+   "honmei_win": false,
+   "honmei_top3": false,
+   "marked_in_top3": 0,
+   "log_loss": 3.9120230054281464,
+   "brier": 1.0431999999999997,
+   "bets": [],
+   "stake_yen": 0,
+   "payout_yen": 0,
+   "prediction_files": [
+    "2026-11-08-05-11/step1-20261108T001555Z.json",
+    "2026-11-08-05-11/step2-20261108T001957Z.json"
+   ],
+   "result_file": "2026-11-08-05-11.json"
+  },
+  {
+   "race_id": "2026-11-08-08-11",
+   "prospective": true,
+   "honmei_no": 10,
+   "honmei_win": false,
+   "honmei_top3": false,
+   "marked_in_top3": 1,
+   "log_loss": 1.8971199848858815,
+   "brier": 0.7958080000000002,
+   "bets": [
+    {
+     "type": "ワイド",
+     "selection": [
+      3,
+      13
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "三連複",
+     "selection": [
+      5,
+      10,
+      11
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "馬連",
+     "selection": [
+      5,
+      10
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "ワイド",
+     "selection": [
+      3,
+      10
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "ワイド",
+     "selection": [
+      10,
+      13
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "三連複",
+     "selection": [
+      9,
+      10,
+      11
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "ワイド",
+     "selection": [
+      5,
+      10
+     ],
+     "stake_yen": 300,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "馬連",
+     "selection": [
+      9,
+      10
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "ワイド",
+     "selection": [
+      5,
+      9
+     ],
+     "stake_yen": 200,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "馬連",
+     "selection": [
+      5,
+      11
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "単勝",
+     "selection": [
+      5
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "ワイド",
+     "selection": [
+      9,
+      10
+     ],
+     "stake_yen": 200,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "ワイド",
+     "selection": [
+      5,
+      11
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "馬連",
+     "selection": [
+      10,
+      11
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    },
+    {
+     "type": "単勝",
+     "selection": [
+      10
+     ],
+     "stake_yen": 100,
+     "hit": false,
+     "payout_yen": 0
+    }
+   ],
+   "stake_yen": 1900,
+   "payout_yen": 0,
+   "prediction_files": [
+    "2026-11-08-08-11/step1-20261108T001555Z.json",
+    "2026-11-08-08-11/step2-20261108T001957Z.json"
+   ],
+   "result_file": "2026-11-08-08-11.json"
   }
  ]
 }
