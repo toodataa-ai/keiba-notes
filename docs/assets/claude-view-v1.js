@@ -36,18 +36,88 @@
       if(r.report)h+='<p class="pv-bets"><a class="btn" href="'+esc(encodeURI(r.report))+'">予想詳細を見る</a></p>';
       return h+'</article>';
     }
+
+    /* ---- 過去の成績：ChatGPT 側（results.js）と同じ部品・同じ並びで表示する ---- */
+    function pctN(n,d){return d?(n/d*100).toFixed(1)+'%':'—'}
+    function yenN(n){return isFinite(n)&&n!==null?Math.round(n).toLocaleString('ja-JP')+'円':'—'}
+    function wkRange(s){var a=s.split('-').map(Number),dt=new Date(Date.UTC(a[0],a[1]-1,a[2])),back=(dt.getUTCDay()+6)%7,st=new Date(dt);st.setUTCDate(dt.getUTCDate()-back);var en=new Date(st);en.setUTCDate(st.getUTCDate()+6);function iso(d){return d.getUTCFullYear()+'-'+('0'+(d.getUTCMonth()+1)).slice(-2)+'-'+('0'+d.getUTCDate()).slice(-2)}return{key:iso(st),start:iso(st),end:iso(en)}}
+    function pKey(m,r){if(m==='year')return r.date.slice(0,4);if(m==='month')return r.date.slice(0,7);if(m==='week')return wkRange(r.date).key;return 'all'}
+    function pText(m,k,rows){if(m==='all')return '全期間';if(m==='year')return k+'年';if(m==='month'){var a=k.split('-');return a[0]+'年'+Number(a[1])+'月'}var s=rows.filter(function(r){return wkRange(r.date).key===k})[0];var w=s?wkRange(s.date):{start:k,end:k};return w.start+'〜'+w.end}
+    var ORDERED={'馬単':1,'三連単':1};
+    function selText(b){return (b.selection||[]).join(ORDERED[b.type]?'→':'-')}
+    function fallbackHit(b,t){var s=b.selection||[];function has(n){return t.indexOf(n)>=0}
+      if(b.type==='単勝')return s[0]===t[0];if(b.type==='複勝')return has(s[0]);
+      if(b.type==='馬連')return s.length===2&&has(s[0])&&has(s[1])&&t.indexOf(s[0])<2&&t.indexOf(s[1])<2;
+      if(b.type==='ワイド')return s.length===2&&has(s[0])&&has(s[1]);
+      if(b.type==='馬単')return s[0]===t[0]&&s[1]===t[1];
+      if(b.type==='三連複')return s.length===3&&s.every(has);
+      if(b.type==='三連単')return s[0]===t[0]&&s[1]===t[1]&&s[2]===t[2];return false}
+    function settled(r){/* 買い目ごとの的中・払戻。公開データに無い古い版でも、的中だけは着順から判定する */
+      var br=r.result&&r.result.bet_results;
+      return (r.bets||[]).map(function(b,i){
+        var x=br&&br[i]&&br[i].type===b.type?br[i]:null;
+        if(x)return{b:b,hit:!!x.hit,payout:Number(x.payout_yen||0),known:true};
+        var h=fallbackHit(b,(r.result&&r.result.finish_top3)||[]);return{b:b,hit:h,payout:null,known:false}})}
+    function betPanelC(r){
+      var rows=settled(r);
+      if(!rows.length)return '<div class="bet-panel"><div class="bet-empty">この予想は購入見送りで、買い目はありません（馬券0円）。</div></div>';
+      var stake=Number(r.result.stake_yen||0),payout=Number(r.result.payout_yen||0),profit=payout-stake;
+      var counts={},order=[];rows.forEach(function(x){if(!counts[x.b.type]){counts[x.b.type]=0;order.push(x.b.type)}counts[x.b.type]++});
+      var summary=order.map(function(t){return t+counts[t]+'点'}).join('・');
+      var list=rows.map(function(x){
+        var cls=x.hit?'hit':'miss',pay=x.payout!=null?'払戻 '+yenN(x.payout):'払戻 —';
+        var reason=x.b.reason?'<span>理由 '+esc(x.b.reason)+'</span>':'';
+        return '<div class="bet-row '+(x.hit?'is-hit':'')+'"><div class="bet-main"><span class="bet-type">'+esc(x.b.type)+'</span><span class="bet-selection">'+esc(selText(x.b))+'</span></div><span class="bet-status '+cls+'">'+(x.hit?'的中':'ハズレ')+'</span><div class="bet-money"><span>購入 '+yenN(x.b.stake_yen)+'</span><span class="'+(x.hit&&x.payout>0?'payout-hit':'')+'">'+esc(pay)+'</span>'+reason+'</div></div>'}).join('');
+      return '<section class="bet-panel" aria-label="仮想の買い目"><div class="bet-panel-head"><strong>仮想の買い目（実際には購入していません）</strong><span>'+esc(summary)+' ／ '+rows.length+'点 / 発走前固定</span></div><div class="bet-list">'+list+'</div><div class="bet-total"><div><small>購入合計（仮想）</small><strong>'+yenN(stake)+'</strong></div><div><small>払戻合計</small><strong>'+yenN(payout)+'</strong></div><div><small>収支</small><strong class="'+(profit>0?'positive':profit<0?'negative':'')+'">'+yenN(profit)+'</strong></div></div></section>'}
+    function reviewText(v){if(!v)return '';var t=v.summary||'';if(v.honmei_result)t+='\n\n◎の結果：'+v.honmei_result;if(v.failure_types&&v.failure_types.length)t+='\n失敗の分類：'+v.failure_types.join('、');if(v.lessons&&v.lessons.length)t+='\n\n学んだこと：\n'+v.lessons.map(function(x){return '・'+x}).join('\n');return t}
+    function raceCardC(r){
+      var pass=!(r.bets&&r.bets.length);var hit=!pass&&Number(r.result.payout_yen||0)>0;
+      var mk={};(r.marks||[]).forEach(function(m){if(!mk[m.mark])mk[m.mark]=m});
+      var marks='<div class="marks">'+['◎','○','▲'].map(function(k){var m=mk[k];return '<span class="mark"><b>'+k+'</b>'+(m?esc(m.no+' '+m.name):'—')+'</span>'}).join('')+'</div>';
+      var outcome=pass?'<span class="status">購入見送り（馬券0円）</span>':hit?'<span class="status reviewed">的中あり</span>':'<span class="status">全買い目ハズレ</span>';
+      var top3=(r.result.finish_top3||[]).join('・');
+      var res='<div class="result-box result-summary"><b>レース結果</b><br>3着内（馬番）：'+esc(top3)+'　◎'+(r.result.honmei_win?'1着':r.result.honmei_top3?'3着内':'着外')+'</div>';
+      var spoiler='<details class="race-spoiler"><summary>結果・馬券成績を見る<span class="spoiler-warning">着順・的中／ハズレ・払戻・収支を表示します</span></summary><div class="race-spoiler-body"><div class="result-outcome">'+outcome+'</div>'+res+betPanelC(r)+'</div></details>';
+      var rv=r.review?'<details class="review-disclosure"><summary>反省会を見る</summary><div class="review-box">'+esc(reviewText(r.review))+'</div></details>':'';
+      var act=r.report?'<div class="actions"><a class="btn" href="'+esc(encodeURI(r.report))+'">予想詳細を見る</a></div>':'';
+      return '<article class="race-card"><div class="race-top"><div><div class="meta">'+esc(r.date)+' · '+esc(r.venue||'JRA')+' · '+esc(r.prompt_version||'—')+'</div><h3>'+esc(r.race_name||'')+'</h3></div><span class="status reviewed">'+(r.review?'回顧済み':'結果確認済み')+'</span></div>'+marks+spoiler+rv+act+'</article>'}
+    function renderResults(all){
+      var h='<p class="pv-note">これは <strong>Claude</strong> の予想です。ChatGPT の成績とは合算せず、別々に集計します。対象は、JRAの毎開催日のメインレース（11R）です。買い目は「もし買ったら」の仮想で、実際には購入しません。発走前に保存し、あとから変えません。</p>';
+      if(!all.length){panel.innerHTML=h+'<div class="pv-empty">まだ結果の出た Claude の予想はありません。</div>';return}
+      h+='<section class="period-panel"><div><h2>集計期間</h2></div><div class="period-controls"><select id="cvMode" aria-label="期間単位"><option value="all">全期間</option><option value="year">年別</option><option value="month">月別</option><option value="week">開催週別</option></select><select id="cvValue" aria-label="期間" disabled><option value="all">全期間</option></select></div><p id="cvLabel" class="period-label">全期間</p></section>'+
+        '<details class="spoiler-summary"><summary>期間成績を見る<span class="spoiler-warning">的中率・払戻・回収率・収支などの結果を表示します</span></summary><div class="spoiler-body"><section class="results-stats" id="cvStats" aria-label="Claudeの期間成績"></section></div></details>'+
+        '<section class="section-head"><div><h2>レース別の結果・反省会</h2></div></section><div id="cvList" class="race-list"></div>';
+      panel.innerHTML=h;
+      var mode=document.getElementById('cvMode'),value=document.getElementById('cvValue');
+      function fill(){var m=mode.value;value.innerHTML='';if(m==='all'){value.disabled=true;value.innerHTML='<option value="all">全期間</option>';return}value.disabled=false;var seen={};all.forEach(function(r){seen[pKey(m,r)]=1});Object.keys(seen).sort().reverse().forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=pText(m,k,all);value.appendChild(o)})}
+      function rowsNow(){return mode.value==='all'?all.slice():all.filter(function(r){return pKey(mode.value,r)===value.value})}
+      function render(){
+        var rs=rowsNow();document.getElementById('cvLabel').textContent=pText(mode.value,value.value,all);
+        var bought=rs.filter(function(r){return Number(r.result.stake_yen||0)>0});
+        var hits=bought.filter(function(r){return Number(r.result.payout_yen||0)>0}).length;
+        var stake=0,payout=0;rs.forEach(function(r){stake+=Number(r.result.stake_yen||0);payout+=Number(r.result.payout_yen||0)});
+        var profit=payout-stake;
+        var hm=rs.filter(function(r){return r.result.honmei_win!==null&&r.result.honmei_win!==undefined});
+        var wins=hm.filter(function(r){return r.result.honmei_win}).length,places=hm.filter(function(r){return r.result.honmei_top3}).length;
+        document.getElementById('cvStats').innerHTML=
+          '<article><span class="label">評価済み</span><strong>'+rs.length+'</strong><span class="unit">レース</span></article>'+
+          '<article><span class="label">的中レース率（購入レース）</span><strong>'+pctN(hits,bought.length)+'</strong></article>'+
+          '<article><span class="label">購入金額（仮想）</span><strong>'+yenN(stake)+'</strong></article>'+
+          '<article><span class="label">払戻金額</span><strong>'+yenN(payout)+'</strong></article>'+
+          '<article><span class="label">回収率</span><strong>'+(stake?(payout/stake*100).toFixed(1)+'%':'—')+'</strong></article>'+
+          '<article><span class="label">収支</span><strong class="'+(profit>0?'positive':profit<0?'negative':'')+'">'+yenN(profit)+'</strong></article>'+
+          '<article class="wide"><span class="label">◎勝率 / 複勝率</span><strong>'+(hm.length?pctN(wins,hm.length)+' / '+pctN(places,hm.length):'—')+'</strong></article>';
+        document.getElementById('cvList').innerHTML=rs.length?rs.map(raceCardC).join(''):'<p class="muted">該当する成績はありません。</p>';
+      }
+      mode.addEventListener('change',function(){fill();render()});value.addEventListener('change',render);fill();render();
+    }
     function load(){
       panel.dataset.loaded='1';panel.innerHTML='<p class="muted">読み込み中…</p>';
       fetch('data/predictors/claude_status_v1.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
         var rows=d.races||[];var s=d.summary||{};
+        if(mode==='results'){renderResults(rows.filter(function(r){return r.result}));return}
         var h='<p class="pv-note">これは <strong>Claude</strong> の予想です。ChatGPT の成績とは合算せず、別々に集計します。対象は、JRAの毎開催日のメインレース（11R）です。買い目は「もし買ったら」の仮想で、実際には購入しません。発走前に保存し、あとから変えません。</p>';
-        if(mode==='results'){
-          h+='<details class="spoiler-summary"><summary>Claude の期間成績を見る<span class="spoiler-warning">的中率・払戻・回収率などの結果を表示します</span></summary><div class="pv-stats">'+
-            '<div><span>評価済み</span><strong>'+esc(s.races||0)+'レース</strong></div><div><span>◎勝率 / 複勝率</span><strong>'+pct(s.honmei_win_rate)+' / '+pct(s.honmei_top3_rate)+'</strong></div>'+
-            '<div><span>購入（仮想）</span><strong>'+yen(s.stake_yen)+'</strong></div><div><span>払戻</span><strong>'+yen(s.payout_yen)+'</strong></div><div><span>回収率</span><strong>'+pct(s.roi)+'</strong></div></div></details>';
-          rows=rows.filter(function(r){return r.result});
-        }
-        h+=rows.length?rows.map(card).join(''):'<div class="pv-empty">'+(mode==='results'?'まだ結果の出た Claude の予想はありません。':'いま公開している Claude の予想はありません。ChatGPT と同じレースを対象に、次の開催から発走前に保存して、ここに表示します。')+'</div>';
+        h+=rows.length?rows.map(card).join(''):'<div class="pv-empty">いま公開している Claude の予想はありません。ChatGPT と同じレースを対象に、次の開催から発走前に保存して、ここに表示します。</div>';
         panel.innerHTML=h;
       }).catch(function(){panel.innerHTML='<div class="pv-empty">Claude のデータを読み込めませんでした。</div>'});
     }
