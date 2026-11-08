@@ -3,7 +3,7 @@
   "date": "2026-11-08",
   "meeting_id": "2026-11-07-to-2026-11-08",
   "observed_at": "2026-11-08T09:37:59.741Z",
-  "status": "REVIEWED_SIX_PENDING_INDEPENDENT_CI_PAGES_PROOF",
+  "status": "FORMAL_STRICT_GRADE_A_PASS_PUBLIC_HTTP_BYTES_VERIFIED_WEEKLY_GATE_NO_BET_PENDING",
   "official_result_confirmed_races": [
     "2026-11-08-argentina-republic-cup",
     "2026-11-08-miyako-stakes",
@@ -21,7 +21,7 @@
   "immutable_original_html_pdf": true,
   "weekly_improvement_decision": "not_evaluated",
   "conservative_model_action": "no_change",
-  "weekly_reason": "No-bet Kibitaki formal Grade A gate cannot pass with current strict purchase adapter; prospective paired comparisons insufficient; user A/B/C approval not granted.",
+  "weekly_reason": "All six main-race registry statuses reviewed and three Nov 8 new Grade A cases passed. Weekly formal proof gate still pending because legitimate 0-ticket Kibitaki lacks compatible strict Grade A representation. Independent prospective experiment sample remains insufficient. No prompt change.",
   "improvement_policy": {
     "approval_classes": "A/B/C manual",
     "automatic_promotion": false,
@@ -32,12 +32,26 @@
   },
   "publication_verification": {
     "github_html_pdf_blob_existence_verified": true,
-    "public_http_byte_parity_verified": false,
-    "independent_actions_verified": false
+    "public_http_byte_parity_verified": true,
+    "independent_actions_verified": true,
+    "success_workflow_url": "https://github.com/toodataa-ai/keiba-notes/actions/runs/42468349599",
+    "verified_at": "2026-11-08T09:43:20.9804926Z",
+    "scope": "All reviewed canonical JRA HTML/PDF and published strict Grade A case/result files, with legitimate zero-bet review checked against canonical registry rather than nonexistent ticket-case files"
   },
   "blockers": [
-    "2026-11-07-kibitaki-stakes: zero-bet valid review cannot be scored by current Grade A strict adapter; frozen final_bets must remain empty.",
-    "New cases not independently verified by CI yet; Pages byte parity requires post-commit verification.",
-    "Separate legacy research validator may still reject unpinned prerace E0/E1/E2 omissions."
-  ]
+    "2026-11-07-kibitaki-stakes: reviewed legitimate no-bet race with sealed final_bets=[], settlements=[]; current strict E2E adapter and weekly-review Grade A gate do not represent a zero-ticket review. No postrace purchase reconstruction.",
+    "Independent Validate E2E predictions workflow E0/E1/E2 research diagnostics fails on 26 originally missing prestart research fields, separate from successful formal JRA Grade A evaluator.",
+    "Two staging results-page workflows fail a production-mirror renderer assertion. This is a UI/staging regression outside the immutable data workflow; no UI production changes authorized.",
+    "Prospective registered challengers EXP-001/002/003 have only 2 pairs each against a 20-pair decision threshold; manual A/B/C adoption not authorized."
+  ],
+  "last_verified_at": "2026-11-08T09:44:38.369Z",
+  "grade_a": {
+    "validated_case_count": 27,
+    "errors": [],
+    "nov8_cases_verified": [
+      "2026-11-08-argentina-republic-cup",
+      "2026-11-08-miyako-stakes",
+      "2026-11-08-michinoku-stakes"
+    ]
+  }
 }
