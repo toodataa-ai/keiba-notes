@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-11-08T08:54:26.429+09:00",
+  "updated_at": "2026-11-08T16:03:19+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -23352,7 +23352,7 @@
       "race": "キビタキステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 16,
@@ -23415,7 +23415,67 @@
         "modeled_low_expected_net_profit_yen": 0,
         "modeled_union_hit_probability": 0,
         "modeled_net_loss_probability": 0
-      }
+      },
+      "result": {
+        "summary": "JRA公式結果・全着順と払戻を検証済み（最終購入判断：見送り）",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 12,
+            "horse": "ハリウッドメモリー"
+          },
+          {
+            "pos": 2,
+            "no": 6,
+            "horse": "カーヌスティ"
+          },
+          {
+            "pos": 3,
+            "no": 11,
+            "horse": "カウンターセブン"
+          }
+        ],
+        "finish_order": [
+          12,
+          6,
+          11,
+          15,
+          8,
+          10,
+          5,
+          14,
+          16,
+          3,
+          9,
+          13,
+          2,
+          7,
+          4,
+          1
+        ],
+        "going": "稍重",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde1003202603011120261107%2FDA",
+        "verified_at": "2026-11-08T16:03:19+09:00"
+      },
+      "settlements": [],
+      "performance": {
+        "stake_yen": 0,
+        "payout_yen": 0,
+        "profit_yen": 0,
+        "roi_pct": null,
+        "ticket_hit": null,
+        "honmei_finish": 2,
+        "honmei_win": false,
+        "honmei_place": true,
+        "second_mark_finish": 6,
+        "third_mark_finish": 9,
+        "top_marks_in_top3": 1,
+        "hit_bets": [],
+        "miss_bets": [],
+        "no_bet": true
+      },
+      "review": "発走前の印は◎6・○10・▲16で固定。福島芝1200mは朝の「良」からレース時に「稍重」となった。◎6は上位入線したが、○10・▲16は上位3着に届かず、馬場変化と前後の位置取り・ペースの想定を今後の検証課題とする。STEP2の最終判断は期待値条件を満たさないため見送り（購入0円・的中／不的中なし）。公式結果・払戻を確認し、事前の印・見送り判断・proof_commit・HTML/PDFを一切変更していない。回収率は0円のためレース単独では定義せず、E2E Grade Aの登録は現行0点購入アダプタと証拠監査が整うまで保留し、事後的に購入馬券を作らない。単発結果によるパラメータ変更はしない。",
+      "review_at": "2026-11-08T16:03:19+09:00"
     },
     {
       "id": "2026-11-07-muromachi-stakes",
