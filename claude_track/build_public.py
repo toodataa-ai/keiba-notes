@@ -48,7 +48,9 @@ def build(pred_dir: Path, results_dir: Path, now: datetime | None = None) -> dic
         if res and e:
             item["result"] = {"finish_top3": res["finish_order"][:3], "prospective": e["prospective"],
                               "honmei_win": e["honmei_win"], "honmei_top3": e["honmei_top3"],
-                              "stake_yen": e["stake_yen"], "payout_yen": e["payout_yen"]}
+                              "stake_yen": e["stake_yen"], "payout_yen": e["payout_yen"],
+                              "bet_results": [{"type": b["type"], "selection": b["selection"], "stake_yen": b["stake_yen"],
+                                               "hit": b["hit"], "payout_yen": b["payout_yen"]} for b in e.get("bets", [])]}
         items.append(item)
     items.sort(key=lambda x: (x["date"], x["race_id"]), reverse=True)
     summary = sc.aggregate([e for e in scored.values()])

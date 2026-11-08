@@ -59,6 +59,9 @@ class PublicTest(unittest.TestCase):
             (d / "res/r1.json").write_text(json.dumps(RESULT), encoding="utf-8")
             r = bp.build(d / "p", d / "res")
             self.assertEqual(r["races"][0]["result"]["payout_yen"], 19450)
+            br = r["races"][0]["result"]["bet_results"]
+            self.assertEqual(sum(b["payout_yen"] for b in br), 19450)
+            self.assertTrue(all({"type", "selection", "stake_yen", "hit", "payout_yen"} <= set(b) for b in br))
 
 
 class TwoStageTest(unittest.TestCase):
