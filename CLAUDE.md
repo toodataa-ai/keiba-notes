@@ -59,6 +59,7 @@
 - ガード：`.github/scripts/jra-release-guard-v1.py`（全リリース共通の不変条件＋過去リリースの固定値）。
 
 ### 承認待ちの変更案（承認はチャットで受ける）
+- `ui-claude-results-same-v1`（this-week.html の版番号＋`assets/claude-view-v1.js`。2026-11-08 ステージング済み・承認待ち）：過去の成績の Claude タブを ChatGPT タブと同じ部品（集計期間の選択・期間成績7項目・レース別カード・買い目ごとの的中/ハズレと払戻・反省会）で表示。的中レース率は購入レースだけで割る（見送りを除く）。買い目ごとの払戻は `claude_status_v1.json` の `result.bet_results`（build_public.py で追加）。
 - `ui-claude-exp-v1`（improvement-cycle.html）：「Claudeの予想だけで進めている比較」を表示。**v1.14 として本番リリース済み（2026-11-03）**。
 - `ui-portfolio-card-v1`（improvement-cycle.html）：購入セットの比較カードを回収率の表示にする。**v1.13 として本番リリース済み（2026-11-03）**。
 （以下は以前の記録。直近：v1.11 ui-claude-view-v1、v1.12 ui-baba-progress-v1 をリリース済み）
