@@ -35,7 +35,7 @@
 
 /* ---- 解説・研究ページ（method-hero）：黒い帯はナビだけ、見出しは白地 ---- */
 .method-hero{background:var(--lt-bg)!important;color:var(--lt-ink)!important;border-bottom:1px solid var(--lt-line)!important;padding-top:0!important}
-.method-hero .method-nav{background:var(--lt-band);box-shadow:0 0 0 100vmax var(--lt-band);clip-path:inset(0 -100vmax);margin:0 0 22px!important;padding:12px 0!important;border-bottom:3px solid #6b7280}
+.method-hero .method-nav{background:var(--lt-band);box-shadow:0 0 0 100vmax var(--lt-band);clip-path:inset(0 -100vmax);margin:0 0 22px!important;padding:12px 0 15px!important;position:relative}
 .method-hero h1,.method-hero .hero-copy h1{color:var(--lt-ink)!important}
 .method-hero .eyebrow,.method-hero .kicker{color:var(--lt-red)!important}
 .method-hero p,.method-hero .hero-deck,.method-hero .lead{color:#3a3d46!important}
@@ -51,7 +51,7 @@
 body.ic-light{color-scheme:light;--bg:#f3f3f4;--panel:#fff;--panel2:#f6f6f8;--border:#e1e1e4;--text:#19191d;--muted:#6d6e75;--rose:#33557a;--rose-soft:#33557a;--cyan:#1f6f86;--green:#167a52;--amber:#8a5a00;--red:#a53737;background:var(--bg);color:var(--text)}
 body.ic-light a{color:#33557a}
 body.ic-light .wrap{padding-top:0}
-body.ic-light nav{background:var(--lt-band);box-shadow:0 0 0 100vmax var(--lt-band);clip-path:inset(0 -100vmax);padding:12px 0;margin-bottom:24px;border-bottom:3px solid #6b7280}
+body.ic-light nav{background:var(--lt-band);box-shadow:0 0 0 100vmax var(--lt-band);clip-path:inset(0 -100vmax);padding:12px 0 15px;margin-bottom:24px;position:relative}
 body.ic-light nav a{color:#fff;border-color:#575d67}
 body.ic-light .eyebrow{color:#33557a}
 body.ic-light .lead{color:#3a3d46}
@@ -83,3 +83,5 @@ body.ic-light .fact b.bad{color:#a53737}
 body.ic-light .fact b.even{color:#4a4d57}
 html:root{--m-red:#33557a;--rose:#33557a;--red:#6b7a90}
 .method-hero .m-live-link .live-value,.method-hero .live-value{color:var(--lt-ink)!important}
+/* 帯の下の灰色の線を、画面の端から端まで引く（枠線だと中身の幅で切れる） */
+.method-hero .method-nav::after,body.ic-light nav::after{content:"";position:absolute;left:50%;bottom:0;width:100vw;margin-left:-50vw;height:3px;background:#6b7280;pointer-events:none}
