@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta name="robots" content="noindex,nofollow"><base href="../">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<title>騎手・調教師の成績 | AIによる競馬予想研究所</title>
+<link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+<link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
+<style>
+.pp-seg{display:inline-flex;flex-wrap:wrap;border:1px solid #dcdee3;border-radius:14px;overflow:hidden;margin:0 8px 8px 0;background:#fff}
+.pp-seg button{font:inherit;font-size:13px;border:0;background:#fff;color:#2b2c31;padding:7px 11px;cursor:pointer}
+.pp-seg button+button{border-left:1px solid #dcdee3}
+.pp-seg button[aria-pressed="true"]{background:#17171a;color:#fff}
+.pp-seg button:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
+.pp-box{border:1px solid #e3e4e8;border-radius:12px;background:#f6f7f9;padding:11px 13px;font-size:13px;line-height:1.75;margin:10px 0}
+.pp-box ul{margin:6px 0 0;padding-left:18px}
+.pp-search{font:inherit;font-size:14px;border:1px solid #dcdee3;border-radius:12px;padding:8px 12px;width:100%;box-sizing:border-box;margin:0 0 10px;background:#fff}
+.pp-item{border-bottom:1px solid #ececef}
+.pp-head{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;width:100%;text-align:left;font:inherit;border:0;background:none;padding:10px 2px;cursor:pointer;color:inherit}
+.pp-head:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
+.pp-name{font-size:14px;font-weight:700}
+.pp-name small{font-weight:400;color:#6d6e75;font-size:11.5px;margin-left:6px}
+.pp-ae{font-size:14px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.pp-meta{grid-column:1/-1;font-size:11.5px;color:#6d6e75;line-height:1.6}
+.pp-tag{display:inline-block;font-size:10.5px;font-weight:400;color:#6d6e75;border:1px solid #dcdee3;border-radius:999px;padding:0 6px;margin-left:4px;white-space:nowrap}
+.pp-tag.on{color:#1d4f9f;border-color:#9db9e6;background:#eef4fd}
+.pp-up{color:#1d4f9f}
+.pp-body{padding:2px 2px 14px}
+.pp-tbl{overflow-x:auto}
+.pp-tbl table{width:100%;border-collapse:collapse;font-size:12.5px}
+.pp-tbl th,.pp-tbl td{padding:6px 5px;border-bottom:1px solid #f0f0f3;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pp-tbl th:first-child,.pp-tbl td:first-child{text-align:left}
+.pp-tbl th{font-size:11.5px;color:#6d6e75;font-weight:400}
+.pp-grp td{background:#f6f7f9;font-weight:700;color:#4a4b52}
+.pp-note{font-size:12px;color:#6d6e75;line-height:1.75;margin:6px 0 0}
+.pp-star{font-size:12.5px;line-height:1.8;margin:2px 0 8px}
+</style>
+<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+</head>
+<body class="ic-light">
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
+<div class="wrap">
+<nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/track-trends.html">競馬場の傾向</a></nav>
+
+<header>
+<p class="eyebrow">予想の材料（研究）</p>
+<h1>騎手・調教師の成績</h1>
+<p class="lead">2018年以降のJRAの平地レースで、<strong>騎手・調教師ごとの成績と、条件別（芝ダート・距離・競馬場・人気）の得意不得意</strong>をまとめました。人気（オッズ）の影響は除いてあります。</p>
+</header>
+
+<section aria-labelledby="howTitle">
+<h2 id="howTitle">数字の読み方</h2>
+<div class="pp-box">
+<b>勝ちやすさ（A/E）</b>＝実際の勝ち数 ÷ 人気（オッズ）どおりなら勝つはずの数。<b>1.00</b>は人気どおり、<b>1.10</b>は人気より1割多く勝つ、<b>0.90</b>は1割少ない。<br>
+<span class="pp-tag">偶然の範囲</span>は、偶然でも出てしまう大きさの差。<span class="pp-tag on">差あり</span>は、誤差の2倍を超える差です（たくさんの人・条件を見ているので、偶然で出てしまうものも一部混ざります）。
+</div>
+<div class="pp-box" id="ppFind">読み込み中…</div>
+</section>
+
+<section aria-labelledby="listTitle">
+<h2 id="listTitle">一覧</h2>
+<p class="sub" id="ppMeta">読み込み中…</p>
+<div class="pp-seg" role="group" aria-label="騎手か調教師か"><button type="button" data-k="jockey" aria-pressed="true">騎手</button><button type="button" data-k="trainer" aria-pressed="false">調教師</button></div>
+<div class="pp-seg" role="group" aria-label="並べ方"><button type="button" data-o="n" aria-pressed="true">出走数順</button><button type="button" data-o="ae" aria-pressed="false">勝ちやすさ順</button><button type="button" data-o="roi" aria-pressed="false">回収率順</button></div>
+<input class="pp-search" id="ppQ" type="search" placeholder="名前で探す（例：川田）" aria-label="名前で探す">
+<div id="ppList"></div>
+</section>
+
+<section aria-labelledby="noteTitle">
+<h2 id="noteTitle">注意</h2>
+<p class="pp-note">過去の成績であって、次のレースを当てる保証ではありません。予想には使っていません（使えるかを研究するための材料です）。出走数が少ない人（2018年以降で300走未満）は載せていません。条件別は60走以上の条件だけを載せています。</p>
+</section>
+</div>
+<script>
+(function(){
+var D=null,K='jockey',O='n',Q='',OPEN={};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function f2(x){return x==null?'—':x.toFixed(2)}
+function pc(x){return x==null?'—':(x*100).toFixed(1)+'%'}
+function roi(x){return x==null?'—':Math.round(x*100)+'%'}
+function num(n){return n.toLocaleString('ja-JP')}
+function tg(x){return x&&x.z!=null&&x.n>=100&&Math.abs(x.z)>=2?'<span class="pp-tag on">差あり</span>':'<span class="pp-tag">偶然の範囲</span>'}
+var GROUPS=[['面','芝かダートか'],['距離','距離'],['場','競馬場'],['人','人気の位置']];
+function detail(p){
+ var star=p.conds.filter(function(c){return c.n>=100&&c.z>=2}).sort(function(a,b){return b.z-a.z}).slice(0,3);
+ var h='<div class="pp-body">';
+ if(star.length)h+='<p class="pp-star"><b>人気以上に勝った条件</b>（誤差の2倍を超えたもの）：'+star.map(function(c){return esc(c.v)+'（A/E '+f2(c.ae)+'・'+num(c.n)+'走）'}).join('、')+'<br><span style="color:#6d6e75">ただし、たくさんの条件から目立つものを選ぶと、偶然で目立つものも混ざります。下の「続くか」の検証では、条件ごとの得意はあまり続きませんでした。</span></p>';
+ h+='<div class="pp-tbl"><table><thead><tr><th>条件</th><th>走数</th><th>勝率</th><th>3着内</th><th>A/E</th><th>回収率</th></tr></thead><tbody>';
+ GROUPS.forEach(function(g){var rows=p.conds.filter(function(c){return c.k===g[0]});if(!rows.length)return;
+  h+='<tr class="pp-grp"><td colspan="6">'+g[1]+'</td></tr>';
+  rows.forEach(function(c){h+='<tr><td>'+esc(c.v)+'</td><td>'+num(c.n)+'</td><td>'+pc(c.win)+'</td><td>'+pc(c.top3)+'</td><td>'+(Math.abs(c.z)>=2&&c.n>=100?'<b class="'+(c.ae>1?'pp-up':'')+'">'+f2(c.ae)+'</b>':f2(c.ae))+'</td><td>'+roi(c.roi)+'</td></tr>'})});
+ return h+'</tbody></table></div></div>'
+}
+function render(){
+ var a=D[K].filter(function(p){return (!Q||p.name.replace(/\s/g,'').indexOf(Q.replace(/\s/g,''))>=0)&&(O==='n'||p.all.n>=1000)});
+ a=a.slice().sort(function(x,y){return O==='n'?y.all.n-x.all.n:(y.all[O]||0)-(x.all[O]||0)});
+ $('ppMeta').textContent=(K==='jockey'?'騎手':'調教師')+' '+a.length+'人'+(Q?'（検索結果）':'')+'。'+(O==='n'?'':'走数が少ない人は偶然で上下しやすいため、1,000走以上の人だけを並べています。')+'名前を押すと条件別の成績が開きます。';
+ $('ppList').innerHTML=a.map(function(p){var id=K+p.id,open=OPEN[id];
+  return '<div class="pp-item"><button type="button" class="pp-head" data-id="'+id+'" aria-expanded="'+(!!open)+'"><span class="pp-name">'+esc(p.name)+'<small>'+num(p.all.n)+'走（'+p.years[0]+'〜'+p.years[1]+'）</small></span><span class="pp-ae">'+f2(p.all.ae)+tg(p.all)+'</span><span class="pp-meta">勝率 '+pc(p.all.win)+'・3着内 '+pc(p.all.top3)+'・単勝回収率 '+roi(p.all.roi)+'</span></button>'+(open?detail(p):'')+'</div>'}).join('')||'<p class="pp-note">該当する人がいません。</p>';
+ Array.prototype.forEach.call($('ppList').querySelectorAll('.pp-head'),function(b){b.onclick=function(){var id=b.getAttribute('data-id');OPEN[id]=!OPEN[id];render()}});
+}
+function findings(){
+ var p=D.persistence;
+ $('ppFind').innerHTML='<b>先に分かったこと：「得意」は続くのか</b><ul>'+
+ '<li><b>騎手の強さ（人気以上に勝つ力）</b>：前半（〜'+(D.split_year-1)+'年）と後半（'+D.split_year+'年〜）で、順位は<b>ほとんど続きませんでした</b>（そろい具合 '+f2(p.jockey.overall.corr)+'。1.00で完全にそろう、0で無関係）。上手い騎手は、すでに人気（オッズ）に織り込まれているためとみられます。</li>'+
+ '<li><b>調教師</b>は、少しだけ続きました（'+f2(p.trainer.overall.corr)+'）。</li>'+
+ '<li><b>条件別の得意</b>（芝ダート・距離・競馬場・人気）：騎手 '+f2(p.jockey.condition.corr)+'、調教師 '+f2(p.trainer.condition.corr)+'で、<b>ほぼ続きません</b>。前半に「得意」に見えた条件が、後半も得意とは限りません。</li></ul>'+
+ '<span style="color:#6d6e75">そのため、このページの「得意条件」は、過去にどうだったかの記録として見てください。</span>';
+}
+Array.prototype.forEach.call(document.querySelectorAll('[data-k]'),function(b){b.onclick=function(){K=b.getAttribute('data-k');Array.prototype.forEach.call(document.querySelectorAll('[data-k]'),function(x){x.setAttribute('aria-pressed',String(x===b))});render()}});
+Array.prototype.forEach.call(document.querySelectorAll('[data-o]'),function(b){b.onclick=function(){O=b.getAttribute('data-o');Array.prototype.forEach.call(document.querySelectorAll('[data-o]'),function(x){x.setAttribute('aria-pressed',String(x===b))});render()}});
+$('ppQ').oninput=function(){Q=this.value.trim();render()};
+fetch('data/people_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;findings();render()}).catch(function(){$('ppMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ppFind').textContent=''});
+})();
+</script>
+</body>
+</html>

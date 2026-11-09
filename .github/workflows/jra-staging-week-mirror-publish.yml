@@ -22,6 +22,8 @@ on:
       - 'docs/sire-map.html'
       - 'docs/collection-status.html'
       - 'docs/baba-bias.html'
+      - 'docs/track-trends.html'
+      - 'docs/people-trends.html'
       - '.github/staging-candidates.json'
       - '.github/staging-candidates/**'
   workflow_dispatch:
@@ -43,7 +45,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             python3 .github/scripts/staging-baseline-v2.py
-            git add -- docs/staging/index.html docs/staging/this-week.html docs/staging/schedule.html docs/staging/results.html docs/staging/methodology.html docs/staging/roadmap.html docs/staging/e2e.html docs/staging/baba-models.html docs/staging/local-racing-shadow.html docs/staging/experience-regime.html docs/staging/release-history.html docs/staging/improvement-cycle.html docs/staging/operations.html docs/staging/sire-map.html docs/staging/collection-status.html docs/staging/baba-bias.html
+            git add -- docs/staging/index.html docs/staging/this-week.html docs/staging/schedule.html docs/staging/results.html docs/staging/methodology.html docs/staging/roadmap.html docs/staging/e2e.html docs/staging/baba-models.html docs/staging/local-racing-shadow.html docs/staging/experience-regime.html docs/staging/release-history.html docs/staging/improvement-cycle.html docs/staging/operations.html docs/staging/sire-map.html docs/staging/collection-status.html docs/staging/baba-bias.html docs/staging/track-trends.html docs/staging/people-trends.html
             mkdir -p docs/staging/candidate-assets
             git add -A -- docs/staging/candidate-assets || true
             python3 - <<'PY'

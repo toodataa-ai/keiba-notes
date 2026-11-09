@@ -1,5 +1,18 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-trends-pages-v1",
+      "title": "競馬場の傾向・騎手調教師の成績ページ",
+      "summary": "新ページ2つ（競馬場の傾向／騎手・調教師の成績）とトップのカード2枚。データは docs/data の集計だけ（人気の影響を除いたA/Eと、得意が続くかの検証つき）。",
+      "status": "awaiting_user_approval",
+      "pages": [
+        "index.html",
+        "track-trends.html",
+        "people-trends.html"
+      ],
+      "assets": []
+    }
+  ]
 }
