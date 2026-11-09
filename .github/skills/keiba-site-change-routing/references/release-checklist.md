@@ -26,7 +26,7 @@
 - [ ] docs/data、docs/reports、docs/pdfs、e2e_validation、local_racing_shadow_v1 のtree SHAがリリース前後で同じことを確認。
 - [ ] 他の未承認ステージング候補をバックアップしてから自動ミラーを許可する。
 - [ ] 本番の最新予想・PDF・final_bets・proof・回顧が残っているか確認する。
-- [ ] UI昇格処理でトップ入口の増分から \`new_entry_pages\` を自動登録し、release guardの自動照合で漏れを防ぐ。
+- [ ] UI昇格処理でトップ入口の増分から `new_entry_pages` を自動登録し、release guardの自動照合で漏れを防ぐ。
 - [ ] 実際の公開HTTPのバイト一致、モバイル/PC表示、Actionsの成功を検証してから完了報告。
 
 ## 5. ルーティング例
