@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -75,6 +76,7 @@ def main() -> None:
     assert "fetch('data/production-releases.json'" in history
     autorevise = (ROOT / ".github/workflows/jra-prerace-rerun-fresh-v313.yml").read_text()
     assert "docs/data/races.json" in autorevise
+    subprocess.run([sys.executable, str(ROOT / ".github/scripts/jra-ui-promote-v1.py"), "verify-badges"], cwd=ROOT, check=True)
     print("PASS_RELEASE_LEDGER_AND_PRODUCTION_UI", latest["public_version"], len(latest["scope_files"]))
 
 
