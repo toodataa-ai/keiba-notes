@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.46-20261110",
-  "current_public_version": "1.46",
+  "current_public_release": "release/jra-site-v1.47-20261110",
+  "current_public_version": "1.47",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -976,6 +976,27 @@
         "docs/index.html",
         "docs/track-trends.html",
         "docs/people-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.47-20261110",
+      "branch": "release/jra-site-v1.47-20261110",
+      "commit_sha": "3842959bb97333bd891e76dafa130f8da6e155b2",
+      "deployed_at": "2026-11-10T07:33:54+09:00",
+      "workflow_run_id": 42712974322,
+      "validation_workflow_run_id": 42712974322,
+      "public_version": "1.47",
+      "note": "2026-11-10ユーザー明示承認済み。競馬場の傾向：道すじを直線と円弧だけで描き直し：コース図の道すじを、直線と円弧だけ（円の中心は常に内側・つなぎ目は向きがぴったり一致・中心線から幅の10%以内・部品は最小限）で描き直した。データは docs/lab/sim-v2/umapot-starts-arc.json（本番が読む umapot-starts.json は変えない）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-arc-paths-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/track-trends.html"
       ],
       "public_http_files_verified": null
     }
