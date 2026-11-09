@@ -46,6 +46,28 @@
     style.textContent = '.new-badge{position:absolute;top:-7px;right:12px;z-index:2;padding:2px 7px;border-radius:999px;background:#c61d31;color:#fff;font:800 10px/1.3 system-ui,-apple-system,sans-serif;letter-spacing:.06em;box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:none}';
     document.head.appendChild(style);
     addBadges(LEGACY);  // Also works if the ledger is temporarily unavailable.
+    // In STAGING, preview new portal cards before the release metadata exists.
+    // <base href="../"> makes index.html resolve to the production homepage.
+    if (document.documentElement.hasAttribute('data-stage')) {
+      fetch('index.html', {cache: 'no-store'}).then(function (r) {
+        if (!r.ok) throw Error('production homepage HTTP ' + r.status);
+        return r.text();
+      }).then(function (html) {
+        var page = new DOMParser().parseFromString(html, 'text/html');
+        var previous = {};
+        Array.prototype.forEach.call(page.querySelectorAll('a.portal-card'), function (a) {
+          previous[(a.getAttribute('href') || '').split(/[?#]/)[0].split('/').pop()] = true;
+        });
+        var n = new Date(Date.now() + 9 * 3600000);
+        var yyyyMmDd = n.toISOString().slice(0, 10);
+        var preview = [];
+        Array.prototype.forEach.call(document.querySelectorAll('a.portal-card'), function (a) {
+          var href = (a.getAttribute('href') || '').split(/[?#]/)[0].split('/').pop();
+          if (href && !previous[href]) preview.push({href: href, since: yyyyMmDd});
+        });
+        addBadges(preview);
+      }).catch(function () { /* Preview badge requires the production baseline. */ });
+    }
     // STAGING has <base href="../">, so this resolves to the same data URL on both sites.
     var ledgerUrl = 'data/production-releases.json';
     fetch(ledgerUrl, {cache: 'no-store'}).then(function (response) {
