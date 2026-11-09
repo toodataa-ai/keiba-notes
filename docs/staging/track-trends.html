@@ -40,7 +40,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/people-trends.html">騎手・調教師の成績</a></nav>
 
@@ -232,7 +232,7 @@ function findings(){
  '<li>位置取りの競馬場ごとの差は、枠よりはそろいます（そろい具合 '+f2(p.style.corr)+'）が、強くはありません。</li></ul>';
  $('ttFind').innerHTML=h;
 }
-fetch('lab/sim-v2/umapot-starts-arc.json?v=20261110f').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
+fetch('lab/sim-v2/umapot-starts-arc2.json?v=20261110g').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
 fetch('lab/sim-v2/umapot-shapes.json').then(function(r){return r.json()}).then(function(j){SH=j;if(D)render()}).catch(function(){});
 fetch('data/track_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;V='東京';SF='芝';BD='全距離';findings();fixSel();render()}).catch(function(){$('ttMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ttFind').textContent=''});
 })();

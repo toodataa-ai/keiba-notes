@@ -359,6 +359,10 @@ def main(a):
         out, centre, half = build_venue(code, sh[code], starts, img)
         smooth = {o["label"]: o for o in out}                       # なめらかな折れ線版（直線と円弧に直す前）
         out, loops = arc_paths.arcify(code, out, centre, half, sh[code]["routes"], log=lambda *x: None)
+        extra = arc_paths.approx_starts(code, loops, sh[code]["routes"], cat.get(code, []) if cat else [], out)
+        out = out + extra
+        for o in extra:
+            print(f"  {code} {o['label']}: 印が無いので目安で補う（周回{o['laps']}）")
         k3 = np.ones((1, 15), np.uint8)
         band = (cv2.morphologyEx(((mask(img, GREEN) | mask(img, ORANGE)) * 255).astype(np.uint8), cv2.MORPH_CLOSE, k3) > 0)
         for rk, lp in loops.items():

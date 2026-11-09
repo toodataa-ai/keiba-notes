@@ -66,3 +66,28 @@ def arcify(code, out, centre, half, routes, log=print):
         res.append(q)
         log(f"  {code:9s}{o['label']:7s} {o['dist']:5d}m→{q['measured_m']:5d}m {info}")
     return res, loops
+
+
+def approx_starts(code, loops, routes, cat_routes, have):
+    """元図に発走の印が無い距離を、本線の上でゴールから距離ぶん戻った所を発走地点にして補う（approx=True＝画面に「目安」と出す）。
+    内回り→外回りの乗り換え（outer_to_inner）は、どこで乗り換えるか決められないので補わない。"""
+    new = []
+    for r in cat_routes:
+        if r["layout"] not in ("inner", "outer", "single"):
+            continue
+        rk = f"{r['surface']}|{r['layout']}"
+        if rk not in loops:
+            continue
+        io = {"inner": "内", "outer": "外"}.get(r["layout"])
+        Lp = loops[rk]; base = Lp["base"]; L = base.length; fy = Lp["fy"]; lap = routes[rk]["lap_m"]; mpp = lap / L
+        for dist in r["distances_m"]:
+            if any(s["surface"] == r["surface"] and s["dist"] == dist and s.get("inout") == io for s in have):
+                continue
+            laps = max(0, math.ceil(dist / lap - 1e-9) - 1); rem = dist - laps * lap      # 0 < rem <= lap
+            s0 = max(0.0, L - rem / mpp)
+            x, y = base.at(s0)[:2]
+            full = np.vstack([base.vertices(s0, L)] + [base.vertices()[1:]] * laps) * [1.0, fy]
+            new.append(dict(label=("D" if r["surface"] == "dirt" else "") + str(dist) + (io or ""), dist=dist, surface=r["surface"], inout=io, route=rk,
+                            x=round(float(x), 2), y=round(float(y * fy), 2), path=[[round(float(a), 2), round(float(b), 2)] for a, b in full],
+                            prim="|" + base.kinds(), measured_m=int(round(dist)), official=True, mx=round(float(x), 2), my=round(float(y * fy), 2), laps=int(laps), approx=True))
+    return new
