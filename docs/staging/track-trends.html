@@ -34,7 +34,7 @@
 .tt-tbl th,.tt-tbl td{padding:7px 6px;border-bottom:1px solid #ececef;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .tt-tbl th:first-child,.tt-tbl td:first-child{text-align:left;font-weight:700}
 .tt-tbl th{font-size:12px;color:#6d6e75;font-weight:400}
-.tt-note{font-size:12px;color:#6d6e75;line-height:1.75;margin:6px 0 0}
+.tt-map{margin:10px 0 0;max-width:560px}.tt-map svg{display:block;width:100%;height:auto;border:1px solid #dcdee3;border-radius:10px;background:#fff}.tt-note{font-size:12px;color:#6d6e75;line-height:1.75;margin:6px 0 0}
 .tt-bold{font-weight:700;color:#1d4f9f}
 </style>
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
@@ -66,6 +66,7 @@
 <div id="ttVenue" class="tt-seg" role="group" aria-label="競馬場"></div><br>
 <div class="tt-seg" role="group" aria-label="芝かダートか"><button type="button" data-s="芝" aria-pressed="true">芝</button><button type="button" data-s="ダート" aria-pressed="false">ダート</button></div>
 <div id="ttBand" class="tt-seg" role="group" aria-label="距離"></div><br><span class="tt-note" style="margin:0 6px 0 0">見る数字：</span><div class="tt-seg" id="ttMetric" role="group" aria-label="見る数字"><button type="button" data-m="win" aria-pressed="true">勝率</button><button type="button" data-m="top3" aria-pressed="false">3着内率</button><button type="button" data-m="ae" aria-pressed="false">人気を除く（A/E）</button></div>
+<figure class="tt-map" id="ttMap" hidden></figure>
 </section>
 
 <section aria-labelledby="drawTitle">
@@ -106,6 +107,7 @@
 </div>
 <script>
 (function(){
+var SH=null,VK={'札幌':'sapporo','函館':'hakodate','福島':'fukushima','新潟':'niigata','東京':'tokyo','中山':'nakayama','中京':'chukyo','京都':'kyoto','阪神':'hanshin','小倉':'kokura'};
 var D=null,V=null,SF='芝',BD='全距離',M='win';
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -131,6 +133,33 @@ function row(label,x,baseAe,R){
  var weak=!(x.z!=null&&Math.abs(x.z)>=2);
  return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+num(x.n)+'頭</small></div>'+bar(x.ae,0.5,1.5,1,weak)+'<div class="tt-val">'+f2(x.ae)+'</div>'+
   '<div class="tt-sub">勝率 '+pc(x.win)+'・3着内 '+pc(x.top3)+'・単勝回収率 '+(x.roi==null?'—':Math.round(x.roi*100)+'%')+tag(x)+(baseAe!=null?'　全競馬場の'+(BD==='全距離'?'':BD+'の')+'平均 '+f2(baseAe):'')+'</div></div>'}
+function drawMap(){
+ var el=$('ttMap');if(!SH||!VK[V]||!SH.venues[VK[V]]){el.hidden=true;return}
+ var sv=SH.venues[VK[V]],m=BD.match(/^(\d+)m(?:（(内|外)）)?$/),rk=null;
+ var sfk=SF==='芝'?'turf':'dirt',cand=[];
+ if(sfk==='turf'&&m&&m[2]==='内')cand.push('turf|inner');if(sfk==='turf'&&m&&m[2]==='外')cand.push('turf|outer');
+ cand.push(sfk+'|single');if(sfk==='turf'){cand.push('turf|inner','turf|outer')}else cand.push('dirt|single');
+ for(var i=0;i<cand.length;i++){if(sv.routes[cand[i]]){rk=cand[i];break}}
+ if(!rk){el.hidden=true;return}
+ var P=sv.routes[rk].pts,n=P.length,cum=[0];
+ for(var i=1;i<=n;i++){var a=P[i-1],b=P[i%n];cum.push(cum[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]))}
+ var L=cum[n],dist=m?+m[1]:null,lap=sv.routes[rk].lap_m;
+ var straight=(V==='新潟'&&SF==='芝'&&dist===1000);
+ function at(f){var t=f*L,i=1;while(i<n&&cum[i]<t)i++;var a=P[i-1],b=P[i%n],u=(t-cum[i-1])/((cum[i]-cum[i-1])||1);return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u]}
+ var out='<svg viewBox="0 0 '+sv.w+' '+sv.h+'" role="img" aria-label="'+esc(V+'競馬場のコース図')+'"><image href="lab/'+sv.img+'" width="'+sv.w+'" height="'+sv.h+'"/>';
+ var gl=P[0],note='';
+ if(dist&&!straight){
+  var f0=1-Math.min(1,(dist%lap||lap)/lap);if(dist>=lap)f0=0;
+  var pts=[],st=at(f0);pts.push(st);
+  for(var i=1;i<n;i++){if(cum[i]/L>f0)pts.push(P[i])}pts.push(P[0]);
+  out+='<polyline points="'+pts.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' ')+'" fill="none" stroke="#e5484d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>';
+  out+='<circle cx="'+st[0].toFixed(1)+'" cy="'+st[1].toFixed(1)+'" r="9" fill="#2f6fd0" stroke="#fff" stroke-width="3"/>';
+  note='青＝スタートのおよその位置、赤＝走る道すじ。';
+ }else if(straight){note='新潟の芝1000m（直線）は図にコースを描いていません。'}
+ out+='<rect x="'+(gl[0]-7).toFixed(1)+'" y="'+(gl[1]-7).toFixed(1)+'" width="14" height="14" fill="#17171a" stroke="#fff" stroke-width="2" transform="rotate(45 '+gl[0].toFixed(1)+' '+gl[1].toFixed(1)+')"/></svg>'+
+  '<figcaption class="tt-note">'+esc(V+'・'+SF+'・'+BD)+'。◆＝ゴール。'+note+'スタート位置は一周の長さから求めた目安で、引き込み線（発走地点の枝道）は反映していません。元図：うまぽっと（umapot.com）</figcaption>';
+ el.innerHTML=out;el.hidden=false;
+}
 function sel(){return D.tracks[V+'|'+SF]}
 function venues(){var s={};Object.keys(D.tracks).forEach(function(k){s[k.split('|')[0]]=1});
  var order=['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'];return order.filter(function(v){return s[v]})}
@@ -149,6 +178,7 @@ function render(){
  var names=Object.keys(t.bands);
  $('ttBand').innerHTML=names.map(function(b){return '<button type="button" data-b="'+b+'" aria-pressed="'+(b===BD)+'">'+b+'</button>'}).join('');
  Array.prototype.forEach.call($('ttBand').querySelectorAll('button'),function(b){b.onclick=function(){BD=b.getAttribute('data-b');render()}});
+ drawMap();
  var bb=t.bands[BD]||t.bands['全距離'];var base=D.base[SF];var bs=bb.base||{draw:base.draw,style:base.style,winners:base.winners};var all=true;
  $('ttMeta').textContent=V+'・'+SF+'：'+num(t.races)+'レース（'+D.years[0]+'〜'+D.years[1]+'年）。距離を選ぶと、その距離だけの数字になります（内回り・外回りがある距離は別々）。';
  var Rd=refs(bb.draw),Rs=refs(bb.style);
@@ -179,6 +209,7 @@ function findings(){
  '<li>位置取りの競馬場ごとの差は、枠よりはそろいます（そろい具合 '+f2(p.style.corr)+'）が、強くはありません。</li></ul>';
  $('ttFind').innerHTML=h;
 }
+fetch('lab/sim-v2/umapot-shapes.json').then(function(r){return r.json()}).then(function(j){SH=j;if(D)render()}).catch(function(){});
 fetch('data/track_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;V='東京';SF='芝';BD='全距離';findings();fixSel();render()}).catch(function(){$('ttMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ttFind').textContent=''});
 })();
 </script>
