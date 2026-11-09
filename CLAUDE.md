@@ -59,6 +59,7 @@
 - ガード：`.github/scripts/jra-release-guard-v1.py`（全リリース共通の不変条件＋過去リリースの固定値）。
 
 ### 承認待ちの変更案（承認はチャットで受ける）
+- `ui-trends-pages-v1`（index.html＋新ページ `track-trends.html`・`people-trends.html`。2026-11-09 ステージング済み・承認待ち）：競馬場の傾向（枠・脚質・馬場・開催の進み・年ごとの変化）と騎手・調教師の条件別成績。データは `docs/data/track_trends_v1.json`・`people_trends_v1.json`（`python3 -m trends_v1.track|people --data <非公開 data_v2> --out docs/data/…`。非公開リポジトリのレースページから読み取り、公開は集計だけ・自動更新なし）。指標は A/E（オッズ由来の期待に対する実際の勝ち数）。**検証結果**：競馬場ごとの枠の偏りは前半(〜2021)と後半(2022〜)で続かない（相関0.01）、脚質の競馬場差は弱く続く（0.23）、騎手の総合力は続かない（0.04）・調教師は少し（0.19）、条件別の得意は騎手0.05・調教師0.07でほぼ続かない。脚質（逃げ・先行が人気より勝つ）は結果後に分かる位置取りで、予想には直接使えない。新ページを足すときの3か所（staging-baseline-v2.py・release-guard・mirror workflow）は更新済み。
 - `ui-claude-results-same-v1`（this-week.html の版番号＋`assets/claude-view-v1.js`。2026-11-08 ステージング済み・承認待ち）：過去の成績の Claude タブを ChatGPT タブと同じ部品（集計期間の選択・期間成績7項目・レース別カード・買い目ごとの的中/ハズレと払戻・反省会）で表示。的中レース率は購入レースだけで割る（見送りを除く）。買い目ごとの払戻は `claude_status_v1.json` の `result.bet_results`（build_public.py で追加）。
 - `ui-claude-exp-v1`（improvement-cycle.html）：「Claudeの予想だけで進めている比較」を表示。**v1.14 として本番リリース済み（2026-11-03）**。
 - `ui-portfolio-card-v1`（improvement-cycle.html）：購入セットの比較カードを回収率の表示にする。**v1.13 として本番リリース済み（2026-11-03）**。
