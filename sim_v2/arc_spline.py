@@ -254,7 +254,7 @@ def tangent_inits(S, loop, s_hint):
     return out[:3]
 
 
-def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None):
+def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin_th=None):
     """発走地点 S から、閉じた軌跡 loop（Spline）へ乗り移る直線＋円弧（loop に接して入る）。
     ref：なぞりたい元の線（S から合流のあたりまで、1画素間隔）。発走の印は max_shift 画素までなら動かしてよい。
     返り値は (Spline, 最大ずれ, 合流位置 s*)。"""
@@ -280,7 +280,7 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None):
         cands.append((key, segs))
     cands.sort(key=lambda c: (len(c[0]), c[0].count("A")))
     best = None
-    tans = tangent_inits(S, loop, s_hint)
+    tans = [] if pin_th is not None else tangent_inits(S, loop, s_hint)
     runs = []
     for key, segs in cands:
         runs.append((key, segs, th[0], s_hint, None))
@@ -291,7 +291,7 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None):
             continue
         if l_init is not None:
             segs = [(0, max(1, int(l_init / h)), 0.0)] + list(segs[1:])
-        r = _refine_chute(S, ref, segs, h, th_init, loop, tol, s_init, max_shift, s_hint)
+        r = _refine_chute(S, ref, segs, h, th_init if pin_th is None else pin_th, loop, tol, s_init, max_shift, s_hint, pin_th)
         if verbose:
             print("   chute", key, None if r is None else round(r[1], 2))
         if r is not None and r[1] <= tol:
@@ -301,7 +301,7 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None):
     return best
 
 
-def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=None):
+def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=None, pin_th=None):
     s_anchor = s_hint if s_anchor is None else s_anchor
     n = len(segs)
     L0 = [max(1.0, (j - i) * h) for i, j, k in segs]
@@ -331,8 +331,11 @@ def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=N
     try:
         lo = np.concatenate([[-np.inf] * 3, np.full(n, 1.0), np.full(len(arc), 0.1), [max(0.0, s_anchor - 800)]])
         hi = np.concatenate([[np.inf] * 3, np.full(n, np.inf), np.full(len(arc), 20.0), [Lloop]])
-        r = least_squares(fun, np.clip(v0, lo + 1e-9, hi - 1e-9), bounds=(lo, hi), x_scale=np.concatenate([[3, 3, 0.1], np.full(n, 30.0), np.full(len(arc), 1.0), [30.0]]), max_nfev=80, diff_step=1e-6)
-        v = _polish(eq, r.x, list(range(len(v0))))
+        if pin_th is not None:      # 始点の位置と向きを固定（直前の線にぴったりつなぐ）
+            for k_, val in enumerate((S[0], S[1], pin_th)):
+                lo[k_] = val - 1e-9; hi[k_] = val + 1e-9
+        r = least_squares(fun, np.clip(v0, lo + 1e-12, hi - 1e-12), bounds=(lo, hi), x_scale=np.concatenate([[3, 3, 0.1], np.full(n, 30.0), np.full(len(arc), 1.0), [30.0]]), max_nfev=80, diff_step=1e-6)
+        v = _polish(eq, r.x, list(range(3 if pin_th is not None else 0, len(v0))))
         if v[-1] > Lloop + 1e-6 or v[-1] < 0:
             return None
     except Exception:

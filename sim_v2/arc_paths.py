@@ -73,6 +73,9 @@ def approx_starts(code, loops, routes, cat_routes, have):
     内回り→外回りの乗り換え（outer_to_inner）は、どこで乗り換えるか決められないので補わない。"""
     new = []
     for r in cat_routes:
+        if r["layout"] == "outer_to_inner":
+            new += _outer_to_inner(code, loops, routes, r, have)
+            continue
         if r["layout"] not in ("inner", "outer", "single"):
             continue
         rk = f"{r['surface']}|{r['layout']}"
@@ -91,3 +94,38 @@ def approx_starts(code, loops, routes, cat_routes, have):
                             x=round(float(x), 2), y=round(float(y * fy), 2), path=[[round(float(a), 2), round(float(b), 2)] for a, b in full],
                             prim="|" + base.kinds(), measured_m=int(round(dist)), official=True, mx=round(float(x), 2), my=round(float(y * fy), 2), laps=int(laps), approx=True))
     return new
+
+
+def _outer_to_inner(code, loops, routes, r, have):
+    """外回りで発走し、ゴールを通ったあと内回りを一周する距離（中山・阪神の芝3200m）。
+    ゴールの手前（まだ直線）で、外回りの線から内回りの線へ、向きを保ったまま直線＋円弧でつなぎ替える。"""
+    if "turf|outer" not in loops or "turf|inner" not in loops:
+        return []
+    O = loops["turf|outer"]; I = loops["turf|inner"]; bo, bi = O["base"], I["base"]; fy = O["fy"]
+    Lo, Li = bo.length, bi.length
+    mo = routes["turf|outer"]["lap_m"] / Lo; mi = routes["turf|inner"]["lap_m"] / Li; lap_i = routes["turf|inner"]["lap_m"]
+    out = []
+    for dist in r["distances_m"]:
+        if any(s["surface"] == "turf" and s["dist"] == dist and s.get("route") == "turf|outer_to_inner" for s in have):
+            continue
+        for back in (250, 180, 330, 120, 420, 520, 620, 700, 90, 60):
+            sa = Lo - back; xa, ya, tha = bo.at(sa)
+            smp = bo.sample(1.0); ref = smp[int(sa):]
+            ch = A.fit_chute(np.array([xa, ya]), ref, bi, O["tol"], Li - back * 0.5, pin_th=tha, max_shift=1e-6)
+            if ch is not None and ch[1] <= O["tol"]:
+                break
+        else:
+            print(f"  !! {code} {dist}: 外回り→内回りのつなぎ替えが作れない"); continue
+        cs, dev, ss = ch
+        inner_m = (cs.length + (Li - ss)) * mi + lap_i
+        s0 = sa - (dist - inner_m) / mo
+        if s0 < 0:
+            print(f"  !! {code} {dist}: 外回りの距離が足りない"); continue
+        loop_i = bi.vertices()
+        full = np.vstack([bo.vertices(s0, sa), cs.vertices()[1:], bi.vertices(ss, Li)[1:], loop_i[1:]]) * [1.0, fy]
+        x, y = bo.at(s0)[:2]
+        out.append(dict(label=str(dist), dist=dist, surface="turf", inout=None, route="turf|outer_to_inner", x=round(float(x), 2), y=round(float(y * fy), 2),
+                        path=[[round(float(a), 2), round(float(b), 2)] for a, b in full], prim="outer>" + cs.kinds() + ">inner", measured_m=int(round(dist)), official=True,
+                        mx=round(float(x), 2), my=round(float(y * fy), 2), laps=1, approx=True))
+        print(f"  {code} {dist}: 外→内 つなぎ {cs.kinds()}（長さ{cs.length:.0f}px・ずれ{dev:.1f}px・ゴール{back}px手前）")
+    return out
