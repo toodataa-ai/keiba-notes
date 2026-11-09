@@ -1,0 +1,54 @@
+name: People pages crawl v1 (jockeys and trainers -> pages saved as-is; research only, no Claude usage)
+on:
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: 'Test: jockey/01171 or trainer/01206 — fetch and print the page structure only, save nothing'
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: people-pages-crawl
+  cancel-in-progress: false
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests beautifulsoup4
+      - name: Probe (fetch and print only)
+        if: ${{ inputs.probe != '' }}
+        run: python3 sire_db_v1/people_crawl.py --probe "${{ inputs.probe }}"
+      - name: Check the private data token exists
+        if: ${{ inputs.probe == '' }}
+        env:
+          T: ${{ secrets.PRIVATE_DATA_TOKEN }}
+        run: test -n "$T" || { echo 'PRIVATE_DATA_TOKEN is not set'; exit 1; }
+      - name: Check out the PRIVATE data repository (raw data never goes into this public repository)
+        if: ${{ inputs.probe == '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - name: Crawl and commit to the private repository
+        if: ${{ inputs.probe == '' }}
+        env:
+          SIRE_DATA_DIR: ${{ github.workspace }}/private/data_v2
+        run: |
+          set -euo pipefail
+          python3 sire_db_v1/people_crawl.py --max-minutes 100 | tee "$RUNNER_TEMP/out.txt"
+          cd private
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data_v2
+          if ! git diff --cached --quiet; then
+            git commit -q -m "People pages: jockeys and trainers collected"
+            for i in 1 2 3 4 5; do
+              if git pull -q --rebase origin HEAD && git push -q origin HEAD; then break; fi
+              sleep $((i*3))
+            done
+          fi
