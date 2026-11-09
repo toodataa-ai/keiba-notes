@@ -116,5 +116,6 @@ $('ppQ').oninput=function(){Q=this.value.trim();render()};
 fetch('data/people_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;findings();render()}).catch(function(){$('ppMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ppFind').textContent=''});
 })();
 </script>
+  <script src="../assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body>
 </html>
