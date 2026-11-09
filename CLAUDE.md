@@ -143,3 +143,11 @@
 - 浅いクローンでは古いリリースのコミットが見えない。必要なら `git fetch --depth=1000 origin main`。
 - Python のバージョン差で浮動小数の最後の桁が変わる。保存済み記録の照合は 1e-9 の許容で行う（runner 実装済み）。
 - 予想・PDF・結果・証拠（docs/data, docs/reports, docs/pdfs, e2e_validation の封印済みファイル, local_racing_shadow_v1）は UI 作業で変更しない。
+
+### NEWバッジの自動管理（2026-11-10修正）
+- トップページの新しくリリースした入口には、正式公開日（JST）から **7日間** NEW を表示する。手動リストだけに依存しない。
+- `.github/scripts/jra-ui-promote-v1.py` が正式UIリリース時の `docs/index.html` の `a.portal-card` リンクを「リリース前コミットと後コミット」で比較し、増えた入口を公開台帳の `new_entry_pages` に **自動記録** する。候補のトップリンク追加漏れにも注意する。
+- `docs/assets/new-badge-v1.js` は公開台帳の `new_entry_pages` と `deployed_at` を読み、JST公開日から7日間表示する。v1.46以前の既存入口だけは互換用の固定日付を利用する。
+- `.github/scripts/jra-release-guard-v1.py` はv1.47以降の全リリースで、記録された新入口とGit差分が一致するかをチェックする。漏れ・不一致ならリリースを失敗させる。バッジ表示は予想データに触れない。
+- **Claudeは新しいトップ入口を追加・公開するたびに、STAGINGのNEW表示を確認し、正式UIリリースは必ず `jra-ui-promote-v1.yml` を使う。** 直接 `docs/index.html` を本番に書き換えてリリース手順を迂回しない。 `new_entry_pages` を手入力で偽装しない。
+
