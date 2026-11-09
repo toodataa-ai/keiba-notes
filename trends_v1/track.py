@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -31,7 +32,8 @@ def build(data_dir: Path) -> dict:
             continue
         n_races += 1
         years.add(race["year"])
-        v, sf, b = race["venue"], race["surface"], band(race["dist"])
+        v, sf = race["venue"], race["surface"]
+        b = f'{race["dist"]}m' + (f'（{race["inout"]}）' if race["inout"] else "")   # 距離を個別に（内/外回りは別扱い）
         races_n[(v, sf)] += 1
         w = next((r for r in rows if r["finish"] == 1 and r["time"]), None)
         if w:
@@ -101,12 +103,17 @@ def build(data_dir: Path) -> dict:
         if nr < 150:
             continue
         item = {"races": nr, "bands": {}}
-        for bb in ["全距離"] + BANDS:
+        dl = sorted({k[2] for k in acc if k[0] == v and k[1] == sf and k[2] != "全距離"},
+                    key=lambda x: (int(re.match(r"\d+", x).group()), x))
+        for bb in ["全距離"] + dl:
             draw = {g: get(v, sf, bb, "draw", g, "all") for g in ("内枠(1〜2枠)", "中枠(3〜6枠)", "外枠(7〜8枠)")}
             style = {g: get(v, sf, bb, "style", g, "all") for g in ("逃げ", "先行", "差し", "追込")}
             if not any(x and x["n"] >= MIN_N for x in draw.values()):
                 continue
-            item["bands"][bb] = {"draw": draw, "style": style, "winners": winners(v, sf, bb)}
+            item["bands"][bb] = {"draw": draw, "style": style, "winners": winners(v, sf, bb),
+                                 "base": {"draw": {g: get("全場", sf, bb, "draw", g, "all") for g in draw},
+                                          "style": {g: get("全場", sf, bb, "style", g, "all") for g in style},
+                                          "winners": winners("全場", sf, bb)}}
             if bb != "全距離":
                 for dim, groups in (("draw", list(draw)), ("style", list(style))):
                     persist_pairs[dim] += persistence(v, sf, bb, dim, groups)

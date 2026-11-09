@@ -127,7 +127,7 @@ function row(label,x,baseAe,R){
  if(!x||x.n<D.min_n)return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+(x?num(x.n)+'頭':'')+'</small></div><div class="tt-sub">頭数が少なく、数字は出していません。</div></div>';
  var weak=!(x.z!=null&&Math.abs(x.z)>=2);
  return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+num(x.n)+'頭</small></div>'+bar(x.ae,0.5,1.5,1,weak)+'<div class="tt-val">'+f2(x.ae)+'</div>'+
-  '<div class="tt-sub">勝率 '+pc(x.win)+'・3着内 '+pc(x.top3)+'・単勝回収率 '+(x.roi==null?'—':Math.round(x.roi*100)+'%')+tag(x)+(baseAe!=null?'　全競馬場の平均 '+f2(baseAe):'')+'</div></div>'}
+  '<div class="tt-sub">勝率 '+pc(x.win)+'・3着内 '+pc(x.top3)+'・単勝回収率 '+(x.roi==null?'—':Math.round(x.roi*100)+'%')+tag(x)+(baseAe!=null?'　全競馬場の'+(BD==='全距離'?'':BD+'の')+'平均 '+f2(baseAe):'')+'</div></div>'}
 function sel(){return D.tracks[V+'|'+SF]}
 function venues(){var s={};Object.keys(D.tracks).forEach(function(k){s[k.split('|')[0]]=1});
  var order=['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'];return order.filter(function(v){return s[v]})}
@@ -146,14 +146,14 @@ function render(){
  var names=Object.keys(t.bands);
  $('ttBand').innerHTML=names.map(function(b){return '<button type="button" data-b="'+b+'" aria-pressed="'+(b===BD)+'">'+b+'</button>'}).join('');
  Array.prototype.forEach.call($('ttBand').querySelectorAll('button'),function(b){b.onclick=function(){BD=b.getAttribute('data-b');render()}});
- var bb=t.bands[BD]||t.bands['全距離'];var base=D.base[SF];var all=BD==='全距離';
- $('ttMeta').textContent=V+'・'+SF+'：'+num(t.races)+'レース（'+D.years[0]+'〜'+D.years[1]+'年）。距離を選ぶと、その距離だけの数字になります。';
+ var bb=t.bands[BD]||t.bands['全距離'];var base=D.base[SF];var bs=bb.base||{draw:base.draw,style:base.style,winners:base.winners};var all=true;
+ $('ttMeta').textContent=V+'・'+SF+'：'+num(t.races)+'レース（'+D.years[0]+'〜'+D.years[1]+'年）。距離を選ぶと、その距離だけの数字になります（内回り・外回りがある距離は別々）。';
  var Rd=refs(bb.draw),Rs=refs(bb.style);
- $('ttDraw').innerHTML=['内枠(1〜2枠)','中枠(3〜6枠)','外枠(7〜8枠)'].map(function(g){return row(g,bb.draw[g],all&&base.draw[g]?base.draw[g].ae:null,Rd)}).join('');
- $('ttStyle').innerHTML=['逃げ','先行','差し','追込'].map(function(g){return row(g,bb.style[g],all&&base.style[g]?base.style[g].ae:null,Rs)}).join('');
- var wn=bb.winners,wb=base.winners;
+ $('ttDraw').innerHTML=['内枠(1〜2枠)','中枠(3〜6枠)','外枠(7〜8枠)'].map(function(g){return row(g,bb.draw[g],bs.draw&&bs.draw[g]?bs.draw[g].ae:null,Rd)}).join('');
+ $('ttStyle').innerHTML=['逃げ','先行','差し','追込'].map(function(g){return row(g,bb.style[g],bs.style&&bs.style[g]?bs.style[g].ae:null,Rs)}).join('');
+ var wn=bb.winners,wb=bs.winners;
  $('ttWinStyle').innerHTML=wn&&wn.n>=D.min_n/3?['逃げ','先行','差し','追込'].map(function(g){var v=wn[g],r=wb?wb[g]:null;
-  return '<div class="tt-row"><div class="tt-lab">'+g+'<small>勝ち馬の割合</small></div>'+barZ(v,0.6,r!=null?r:v)+'<div class="tt-val">'+pc(v)+'</div><div class="tt-sub">'+num(wn.n)+'レース中'+(r!=null?'　全競馬場の'+SF+'（全距離）は '+pc(r):'')+(r!=null?'（差 '+((v-r)*100>0?'+':'')+((v-r)*100).toFixed(1)+'ポイント）':'')+'</div></div>'}).join(''):'<p class="tt-note">レース数が少なく、数字は出していません。</p>';
+  return '<div class="tt-row"><div class="tt-lab">'+g+'<small>勝ち馬の割合</small></div>'+barZ(v,0.6,r!=null?r:v)+'<div class="tt-val">'+pc(v)+'</div><div class="tt-sub">'+num(wn.n)+'レース中'+(r!=null?'　全競馬場の'+SF+(BD==='全距離'?'（全距離）':'の'+BD)+'は '+pc(r):'')+(r!=null?'（差 '+((v-r)*100>0?'+':'')+((v-r)*100).toFixed(1)+'ポイント）':'')+'</div></div>'}).join(''):'<p class="tt-note">レース数が少なく、数字は出していません。</p>';
  var gv=t.going||{},gk=['稍重','重','不良'].filter(function(k){return gv[k]});
  $('ttGoing').innerHTML=gk.length?gk.map(function(k){var x=gv[k],d=x.time_diff_pct;
   return '<div class="tt-row"><div class="tt-lab">'+k+'<small>'+num(x.races)+'レース</small></div>'+bar(d,-3,3,0,false)+'<div class="tt-val">'+(d>0?'+':'')+d.toFixed(2)+'%</div><div class="tt-sub">同じ競馬場・距離・クラスの「良」の勝ちタイムより、'+(d>0?'遅い':'速い')+'（1600mなら約'+Math.abs(d*0.96).toFixed(1)+'秒）</div></div>'}).join('')
