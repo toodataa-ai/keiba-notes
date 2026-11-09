@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import subprocess
+from html.parser import HTMLParser
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -45,6 +47,60 @@ def apply(candidate_id: str) -> list[str]:
     return scope
 
 
+
+class PortalCardLinks(HTMLParser):
+    """Only top-page cards are user-facing NEW entrances."""
+
+    def __init__(self):
+        super().__init__()
+        self.pages = set()
+
+    def handle_starttag(self, tag, attrs):
+        if tag != "a":
+            return
+        info = dict(attrs)
+        if "portal-card" not in info.get("class", "").split():
+            return
+        href = info.get("href", "").split("#", 1)[0].split("?", 1)[0]
+        if href.endswith(".html") and "/" not in href and href not in (".html",):
+            self.pages.add(href)
+
+
+def pages_in_index_revision(revision: str) -> set[str]:
+    html = subprocess.check_output(
+        ["git", "show", f"{revision}:docs/index.html"], cwd=ROOT, text=True
+    )
+    parser = PortalCardLinks()
+    parser.feed(html)
+    return parser.pages
+
+
+def new_entry_pages(commit: str) -> list[str]:
+    """Detect new homepage entrances without manually maintaining a badge list."""
+    before = pages_in_index_revision(commit + "^")
+    after = pages_in_index_revision(commit)
+    added = sorted(after - before)
+    for path in added:
+        assert (ROOT / "docs" / path).is_file(), ("new entrance has no published page", path)
+    return added
+
+
+def verify_badges() -> None:
+    ledger = json.loads(LEDGERS[0].read_text(encoding="utf-8"))
+    checked = 0
+    for release in ledger["releases"]:
+        version = tuple(int(x) for x in release["public_version"].split("."))
+        if version < (1, 47):  # Older releases retain their historical fixed entries.
+            continue
+        actual = new_entry_pages(release["commit_sha"])
+        recorded = release.get("new_entry_pages")
+        assert recorded == actual, (
+            "NEW badge release metadata missing/mismatched",
+            release["release_id"], recorded, actual
+        )
+        checked += 1
+    print("PASS_NEW_BADGE_RELEASE_REGISTRY", checked)
+
 def next_version(current: str) -> str:
     major, minor = current.split(".")
     return f"{major}.{int(minor) + 1:0{len(minor)}d}"
@@ -68,6 +124,7 @@ def record(candidate_json: str, commit: str, run_id: int, approval: str, scope: 
         "immutable_prediction_source_preserved": True,
         "presentation_only": True,
         "staging_identity_not_in_production": True,
+        "new_entry_pages": new_entry_pages(commit),
         "scope_files": scope,
         "public_http_files_verified": None,
     })
@@ -83,11 +140,14 @@ def main():
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest="cmd", required=True)
     a = sub.add_parser("apply"); a.add_argument("--candidate", required=True)
+    sub.add_parser("verify-badges")
     r = sub.add_parser("record")
     r.add_argument("--commit", required=True); r.add_argument("--run-id", type=int, required=True)
     r.add_argument("--approval", required=True); r.add_argument("--scope", required=True)
     args = p.parse_args()
-    if args.cmd == "apply":
+    if args.cmd == "verify-badges":
+        verify_badges()
+    elif args.cmd == "apply":
         print(json.dumps(apply(args.candidate)))
     else:
         assert args.approval.strip(), "explicit user approval quote is required"
