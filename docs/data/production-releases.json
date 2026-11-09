@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.45-20261109",
-  "current_public_version": "1.45",
+  "current_public_release": "release/jra-site-v1.46-20261110",
+  "current_public_version": "1.46",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -954,6 +954,28 @@
       "scope_files": [
         "docs/results.html",
         "docs/assets/results.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.46-20261110",
+      "branch": "release/jra-site-v1.46-20261110",
+      "commit_sha": "caf1acb27d98cb37c776d92bdecf664a3e5e8f73",
+      "deployed_at": "2026-11-10T05:52:22+09:00",
+      "workflow_run_id": 42697041493,
+      "validation_workflow_run_id": 42697041493,
+      "public_version": "1.46",
+      "note": "2026-11-10ユーザー明示承認済み。競馬場の傾向・騎手調教師の成績ページ：新ページ2つ（競馬場の傾向／騎手・調教師の成績）とトップのカード2枚。データは docs/data の集計だけ（人気の影響を除いたA/Eと、得意が続くかの検証つき）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-pages-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "scope_files": [
+        "docs/index.html",
+        "docs/track-trends.html",
+        "docs/people-trends.html"
       ],
       "public_http_files_verified": null
     }
