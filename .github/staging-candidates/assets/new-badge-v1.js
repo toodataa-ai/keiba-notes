@@ -46,8 +46,8 @@
     style.textContent = '.new-badge{position:absolute;top:-7px;right:12px;z-index:2;padding:2px 7px;border-radius:999px;background:#c61d31;color:#fff;font:800 10px/1.3 system-ui,-apple-system,sans-serif;letter-spacing:.06em;box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:none}';
     document.head.appendChild(style);
     addBadges(LEGACY);  // Also works if the ledger is temporarily unavailable.
-    var fromStaging = /\/staging\//.test(window.location.pathname);
-    var ledgerUrl = fromStaging ? '../data/production-releases.json' : 'data/production-releases.json';
+    // STAGING has <base href="../">, so this resolves to the same data URL on both sites.
+    var ledgerUrl = 'data/production-releases.json';
     fetch(ledgerUrl, {cache: 'no-store'}).then(function (response) {
       if (!response.ok) throw Error('release ledger HTTP ' + response.status);
       return response.json();
