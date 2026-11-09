@@ -17,6 +17,7 @@ umapot-shapes.json（LABのシミュレータが使う内ラチの線）は変�
 import argparse, json, math
 from pathlib import Path
 import cv2, numpy as np
+from . import arc_paths
 from scipy import ndimage as ndi
 from skimage.graph import MCP_Geometric
 import scipy.sparse as sp, scipy.sparse.linalg as spl
@@ -312,7 +313,7 @@ def build_venue(code, v, starts, img):
         o["_kink"] = (float(np.degrees(turn[ik])) if len(turn) else 0.0, Qk[ik + 3].round().tolist() if len(turn) else None)
         o["measured_m"] = round(first_m + laps * routes[rk]["lap_m"]); o["laps"] = int(laps); o["_inside"] = float((A | cut)[cy, cx].mean())
         out.append(o)
-    return out, centre
+    return out, centre, half
 
 
 def fix_starts(code, starts, v):
@@ -355,11 +356,23 @@ def main(a):
         starts = fix_starts(code, starts, sh[code])
         for s0 in starts:
             s0["official"] = official(cat, code, s0)
-        out, centre = build_venue(code, sh[code], starts, img)
+        out, centre, half = build_venue(code, sh[code], starts, img)
+        smooth = {o["label"]: o for o in out}                       # なめらかな折れ線版（直線と円弧に直す前）
+        out, loops = arc_paths.arcify(code, out, centre, half, sh[code]["routes"], log=lambda *x: None)
+        k3 = np.ones((1, 15), np.uint8)
+        band = (cv2.morphologyEx(((mask(img, GREEN) | mask(img, ORANGE)) * 255).astype(np.uint8), cv2.MORPH_CLOSE, k3) > 0)
+        for rk, lp in loops.items():
+            print(f"  {code} {rk}: 周回 {lp['sp'].kinds()}（{len(lp['sp'].L)}部品）中心線からの最大ずれ {lp['dev']:.1f}px = 幅の{lp['dev'] / (2 * half[rk]) * 100:.1f}%" + ("  ※10%超" if lp["dev"] > lp["tol"] else ""))
         for o in out:
-            e = o["measured_m"] - o["dist"]; ins = o.pop("_inside", 0); kk = o.pop("_kink", (0, None))
+            if "prim" not in o:
+                print(f"  !! {code} {o['label']}: 直線と円弧に直せず（なめらかな線のまま）")
+            e = o["measured_m"] - o["dist"]
+            Q = np.array(o["path"]); cx = np.clip(np.round(Q[:, 0]).astype(int), 0, img.shape[1] - 1); cy = np.clip(np.round(Q[:, 1]).astype(int), 0, img.shape[0] - 1)
+            ins = float(band[cy, cx].mean())
+            o.pop("_inside", 0); o.pop("_kink", 0); prim = o.pop("prim", "-")
             flag = (" 距離ずれ" if abs(e) > 0.06 * o["dist"] else "") + (" 帯の外" if ins < 0.985 else "")
-            print(f"{code:10s}{o['label']:8s}{o['measured_m']:6d} ({e:+5d}) 周回{o.get('laps', '-')} 帯の中{ins * 100:5.1f}% 点{len(o['path']):4d} 最急{kk[0]:5.1f}度@{kk[1]}{flag}")
+            so = smooth.get(o["label"], {})
+            print(f"{code:10s}{o['label']:8s}{o['measured_m']:6d} ({e:+5d}; 前{so.get('measured_m', 0) - o['dist']:+5d}) 周回{o.get('laps', '-')} 帯の中{ins * 100:5.1f}% 点{len(o['path']):4d} {prim}{flag}")
         res[code] = out
         if a.overlay:
             Path(a.overlay).mkdir(parents=True, exist_ok=True)
@@ -378,12 +391,12 @@ def main(a):
             cv2.imwrite(str(Path(a.overlay) / f"{code}.png"), cv2.resize(sheet, None, fx=f, fy=f, interpolation=cv2.INTER_AREA))
     if a.write:
         doc["venues"] = res
-        doc["source"] = "うまぽっと（https://umapot.com/）のコース素材の発走位置の印をもとに作成。道すじは走路の帯の中央を通る線（sim_v2/build_course_paths.py）。"
-        Path(a.starts).write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        doc["source"] = "うまぽっと（https://umapot.com/）のコース素材の発走位置の印をもとに作成。道すじは走路の帯の中央を通る、直線と円弧だけの線（sim_v2/build_course_paths.py・arc_paths.py・arc_spline.py）。"
+        Path(a.out or a.starts).write_text(json.dumps(doc, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--shapes", required=True); ap.add_argument("--starts", required=True); ap.add_argument("--img-root", required=True)
-    ap.add_argument("--write", action="store_true"); ap.add_argument("--overlay"); ap.add_argument("--catalog")
+    ap.add_argument("--write", action="store_true"); ap.add_argument("--out"); ap.add_argument("--overlay"); ap.add_argument("--catalog")
     main(ap.parse_args())
