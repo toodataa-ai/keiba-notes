@@ -237,6 +237,5 @@ fetch('lab/sim-v2/umapot-shapes.json').then(function(r){return r.json()}).then(f
 fetch('data/track_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;V='東京';SF='芝';BD='全距離';findings();fixSel();render()}).catch(function(){$('ttMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ttFind').textContent=''});
 })();
 </script>
-  <script src="../assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body>
 </html>
