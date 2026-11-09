@@ -23,6 +23,7 @@ def build(data_dir: Path) -> dict:
     acc = defaultdict(S)                 # (venue, surface, band, dim, group, period) -> S
     win_times = defaultdict(list)        # (venue, surface, dist, inout, klass, going) -> [勝ちタイム]
     races_n = defaultdict(int)
+    wins_by_style = defaultdict(lambda: defaultdict(int))
     n_races = n_rows = 0
     years = set()
     for race, rows in iter_races(data_dir):
@@ -35,6 +36,12 @@ def build(data_dir: Path) -> dict:
         w = next((r for r in rows if r["finish"] == 1 and r["time"]), None)
         if w:
             win_times[(v, sf, race["dist"], race["inout"], race["klass"], race["going"])].append(w["time"])
+        wr = next((r for r in rows if r["finish"] == 1), None)
+        wst = style_of(wr, len(rows)) if wr else None
+        if wst:                                   # そのレースの勝ち馬の脚質（1レース1回数える）
+            for vv in (v, "全場"):
+                for bb in (b, "全距離"):
+                    wins_by_style[(vv, sf, bb)][wst] += 1
         probs = race_probs(rows)
         if probs is None:
             continue
@@ -66,6 +73,11 @@ def build(data_dir: Path) -> dict:
         s = acc.get(k)
         return s.out() if s and s.n else None
 
+    def winners(v, sf, bb):
+        c = wins_by_style.get((v, sf, bb))
+        t = sum(c.values()) if c else 0
+        return {"n": t, **{g: round(c[g] / t, 3) for g in ("逃げ", "先行", "差し", "追込")}} if t else None
+
     def persistence(v, sf, bb, dim, groups):
         """競馬場ごとの『全場平均との差』が前半・後半でそろうか（全場共通の脚質の差は除く）"""
         pairs = []
@@ -82,6 +94,7 @@ def build(data_dir: Path) -> dict:
     for sf in ("芝", "ダート"):
         base[sf] = {"draw": {g: get("全場", sf, "全距離", "draw", g, "all") for g in ("内枠(1〜2枠)", "中枠(3〜6枠)", "外枠(7〜8枠)")},
                     "style": {g: get("全場", sf, "全距離", "style", g, "all") for g in ("逃げ", "先行", "差し", "追込")},
+                    "winners": winners("全場", sf, "全距離"),
                     "progress": {g: {p: get("全場", sf, "全距離", "progress_" + g, p, "all") for p in ("序盤(1〜3日目)", "中盤(4〜6日目)", "終盤(7日目〜)")}
                                  for g in ("内枠(1〜2枠)", "外枠(7〜8枠)")}}
     for (v, sf), nr in sorted(races_n.items()):
@@ -93,7 +106,7 @@ def build(data_dir: Path) -> dict:
             style = {g: get(v, sf, bb, "style", g, "all") for g in ("逃げ", "先行", "差し", "追込")}
             if not any(x and x["n"] >= MIN_N for x in draw.values()):
                 continue
-            item["bands"][bb] = {"draw": draw, "style": style}
+            item["bands"][bb] = {"draw": draw, "style": style, "winners": winners(v, sf, bb)}
             if bb != "全距離":
                 for dim, groups in (("draw", list(draw)), ("style", list(style))):
                     persist_pairs[dim] += persistence(v, sf, bb, dim, groups)
