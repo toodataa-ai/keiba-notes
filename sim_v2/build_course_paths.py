@@ -19,6 +19,7 @@ from pathlib import Path
 import cv2, numpy as np
 from scipy import ndimage as ndi
 from skimage.graph import MCP_Geometric
+import scipy.sparse as sp, scipy.sparse.linalg as spl
 
 GREEN = (0, 176, 80); ORANGE = (197, 90, 17)
 
@@ -131,6 +132,44 @@ def pull_taut(P, ok):
     return P[out]
 
 
+def signed_dist(M):
+    return ndi.distance_transform_edt(M) - ndi.distance_transform_edt(~M)
+
+
+def fit_smooth(ref, sd, margin, closed, cap, w=None, lam=4e6, h=2.0):
+    """線 ref をなめらかな曲線に置きかえる（曲がり具合が少しずつ変わる線。角も、急な曲がり始めも作らない）。
+    「元の線に近い」と「曲がり具合の変化が小さい」のつり合いで決め、通ってよい範囲（sd >= margin、元の線から cap 以内）を
+    はみ出した所だけ、元の線に強く引き寄せてやり直す。ref は h 画素おきの点。w は点ごとの重み（大きいほど動かさない）。"""
+    R = np.asarray(ref, float); n = len(R)
+    w = np.ones(n) if w is None else np.asarray(w, float).copy()
+    if closed:
+        D = sp.diags([-1.0, 3.0, -3.0, 1.0], [0, 1, 2, 3], shape=(n, n), format="lil")
+        for r in range(n - 3, n):
+            for c, val in zip(range(r, r + 4), (-1.0, 3.0, -3.0, 1.0)):
+                D[r, c % n] = val
+        D = D.tocsc()
+    else:
+        D = sp.diags([-1.0, 3.0, -3.0, 1.0], [0, 1, 2, 3], shape=(n - 3, n), format="csc")
+    K = lam * (D.T @ D)
+    Hh, Ww = sd.shape
+    for it in range(14):
+        lu = spl.splu((sp.diags(w) + K).tocsc())
+        F = np.stack([lu.solve(w * R[:, 0]), lu.solve(w * R[:, 1])], axis=1)
+        d = ndi.map_coordinates(sd, [np.clip(F[:, 1], 0, Hh - 1), np.clip(F[:, 0], 0, Ww - 1)], order=1, mode="nearest")
+        bad = (d < margin) | (np.linalg.norm(F - R, axis=1) > cap)
+        bad &= w < 100
+        if not bad.any():
+            break
+        bad = ndi.binary_dilation(bad, iterations=4) if not closed else np.roll(ndi.binary_dilation(np.tile(bad, 3), iterations=4)[n:2 * n], 0)
+        w = np.where(bad & (w < 100), np.minimum(w * 3.0, 100), w)
+    return F
+
+
+def corridor(B, raw, hb, shape, closed):
+    """線 raw のまわり（帯の中）で、線を動かしてよい範囲を表す符号つき距離。"""
+    return signed_dist(B & (line_dist(shape, raw, closed) < 1.6 * hb))
+
+
 def build_venue(code, v, starts, img):
     H, W = img.shape[:2]
     k = np.ones((1, 15), np.uint8)   # ゴールの黒い縦線で帯が切れないように横につなぐ
@@ -173,7 +212,11 @@ def build_venue(code, v, starts, img):
         raw = path_between(cost, snap(A & ~cut, (gx + 4 * dirx, ya)), snap(A & ~cut, (gx - 4 * dirx, yb)))
         if raw is None:
             raise SystemExit(f"{code} {rk}: 一周の線が作れません")
-        C = smooth_closed(raw, 22.0 if rk == "turf|outer" else 14.0)   # 外回りは内回りの線から分かれる所をゆるやかに
+        ref = smooth_closed(raw, 8.0)[::2]
+        if rk == "turf|outer":   # 外回り：内回りの線に乗り移る所を大きな弧でつなげるよう、動かせる幅を広めにとる
+            C = fit_smooth(ref, signed_dist(B), 0.35 * half[rk], True, cap=3.0 * half[rk], lam=3e7)
+        else:
+            C = fit_smooth(ref, signed_dist(A), 0.35 * half[rk], True, cap=1.2 * half[rk])
         near = np.nonzero(np.abs(C[:, 1] - (ya + yb) / 2) < 2 * half[rk])[0]
         i0 = near[int(np.argmin(np.abs(C[near, 0] - gx)))]   # ゴール線の位置から始まるように並べ直す
         C = np.vstack([C[i0:], C[:i0]])
@@ -203,7 +246,8 @@ def build_venue(code, v, starts, img):
         free = np.isfinite(cost)
         dtA = ndi.distance_transform_edt(A)
         okm = dtA >= 0.9 * min(hb, float(np.percentile(dtA[A], 99)))
-        sx, sy = float(s["x"]), float(s["y"]); straight_in = None
+        mx0, my0 = float(s.get("mx", s["x"])), float(s.get("my", s["y"]))   # 元図の印の位置（作り直しても変わらないように別に持つ）
+        sx, sy = mx0, my0; straight_in = None
         gap = float(ndi.distance_transform_edt(~A)[int(round(sy)), int(round(sx))])
         if 0 < gap <= 20:      # 印が帯から少しはみ出している：帯の中央寄りへ寄せる
             sx, sy = snap(free & (dtA >= 0.8 * hb), (sx, sy))
@@ -216,6 +260,8 @@ def build_venue(code, v, starts, img):
                 tg = C[kk + 6] - C[kk - 6]; vv = C[kk] - [sx, sy]
                 if np.dot(tg, vv) / (np.linalg.norm(tg) * np.linalg.norm(vv)) > math.cos(math.radians(18)):
                     straight_in = kk; break
+        if straight_in is None and dC[int(round(sy)), int(round(sx))] < hb:   # 本線の上の発走：印を線の上にのせる
+            sx, sy = map(float, C[int(np.argmin(np.linalg.norm(C - [sx, sy], axis=1)))])
         tgt = snap(free & (dC < 1.5), C[-6]); st = snap(free, (sx, sy)) if straight_in is None else snap(free, C[straight_in])
         raw = path_between(cost, st, tgt)
         if raw is None:
@@ -223,40 +269,97 @@ def build_venue(code, v, starts, img):
         on = dC[raw[:, 1].astype(int), raw[:, 0].astype(int)] <= 2.0
         off_idx = np.nonzero(~on)[0]
         j = int(off_idx[-1]) + 1 if len(off_idx) else 0      # ここから先はずっと中心線の上
-        je = min(len(raw) - 1, j + 75)
+        je = min(len(raw) - 1, j + 140)
         kC = int(np.argmin(np.linalg.norm(C - raw[je], axis=1)))
         if kC < 3:
             kC = len(C) - 1
-        chute = np.vstack([[sx, sy], raw[:je], C[kC]])
-        tube = np.zeros((H, W), np.uint8); cv2.polylines(tube, [np.round(chute).astype(np.int32)], False, 255, 3)
-        cv2.circle(tube, (int(round(sx)), int(round(sy))), int(hb), 255, -1)
-        chute = pull_taut(resample(chute, 2.0), (okm | (tube > 0)))
-        chute = smooth_open(chute, 22.0)
+        if j <= 3 and straight_in is None:      # はじめから本線の上
+            k0 = int(np.argmin(np.linalg.norm(C - [sx, sy], axis=1))); kC = max(kC, k0)
+            chute = C[k0:kC + 1]
+        else:
+            # 発走地点から、本線に乗って少し進んだ所までをピンと張る（引き込み線と本線が一直線なら、まっすぐ入る）。
+            # その先に本線の線そのものを足し、そこで本線へ少しずつ寄せる（つなぎ目に角を作らない）
+            kj = int(np.argmin(np.linalg.norm(C - raw[min(j, len(raw) - 1)], axis=1)))
+            kC = min(len(C) - 1, kj + 140) if kj < len(C) - 4 else len(C) - 1
+            pre = np.vstack([[sx, sy], raw[:j + 1], C[kj + 1:kC + 1]]) if kC > kj else np.vstack([[sx, sy], raw[:j + 1], C[kC]])
+            tube = np.zeros((H, W), np.uint8); cv2.polylines(tube, [np.round(pre).astype(np.int32)], False, 255, 3)
+            cv2.circle(tube, (int(round(sx)), int(round(sy))), int(hb), 255, -1)
+            taut = pull_taut(resample(pre, 2.0), (okm | (tube > 0)))
+            k2 = min(len(C) - 1, kC + 120)
+            body = resample(smooth_open(np.vstack([taut, C[kC + 1:k2 + 1]]), 10.0), 2.0)
+            n2 = max(0, (k2 - kC) // 2); kC = k2
+            body[0] = [sx, sy]; body[-1] = C[kC]
+            if n2 >= 2:
+                body[-n2:] = resample(C[kC - 2 * n2 + 1:kC + 1], 2.0)[-n2:]
+            walls = A & np.isfinite(cost) if BARRIERS.get((code, s["label"])) else A
+            tailC = np.vstack([C[kC + 1:], C])[1:240:2]
+            wt = np.ones(len(body) + len(tailC)); wt[0] = 1e6; wt[len(body):] = 1e5
+            m = min(max(n2, 30), len(body) - 2); wt[len(body) - m:len(body)] = np.logspace(0, 5, m)
+            F = fit_smooth(np.vstack([body, tailC]), signed_dist(walls), 0.35 * hb, False, cap=1.6 * hb, w=wt)
+            chute = F[:len(body)]; chute[0] = [sx, sy]; chute[-1] = C[kC]
         seg = np.vstack([chute, C[kC + 1:], C[:1]])
         loop = np.vstack([C[1:], C[:1]])
         mpp = routes[rk]["lap_m"] / len(C)
         first_m = arclen(seg)[-1] * mpp
         laps = max(0, round((s["dist"] - first_m) / routes[rk]["lap_m"]))
         full = np.vstack([seg] + [loop] * laps)
-        pts = rdp(resample(full, 2.0), 0.3)
+        pts = rdp(resample(full, 1.5), 0.06)   # 細かめに残す（粗く間引くと折れ線の角が見える）
+        Qk = resample(full, 3.0); dk = np.diff(Qk, axis=0); th = np.unwrap(np.arctan2(dk[:, 1], dk[:, 0]))
+        turn = np.abs(th[6:] - th[:-6])       # 18画素進む間に向きが変わる量
+        ik = int(np.argmax(turn)) if len(turn) else 0
         chk = resample(full, 3.0); cx = np.clip(np.round(chk[:, 0]).astype(int), 0, W - 1); cy = np.clip(np.round(chk[:, 1]).astype(int), 0, H - 1)
-        o = dict(s); o["route"] = rk; o["x"] = round(sx, 1); o["y"] = round(sy, 1); o["path"] = [[round(float(a), 1), round(float(b), 1)] for a, b in pts]
+        o = dict(s); o["route"] = rk; o["x"] = round(sx, 1); o["y"] = round(sy, 1); o["mx"] = round(mx0, 1); o["my"] = round(my0, 1); o["path"] = [[round(float(a), 1), round(float(b), 1)] for a, b in pts]
+        o["_kink"] = (float(np.degrees(turn[ik])) if len(turn) else 0.0, Qk[ik + 3].round().tolist() if len(turn) else None)
         o["measured_m"] = round(first_m + laps * routes[rk]["lap_m"]); o["laps"] = int(laps); o["_inside"] = float((A | cut)[cy, cx].mean())
         out.append(o)
     return out, centre
 
 
+def fix_starts(code, starts, v):
+    """元図の札の直しと、元図に印が無い主要コースの補い（どれも approx=True を付け、画面に「目安」と出す）。"""
+    starts = [dict(s) for s in starts if not s.get("approx")]
+    by = {s["label"]: s for s in starts}
+    if code == "kyoto":
+        if "2200内" in by:   # 京都の芝2200mは外回りだけ（内回りの設定は無い）
+            by["2200内"].update(label="2200外", inout="外", route="turf|outer")
+        if "1600内" in by and "1600外" not in by:   # 芝1600mは内・外とも同じ引き込み線から発走
+            starts.append(dict(by["1600内"], label="1600外", inout="外", route="turf|outer", approx=True))
+    if code == "tokyo" and "D1400" in by and "D1300" in by and "D1600" not in by:
+        # ダート1600m：向正面を2コーナー側へのばした先の芝のポケットから発走。D1400 の印から200m手前に置く
+        g = lambda t: np.array([by[t].get("mx", by[t]["x"]), by[t].get("my", by[t]["y"])], float)
+        a, b = g("D1400"), g("D1300")
+        r = v["routes"]["dirt|single"]; mpp = r["lap_m"] / r["per_px"]
+        p = a + (a - b) / np.linalg.norm(a - b) * (200.0 / mpp)
+        starts.append(dict(by["D1400"], label="D1600", dist=1600, x=round(float(p[0]), 1), y=round(float(p[1]), 1), mx=round(float(p[0]), 1), my=round(float(p[1]), 1), approx=True))
+    return starts
+
+
+def official(cat, code, s):
+    """JRAのコース台帳にある距離かどうか（台帳が無ければ True）。"""
+    if not cat:
+        return True
+    lay = {"内": ("inner",), "外": ("outer",), None: ("single", "straight", "inner", "outer")}[s["inout"]]
+    for r in cat.get(code, []):
+        if r["surface"] == s["surface"] and r["layout"] in lay and s["dist"] in r["distances_m"]:
+            return True
+    return False
+
+
 def main(a):
     sh = json.loads(Path(a.shapes).read_text(encoding="utf-8"))["venues"]
     doc = json.loads(Path(a.starts).read_text(encoding="utf-8"))
+    cat = {v["code"]: v["routes"] for v in json.loads(Path(a.catalog).read_text(encoding="utf-8"))["venues"]} if a.catalog else None
     res = {}
     for code, starts in doc["venues"].items():
         img = cv2.imread(str(Path(a.img_root) / f"{code}.png"))
+        starts = fix_starts(code, starts, sh[code])
+        for s0 in starts:
+            s0["official"] = official(cat, code, s0)
         out, centre = build_venue(code, sh[code], starts, img)
         for o in out:
-            e = o["measured_m"] - o["dist"]; ins = o.pop("_inside", 0)
+            e = o["measured_m"] - o["dist"]; ins = o.pop("_inside", 0); kk = o.pop("_kink", (0, None))
             flag = (" 距離ずれ" if abs(e) > 0.06 * o["dist"] else "") + (" 帯の外" if ins < 0.985 else "")
-            print(f"{code:10s}{o['label']:8s}{o['measured_m']:6d} ({e:+5d}) 周回{o.get('laps', '-')} 帯の中{ins * 100:5.1f}% 点{len(o['path']):4d}{flag}")
+            print(f"{code:10s}{o['label']:8s}{o['measured_m']:6d} ({e:+5d}) 周回{o.get('laps', '-')} 帯の中{ins * 100:5.1f}% 点{len(o['path']):4d} 最急{kk[0]:5.1f}度@{kk[1]}{flag}")
         res[code] = out
         if a.overlay:
             Path(a.overlay).mkdir(parents=True, exist_ok=True)
@@ -282,5 +385,5 @@ def main(a):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--shapes", required=True); ap.add_argument("--starts", required=True); ap.add_argument("--img-root", required=True)
-    ap.add_argument("--write", action="store_true"); ap.add_argument("--overlay")
+    ap.add_argument("--write", action="store_true"); ap.add_argument("--overlay"); ap.add_argument("--catalog")
     main(ap.parse_args())

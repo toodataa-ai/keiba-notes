@@ -108,7 +108,7 @@
 <script>
 (function(){
 var SH=null,ST=null,VK={'札幌':'sapporo','函館':'hakodate','福島':'fukushima','新潟':'niigata','東京':'tokyo','中山':'nakayama','中京':'chukyo','京都':'kyoto','阪神':'hanshin','小倉':'kokura'};
-var D=null,V=null,SF='芝',BD='全距離',M='win';
+var D=null,V=null,SF='芝',BD='全距離',M='win',MD=null;
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function f2(x){return x==null?'—':x.toFixed(2)}
@@ -137,10 +137,10 @@ var AN=0;
 function drawMap(){
  if(AN){cancelAnimationFrame(AN);AN=0}
  var el=$('ttMap');if(!SH||!VK[V]||!SH.venues[VK[V]]){el.hidden=true;return}
- var sv=SH.venues[VK[V]],m=BD.match(/^(\d+)m(?:（(内|外)）)?$/),dist=m?+m[1]:null,io=m?m[2]||null:null;
+ var sv=SH.venues[VK[V]],BM=MD||BD,m=BM.match(/^(\d+)m(?:（(内|外)）)?$/),dist=m?+m[1]:null,io=m?m[2]||null:null;
  var sfk=SF==='芝'?'turf':'dirt',ss=(ST&&ST.venues[VK[V]])||[],hit=null;
  if(dist){var c=ss.filter(function(x){return x.dist===dist&&x.surface===sfk});
-  hit=c.filter(function(x){return x.inout===io})[0]||(!io?c[0]:null)||null}
+  hit=c.filter(function(x){return x.inout===io})[0]||(!io?(c.filter(function(x){return x.inout!=='外'})[0]||c[0]):null)||null}
  var out='<svg viewBox="0 0 '+sv.w+' '+sv.h+'" role="img" aria-label="'+esc(V+'競馬場のコース図')+'"><image href="lab/'+sv.img+'" width="'+sv.w+'" height="'+sv.h+'"/>';
  var pts=hit?hit.path:null,gl=null,note='';
  if(pts){
@@ -148,11 +148,11 @@ function drawMap(){
   var ln=' fill="none" stroke-linecap="round" stroke-linejoin="round"';
   out+='<polyline points="'+ps+'"'+ln+' stroke="#fff" stroke-width="13"/><polyline points="'+ps+'"'+ln+' stroke="#1f4fb8" stroke-width="7" opacity=".3"/><polyline id="ttTrail" points="'+ps+'"'+ln+' stroke="#1f4fb8" stroke-width="7"/>';
   out+='<circle cx="'+hit.x+'" cy="'+hit.y+'" r="11" fill="#fff" stroke="#17171a" stroke-width="5"/><circle id="ttHead" cx="'+hit.x+'" cy="'+hit.y+'" r="11" fill="#ffd43b" stroke="#17171a" stroke-width="4"/>';
-  note='白い丸＝スタート位置（うまぽっとの図にある発走地点の印）、青い線＝走る道すじ（走路の中央を通る線）、黄色い丸＝走っている馬（目安）。';
+  note='白い丸＝スタート位置（'+(hit.approx?'元の図に印が無いため、近い距離の印から求めた目安':'うまぽっとの図にある発走地点の印')+'）、青い線＝走る道すじ、黄色い丸＝走っている馬（目安）。';
  }else if(dist){note='この距離の発走地点は、元の図に載っていないため、道すじは出していません。'}
  var g=gl||(sv.routes['turf|single']||sv.routes['turf|inner']||sv.routes['dirt|single']).pts[0];
  out+='<rect x="'+(g[0]-9).toFixed(1)+'" y="'+(g[1]-9).toFixed(1)+'" width="18" height="18" fill="#17171a" stroke="#fff" stroke-width="3" transform="rotate(45 '+g[0].toFixed(1)+' '+g[1].toFixed(1)+')"/></svg>'+
-  '<figcaption class="tt-note">'+esc(V+'・'+SF+'・'+BD)+'。◆＝ゴール。'+note+'引き込み線から本線に入るまでの道すじは目安です。元図：うまぽっと（umapot.com）</figcaption>';
+  '<figcaption class="tt-note">'+esc(V+'・'+SF+'・'+BM)+'。◆＝ゴール。'+note+'引き込み線から本線に入るまでの道すじは目安です。元図：うまぽっと（umapot.com）'+(MD?'<br><b>この距離はレースが少ないため、下の数字は全距離のものです。</b>':'')+'</figcaption>';
  el.innerHTML=out;el.hidden=false;
  if(pts)runAnim(el,pts,dist);
 }
@@ -181,14 +181,26 @@ function renderPick(){
 }
 function fixSel(){
  if(!sel()){SF=SF==='芝'?'ダート':'芝'}
- var t=sel();if(!t.bands[BD])BD='全距離';
+ var t=sel();if(!t.bands[BD])BD='全距離';MD=null;
 }
+function bandKey(b){var m=b.match(/^(\d+)m(?:（(内|外)）)?$/);return m?[+m[1],m[2]||null]:null}
+function mapOnly(t){
+ var ss=(ST&&VK[V]&&ST.venues[VK[V]])||[],sfk=SF==='芝'?'turf':'dirt',bk=Object.keys(t.bands).map(bandKey).filter(Boolean),out=[];
+ ss.forEach(function(x){
+  if(x.surface!==sfk||x.official===false)return;
+  var inner=ss.some(function(y){return y.surface===sfk&&y.dist===x.dist&&y.inout!=='外'});
+  if(bk.some(function(k){return k[0]===x.dist&&(k[1]===x.inout||!x.inout||(k[1]===null&&(x.inout!=='外'||!inner)))}))return;
+  var nm=x.dist+'m'+(x.inout==='外'?'（外）':'');
+  if(out.indexOf(nm)<0)out.push(nm)});
+ return out}
 function render(){
  renderPick();var t=sel();if(!t)return;
  Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-m')===M));b.onclick=function(){M=b.getAttribute('data-m');render()}});
- var names=Object.keys(t.bands);
- $('ttBand').innerHTML=names.map(function(b){return '<button type="button" data-b="'+b+'" aria-pressed="'+(b===BD)+'">'+b+'</button>'}).join('');
- Array.prototype.forEach.call($('ttBand').querySelectorAll('button'),function(b){b.onclick=function(){BD=b.getAttribute('data-b');render()}});
+ var extra=mapOnly(t);if(MD&&extra.indexOf(MD)<0)MD=null;
+ var names=Object.keys(t.bands).map(function(b){return [b,0]}).concat(extra.map(function(b){return [b,1]}));
+ names.sort(function(a,b){var x=bandKey(a[0]),y=bandKey(b[0]);return (x?x[0]:0)-(y?y[0]:0)||(a[0]<b[0]?-1:1)});
+ $('ttBand').innerHTML=names.map(function(n){var on=n[1]?n[0]===MD:(!MD&&n[0]===BD);return '<button type="button" data-b="'+n[0]+'" data-x="'+n[1]+'" aria-pressed="'+on+'">'+n[0]+'</button>'}).join('');
+ Array.prototype.forEach.call($('ttBand').querySelectorAll('button'),function(b){b.onclick=function(){if(b.getAttribute('data-x')==='1'){MD=b.getAttribute('data-b');BD='全距離'}else{MD=null;BD=b.getAttribute('data-b')}render()}});
  drawMap();
  var bb=t.bands[BD]||t.bands['全距離'];var base=D.base[SF];var bs=bb.base||{draw:base.draw,style:base.style,winners:base.winners};var all=true;
  $('ttMeta').textContent=V+'・'+SF+'：'+num(t.races)+'レース（'+D.years[0]+'〜'+D.years[1]+'年）。距離を選ぶと、その距離だけの数字になります（内回り・外回りがある距離は別々）。';
@@ -220,7 +232,7 @@ function findings(){
  '<li>位置取りの競馬場ごとの差は、枠よりはそろいます（そろい具合 '+f2(p.style.corr)+'）が、強くはありません。</li></ul>';
  $('ttFind').innerHTML=h;
 }
-fetch('lab/sim-v2/umapot-starts.json?v=20261110c').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
+fetch('lab/sim-v2/umapot-starts.json?v=20261110e').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
 fetch('lab/sim-v2/umapot-shapes.json').then(function(r){return r.json()}).then(function(j){SH=j;if(D)render()}).catch(function(){});
 fetch('data/track_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;V='東京';SF='芝';BD='全距離';findings();fixSel();render()}).catch(function(){$('ttMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ttFind').textContent=''});
 })();
