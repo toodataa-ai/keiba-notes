@@ -133,7 +133,9 @@ function row(label,x,baseAe,R){
  var weak=!(x.z!=null&&Math.abs(x.z)>=2);
  return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+num(x.n)+'頭</small></div>'+bar(x.ae,0.5,1.5,1,weak)+'<div class="tt-val">'+f2(x.ae)+'</div>'+
   '<div class="tt-sub">勝率 '+pc(x.win)+'・3着内 '+pc(x.top3)+'・単勝回収率 '+(x.roi==null?'—':Math.round(x.roi*100)+'%')+tag(x)+(baseAe!=null?'　全競馬場の'+(BD==='全距離'?'':BD+'の')+'平均 '+f2(baseAe):'')+'</div></div>'}
+var AN=0;
 function drawMap(){
+ if(AN){cancelAnimationFrame(AN);AN=0}
  var el=$('ttMap');if(!SH||!VK[V]||!SH.venues[VK[V]]){el.hidden=true;return}
  var sv=SH.venues[VK[V]],m=BD.match(/^(\d+)m(?:（(内|外)）)?$/),rk=null;
  var sfk=SF==='芝'?'turf':'dirt',cand=[];
@@ -147,19 +149,37 @@ function drawMap(){
  var straight=(V==='新潟'&&SF==='芝'&&dist===1000);
  function at(f){var t=f*L,i=1;while(i<n&&cum[i]<t)i++;var a=P[i-1],b=P[i%n],u=(t-cum[i-1])/((cum[i]-cum[i-1])||1);return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u]}
  var out='<svg viewBox="0 0 '+sv.w+' '+sv.h+'" role="img" aria-label="'+esc(V+'競馬場のコース図')+'"><image href="lab/'+sv.img+'" width="'+sv.w+'" height="'+sv.h+'"/>';
- var gl=P[0],note='';
+ var gl=P[0],note='',anim=null;
  if(dist&&!straight){
   var f0=1-Math.min(1,(dist%lap||lap)/lap);if(dist>=lap)f0=0;
   var pts=[],st=at(f0);pts.push(st);
   for(var i=1;i<n;i++){if(cum[i]/L>f0)pts.push(P[i])}pts.push(P[0]);
-  out+='<polyline points="'+pts.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' ')+'" fill="none" stroke="#e5484d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>';
+  var ps=pts.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' ');
+  out+='<polyline points="'+ps+'" fill="none" stroke="#e5484d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".3"/><polyline id="ttTrail" points="'+ps+'" fill="none" stroke="#e5484d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".95"/>';
+  anim=pts;
   out+='<circle cx="'+st[0].toFixed(1)+'" cy="'+st[1].toFixed(1)+'" r="9" fill="#2f6fd0" stroke="#fff" stroke-width="3"/>';
-  note='青＝スタートのおよその位置、赤＝走る道すじ。';
+  note='青＝スタートのおよその位置、赤＝走る道すじ（馬が走る向きにたどります）。';
  }else if(straight){note='新潟の芝1000m（直線）は図にコースを描いていません。'}
  out+='<rect x="'+(gl[0]-7).toFixed(1)+'" y="'+(gl[1]-7).toFixed(1)+'" width="14" height="14" fill="#17171a" stroke="#fff" stroke-width="2" transform="rotate(45 '+gl[0].toFixed(1)+' '+gl[1].toFixed(1)+')"/></svg>'+
   '<figcaption class="tt-note">'+esc(V+'・'+SF+'・'+BD)+'。◆＝ゴール。'+note+'スタート位置は一周の長さから求めた目安で、引き込み線（発走地点の枝道）は反映していません。元図：うまぽっと（umapot.com）</figcaption>';
  el.innerHTML=out;el.hidden=false;
+ if(anim)runAnim(el,anim,dist);
 }
+function runAnim(el,pts,dist){
+ var tr=el.querySelector('#ttTrail'),hd=el.querySelector('circle');if(!tr||!hd)return;
+ var cum=[0];for(var i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+ var L=cum[cum.length-1]||1;
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ var dur=Math.max(3500,Math.min(11000,dist*3.2)),hold=1200,t0=null;
+ function pos(f){var t=f*L,i=1;while(i<pts.length-1&&cum[i]<t)i++;var a=pts[i-1],b=pts[i],u=(t-cum[i-1])/((cum[i]-cum[i-1])||1);u=Math.max(0,Math.min(1,u));return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,i]}
+ function step(ts){
+  if(!document.body.contains(tr)){AN=0;return}
+  if(t0===null)t0=ts;var e=(ts-t0)%(dur+hold),f=Math.min(1,e/dur);
+  f=f<1?(0.55*f+0.45*(1-Math.cos(Math.PI*f))/2):1;
+  var q=pos(f),cut=[];for(var i=0;i<q[2];i++)cut.push(pts[i][0].toFixed(1)+','+pts[i][1].toFixed(1));cut.push(q[0].toFixed(1)+','+q[1].toFixed(1));
+  tr.setAttribute('points',cut.join(' '));hd.setAttribute('cx',q[0].toFixed(1));hd.setAttribute('cy',q[1].toFixed(1));
+  AN=requestAnimationFrame(step)}
+ AN=requestAnimationFrame(step)}
 function sel(){return D.tracks[V+'|'+SF]}
 function venues(){var s={};Object.keys(D.tracks).forEach(function(k){s[k.split('|')[0]]=1});
  var order=['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'];return order.filter(function(v){return s[v]})}
