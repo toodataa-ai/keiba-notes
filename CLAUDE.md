@@ -134,6 +134,8 @@
 3. `Validate JRA v3.8〜v3.11` の4検査が 2026-10-18 から main で失敗（10/18 の予想実行で `e2e_validation/validate_manifests.py` が変わり、`.github/scripts/validate-jra-prompt-v312.mjs` の固定SHAと不一致）。今回の変更とは無関係。
 4. 古い改善ページ用の比較設定（`docs/data/e2e_status.json` の comparison が v3.0/v3.1 のまま）、E2E評価で新形式予想の勝率Brierが null になる問題（新しい runner は独自に計算しているので比較には影響なし）。
 
+- **競馬場の傾向ページの道すじ（2026-11-10 作り直し）**：`sim_v2/build_course_paths.py` が `docs/lab/sim-v2/umapot-starts.json` の道すじ（path）を作る。走路の帯の中央を通る線（内回り・単独・ダートは既存の内ラチ線から帯の半分だけ外、外回りは帯の中央で内回りと同じ区間は内回りの線に重ねる）→ 発走地点から帯の中だけを通って合流 → 周回を足す → なめらかにして間引く。発走地点の位置と札は既存の starts.json から読むので元図（非公開）なしで作り直せる。`umapot-shapes.json`（LABシミュレータ用の内ラチ線）は変更しない。確認は `--overlay <dir>` の重ね描き画像。東京芝2000mはポケットから外側の弧を通るよう壁（BARRIERS）を置いている。小倉芝1200mは背景図に引き込み線が無いので発走地点から本線へ直線で入る。線の色は青（赤は使わない）。旧 `build_umapot_starts.py` は発走位置を元図から取り直すとき専用（道すじは上書きされるので、その後に build_course_paths を実行）。
+
 ## 作業上の注意
 - GitHub の GraphQL はこの環境から使えない（`gh workflow run` や `gh pr` 系も失敗する）。PR作成・マージ・ワークフロー起動は REST（`gh api repos/toodataa-ai/keiba-notes/pulls ...`、起動は `gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>.yml/dispatches -f ref=main -f 'inputs[キー]=値'`）。
 - GITHUB_TOKEN でのpushは他のワークフローを起動しない。自動処理の後続はワークフロー内で直接実行する。
