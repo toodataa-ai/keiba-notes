@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 from . import arc_spline as A
 
+SNAP_STRAIGHT = {("chukyo", 1300), ("chukyo", 3000)}   # JRAの図で発走が直線上にあるもの：目安の位置が円弧の途中なら、その円弧を出た所（直線のはじまり）に置く
 CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
 
@@ -89,11 +90,18 @@ def approx_starts(code, loops, routes, cat_routes, have):
                 continue
             laps = max(0, math.ceil(dist / lap - 1e-9) - 1); rem = dist - laps * lap      # 0 < rem <= lap
             s0 = max(0.0, L - rem / mpp)
+            if (code, dist) in SNAP_STRAIGHT:
+                acc = 0.0
+                for l_, k_ in zip(base.L, base.K):
+                    if acc <= s0 < acc + l_ and k_ > 0:
+                        s0 = acc + l_; break
+                    acc += l_
+                rem = (L - s0) * mpp
             x, y = base.at(s0)[:2]
             full = np.vstack([base.vertices(s0, L)] + [base.vertices()[1:]] * laps) * [1.0, fy]
             new.append(dict(label=("D" if r["surface"] == "dirt" else "") + str(dist) + (io or ""), dist=dist, surface=r["surface"], inout=io, route=rk,
                             x=round(float(x), 2), y=round(float(y * fy), 2), path=[[round(float(a), 2), round(float(b), 2)] for a, b in full],
-                            prim="|" + base.kinds(), measured_m=int(round(dist)), official=True, mx=round(float(x), 2), my=round(float(y * fy), 2), laps=int(laps), approx=True))
+                            prim="|" + base.kinds(), measured_m=int(round(laps * lap + rem)), official=True, mx=round(float(x), 2), my=round(float(y * fy), 2), laps=int(laps), approx=True))
     return new
 
 
