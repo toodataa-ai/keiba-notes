@@ -254,7 +254,7 @@ def tangent_inits(S, loop, s_hint):
     return out[:3]
 
 
-def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin_th=None):
+def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin_th=None, s_max=None, nu_max=20.0):
     """発走地点 S から、閉じた軌跡 loop（Spline）へ乗り移る直線＋円弧（loop に接して入る）。
     ref：なぞりたい元の線（S から合流のあたりまで、1画素間隔）。発走の印は max_shift 画素までなら動かしてよい。
     返り値は (Spline, 最大ずれ, 合流位置 s*)。"""
@@ -271,7 +271,7 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin
         if len(segs) > 5 or key in seen:
             continue
         seen.add(key); cands.append((key, segs))
-    for key in ("L", "LA", "AL", "LAL", "ALA", "LALA", "LAAL", "AAL"):   # 数が少ない順に、足りない型も試す
+    for key in (("L", "LA", "AL", "LAL") if pin_th is not None else ("L", "LA", "AL", "LAL", "ALA", "LALA", "LAAL", "AAL")):   # 数が少ない順に、足りない型も試す
         if key in seen:
             continue
         seen.add(key)
@@ -291,7 +291,7 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin
             continue
         if l_init is not None:
             segs = [(0, max(1, int(l_init / h)), 0.0)] + list(segs[1:])
-        r = _refine_chute(S, ref, segs, h, th_init if pin_th is None else pin_th, loop, tol, s_init, max_shift, s_hint, pin_th)
+        r = _refine_chute(S, ref, segs, h, th_init if pin_th is None else pin_th, loop, tol, s_init, max_shift, s_hint, pin_th, s_max, nu_max)
         if verbose:
             print("   chute", key, None if r is None else round(r[1], 2))
         if r is not None and r[1] <= tol:
@@ -301,13 +301,18 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin
     return best
 
 
-def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=None, pin_th=None):
+def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=None, pin_th=None, s_max=None, nu_max=20.0):
     s_anchor = s_hint if s_anchor is None else s_anchor
     n = len(segs)
     L0 = [max(1.0, (j - i) * h) for i, j, k in segs]
     K0 = [k for i, j, k in segs]
     arc = [i for i in range(n) if K0[i] > 0]
-    Lloop = loop.length
+    Lloop = loop.length if s_max is None else s_max
+    LP = loop.sample(0.5)
+
+    def model(sp, s, step):      # 引き込み線＋合流したあとの本線（なぞる線は合流のあとも本線の上を続く）
+        k = int(max(0.0, s) * 2)
+        return np.vstack([sp.sample(step), LP[k:k + 700]])
 
     def build(v):
         L = np.maximum(v[3:3 + n], 0.5); K = np.zeros(n); K[arc] = np.maximum(v[3 + n:3 + n + len(arc)], 0.1) / 100.0
@@ -318,25 +323,25 @@ def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=N
         x, y, t = x0, y0, t0
         for l, k in zip(L, K):
             x, y, t = _adv(x, y, t, l, k)
-        X, Y, T = loop.at(min(max(s, 0.0), Lloop))
+        X, Y, T = loop.at(min(max(s, 0.0), loop.length))
         return np.array([x - X, y - Y, wrap(t - T) * 100.0])
 
     def fun(v):
         x0, y0, t0, L, K, s = build(v)
-        r = _res(_dist(Spline(x0, y0, t0, L, K).sample(1.0), ref), tol)
+        r = _res(_dist(model(Spline(x0, y0, t0, L, K), s, 1.0), ref), tol)
         sh = math.hypot(x0 - S[0], y0 - S[1])
         return np.concatenate([r, 30.0 * eq(v), [0.03 * (v[-1] - s_anchor)], [max(0.0, sh - max_shift) * 3.0 / tol * 10 + sh * 0.3 / tol]])
 
     v0 = np.concatenate([[S[0], S[1], th0], L0, [K0[i] * 100.0 for i in arc], [s_hint]])
     try:
-        lo = np.concatenate([[-np.inf] * 3, np.full(n, 1.0), np.full(len(arc), 0.1), [max(0.0, s_anchor - 800)]])
-        hi = np.concatenate([[np.inf] * 3, np.full(n, np.inf), np.full(len(arc), 20.0), [Lloop]])
+        lo = np.concatenate([[-np.inf] * 3, np.full(n, 1.0), np.full(len(arc), 0.1), [(Lloop - 25.0) if pin_th is not None else max(0.0, s_anchor - 800)]])
+        hi = np.concatenate([[np.inf] * 3, np.full(n, np.inf), np.full(len(arc), nu_max), [Lloop]])
         if pin_th is not None:      # 始点の位置と向きを固定（直前の線にぴったりつなぐ）
             for k_, val in enumerate((S[0], S[1], pin_th)):
                 lo[k_] = val - 1e-9; hi[k_] = val + 1e-9
         r = least_squares(fun, np.clip(v0, lo + 1e-12, hi - 1e-12), bounds=(lo, hi), x_scale=np.concatenate([[3, 3, 0.1], np.full(n, 30.0), np.full(len(arc), 1.0), [30.0]]), max_nfev=80, diff_step=1e-6)
         v = _polish(eq, r.x, list(range(3 if pin_th is not None else 0, len(v0))))
-        if v[-1] > Lloop + 1e-6 or v[-1] < 0:
+        if v[-1] > Lloop + 1e-6 or v[-1] < 0 or (pin_th is not None and v[-1] < Lloop - 25.0 - 1e-6):
             return None
     except Exception:
         return None
@@ -346,7 +351,7 @@ def _refine_chute(S, ref, segs, h, th0, loop, tol, s_hint, max_shift, s_anchor=N
     if math.hypot(x0 - S[0], y0 - S[1]) > max_shift + 1e-6:
         return None
     sp = Spline(x0, y0, t0, L, K)
-    return sp, float(_dist(sp.sample(0.25), ref).max()), min(s, Lloop)
+    return sp, float(_dist(model(sp, s, 0.25), ref).max()), min(s, Lloop)
 
 
 def rebase(sp, s0):

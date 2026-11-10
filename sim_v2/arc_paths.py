@@ -103,20 +103,40 @@ def _outer_to_inner(code, loops, routes, r, have):
         return []
     O = loops["turf|outer"]; I = loops["turf|inner"]; bo, bi = O["base"], I["base"]; fy = O["fy"]
     Lo, Li = bo.length, bi.length
+    for L_ in (O, I):
+        L_["tree_f"] = cKDTree(L_["base"].sample(1.0))
     mo = routes["turf|outer"]["lap_m"] / Lo; mi = routes["turf|inner"]["lap_m"] / Li; lap_i = routes["turf|inner"]["lap_m"]
     out = []
     for dist in r["distances_m"]:
         if any(s["surface"] == "turf" and s["dist"] == dist and s.get("route") == "turf|outer_to_inner" for s in have):
             continue
-        for back in (250, 180, 330, 120, 420, 520, 620, 700, 90, 60):
-            sa = Lo - back; xa, ya, tha = bo.at(sa)
-            smp = bo.sample(1.0); ref = smp[int(sa):]
-            ch = A.fit_chute(np.array([xa, ya]), ref, bi, O["tol"], Li - back * 0.5, pin_th=tha, max_shift=1e-6)
-            if ch is not None and ch[1] <= O["tol"]:
+        # 内回りの最後の円弧（最後のコーナー）のはじまりあたりまでに内回りの線に乗り、そこから先は1周目と2周目をぴったり重ねる
+        # 内回りに乗る位置の候補：最後の円弧のはじまり／なかほど／最後の直線のはじまり（早く乗れるほど1周目と2周目が長く重なる）。
+        # つなぎが外回りの線か内回りの線から遠く離れる（帯の外へ出る）ものは使わない。
+        ia = max(i for i in range(len(bi.L)) if bi.K[i] > 0)
+        lims = [bi.cum[ia], bi.cum[ia] + 0.5 * bi.L[ia], bi.cum[ia + 1]]
+        ch = None
+        for s_lim in lims:
+            for back in range(int(Li - s_lim) + 30, int(Lo * 0.7), 30):
+                sa = Lo - back; xa, ya, tha = bo.at(sa)
+                P1 = np.array(bi.at(s_lim)[:2]); S0 = np.array([xa, ya]); n_ = max(2, int(np.linalg.norm(P1 - S0)))
+                ref = np.c_[np.linspace(S0[0], P1[0], n_), np.linspace(S0[1], P1[1], n_)]
+                c = A.fit_chute(S0, ref, bi, O["tol"] * 5, s_lim - 0.5, pin_th=tha, max_shift=1e-6, s_max=s_lim, nu_max=1.0)
+                if c is not None:
+                    q = c[0].sample(1.0)
+                    off = np.minimum(O["tree_f"].query(q)[0], I["tree_f"].query(q)[0]).max()
+                    if off <= O["tol"] * 2.5:
+                        ch = c; break
+            if ch is not None:
                 break
-        else:
+        if ch is None:
             print(f"  !! {code} {dist}: 外回り→内回りのつなぎ替えが作れない"); continue
         cs, dev, ss = ch
+        # ルールの確認：つなぎ目で位置も向きもぴったり一致していること（一致しなければ作らない）
+        e = cs.end(); p1 = bi.at(ss); s1 = cs.st[0]; p0 = bo.at(sa)
+        mis = max(math.hypot(e[0] - p1[0], e[1] - p1[1]), math.hypot(s1[0] - p0[0], s1[1] - p0[1]), abs(A.wrap(e[2] - p1[2])), abs(A.wrap(s1[2] - p0[2])))
+        if mis > 1e-4 or any(k < 0 for k in cs.K):
+            raise SystemExit(f"{code} {dist}: つなぎ目が一致しない（{mis:.2e}）")
         inner_m = (cs.length + (Li - ss)) * mi + lap_i
         s0 = sa - (dist - inner_m) / mo
         if s0 < 0:
@@ -127,5 +147,5 @@ def _outer_to_inner(code, loops, routes, r, have):
         out.append(dict(label=str(dist), dist=dist, surface="turf", inout=None, route="turf|outer_to_inner", x=round(float(x), 2), y=round(float(y * fy), 2),
                         path=[[round(float(a), 2), round(float(b), 2)] for a, b in full], prim="outer>" + cs.kinds() + ">inner", measured_m=int(round(dist)), official=True,
                         mx=round(float(x), 2), my=round(float(y * fy), 2), laps=1, approx=True))
-        print(f"  {code} {dist}: 外→内 つなぎ {cs.kinds()}（長さ{cs.length:.0f}px・ずれ{dev:.1f}px・ゴール{back}px手前）")
+        print(f"  {code} {dist}: 外→内 つなぎ {cs.kinds()}（長さ{cs.length:.0f}px・ゴール{back}px手前から・内回りの線に乗る位置 s={ss:.0f}/{Li:.0f}）")
     return out

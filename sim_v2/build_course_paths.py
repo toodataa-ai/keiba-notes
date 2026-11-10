@@ -203,11 +203,13 @@ def build_venue(code, v, starts, img):
         else:
             hb = half.get("turf|inner") or half.get("turf|single") or Wt0 / 2; half[rk] = hb
             A = B & (line_dist((H, W), old) < 1.7 * hb + 4)
-            cost = centre_cost(A, hb)
-            for ok in ("turf|inner", "turf|single"):   # 内回りと同じ帯を走る区間は、内回りの中心線に重ねる
-                if ok in centre:
-                    dI = line_dist((H, W), centre[ok])
-                    cost = np.where(A, np.minimum(cost, np.where(dI < hb, 0.9 * (1.0 + 10.0 * dI / hb), np.inf)), np.inf)
+            # 外回りは、芝の「外側のふち」（図の外の白地に接するふち）から帯の半分だけ内へ入った所を通す。
+            # 内回りの帯と合わさって幅が倍になっている所でも、外回り自身の帯の中央になる（帯どうしの境目を通らない）。
+            nong = ~(Mg | Mo)
+            lab, _ = ndi.label(nong)
+            ext = np.isin(lab, np.unique(np.r_[lab[0, :], lab[-1, :], lab[:, 0], lab[:, -1]])) & nong
+            dE = ndi.distance_transform_edt(~ext)
+            cost = np.where(A, 1.0 + 10.0 * np.clip(np.abs(dE - hb) / hb, 0, 1), np.inf)
             ya = run_centre(A[:, gx + 4 * dirx], yg); yb = run_centre(A[:, gx - 4 * dirx], yg)
         cost[cut] = np.inf
         raw = path_between(cost, snap(A & ~cut, (gx + 4 * dirx, ya)), snap(A & ~cut, (gx - 4 * dirx, yb)))
