@@ -210,6 +210,11 @@ def build_venue(code, v, starts, img):
             ext = np.isin(lab, np.unique(np.r_[lab[0, :], lab[-1, :], lab[:, 0], lab[:, -1]])) & nong
             dE = ndi.distance_transform_edt(~ext)
             cost = np.where(A, 1.0 + 10.0 * np.clip(np.abs(dE - hb) / hb, 0, 1), np.inf)
+            if code == "nakayama":   # 1〜2コーナー付近：外側の枠が膨らんで帯が広がる所は、外のふちに引かれすぎないよう内回りの中心線とのまん中を狙う
+                yy, xx = np.mgrid[0:H, 0:W]
+                dIn = line_dist((H, W), centre["turf|inner"])
+                zone = (xx < 180) & (yy > 230) & (yy < 460)
+                cost = np.where(zone, 0.5 * cost + 0.5 * (1.0 + 10.0 * np.clip(dIn / hb, 0, 1)), cost)
             if code == "kyoto":   # 4コーナー出口：内外の帯が合流して幅が倍になる所は、外側のふちに引かれすぎないよう内回りの中心線とのまん中を狙う
                 yy, xx = np.mgrid[0:H, 0:W]
                 dIn = line_dist((H, W), centre["turf|inner"])
