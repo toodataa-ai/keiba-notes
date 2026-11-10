@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.47-20261110",
-  "current_public_version": "1.47",
+  "current_public_release": "release/jra-site-v1.48-20261110",
+  "current_public_version": "1.48",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -990,6 +990,27 @@
       "note": "2026-11-10ユーザー明示承認済み。競馬場の傾向：道すじを直線と円弧だけで描き直し：コース図の道すじを、直線と円弧だけ（円の中心は常に内側・つなぎ目は向きがぴったり一致・中心線から幅の10%以内・部品は最小限）で描き直した。データは docs/lab/sim-v2/umapot-starts-arc.json（本番が読む umapot-starts.json は変えない）。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-trends-arc-paths-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/track-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.48-20261110",
+      "branch": "release/jra-site-v1.48-20261110",
+      "commit_sha": "c7544ac4a4214eaf6124cf8de9d61d13b41d128c",
+      "deployed_at": "2026-11-10T17:01:58+09:00",
+      "workflow_run_id": 42779461945,
+      "validation_workflow_run_id": 42779461945,
+      "public_version": "1.48",
+      "note": "2026-11-10ユーザー明示承認済み。競馬場の傾向：印の無かった距離の道すじを追加（菊花賞の京都芝3000mなど）：図に発走の印が無く道すじが出なかった32距離を、同じ直線と円弧の方式で「目安」として追加。ゴールから距離ぶん戻った本線上を発走地点にした。中山・阪神の芝3200m（外回り→内回り）は、ゴール手前の直線で外回りの線から内回りの線へ向きを保ってつなぎ替えた。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-missing-distances-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
