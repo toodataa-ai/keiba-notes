@@ -254,7 +254,7 @@ def tangent_inits(S, loop, s_hint):
     return out[:3]
 
 
-def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin_th=None, s_max=None, nu_max=20.0):
+def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin_th=None, s_max=None, nu_max=20.0, keys=None):
     """発走地点 S から、閉じた軌跡 loop（Spline）へ乗り移る直線＋円弧（loop に接して入る）。
     ref：なぞりたい元の線（S から合流のあたりまで、1画素間隔）。発走の印は max_shift 画素までなら動かしてよい。
     返り値は (Spline, 最大ずれ, 合流位置 s*)。"""
@@ -278,6 +278,12 @@ def fit_chute(S, ref, loop, tol, s_hint, h=3, verbose=False, max_shift=None, pin
         na = key.count("A"); w = T / len(key)
         segs = [(int(i * w / h), int((i + 1) * w / h), (turn / (na * w)) if c == "A" else 0.0) for i, c in enumerate(key)]
         cands.append((key, segs))
+    if keys:   # 型を指定（例：最後の直線を、半径の大きい円弧に置き換える）
+        cands = [c for c in cands if c[0] in keys]
+        for key in keys:
+            if all(c[0] != key for c in cands):
+                na = key.count("A"); w = T / len(key)
+                cands.append((key, [(int(i * w / h), int((i + 1) * w / h), (turn / (na * w)) if c == "A" else 0.0) for i, c in enumerate(key)]))
     cands.sort(key=lambda c: (len(c[0]), c[0].count("A")))
     best = None
     tans = [] if pin_th is not None else tangent_inits(S, loop, s_hint)

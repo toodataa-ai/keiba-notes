@@ -4,6 +4,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 from . import arc_spline as A
 
+CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
 
 
@@ -49,7 +50,7 @@ def arcify(code, out, centre, half, routes, log=print):
             smp = base.sample(0.5)
             s_hint = int(np.argmin(np.linalg.norm(smp - ref[-1], axis=1))) * 0.5
             S = np.array([o["x"], o["y"]]) * [1.0, fy]
-            ch = A.fit_chute(S, ref, base, Lp["tol"], s_hint)
+            ch = A.fit_chute(S, ref, base, Lp["tol"], s_hint, keys=CHUTE_KEYS.get((code, str(o["label"]))))
             if ch is None:
                 log(f"  !! {code} {o['label']}: 引き込み線が直線＋円弧で作れない"); res.append(o); continue
             cs, dev, ss = ch; sx, sy = cs.st[0][:2]
