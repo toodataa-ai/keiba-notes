@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.50-20261112",
-  "current_public_version": "1.50",
+  "current_public_release": "release/jra-site-v1.51-20261112",
+  "current_public_version": "1.51",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1054,6 +1054,27 @@
       "note": "2026-11-12ユーザー明示承認済み。競馬場の傾向：東京芝2600m・2500m・2400m・2300mの発走位置を直し：東京芝2600mの発走位置が4コーナーの曲がりの中にあったのを、ゴール前の直線のはじまり（実際はゴールの約517m手前）に直す。図の直線は実際（525.9m）より短く描かれているため、2500m・2400m・2300mも同じ考え方で置き直し（2500mは直線に入って約109m先）。データは新ファイル umapot-starts-arc3.json（本番が読む arc2 は変更なし）。",
       "user_approval_quote": "本番リリースOK",
       "staging_candidate_id": "ui-trends-tokyo-2600-start-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/track-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.51-20261112",
+      "branch": "release/jra-site-v1.51-20261112",
+      "commit_sha": "9b261e44e222d9ad68f219861511d884948ae4b9",
+      "deployed_at": "2026-11-12T08:39:33+09:00",
+      "workflow_run_id": 43121481391,
+      "validation_workflow_run_id": 43121481391,
+      "public_version": "1.51",
+      "note": "2026-11-12ユーザー明示承認済み。競馬場の傾向：東京ダート2400m・2100mの発走位置を直し＋東京芝2000mの道すじを円弧1つに：東京ダート2400mの発走位置が4コーナーの曲がりの中にあったのを、ゴール前の直線のはじまり（実際はゴールの約501m手前）に直す。2100mも同じ考え方で置き直し。あわせて東京芝2000mの道すじを、スタート直後の直線→円弧1つ→向正面の直線、の形にした。**この芝2000mの形は、中心線からのずれが幅の約16%で、規定（幅の10%）を超える例外**（元の中心線が向正面のはじまり付近で外にふくらんでいるため）。芝2000mだけ今の形（ずれ幅の約9%）に戻す場合は、データを arc4 に差し替える。データは新ファイル umapot-starts-arc5.json（本番が読む arc3 は変更なし。変わるのは東京ダート2距離と東京芝2000m）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-tokyo-dirt-2400-start-v1",
       "user_approved": true,
       "immutable_prediction_source_preserved": true,
       "presentation_only": true,
