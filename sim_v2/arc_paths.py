@@ -144,6 +144,33 @@ def approx_starts(code, loops, routes, cat_routes, have):
     return new
 
 
+HOME_STRAIGHT_M = {("tokyo", "turf|single"): 525.9}   # JRA公式のゴール前の直線の長さ（m）。東京芝は図の直線が実際より短く描かれている（図で約388m）
+
+
+def fix_home_straight(code, loops, routes, out):
+    """ゴール前の直線の上に発走地点がある距離（周回の長さ＋直線以内。東京芝なら2300〜2600m）を、直線の中の割合で置き直す。
+    図の直線は実際より短い（東京芝は約388m ←→ 実際525.9m）ので、ゴールから距離ぶん戻ると円弧（4コーナー）に入ってしまう。
+    ゴールから戻る距離÷実際の直線の長さ＝図の直線の中の位置、とする（2600mは直線のはじまり、2500mは直線に入って約109m先）。
+    元図の印の位置は図の縮尺に合っていないので使わない（approx=True＝画面に「目安」と出る）。"""
+    res = []
+    for o in out:
+        rk = o.get("route"); sm = HOME_STRAIGHT_M.get((code, rk))
+        if sm is None or rk not in loops or o.get("surface") != "turf" or o.get("inout") is not None:
+            res.append(o); continue
+        Lp = loops[rk]; base = Lp["base"]; L = base.length; fy = Lp["fy"]; lap = routes[rk]["lap_m"]
+        laps = max(0, math.ceil(o["dist"] / lap - 1e-9) - 1); back = o["dist"] - laps * lap      # ゴールから戻る距離（m）
+        if laps < 1 or not (0 < back <= sm) or base.K[-1] != 0:
+            res.append(o); continue
+        s0 = L - back / sm * base.L[-1]                      # 図の最後の直線（ゴールの手前）の中の位置
+        x, y = base.at(s0)[:2]
+        full = np.vstack([base.vertices(s0, L)] + [base.vertices()[1:]] * laps) * [1.0, fy]
+        q = dict(o); q.update(x=round(float(x), 2), y=round(float(y * fy), 2), mx=round(float(x), 2), my=round(float(y * fy), 2),
+                              path=[[round(float(a), 2), round(float(b), 2)] for a, b in full], measured_m=int(o["dist"]), laps=int(laps), approx=True, basis="home_straight",
+                              prim="|" + base.kinds())
+        res.append(q)
+    return res
+
+
 def _outer_to_inner(code, loops, routes, r, have):
     """外回りで発走し、ゴールを通ったあと内回りを一周する距離（中山・阪神の芝3200m）。
     ゴールの手前（まだ直線）で、外回りの線から内回りの線へ、向きを保ったまま直線＋円弧でつなぎ替える。"""
