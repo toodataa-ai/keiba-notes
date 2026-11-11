@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.49-20261111",
-  "current_public_version": "1.49",
+  "current_public_release": "release/jra-site-v1.50-20261112",
+  "current_public_version": "1.50",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1040,6 +1040,27 @@
       "scope_files": [
         "docs/index.html",
         "docs/assets/new-badge-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.50-20261112",
+      "branch": "release/jra-site-v1.50-20261112",
+      "commit_sha": "81fd44082afb6fe7449b48c44a2d5e4ae3f3cc38",
+      "deployed_at": "2026-11-12T07:32:38+09:00",
+      "workflow_run_id": 43112611957,
+      "validation_workflow_run_id": 43112611957,
+      "public_version": "1.50",
+      "note": "2026-11-12ユーザー明示承認済み。競馬場の傾向：東京芝2600m・2500m・2400m・2300mの発走位置を直し：東京芝2600mの発走位置が4コーナーの曲がりの中にあったのを、ゴール前の直線のはじまり（実際はゴールの約517m手前）に直す。図の直線は実際（525.9m）より短く描かれているため、2500m・2400m・2300mも同じ考え方で置き直し（2500mは直線に入って約109m先）。データは新ファイル umapot-starts-arc3.json（本番が読む arc2 は変更なし）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-tokyo-2600-start-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/track-trends.html"
       ],
       "public_http_files_verified": null
     }
