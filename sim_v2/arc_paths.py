@@ -1,6 +1,7 @@
 """build_course_paths が作った道すじを、直線と円弧だけの軌跡に作り直す（ルールは arc_spline.py）。"""
 import math
 import numpy as np
+from scipy.optimize import minimize
 from scipy.spatial import cKDTree
 from . import arc_spline as A
 
@@ -8,6 +9,7 @@ SNAP_STRAIGHT = {("chukyo", 1300), ("chukyo", 3000)}   # JRAの図で発走が�
 FORCE_CHUTE = {("tokyo", "1600")}; CHUTE_KEYS_FORCED = None   # 印が円弧の途中にあっても、発走は引き込み線（直線）から入る形にする
 CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
+SINGLE_ARC = {("tokyo", "2000")}   # 引き込み線を『直線＋円弧1つ＋向正面の直線の延長』にする距離（ユーザー依頼 2026-11-12）。中心線からのずれが幅の10%を超える（東京芝2000mは約16%）規定外の例外
 
 
 def resample(P, step):
@@ -53,7 +55,9 @@ def arcify(code, out, centre, half, routes, log=print):
             s_hint = int(np.argmin(np.linalg.norm(smp - ref[-1], axis=1))) * 0.5
             forced = (code, str(o["label"])) in FORCE_CHUTE
             S = np.array([o.get("mx", o["x"]), o.get("my", o["y"])] if forced else [o["x"], o["y"]]) * [1.0, fy]
-            if forced:   # 印の位置から本線の円弧へ、接線になる直線を引く（印は動かさない）
+            if (code, str(o["label"])) in SINGLE_ARC:
+                ch = _single_arc_chute(S, ref, base)
+            elif forced:   # 印の位置から本線の円弧へ、接線になる直線を引く（印は動かさない）
                 ch = _tangent_chute(S, base, s_hint)
             else:
                 ch = A.fit_chute(S, ref, base, Lp["tol"], s_hint, keys=CHUTE_KEYS.get((code, str(o["label"]))))
@@ -73,6 +77,51 @@ def arcify(code, out, centre, half, routes, log=print):
         res.append(q)
         log(f"  {code:9s}{o['label']:7s} {o['dist']:5d}m→{q['measured_m']:5d}m {info}")
     return res, loops
+
+
+def _single_arc_chute(S, ref, base):
+    """発走地点 S（動かさない）から、直線 → 円弧1つ → 向正面の直線の延長、で本線の向正面の直線のはじまりに入る引き込み線。
+    円弧の半径と、はじめの向きを、元の線（ref）にいちばん近くなるように決める（直線の長さは、つなぎ目の位置と向きの一致から決まる）。
+    返り値は (Spline, 最大ずれ, 合流位置 s*)。作れなければ None。"""
+    ib = next((i for i in range(2, len(base.L)) if base.K[i] == 0), None)      # 本線の最初の円弧のあとの直線＝向正面
+    if ib is None:
+        return None
+    sb0 = float(base.cum[ib]); B0 = np.array(base.at(sb0)[:2]); thb = base.at(sb0 + 1.0)[2]
+    LP = base.sample(0.5); refT = cKDTree(ref)
+    th_ref = math.atan2(*(ref[8] - ref[0])[::-1])
+    db = np.array([math.cos(thb), math.sin(thb)])
+
+    def build(v):
+        R, th0 = v
+        D = (thb - th0) % (2 * math.pi); d0 = np.array([math.cos(th0), math.sin(th0)])
+        arcv = R * np.array([-math.sin(th0) + math.sin(thb), math.cos(th0) - math.cos(thb)])
+        try:
+            L1, L2 = np.linalg.solve(np.array([d0, db]).T, B0 - S - arcv)
+        except np.linalg.LinAlgError:
+            return None
+        return R, th0, D, float(L1), float(L2)
+
+    def obj(v, ret=False):
+        b = build(v)
+        if b is None or b[0] < 30 or b[2] <= 0 or b[2] > math.pi * 0.99:
+            return 1e3
+        R, th0, D, L1, L2 = b
+        pen = (100 - L1 if L1 < 0 else 0) + (100 - L2 if L2 < 0 else 0)
+        cs = A.Spline(S[0], S[1], th0, [max(L1, 0.0), R * D, max(L2, 0.0)], [0.0, 1.0 / R, 0.0])
+        sm = cs.sample(1.0); Mp = np.vstack([sm, LP[int(sb0 * 2):int(sb0 * 2) + 700]])
+        dev = max(float(cKDTree(Mp).query(ref)[0].max()), float(refT.query(sm)[0].max()))
+        return (cs, dev) if ret else dev + pen
+
+    best = None
+    for R0 in (100, 140, 170, 200, 240):
+        for off in (-0.05, 0.0, 0.05):
+            r = minimize(obj, np.array([R0, th_ref + off]), method="Nelder-Mead", options=dict(xatol=1e-3, fatol=1e-4, maxiter=4000))
+            if best is None or r.fun < best.fun:
+                best = r
+    if best.fun >= 100:
+        return None
+    cs, dev = obj(best.x, True)
+    return cs, dev, sb0
 
 
 def _tangent_chute(S, base, s_hint, span=120.0):
