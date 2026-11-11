@@ -144,18 +144,18 @@ def approx_starts(code, loops, routes, cat_routes, have):
     return new
 
 
-HOME_STRAIGHT_M = {("tokyo", "turf|single"): 525.9}   # JRA公式のゴール前の直線の長さ（m）。東京芝は図の直線が実際より短く描かれている（図で約388m）
+HOME_STRAIGHT_M = {("tokyo", "turf|single"): 525.9, ("tokyo", "dirt|single"): 501.6}   # JRA公式のゴール前の直線の長さ（m）。東京は図の直線が実際より短く描かれている（芝 図で約388m、ダート 図で約441m）
 
 
 def fix_home_straight(code, loops, routes, out):
-    """ゴール前の直線の上に発走地点がある距離（周回の長さ＋直線以内。東京芝なら2300〜2600m）を、直線の中の割合で置き直す。
+    """ゴール前の直線の上に発走地点がある距離（周回の長さ＋直線以内。東京芝なら2300〜2600m、東京ダートなら2100・2400m）を、直線の中の割合で置き直す。
     図の直線は実際より短い（東京芝は約388m ←→ 実際525.9m）ので、ゴールから距離ぶん戻ると円弧（4コーナー）に入ってしまう。
     ゴールから戻る距離÷実際の直線の長さ＝図の直線の中の位置、とする（2600mは直線のはじまり、2500mは直線に入って約109m先）。
     元図の印の位置は図の縮尺に合っていないので使わない（approx=True＝画面に「目安」と出る）。"""
     res = []
     for o in out:
         rk = o.get("route"); sm = HOME_STRAIGHT_M.get((code, rk))
-        if sm is None or rk not in loops or o.get("surface") != "turf" or o.get("inout") is not None:
+        if sm is None or rk not in loops or o.get("inout") is not None:
             res.append(o); continue
         Lp = loops[rk]; base = Lp["base"]; L = base.length; fy = Lp["fy"]; lap = routes[rk]["lap_m"]
         laps = max(0, math.ceil(o["dist"] / lap - 1e-9) - 1); back = o["dist"] - laps * lap      # ゴールから戻る距離（m）
