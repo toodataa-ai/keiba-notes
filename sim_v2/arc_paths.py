@@ -5,6 +5,7 @@ from scipy.spatial import cKDTree
 from . import arc_spline as A
 
 SNAP_STRAIGHT = {("chukyo", 1300), ("chukyo", 3000)}   # JRAの図で発走が直線上にあるもの：目安の位置が円弧の途中なら、その円弧を出た所（直線のはじまり）に置く
+FORCE_CHUTE = {("tokyo", "1600")}; CHUTE_KEYS_FORCED = None   # 印が円弧の途中にあっても、発走は引き込み線（直線）から入る形にする
 CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
 
@@ -42,7 +43,7 @@ def arcify(code, out, centre, half, routes, log=print):
         far = np.nonzero(d > 1.2)[0]
         j = int(far[-1]) + 1 if len(far) else 0
         info = ""
-        if j <= 3:     # はじめから本線の上：印を新しい線の上へ
+        if j <= 3 and (code, str(o["label"])) not in FORCE_CHUTE:     # はじめから本線の上：印を新しい線の上へ
             smp = base.sample(0.25); k = int(np.argmin(np.linalg.norm(smp - np.array([o["x"], o["y"]]) * [1, fy], axis=1)))
             s0 = k * 0.25; sx, sy = base.at(s0)[:2]
             chute = None; first = L - s0; verts = base.vertices(s0, L)
@@ -50,8 +51,12 @@ def arcify(code, out, centre, half, routes, log=print):
             ref = P[:min(len(P), j + 12)] * [1.0, fy]
             smp = base.sample(0.5)
             s_hint = int(np.argmin(np.linalg.norm(smp - ref[-1], axis=1))) * 0.5
-            S = np.array([o["x"], o["y"]]) * [1.0, fy]
-            ch = A.fit_chute(S, ref, base, Lp["tol"], s_hint, keys=CHUTE_KEYS.get((code, str(o["label"]))))
+            forced = (code, str(o["label"])) in FORCE_CHUTE
+            S = np.array([o.get("mx", o["x"]), o.get("my", o["y"])] if forced else [o["x"], o["y"]]) * [1.0, fy]
+            if forced:   # 印の位置から本線の円弧へ、接線になる直線を引く（印は動かさない）
+                ch = _tangent_chute(S, base, s_hint)
+            else:
+                ch = A.fit_chute(S, ref, base, Lp["tol"], s_hint, keys=CHUTE_KEYS.get((code, str(o["label"]))))
             if ch is None:
                 log(f"  !! {code} {o['label']}: 引き込み線が直線＋円弧で作れない"); res.append(o); continue
             cs, dev, ss = ch; sx, sy = cs.st[0][:2]
@@ -68,6 +73,40 @@ def arcify(code, out, centre, half, routes, log=print):
         res.append(q)
         log(f"  {code:9s}{o['label']:7s} {o['dist']:5d}m→{q['measured_m']:5d}m {info}")
     return res, loops
+
+
+def _tangent_chute(S, base, s_hint, span=120.0):
+    """点 S から、本線の円弧に接する直線（引き込み線）。S 自体は動かさない。接する点は s_hint の前後で探す。"""
+    best = None
+    for s in np.arange(max(0.0, s_hint - span), min(base.length, s_hint + span), 0.25):
+        x, y, th = base.at(s)
+        i = int(np.clip(np.searchsorted(base.cum, s, side="right") - 1, 0, len(base.L) - 1))
+        if base.K[i] <= 0:
+            continue
+        v = np.array([x, y]) - S; n = float(np.hypot(*v))
+        if n < 2.0 or v @ np.array([math.cos(th), math.sin(th)]) <= 0:
+            continue
+        g = abs(v[0] * math.sin(th) - v[1] * math.cos(th)) / n       # 直線の向きと接線の向きのずれ（sin）
+        if best is None or g < best[0]:
+            best = (g, s, n, math.atan2(v[1], v[0]))
+    if best is None or best[0] > 1e-3:
+        return None
+    g, s, n, thv = best
+
+    def sg(s_):   # 符号つきのずれ（0 になる s が、ぴったり接する点）
+        x, y, th = base.at(s_); v = np.array([x, y]) - S
+        return v[0] * math.sin(th) - v[1] * math.cos(th)
+    lo, hi = s - 0.5, s + 0.5
+    if sg(lo) * sg(hi) > 0:
+        return None
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if sg(lo) * sg(mid) <= 0: hi = mid
+        else: lo = mid
+    s = 0.5 * (lo + hi); x, y, th = base.at(s)
+    n = float(np.hypot(x - S[0], y - S[1]))
+    cs = A.Spline(S[0], S[1], th, [n], [0.0])
+    return cs, 0.0, s
 
 
 def approx_starts(code, loops, routes, cat_routes, have):
