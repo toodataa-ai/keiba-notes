@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.48-20261110",
-  "current_public_version": "1.48",
+  "current_public_release": "release/jra-site-v1.49-20261111",
+  "current_public_version": "1.49",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1018,6 +1018,28 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/track-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.49-20261111",
+      "branch": "release/jra-site-v1.49-20261111",
+      "commit_sha": "83a5d17853138551e79b4de53ebb9f398df5278a",
+      "deployed_at": "2026-11-11T20:07:19+09:00",
+      "workflow_run_id": 43009261978,
+      "validation_workflow_run_id": 43009261978,
+      "public_version": "1.49",
+      "note": "2026-11-11ユーザー明示承認済み。NEW表示の漏れ修正と今後の自動連携：v1.46で追加した競馬場の傾向・騎手調教師の成績に7日間NEWを表示。今後は新しく追加された入口を正式リリース台帳から自動表示する。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-auto-new-badges-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/index.html",
+        "docs/assets/new-badge-v1.js"
       ],
       "public_http_files_verified": null
     }
