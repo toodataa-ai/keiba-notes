@@ -1,16 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-trends-tokyo-dirt-2400-start-v1",
-      "title": "競馬場の傾向：東京ダート2400m・2100mの発走位置を直し＋東京芝2000mの道すじを円弧1つに",
-      "pages": [
-        "track-trends.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "summary": "東京ダート2400mの発走位置が4コーナーの曲がりの中にあったのを、ゴール前の直線のはじまり（実際はゴールの約501m手前）に直す。2100mも同じ考え方で置き直し。あわせて東京芝2000mの道すじを、スタート直後の直線→円弧1つ→向正面の直線、の形にした。**この芝2000mの形は、中心線からのずれが幅の約16%で、規定（幅の10%）を超える例外**（元の中心線が向正面のはじまり付近で外にふくらんでいるため）。芝2000mだけ今の形（ずれ幅の約9%）に戻す場合は、データを arc4 に差し替える。データは新ファイル umapot-starts-arc5.json（本番が読む arc3 は変更なし。変わるのは東京ダート2距離と東京芝2000m）。"
-    }
-  ]
+  "candidates": []
 }
