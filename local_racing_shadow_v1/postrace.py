@@ -231,6 +231,19 @@ def parse_official(soup, p):
             and clean(p["race_name"]).endswith("3歳")
             and clean(official_name) == clean(p["race_name"]) + "以上特別"
         )
+        # NAR RaceList can clip the middle of a long 2/3-year-old title while
+        # keeping the age token (2026-11-11 Nagoya 5R: "...コメッ2歳" for
+        # "...コメット賞2歳特別"). Accept only: identical age token, the clipped
+        # head (>=10 chars) is a prefix of the full title, and the omitted
+        # part is at most 4 chars. Date/venue/R/distance/runners stay strict.
+        def clipped_age_title(full, shortened):
+            fa = re.search(r"([23]歳)(?:特別)?$", full)
+            sa = re.search(r"([23]歳)(?:特別)?$", shortened)
+            if not fa or not sa or fa.group(1) != sa.group(1):
+                return False
+            head_f, head_s = full[:fa.start()], shortened[:sa.start()]
+            return (len(head_s) >= 10 and head_f.startswith(head_s)
+                    and 0 < len(head_f) - len(head_s) <= 4)
         clipped_final_paren = (
             card_name.count("(") == card_name.count(")") + 1
             and (standard_name == card_name + ")"
@@ -241,6 +254,8 @@ def parse_official(soup, p):
         elif (standard_name != card_name and
                 not clipped_final_paren and
                 not clipped_age_suffix and
+                not clipped_age_title(standard_name, card_name) and
+                not clipped_age_title(card_name, standard_name) and
                 (len(card_name) < 6 or card_name not in standard_name) and
                 not verified_short_title(standard_name, card_name)):
             raise Blocked("BLOCKED_JOIN", f"Race name differs: {official_name} != {p['race_name']}")
