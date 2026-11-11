@@ -1,18 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-auto-new-badges-v1",
-      "title": "NEW表示の漏れ修正と今後の自動連携",
-      "summary": "v1.46で追加した競馬場の傾向・騎手調教師の成績に7日間NEWを表示。今後は新しく追加された入口を正式リリース台帳から自動表示する。",
-      "status": "awaiting_user_approval",
-      "pages": [
-        "index.html"
-      ],
-      "assets": [
-        "assets/new-badge-v1.js"
-      ]
-    }
-  ]
+  "candidates": []
 }
