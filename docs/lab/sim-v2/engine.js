@@ -256,7 +256,7 @@
     const cd = (du, dl) => { const y = dl * KL; return Math.sqrt(du * du + y * y); };   // 丸の中心どうしの距離（画面の見た目と同じ）
     const PL = plan(race, o, R, course), P = PL.horses;
     const gate = Math.min(WL, Math.max(0.5, (course.width - 1.6) / Math.max(1, H - 1)));
-    const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * gate, done: false, t: null, blocked: 0, effort: 0, bank: 0 }));
+    const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * gate, done: false, t: null, blocked: 0, effort: 0, bank: 0, waitT: 0 }));
     const rec = o.record ? [] : null; let t = 0; const dt = o.dt; let finished = 0;
     const maxT = (race.std_time || D / 15) * 1.6 + 30;
     while (finished < H && t < maxT) {
@@ -294,7 +294,7 @@
           const du = s.u - st[j].u;
           if (du > 0 && du < (final ? 12 : 5) && cd(du, st[j].lane - s.lane) < HD * 1.15 + 0.6 && st[j].v < vt) { ahead = j; break; }
         }
-        if (ahead !== null) {
+        if (ahead !== null && s.waitT > 0.7) {   // 前で0.7秒以上待たされたときだけ外へ出す（そうでなければ内ラチ沿いで前の馬について行く）
           const cands = [WL, 2 * WL, 3 * WL, 4 * WL, -WL];   // 外へ出すのが先、内が空いていれば内も
           for (const d of cands) {
             const L = s.lane + d; if (L < 0.5 || L > course.width - 1) continue;
@@ -328,9 +328,9 @@
         if (s.u - adv < wall) {
           const ok = Math.max(0, s.u - wall);
           const lost = adv - ok;
-          if (lost > 0.05) { s.blocked += dt; if (!final) s.bank += lost * 0.6; }
+          if (lost > 0.05) { s.blocked += dt; s.waitT += dt; if (!final) s.bank += lost * 0.6; } else s.waitT = Math.max(0, s.waitT - 2 * dt);
           adv = ok; v = Math.min(v, Math.max(st[wj].v, v - 1.5 * dt));
-        }
+        } else s.waitT = Math.max(0, s.waitT - 2 * dt);
         s.v = v;
         if (s.u - adv <= 0) { s.t = t + s.u / Math.max(0.1, v * k); s.u = 0; s.done = true; finished++; }
         else s.u -= adv;

@@ -124,7 +124,7 @@ h2{font-size:17px;margin:0 0 8px}
 </section>
 </div>
 
-<script src="sim-v2/engine.js?v=20261113b-1"></script>
+<script src="sim-v2/engine.js?v=20261113c-1"></script>
 <script>
 (function(){
 'use strict';
@@ -249,7 +249,6 @@ function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  const lat=pos.map((q,i)=>{const e=q[1]-SMO.lane[i],mx=2.0*dt,st=Math.abs(e)<1e-9?0:Math.sign(e)*Math.min(Math.abs(e)*(1-Math.exp(-dt/0.5)),mx);SMO.lane[i]+=st;return [q[0],SMO.lane[i]]});
  const base=lat.map(q=>{const p=hxy(c,q[0],q[1]);return T.f(p.x,p.y)});
  const SC=base;
- if(fr&&cam==='lead'){const pv=frameAt(Math.max(0,tt-1.2));ctx.lineCap='round';for(const i of ord){const a=hxy(c,pv[i][0],pv[i][1]);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=SC[i];const g=ctx.createLinearGradient(x1,y1,x2,y2);g.addColorStop(0,'#ffffff00');g.addColorStop(1,'#ffffffaa');ctx.strokeStyle=g;ctx.lineWidth=rad*1.1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}}
  for(const i of ord){const [X,Y]=SC[i];const fr_=E.frameOf(race.runners[i].no,H);
   ctx.fillStyle='#0000004d';ctx.beginPath();ctx.arc(X+1,Y+1.8,rad,0,Math.PI*2);ctx.fill();
   if(i===leader&&fr){ctx.beginPath();ctx.arc(X,Y,rad+3,0,Math.PI*2);ctx.fillStyle='#ffd43b';ctx.fill()}
