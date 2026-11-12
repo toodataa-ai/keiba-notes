@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/improvement-cycle.html">予想の改善状況</a></nav>
 
@@ -144,9 +144,9 @@ function render(d){
    var rr=sched.filter(function(r){return nday(r)===day});
    var mm=man.filter(function(r){return nday(r)===day});
    var c='';
-   if(rr.length){var okr=rr.filter(function(x){return x.status==='completed'&&(x.conclusion==='success'||(x.fail_kind==='publish_check'&&x.confirmed_by_rerun))})[0],r=okr||rr[0],rm=null;if(r.fail_kind==='publish_check'&&r.confirmed_by_rerun)rm=mm.filter(function(m){return m.conclusion==='success'&&Date.parse(m.created_at)>Date.parse(r.created_at)})[0]||null;
-    c=rm?cellFor(rm,true,i===6,null,day,'定時（'+hms(Date.parse(r.started_at||r.created_at))+'）は公開サイトへの反映の確認が時間切れ→手動の再実行で公開まで確認済み'):fixCell(cellFor(r,byOf(r)==='手',i===6,it,day),r,pst(it,day,d),r.status==='completed'&&r.conclusion==='success');
-        if(isT){if(r.status==='completed'){if(r.conclusion==='success'){var sx=pst(it,day,d);if(sx&&!sx.na&&!sx.ok)cnt.part++;else cnt.ok++}else if(r.fail_kind==='publish_check'){cnt.ok++;if(rm)cnt.rr++;else if(!r.confirmed_by_rerun)cnt.chk++}else cnt.ng++}}}
+   if(rr.length){var okr=rr.filter(function(x){return x.status==='completed'&&(x.conclusion==='success'||(x.fail_kind==='publish_check'&&x.confirmed_by_rerun))})[0],r=okr||rr[0],rm=null;if(r.status==='completed'&&r.conclusion!=='success'&&(r.fail_kind!=='publish_check'||r.confirmed_by_rerun))rm=mm.filter(function(m){return m.conclusion==='success'&&Date.parse(m.created_at)>Date.parse(r.created_at)&&Date.parse(m.created_at)-Date.parse(r.created_at)<=6*3600000})[0]||null;
+    c=rm?cellFor(rm,true,i===6,null,day,'定時（'+hms(Date.parse(r.started_at||r.created_at))+'）は'+(r.fail_kind==='publish_check'?'公開サイトへの反映の確認が時間切れ→手動の再実行で公開まで確認済み':'失敗→手動の再実行で成功（復旧）')):fixCell(cellFor(r,byOf(r)==='手',i===6,it,day),r,pst(it,day,d),r.status==='completed'&&r.conclusion==='success');
+        if(isT){if(r.status==='completed'){if(r.conclusion==='success'){var sx=pst(it,day,d);if(sx&&!sx.na&&!sx.ok)cnt.part++;else cnt.ok++}else if(rm){cnt.ok++;cnt.rr++}else if(r.fail_kind==='publish_check'){cnt.ok++;if(!r.confirmed_by_rerun)cnt.chk++}else cnt.ng++}}}
    else if(!exp){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic na">－</span><span class="tm">&nbsp;</span>'}
    else if(isT){
     if(mins(now)<tmin(it.t)+20||(first===null&&mins(now)-tmin(it.t)>660)){c=mm.length?cellFor(mm[0],true,i===6,null,day):'<span class="ic wt">・</span><span class="tm wt">'+it.t+'</span>';cnt.wait++}
@@ -159,7 +159,7 @@ function render(d){
   html+=row+'</tr>'
  });
  body.innerHTML=html;
- sum.innerHTML='きょう（'+today.slice(5).replace('-','/')+'・'+DAYS[td]+'）の定時の自動実行：<b class="ok">成功 '+cnt.ok+'</b>'+(cnt.part?'（うち保存が不足 '+cnt.part+'）':'')+(cnt.rr?'（うち公開確認が時間切れ→手動の再実行で確認 '+cnt.rr+'）':'')+(cnt.chk?'（うち公開確認のみ時間切れ '+cnt.chk+'・データは保存済み）':'')+'／<b class="'+(cnt.ng?'ng':'')+'">失敗 '+cnt.ng+'</b>／待ち '+cnt.wait+(cnt.late?'（うち予定より遅れ '+cnt.late+'）':'')+(cnt.miss?'／<b class="ng">記録なし '+cnt.miss+'</b>':'')+'<br><span class="wt">最終更新 '+hms(Date.parse(d.generated_at))+'（各処理の終了後と、毎時に更新。GitHubの都合で数時間遅れることがあります）</span>'}
+ sum.innerHTML='きょう（'+today.slice(5).replace('-','/')+'・'+DAYS[td]+'）の定時の自動実行：<b class="ok">成功 '+cnt.ok+'</b>'+(cnt.part?'（うち保存が不足 '+cnt.part+'）':'')+(cnt.rr?'（うち失敗・公開確認の時間切れ→手動の再実行で復旧 '+cnt.rr+'）':'')+(cnt.chk?'（うち公開確認のみ時間切れ '+cnt.chk+'・データは保存済み）':'')+'／<b class="'+(cnt.ng?'ng':'')+'">失敗 '+cnt.ng+'</b>／待ち '+cnt.wait+(cnt.late?'（うち予定より遅れ '+cnt.late+'）':'')+(cnt.miss?'／<b class="ng">記録なし '+cnt.miss+'</b>':'')+'<br><span class="wt">最終更新 '+hms(Date.parse(d.generated_at))+'（各処理の終了後と、毎時に更新。GitHubの都合で数時間遅れることがあります）</span>'}
 load().then(render);
 })();
 </script>
