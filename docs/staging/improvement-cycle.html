@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -76,6 +76,15 @@
 (() => {
 const $ = id => document.getElementById(id);
 const RACES_PER_WEEK = 5; // 直近の開催週の正式メイン数（4〜6）の目安
+  function lineageHtml(L){
+    if(!L||!L.debut_ae)return '';
+    const f=v=>v==null?'－':v.toFixed(2);
+    const cls=v=>v==null?'':(v>=1.05?'color:#1a7f37;font-weight:700':(v<=0.95?'color:#b42318;font-weight:700':''));
+    const rows=L.debut_ae.map(r=>`<tr><td>${esc(r.line)}</td><td style="text-align:right">${(r.starters_early+r.starters_late).toLocaleString()}</td><td style="text-align:right;${cls(r.ae_early)}">${f(r.ae_early)}</td><td style="text-align:right;${cls(r.ae_late)}">${f(r.ae_late)}</td></tr>`).join('');
+    const share=(L.share||[]).slice(0,6).map(x=>`${esc(x.line)} ${x.pct}%`).join('、');
+    return `<details style="margin:8px 0"><summary class="tiny"><b>父の系統（サンデーサイレンス系など）で見た結果</b>（${esc(L.verified_at)}時点）</summary><p class="tiny">${esc(L.text)}</p><p class="tiny">馬${L.horses.toLocaleString()}頭・種牡馬${L.sires}頭を、父をさかのぼって系統に分けました。頭数の割合：${share}。</p><p class="tiny"><b>新馬戦で、オッズ以上に勝つか</b>（${L.debut_races.toLocaleString()}レース。1.00＝オッズどおり。前半＝${esc(L.split.slice(0,4))}年より前、後半＝${esc(L.split.slice(0,4))}年以降。緑＝1.05以上、赤＝0.95以下）</p><div style="overflow-x:auto"><table class="tiny" style="border-collapse:collapse;min-width:300px"><thead><tr><th style="text-align:left">系統</th><th style="text-align:right">出走</th><th style="text-align:right">前半</th><th style="text-align:right">後半</th></tr></thead><tbody>${rows}</tbody></table></div><p class="tiny">系統の数が多いため、1つだけ高い・低いのは偶然の可能性があります。前後半とも同じ向きの系統に注目してください。</p></details>`;
+  }
+
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const shortTitle = t => String(t || '').split('（')[0];
 function word(delta, lowerIsBetter) {
@@ -169,7 +178,7 @@ Promise.all([
       if(f) extra+=`<p class="tiny ${f.is_stale?'warn':''}">馬場モデルの記録の最終更新：${esc(f.updated_at)}（${f.age_days}日前）。${f.is_stale?'更新が止まっています。':''}${esc(f.owner)}</p>`;
       extra+='<p class="tiny"><b>使える見込み</b>＝天気予報なしでも、今のやり方（朝の馬場が一日続くと見なす）より外れが5%以上減る。<b>予報待ち</b>＝天気予報が当たれば良くなるが、予報なしでは足りない（予報を毎日保存していて、たまり次第、本当の精度で測り直します）。<b>まだ足りない</b>＝予報が当たっても基準に届かない。</p><p class="tiny">比較中の案が使うのは、発走前に発表される公式の馬場だけです。研究の馬場予測は、競馬場ごとに条件に届いたら、20レースの比較を挟まず採用できます（承認が必要）。中山・阪神も、他の競馬場と同じ基準で評価しています。</p>';
     }
-    if(t.id==='field_experience'&&sire){extra+=`<p class="tiny"><b>これまでに分かったこと</b>（${esc(sire.debut_sire.verified_at)}時点）</p><ul class="tiny" style="margin:4px 0 8px 18px;padding:0">${(sire.findings||[]).map(x=>`<li style="margin:3px 0">${esc(x)}</li>`).join('')}</ul><p class="tiny">${esc(sire.race_pages.text)}　（${esc(sire.updated_at)}時点）</p><p class="tiny">${esc(sire.stopped)}</p>`}
+    if(t.id==='field_experience'&&sire){extra+=`<p class="tiny"><b>これまでに分かったこと</b>（${esc(sire.debut_sire.verified_at)}時点）</p><ul class="tiny" style="margin:4px 0 8px 18px;padding:0">${(sire.findings||[]).map(x=>`<li style="margin:3px 0">${esc(x)}</li>`).join('')}</ul>${lineageHtml(sire.lineage)}<p class="tiny">${esc(sire.race_pages.text)}　（${esc(sire.updated_at)}時点）</p><p class="tiny">${esc(sire.stopped)}</p>`}
     const entry=!crit.length&&regd?`<div class="entry"><b>登録ずみ：</b><span class="eline">登録の条件に届いたため、改善案として登録しました。いまは「比較」の段階です（下の「比較中の詳しい経過」で見られます）。</span></div>`:crit.length?`<div class="entry"><b>登録の条件：</b>${crit.map(c=>`<span class="eline">${esc(c)}</span>`).join('')}${ready?`<span class="eline"><b>いま登録できる状態：${ready}件。</b>通知（Issue）を出しています。</span>`:''}${adopt?`<span class="eline"><b>いま採用できる状態：${adopt}件。</b>通知（Issue）を出しています。</span>`:''}</div>`:'';
     const link=t.research?`<p class="tiny"><a href="${t.research.href}">つながる研究：${esc(t.research.label)} →</a></p>`:'<p class="tiny">専用の研究ページはなく、毎週の回顧で集めた観察をもとにしています。</p>';
     const cmp=ex.map(expCard).join('');
