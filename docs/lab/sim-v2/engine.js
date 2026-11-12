@@ -256,7 +256,7 @@
     const cd = (du, dl) => { const y = dl * KL; return Math.sqrt(du * du + y * y); };   // 丸の中心どうしの距離（画面の見た目と同じ）
     const PL = plan(race, o, R, course), P = PL.horses;
     const gate = Math.min(WL, Math.max(0.5, (course.width - 1.6) / Math.max(1, H - 1)));
-    const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * gate, done: false, t: null, blocked: 0, effort: 0, bank: 0, waitT: 0 }));
+    const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * gate, done: false, t: null, blocked: 0, effort: 0, bank: 0, waitT: 0, hold: 0 }));
     const rec = o.record ? [] : null; let t = 0; const dt = o.dt; let finished = 0;
     const maxT = (race.std_time || D / 15) * 1.6 + 30;
     while (finished < H && t < maxT) {
@@ -300,9 +300,10 @@
             const L = s.lane + d; if (L < 0.5 || L > course.width - 1) continue;
             let clear = true;
             for (const j of order) { if (j === i || st[j].done) continue; const du = s.u - st[j].u; if (du > -HD && du < (final ? 10 : 6) && Math.abs(st[j].lane - L) * KL < HD * 0.95) { clear = false; break; } }
-            if (clear) { want = L; break; }
+            if (clear) { want = L; s.hold = 2.5; break; }
           }
         }
+        if (s.hold > 0) { s.hold -= dt; if (want < s.lane) want = s.lane; }   // 外へ出した直後は少しの間そのまま走る（出たり入ったりしない）
         const side = Math.sign(want - s.lane);
         const nl = s.lane + Math.max(-0.3, Math.min(0.3, want - s.lane));
         let free = true;
@@ -312,10 +313,10 @@
           // 動いた先で丸が重なる（しかも今より近づく）なら動かない
           if (cd(du, st[j].lane - nl) < HD * 0.95 && cd(du, st[j].lane - nl) < cd(du, st[j].lane - s.lane)) { free = false; break; }
           // 内へ戻るときは、その進路のすぐ前（約8m）が空いているときだけ（空いていないと外へ出す・戻すを繰り返してしまう）
-          if (side < 0 && -du > -HD && -du < (final ? 10 : 8) && Math.abs(st[j].lane - nl) * KL < HD * 0.95) { free = false; break; }
+          if (side < 0 && -du > -HD && -du < HD * 1.6 && Math.abs(st[j].lane - nl) * KL < HD * 0.95) { free = false; break; }
         }
         const lat = run < 400 ? 1.4 : (final ? 1.3 : 1.0);
-        if (free) s.lane += Math.max(-lat * dt, Math.min(lat * dt, want - s.lane));
+        if (free) s.lane += Math.max(-lat * dt * 1.6, Math.min(lat * dt, want - s.lane));   // 内へ寄るほうが少し速い
         s.lane = Math.max(0.5, Math.min(course.width - 1, s.lane));
         const k = laneFactor(course, s.u, s.lane);
         let adv = v * k * dt;
