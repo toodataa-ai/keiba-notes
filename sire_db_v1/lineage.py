@@ -77,6 +77,36 @@ def lineage_map(hs):
     return {n: line_of(n, par) for n in sorted(names)}, par
 
 
+def grp(x):
+    return "その他" if x and x.startswith("その他") else x
+
+
+def summary(hs, min_starters=150, split="2024-01-01", since="2021-01-01"):
+    """公開してよい集計だけ：系統ごとの頭数の割合と、新馬戦のオッズ比（A/E＝実際の勝ち÷オッズ由来の期待）。
+    前半（since〜split前）と後半（split以降）に分けて、同じ向きが続くかを見る。馬や父の名前は出さない（系統名のみ）。"""
+    from sire_db_v1.debut_common import debut_races
+    LM, _ = lineage_map(hs)
+    sires = collections.Counter(grp(LM.get(h["ped"]["sire"])) for h in hs.values())
+    tot = sum(sires.values())
+    T = collections.defaultdict(lambda: [0, 0, 0.0, 0, 0, 0.0])
+    nrace = 0
+    for code, lst in debut_races(hs).items():
+        d = lst[0][1]["date"]
+        if d < since:
+            continue
+        ps = [0.8 / r["odds"] for h, r in lst]; z = sum(ps); nrace += 1
+        i = 0 if d < split else 3
+        for (h, r), p in zip(lst, ps):
+            k = T[grp(LM.get(h["ped"]["sire"]))]
+            k[i] += 1; k[i + 1] += 1 if r["finish"] == 1 else 0; k[i + 2] += p / z
+    ae = lambda w, e: round(w / e, 2) if e else None
+    rows = [{"line": ln, "starters_early": k[0], "starters_late": k[3], "ae_early": ae(k[1], k[2]), "ae_late": ae(k[4], k[5])}
+            for ln, k in sorted(T.items(), key=lambda x: -(x[1][0] + x[1][3])) if k[0] + k[3] >= min_starters]
+    return {"horses": tot, "sires": len({h["ped"]["sire"] for h in hs.values()}),
+            "share": [{"line": k, "pct": round(100 * n / tot, 1)} for k, n in sires.most_common() if n / tot >= 0.01],
+            "debut_races": nrace, "split": split, "debut_ae": rows}
+
+
 def main():
     import argparse
     from sire_db_v1.debut_common import load_horses
