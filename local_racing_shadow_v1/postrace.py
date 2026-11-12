@@ -213,7 +213,7 @@ def parse_official(soup, p):
             after_f, after_s = full[f.start():], shortened[s.start():]
             return (len(before_s) >= 7
                     and before_f.startswith(before_s)
-                    and 0 <= len(before_f) - len(before_s) <= 3
+                    and 0 <= len(before_f) - len(before_s) <= 8
                     and after_f.startswith(after_s)
                     and 0 <= len(after_f) - len(after_s) <= 4)
         # NAR RaceList can truncate just the final closing parenthesis.
