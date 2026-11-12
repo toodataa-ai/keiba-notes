@@ -135,7 +135,7 @@ def parse_horse(soup) -> dict:
             jk = tds[4].find("a", href=True) if len(tds) > 4 else None
             jm = re.search(r"/jockey/(\d+)/", jk["href"]) if jk else None
             kg = re.search(r"\(([\d.]+)\)", _t(tds[4])) if len(tds) > 4 else None
-            wm = re.match(r"(\d+)\(([+-]?\d+)\)", _t(tds[6])) if len(tds) > 6 else None
+            wm = re.match(r"(\d{3,4})(?:\(([+-]?\d+)\))?", _t(tds[6])) if len(tds) > 6 else None
             tm = re.match(r"((?:\d+:)?\d+\.\d)(?: \(([+-]?[\d.]+)\))?", _t(tds[7])) if len(tds) > 7 else None  # 直線1000mなどは「55.0」のように分が無い
             od = re.match(r"(\S+)(?: ([\d.]+))?", _t(tds[8])) if len(tds) > 8 else None
             if od and not od.group(2) and re.fullmatch(r"\d{2}\.\d", od.group(1)):
@@ -154,7 +154,7 @@ def parse_horse(soup) -> dict:
                          "ninki": int(om.group(1)) if om else None,
                          "odds": float(om.group(2)) if om else None,
                          "body_weight": int(wm.group(1)) if wm else None,
-                         "body_weight_diff": int(wm.group(2)) if wm else None,
+                         "body_weight_diff": int(wm.group(2)) if wm and wm.group(2) else None,
                          "time": tm.group(1) if tm else None,
                          "margin": tm.group(2) if tm and tm.group(2) else None,
                          "passing": od.group(1) if od else None,
@@ -175,14 +175,19 @@ def known_ids() -> set[str]:
     return s
 
 
-PARSE_V = 2   # 2 = 2026-11-06 の読み取り修正（直線レースのタイム・上がり）以後
+PARSE_V = 3   # 2 = 2026-11-06 の読み取り修正（直線レースのタイム・上がり）／3 = 2026-11-13 初出走の馬体重（増減なし）を読む
 
 
 def needs_refetch(rec) -> bool:
     """修正前に取った馬で、直線レースなどの欄がずれて取れた可能性のある履歴を持つもの"""
     if rec.get("parse_v", 1) >= PARSE_V:
         return False
-    for r in rec.get("history", []):
+    hist = rec.get("history", [])
+    if hist:  # 初出走（いちばん古い履歴）の馬体重が空 → 増減なしの形を読めていなかった
+        first = min(hist, key=lambda r: r.get("date") or "9999")
+        if first.get("body_weight") is None and isinstance(first.get("finish"), int):
+            return True
+    for r in hist:
         pas = r.get("passing") or ""
         if re.fullmatch(r"\d{2}\.\d", pas) or (r.get("time") is None and isinstance(r.get("finish"), int)):
             return True

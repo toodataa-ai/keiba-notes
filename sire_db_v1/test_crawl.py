@@ -39,7 +39,9 @@ class T(unittest.TestCase):
         bad = {"history": [{"passing": "34.5", "time": None, "finish": 3}]}
         self.assertTrue(c.needs_refetch(bad))
         self.assertFalse(c.needs_refetch({**bad, "parse_v": c.PARSE_V}))
-        self.assertFalse(c.needs_refetch({"history": [{"passing": "3-3", "time": "1:10.0", "finish": 3}]}))
+        self.assertFalse(c.needs_refetch({"history": [{"passing": "3-3", "time": "1:10.0", "finish": 3, "body_weight": 450}]}))
+        # 初出走の馬体重が空（増減なしの形を読めていなかった）→ 取り直す
+        self.assertTrue(c.needs_refetch({"history": [{"date": "2025-06-01", "passing": "3-3", "time": "1:10.0", "finish": 3, "body_weight": None}]}))
 
     def test_race_code(self):
         codes = dict((d, k) for d, k in c.race_codes(["2026"]) if d == "2026-10-31" and k.endswith("11"))
