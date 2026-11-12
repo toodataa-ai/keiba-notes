@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.51-20261112",
-  "current_public_version": "1.51",
+  "current_public_release": "release/jra-site-v1.52-20261112",
+  "current_public_version": "1.52",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1082,6 +1082,27 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/track-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.52-20261112",
+      "branch": "release/jra-site-v1.52-20261112",
+      "commit_sha": "e13f62111cf3448b9b3dbeefdc76733cd49d36e8",
+      "deployed_at": "2026-11-12T11:39:47+09:00",
+      "workflow_run_id": 43142930310,
+      "validation_workflow_run_id": 43142930310,
+      "public_version": "1.52",
+      "note": "2026-11-12ユーザー明示承認済み。自動運用の状況：定時が失敗→手動の再実行で成功した回を『R（復旧）』で表示：これまでは公開確認の時間切れだけが再実行で『確認済み』になっていた。名前の食い違いなど、どんな失敗でも、6時間以内に手動の再実行が成功していれば、その再実行をR（復旧）の✅で表示し、きょうの集計にも『再実行で復旧』として数える。データの保存が確認できない失敗は従来どおり❌のまま。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-rerun-recovery-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
