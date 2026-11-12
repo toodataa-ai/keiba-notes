@@ -1,16 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-operations-rerun-recovery-v1",
-      "title": "自動運用の状況：定時が失敗→手動の再実行で成功した回を『R（復旧）』で表示",
-      "pages": [
-        "operations.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "summary": "これまでは公開確認の時間切れだけが再実行で『確認済み』になっていた。名前の食い違いなど、どんな失敗でも、6時間以内に手動の再実行が成功していれば、その再実行をR（復旧）の✅で表示し、きょうの集計にも『再実行で復旧』として数える。データの保存が確認できない失敗は従来どおり❌のまま。"
-    }
-  ]
+  "candidates": []
 }
