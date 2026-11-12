@@ -9,6 +9,11 @@
  *   前半・中盤・終盤の速さの配分を、脚質・ペース（先行馬の数）・瞬発力で決める。
  *   走っている間は、進路（内ラチからの距離）・前が詰まったときの減速と進路変更・
  *   コーナーで外を回る距離のロス・最後の直線での外への持ち出しを1歩ずつ計算するので、計画どおりにはいかない。
+ *
+ * 道すじ（2026-11-13）：競馬場の傾向ページで作った「発走地点→ゴール」の道すじ（直線と円弧だけの線、
+ *   umapot-starts-arc5.json）があれば、それを走る。道すじの長さを距離に合わせて伸縮するので、
+ *   スタートからゴールまでの走行距離は実際の距離と一致する。曲がり具合（1/半径）は円弧の部品から直接求め、
+ *   外を回るロスに使う。道すじが無い距離は、従来の周回の線（または競技場型）で走る。
  */
 (function (root, factory) {
   const api = factory();
@@ -61,7 +66,66 @@
     return { i, j, w };
   }
 
-  function buildCourse(route, dist, shapePts) {
+  // 道すじ（発走地点→ゴールの点列、図の画素）。直線と円弧だけでできているので、
+  // 点ごとの向きの変化÷長さ が、その部品の曲がり具合（円弧なら 1/半径、直線なら0）になる。
+  // 道すじは走路の帯の中央を通るので、画面では「内ラチからの距離 − 幅/2」だけ横へずらして描く。
+  function buildTrack(route, dist, pts, drawScale) {
+    const n = pts.length, cum = [0];
+    for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const len = cum[n - 1], fp = dist / len;               // 1画素あたりのメートル（この道すじの長さ＝距離）
+    const seg = [];                                        // 区間ごとの向き
+    for (let i = 0; i < n - 1; i++) seg.push(Math.atan2(pts[i + 1][1] - pts[i][1], pts[i + 1][0] - pts[i][0]));
+    const turnAt = []; let tot = 0;                        // 頂点での曲がる角度（符号つき）
+    for (let i = 0; i < n; i++) {
+      if (i === 0 || i === n - 1) { turnAt.push(0); continue; }
+      let a = seg[i] - seg[i - 1]; while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI;
+      turnAt.push(a); tot += a;
+    }
+    const inSign = tot >= 0 ? 1 : -1;                      // 内側へ曲がる向き（円弧は常に内側へ曲がる）
+    // 区間 i（点 i→i+1）の曲がり具合（1/m）：両端の頂点の角度を、隣の区間との長さの半分ずつで割り振る
+    const kap = [];
+    for (let i = 0; i < n - 1; i++) {
+      const li = cum[i + 1] - cum[i] || 1e-9;
+      const ka = i > 0 ? turnAt[i] / ((li + (cum[i] - cum[i - 1])) / 2) : 0;
+      const kb = i + 1 < n - 1 ? turnAt[i + 1] / ((li + (cum[i + 2] - cum[i + 1])) / 2) : 0;
+      // 長い直線の区間に角度を広げすぎない（短い円弧側の値を使う）
+      let k = (Math.abs(ka) < Math.abs(kb) ? ka : kb);
+      if (li > 30) k = 0;
+      k = inSign * k / fp;                                 // 内側へ曲がると＋（1/m）
+      kap.push(Math.max(-1 / 75, Math.min(1 / 75, k)));
+    }
+    // 1画素未満の細かい点ではなめらかに：前後2区間の、長さで重みをつけた平均
+    const kap2 = kap.map((_, i) => { let t = 0, w = 0; for (let d = -2; d <= 2; d++) { const j = i + d; if (j < 0 || j >= kap.length) continue; const l = cum[j + 1] - cum[j]; if (l > 30) continue; t += kap[j] * l; w += l; } return w ? t / w : kap[i]; });
+    let minR = Infinity; kap2.forEach(k => { if (k > 0) minR = Math.min(minR, 1 / k); });
+    return { pts, cum, len, fp, seg, kap: kap2, inSign, drawScale: drawScale || fp, minR };
+  }
+  function trackAt(T, u, dist) {
+    const sp = Math.max(0, Math.min(T.len, (dist - u) / T.fp));   // 発走地点から何画素先か
+    let lo = 0, hi = T.pts.length - 1;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (T.cum[m] <= sp) lo = m; else hi = m; }
+    const w = (sp - T.cum[lo]) / ((T.cum[lo + 1] - T.cum[lo]) || 1);
+    return { i: lo, w };
+  }
+
+  // umapot-starts-arc5.json の venues から、route（芝ダ・内外）と距離に合う道すじを選ぶ。無ければ null
+  function pathFor(starts, route, dist) {
+    if (!starts || !route || !starts.venues) return null;
+    const list = starts.venues[route.venue] || [];
+    const key = route.surface + '|' + route.layout;
+    const hit = list.filter(e => e.dist === dist && e.route === key && e.path && e.path.length >= 2)[0];
+    return hit || null;
+  }
+
+  function buildCourse(route, dist, shapePts, pathPts) {
+    if (pathPts && pathPts.length >= 2 && route.layout !== 'straight') {
+      // 周回の線（画面の内ラチ・外ラチの描画用）は従来どおり作り、走る線だけ道すじに置き換える
+      const base = (shapePts && shapePts.length > 20) ? shapeCourse(route, dist, shapePts) : null;
+      const c = base || { shaped: false, straightOnly: false, lap: dist, dist, goalParam: 0,
+        width: (route.width_m && route.width_m[0]) || (route.surface === 'dirt' ? 20 : 25), turn: route.turn,
+        elevation: route.elevation_m || 0, home: route.straight_m, Ls: 0, R: 0, f: 1 };
+      c.track = buildTrack(route, dist, pathPts, base ? base.f : null);
+      return c;
+    }
     if (shapePts && shapePts.length > 20 && route.layout !== 'straight') return shapeCourse(route, dist, shapePts);
     const straightOnly = route.layout === 'straight';
     const width = (route.width_m && route.width_m[0]) || (route.surface === 'dirt' ? 20 : 25);
@@ -92,6 +156,18 @@
   }
   // 画面用の座標（メートル）。ホームストレッチを下側に置く。lane = 内ラチから外へのメートル
   function xy(course, u, lane) {
+    if (course.track) {
+      const T = course.track, { i, w } = trackAt(T, u, course.dist), P = T.pts, j = Math.min(i + 1, P.length - 1);
+      const x = P[i][0] + (P[j][0] - P[i][0]) * w, y = P[i][1] + (P[j][1] - P[i][1]) * w;
+      const h = T.seg[Math.min(i, T.seg.length - 1)];
+      // 外向きの法線（内側へ曲がる向きの反対）。画面の縮尺は周回の線と同じ（背景の図と重なる）
+      const nx = T.inSign * Math.sin(h), ny = -T.inSign * Math.cos(h), off = lane - course.width / 2, s = T.drawScale;
+      return { x: x * s + nx * off, y: y * s + ny * off, heading: h };
+    }
+    return xyLoop(course, u, lane);
+  }
+  // 周回の線の上の位置（内ラチ・外ラチの描画用。道すじがあっても周回で描く）
+  function xyLoop(course, u, lane) {
     if (course.shaped) {
       const { i, j, w } = shapeAt(course, u); const P = course.pts, N = course.nor, T = course.tan;
       const x = P[i][0] + (P[j][0] - P[i][0]) * w, y = P[i][1] + (P[j][1] - P[i][1]) * w;
@@ -121,11 +197,13 @@
     return { x: sign * (-L / 2 + r * Math.cos(a)), y: r * Math.sin(a), heading: sign > 0 ? a - Math.PI / 2 : Math.PI - (a - Math.PI / 2) };
   }
   function inCurve(course, u) {
+    if (course.track) { const T = course.track; return T.kap[trackAt(T, u, course.dist).i] > 1 / 400; }
     if (course.shaped) { const { i } = shapeAt(course, u); return course.kap[i] > 1 / 400; }
     return !course.straightOnly && segmentAt(course, loopParam(course, u)).kind === 'curve';
   }
   // 外を回るロス：ラチ沿いに進む距離 ＝ 走った距離 × この倍率
   function laneFactor(course, u, lane) {
+    if (course.track) { const T = course.track; return 1 / (1 + lane * T.kap[Math.min(trackAt(T, u, course.dist).i, T.kap.length - 1)]); }
     if (course.straightOnly) return 1;
     if (course.shaped) { const { i } = shapeAt(course, u); return 1 / (1 + lane * course.kap[i]); }
     return inCurve(course, u) ? course.R / (course.R + lane) : 1;
@@ -171,7 +249,7 @@
   function simulate(race, opts = {}) {
     const o = Object.assign({}, DEFAULT, opts);
     const R = rng(o.seed || 1);
-    const course = race._course || buildCourse(race.route, race.dist, race.shape);
+    const course = race._course || buildCourse(race.route, race.dist, race.shape, race.path);
     const H = race.runners.length, D = race.dist;
     const PL = plan(race, o, R, course), P = PL.horses;
     const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * 1.05, done: false, t: null, blocked: 0, effort: 0, bank: 0 }));
@@ -261,7 +339,7 @@
   function monteCarlo(race, n = 300, opts = {}) {
     const H = race.runners.length;
     const win = new Array(H).fill(0), top3 = new Array(H).fill(0), avgPos = new Array(H).fill(0);
-    race._course = race._course || buildCourse(race.route, race.dist, race.shape);
+    race._course = race._course || buildCourse(race.route, race.dist, race.shape, race.path);
     for (let k = 0; k < n; k++) {
       const r = simulate(race, Object.assign({}, opts, { seed: (opts.seed || 7) * 7919 + k * 104729 + 13, record: false }));
       r.results.forEach(x => { if (x.pos === 1) win[x.i]++; if (x.pos <= 3) top3[x.i]++; avgPos[x.i] += x.pos; });
@@ -269,5 +347,5 @@
     return race.runners.map((x, i) => ({ no: x.no, win: win[i] / n, top3: top3[i] / n, avgPos: avgPos[i] / n }));
   }
 
-  return { rng, buildCourse, xy, loopParam, segmentAt, inCurve, laneFactor, simulate, monteCarlo, frameOf, DEFAULT };
+  return { rng, buildCourse, xy, xyLoop, pathFor, loopParam, segmentAt, inCurve, laneFactor, simulate, monteCarlo, frameOf, DEFAULT };
 });

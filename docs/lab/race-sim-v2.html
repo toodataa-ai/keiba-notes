@@ -108,13 +108,13 @@ h2{font-size:17px;margin:0 0 8px}
 <section class="panel" aria-labelledby="howTitle">
  <h2 id="howTitle">しくみと注意</h2>
  <p class="note">能力値は、そのレースの日より前の走りだけで計算しています（未来の情報は使いません）。1走ごとに「同じ競馬場・芝ダ・距離・内外・馬場の基準タイム」と比べた速さ（スピード）、上がり3ハロンの速さ（瞬発力）、1コーナーの位置（先行力）、道悪での走り、距離の得手、走りのばらつき（安定感）を出し、近走ほど・距離が近いほど重く平均します。最後に、着順・着差・人気・クラスの上下・間隔・年齢なども合わせて「総合」にまとめます（学習期間で係数を決め、検証期間で確かめています）。表示の0〜100は、全出走馬の中での位置です。</p>
- <p class="note">コースは JRA 公表の一周・直線・幅・高低差から、直線2本と半円2つの形で近似しています。コーナーのきつさの違い・引き込み線・芝のA〜Dの違い・坂の細かい位置は省略しています。馬の動きは、目標タイムに向けた区間ごとの速さ、加速の上限、前の馬との距離（約2.6m・横1m以内で詰まる）、横への移動（毎秒0.7mまで）、コーナーで外を回る距離の増加で動いています。</p>
+ <p class="note">コースは、競馬場の傾向ページで作った「発走地点からゴールまでの道すじ」（うまぽっとの図の発走地点の印から、走路の帯の中央を直線と円弧だけでつないだ線）を走ります。道すじの長さはレースの距離に合わせているので、スタートからゴールまでの走行距離は実際の距離と同じです。コーナーのきつさ（半径）は円弧の部品から求め、外を回るほど余計に走る距離に使います。道すじの無い距離（新潟の直線1000mなど）は、図をなぞった周回の線か、JRA 公表の一周・直線から作った近似の形で走ります。芝のA〜Dの違い・坂の細かい位置は省略しています。馬の動きは、目標タイムに向けた区間ごとの速さ、加速の上限、前の馬との距離（約2.6m・横1m以内で詰まる）、横への移動（毎秒0.7mまで）、コーナーで外を回る距離の増加で動いています。</p>
  <p class="note">「能力の勝率」は、能力値の総合から直接出した勝つ確率です。「シミュの勝率」は、走りを何百回も再現して数えた確率で、位置取り・ペース・進路の偶然も入ります。過去のレースで確かめたところ、いまはシミュの勝率より能力の勝率のほうが当たります（上の数字。小さいほど良い）。シミュレーションは展開の見え方を確かめるためのもので、予想に使うなら能力の勝率を見てください。どちらも単勝オッズほどは当たりません。</p>
  <p class="note">データは JRA のレースに出走した馬の公開成績から作った研究用です（取得は全体の約35%まで）。出走馬の一部が取得できていないレースは載せていません。</p>
 </section>
 </div>
 
-<script src="sim-v2/engine.js?v=20261106-1"></script>
+<script src="sim-v2/engine.js?v=20261113-1"></script>
 <script>
 (function(){
 'use strict';
@@ -131,7 +131,7 @@ const LJ={single:'',inner:'内回り',outer:'外回り',straight:'直線',outer_
 const SJ={turf:'芝',dirt:'ダート'};
 
 async function load(){
- const [r,c,m,up,sh,um]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]})),fetch('sim-v2/course-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-shapes.json').then(x=>x.json()).catch(()=>null)]);SHAPES=sh;UMAP=um;
+ const [r,c,m,up,sh,um,st]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]})),fetch('sim-v2/course-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-starts-arc5.json').then(x=>x.json()).catch(()=>null)]);SHAPES=sh;UMAP=um;STARTS=st;
  const upc=(up.races||[]).filter(x=>x.route);RACES=upc.concat(r.races.sort((a,b)=>b.date.localeCompare(a.date)||a.venue.localeCompare(b.venue)));CAT=c;META=m;
  const sel=$('selRace');let lastD='';let grp=null;
  RACES.forEach((x,i)=>{const key=(x.upcoming?'これから：':'')+x.date;if(key!==lastD){grp=document.createElement('optgroup');grp.label=x.upcoming?x.date+'（これから・結果前）':x.date;sel.appendChild(grp);lastD=key}
@@ -150,14 +150,14 @@ function stdTime(route,dist,going){// 基準タイムの近似：同じ芝ダの
 function current(){const src=RACES[+$('selRace').value];if(mode==='real')return src;
  const [s,l]=$('selRoute').value.split('|');const route=routeOf($('selVenue').value,s,l);const dist=+$('selDist').value;const going=$('selGoing').value;
  return Object.assign({},src,{route,dist,going,surface:SJ[s],venue:route.name,std_time:stdTime(route,dist,going),_course:null,free:true})}
-let UMAP=null;const BGIMG={};
+let UMAP=null,STARTS=null;const BGIMG={};
 function umapFor(route){if(!UMAP||!route)return null;const v=UMAP.venues[route.venue];if(!v)return null;const k=(route.surface||'')+'|'+route.layout;const r=v.routes[k]||(route.layout==='outer_to_inner'?v.routes[route.surface+'|inner']:null);if(!r)return null;if(!BGIMG[route.venue]){const im=new Image();im.onload=()=>{if(typeof draw==='function'&&race)try{draw(clock)}catch(e){}};im.src='sim-v2/'+v.img.replace('sim-v2/','');BGIMG[route.venue]=im}return {pts:r.pts,img:BGIMG[route.venue],w:v.w,h:v.h}}
 function shapeFor(route){const u=umapFor(route);if(u)return u.pts;if(!SHAPES||!route)return null;const v=SHAPES.venues[route.venue];if(!v)return null;const k=(route.surface||'')+'|'+route.layout;const r=v.routes[k]||(route.layout==='outer_to_inner'?v.routes[route.surface+'|inner']:null);return r?r.pts:null}
-function pick(i){$('selRace').value=i;race=current();race.shape=shapeFor(race.route);race.bg=umapFor(race.route);race._course=E.buildCourse(race.route,race.dist,race.shape);sim=null;clock=0;play=false;
+function pick(i){$('selRace').value=i;race=current();race.shape=shapeFor(race.route);race.bg=umapFor(race.route);const ph=E.pathFor(STARTS,race.route,race.dist);race.pathInfo=ph;race.path=ph?ph.path:null;race._course=E.buildCourse(race.route,race.dist,race.shape,race.path);sim=null;clock=0;play=false;
  const src=RACES[+$('selRace').value];
  $('raceInfo').innerHTML=(race.free?'<b>別のコースで：</b>'+esc(race.venue)+' '+esc(race.surface)+race.dist+'m（'+esc(race.going)+'）。出走馬は '+esc(src.date+' '+src.venue+src.race_no+'R '+(src.race_name||''))+' と同じです':
   esc(race.date)+' '+esc(race.venue)+race.race_no+'R '+esc(race.race_name||'')+'・'+esc(race.surface)+race.dist+'m'+(LJ[race.route.layout]?'（'+LJ[race.route.layout]+'）':'')+'・'+esc(race.going)+'・'+race.runners.length+'頭')+
-  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース'+(race._course.shaped?'（'+(race.bg?'うまぽっとの図をなぞった形・元図：うまぽっと https://umapot.com/':'JRA公式の平面図をなぞった形')+'）':'（楕円で近似）')+'：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。';
+  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース'+(race._course.shaped?'（'+(race.bg?'うまぽっとの図をなぞった形・元図：うまぽっと https://umapot.com/':'JRA公式の平面図をなぞった形')+'）':'（楕円で近似）')+'：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。'+(race._course.track?'走る線は、発走地点からゴールまでの道すじ（直線と円弧だけの線・青い線）で、長さを '+race.dist+'m に合わせています'+(race.pathInfo&&race.pathInfo.approx?'（この距離の発走地点は目安）':'')+'。':'この距離は道すじが無いため、周回の線の上で走らせています。');
  table(null);draw(0);$('hOrder').innerHTML='';$('hRemain').textContent=race.dist+'m';$('hTime').textContent='0.0';$('hPace').textContent='';$('runNote').textContent='';}
 
 // ---------- 描画 ----------
@@ -170,7 +170,7 @@ function fitView(course){const W=course.width,L=course.Ls,R=course.R;
 function setup(){const w=cv.clientWidth||1000;const dpr=Math.min(2,window.devicePixelRatio||1);const c=race._course;const v=fitView(c);const asp=(v.y1-v.y0)/(v.x1-v.x0);
  const h=Math.max(260,Math.min(Math.round(w*Math.max(.42,asp)),Math.round(window.innerHeight*0.62)));cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);return {w,h}}
 function toScreen(v,w,h){const sx=w/(v.x1-v.x0),sy=h/(v.y1-v.y0),s=Math.min(sx,sy);const ox=(w-(v.x1-v.x0)*s)/2,oy=(h-(v.y1-v.y0)*s)/2;return {s,f:(x,y)=>[ox+(x-v.x0)*s,oy+(y-v.y0)*s]}}
-function pathLane(c,lane,T){ctx.beginPath();const n=c.straightOnly?2:220;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist+40):k/n*c.lap;const p=E.xy(c,u,lane);const [X,Y]=T.f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath()}
+function pathLane(c,lane,T){ctx.beginPath();const n=c.straightOnly?2:220;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist+40):k/n*c.lap;const p=E.xyLoop(c,u,lane);const [X,Y]=T.f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath()}
 function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  const fr=sim&&sim.record?frameAt(tt):null;
  const fr0=fr||race.runners.map(x=>[race.dist,0.6+(x.no-1)*1.05,0]);
@@ -188,6 +188,8 @@ function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  {ctx.lineWidth=Math.max(1.2,0.35*T.s);ctx.strokeStyle='#f4f4ef';pathLane(c,0,T);ctx.stroke();ctx.strokeStyle='#f4f4efaa';pathLane(c,c.width,T);ctx.stroke();
  // 内馬場
  if(!c.straightOnly&&!BG){ctx.fillStyle='#16301d';pathLane(c,-0.5,T);ctx.fill();}}
+ // 道すじ（発走地点→ゴール。直線と円弧だけの線）
+ if(c.track){ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#4f8cff99';ctx.lineWidth=Math.max(2,Math.min(7,1.2*T.s));ctx.beginPath();const n=240;for(let k=0;k<=n;k++){const p=E.xy(c,race.dist*(1-k/n),c.width/2);const [X,Y]=T.f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}ctx.stroke();ctx.restore()}
  // ハロン棒（ゴールから200mごと）とゴール板、スタート
  ctx.font='600 11px system-ui';ctx.textAlign='center';
  for(let u=200;u<race.dist;u+=200){const a=E.xy(c,u,-1),b=E.xy(c,u,-6);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=T.f(b.x,b.y);ctx.strokeStyle='#ffffffaa';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
@@ -206,7 +208,7 @@ function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  if(fr)hud(fr,tt);
 }
 function mini(c,pos,w,h){const v=fitView(c);const mw=Math.min(170,w*0.36),mh=mw*(v.y1-v.y0)/(v.x1-v.x0);const ox=w-mw-8,oy=h-mh-36;ctx.save();ctx.fillStyle='#0b120dcc';ctx.fillRect(ox-4,oy-4,mw+8,mh+8);
- const s=mw/(v.x1-v.x0);const f=(x,y)=>[ox+(x-v.x0)*s,oy+(y-v.y0)*s];ctx.strokeStyle=race.route.surface==='turf'?'#3f8a4e':'#9a7449';ctx.lineWidth=Math.max(2,c.width*s);ctx.beginPath();const n=c.straightOnly?2:120;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist):k/n*c.lap;const p=E.xy(c,u,c.width/2);const [X,Y]=f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath();ctx.stroke();
+ const s=mw/(v.x1-v.x0);const f=(x,y)=>[ox+(x-v.x0)*s,oy+(y-v.y0)*s];ctx.strokeStyle=race.route.surface==='turf'?'#3f8a4e':'#9a7449';ctx.lineWidth=Math.max(2,c.width*s);ctx.beginPath();const n=c.straightOnly?2:120;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist):k/n*c.lap;const p=E.xyLoop(c,u,c.width/2);const [X,Y]=f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath();ctx.stroke();
  {const p=E.xy(c,0,c.width/2);const [X,Y]=f(p.x,p.y);ctx.fillStyle='#ff4d4d';ctx.fillRect(X-1.5,Y-5,3,10)}
  pos.forEach(q=>{const p=E.xy(c,q[0],q[1]);const [X,Y]=f(p.x,p.y);ctx.fillStyle='#f2c14e';ctx.beginPath();ctx.arc(X,Y,1.8,0,Math.PI*2);ctx.fill()});ctx.restore()}
 function frameAt(tt){const R=sim.record;if(!R.length)return null;if(tt<=R[0].t)return R[0].h;for(let k=1;k<R.length;k++){if(R[k].t>=tt){const a=R[k-1],b=R[k],w=(tt-a.t)/(b.t-a.t);return a.h.map((x,i)=>[x[0]+(b.h[i][0]-x[0])*w,x[1]+(b.h[i][1]-x[1])*w,x[2]])}}return R[R.length-1].h}
@@ -216,7 +218,7 @@ function hud(fr,tt){const H=race.runners.length;const ord=fr.map((p,i)=>i).sort(
 function loop(ts){if(!play){last=0;return}if(!last)last=ts;const d=(ts-last)/1000;last=ts;clock+=d*speed;const end=sim.results[H()-1].time+1.5;if(clock>=end){clock=end;play=false;finish()}$('seek').value=Math.round(clock/end*1000);draw(clock);requestAnimationFrame(loop)}
 function H(){return race.runners.length}
 function finish(){const r=sim.results;const w=r[0];$('runNote').innerHTML='この1回の結果：'+r.slice(0,5).map((x,k)=>(k+1)+'着 '+x.no+' '+esc(race.runners[x.i].name)+'（'+fmtT(x.time)+(k?'・'+(x.time-w.time).toFixed(1)+'秒差':'')+'）').join('　')+'。ペース：'+(sim.pace>0.15?'速い':sim.pace<-0.15?'遅い':'ふつう')+(race.free||race.upcoming?'':'。実際の1着は '+(()=>{const a=race.runners.find(x=>x.finish===1);return a?a.no+' '+esc(a.name):'-'})());}
-function run(){race._course=race._course||E.buildCourse(race.route,race.dist,race.shape);sim=E.simulate(race,{seed:(Math.random()*1e9)|0,record:true});
+function run(){race._course=race._course||E.buildCourse(race.route,race.dist,race.shape,race.path);sim=E.simulate(race,{seed:(Math.random()*1e9)|0,record:true});
  sim.lead1000=(()=>{const R=sim.record;for(const f of R){const m=Math.min(...f.h.map(x=>x[0]));if(race.dist-m>=1000)return f.t}return null})();
  $('hPace').textContent='';clock=0;play=true;last=0;requestAnimationFrame(loop)}
 // ---------- 表 ----------
