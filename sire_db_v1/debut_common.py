@@ -38,3 +38,40 @@ def debut_races(hs, done=None):
             continue
         out[code] = lst
     return out
+
+
+def fill_debut_weights(drs, data_dir):
+    """新馬戦の馬体重を、レースの結果ページ（race_pages）から補う。
+    馬のページの履歴は『前走との増減』が無い初出走の体重を取り込めていないため（取り込み側の既知の欠け）。
+    結果ページの『牝2/416』の416を、(レースコード, 馬ID)で結びつけて、出走の行（body_weight）に入れる。"""
+    import re
+    want = set(drs)
+    pat_w = re.compile(r"/(\d{3,4})(?:\(|⟨|$)")
+    pat_h = re.compile(r"/keiba/directory/horse/(\w+)/")
+    got = total = 0
+    for f in sorted(glob.glob(str(Path(data_dir) / "race_pages" / "*.jsonl"))):
+        for line in open(f, encoding="utf-8"):
+            if '"code"' not in line:
+                continue
+            d = json.loads(line)
+            code = d.get("code")
+            if code not in want:
+                continue
+            tabs = ((d.get("pages") or {}).get("result") or {}).get("tables") or []
+            wmap = {}
+            for t in tabs:
+                if not t or not t[0] or not any("馬体重" in (c or "") for c in t[0]):
+                    continue
+                ci = next(i for i, c in enumerate(t[0]) if "馬体重" in (c or ""))
+                for row in t[1:]:
+                    if len(row) <= ci:
+                        continue
+                    mh = pat_h.search(row[ci]); mw = pat_w.search(row[ci])
+                    if mh and mw:
+                        wmap[mh.group(1)] = int(mw.group(1))
+            for h, r in drs[code]:
+                total += 1
+                w = wmap.get(str(h["id"]))
+                if w and 300 <= w <= 650:
+                    r["body_weight"] = w; got += 1
+    return got, total
