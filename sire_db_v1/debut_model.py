@@ -8,6 +8,7 @@ import numpy as np
 from scipy.optimize import minimize
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sire_db_v1.debut_common import load_horses, debut_races, mb
+from sire_db_v1.lineage import lineage_map
 
 K = 4.0  # 縮小（勝ち数の目安）
 
@@ -16,7 +17,13 @@ def lae(w, e):
     return math.log((w + K) / (e + K))
 
 
+def grp(x):
+    return "その他" if x and x.startswith("その他") else x
+
+
 def build(hs, drs):
+    LM, _ = lineage_map(hs)
+    L = lambda n: grp(LM.get(n)) if n else None  # 系統（その他は1つにまとめる）
     ev = []  # 全出走（日付順）
     for h in hs.values():
         p = h["ped"]
@@ -45,7 +52,8 @@ def build(hs, drs):
                 if key and key[1]:
                     S[key][0] += w; S[key][1] += p
             if deb:
-                for key in (("sire", ped["sire"], "deb", sur), ("sire", ped["sire"], "deb", "-"), ("dsire", ped.get("dam_sire"), "deb", "-"),
+                for key in (("line", L(ped["sire"]), "deb", sur), ("line", L(ped["sire"]), "deb", "-"), ("dline", L(ped.get("dam_sire")), "deb", "-"),
+                            ("sire", ped["sire"], "deb", sur), ("sire", ped["sire"], "deb", "-"), ("dsire", ped.get("dam_sire"), "deb", "-"),
                             ("trainer", prof.get("調教師（所属）_id"), "deb", "-"), ("breeder", prof.get("生産者"), "deb", "-"), ("jockey", r.get("jockey_id"), "deb", "-")):
                     if key[1]:
                         S[key][0] += w; S[key][1] += p
@@ -62,6 +70,9 @@ def build(hs, drs):
                 lae(*S[("trainer", prof.get("調教師（所属）_id"), "deb", "-")]),   # 比較用（血統以外）：調教師
                 lae(*S[("breeder", prof.get("生産者"), "deb", "-")]),               # 比較用：生産者
                 lae(*S[("jockey", r.get("jockey_id"), "deb", "-")]),                # 比較用：騎手
+                lae(*S[("line", L(ped["sire"]), "deb", "-")]),       # 父の系統の新馬戦の傾向
+                lae(*S[("line", L(ped["sire"]), "deb", sur)]),       # 父の系統×芝ダの新馬戦の傾向
+                lae(*S[("dline", L(ped.get("dam_sire")), "deb", "-")]),  # 母の父の系統の新馬戦の傾向
             ]
             feats.append(f); odds.append(r["odds"])
             if r.get("finish") == 1:
@@ -71,7 +82,7 @@ def build(hs, drs):
     return rows
 
 
-NAMES = ["父:新馬戦の傾向", "父×芝ダ:新馬戦の傾向", "父×芝ダ:若い時期の全出走", "母の父:新馬戦の傾向", "母の父×芝ダ:全出走", "母の他の産駒:全出走", "(比較)調教師:新馬戦", "(比較)生産者:新馬戦", "(比較)騎手:新馬戦"]
+NAMES = ["父:新馬戦の傾向", "父×芝ダ:新馬戦の傾向", "父×芝ダ:若い時期の全出走", "母の父:新馬戦の傾向", "母の父×芝ダ:全出走", "母の他の産駒:全出走", "(比較)調教師:新馬戦", "(比較)生産者:新馬戦", "(比較)騎手:新馬戦", "父の系統:新馬戦の傾向", "父の系統×芝ダ:新馬戦の傾向", "母の父の系統:新馬戦の傾向"]
 
 
 def nll(theta, rows, cols, ridge=0.0):
@@ -110,7 +121,8 @@ def main():
     res = {"train_races": len(tr), "test_races": len(te), "tests": []}
     base = fit(tr, []); print("odds-only a=", base[0], "train", ll(base, tr, []), "test", ll(base, te, []))
     res["odds_only"] = {"a": float(base[0]), "train": ll(base, tr, []), "test": ll(base, te, [])}
-    sets = {"血統だけ(父3+母父2+母産駒1)": [0, 1, 2, 3, 4, 5], "父だけ": [0, 1, 2], "全部": list(range(9)), "調教師・生産者・騎手だけ(比較)": [6, 7, 8]}
+    sets = {"血統だけ(父3+母父2+母産駒1)": [0, 1, 2, 3, 4, 5], "父だけ": [0, 1, 2], "全部": list(range(9)), "調教師・生産者・騎手だけ(比較)": [6, 7, 8],
+            "系統だけ(父の系統2+母の父の系統1)": [9, 10, 11], "父＋父の系統": [0, 1, 2, 9, 10], "血統全部＋系統": [0, 1, 2, 3, 4, 5, 9, 10, 11]}
     for nm, cols in sets.items():
         th = fit(tr, cols, ridge=1.0); t_te = ll(th, te, cols); t_b = ll(base, te, [])
         # 対応のあるブートストラップ（レース単位）で差の信頼区間
@@ -128,7 +140,7 @@ def main():
     b0 = fit(allr, [])
     print("全期間・1つずつ追加:")
     res["single"] = []
-    for c in range(9):
+    for c in range(len(NAMES)):
         th = fit(allr, [c], ridge=0.0); lr = 2 * (nll(b0, allr, [])[0] - nll(th, allr, [c])[0])
         print("  %-28s b=%.3f  LR=%.2f" % (NAMES[c], th[1], lr)); res["single"].append({"feature": NAMES[c], "b": float(th[1]), "LR": float(lr)})
     Path(a.out).write_text(json.dumps(res, ensure_ascii=False, indent=1))
