@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-12T18:20:00+00:00",
+ "generated_at": "2026-11-12T21:12:01+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 43307730914,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-12T21:11:16Z",
+     "started_at": "2026-11-12T21:11:16Z",
+     "ended_at": "2026-11-12T21:11:39Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 43270186753,
      "event": "schedule",
@@ -519,6 +530,17 @@
    "label": "地方競馬：前日の回顧",
    "runs": [
     {
+     "id": 43307740221,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-12T21:11:20Z",
+     "started_at": "2026-11-12T21:11:20Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
+    {
      "id": 43140683549,
      "event": "schedule",
      "created_at": "2026-11-12T02:20:13Z",
@@ -912,6 +934,17 @@
   "local-racing-shadow-prerace-generic.yml": {
    "label": "地方競馬：予想の固定",
    "runs": [
+    {
+     "id": 43307744160,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-12T21:11:21Z",
+     "started_at": "2026-11-12T21:11:21Z",
+     "ended_at": null,
+     "status": "pending",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 43147107492,
      "event": "schedule",
@@ -2745,6 +2778,17 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 43281643726,
+     "event": "schedule",
+     "created_at": "2026-11-12T18:36:44Z",
+     "started_at": "2026-11-12T18:36:44Z",
+     "ended_at": "2026-11-12T18:37:06Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 43074220327,
      "event": "schedule",
