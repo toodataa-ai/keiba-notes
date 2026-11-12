@@ -66,6 +66,7 @@ h2{font-size:17px;margin:0 0 8px}
 <header>
  <p class="eyebrow">LAB・研究用（正式予想・買い目には使っていません）</p>
  <h1>レースシミュレータ v2</h1>
+ <p class="note" id="vecVenues" style="margin:2px 0 6px"></p>
  <p class="lead">全10競馬場・芝ダート・内外回りのコースで、実在の出走馬の能力値（過去の走りから計算）を使ってレースを再現します。位置取り・ペース・コーナーで外を回るロス・前が詰まったときの進路変更・最後の直線の末脚を1歩ずつ計算します。何百回も走らせて勝率も出せます。</p>
 </header>
 
@@ -140,18 +141,19 @@ const LJ={single:'',inner:'内回り',outer:'外回り',straight:'直線',outer_
 const SJ={turf:'芝',dirt:'ダート'};
 
 async function load(){
- const [r,c,m,up,sh,um,st]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]})),fetch('sim-v2/course-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-starts-arc5.json').then(x=>x.json()).catch(()=>null)]);SHAPES=sh;UMAP=um;STARTS=st;
- const upc=(up.races||[]).filter(x=>x.route);RACES=upc.concat(r.races.sort((a,b)=>b.date.localeCompare(a.date)||a.venue.localeCompare(b.venue)));CAT=c;META=m;
+ const [r,c,m,up,sh,um,st,vec]=await Promise.all([fetch('sim-v2/races-public.json',{cache:'no-store'}).then(x=>x.json()),fetch('race-course-catalog-v1.json').then(x=>x.json()),fetch('sim-v2/meta.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>null),fetch('sim-v2/upcoming.json',{cache:'no-store'}).then(x=>x.json()).catch(()=>({races:[]})),fetch('sim-v2/course-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-shapes.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-starts-arc5.json').then(x=>x.json()).catch(()=>null),fetch('sim-v2/umapot-vector.json').then(x=>x.json()).catch(()=>null)]);SHAPES=sh;UMAP=um;STARTS=st;VECD=vec;
+ CAT=c;META=m;const upc=(up.races||[]).filter(x=>x.route);RACES=upc.concat(r.races.sort((a,b)=>b.date.localeCompare(a.date)||a.venue.localeCompare(b.venue))).filter(x=>vecOK(x.route));
+ const okV=CAT.venues.filter(v=>VECD&&VECD.venues[v.code]);$('vecVenues').textContent=okV.length?'対応競馬場：'+okV.map(v=>v.name).join('・')+(okV.length<CAT.venues.length?'（ほかの競馬場は準備中）':''):'対応競馬場：準備中';
  const sel=$('selRace');let lastD='';let grp=null;
  RACES.forEach((x,i)=>{const key=(x.upcoming?'これから：':'')+x.date;if(key!==lastD){grp=document.createElement('optgroup');grp.label=x.upcoming?x.date+'（これから・結果前）':x.date;sel.appendChild(grp);lastD=key}
   const o=document.createElement('option');o.value=i;o.textContent=x.venue+x.race_no+'R '+(x.race_name||'')+(x.grade?'（'+x.grade.replace('GIII','G3').replace('GII','G2').replace('GI','G1')+'）':'')+'・'+(x.surface)+x.dist+'m';grp.appendChild(o)});
- const venues=CAT.venues;$('selVenue').innerHTML=venues.map(v=>'<option value="'+v.code+'">'+v.name+'</option>').join('');
+ const venues=CAT.venues;$('selVenue').innerHTML=venues.map(v=>{const ok=v.routes.some(r=>vecOK(routeOf(v.code,r.surface,r.layout)));return '<option value="'+v.code+'"'+(ok?'':' disabled')+'>'+v.name+(ok?'':'（準備中）')+'</option>'}).join('');
  kpi();pick(0);
 }
 function routeOf(vcode,surface,layout){const v=CAT.venues.find(x=>x.code===vcode);let r=v.routes.find(x=>x.surface===surface&&x.layout===layout);if(!r)return null;let var0=Object.values(r.variants)[0];
  if(layout==='outer_to_inner'){const inn=v.routes.find(x=>x.surface===surface&&x.layout==='inner');var0=Object.values(inn.variants)[0]}
  return {venue:v.code,name:v.name,turn:v.turn,surface,layout,lap_m:var0.lap_m,straight_m:var0.straight_m,width_m:var0.width_m,elevation_m:r.elevation_m,distances_m:r.distances_m}}
-function fillRoutes(){const v=CAT.venues.find(x=>x.code===$('selVenue').value);$('selRoute').innerHTML=v.routes.map(r=>'<option value="'+r.surface+'|'+r.layout+'">'+SJ[r.surface]+(LJ[r.layout]?' '+LJ[r.layout]:'')+'</option>').join('');fillDists()}
+function fillRoutes(){const v=CAT.venues.find(x=>x.code===$('selVenue').value);$('selRoute').innerHTML=v.routes.map(r=>{const ok=vecOK(routeOf(v.code,r.surface,r.layout));return '<option value="'+r.surface+'|'+r.layout+'"'+(ok?'':' disabled')+'>'+SJ[r.surface]+(LJ[r.layout]?' '+LJ[r.layout]:'')+(ok?'':'（準備中）')+'</option>'}).join('');{const o=[...$('selRoute').options].find(o=>!o.disabled);if(o)$('selRoute').value=o.value}fillDists()}
 function fillDists(){const v=CAT.venues.find(x=>x.code===$('selVenue').value);const [s,l]=$('selRoute').value.split('|');const r=v.routes.find(x=>x.surface===s&&x.layout===l);$('selDist').innerHTML=r.distances_m.map(d=>'<option>'+d+'</option>').join('')}
 function stdTime(route,dist,going){// 基準タイムの近似：同じ芝ダの平均的な速さ（実レースの基準があればそれを使う）
  const base=route.surface==='turf'?(dist<=1400?16.75:dist<=2000?16.45:16.15):(dist<=1400?16.0:dist<=1900?15.7:15.4);
@@ -159,14 +161,21 @@ function stdTime(route,dist,going){// 基準タイムの近似：同じ芝ダの
 function current(){const src=RACES[+$('selRace').value];if(mode==='real')return src;
  const [s,l]=$('selRoute').value.split('|');const route=routeOf($('selVenue').value,s,l);const dist=+$('selDist').value;const going=$('selGoing').value;
  return Object.assign({},src,{route,dist,going,surface:SJ[s],venue:route.name,std_time:stdTime(route,dist,going),_course:null,free:true})}
-let UMAP=null,STARTS=null;const BGIMG={};
+let UMAP=null,STARTS=null,VECD=null;const BGIMG={},VECP={};
+// 元図（うまぽっと）の図形をベクターのまま持っている競馬場・コースだけを選べるようにする（この方式で描けないコースは「準備中」）
+function vecOK(route){if(!route||!VECD||!UMAP)return false;const v=UMAP.venues[route.venue];if(!VECD.venues[route.venue]||!v)return false;return !!(v.routes[(route.surface||'')+'|'+route.layout]||(route.layout==='outer_to_inner'&&v.routes[route.surface+'|inner']))}
+// 元図の図形を Path2D にして描く（背景pngの画素 = 元図の座標×k − (ox,oy)。拡大してもぼやけない）
+function vecBg(code,c,T){const g=VECD&&VECD.venues[code];if(!g)return false;if(!VECP[code])VECP[code]=g.paths.map(e=>Object.assign({p:new Path2D(e.d)},e));
+ const [bx,by]=T.f(0,0);const S=c.f*T.s*g.k;ctx.save();ctx.translate(bx,by);ctx.scale(S,S);ctx.translate(-g.ox/g.k,-g.oy/g.k);
+ for(const e of VECP[code]){if(e.fill){ctx.fillStyle=e.fill;ctx.fill(e.p,'evenodd')}if(e.stroke){ctx.strokeStyle=e.stroke;ctx.lineWidth=e.sw;ctx.lineJoin=e.join||'miter';ctx.lineCap=e.cap||'butt';ctx.stroke(e.p)}}
+ ctx.restore();return true}
 function umapFor(route){if(!UMAP||!route)return null;const v=UMAP.venues[route.venue];if(!v)return null;const k=(route.surface||'')+'|'+route.layout;const r=v.routes[k]||(route.layout==='outer_to_inner'?v.routes[route.surface+'|inner']:null);if(!r)return null;if(!BGIMG[route.venue]){const im=new Image();im.onload=()=>{if(typeof draw==='function'&&race)try{draw(clock)}catch(e){}};im.src='sim-v2/'+v.img.replace('sim-v2/','');BGIMG[route.venue]=im}return {pts:r.pts,img:BGIMG[route.venue],w:v.w,h:v.h}}
 function shapeFor(route){const u=umapFor(route);if(u)return u.pts;if(!SHAPES||!route)return null;const v=SHAPES.venues[route.venue];if(!v)return null;const k=(route.surface||'')+'|'+route.layout;const r=v.routes[k]||(route.layout==='outer_to_inner'?v.routes[route.surface+'|inner']:null);return r?r.pts:null}
 function pick(i){$('selRace').value=i;race=current();race.shape=shapeFor(race.route);race.bg=umapFor(race.route);const ph=E.pathFor(STARTS,race.route,race.dist);race.pathInfo=ph;race.path=ph?ph.path:null;race._course=E.buildCourse(race.route,race.dist,race.shape,race.path);sim=null;clock=0;play=false;
  const src=RACES[+$('selRace').value];
  $('raceInfo').innerHTML=(race.free?'<b>別のコースで：</b>'+esc(race.venue)+' '+esc(race.surface)+race.dist+'m（'+esc(race.going)+'）。出走馬は '+esc(src.date+' '+src.venue+src.race_no+'R '+(src.race_name||''))+' と同じです':
   esc(race.date)+' '+esc(race.venue)+race.race_no+'R '+esc(race.race_name||'')+'・'+esc(race.surface)+race.dist+'m'+(LJ[race.route.layout]?'（'+LJ[race.route.layout]+'）':'')+'・'+esc(race.going)+'・'+race.runners.length+'頭')+
-  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース'+(race._course.shaped?'（'+(race.bg?'うまぽっとの図をなぞった形・元図：うまぽっと https://umapot.com/':'JRA公式の平面図をなぞった形')+'）':'（楕円で近似）')+'：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。'+(race._course.track?'走る位置は、発走地点からゴールまでの道すじ（走路の帯の中央を通る直線と円弧だけの線。画面には描きません）を基準にし、長さを '+race.dist+'m に合わせています。馬の横の位置（内ラチから外へ）は、図の走路の帯の幅いっぱいに割り当てて描きます（図の帯は実際の路面幅 '+race._course.width+'m より広く描かれているため、横の間隔は約'+(bandOf(race._course)*0.92/race._course.width).toFixed(1)+'倍に見えます）。追う表示では、ぼやけないよう背景の図の代わりに走路を線で描きます'+(race.pathInfo&&race.pathInfo.approx?'（この距離の発走地点は目安）':'')+'。':'この距離は道すじが無いため、周回の線の上で走らせています。');
+  (race.upcoming?'。結果が出る前のレースです（能力値は出馬表の馬名で照合。データの無い馬は初出走と同じ扱い：'+race.matched+'/'+race.runners.length+'頭照合）':'')+'。コース'+(race._course.shaped?'（'+(race.bg?'うまぽっとの図をなぞった形・元図：うまぽっと https://umapot.com/':'JRA公式の平面図をなぞった形')+'）':'（楕円で近似）')+'：一周 '+Math.round(race._course.lap)+'m・最後の直線 '+race.route.straight_m+'m・'+(race.route.turn==='left'?'左回り':'右回り')+(race.route.elevation_m?'・高低差 '+race.route.elevation_m+'m':'')+'。'+(race._course.track?'走る位置は、発走地点からゴールまでの道すじ（走路の帯の中央を通る直線と円弧だけの線。画面には描きません）を基準にし、長さを '+race.dist+'m に合わせています。馬の横の位置（内ラチから外へ）は、図の走路の帯の幅いっぱいに割り当てて描きます（図の帯は実際の路面幅 '+race._course.width+'m より広く描かれているため、横の間隔は約'+(bandOf(race._course)*0.92/race._course.width).toFixed(1)+'倍に見えます）。追う表示では、元図の図形（芝・ダート・ラチ・ゴール）をベクターのまま描くので、拡大してもぼやけません'+(race.pathInfo&&race.pathInfo.approx?'（この距離の発走地点は目安）':'')+'。':'この距離は道すじが無いため、周回の線の上で走らせています。');
  table(null);draw(0);$('hOrder').innerHTML='';$('hRemain').textContent=race.dist+'m';$('hTime').textContent='0.0';$('hPace').textContent='';$('runNote').textContent='';}
 
 // ---------- 描画 ----------
@@ -208,9 +217,9 @@ function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  const T=toScreen(v,w,h);
  const turf=race.route.surface==='turf';
  const BG0=race.bg&&race.bg.img&&race.bg.img.complete&&race.bg.img.naturalWidth&&c.shaped?race.bg:null;
- const VEC=cam==='lead'&&c.track&&race.bg&&c.shaped;const BG=VEC?null:BG0;const B=bandOf(c);
+ const VEC=cam==='lead'&&race.bg&&c.shaped&&!!(VECD&&VECD.venues[race.route.venue]);const BG=VEC?null:BG0;const B=bandOf(c);
  ctx.fillStyle=(BG||VEC)?'#ffffff':'#13201a';ctx.fillRect(0,0,w,h);
- if(VEC)vecTrack(c,T,turf,-160,race.dist+60);
+ if(VEC)vecBg(race.route.venue,c,T);
  else if(BG){const [bx,by]=T.f(0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(BG.img,bx,by,BG.w*c.f*T.s,BG.h*c.f*T.s)}
  else{// 背景の図が無いとき：走路の帯を自前で塗る
   ctx.lineJoin='round';if(!c.straightOnly){ctx.fillStyle='#183a24';pathLane(c,-0.5,T);ctx.fill()}
