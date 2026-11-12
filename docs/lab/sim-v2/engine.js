@@ -316,7 +316,8 @@
           if (side < 0 && -du > -HD && -du < HD * 1.6 && Math.abs(st[j].lane - nl) * KL < HD * 0.95) { free = false; break; }
         }
         const lat = run < 400 ? 1.4 : (final ? 1.3 : 1.0);
-        if (free) s.lane += Math.max(-lat * dt * 1.6, Math.min(lat * dt, want - s.lane));   // 内へ寄るほうが少し速い
+        const inw = run < 200 ? 4.0 : (run < 400 ? 2.5 : 1.6);   // スタート直後はいきなり内へ寄る
+        if (free) s.lane += Math.max(-lat * dt * inw, Math.min(lat * dt, want - s.lane));   // 内へ寄るほうが少し速い
         s.lane = Math.max(0.5, Math.min(course.width - 1, s.lane));
         const k = laneFactor(course, s.u, s.lane);
         let adv = v * k * dt;
