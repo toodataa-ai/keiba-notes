@@ -69,6 +69,7 @@ def build(data_dir: Path) -> pd.DataFrame:
                 "frame": r["frame"], "no": r["no"], "sex": r["sex"], "age": r["age"], "weight": r["weight"], "wdiff": r["wdiff"],
                 "pop": r["pop"], "odds": r["odds"], "p": p, "finish": r["finish"],
                 "jockey": r["jockey"], "trainer": r["trainer"], "horse": r["horse"],
+                "jockey_name": r["jockey_name"], "trainer_name": r["trainer_name"],
                 "fair": 1.0 / n,
             }
             h = hist.get(r["horse"])

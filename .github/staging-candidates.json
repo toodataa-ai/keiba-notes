@@ -11,6 +11,17 @@
       "assets": [],
       "status": "awaiting_user_approval",
       "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
+    },
+    {
+      "id": "ui-factor-screen-v1",
+      "title": "新ページ『要素の検証』（勝率・オッズ妙味と関係する要素）",
+      "pages": [
+        "index.html",
+        "factor-screen.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "summary": "発走前に分かる要素を、単独と2つの組み合わせで調べ、勝率との関係とオッズ妙味（人気で説明できない上乗せ）が、前半の期間で見つかって後半でも続いたかを表示。偶然の見込みとの比較・q値・回収率つき。データは docs/data/factor_screen_v1.json。トップの研究カードに入口を追加。"
     }
   ]
 }

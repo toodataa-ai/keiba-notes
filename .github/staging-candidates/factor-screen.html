@@ -56,7 +56,8 @@ details.fs-d summary:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px
 
 <section aria-labelledby="winTitle">
 <h2 id="winTitle">勝率と関係する要素</h2>
-<p class="sub">前半・後半の両方で、頭数だけの期待より勝ちやすかった条件（誤差の1.5倍以上が両方）。</p>
+<p class="sub">前半・後半の両方で、頭数だけの期待より勝ちやすかった条件（誤差の1.5倍以上が両方）。人気の高い馬が勝ちやすいのを反映した条件が多いので、<b>「人気を含む条件を外す」</b>で見るのがおすすめです。</p>
+<label class="fs-note" style="display:block;margin:0 0 8px"><input type="checkbox" id="fsNoPop" checked> 人気を含む条件を外す</label>
 <div class="fs-seg" role="group" aria-label="単独か組み合わせか"><button type="button" data-w="singles" aria-pressed="true">単独</button><button type="button" data-w="pairs" aria-pressed="false">2つの組み合わせ</button></div>
 <div class="fs-tbl" id="fsWin"></div>
 </section>
@@ -105,9 +106,14 @@ function findings(){
  var s=D.summary,m=D.meta;
  $('fsFind').innerHTML='<b>先に分かったこと</b><br>2018〜2026年のJRA平地 '+num(m.races)+'レース・'+num(m.rows)+'頭を対象に、<b>'+num(m.conditions_tested)+'通り</b>の条件（単独'+num(m.singles)+'・2つの組み合わせ'+num(m.pairs)+'）を調べました。'+
  '<div class="fs-kpi">'+sumBox(s.value_singles)+sumBox(s.value_pairs)+sumBox(s.win_singles)+sumBox(s.win_pairs)+'</div>'+
- '<span style="color:#6d6e75">条件の数で補正（q&lt;0.05）しても残ったのは、オッズ妙味 '+D.q_pass.value_q05+'件、勝ちやすさ '+D.q_pass.win_q05+'件。</span>';
+ '<span style="color:#6d6e75">条件の数で補正（q&lt;0.05）しても残ったのは、オッズ妙味 '+D.q_pass.value_q05+'件、勝ちやすさ '+D.q_pass.win_q05+'件。</span>'+
+ '<ul><li><b>オッズ妙味は、あります。ただし小さい</b>：前半で見つかり後半も続いた条件は、偶然の見込みを上回りました。しかし A/E は多くが1.03〜1.1で、<b>単勝を買い続けた回収率が100%を超える条件は、上位 '+(D.value.singles.concat(D.value.pairs)).length+'件のうち '+(D.value.singles.concat(D.value.pairs)).filter(function(c){return c.roi>=1}).length+'件</b>だけです（控除があるため）。</li>'+
+ '<li><b>勝率との関係</b>は、人気（オッズ）で説明できる部分が大きいので、「人気を含む条件を外す」で見てください。</li>'+
+ '<li>似た条件（例：前走の着順と距離の変化）は同じ効果を別の形で拾うので、件数は<b>独立の発見の数ではありません</b>。</li></ul>';
 }
-function renderW(){$('fsWin').innerHTML=tbl(D.win[W],'win')}
+var NP=true;
+function renderW(){var r=D.win[W];if(NP)r=r.filter(function(c){return c.f.indexOf('人気')<0});$('fsWin').innerHTML=tbl(r,'win')}
+$('fsNoPop').onchange=function(){NP=this.checked;renderW()};
 function renderV(){$('fsVal').innerHTML=V==='overbet'?tbl(D.value.overbet,'val'):tbl(D.value[V],'val')}
 function renderAll(){
  var h='';Object.keys(D.single_tables).forEach(function(k){var rows=D.single_tables[k];

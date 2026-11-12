@@ -58,6 +58,8 @@ def prep(df: pd.DataFrame) -> pd.DataFrame:
     d["going"] = d["going"].replace({"稍重": "道悪(稍重〜不良)", "重": "道悪(稍重〜不良)", "不良": "道悪(稍重〜不良)", "良": "良"})
     d["course"] = d["venue"] + d["surface"] + d["dist"].astype(str) + "m" + d["inout"].fillna("").map(lambda x: f"({x})" if x else "")
     for k in ("jockey", "trainer"):
+        nm = d.dropna(subset=[k, k + "_name"]).groupby(k)[k + "_name"].agg(lambda x: x.value_counts().index[0])   # 番号→名前（いちばん多い表記）
+        d[k] = d[k].map(nm)
         vc = d[k].value_counts()
         keep = set(vc[vc >= 600].index)
         d[k] = d[k].where(d[k].isin(keep))
