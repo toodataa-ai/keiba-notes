@@ -251,8 +251,12 @@
     const R = rng(o.seed || 1);
     const course = race._course || buildCourse(race.route, race.dist, race.shape, race.path);
     const H = race.runners.length, D = race.dist;
+    // 馬＝画面の馬番の丸（直径 HD メートル）。画面は横を図の帯の幅に合わせて広げて描くので、横方向は KL 倍して丸の距離を測る
+    const HD = o.horseD || 2.4, KL = (course.shaped && course.f) ? Math.max(1, 0.92 * 46 * course.f / course.width) : 1, WL = HD / KL;   // WL＝丸が横に占める実際の幅(m)
+    const cd = (du, dl) => { const y = dl * KL; return Math.sqrt(du * du + y * y); };   // 丸の中心どうしの距離（画面の見た目と同じ）
     const PL = plan(race, o, R, course), P = PL.horses;
-    const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * 1.05, done: false, t: null, blocked: 0, effort: 0, bank: 0 }));
+    const gate = Math.min(WL, Math.max(0.5, (course.width - 1.6) / Math.max(1, H - 1)));
+    const st = P.map(p => ({ u: D, v: 0, lane: 0.6 + (p.no - 1) * gate, done: false, t: null, blocked: 0, effort: 0, bank: 0 }));
     const rec = o.record ? [] : null; let t = 0; const dt = o.dt; let finished = 0;
     const maxT = (race.std_time || D / 15) * 1.6 + 30;
     while (finished < H && t < maxT) {
@@ -283,27 +287,32 @@
         let v = s.v + Math.max(-2.0 * dt, Math.min(acc * dt, vt - s.v));
         // 進路：基本の位置。最後の直線では差し・追込は外へ。前が詰まったら空いている進路を探す
         const inFinal = s.u < course.home;
-        let want = p.styleLane + (inFinal && p.lead < 0.05 ? 2.0 + 1.5 * (-p.lead) : 0);
+        let want = WL / 2 + 0.1;   // できるだけ内ラチ沿い。前が詰まったときだけ外へ出す
         let ahead = null;
         for (const j of order) {
           if (j === i || st[j].done) continue;
           const du = s.u - st[j].u;
-          if (du > 0 && du < (final ? 12 : 5) && Math.abs(st[j].lane - s.lane) < 0.8 && st[j].v < vt) { ahead = j; break; }
+          if (du > 0 && du < (final ? 12 : 5) && cd(du, st[j].lane - s.lane) < HD * 1.15 + 0.6 && st[j].v < vt) { ahead = j; break; }
         }
         if (ahead !== null) {
-          const cands = final ? [1.0, -1.0, 2.0, -2.0, 3.0, 4.0] : [-1.0, 1.0, 2.0];
+          const cands = [WL, 2 * WL, 3 * WL, 4 * WL, -WL];   // 外へ出すのが先、内が空いていれば内も
           for (const d of cands) {
             const L = s.lane + d; if (L < 0.5 || L > course.width - 1) continue;
             let clear = true;
-            for (const j of order) { if (j === i || st[j].done) continue; const du = s.u - st[j].u; if (du > -1.2 && du < (final ? 10 : 6) && Math.abs(st[j].lane - L) < 0.75) { clear = false; break; } }
+            for (const j of order) { if (j === i || st[j].done) continue; const du = s.u - st[j].u; if (du > -HD && du < (final ? 10 : 6) && Math.abs(st[j].lane - L) * KL < HD * 0.95) { clear = false; break; } }
             if (clear) { want = L; break; }
           }
         }
         const side = Math.sign(want - s.lane);
+        const nl = s.lane + Math.max(-0.3, Math.min(0.3, want - s.lane));
         let free = true;
         for (const j of order) {
           if (j === i || st[j].done) continue;
-          if (Math.abs(st[j].u - s.u) < 1.6 && (st[j].lane - s.lane) * side > 0 && Math.abs(st[j].lane - s.lane) < 0.9) { free = false; break; }
+          const du = st[j].u - s.u;
+          // 動いた先で丸が重なる（しかも今より近づく）なら動かない
+          if (cd(du, st[j].lane - nl) < HD * 0.95 && cd(du, st[j].lane - nl) < cd(du, st[j].lane - s.lane)) { free = false; break; }
+          // 内へ戻るときは、その進路のすぐ前（約8m）が空いているときだけ（空いていないと外へ出す・戻すを繰り返してしまう）
+          if (side < 0 && -du > -HD && -du < (final ? 10 : 8) && Math.abs(st[j].lane - nl) * KL < HD * 0.95) { free = false; break; }
         }
         const lat = run < 400 ? 1.4 : (final ? 1.3 : 1.0);
         if (free) s.lane += Math.max(-lat * dt, Math.min(lat * dt, want - s.lane));
@@ -314,7 +323,7 @@
         let wall = -Infinity, wj = -1;
         for (const j of order) {
           if (j === i || st[j].done) continue;
-          if (run > 120 && st[j].u < s.u && Math.abs(st[j].lane - s.lane) < 0.7 && st[j].u + 2.1 > wall) { wall = st[j].u + 2.1; wj = j; }
+          if (run > 120 && st[j].u < s.u && Math.abs(st[j].lane - s.lane) * KL < HD) { const gap = Math.sqrt(HD * HD - Math.pow((st[j].lane - s.lane) * KL, 2)); if (st[j].u + gap > wall) { wall = st[j].u + gap; wj = j; } }
         }
         if (s.u - adv < wall) {
           const ok = Math.max(0, s.u - wall);
