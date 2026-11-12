@@ -23,14 +23,22 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outlin
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .seg button{border:0;border-radius:0;padding:6px 12px;font-size:13px;background:transparent}
 .seg button[aria-pressed="true"]{background:var(--accent);color:#1b1b12}
-.stage{position:relative;border-radius:12px;overflow:hidden;background:#0b120d;border:1px solid var(--line)}
+.stage{position:relative;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#132019,#0c140f);border:1px solid var(--line);box-shadow:0 10px 30px #0006}
 canvas{display:block;width:100%;height:auto;touch-action:pan-y}
-.hud{position:absolute;left:10px;top:8px;right:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;font-size:13px;text-shadow:0 1px 2px #000}
-.hud b{font-size:18px;font-variant-numeric:tabular-nums}
-.order{position:absolute;left:8px;top:34px;right:8px;display:flex;gap:3px;flex-wrap:wrap;pointer-events:none;opacity:.92}
-.order span{min-width:19px;height:19px;border-radius:4px;display:inline-grid;place-items:center;font-size:11px;font-weight:800;box-shadow:0 1px 2px #0008}
-.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
-input[type=range]{flex:1 1 200px;accent-color:var(--accent)}
+.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:8px;padding:10px 14px 8px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+.hud>div:last-child{text-align:right}.hud>div:nth-child(2){text-align:center;font-size:11.5px;color:var(--accent)}
+.hud b{display:block;font-size:22px;line-height:1.15;color:var(--fg);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.order{display:flex;gap:4px;flex-wrap:wrap;padding:8px 12px 10px;border-top:1px solid var(--line);min-height:44px;align-items:center}
+.order:empty::before{content:"走らせると、ここに今の順位が出ます";font-size:12px;color:var(--muted)}
+.order span{min-width:24px;height:24px;padding:0 3px;border-radius:999px;display:inline-grid;place-items:center;font-size:12px;font-weight:800;box-shadow:inset 0 0 0 1.5px #0005;font-variant-numeric:tabular-nums}
+.order span.top{outline:2px solid var(--accent);outline-offset:1px}
+.order em{font-style:normal;font-size:10px;color:var(--muted);margin:0 2px 0 4px}
+.ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;margin-top:10px}
+.ctrl button{min-height:44px}
+.ctrl .seg{display:flex;width:100%}.ctrl .seg button{flex:1;min-height:42px;white-space:nowrap;padding:6px 8px}
+.ctrl input[type=range]{grid-column:1/-1;width:100%;height:32px;margin:0}
+input[type=range]{accent-color:var(--accent)}
+@media (min-width:760px){.ctrl{grid-template-columns:auto auto auto auto 1fr}.ctrl input[type=range]{grid-column:auto}}
 .tbl{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:13px}
 th,td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -79,15 +87,16 @@ h2{font-size:17px;margin:0 0 8px}
 </section>
 
 <section aria-label="レースの再生">
- <div class="stage"><canvas id="cv" width="1100" height="640" aria-label="レースの上から見た図"></canvas>
-  <div class="hud"><div>残り <b id="hRemain">-</b></div><div id="hPace"></div><div>タイム <b id="hTime">0.0</b></div></div>
-  <div class="order" id="hOrder"></div>
+ <div class="stage">
+  <div class="hud"><div>残り<b id="hRemain">-</b></div><div id="hPace"></div><div>タイム<b id="hTime">0.0</b></div></div>
+  <canvas id="cv" width="1100" height="640" aria-label="レースの上から見た図"></canvas>
+  <div class="order" id="hOrder" aria-label="いまの順位"></div>
  </div>
  <div class="ctrl">
   <button type="button" class="primary" id="btnRun">▶ 1回走らせる</button>
   <button type="button" id="btnPause">一時停止</button>
   <span class="seg" role="group" aria-label="再生の速さ"><button type="button" data-sp="1" aria-pressed="false">×1</button><button type="button" data-sp="3" aria-pressed="true">×3</button><button type="button" data-sp="8" aria-pressed="false">×8</button></span>
-  <span class="seg" role="group" aria-label="カメラ"><button type="button" data-cam="lead" aria-pressed="true">馬群を追う</button><button type="button" data-cam="all" aria-pressed="false">全体</button></span>
+  <span class="seg" role="group" aria-label="カメラ"><button type="button" data-cam="lead" aria-pressed="true">追う</button><button type="button" data-cam="all" aria-pressed="false">全体</button></span>
   <input type="range" id="seek" min="0" max="1000" value="0" aria-label="再生位置">
  </div>
  <p class="note" id="runNote" style="margin-top:6px"></p>
@@ -119,7 +128,7 @@ h2{font-size:17px;margin:0 0 8px}
 (function(){
 'use strict';
 const E=window.RaceSimV2;
-const FRAME_BG=['#fff','#fff','#222','#e53935','#1e63d6','#f3d32a','#2e9d48','#f08a1c','#f39ac0'];
+const FRAME_BG=['#fff','#fafafa','#222','#e53935','#1e63d6','#f3d32a','#2e9d48','#f08a1c','#f39ac0'];
 const FRAME_FG=['#111','#111','#fff','#fff','#fff','#111','#fff','#111','#111'];
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 let RACES=[],CAT=null,META=null,SHAPES=null,race=null,sim=null,play=false,clock=0,speed=3,cam='lead',last=0,mode='real';
@@ -171,50 +180,59 @@ function setup(){const w=cv.clientWidth||1000;const dpr=Math.min(2,window.device
  const h=Math.max(260,Math.min(Math.round(w*Math.max(.42,asp)),Math.round(window.innerHeight*0.62)));cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);return {w,h}}
 function toScreen(v,w,h){const sx=w/(v.x1-v.x0),sy=h/(v.y1-v.y0),s=Math.min(sx,sy);const ox=(w-(v.x1-v.x0)*s)/2,oy=(h-(v.y1-v.y0)*s)/2;return {s,f:(x,y)=>[ox+(x-v.x0)*s,oy+(y-v.y0)*s]}}
 function pathLane(c,lane,T){ctx.beginPath();const n=c.straightOnly?2:220;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist+40):k/n*c.lap;const p=E.xyLoop(c,u,lane);const [X,Y]=T.f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath()}
+// 馬の表示位置：道すじ（走路の帯の中央）がある場合は、馬群が道すじの上に乗るように、内ラチからの距離を道すじ中心の左右のずれとして縮めて描く（表示だけ。計算は変えない）
+function hxy(c,u,lane){return c.track?E.xy(c,u,c.width/2+(lane-4)*0.7):E.xy(c,u,lane)}
+function pill(txt,X,Y,bg,fg){ctx.font='700 11px system-ui,sans-serif';const w=ctx.measureText(txt).width+10;ctx.fillStyle=bg;ctx.beginPath();ctx.roundRect?ctx.roundRect(X-w/2,Y-9,w,18,9):ctx.rect(X-w/2,Y-9,w,18);ctx.fill();ctx.fillStyle=fg;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,X,Y+.5);ctx.textBaseline='alphabetic'}
+function trackLine(c,T,from,to){ctx.beginPath();const n=Math.max(60,Math.round((from-to)/4));for(let k=0;k<=n;k++){const p=E.xy(c,from-(from-to)*k/n,c.width/2);const [X,Y]=T.f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}}
 function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  const fr=sim&&sim.record?frameAt(tt):null;
  const fr0=fr||race.runners.map(x=>[race.dist,0.6+(x.no-1)*1.05,0]);
- if(cam==='lead'){const us=fr0.map(x=>x[0]).sort((a,b)=>a-b);const lo=us[0],hi=us[Math.max(0,Math.floor(us.length*0.85)-1)];const mid=Math.max(0,(lo+hi)/2);const p=E.xy(c,mid,c.width*0.4);const half=Math.max(28,Math.min(150,(hi-lo)*0.6+22));const asp=h/w;const hx=Math.max(half,(c.width+10)/asp/2);v={x0:p.x-hx,x1:p.x+hx,y0:p.y-hx*asp,y1:p.y+hx*asp}}
- const T=toScreen(v,w,h);ctx.fillStyle='#0b120d';ctx.fillRect(0,0,w,h);
+ if(cam==='lead'){const us=fr0.map(x=>x[0]).sort((a,b)=>a-b);const lo=us[0],hi=us[Math.max(0,Math.floor(us.length*0.85)-1)];const mid=Math.max(0,(lo+hi)/2);const p=E.xy(c,mid,c.width*0.4);const half=Math.max(70,Math.min(170,(hi-lo)*0.6+40));const asp=h/w;const hx=Math.max(half,(c.width+10)/asp/2);v={x0:p.x-hx,x1:p.x+hx,y0:p.y-hx*asp,y1:p.y+hx*asp}}
+ const T=toScreen(v,w,h);
  const turf=race.route.surface==='turf';
  const BG=race.bg&&race.bg.img&&race.bg.img.complete&&race.bg.img.naturalWidth&&c.shaped?race.bg:null;
- if(BG){const [bx,by]=T.f(0,0);ctx.imageSmoothingQuality='high';ctx.drawImage(BG.img,bx,by,BG.w*c.f*T.s,BG.h*c.f*T.s)}
- // 走路
- if(!BG){ctx.lineJoin='round';ctx.lineWidth=c.width*T.s;ctx.strokeStyle=turf?'#2f6e3c':'#8a6440';pathLane(c,c.width/2,T);ctx.stroke();
- // 芝の模様
- if(turf){ctx.setLineDash([6,10]);ctx.lineWidth=1;ctx.strokeStyle='#3c8a4c55';for(let l=4;l<c.width;l+=5){pathLane(c,l,T);ctx.stroke()}ctx.setLineDash([])}
- }
- // 内ラチ・外ラチ
- {ctx.lineWidth=Math.max(1.2,0.35*T.s);ctx.strokeStyle='#f4f4ef';pathLane(c,0,T);ctx.stroke();ctx.strokeStyle='#f4f4efaa';pathLane(c,c.width,T);ctx.stroke();
- // 内馬場
- if(!c.straightOnly&&!BG){ctx.fillStyle='#16301d';pathLane(c,-0.5,T);ctx.fill();}}
- // 道すじ（発走地点→ゴール。直線と円弧だけの線）
- if(c.track){ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#4f8cff99';ctx.lineWidth=Math.max(2,Math.min(7,1.2*T.s));ctx.beginPath();const n=240;for(let k=0;k<=n;k++){const p=E.xy(c,race.dist*(1-k/n),c.width/2);const [X,Y]=T.f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}ctx.stroke();ctx.restore()}
- // ハロン棒（ゴールから200mごと）とゴール板、スタート
- ctx.font='600 11px system-ui';ctx.textAlign='center';
- for(let u=200;u<race.dist;u+=200){const a=E.xy(c,u,-1),b=E.xy(c,u,-6);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=T.f(b.x,b.y);ctx.strokeStyle='#ffffffaa';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-  if(u%400===0&&T.s>0.25){const t=E.xy(c,u,-13);const [tx,ty]=T.f(t.x,t.y);ctx.fillStyle='#ffffffb0';ctx.fillText(u,tx,ty+4)}}
- {const a=E.xy(c,0,-3),b=E.xy(c,0,c.width+3);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=T.f(b.x,b.y);ctx.strokeStyle='#ff4d4d';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.fillStyle='#ff8080';const g=E.xy(c,0,c.width+9);const [gx,gy]=T.f(g.x,g.y);ctx.fillText('ゴール',gx,gy+4)}
- {const a=E.xy(c,race.dist,-2),b=E.xy(c,race.dist,c.width+2);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=T.f(b.x,b.y);ctx.strokeStyle='#ffd34d';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);const g=E.xy(c,race.dist,c.width+9);const [gx,gy]=T.f(g.x,g.y);ctx.fillStyle='#ffd34d';ctx.fillText('スタート',gx,gy+4)}
- // 馬
+ ctx.fillStyle=BG?'#ffffff':'#13201a';ctx.fillRect(0,0,w,h);
+ if(BG){const [bx,by]=T.f(0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(BG.img,bx,by,BG.w*c.f*T.s,BG.h*c.f*T.s)}
+ else{// 背景の図が無いとき：走路の帯を自前で塗る
+  ctx.lineJoin='round';if(!c.straightOnly){ctx.fillStyle='#183a24';pathLane(c,-0.5,T);ctx.fill()}
+  ctx.lineWidth=c.width*T.s;ctx.strokeStyle=turf?'#2f7a40':'#9a7048';pathLane(c,c.width/2,T);ctx.stroke();
+  if(turf){ctx.lineWidth=Math.max(1,c.width*T.s/6);ctx.strokeStyle='#ffffff10';for(let l=c.width/12;l<c.width;l+=c.width/3){pathLane(c,l,T);ctx.stroke()}}
+  ctx.lineWidth=Math.max(1.2,0.35*T.s);ctx.strokeStyle='#f4f4ef';pathLane(c,0,T);ctx.stroke();ctx.strokeStyle='#f4f4ef99';pathLane(c,c.width,T);ctx.stroke()}
+ // 道すじ：競馬場の傾向ページと同じ描き方（白い縁取り＋青い線）。同じ図・同じ座標なので重なる
+ const lw=cam==='all'?Math.max(2.5,Math.min(6,5*T.s/c.f)):Math.max(4,Math.min(9,5*T.s/c.f));
+ if(c.track){ctx.save();ctx.lineCap='round';ctx.lineJoin='round';trackLine(c,T,race.dist,0);ctx.strokeStyle='#ffffff';ctx.lineWidth=lw*1.9;ctx.stroke();ctx.strokeStyle='#1f4fb84d';ctx.lineWidth=lw;ctx.stroke();
+  if(fr){const lead=Math.min(...fr0.map(x=>x[0]));trackLine(c,T,race.dist,Math.max(0,lead));ctx.strokeStyle='#1f4fb8b3';ctx.lineWidth=lw*0.7;ctx.stroke()}ctx.restore()}
+ // ハロン棒（ゴールから200mごと。400mごとに数字）
+ for(let u=200;u<race.dist;u+=200){const a=E.xy(c,u,-0.5),b=E.xy(c,u,-4);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=T.f(b.x,b.y);ctx.strokeStyle=BG?'#17171acc':'#ffffffcc';ctx.lineWidth=u%400?1:2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  if(u%400===0&&cam==='lead'&&u<race.dist-100){const t=E.xy(c,u,-14);const [tx,ty]=T.f(t.x,t.y);pill(u+'m',tx,ty,'#17171ad0','#fff')}}
+ // ゴール（◆）とスタート（白い丸）：競馬場の傾向ページと同じ印
+ {const g=E.xy(c,0,c.width/2);const [gx,gy]=T.f(g.x,g.y);const r=cam==='all'?7:10;ctx.save();ctx.translate(gx,gy);ctx.rotate(Math.PI/4);ctx.fillStyle='#17171a';ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.fillRect(-r,-r,2*r,2*r);ctx.strokeRect(-r,-r,2*r,2*r);ctx.restore();
+  const q=E.xy(c,0,c.width+12);const [qx,qy]=T.f(q.x,q.y);pill('ゴール',qx,qy,'#17171ae0','#fff')}
+ {const g=E.xy(c,race.dist,c.width/2);const [gx,gy]=T.f(g.x,g.y);const r=cam==='all'?7:10;ctx.beginPath();ctx.arc(gx,gy,r,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#17171a';ctx.stroke();
+  if(!fr||tt<3){const q=E.xy(c,race.dist,c.width+12);const [qx,qy]=T.f(q.x,q.y);pill('スタート',qx,qy,'#ffd43be8','#17171a')}}
+ // 馬：枠の色の丸＋馬番。後ろの馬から描いて、先頭が一番上
  const H=race.runners.length;const pos=fr0;
- const rad=Math.max(4.5,Math.min(16,0.9*T.s));
- const ord=pos.map((p,i)=>i).sort((a,b)=>pos[b][0]-pos[a][0]);
- for(const i of ord){const p=E.xy(c,pos[i][0],pos[i][1]);const [X,Y]=T.f(p.x,p.y);const fr_=E.frameOf(race.runners[i].no,H);
-  ctx.save();ctx.translate(X,Y);ctx.rotate(p.heading);ctx.fillStyle='#00000066';ctx.beginPath();ctx.ellipse(1.5,2,rad*1.35,rad*.8,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=FRAME_BG[fr_];ctx.strokeStyle='#111';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(0,0,rad*1.35,rad*.8,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
-  ctx.fillStyle=FRAME_FG[fr_];ctx.font='800 '+Math.round(rad*1.15)+'px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(race.runners[i].no,X,Y+0.5);ctx.textBaseline='alphabetic'}
+ const rad=cam==='all'?Math.max(3.2,Math.min(6,0.8*T.s)):Math.max(8,Math.min(15,0.95*T.s));
+ const ord=pos.map((p,i)=>i).sort((a,b)=>pos[b][0]-pos[a][0]);const leader=ord[ord.length-1];
+ if(fr&&cam==='lead'){const pv=frameAt(Math.max(0,tt-1.2));ctx.lineCap='round';for(const i of ord){const a=hxy(c,pv[i][0],pv[i][1]),b=hxy(c,pos[i][0],pos[i][1]);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=T.f(b.x,b.y);const g=ctx.createLinearGradient(x1,y1,x2,y2);g.addColorStop(0,'#ffffff00');g.addColorStop(1,'#ffffffaa');ctx.strokeStyle=g;ctx.lineWidth=rad*1.1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}}
+ for(const i of ord){const p=hxy(c,pos[i][0],pos[i][1]);const [X,Y]=T.f(p.x,p.y);const fr_=E.frameOf(race.runners[i].no,H);
+  ctx.fillStyle='#0000004d';ctx.beginPath();ctx.arc(X+1,Y+1.8,rad,0,Math.PI*2);ctx.fill();
+  if(i===leader&&fr){ctx.beginPath();ctx.arc(X,Y,rad+3,0,Math.PI*2);ctx.fillStyle='#ffd43b';ctx.fill()}
+  ctx.beginPath();ctx.arc(X,Y,rad,0,Math.PI*2);ctx.fillStyle=FRAME_BG[fr_];ctx.fill();ctx.lineWidth=rad>6?1.6:1;ctx.strokeStyle=fr_<=1?'#555':'#17171a';ctx.stroke();
+  if(rad>=7){ctx.fillStyle=FRAME_FG[fr_];ctx.font='800 '+Math.round(rad*1.05)+'px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(race.runners[i].no,X,Y+0.5);ctx.textBaseline='alphabetic'}}
  if(cam==='lead')mini(c,pos,w,h);
  if(fr)hud(fr,tt);
 }
-function mini(c,pos,w,h){const v=fitView(c);const mw=Math.min(170,w*0.36),mh=mw*(v.y1-v.y0)/(v.x1-v.x0);const ox=w-mw-8,oy=h-mh-36;ctx.save();ctx.fillStyle='#0b120dcc';ctx.fillRect(ox-4,oy-4,mw+8,mh+8);
- const s=mw/(v.x1-v.x0);const f=(x,y)=>[ox+(x-v.x0)*s,oy+(y-v.y0)*s];ctx.strokeStyle=race.route.surface==='turf'?'#3f8a4e':'#9a7449';ctx.lineWidth=Math.max(2,c.width*s);ctx.beginPath();const n=c.straightOnly?2:120;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist):k/n*c.lap;const p=E.xyLoop(c,u,c.width/2);const [X,Y]=f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath();ctx.stroke();
- {const p=E.xy(c,0,c.width/2);const [X,Y]=f(p.x,p.y);ctx.fillStyle='#ff4d4d';ctx.fillRect(X-1.5,Y-5,3,10)}
- pos.forEach(q=>{const p=E.xy(c,q[0],q[1]);const [X,Y]=f(p.x,p.y);ctx.fillStyle='#f2c14e';ctx.beginPath();ctx.arc(X,Y,1.8,0,Math.PI*2);ctx.fill()});ctx.restore()}
+function mini(c,pos,w,h){const v=fitView(c);const mw=Math.min(132,w*0.34),mh=mw*(v.y1-v.y0)/(v.x1-v.x0);const ox=w-mw-8,oy=8;ctx.save();ctx.fillStyle='#ffffffe6';ctx.strokeStyle='#17171a33';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect?ctx.roundRect(ox-5,oy-5,mw+10,mh+10,8):ctx.rect(ox-5,oy-5,mw+10,mh+10);ctx.fill();ctx.stroke();
+ const s=mw/(v.x1-v.x0);const f=(x,y)=>[ox+(x-v.x0)*s,oy+(y-v.y0)*s];const BG=race.bg&&race.bg.img&&race.bg.img.complete&&race.bg.img.naturalWidth&&c.shaped?race.bg:null;
+ if(BG){ctx.globalAlpha=.85;const [bx,by]=f(0,0);ctx.drawImage(BG.img,bx,by,BG.w*c.f*s,BG.h*c.f*s);ctx.globalAlpha=1}
+ else{ctx.strokeStyle=race.route.surface==='turf'?'#3f8a4e':'#9a7449';ctx.lineWidth=Math.max(2,c.width*s);ctx.beginPath();const n=c.straightOnly?2:120;for(let k=0;k<=n;k++){const u=c.straightOnly?(k?0:c.dist):k/n*c.lap;const p=E.xyLoop(c,u,c.width/2);const [X,Y]=f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}if(!c.straightOnly)ctx.closePath();ctx.stroke()}
+ if(c.track){ctx.strokeStyle='#1f4fb8';ctx.lineWidth=1.6;ctx.beginPath();const n=120;for(let k=0;k<=n;k++){const p=E.xy(c,race.dist*(1-k/n),c.width/2);const [X,Y]=f(p.x,p.y);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y)}ctx.stroke()}
+ pos.forEach(q=>{const p=hxy(c,q[0],q[1]);const [X,Y]=f(p.x,p.y);ctx.fillStyle='#e8590c';ctx.beginPath();ctx.arc(X,Y,2,0,Math.PI*2);ctx.fill()});ctx.restore()}
 function frameAt(tt){const R=sim.record;if(!R.length)return null;if(tt<=R[0].t)return R[0].h;for(let k=1;k<R.length;k++){if(R[k].t>=tt){const a=R[k-1],b=R[k],w=(tt-a.t)/(b.t-a.t);return a.h.map((x,i)=>[x[0]+(b.h[i][0]-x[0])*w,x[1]+(b.h[i][1]-x[1])*w,x[2]])}}return R[R.length-1].h}
 function hud(fr,tt){const H=race.runners.length;const ord=fr.map((p,i)=>i).sort((a,b)=>fr[a][0]-fr[b][0]);const lead=fr[ord[0]][0];
  $('hRemain').textContent=Math.max(0,Math.round(lead))+'m';$('hPace').textContent=sim.lead1000&&race.dist>=1400&&tt>=sim.lead1000?'1000m通過 '+sim.lead1000.toFixed(1)+'秒':'';$('hTime').textContent=fmtT(Math.min(tt,sim.results[0].time));
- $('hOrder').innerHTML=ord.map(i=>{const f=E.frameOf(race.runners[i].no,H);return '<span style="background:'+FRAME_BG[f]+';color:'+FRAME_FG[f]+'">'+race.runners[i].no+'</span>'}).join('');}
+ $('hOrder').innerHTML='<em>先頭</em>'+ord.map((i,k)=>{const f=E.frameOf(race.runners[i].no,H);return '<span'+(k===0?' class="top"':'')+' style="background:'+FRAME_BG[f]+';color:'+FRAME_FG[f]+'">'+race.runners[i].no+'</span>'}).join('')+'<em>後方</em>';}
 function loop(ts){if(!play){last=0;return}if(!last)last=ts;const d=(ts-last)/1000;last=ts;clock+=d*speed;const end=sim.results[H()-1].time+1.5;if(clock>=end){clock=end;play=false;finish()}$('seek').value=Math.round(clock/end*1000);draw(clock);requestAnimationFrame(loop)}
 function H(){return race.runners.length}
 function finish(){const r=sim.results;const w=r[0];$('runNote').innerHTML='この1回の結果：'+r.slice(0,5).map((x,k)=>(k+1)+'着 '+x.no+' '+esc(race.runners[x.i].name)+'（'+fmtT(x.time)+(k?'・'+(x.time-w.time).toFixed(1)+'秒差':'')+'）').join('　')+'。ペース：'+(sim.pace>0.15?'速い':sim.pace<-0.15?'遅い':'ふつう')+(race.free||race.upcoming?'':'。実際の1着は '+(()=>{const a=race.runners.find(x=>x.finish===1);return a?a.no+' '+esc(a.name):'-'})());}
