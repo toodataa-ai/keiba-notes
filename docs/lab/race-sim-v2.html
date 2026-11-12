@@ -243,13 +243,12 @@ function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  const H=race.runners.length;const pos=fr0;
  const rad=cam==='all'?Math.max(3.2,Math.min(6,0.8*T.s)):Math.max(11,Math.min(15,0.9*T.s));
  const ord=pos.map((p,i)=>i).sort((a,b)=>pos[b][0]-pos[a][0]);const leader=ord[ord.length-1];
- // 動きをなめらかに：横の位置は上限つきの速さでしか動かさず（実際の馬の横移動は秒速1〜2m程度）、押し離しのずれも前の画面から引き継ぐ
+ // 動きをなめらかに：横の位置は上限つきの速さでしか動かさず（実際の馬の横移動は秒速1〜2m程度）。丸の押し離しはしない（エンジンの位置のまま描く）
  if(!SMO||SMO.n!==H||tt<SMO.t||tt-SMO.t>3){SMO={n:H,t:tt,lane:pos.map(q=>q[1]),d:pos.map(()=>[0,0]),key:race.key||race.name}}
  const dt=Math.min(0.5,Math.max(0,tt-SMO.t));SMO.t=tt;
  const lat=pos.map((q,i)=>{const e=q[1]-SMO.lane[i],mx=2.0*dt,st=Math.abs(e)<1e-9?0:Math.sign(e)*Math.min(Math.abs(e)*(1-Math.exp(-dt/0.5)),mx);SMO.lane[i]+=st;return [q[0],SMO.lane[i]]});
  const base=lat.map(q=>{const p=hxy(c,q[0],q[1]);return T.f(p.x,p.y)});
- const sp=spread(base.map(a=>[a[0],a[1]]),rad),ka=1-Math.exp(-dt/0.35);
- const SC=sp.map((a,i)=>{const d=SMO.d[i];d[0]+=((a[0]-base[i][0])-d[0])*ka;d[1]+=((a[1]-base[i][1])-d[1])*ka;return [base[i][0]+d[0],base[i][1]+d[1]]});
+ const SC=base;
  if(fr&&cam==='lead'){const pv=frameAt(Math.max(0,tt-1.2));ctx.lineCap='round';for(const i of ord){const a=hxy(c,pv[i][0],pv[i][1]);const [x1,y1]=T.f(a.x,a.y),[x2,y2]=SC[i];const g=ctx.createLinearGradient(x1,y1,x2,y2);g.addColorStop(0,'#ffffff00');g.addColorStop(1,'#ffffffaa');ctx.strokeStyle=g;ctx.lineWidth=rad*1.1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}}
  for(const i of ord){const [X,Y]=SC[i];const fr_=E.frameOf(race.runners[i].no,H);
   ctx.fillStyle='#0000004d';ctx.beginPath();ctx.arc(X+1,Y+1.8,rad,0,Math.PI*2);ctx.fill();
