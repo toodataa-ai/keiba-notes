@@ -19,7 +19,7 @@ PROD=ROOT/"docs"
 STAGE=PROD/"staging"
 PAGES=("index.html","this-week.html","schedule.html","results.html","methodology.html",
        "roadmap.html","e2e.html","baba-models.html","local-racing-shadow.html",
-       "experience-regime.html","release-history.html","improvement-cycle.html","operations.html","sire-map.html","collection-status.html","baba-bias.html","track-trends.html","people-trends.html")
+       "experience-regime.html","release-history.html","improvement-cycle.html","operations.html","sire-map.html","collection-status.html","baba-bias.html","track-trends.html","people-trends.html","factor-screen.html")
 CANDIDATES=ROOT/".github"/"staging-candidates.json"
 CANDIDATE_SRC=ROOT/".github"/"staging-candidates"
 CANDIDATE_ASSETS=STAGE/"candidate-assets"

@@ -91,6 +91,8 @@ def parse_race(rec: dict):
             "trainer_name": strip_links(tc),
             "pop": int(om.group(1)) if om else None, "odds": float(om.group(2)) if om else None,
             "sex": wm.group(1) if wm else None, "age": int(wm.group(2)) if wm else None,
+            "horse": link(r[ci["馬名"]], "horse"),
+            "weight": int(wm.group(3)) if wm else None, "wdiff": int(wm.group(4)) if wm else None,
         })
     race["n"] = len(rows)
     return race, rows

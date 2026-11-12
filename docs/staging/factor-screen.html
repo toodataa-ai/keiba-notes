@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ja" data-stage="preview">
+<head>
+<meta name="robots" content="noindex,nofollow"><base href="../">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<title>要素の検証 | AIによる競馬予想研究所</title>
+<link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+<link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
+<style>
+.fs-seg{display:inline-flex;flex-wrap:wrap;border:1px solid #dcdee3;border-radius:14px;overflow:hidden;margin:0 8px 8px 0;background:#fff}
+.fs-seg button{font:inherit;font-size:13px;border:0;background:#fff;color:#2b2c31;padding:7px 11px;cursor:pointer}
+.fs-seg button+button{border-left:1px solid #dcdee3}
+.fs-seg button[aria-pressed="true"]{background:#17171a;color:#fff}
+.fs-seg button:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
+.fs-box{border:1px solid #e3e4e8;border-radius:12px;background:#f6f7f9;padding:11px 13px;font-size:13px;line-height:1.75;margin:10px 0}
+.fs-box ul{margin:6px 0 0;padding-left:18px}
+.fs-kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.fs-kpi div{border:1px solid #e3e4e8;border-radius:12px;padding:9px 11px;background:#fff}
+.fs-kpi b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.fs-kpi span{font-size:12px;color:#6d6e75;line-height:1.5}
+.fs-tbl{overflow-x:auto}
+.fs-tbl table{width:100%;border-collapse:collapse;font-size:12.5px}
+.fs-tbl th,.fs-tbl td{padding:6px 5px;border-bottom:1px solid #f0f0f3;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.fs-tbl th:first-child,.fs-tbl td:first-child{text-align:left;white-space:normal;min-width:9em}
+.fs-tbl th{font-size:11.5px;color:#6d6e75;font-weight:400}
+.fs-up{color:#1d4f9f;font-weight:700}
+.fs-dn{color:#a4372b;font-weight:700}
+.fs-cond small{display:block;color:#6d6e75;font-size:11px;font-weight:400}
+.fs-note{font-size:12px;color:#6d6e75;line-height:1.75;margin:6px 0 0}
+details.fs-d{border-bottom:1px solid #ececef;padding:2px 0}
+details.fs-d summary{cursor:pointer;font-size:14px;font-weight:700;padding:9px 2px}
+details.fs-d summary:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
+</style>
+<link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
+</head>
+<body class="ic-light">
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
+<div class="wrap">
+<nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/track-trends.html">競馬場の傾向</a><a href="staging/people-trends.html">騎手・調教師の成績</a></nav>
+
+<header>
+<p class="eyebrow">予想の材料（研究）</p>
+<h1>要素の検証</h1>
+<p class="lead">発走前に分かる要素を、<strong>単独と2つの組み合わせ</strong>で調べ、<strong>勝率との関係</strong>と<strong>オッズ妙味</strong>（人気で説明できない上乗せ）が、<strong>前半の期間で見つけて後半でも続いたか</strong>を確かめた結果です。</p>
+</header>
+
+<section aria-labelledby="howTitle">
+<h2 id="howTitle">数字の読み方</h2>
+<div class="fs-box">
+<b>勝ちやすさ</b>＝実際の勝ち数 ÷ <u>頭数だけで決めた期待の勝ち数</u>（1÷頭数）。1.00より大きいほど、その条件の馬は勝ちやすい。人気の馬が勝ちやすいのも含みます。<br>
+<b>妙味（A/E）</b>＝実際の勝ち数 ÷ <u>オッズどおりなら勝つはずの数</u>。1.00は人気どおり、1.10は人気より1割多く勝つ。<b>人気の影響を除いた</b>上乗せです。<br>
+<b>前半／後半</b>＝2018〜2021年と2022年〜。前半で目立った条件が、後半でも続くかを見ます（続かなければ偶然の可能性が高い）。<br>
+<b>q値</b>＝条件をたくさん調べたことによる「偶然の当たり」を補正した確からしさ。0.05より小さいほど、偶然とは考えにくい。
+</div>
+<div class="fs-box" id="fsFind">読み込み中…</div>
+</section>
+
+<section aria-labelledby="winTitle">
+<h2 id="winTitle">勝率と関係する要素</h2>
+<p class="sub">前半・後半の両方で、頭数だけの期待より勝ちやすかった条件（誤差の1.5倍以上が両方）。人気の高い馬が勝ちやすいのを反映した条件が多いので、<b>「人気を含む条件を外す」</b>で見るのがおすすめです。</p>
+<label class="fs-note" style="display:block;margin:0 0 8px"><input type="checkbox" id="fsNoPop" checked> 人気を含む条件を外す</label>
+<div class="fs-seg" role="group" aria-label="単独か組み合わせか"><button type="button" data-w="singles" aria-pressed="true">単独</button><button type="button" data-w="pairs" aria-pressed="false">2つの組み合わせ</button></div>
+<div class="fs-tbl" id="fsWin"></div>
+</section>
+
+<section aria-labelledby="valTitle">
+<h2 id="valTitle">オッズ妙味と関係する要素</h2>
+<p class="sub">前半・後半の両方で、人気（オッズ）以上に勝った条件（A/E が両方1より大きく、誤差の1.5倍以上が両方）。</p>
+<div class="fs-seg" role="group" aria-label="単独か組み合わせか"><button type="button" data-v="singles" aria-pressed="true">単独</button><button type="button" data-v="pairs" aria-pressed="false">2つの組み合わせ</button><button type="button" data-v="overbet" aria-pressed="false">人気ほど勝たない条件</button></div>
+<div class="fs-tbl" id="fsVal"></div>
+</section>
+
+<section aria-labelledby="allTitle">
+<h2 id="allTitle">要素ごとの一覧（単独）</h2>
+<p class="sub">各要素の全部の区分を並べています（騎手・調教師・コースは、差の大きい15件）。</p>
+<div id="fsAll"></div>
+</section>
+
+<section aria-labelledby="noteTitle">
+<h2 id="noteTitle">注意</h2>
+<p class="fs-note">過去の成績であって、次のレースを当てる保証ではありません。予想には使っていません（使えるかを研究するための材料です）。調べた条件の数が多いので、偶然で当たって見えるものが必ず混じります。上の「偶然の見込み」と「実際に続いた数」を比べて読んでください。調教・パドック・厩舎コメントなど、取得できていない情報は含みません。馬体重は発走の約1時間前に分かる情報です。</p>
+</section>
+</div>
+<script>
+(function(){
+var D=null,W='singles',V='singles';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function f2(x){return x==null?'—':x.toFixed(2)}
+function pc(x){return x==null?'—':(x*100).toFixed(1)+'%'}
+function roi(x){return x==null?'—':Math.round(x*100)+'%'}
+function num(n){return n.toLocaleString('ja-JP')}
+function cond(c){return '<span class="fs-cond">'+c.v.map(esc).join(' × ')+'<small>'+c.f.map(esc).join(' × ')+'</small></span>'}
+function qv(q){return q==null?'—':(q<0.001?'<0.001':q.toFixed(3))}
+function tbl(rows,mode){
+ if(!rows.length)return '<p class="fs-note">この条件で、前半・後半ともにそろった組み合わせはありませんでした。</p>';
+ var head=mode==='win'?'<th>勝ちやすさ</th><th>前半</th><th>後半</th><th>勝率</th>':'<th>A/E</th><th>前半</th><th>後半</th><th>回収率</th>';
+ var h='<table><thead><tr><th>条件</th><th>走数</th>'+head+'<th>q値</th></tr></thead><tbody>';
+ rows.forEach(function(c){
+  var m=mode==='win'?[c.lift,c.h1.lift,c.h2.lift,pc(c.wr)]:[c.ae,c.h1.ae,c.h2.ae,roi(c.roi)];
+  var q=mode==='win'?c.ql:c.q;var up=(m[0]||0)>=1;
+  h+='<tr><td>'+cond(c)+'</td><td>'+num(c.n)+'</td><td class="'+(up?'fs-up':'fs-dn')+'">'+f2(m[0])+'</td><td>'+f2(m[1])+'</td><td>'+f2(m[2])+'</td><td>'+m[3]+'</td><td>'+qv(q)+'</td></tr>'});
+ return h+'</tbody></table>'
+}
+function sumBox(s){return '<div><b>'+s.continued+' / '+s.candidates+'</b><span>'+esc(s.label)+'：前半で目立った条件のうち、後半も同じ向きだった数（偶然なら約半分。調べた条件 '+num(s.tested)+'、前半で偶然に目立つ見込み '+s.chance_expected+'件）</span></div>'}
+function findings(){
+ var s=D.summary,m=D.meta;
+ $('fsFind').innerHTML='<b>先に分かったこと</b><br>2018〜2026年のJRA平地 '+num(m.races)+'レース・'+num(m.rows)+'頭を対象に、<b>'+num(m.conditions_tested)+'通り</b>の条件（単独'+num(m.singles)+'・2つの組み合わせ'+num(m.pairs)+'）を調べました。'+
+ '<div class="fs-kpi">'+sumBox(s.value_singles)+sumBox(s.value_pairs)+sumBox(s.win_singles)+sumBox(s.win_pairs)+'</div>'+
+ '<span style="color:#6d6e75">条件の数で補正（q&lt;0.05）しても残ったのは、オッズ妙味 '+D.q_pass.value_q05+'件、勝ちやすさ '+D.q_pass.win_q05+'件。</span>'+
+ '<ul><li><b>オッズ妙味は、あります。ただし小さい</b>：前半で見つかり後半も続いた条件は、偶然の見込みを上回りました。しかし A/E は多くが1.03〜1.1で、<b>単勝を買い続けた回収率が100%を超える条件は、上位 '+(D.value.singles.concat(D.value.pairs)).length+'件のうち '+(D.value.singles.concat(D.value.pairs)).filter(function(c){return c.roi>=1}).length+'件</b>だけです（控除があるため）。</li>'+
+ '<li><b>勝率との関係</b>は、人気（オッズ）で説明できる部分が大きいので、「人気を含む条件を外す」で見てください。</li>'+
+ '<li>似た条件（例：前走の着順と距離の変化）は同じ効果を別の形で拾うので、件数は<b>独立の発見の数ではありません</b>。</li></ul>';
+}
+var NP=true;
+function renderW(){var r=D.win[W];if(NP)r=r.filter(function(c){return c.f.indexOf('人気')<0});$('fsWin').innerHTML=tbl(r,'win')}
+$('fsNoPop').onchange=function(){NP=this.checked;renderW()};
+function renderV(){$('fsVal').innerHTML=V==='overbet'?tbl(D.value.overbet,'val'):tbl(D.value[V],'val')}
+function renderAll(){
+ var h='';Object.keys(D.single_tables).forEach(function(k){var rows=D.single_tables[k];
+  h+='<details class="fs-d"><summary>'+esc(k)+'</summary><div class="fs-tbl"><table><thead><tr><th>区分</th><th>走数</th><th>勝率</th><th>勝ちやすさ</th><th>A/E</th><th>前半 A/E</th><th>後半 A/E</th><th>回収率</th></tr></thead><tbody>'+
+  rows.map(function(c){var sig=Math.abs(c.z||0)>=2&&c.n>=300;return '<tr><td>'+esc(c.v[0])+'</td><td>'+num(c.n)+'</td><td>'+pc(c.wr)+'</td><td>'+f2(c.lift)+'</td><td>'+(sig?'<b class="'+(c.ae>1?'fs-up':'fs-dn')+'">'+f2(c.ae)+'</b>':f2(c.ae))+'</td><td>'+f2(c.h1.ae)+'</td><td>'+f2(c.h2.ae)+'</td><td>'+roi(c.roi)+'</td></tr>'}).join('')+'</tbody></table></div></details>'});
+ $('fsAll').innerHTML=h
+}
+Array.prototype.forEach.call(document.querySelectorAll('[data-w]'),function(b){b.onclick=function(){W=b.getAttribute('data-w');Array.prototype.forEach.call(document.querySelectorAll('[data-w]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderW()}});
+Array.prototype.forEach.call(document.querySelectorAll('[data-v]'),function(b){b.onclick=function(){V=b.getAttribute('data-v');Array.prototype.forEach.call(document.querySelectorAll('[data-v]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderV()}});
+fetch('data/factor_screen_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;findings();renderW();renderV();renderAll()}).catch(function(){$('fsFind').textContent='データを読み込めませんでした。時間をおいて開き直してください。'});
+})();
+</script>
+  <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+</body>
+</html>
