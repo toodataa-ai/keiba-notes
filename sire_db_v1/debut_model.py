@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from scipy.optimize import minimize
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from sire_db_v1.debut_common import load_horses, debut_races, mb
+from sire_db_v1.debut_common import load_horses, debut_races, mb, fill_debut_weights
 from sire_db_v1.lineage import lineage_map
 
 K = 4.0  # 縮小（勝ち数の目安）
@@ -37,6 +37,11 @@ def build(hs, drs):
     ev.sort(key=lambda x: x[0])
     races = sorted(drs.items(), key=lambda kv: kv[1][0][1]["date"])
     S = collections.defaultdict(lambda: [0.0, 0.0])  # key -> [wins, exp]
+    HFW = set(); DAMFW = collections.defaultdict(list); GFW = [0, 0.0]   # 初勝利の月齢（馬ごと・母ごと・全体）
+    WS = {}; SZ = collections.defaultdict(lambda: [0.0, 0])               # 新馬戦の馬体重（性別ごとの平均・分散／父ごとの偏り）
+    def wz(h, r):
+        st = WS.get(h.get("sex")); bw = r.get("body_weight")
+        return (bw - st[1]) / math.sqrt(st[2] / st[0]) if (bw and st and st[0] >= 30 and st[2] > 0) else 0.0
     rows = []  # 1レース=（特徴行列, 勝ち馬index, ログオッズ）
     j = 0
     for code, lst in races:
@@ -47,12 +52,23 @@ def build(hs, drs):
             ped = h["ped"]; prof = h.get("profile") or {}
             deb = "新馬" in (r.get("race") or "")
             sur = r["surface"]
+            if w == 1.0 and h["id"] not in HFW:
+                HFW.add(h["id"]); GFW[0] += 1; GFW[1] += m
+                if ped.get("dam"):
+                    DAMFW[ped["dam"]].append(m)
+            if deb and r.get("body_weight"):
+                z = wz(h, r)
+                if z != 0.0 or WS.get(h.get("sex")):
+                    SZ[ped["sire"]][0] += z; SZ[ped["sire"]][1] += 1
+                st = WS.setdefault(h.get("sex"), [0, 0.0, 0.0]); st[0] += 1
+                dlt = r["body_weight"] - st[1]; st[1] += dlt / st[0]; st[2] += dlt * (r["body_weight"] - st[1])
             for key in (("sire", ped["sire"], "all", sur), ("dsire", ped.get("dam_sire"), "all", sur), ("dam", ped.get("dam"), "all", "-"),
                         ("sire", ped["sire"], "young", sur) if m <= 38 else None):
                 if key and key[1]:
                     S[key][0] += w; S[key][1] += p
             if deb:
                 for key in (("line", L(ped["sire"]), "deb", sur), ("line", L(ped["sire"]), "deb", "-"), ("dline", L(ped.get("dam_sire")), "deb", "-"),
+                            ("dam", ped.get("dam"), "deb", "-"),
                             ("sire", ped["sire"], "deb", sur), ("sire", ped["sire"], "deb", "-"), ("dsire", ped.get("dam_sire"), "deb", "-"),
                             ("trainer", prof.get("調教師（所属）_id"), "deb", "-"), ("breeder", prof.get("生産者"), "deb", "-"), ("jockey", r.get("jockey_id"), "deb", "-")):
                     if key[1]:
@@ -73,6 +89,12 @@ def build(hs, drs):
                 lae(*S[("line", L(ped["sire"]), "deb", "-")]),       # 父の系統の新馬戦の傾向
                 lae(*S[("line", L(ped["sire"]), "deb", sur)]),       # 父の系統×芝ダの新馬戦の傾向
                 lae(*S[("dline", L(ped.get("dam_sire")), "deb", "-")]),  # 母の父の系統の新馬戦の傾向
+                lae(*S[("dam", ped.get("dam"), "deb", "-")]),        # 兄姉の新馬戦の成績（母が同じ）
+                ((sum(DAMFW[ped["dam"]]) / len(DAMFW[ped["dam"]]) - GFW[1] / max(GFW[0], 1)) / 12.0) if DAMFW.get(ped.get("dam")) else 0.0,  # 兄姉の初勝利月齢（全体平均との差、年）
+                1.0 if DAMFW.get(ped.get("dam")) else 0.0,           # 勝ち上がった兄姉がいる
+                wz(h, r),                                            # デビュー時の馬体重（性別の平均との差）
+                wz(h, r) - SZ[ped["sire"]][0] / (SZ[ped["sire"]][1] + 5.0) if wz(h, r) != 0.0 else 0.0,  # 同じ父の産駒の平均との差
+                (float(r["horse_no"]) / r["heads"] - 0.5) if (r.get("horse_no") and str(r["horse_no"]).isdigit() and r.get("heads")) else 0.0,  # 馬番（内0→外1）
             ]
             feats.append(f); odds.append(r["odds"])
             if r.get("finish") == 1:
@@ -82,7 +104,7 @@ def build(hs, drs):
     return rows
 
 
-NAMES = ["父:新馬戦の傾向", "父×芝ダ:新馬戦の傾向", "父×芝ダ:若い時期の全出走", "母の父:新馬戦の傾向", "母の父×芝ダ:全出走", "母の他の産駒:全出走", "(比較)調教師:新馬戦", "(比較)生産者:新馬戦", "(比較)騎手:新馬戦", "父の系統:新馬戦の傾向", "父の系統×芝ダ:新馬戦の傾向", "母の父の系統:新馬戦の傾向"]
+NAMES = ["父:新馬戦の傾向", "父×芝ダ:新馬戦の傾向", "父×芝ダ:若い時期の全出走", "母の父:新馬戦の傾向", "母の父×芝ダ:全出走", "母の他の産駒:全出走", "(比較)調教師:新馬戦", "(比較)生産者:新馬戦", "(比較)騎手:新馬戦", "父の系統:新馬戦の傾向", "父の系統×芝ダ:新馬戦の傾向", "母の父の系統:新馬戦の傾向", "兄姉の新馬戦の成績", "兄姉の初勝利月齢(早いほど−)", "勝ち上がった兄姉がいる", "馬体重(性別の平均との差)", "馬体重(同じ父の産駒との差)", "馬番(内→外)"]
 
 
 def nll(theta, rows, cols, ridge=0.0):
@@ -114,6 +136,7 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--data", required=True); ap.add_argument("--split", default="2025-01-01"); ap.add_argument("--out", default="debut_model_result.json")
     a = ap.parse_args()
     hs = load_horses(a.data); drs = debut_races(hs)
+    print('新馬戦の馬体重を結果ページから補完', fill_debut_weights(drs, a.data))
     rows = build(hs, drs)
     rows = [r for r in rows if r[0] >= "2022-01-01"]  # 特徴が育つまでの最初の1年は除く
     tr = [r for r in rows if r[0] < a.split]; te = [r for r in rows if r[0] >= a.split]
@@ -122,7 +145,8 @@ def main():
     base = fit(tr, []); print("odds-only a=", base[0], "train", ll(base, tr, []), "test", ll(base, te, []))
     res["odds_only"] = {"a": float(base[0]), "train": ll(base, tr, []), "test": ll(base, te, [])}
     sets = {"血統だけ(父3+母父2+母産駒1)": [0, 1, 2, 3, 4, 5], "父だけ": [0, 1, 2], "全部": list(range(9)), "調教師・生産者・騎手だけ(比較)": [6, 7, 8],
-            "系統だけ(父の系統2+母の父の系統1)": [9, 10, 11], "父＋父の系統": [0, 1, 2, 9, 10], "血統全部＋系統": [0, 1, 2, 3, 4, 5, 9, 10, 11]}
+            "系統だけ(父の系統2+母の父の系統1)": [9, 10, 11], "父＋父の系統": [0, 1, 2, 9, 10], "血統全部＋系統": [0, 1, 2, 3, 4, 5, 9, 10, 11],
+            "兄姉だけ": [12, 13, 14], "馬体重だけ": [15, 16], "馬番だけ": [17], "新しい材料全部": [12, 13, 14, 15, 16, 17], "父＋新しい材料全部": [0, 1, 2, 12, 13, 14, 15, 16, 17], "全部入り": [0, 1, 2, 3, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 17]}
     for nm, cols in sets.items():
         th = fit(tr, cols, ridge=1.0); t_te = ll(th, te, cols); t_b = ll(base, te, [])
         # 対応のあるブートストラップ（レース単位）で差の信頼区間
