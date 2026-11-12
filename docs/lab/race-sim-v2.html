@@ -124,7 +124,7 @@ h2{font-size:17px;margin:0 0 8px}
 </section>
 </div>
 
-<script src="sim-v2/engine.js?v=20261113d-1"></script>
+<script src="sim-v2/engine.js?v=20261113e-1"></script>
 <script>
 (function(){
 'use strict';
@@ -213,11 +213,16 @@ function vecTrack(c,T,turf,u0,u1){const B=bandOf(c);ctx.save();ctx.lineCap='butt
 // 表示の重なりを減らす：画面上で近すぎる丸を少しずつ押し離す（表示だけ。順位が入れ替わらないよう、ずらす量は丸の大きさ程度まで）
 function spread(P,rad,order){const n=P.length,o=P.map(p=>[p[0],p[1]]),min=2*rad*0.98,cap=rad*2;for(let it=0;it<14;it++){let mv=false;for(let a=0;a<n;a++)for(let b=a+1;b<n;b++){let dx=P[b][0]-P[a][0],dy=P[b][1]-P[a][1];let d=Math.hypot(dx,dy);if(d>=min)continue;if(d<1e-3){dx=0;dy=1;d=1e-3}const push=(min-d)/2,ux=dx/d,uy=dy/d;P[a][0]-=ux*push;P[a][1]-=uy*push;P[b][0]+=ux*push;P[b][1]+=uy*push;mv=true}
  for(let i=0;i<n;i++){const dx=P[i][0]-o[i][0],dy=P[i][1]-o[i][1],d=Math.hypot(dx,dy);if(d>cap){P[i][0]=o[i][0]+dx/d*cap;P[i][1]=o[i][1]+dy/d*cap}}if(!mv)break}return P}
-let SMO=null;
+let SMO=null,CAMS=null;
 function draw(tt){const {w,h}=setup();const c=race._course;let v=fitView(c);
  const fr=sim&&sim.record?frameAt(tt):null;
  const fr0=fr||race.runners.map(x=>[race.dist,0.6+(x.no-1)*1.05,0]);
- if(cam==='lead'){const us=fr0.map(x=>x[0]).sort((a,b)=>a-b);const lo=us[0],hi=us[Math.max(0,Math.floor(us.length*0.85)-1)];const mid=Math.max(0,(lo+hi)/2);const p=cxy(c,mid,0);const half=Math.max(40,Math.min(170,(hi-lo)*0.6+25));const asp=h/w;const hx=Math.max(half,(bandOf(c)+8)/asp/2);v={x0:p.x-hx,x1:p.x+hx,y0:p.y-hx*asp,y1:p.y+hx*asp}}
+ if(cam==='lead'){const H0=fr0.length,ord0=fr0.map((q,i)=>i).sort((x,y)=>fr0[x][0]-fr0[y][0]),keep=ord0.slice(0,Math.max(3,Math.ceil(H0*0.85)));
+  const ws=keep.map(i=>{const p=hxy(c,fr0[i][0],fr0[i][1]);return [p.x,p.y]});let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const q of ws){if(q[0]<x0)x0=q[0];if(q[0]>x1)x1=q[0];if(q[1]<y0)y0=q[1];if(q[1]>y1)y1=q[1]}
+  const asp=h/w;let cx=(x0+x1)/2,cy=(y0+y1)/2,hx=Math.max(16,(x1-x0)/2+9,((y1-y0)/2+9)/asp);
+  // カメラはなめらかに追いかける（急に動かない）
+  if(!CAMS||tt<CAMS.t||tt-CAMS.t>3)CAMS={t:tt,cx,cy,hx};const kc=1-Math.exp(-Math.max(0,tt-CAMS.t)/0.45);CAMS.t=tt;CAMS.cx+=(cx-CAMS.cx)*kc;CAMS.cy+=(cy-CAMS.cy)*kc;CAMS.hx+=(hx-CAMS.hx)*kc;
+  v={x0:CAMS.cx-CAMS.hx,x1:CAMS.cx+CAMS.hx,y0:CAMS.cy-CAMS.hx*asp,y1:CAMS.cy+CAMS.hx*asp}}
  const T=toScreen(v,w,h);
  const turf=race.route.surface==='turf';
  const BG0=race.bg&&race.bg.img&&race.bg.img.complete&&race.bg.img.naturalWidth&&c.shaped?race.bg:null;
