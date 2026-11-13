@@ -1,16 +1,26 @@
 {
-  "schema_version": 1,
-  "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-sire-lineage-v1",
-      "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
-      "pages": [
-        "improvement-cycle.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
-    }
-  ]
+ "schema_version": 1,
+ "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
+ "candidates": [
+  {
+   "id": "ui-sire-lineage-v1",
+   "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
+   "pages": [
+    "improvement-cycle.html"
+   ],
+   "assets": [],
+   "status": "awaiting_user_approval",
+   "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
+  },
+  {
+   "id": "ui-trends-hanshin-4corner-v1",
+   "title": "競馬場の傾向：阪神外回りの4コーナーを内寄り・半径の長い1つの円弧に",
+   "pages": [
+    "track-trends.html"
+   ],
+   "assets": [],
+   "status": "awaiting_user_approval",
+   "summary": "阪神外回り（1400・1600・1800・2400・2600m・芝3200m）の道すじで、4コーナーの3つの円弧を半径約258pxの1つの円弧に置き換え、内ラチ寄りを通るように変更。中心線からのずれは幅の約37%（規定の10%を超える例外）。他の競馬場は変更なし。"
+  }
+ ]
 }
