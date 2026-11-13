@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.53-20261113",
-  "current_public_version": "1.53",
+  "current_public_release": "release/jra-site-v1.54-20261114",
+  "current_public_version": "1.54",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1127,6 +1127,27 @@
       "scope_files": [
         "docs/index.html",
         "docs/factor-screen.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.54-20261114",
+      "branch": "release/jra-site-v1.54-20261114",
+      "commit_sha": "75ad171e0404e24b9ddeb66801a903efe6b5dcd8",
+      "deployed_at": "2026-11-14T00:49:55+09:00",
+      "workflow_run_id": 43456505880,
+      "validation_workflow_run_id": 43456505880,
+      "public_version": "1.54",
+      "note": "2026-11-14ユーザー明示承認済み。競馬場の傾向：阪神外回りの進路（4コーナー・2コーナー・2600m発走）を直す：阪神外回り：①4コーナーを内寄りの円弧に、最後の直線は真っすぐ ②1〜2コーナーと向正面を内回りと同じ線に ③2600mの発走地点をゴール前の直線の延長上（引き込み線）に置き、コーナーの中に置かない。他の競馬場は変更なし。中心線からのずれは幅の約35%（規定10%超の例外）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-hanshin-4corner-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/track-trends.html"
       ],
       "public_http_files_verified": null
     }
