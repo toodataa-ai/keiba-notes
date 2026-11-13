@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta http-equiv="Cache-Control" content="no-cache,no-store">
+<title>競馬場の傾向 | AIによる競馬予想研究所</title>
+<link rel="stylesheet" href="assets/improvement-cycle-v2.css?v=20261102-1">
+<link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
+<link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
+<style>
+.tt-seg{display:inline-flex;flex-wrap:wrap;border:1px solid #dcdee3;border-radius:14px;overflow:hidden;margin:0 8px 8px 0;background:#fff}
+.tt-seg button{font:inherit;font-size:13px;border:0;background:#fff;color:#2b2c31;padding:7px 11px;cursor:pointer}
+.tt-seg button+button{border-left:1px solid #dcdee3}
+.tt-seg button[aria-pressed="true"]{background:#17171a;color:#fff}
+.tt-seg button:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px}
+.tt-box{border:1px solid #e3e4e8;border-radius:12px;background:#f6f7f9;padding:11px 13px;font-size:13px;line-height:1.75;margin:10px 0}
+.tt-box b{font-weight:700}
+.tt-box ul{margin:6px 0 0;padding-left:18px}
+.tt-row{display:grid;grid-template-columns:96px 1fr 64px;gap:4px 10px;align-items:center;padding:9px 0;border-bottom:1px solid #ececef}
+.tt-lab{font-size:13px;font-weight:700;line-height:1.35}
+.tt-lab small{display:block;font-weight:400;color:#6d6e75;font-size:11px}
+.tt-bar{position:relative;height:16px;background:#f1f2f5;border-radius:8px}
+.tt-bar i{position:absolute;top:0;bottom:0;border-radius:8px}
+.tt-bar .mid{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;background:#17171a;opacity:.55}
+.tt-up{background:#2f6fd0}.tt-dn{background:#8c8f98}
+.tt-weak i{opacity:.38}
+.tt-val{font-size:14px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.tt-sub{grid-column:1/-1;font-size:11.5px;color:#6d6e75;line-height:1.6}
+.tt-tag{display:inline-block;font-size:10.5px;font-weight:400;color:#6d6e75;border:1px solid #dcdee3;border-radius:999px;padding:0 6px;margin-left:4px;white-space:nowrap}
+.tt-tag.on{color:#1d4f9f;border-color:#9db9e6;background:#eef4fd}
+.tt-tbl{overflow-x:auto}
+.tt-tbl table{width:100%;border-collapse:collapse;font-size:13px}
+.tt-tbl th,.tt-tbl td{padding:7px 6px;border-bottom:1px solid #ececef;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tt-tbl th:first-child,.tt-tbl td:first-child{text-align:left;font-weight:700}
+.tt-tbl th{font-size:12px;color:#6d6e75;font-weight:400}
+.tt-map{margin:10px 0 0;max-width:560px}.tt-map svg{display:block;width:100%;height:auto;border:1px solid #dcdee3;border-radius:10px;background:#fff}.tt-note{font-size:12px;color:#6d6e75;line-height:1.75;margin:6px 0 0}
+.tt-bold{font-weight:700;color:#1d4f9f}
+</style>
+</head>
+<body class="ic-light">
+<div class="wrap">
+<nav aria-label="ページ移動"><a href="index.html">← トップページに戻る</a><a href="people-trends.html">騎手・調教師の成績</a></nav>
+
+<header>
+<p class="eyebrow">予想の材料（研究）</p>
+<h1>競馬場の傾向</h1>
+<p class="lead">2018年以降のJRAの平地レースをもとに、<strong>競馬場ごとの枠・位置取り・馬場・開催の進み・年ごとの変化</strong>を数字にしました。人気（オッズ）の影響は除いてあるので、「人気とは別に、そこで何が起きやすいか」が分かります。</p>
+</header>
+
+<section aria-labelledby="howTitle">
+<h2 id="howTitle">数字の読み方</h2>
+<div class="tt-box">
+<b>勝ちやすさ（A/E）</b>＝実際の勝ち数 ÷ 人気（オッズ）どおりなら勝つはずの数。<br>
+<b>1.00</b>は人気どおり、<b>1.10</b>は人気より1割多く勝つ、<b>0.90</b>は1割少ない。棒は中央の線（1.00）からどちら側に動いたかを表します。<br>
+<b>勝率・3着内率</b>のボタンでは、人気の影響を<b>除かない</b>実際の割合（純粋な傾向）を見られます。人気馬が多く集まる枠・位置取りは高く出るので、「人気とは別の差」を見たいときはA/Eを使ってください。<br><span class="tt-tag">偶然の範囲</span>と出ている行は、<b>偶然でも出てしまう大きさの差</b>（誤差の2倍以内）なので、うすく表示しています。<span class="tt-tag on">差あり</span>は、誤差の2倍を超える差です（たくさんの項目を見ているので、偶然で出てしまうものも一部混ざります）。
+</div>
+<div class="tt-box" id="ttFind">読み込み中…</div>
+</section>
+
+<section aria-labelledby="pickTitle">
+<h2 id="pickTitle">競馬場を選ぶ</h2>
+<p class="sub" id="ttMeta">読み込み中…</p>
+<div id="ttVenue" class="tt-seg" role="group" aria-label="競馬場"></div><br>
+<div class="tt-seg" role="group" aria-label="芝かダートか"><button type="button" data-s="芝" aria-pressed="true">芝</button><button type="button" data-s="ダート" aria-pressed="false">ダート</button></div>
+<div id="ttBand" class="tt-seg" role="group" aria-label="距離"></div><br><span class="tt-note" style="margin:0 6px 0 0">見る数字：</span><div class="tt-seg" id="ttMetric" role="group" aria-label="見る数字"><button type="button" data-m="win" aria-pressed="true">勝率</button><button type="button" data-m="top3" aria-pressed="false">3着内率</button><button type="button" data-m="ae" aria-pressed="false">人気を除く（A/E）</button></div>
+<figure class="tt-map" id="ttMap" hidden></figure>
+</section>
+
+<section aria-labelledby="drawTitle">
+<h2 id="drawTitle">枠（内か外か）</h2>
+<div id="ttDraw"></div>
+</section>
+
+<section aria-labelledby="styleTitle">
+<h2 id="styleTitle">位置取り（脚質）</h2>
+<div id="ttStyle"></div>
+<h3 style="font-size:15px;margin:16px 0 4px">そのレースの勝ち馬は、どの位置取りだったか</h3>
+<p class="tt-note" style="margin:0 0 4px">上の数字は「1頭あたり」です。逃げは1レースに1頭だけ、差し・追込は何頭もいるので、1頭あたりの勝率は逃げが高く見えます。こちらは<b>レース単位</b>で、勝った馬がどの位置取りだったかの割合です。</p>
+<div id="ttWinStyle"></div>
+<p class="tt-note">最初のコーナーで何番手だったかで分けています。<b>レースが終わってから分かる位置取り</b>なので、「先行しそうな馬を買えば得」という意味ではありません（前に行った馬が、人気より勝ちやすいという実態を示すものです）。</p>
+</section>
+
+<section aria-labelledby="goingTitle">
+<h2 id="goingTitle">馬場が悪いと、タイムはどう変わるか</h2>
+<div id="ttGoing"></div>
+</section>
+
+<section aria-labelledby="progTitle">
+<h2 id="progTitle">開催が進むと、内枠・外枠はどう変わるか</h2>
+<p class="sub">同じ競馬場で開催が進むと、内側の芝が傷んで内枠が不利になるか。距離を問わず全レースでの数字です（上の「見る数字」に合わせて切り替わります）。</p>
+<div class="tt-tbl"><table><thead><tr><th></th><th>序盤（1〜3日目）</th><th>中盤（4〜6日目）</th><th>終盤（7日目〜）</th></tr></thead><tbody id="ttProg"></tbody></table></div>
+</section>
+
+<section aria-labelledby="yearTitle">
+<h2 id="yearTitle">年ごとの変化</h2>
+<p class="sub">前に行った馬（逃げ・先行）と内枠の成績が、年によって変わるか（上の「見る数字」に合わせて切り替わります）。</p>
+<div class="tt-tbl"><table><thead><tr><th>年</th><th>前に行った馬</th><th>内枠（1〜2枠）</th></tr></thead><tbody id="ttYear"></tbody></table></div>
+</section>
+
+<section aria-labelledby="noteTitle">
+<h2 id="noteTitle">注意</h2>
+<p class="tt-note">過去の傾向であって、次のレースを当てる保証ではありません。予想には使っていません（今後使えるかを研究するための材料です）。集計は、人気（オッズ）が分かる平地レースだけ。障害レースは含みません。</p>
+</section>
+</div>
+<script>
+(function(){
+var SH=null,ST=null,VK={'札幌':'sapporo','函館':'hakodate','福島':'fukushima','新潟':'niigata','東京':'tokyo','中山':'nakayama','中京':'chukyo','京都':'kyoto','阪神':'hanshin','小倉':'kokura'};
+var D=null,V=null,SF='芝',BD='全距離',M='win',MD=null;
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function f2(x){return x==null?'—':x.toFixed(2)}
+function pc(x){return x==null?'—':(x*100).toFixed(1)+'%'}
+function num(n){return n.toLocaleString('ja-JP')}
+function tag(x,min){return x&&x.z!=null&&x.n>=(min||D.min_n)&&Math.abs(x.z)>=2?'<span class="tt-tag on">差あり</span>':'<span class="tt-tag">偶然の範囲</span>'}
+function pos(v,lo,hi){var p=(v-lo)/(hi-lo);return Math.max(0,Math.min(1,p))*100}
+function bar(v,lo,hi,mid,weak){var a=pos(v,lo,hi),m=pos(mid,lo,hi),l=Math.min(a,m),w=Math.abs(a-m);
+ return '<div class="tt-bar'+(weak?' tt-weak':'')+'"><i class="'+(v>=mid?'tt-up':'tt-dn')+'" style="left:'+l+'%;width:'+w+'%"></i><b class="mid" style="left:'+m+'%"></b></div>'}
+function barZ(v,hi,ref){var a=pos(v,0,hi),m=pos(ref,0,hi);
+ return '<div class="tt-bar"><i class="tt-up" style="left:0;width:'+a+'%"></i><b class="mid" style="left:'+m+'%"></b></div>'}
+function refs(g){var n=0,w=0,t=0,mw=0,mt=0;Object.keys(g).forEach(function(k){var x=g[k];if(x&&x.n>=D.min_n){n+=x.n;w+=x.win*x.n;t+=x.top3*x.n;mw=Math.max(mw,x.win);mt=Math.max(mt,x.top3)}});
+ return n?{win:w/n,top3:t/n,hi:{win:mw*1.3,top3:mt*1.3}}:null}
+function rawRow(label,x,R){
+ if(!x||x.n<D.min_n||!R)return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+(x?num(x.n)+'頭':'')+'</small></div><div class="tt-sub">頭数が少なく、数字は出していません。</div></div>';
+ var v=x[M],d=(v-R[M])*100,o=M==='win'?'top3':'win';
+ return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+num(x.n)+'頭</small></div>'+barZ(v,R.hi[M],R[M])+'<div class="tt-val">'+pc(v)+'</div>'+
+  '<div class="tt-sub">この表の平均 '+pc(R[M])+'（差 '+(d>0?'+':'')+d.toFixed(1)+'ポイント）・'+(o==='win'?'勝率 ':'3着内 ')+pc(x[o])+'・単勝回収率 '+(x.roi==null?'—':Math.round(x.roi*100)+'%')+'</div></div>'}
+function row(label,x,baseAe,R){
+ if(M!=='ae')return rawRow(label,x,R);
+ if(!x||x.n<D.min_n)return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+(x?num(x.n)+'頭':'')+'</small></div><div class="tt-sub">頭数が少なく、数字は出していません。</div></div>';
+ var weak=!(x.z!=null&&Math.abs(x.z)>=2);
+ return '<div class="tt-row"><div class="tt-lab">'+esc(label)+'<small>'+num(x.n)+'頭</small></div>'+bar(x.ae,0.5,1.5,1,weak)+'<div class="tt-val">'+f2(x.ae)+'</div>'+
+  '<div class="tt-sub">勝率 '+pc(x.win)+'・3着内 '+pc(x.top3)+'・単勝回収率 '+(x.roi==null?'—':Math.round(x.roi*100)+'%')+tag(x)+(baseAe!=null?'　全競馬場の'+(BD==='全距離'?'':BD+'の')+'平均 '+f2(baseAe):'')+'</div></div>'}
+var AN=0;
+function drawMap(){
+ if(AN){cancelAnimationFrame(AN);AN=0}
+ var el=$('ttMap');if(!SH||!VK[V]||!SH.venues[VK[V]]){el.hidden=true;return}
+ var sv=SH.venues[VK[V]],BM=MD||BD,m=BM.match(/^(\d+)m(?:（(内|外)）)?$/),dist=m?+m[1]:null,io=m?m[2]||null:null;
+ var sfk=SF==='芝'?'turf':'dirt',ss=(ST&&ST.venues[VK[V]])||[],hit=null;
+ if(dist){var c=ss.filter(function(x){return x.dist===dist&&x.surface===sfk});
+  hit=c.filter(function(x){return x.inout===io})[0]||(!io?(c.filter(function(x){return x.inout!=='外'})[0]||c[0]):null)||null}
+ var out='<svg viewBox="0 0 '+sv.w+' '+sv.h+'" role="img" aria-label="'+esc(V+'競馬場のコース図')+'"><image href="lab/'+sv.img+'" width="'+sv.w+'" height="'+sv.h+'"/>';
+ var pts=hit?hit.path:null,gl=null,note='';
+ if(pts){
+  gl=pts[pts.length-1];var ps=pts.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' ');
+  var ln=' fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  out+='<polyline points="'+ps+'"'+ln+' stroke="#fff" stroke-width="13"/><polyline points="'+ps+'"'+ln+' stroke="#1f4fb8" stroke-width="7" opacity=".3"/><polyline id="ttTrail" points="'+ps+'"'+ln+' stroke="#1f4fb8" stroke-width="7"/>';
+  out+='<circle cx="'+hit.x+'" cy="'+hit.y+'" r="11" fill="#fff" stroke="#17171a" stroke-width="5"/><circle id="ttHead" cx="'+hit.x+'" cy="'+hit.y+'" r="11" fill="#ffd43b" stroke="#17171a" stroke-width="4"/>';
+  note='白い丸＝スタート位置（'+(hit.basis==='home_straight'?'図のゴール前の直線は実際より短く描かれているため、実際の直線の長さ（525.9m）の中での位置から求めた目安':hit.approx?'元の図に印が無いため、近い距離の印から求めた目安':'うまぽっとの図にある発走地点の印')+'）、青い線＝走る道すじ（走路の中央あたりを、直線と円弧だけでつないだ線）、黄色い丸＝走っている馬（目安）。';
+ }else if(dist){note='この距離の発走地点は、元の図に載っていないため、道すじは出していません。'}
+ var g=gl||(sv.routes['turf|single']||sv.routes['turf|inner']||sv.routes['dirt|single']).pts[0];
+ out+='<rect x="'+(g[0]-9).toFixed(1)+'" y="'+(g[1]-9).toFixed(1)+'" width="18" height="18" fill="#17171a" stroke="#fff" stroke-width="3" transform="rotate(45 '+g[0].toFixed(1)+' '+g[1].toFixed(1)+')"/></svg>'+
+  '<figcaption class="tt-note">'+esc(V+'・'+SF+'・'+BM)+'。◆＝ゴール。'+note+'引き込み線から本線に入るまでの道すじは目安です。元図：うまぽっと（umapot.com）'+(MD?'<br><b>この距離はレースが少ないため、下の数字は全距離のものです。</b>':'')+'</figcaption>';
+ el.innerHTML=out;el.hidden=false;
+ if(pts)runAnim(el,pts,dist);
+}
+function runAnim(el,pts,dist){
+ var tr=el.querySelector('#ttTrail'),hd=el.querySelector('#ttHead');if(!tr||!hd)return;
+ var cum=[0];for(var i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+ var L=cum[cum.length-1]||1;
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ var dur=Math.max(3500,Math.min(11000,dist*3.2)),hold=1200,t0=null;
+ function pos(f){var t=f*L,i=1;while(i<pts.length-1&&cum[i]<t)i++;var a=pts[i-1],b=pts[i],u=(t-cum[i-1])/((cum[i]-cum[i-1])||1);u=Math.max(0,Math.min(1,u));return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u,i]}
+ function step(ts){
+  if(!document.body.contains(tr)){AN=0;return}
+  if(t0===null)t0=ts;var e=(ts-t0)%(dur+hold),f=Math.min(1,e/dur);
+  f=f<1?(0.55*f+0.45*(1-Math.cos(Math.PI*f))/2):1;
+  var q=pos(f),cut=[];for(var i=0;i<q[2];i++)cut.push(pts[i][0].toFixed(1)+','+pts[i][1].toFixed(1));cut.push(q[0].toFixed(1)+','+q[1].toFixed(1));
+  tr.setAttribute('points',cut.join(' '));hd.setAttribute('cx',q[0].toFixed(1));hd.setAttribute('cy',q[1].toFixed(1));
+  AN=requestAnimationFrame(step)}
+ AN=requestAnimationFrame(step)}
+function sel(){return D.tracks[V+'|'+SF]}
+function venues(){var s={};Object.keys(D.tracks).forEach(function(k){s[k.split('|')[0]]=1});
+ var order=['札幌','函館','福島','新潟','東京','中山','中京','京都','阪神','小倉'];return order.filter(function(v){return s[v]})}
+function renderPick(){
+ $('ttVenue').innerHTML=venues().map(function(v){return '<button type="button" data-v="'+v+'" aria-pressed="'+(v===V)+'">'+v+'</button>'}).join('');
+ Array.prototype.forEach.call($('ttVenue').querySelectorAll('button'),function(b){b.onclick=function(){V=b.getAttribute('data-v');fixSel();render()}});
+ Array.prototype.forEach.call(document.querySelectorAll('[data-s]'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-s')===SF));b.onclick=function(){SF=b.getAttribute('data-s');fixSel();render()}});
+}
+function fixSel(){
+ if(!sel()){SF=SF==='芝'?'ダート':'芝'}
+ var t=sel();if(!t.bands[BD])BD='全距離';MD=null;
+}
+function bandKey(b){var m=b.match(/^(\d+)m(?:（(内|外)）)?$/);return m?[+m[1],m[2]||null]:null}
+function mapOnly(t){
+ var ss=(ST&&VK[V]&&ST.venues[VK[V]])||[],sfk=SF==='芝'?'turf':'dirt',bk=Object.keys(t.bands).map(bandKey).filter(Boolean),out=[];
+ ss.forEach(function(x){
+  if(x.surface!==sfk||x.official===false)return;
+  var inner=ss.some(function(y){return y.surface===sfk&&y.dist===x.dist&&y.inout!=='外'});
+  if(bk.some(function(k){return k[0]===x.dist&&(k[1]===x.inout||!x.inout||(k[1]===null&&(x.inout!=='外'||!inner)))}))return;
+  var nm=x.dist+'m'+(x.inout==='外'?'（外）':'');
+  if(out.indexOf(nm)<0)out.push(nm)});
+ return out}
+function render(){
+ renderPick();var t=sel();if(!t)return;
+ Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-m')===M));b.onclick=function(){M=b.getAttribute('data-m');render()}});
+ var extra=mapOnly(t);if(MD&&extra.indexOf(MD)<0)MD=null;
+ var names=Object.keys(t.bands).map(function(b){return [b,0]}).concat(extra.map(function(b){return [b,1]}));
+ names.sort(function(a,b){var x=bandKey(a[0]),y=bandKey(b[0]);return (x?x[0]:0)-(y?y[0]:0)||(a[0]<b[0]?-1:1)});
+ $('ttBand').innerHTML=names.map(function(n){var on=n[1]?n[0]===MD:(!MD&&n[0]===BD);return '<button type="button" data-b="'+n[0]+'" data-x="'+n[1]+'" aria-pressed="'+on+'">'+n[0]+'</button>'}).join('');
+ Array.prototype.forEach.call($('ttBand').querySelectorAll('button'),function(b){b.onclick=function(){if(b.getAttribute('data-x')==='1'){MD=b.getAttribute('data-b');BD='全距離'}else{MD=null;BD=b.getAttribute('data-b')}render()}});
+ drawMap();
+ var bb=t.bands[BD]||t.bands['全距離'];var base=D.base[SF];var bs=bb.base||{draw:base.draw,style:base.style,winners:base.winners};var all=true;
+ $('ttMeta').textContent=V+'・'+SF+'：'+num(t.races)+'レース（'+D.years[0]+'〜'+D.years[1]+'年）。距離を選ぶと、その距離だけの数字になります（内回り・外回りがある距離は別々）。';
+ var Rd=refs(bb.draw),Rs=refs(bb.style);
+ $('ttDraw').innerHTML=['内枠(1〜2枠)','中枠(3〜6枠)','外枠(7〜8枠)'].map(function(g){return row(g,bb.draw[g],bs.draw&&bs.draw[g]?bs.draw[g].ae:null,Rd)}).join('');
+ $('ttStyle').innerHTML=['逃げ','先行','差し','追込'].map(function(g){return row(g,bb.style[g],bs.style&&bs.style[g]?bs.style[g].ae:null,Rs)}).join('');
+ var wn=bb.winners,wb=bs.winners;
+ $('ttWinStyle').innerHTML=wn&&wn.n>=D.min_n/3?['逃げ','先行','差し','追込'].map(function(g){var v=wn[g],r=wb?wb[g]:null;
+  return '<div class="tt-row"><div class="tt-lab">'+g+'<small>勝ち馬の割合</small></div>'+barZ(v,0.6,r!=null?r:v)+'<div class="tt-val">'+pc(v)+'</div><div class="tt-sub">'+num(wn.n)+'レース中'+(r!=null?'　全競馬場の'+SF+(BD==='全距離'?'（全距離）':'の'+BD)+'は '+pc(r):'')+(r!=null?'（差 '+((v-r)*100>0?'+':'')+((v-r)*100).toFixed(1)+'ポイント）':'')+'</div></div>'}).join(''):'<p class="tt-note">レース数が少なく、数字は出していません。</p>';
+ var gv=t.going||{},gk=['稍重','重','不良'].filter(function(k){return gv[k]});
+ $('ttGoing').innerHTML=gk.length?gk.map(function(k){var x=gv[k],d=x.time_diff_pct;
+  return '<div class="tt-row"><div class="tt-lab">'+k+'<small>'+num(x.races)+'レース</small></div>'+bar(d,-3,3,0,false)+'<div class="tt-val">'+(d>0?'+':'')+d.toFixed(2)+'%</div><div class="tt-sub">同じ競馬場・距離・クラスの「良」の勝ちタイムより、'+(d>0?'遅い':'速い')+'（1600mなら約'+Math.abs(d*0.96).toFixed(1)+'秒）</div></div>'}).join('')
+  :'<p class="tt-note">この競馬場・芝ダートは、良と比べられるレース数が足りません。</p>';
+ var pr=t.progress||{};
+ $('ttProg').innerHTML=['内枠(1〜2枠)','外枠(7〜8枠)'].map(function(g){var r=pr[g]||{};
+  return '<tr><td>'+g+'</td>'+['序盤(1〜3日目)','中盤(4〜6日目)','終盤(7日目〜)'].map(function(p){var x=r[p];return '<td>'+(x&&x.n>=D.min_n?(M!=='ae'?pc(x[M]):(Math.abs(x.z)>=2?'<span class="tt-bold">'+f2(x.ae)+'</span>':f2(x.ae))):'—')+'</td>'}).join('')+'</tr>'}).join('')+
+  '<tr><td style="font-weight:400;color:#6d6e75">全競馬場の'+SF+'</td>'+['序盤(1〜3日目)','中盤(4〜6日目)','終盤(7日目〜)'].map(function(p){var x=base.progress['内枠(1〜2枠)'][p];return '<td style="color:#6d6e75">内 '+(M!=='ae'?pc(x&&x[M]):f2(x&&x.ae))+'</td>'}).join('')+'</tr>';
+ var ys=Object.keys(t.years||{}).sort().reverse();
+ $('ttYear').innerHTML=ys.map(function(y){var r=t.years[y];function c(x){return x&&x.n>=100?(M!=='ae'?pc(x[M]):(Math.abs(x.z)>=2?'<span class="tt-bold">'+f2(x.ae)+'</span>':f2(x.ae))):'—'}return '<tr><td>'+y+'年</td><td>'+c(r.front)+'</td><td>'+c(r.inner)+'</td></tr>'}).join('');
+}
+function findings(){
+ var p=D.persistence,b=D.base['芝'],bd=D.base['ダート'];
+ var fr=function(sf,g){var x=D.base[sf].style[g];return x?f2(x.ae):'—'};
+ var h='<b>先に分かったこと</b><ul>'+
+ '<li><b>位置取り</b>：どの競馬場でも、最初に前にいた馬は人気より勝ちやすく、後ろの馬は勝ちにくい（芝の逃げ '+fr('芝','逃げ')+'、追込 '+fr('芝','追込')+'／ダートの逃げ '+fr('ダート','逃げ')+'、追込 '+fr('ダート','追込')+'）。</li>'+
+ '<li><b>枠</b>：競馬場ごとの枠の有利不利は、前半（〜'+(D.split_year-1)+'年）と後半（'+D.split_year+'年〜）で<b>ほとんど続きませんでした</b>（そろい具合 '+f2(p.draw.corr)+'。1.00で完全にそろう、0で無関係）。目立つ偏りの多くは偶然とみられます。</li>'+
+ '<li><b>そのままの割合</b>：上の「見る数字」を勝率・3着内率にすると、人気の影響を含む実際の割合が出ます（初期表示）。</li>'+
+ '<li><b>開催の進み</b>：芝では、開催の序盤は内枠がやや勝ちやすく、終盤は外枠がやや勝ちやすい動きが見られます（下の表）。</li>'+
+ '<li>位置取りの競馬場ごとの差は、枠よりはそろいます（そろい具合 '+f2(p.style.corr)+'）が、強くはありません。</li></ul>';
+ $('ttFind').innerHTML=h;
+}
+fetch('lab/sim-v2/umapot-starts-arc6.json?v=20261113a').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
+fetch('lab/sim-v2/umapot-shapes.json').then(function(r){return r.json()}).then(function(j){SH=j;if(D)render()}).catch(function(){});
+fetch('data/track_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;V='東京';SF='芝';BD='全距離';findings();fixSel();render()}).catch(function(){$('ttMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ttFind').textContent=''});
+})();
+</script>
+  <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+</body>
+</html>
