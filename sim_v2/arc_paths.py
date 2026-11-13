@@ -9,27 +9,27 @@ SNAP_STRAIGHT = {("chukyo", 1300), ("chukyo", 3000)}   # JRAの図で発走が�
 FORCE_CHUTE = {("tokyo", "1600")}; CHUTE_KEYS_FORCED = None   # 印が円弧の途中にあっても、発走は引き込み線（直線）から入る形にする
 CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
-LOOP_MERGE = {("hanshin", "turf|outer"): dict(parts=(5, 6, 7), shift=5.0, n=10)}   # 阪神外回りの4コーナー：3つの円弧（半径321/131/137）を、半径の長い1つの円弧＋直線に置き換える（ユーザー依頼 2026-11-13「もっと内側・半径が長い円弧で」）。中心線からのずれは幅の約37%で、規定の10%を超える例外。shift＝直前の直線の延長(px)で、ずれが最小になる所
+LOOP_MERGE = {("hanshin", "turf|outer"): dict(parts=(4, 5, 6, 7), R=230.0, n=10)}   # 阪神外回りの3〜4コーナー：4つの円弧（半径177/321/131/137）を、手前の円弧（半径177のまま）＋半径230の1つの円弧にまとめる。最後の直線は元のまま（同じ線・同じ向き）。ユーザー依頼 2026-11-13「もっと内側・半径が長い円弧で、最後の直線はまっすぐ」。中心線からのずれは幅の約36%で、規定の10%を超える例外
 OUTER_INNER_OFF = {"hanshin": 3.0}   # 外回り→内回りのつなぎが線から離れてよい上限（帯の許容 tol の倍数）。阪神は4コーナーを内寄りにしたため外回りの線と内回りの線の間が少し広がる
 SINGLE_ARC = {("tokyo", "2000")}   # 引き込み線を『直線＋円弧1つ＋向正面の直線の延長』にする距離（ユーザー依頼 2026-11-12）。中心線からのずれが幅の10%を超える（東京芝2000mは約16%）規定外の例外
 
 
 def _merge_corner(sp, mg):
-    """parts の円弧群を『円弧1つ＋直線』に置き換え、周回が閉じる（位置・向きが一致する）ように半径と直線の長さを解く。"""
+    """parts の円弧群を『手前の円弧＋半径Rの円弧』に置き換える。最後の直線は元の線のまま（終わりの位置・向きを固定）にして、手前の円弧の長さと最後の直線の長さを解く。
+    全体の曲がり角は変えないので向きは必ず一致し、つなぎ目はすべて接線がそろう。"""
     from scipy.optimize import fsolve
     x0, y0, th0 = sp.st[0]
     L = list(sp.L); K = list(sp.K)
     a, c = mg["parts"][0], mg["parts"][-1]
-    turn = sum(L[i] * K[i] for i in mg["parts"])
-    def mk(R, L8):
-        k = 1.0 / R
-        LL = L[:a - 1] + [L[a - 1] + mg["shift"], turn / k, L8] + L[c + 2:]
-        KK = K[:a - 1] + [K[a - 1], k, K[c + 1]] + K[c + 2:]
+    T = sum(L[i] * K[i] for i in mg["parts"]); k4 = K[a]; k = 1.0 / mg["R"]
+    def mk(l4, L8):
+        LL = L[:a] + [l4, (T - l4 * k4) / k, L8] + L[c + 2:]
+        KK = K[:a] + [k4, k, 0.0] + K[c + 2:]
         return A.Spline(x0, y0, th0, LL, KK)
     def err(v):
         e = mk(*v).end(); return [e[0] - x0, e[1] - y0]
-    sol, _, ier, _ = fsolve(err, [250.0, L[c + 1]], full_output=True)
-    if ier != 1 or sol[0] <= 0 or sol[1] < 0:
+    sol, _, ier, _ = fsolve(err, [292.0, 376.0], full_output=True)
+    if ier != 1 or sol[0] <= 0 or sol[1] <= 0 or T - sol[0] * k4 <= 0:
         raise SystemExit("4コーナーの円弧への置き換えが解けません")
     return mk(*sol)
 
