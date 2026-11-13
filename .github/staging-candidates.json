@@ -1,16 +1,26 @@
 {
-  "schema_version": 1,
-  "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-sire-lineage-v1",
-      "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
-      "pages": [
-        "improvement-cycle.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
-    }
-  ]
+ "schema_version": 1,
+ "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
+ "candidates": [
+  {
+   "id": "ui-sire-lineage-v1",
+   "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
+   "pages": [
+    "improvement-cycle.html"
+   ],
+   "assets": [],
+   "status": "awaiting_user_approval",
+   "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
+  },
+  {
+   "id": "ui-people-course-v1",
+   "title": "騎手・調教師の成績：コース別の得意不得意（コースから探す）",
+   "pages": [
+    "people-trends.html"
+   ],
+   "assets": [],
+   "status": "awaiting_user_approval",
+   "summary": "騎手・調教師ごとにコース別（競馬場×芝ダート×距離×内外）の成績を追加。『コースから探す』で、選んだコースの得意・不得意な人を並べる。各人の詳細にもコース別を追加。続くかの検証（騎手0.02・調教師0.11）も表示。"
+  }
+ ]
 }

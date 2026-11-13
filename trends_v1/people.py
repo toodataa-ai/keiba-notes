@@ -17,6 +17,7 @@ from .stats import S, band, corr, race_probs
 SPLIT_YEAR = 2022
 MIN_PERSON = 300       # 公開する最小の出走数
 MIN_COND = 60          # 条件別に載せる最小の出走数
+MIN_COURSE = 30        # コース別（競馬場×芝ダ×距離×内外）に載せる最小の出走数（組み合わせが多く1つあたりの走数が少ないため低めにし、画面で『少ない』と分かるようにする）
 
 
 def pop_group(pop):
@@ -27,7 +28,8 @@ def pop_group(pop):
 
 def conds(race, r):
     out = [("面", race["surface"]), ("場", race["venue"]), ("人", pop_group(r["pop"])),
-           ("距離", f'{race["surface"]}・{band(race["dist"])}')]
+           ("距離", f'{race["surface"]}・{band(race["dist"])}'),
+           ("コース", f'{race["venue"]}・{race["surface"]}{race["dist"]}m' + (f'（{race["inout"]}）' if race.get("inout") else ""))]
     return [(k, v) for k, v in out if v]
 
 
@@ -76,19 +78,27 @@ def build(data_dir: Path) -> dict:
         if per == "all" and k != "全体":
             by_person[(kind, pid)].append((k, v, s))
     out = {"jockey": [], "trainer": []}
+    course_out = {"jockey": [], "trainer": []}
+    pair_course = {"jockey": [], "trainer": []}
     for kind in ("jockey", "trainer"):
         for pid, tot, h1, h2 in people[kind]:
             o_all = ae(tot)
             cl = []
+            crs = []
             for k, v, s in by_person[(kind, pid)]:
-                if s.n < MIN_COND:
+                if s.n < (MIN_COURSE if k == "コース" else MIN_COND):
                     continue
                 d = s.out()
-                d.update({"k": k, "v": v})
-                cl.append(d)
                 a, c = acc.get((kind, pid, k, v, "h1")), acc.get((kind, pid, k, v, "h2"))
                 if a and c and a.n >= 50 and c.n >= 50 and h1 and h2 and ae(h1) and ae(h2):
-                    pair_cond[kind].append((ae(a) - ae(h1), ae(c) - ae(h2), min(a.n, c.n)))
+                    (pair_course if k == "コース" else pair_cond)[kind].append((ae(a) - ae(h1), ae(c) - ae(h2), min(a.n, c.n)))
+                if k == "コース":                      # コース別は別ファイル（組み合わせが多く大きいので、必要なときだけ読む）
+                    crs.append([v, d["n"], d["win"], d["top3"], d["ae"], d["z"]])
+                    continue
+                d.update({"k": k, "v": v})
+                cl.append(d)
+            crs.sort(key=lambda x: -x[1])
+            course_out[kind].append({"id": pid, "name": names[(kind, pid)], "c": crs})
             cl.sort(key=lambda d: (d["k"], -d["n"]))
             lo, hi = span[(kind, pid)]
             rec = {"id": pid, "name": names[(kind, pid)], "years": [lo, hi], "all": tot.out(), "conds": cl}
@@ -98,10 +108,12 @@ def build(data_dir: Path) -> dict:
     for kind in ("jockey", "trainer"):
         r1, n1 = corr(pair_overall[kind])
         r2, n2 = corr(pair_cond[kind])
-        persistence[kind] = {"overall": {"corr": r1, "pairs": n1}, "condition": {"corr": r2, "pairs": n2}}
+        r3, n3 = corr(pair_course[kind])
+        persistence[kind] = {"overall": {"corr": r1, "pairs": n1}, "condition": {"corr": r2, "pairs": n2}, "course": {"corr": r3, "pairs": n3}}
     jst = timezone(timedelta(hours=9))
+    build.course_file = {"version": 1, "min_course": MIN_COURSE, "cols": ["コース", "走数", "勝率", "3着内率", "A/E", "z"], "jockey": course_out["jockey"], "trainer": course_out["trainer"]}
     return {"version": 1, "generated": datetime.now(jst).strftime("%Y-%m-%d %H:%M"), "split_year": SPLIT_YEAR,
-            "min_person": MIN_PERSON, "min_cond": MIN_COND, "persistence": persistence, "jockey": out["jockey"], "trainer": out["trainer"]}
+            "min_person": MIN_PERSON, "min_cond": MIN_COND, "min_course": MIN_COURSE, "persistence": persistence, "jockey": out["jockey"], "trainer": out["trainer"]}
 
 
 if __name__ == "__main__":
@@ -111,4 +123,5 @@ if __name__ == "__main__":
     a = ap.parse_args()
     d = build(Path(a.data))
     Path(a.out).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    Path(a.out).with_name("people_courses_v1.json").write_text(json.dumps(build.course_file, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print("jockeys", len(d["jockey"]), "trainers", len(d["trainer"]), "persistence", json.dumps(d["persistence"], ensure_ascii=False), "bytes", Path(a.out).stat().st_size)
