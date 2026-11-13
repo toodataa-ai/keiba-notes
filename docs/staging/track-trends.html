@@ -232,7 +232,7 @@ function findings(){
  '<li>位置取りの競馬場ごとの差は、枠よりはそろいます（そろい具合 '+f2(p.style.corr)+'）が、強くはありません。</li></ul>';
  $('ttFind').innerHTML=h;
 }
-fetch('lab/sim-v2/umapot-starts-arc7.json?v=20261113c').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
+fetch('lab/sim-v2/umapot-starts-arc8.json?v=20261113d').then(function(r){return r.json()}).then(function(j){ST=j;if(D)render()}).catch(function(){});
 fetch('lab/sim-v2/umapot-shapes.json').then(function(r){return r.json()}).then(function(j){SH=j;if(D)render()}).catch(function(){});
 fetch('data/track_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;V='東京';SF='芝';BD='全距離';findings();fixSel();render()}).catch(function(){$('ttMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ttFind').textContent=''});
 })();
