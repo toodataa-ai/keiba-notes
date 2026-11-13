@@ -1,26 +1,16 @@
 {
- "schema_version": 1,
- "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
- "candidates": [
-  {
-   "id": "ui-sire-lineage-v1",
-   "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
-   "pages": [
-    "improvement-cycle.html"
-   ],
-   "assets": [],
-   "status": "awaiting_user_approval",
-   "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
-  },
-  {
-   "id": "ui-trends-hanshin-4corner-v1",
-   "title": "競馬場の傾向：阪神外回りの進路（4コーナー・2コーナー・2600m発走）を直す",
-   "pages": [
-    "track-trends.html"
-   ],
-   "assets": [],
-   "status": "awaiting_user_approval",
-   "summary": "阪神外回り：①4コーナーを内寄りの円弧に、最後の直線は真っすぐ ②1〜2コーナーと向正面を内回りと同じ線に ③2600mの発走地点をゴール前の直線の延長上（引き込み線）に置き、コーナーの中に置かない。他の競馬場は変更なし。中心線からのずれは幅の約35%（規定10%超の例外）。"
-  }
- ]
+  "schema_version": 1,
+  "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
+  "candidates": [
+    {
+      "id": "ui-sire-lineage-v1",
+      "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
+    }
+  ]
 }
