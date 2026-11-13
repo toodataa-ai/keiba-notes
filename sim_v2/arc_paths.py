@@ -5,10 +5,12 @@ from scipy.optimize import minimize
 from scipy.spatial import cKDTree
 from . import arc_spline as A
 
+HOME_EXTEND = {("hanshin", "turf|outer")}   # 2600mなど、発走地点がゴール前の直線の手前（4コーナーの中）になる距離を、直線の延長上（引き込み線）に置く
 SNAP_STRAIGHT = {("chukyo", 1300), ("chukyo", 3000)}   # JRAの図で発走が直線上にあるもの：目安の位置が円弧の途中なら、その円弧を出た所（直線のはじまり）に置く
 FORCE_CHUTE = {("tokyo", "1600")}; CHUTE_KEYS_FORCED = None   # 印が円弧の途中にあっても、発走は引き込み線（直線）から入る形にする
 CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
+LOOP_SHARE = {("hanshin", "turf|outer"): dict(**{"with": "turf|inner"}, l3=370.0)}   # 阪神外回りの1〜2コーナー（内回りと同じ走路）は内回りの線と同じ円弧を使い、向正面の直線へ接線でつなぐ（ユーザー依頼 2026-11-13「内回りと同じラインが理想」）
 LOOP_MERGE = {("hanshin", "turf|outer"): dict(parts=(4, 5, 6, 7), R=230.0, n=10)}   # 阪神外回りの3〜4コーナー：4つの円弧（半径177/321/131/137）を、手前の円弧（半径177のまま）＋半径230の1つの円弧にまとめる。最後の直線は元のまま（同じ線・同じ向き）。ユーザー依頼 2026-11-13「もっと内側・半径が長い円弧で、最後の直線はまっすぐ」。中心線からのずれは幅の約36%で、規定の10%を超える例外
 OUTER_INNER_OFF = {"hanshin": 3.0}   # 外回り→内回りのつなぎが線から離れてよい上限（帯の許容 tol の倍数）。阪神は4コーナーを内寄りにしたため外回りの線と内回りの線の間が少し広がる
 SINGLE_ARC = {("tokyo", "2000")}   # 引き込み線を『直線＋円弧1つ＋向正面の直線の延長』にする距離（ユーザー依頼 2026-11-12）。中心線からのずれが幅の10%を超える（東京芝2000mは約16%）規定外の例外
@@ -34,6 +36,34 @@ def _merge_corner(sp, mg):
     return mk(*sol)
 
 
+def _share_with_inner(sp, spi, sh):
+    """外回りの『ゴール→1〜2コーナー→向正面の直線』を、内回りの線と同じ円弧にする。
+    内回りの2つの円弧（半径127・348）はそのまま使い、3〜4コーナーの2つの円弧（半径は変えない）は、
+    3コーナーの円弧の長さを sh["l3"] に決め、4コーナーの円弧の長さを曲がり角の合計から出す。
+    向正面の直線とゴール前の直線の長さは、周回が閉じる（位置も向きも一致する）ように解く。
+    3コーナーの円弧の長さは、中心線からのずれが最小になるように選んだ（外回りの帯の中央に近い）。"""
+    from scipy.optimize import fsolve
+    x0, y0, th0 = spi.st[0]
+    iL = [i for i, k in enumerate(sp.K) if k == 0]
+    a, b = iL[0], iL[-1]
+    arcs = list(range(a + 1, b))
+    if len(arcs) != 2:
+        raise SystemExit("外回りの3〜4コーナーの円弧が2つではありません")
+    k3, k4 = sp.K[arcs[0]], sp.K[arcs[1]]; l3 = sh["l3"]
+    k0, k1, l0, l1 = spi.K[0], spi.K[1], spi.L[0], spi.L[1]
+    l4 = (2 * math.pi - l0 * k0 - l1 * k1 - l3 * k3) / k4
+    if l4 <= 0:
+        raise SystemExit("外回りの4コーナーの円弧の長さが負になります")
+    def mk(L2, L5):
+        return A.Spline(x0, y0, th0, [l0, l1, L2, l3, l4, L5], [k0, k1, 0.0, k3, k4, 0.0])
+    def err(v):
+        e = mk(*v).end(); return [e[0] - x0, e[1] - y0]
+    sol, _, ier, _ = fsolve(err, [sp.L[a], sp.L[b]], full_output=True)
+    if ier != 1 or sol[0] <= 0 or sol[1] <= 0:
+        raise SystemExit("外回りの1〜2コーナーの置き換えが解けません")
+    return mk(*sol)
+
+
 def resample(P, step):
     d = np.r_[0, np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=1))]
     t = np.arange(0, d[-1], step)
@@ -41,7 +71,7 @@ def resample(P, step):
 
 
 def arcify(code, out, centre, half, routes, log=print):
-    loops = {}
+    fits = {}
     for rk, C in centre.items():
         th, _ = A.heading_curv(C, True)
         fy = 1.0 if (th[-1] - th[0]) > 0 else -1.0       # 曲がる向きが正になる座標系にそろえる
@@ -50,17 +80,25 @@ def arcify(code, out, centre, half, routes, log=print):
         r = A.fit_closed(Cf, tol)
         if r is None:
             raise SystemExit(f"{code} {rk}: 直線と円弧の周回線が作れません")
-        sp, dev, _ = r
-        mg = LOOP_MERGE.get((code, rk))
-        if mg and len(sp.L) == mg["n"]:
-            sp = _merge_corner(sp, mg)
-            dev = float(cKDTree(C).query(sp.sample(1.0) * [1.0, fy])[0].max())
+        fits[rk] = dict(sp=r[0], dev=r[1], fy=fy, C=C, Cf=Cf, tol=tol)
+    for (c_, rk), mg in LOOP_MERGE.items():
+        f = fits.get(rk)
+        if c_ == code and f and len(f["sp"].L) == mg["n"]:
+            f["sp"] = _merge_corner(f["sp"], mg)
+    for (c_, rk), sh in LOOP_SHARE.items():
+        f = fits.get(rk)
+        if c_ == code and f and sh["with"] in fits:
+            f["sp"] = _share_with_inner(f["sp"], fits[sh["with"]]["sp"], sh)
+    loops = {}
+    for rk, f in fits.items():
+        sp, C, Cf, fy, tol = f["sp"], f["C"], f["Cf"], f["fy"], f["tol"]
+        dev = float(cKDTree(C).query(sp.sample(1.0) * [1.0, fy])[0].max()) if (code, rk) in LOOP_MERGE or (code, rk) in LOOP_SHARE else f["dev"]
         # ゴール線の位置（C の先頭）を道のりの始点にそろえる
         smp = sp.sample(0.25); k = int(np.argmin(np.linalg.norm(smp - Cf[0], axis=1)))
         sg = k * 0.25
         base = A.rebase(sp, sg)
         loops[rk] = dict(sp=sp, base=base, fy=fy, tol=tol, dev=dev, C=C, Cf=Cf, tree=cKDTree(C))
-        log(f"  {code} {rk}: 周回 {sp.kinds()}（{len(sp.L)}部品）中心線からの最大ずれ {dev:.1f}px = 幅の{dev / (2 * half[rk]) * 100:.1f}%  半径 " + ",".join(f"{1 / k:.0f}" for k in sp.K if k > 0))
+        log(f"  {code} {rk}: 周回 {sp.kinds()}（{len(sp.L)}部品）中心線からの最大ずれ {dev:.1f}px = 幅の{dev / (2 * half[rk]) * 100:.1f}%  半径 " + ",".join(f"{1 / k:.0f}" for k in sp.K if k > 0) + ("  ※10%超" if dev > tol else ""))
     res = []
     for o in out:
         if "path" not in o or "route" not in o or o["route"] not in loops:
@@ -212,10 +250,16 @@ def approx_starts(code, loops, routes, cat_routes, have):
                     acc += l_
                 rem = (L - s0) * mpp
             x, y = base.at(s0)[:2]
-            full = np.vstack([base.vertices(s0, L)] + [base.vertices()[1:]] * laps) * [1.0, fy]
+            vs = base.vertices(s0, L); ext = False
+            if (code, rk) in HOME_EXTEND and base.K[-1] == 0 and s0 < base.cum[len(base.L) - 1] - 1e-6:
+                # 発走地点がゴール前の直線より手前（4コーナーの中）になる距離：直線を後ろへまっすぐ延ばした上（引き込み線）に置く。コーナーの中には置かない
+                sj = base.cum[len(base.L) - 1]; xj, yj, thj = base.at(sj); e = sj - s0
+                x, y = xj - e * math.cos(thj), yj - e * math.sin(thj)
+                vs = np.vstack([[x, y], base.vertices(sj, L)]); ext = True
+            full = np.vstack([vs] + [base.vertices()[1:]] * laps) * [1.0, fy]
             new.append(dict(label=("D" if r["surface"] == "dirt" else "") + str(dist) + (io or ""), dist=dist, surface=r["surface"], inout=io, route=rk,
                             x=round(float(x), 2), y=round(float(y * fy), 2), path=[[round(float(a), 2), round(float(b), 2)] for a, b in full],
-                            prim="|" + base.kinds(), measured_m=int(round(laps * lap + rem)), official=True, mx=round(float(x), 2), my=round(float(y * fy), 2), laps=int(laps), approx=True))
+                            prim="|" + base.kinds(), measured_m=int(round(laps * lap + rem)), official=True, mx=round(float(x), 2), my=round(float(y * fy), 2), laps=int(laps), approx=True, **({"basis": "straight_extension"} if ext else {})))
     return new
 
 
