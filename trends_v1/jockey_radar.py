@@ -19,6 +19,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .parse import iter_races
+from .radar_cond import CONDS, MIN_COND, keys
 from .stats import corr
 
 SPLIT_YEAR = 2022
@@ -61,7 +62,7 @@ def build(data_dir: Path) -> dict:
             lo, hi = span.get(jid, (race["year"], race["year"]))
             span[jid] = (min(lo, race["year"]), max(hi, race["year"]))
             fin = r["finish"]
-            for per in ("all", half, race["year"]):
+            for per in ("all", half, race["year"], *keys(race["surface"], race["venue"], r["sex"], race["date"])):
                 a = acc[(jid, per)]
                 if fin is not None:                       # 中止・除外は着順の軸に入れない（出走数にも数えない）
                     a.n += 1
@@ -118,6 +119,16 @@ def build(data_dir: Path) -> dict:
         by_year[str(y)] = [[j, int(acc[(j, y)].n), [sy.get((j, ax)) for ax, *_ in AXES],
                             [None if ry[j][ax] is None else round(ry[j][ax], 4) for ax, *_ in AXES]] for j in
                            sorted(py, key=lambda j: -acc[(j, y)].n)]
+    cond_out = {}
+    for ck, lab, grp in CONDS:
+        pc = [j for j in people if acc[(j, ck)].n >= MIN_COND]
+        if len(pc) < 20:
+            continue
+        rc, cc, sc = scored(pc, ck)
+        cond_out[ck] = {"label": lab, "group": grp, "min": MIN_COND, "jockeys": [
+            [j, int(acc[(j, ck)].n), [sc.get((j, ax)) for ax, *_ in AXES],
+             [None if rc[j][ax] is None else round(rc[j][ax], 4) for ax, *_ in AXES]]
+            for j in sorted(pc, key=lambda j: -acc[(j, ck)].n)]}
     persist = {}
     for ax, *_ in AXES:
         pairs = []
@@ -138,15 +149,22 @@ def build(data_dir: Path) -> dict:
                     "count": cn[j], "score": {ax: score.get((j, ax)) for ax, *_ in AXES}})
     jst = timezone(timedelta(hours=9))
     return {"version": 3, "min_year": MIN_YEAR, "generated": datetime.now(jst).strftime("%Y-%m-%d %H:%M"), "split_year": SPLIT_YEAR, "min_person": MIN_PERSON,
-            "axes": [{"id": a, "label": l, "desc": d, "persist": persist[a]} for a, l, d in AXES], "jockeys": out, "by_year": by_year}
+            "axes": [{"id": a, "label": l, "desc": d, "persist": persist[a]} for a, l, d in AXES], "jockeys": out, "by_year": by_year, "_cond": cond_out}
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--cond-dir")
     a = ap.parse_args()
     d = build(Path(a.data))
+    cd = d.pop("_cond")
+    if a.cond_dir:
+        Path(a.cond_dir).mkdir(parents=True, exist_ok=True)
+        for k, v in cd.items():
+            Path(a.cond_dir, "abs_%s.json" % k).write_text(json.dumps(v, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+        d["conds"] = [{"key": k, "label": v["label"], "group": v["group"], "n": len(v["jockeys"])} for k, v in cd.items()]
     Path(a.out).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print("jockeys", len(d["jockeys"]), "bytes", Path(a.out).stat().st_size)
     for ax in d["axes"]:
