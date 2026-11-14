@@ -12,7 +12,7 @@
 
 ## 最初にやること：GitHub の定時が遅れる保険（2026-11-04 追加）
 GitHub Actions の定時実行は、数時間遅れることがある（2026-11-03 に実測：予定の約7〜8時間後）。この手順書を動かしている Claude の定時は遅れないので、**Claude 自身が先に起動する**。GitHub の定時（出馬表 8:40・オッズ 9:30/10:00）は「保険」。
-0. 先に、朝の公式馬場の保存と福島・阪神の馬場予測を起動する（順番に、各1〜2分）：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/baba-forecast-archive-v1.yml/dispatches -f ref=main` → 完了を待って `baba-going-live-v1.yml`（同じ形式）。失敗しても続行し、record_run の note に書く。
+0. 先に、朝の公式馬場の保存と、全競馬場の馬場予測を起動する：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/baba-forecast-archive-v1.yml/dispatches -f ref=main` と `.../baba-going-live-v1.yml/dispatches -f ref=main`（どちらも起動だけ。待たない）。**JRAの朝の馬場発表は9:15ごろに当日分へ切り替わる**ので、馬場予測の処理はそれまで待ってから動き、`baba_models_v2/live/<今日>_<競馬場>.json` が全開催場ぶん保存されるのは9:25〜9:40ごろ。失敗しても続行し、record_run の note に書く。
 1. `git pull` のあと、今日の `claude_track/inputs/<今日>-*-11/` に出馬表が無ければ、出馬表の取得を起動する：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/claude-race-data-v1.yml/dispatches -f ref=main`（約2分かかる）。1分おきに `git pull` して、最大10分待つ。
    出馬表がそろったら、LABのシミュレータ用の能力値づくりも起動する（待たなくてよい・失敗しても予想は続ける）：`gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/sim-v2-upcoming-v1.yml/dispatches -f ref=main`。
 2. 起動のコマンドが失敗しても（権限なし・gh が使えないなど）、止まらずに従来どおり進める（GitHub の定時が動くのを待つ）。失敗したことは、最後の実行記録の `--note` に書く。
@@ -21,18 +21,18 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
 `claude_track/inputs/` に、今日のメインレース（11R）ごとのフォルダがある（`<日付>-<競馬場コード>-11/`）。中の**一番新しい .json** を使う（出馬表の生データ。現在のオッズと人気は除去済み。ChatGPT の評価は入っていない）。無ければ、その日の予想は無し（取得されていない旨を報告して終わり）。
 
 ## STEP1：全頭の評価（オッズは見ない）
-**評価の手順は共通の手順書 `shared_procedure/predict_common_v1.md`（shared-v1.0）に従う。** ChatGPT も同じ手順書を読む。手順書の中身（馬場予測・初めての距離・斤量など）は、そちらが正。この手順書には書かない（二重にしない）。
-- 手順書の「馬場の予測」を使ったときは、STEP1 の保存内容に `"going_forecast":{"file":"baba_models_v2/live/…","probs":{…},"most_likely":"…"}` を足す（使わなかったときは `null`）。
+**評価の手順は共通の手順書 `shared_procedure/predict_common_v1.md`（shared-v1.1）。** ChatGPT も同じ手順書を読む。手順書の中身（馬場予測・初めての距離・斤量など）は、そちらが正。この手順書には書かない（二重にしない）。
+- 手順書の「馬場の予測」は、**STEP1 を書く前に** `baba_models_v2/live/<今日>_<競馬場>.json` があるか確認する。無ければ、`git pull` しながら2分おきに最大30分待つ（馬場予測の処理は9:15ごろの発表のあと動く）。それでも無いときは使わない（`going_forecast` は null、出馬表の馬場状態だけで評価）。使ったときは、STEP1 の保存内容に `"going_forecast":{"file":"baba_models_v2/live/…","model":"…","probs":{…},"most_likely":"…","p_wet":…}`（11R の probs と、その p_wet_after_morning）を足す（使わなかったときは `null`）。
 - 「前日の馬場傾向」は `bias_used` として {speed_z, front_z, outer_z, label} をそのまま記録する（前日が別開催・ファイルが無いときは null）。この数字で印・勝率を変えない。|z|<0.5 は言及しない。outer（外枠）は使わない。芝1400m以下の front は参考にしない。当日朝の公式馬場状態が前日と違うときは speed も「参考外」と書く。
 - `claude_track/handover_from_chatgpt.md` の A・B も参考にしてよい。C の数値基準は使わない。
-- Claude 独自の追加：**採用した共通手順は shared-v1.0。それ以外の工夫を足したいときは、まず Claude の予想だけで20レース比べ、採用が決まったら共通手順書へ移す。**
+- Claude 独自の追加：**採用した共通手順は shared-v1.1。それ以外の工夫を足したいときは、まず Claude の予想だけで20レース比べ、採用が決まったら共通手順書へ移す。**
 
 出力（保存するもの）：全頭の `mark`（◎○▲△× のいずれか、または null）、`ability`（A+〜C）、`win_prob`（全頭の合計が1）、`top3_prob`、`reason`（その馬固有の根拠。馬名と数値で）。不確実性（データ不足）も `reason` に書く。
 
 保存先：`claude_track/predictions/<race_id>/step1-<UTC日時>.json`
 ```json
 {"schema_version":1,"predictor":"claude","stage":"step1","race_id":"<日付>-<競馬場コード>-11",
- "race_name":"…","venue":"東京","date":"2026-11-08","prompt_version":"claude-v1.2","shared_procedure_version":"shared-v1.0","model":"<実行したモデル名>",
+ "race_name":"…","venue":"東京","date":"2026-11-08","prompt_version":"claude-v1.2","shared_procedure_version":"shared-v1.1","model":"<実行したモデル名>",
  "generated_at":"<JSTの現在時刻 ISO>","information_cutoff_at":"<入力ファイルの captured_at>","odds_seen_before_step1":false,
  "input_file":"claude_track/inputs/<race_id>/<ファイル名>","input_sha256":"<そのファイルのsha256>",
  "going_forecast":null, "bias_used":null,
