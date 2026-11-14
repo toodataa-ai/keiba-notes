@@ -59,16 +59,16 @@
 
 <section aria-labelledby="radTitle">
 <h2 id="radTitle">騎手のレーダーチャート</h2>
-<p class="sub">7つの軸で、騎手の「うまさ・強さ」を見ます。数字は、2018年以降に300走以上した騎手の中での順位（100＝一番上、50＝真ん中）です。2人を重ねて比べられます。</p>
+<p class="sub">7つの軸で、騎手の「強さ」を見ます。人気（オッズ）は使わず、<b>結果そのもの</b>（勝率・着順・位置取り・上がりの速さ）で評価します。得点は、2018年以降に300走以上した騎手151人の値の幅（下位2%〜最高）を0〜100に直したものです（100＝全騎手の最高、0＝下位2%の水準。表には元の数字も並べています）。2人を重ねて比べられます。</p>
 <div><select class="pp-sel" id="radA" aria-label="騎手1"></select><select class="pp-sel" id="radB" aria-label="騎手2（比べる）"></select></div>
 <div id="radSvg" style="max-width:420px"></div>
 <div class="pp-tbl" id="radTbl"></div>
 <div class="pp-box">
 <b>読み方の注意</b>
 <ul>
-<li><b>「続く度」</b>は、前半（〜2021年）と後半（2022年〜）で、騎手の並びがどれだけそろったかです。<b>強く続く軸は本人の傾向、続かない軸は偶然が大きい</b>と見てください。</li>
-<li><b>勝ち切る力・上級戦の強さ</b>はほぼ続きません（誰が上かは、期間で入れ替わります）。<b>人気以上の着順</b>は続きますが、これは「市場が実力より高く／低く見ている」という人気の偏りも含みます（有名な騎手は人気が先に上がり、成績が人気に届きにくい）。</li>
-<li><b>先行力</b>は、騎手の乗り方の傾向がよく続く軸です（その馬の普段より前に出すか、控えるか）。<b>末脚</b>は、馬・厩舎・コースの違いも混ざります。</li>
+<li><b>人気を使わない評価</b>なので、<b>有力な馬に乗れるか</b>（乗り馬の力）の違いがそのまま入ります。人気馬に多く乗る騎手は、どの軸も高く出やすくなります。「騎手の技術だけ」を取り出した数字ではありません（技術だけを見る人気との比べ方は、前のページの「勝ちやすさ（A/E）」にあります）。</li>
+<li><b>「続く度」</b>は、前半（〜2021年）と後半（2022年〜）で、騎手の並びがどれだけそろったかです。どの軸もよく続きます（そろい具合 0.8〜0.9）。これは、有力馬に乗れる騎手が続けて有力馬に乗っているためで、<b>技術が続いている証拠とは限りません</b>。</li>
+<li><b>先行力</b>・<b>末脚</b>は、乗った馬の脚質や、レースの流れにも左右されます。</li>
 <li>どの軸も、結果から見た過去の傾向で、次のレースを当てる保証ではありません。予想には使っていません。</li>
 </ul></div>
 </section>
@@ -174,13 +174,14 @@ function bindBtns(attr,fn){Array.prototype.forEach.call(document.querySelectorAl
 bindBtns('data-ck',function(v){CK=v});bindBtns('data-co',function(v){CO=v});bindBtns('data-cm',function(v){CM=parseInt(v,10)});
 $('crsVenue').onchange=crsCourses;$('crsCourse').onchange=crsRender;
 
-var RD=null,SHORT={win:'勝ち切る力',rank:'人気以上の着順',long:'穴馬の激走',fav:'人気馬の堅実さ',front:'先行力',kick:'末脚',top:'上級戦'};
+var RD=null,SHORT={win:'勝率',p2:'連対率',p3:'複勝率',rank:'着順',front:'先行力',kick:'末脚',top:'上級戦'};
 function radSetup(){
  var opts=RD.jockeys.map(function(j,i){return '<option value="'+i+'">'+esc(j.name)+'（'+num(j.n)+'走）</option>'}).join('');
  $('radA').innerHTML=opts;$('radB').innerHTML='<option value="-1">（比べない）</option>'+opts;
  var ia=0,ib=-1;RD.jockeys.forEach(function(j,i){if(j.name.indexOf('川田')>=0)ia=i;if(j.name.indexOf('ルメール')>=0)ib=i});
  $('radA').value=ia;$('radB').value=ib;$('radA').onchange=$('radB').onchange=radRender;radRender();
 }
+function rawf(id,v){if(v==null)return '—';return (id==='win'||id==='p2'||id==='p3'||id==='top')?(v*100).toFixed(1)+'%':v.toFixed(0)}
 function pt(cx,cy,r,i,n){var a=-Math.PI/2+2*Math.PI*i/n;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
 function radRender(){
  var ax=RD.axes,n=ax.length,A=RD.jockeys[+$('radA').value],bi=+$('radB').value,B=bi>=0?RD.jockeys[bi]:null;
@@ -195,7 +196,7 @@ function radRender(){
  $('radSvg').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="騎手のレーダーチャート">'+g+leg+'</svg>';
  function tag(c){return c==null?'—':(c>=0.5?'<span class="pp-tag on">よく続く</span>':(c>=0.2?'<span class="pp-tag">やや続く</span>':'<span class="pp-tag">続かない</span>'))}
  var h='<table><thead><tr><th>軸</th><th>'+esc(A.name.split(' ').pop())+'</th>'+(B?'<th>'+esc(B.name.split(' ').pop())+'</th>':'')+'<th>続く度</th></tr></thead><tbody>';
- ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'</td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'</td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
+ ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawf(a.id,A.raw[a.id])+'</div></td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawf(a.id,B.raw[a.id])+'</div></td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
  $('radTbl').innerHTML=h+'</tbody></table>';
 }
 fetch('data/jockey_radar_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){RD=d;radSetup()}).catch(function(){$('radTbl').textContent='レーダーチャートのデータを読み込めませんでした。'});
