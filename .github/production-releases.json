@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.61-20261114",
-  "current_public_version": "1.61",
+  "current_public_release": "release/jra-site-v1.62-20261114",
+  "current_public_version": "1.62",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1299,6 +1299,27 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/track-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.62-20261114",
+      "branch": "release/jra-site-v1.62-20261114",
+      "commit_sha": "6cdcc40d953f4587a047274e5d7a0c42e0d77de2",
+      "deployed_at": "2026-11-14T20:01:19+09:00",
+      "workflow_run_id": 43587982499,
+      "validation_workflow_run_id": 43587982499,
+      "public_version": "1.62",
+      "note": "2026-11-14ユーザー明示承認済み。改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加：若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-sire-lineage-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/improvement-cycle.html"
       ],
       "public_http_files_verified": null
     }
