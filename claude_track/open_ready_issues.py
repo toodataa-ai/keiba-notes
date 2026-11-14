@@ -40,7 +40,7 @@ def needed(exp: dict) -> list[dict]:
                     "body": (f"Claudeの予想で、2歳戦の『初めての距離（延長）』の馬が {e['horses']} 頭分（{e['races']} レース）たまりました。\n\n"
                              f"- 予想した勝ちの数（確率の合計）：{e['predicted_wins']}／実際の勝ち：{e['actual_wins']}（実際÷予想 {e['ratio']}、95%の幅 {e['ratio_95']}）\n"
                              f"- 比べる相手（同じ距離を走ったことがある馬）：予想 {kn['predicted_wins']}／実際 {kn['actual_wins']}（実際÷予想 {kn['ratio']}）\n\n"
-                             "実際÷予想が1より大きく、幅も1を超えていれば、Claudeが割り引きすぎています（手順書 claude-v1.1 の効果の確認）。\n"
+                             "実際÷予想が1より大きく、幅も1を超えていれば、Claudeが割り引きすぎています（手順書 claude-v1.1 以降の効果の確認）。\n"
                              "チャットで A（さらに強める）／B（このまま）／C（ルールを外す）のどれかを伝えてください。過去データでは、市場はこの条件をほぼ織り込み済みでした。")})
     for k, r in (exp.get("experience", {}).get("regimes") or {}).items():
         if r.get("state") == "ready_for_review":
