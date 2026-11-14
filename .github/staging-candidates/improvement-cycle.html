@@ -19,36 +19,39 @@
 <header>
 <p class="eyebrow">予想の改善状況</p>
 <h1>AI予想は、いまこう改善しています</h1>
-<p class="lead">新しい予想方法は、いきなり本番に入れません。実際のレースで<strong>今の予想と並べて比べ</strong>、成績が良かったものだけを採用します。</p>
+<p class="lead">新しい予想方法は、いきなり本番に入れません。<strong>Claudeの予想に工夫を足した場合と足さない場合を、実際のレースで並べて比べ</strong>、成績が良かったものだけを採用します。採用した手順は、ClaudeとChatGPTが同じ手順書で使います。</p>
 <div class="status" id="status" aria-live="polite">
-  <div class="status-row"><span>いまの正式な予想</span><b id="sVersion">—</b></div>
-  <div class="status-row"><span>比較中の改善案</span><b id="sCount">—</b></div>
+  <div class="status-row"><span>共通の予想手順書</span><b id="sVersion">shared-v1.0</b></div>
+  <div class="status-row"><span>比較中の改善案（Claude）</span><b id="sCount">—</b></div>
   <div class="status-row"><span>最初の判定まで</span><b id="sEta">—</b></div>
 </div>
 </header>
 
 <section aria-labelledby="sumTitle" id="summary">
 <h2 id="sumTitle">各テーマの進捗まとめ</h2>
-<p class="sub">テーマごとの、いまの段階です。タップすると、下の詳しい説明へ移ります。</p>
-<div class="sumbox"><div id="sumList"><div class="empty">読み込み中…</div></div><div id="sumClaude"></div></div>
+<p class="sub">改善は、<b>Claudeの予想で20レース比べ、たまったら採用を判断する</b>流れに一本化しました。採用が決まった手順は<a href="https://github.com/toodataa-ai/keiba-notes/blob/main/shared_procedure/predict_common_v1.md">共通の予想手順書</a>（ClaudeとChatGPTが同じものを読みます。買い目の作り方は含みません）に入ります。タップすると、下の詳しい説明へ移ります。</p>
+<div class="sumbox"><div id="sumClaude"><div class="empty">読み込み中…</div></div>
+<p class="tiny" style="margin:14px 0 2px"><b>採用済み・研究中</b></p>
+<p class="tiny">・<b>馬場予測（福島・阪神）</b>：採用済み（2026-11-12）。Claudeの予想で使用中で、共通の手順書にも入っています。<br>・<b>若駒・新馬戦（父の傾向）</b>：研究のみ。いまは偶然と区別できず、採用の条件に届いていません。</p>
+<details class="tdet" style="margin-top:12px"><summary>ChatGPTの予想を基準にした比較（停止・記録のみ）</summary><div id="sumList"><div class="empty">読み込み中…</div></div></details></div>
 </section>
 
 <section aria-label="自動運用の状況へのリンク">
 <div class="note">いつ・何が自動で動いているか、実際の実行状況（成功・失敗）は、<a href="operations.html">自動運用の状況</a>のページにまとめました。</div>
 </section>
 
+<section aria-labelledby="claudeExpTitle" id="claudeExp" hidden>
+<h2 id="claudeExpTitle">Claudeの予想で進めている比較</h2>
+<p class="sub">Claudeが付けた勝つ確率と買い目に工夫を足した場合と、足さない場合を、同じ結果で比べます。20レース（初めての距離は100頭）たまったら判定のお知らせが立ち、あなたが A／B／C で答えます。研究用で、購入はしません。</p>
+<div id="claudeExpBody"></div>
+</section>
+
 <section aria-labelledby="themesTitle" id="themes">
-<h2 id="themesTitle">改善テーマ（研究から判定まで）</h2>
-<p class="sub">1行が1つの管理単位（競馬場・戦歴など）です。毎日、基準に届いたかを自動で調べ、届くと通知（Issue）が立ちます。バーは左から「研究 → 登録 → 比較 → 判定」の4段階で、濃い色は完了、赤い枠がいまの段階、枠の中の赤は進み具合です。数字は自動で更新されます。</p>
+<h2 id="themesTitle">ChatGPTの予想を基準にした比較（停止・記録のみ）</h2>
+<p class="sub">2026-11-15 の決定で、ChatGPTの予想を基準にした比較（展開・馬場補正・購入セット）は、判定を求めずに記録だけ続けます。以下は停止前までの記録です。1行が1つの管理単位（競馬場・戦歴など）です。毎日、基準に届いたかを自動で調べ、届くと通知（Issue）が立ちます。バーは左から「研究 → 登録 → 比較 → 判定」の4段階で、濃い色は完了、赤い枠がいまの段階、枠の中の赤は進み具合です。数字は自動で更新されます。</p>
 <div id="themeList"><div class="empty">読み込み中…</div></div>
 </section>
 
-
-<section aria-labelledby="claudeExpTitle" id="claudeExp" hidden>
-<h2 id="claudeExpTitle">Claudeの予想だけで進めている比較</h2>
-<p class="sub">ChatGPTの予想とは混ぜずに、Claudeの予想だけで改善を試しています。研究用で、購入はしません。</p>
-<div id="claudeExpBody"></div>
-</section>
 
 <section aria-labelledby="doneTitle">
 <h2 id="doneTitle">これまでの判定</h2>
@@ -138,12 +141,6 @@ Promise.all([
 ]).then(([status, cycle]) => {
   const exps = (status.experiments || []);
   const active = exps.filter(e => ['collecting', 'comparing', 'reviewing'].includes(e.status));
-  $('sVersion').textContent = cycle.latest_formal_prompt_version || '—';
-  $('sCount').textContent = `${active.length}件`;
-  const minLeft = active.length ? Math.min(...active.map(e => e.remaining_prospective_pairs)) : null;
-  $('sEta').textContent = minLeft == null ? '比較中の案はありません'
-    : minLeft <= 0 ? '判定できる案があります'
-    : `あと${minLeft}レース（${weeks(minLeft)}）`;
 
 
 
@@ -249,10 +246,13 @@ Promise.all([
       <p class="tiny">${fn?`予想した勝ちの数 ${rr(fe.predicted_wins)} に対して実際の勝ち ${fe.actual_wins}（実際÷予想 ${rr(fe.ratio)}）。比べる相手（同じ距離を走ったことのある2歳馬）は ${rr(fkn.ratio)}。頭数が少ないうちは、偶然のぶれが大きく結論は出せません。`:'まだ該当する馬がいません。2歳戦の開催のたびに少しずつたまります。メインレースだけが対象なので、たまるまでには時間がかかります。'}</p>
       <p class="tiny">参考：過去の約8,900頭（2019年以降・2歳の延長）では、単勝オッズの期待に対する実際の勝ちの比は 1.04（95%の幅 0.98〜1.12）で、市場がほぼ織り込み済みでした。</p></article>`;
     document.getElementById('claudeExpBody').innerHTML=pace+going+port+fdist; document.getElementById('claudeExp').hidden=false;
+    const RPW=(typeof RACES_PER_WEEK==='number'?RACES_PER_WEEK:3);const left=[Math.max(0,need-n),Math.max(0,gneed-gn),Math.max(0,pneed-pn)];const minLeft=Math.min(...left);
+    document.getElementById('sCount').textContent='4件';
+    document.getElementById('sEta').textContent=minLeft<=0?'判定できる案があります':`あと${minLeft}レース（あと約${Math.ceil(minLeft/RPW)}週）`;
     const nm=['研究','登録','比較','判定'];
     const cb=fr=>`<div class="pb" aria-hidden="true">${nm.map((x,i)=>i<2?'<i class="d"></i>':i===2?`<i class="n"><b style="width:${Math.max(0,Math.min(1,fr))*100}%"></b></i>`:'<i></i>').join('')}</div>`;
     const crow=(t,txt,fr)=>`<a class="sumlink" href="#claudeExp"><div class="pr"><span class="pl">${t}</span>${cb(fr)}<span class="pt">${txt}</span></div></a>`;
-    document.getElementById('sumClaude').innerHTML=`<p class="tiny" style="margin:14px 0 2px"><b>Claudeの予想だけで進めている比較</b>（ChatGPTとは別枠・研究用）</p>`+
+    document.getElementById('sumClaude').innerHTML=`<div class="ph"><span></span><div class="pb ph-n">${nm.map(x=>`<i>${x}</i>`).join('')}</div><span></span></div>`+
       crow('位置取り',`比較 ${n}/${need}レース<br>${window.WK.text(p.dates,'レース')}`,n/need)+crow('馬場補正',`比較 ${gn}/${gneed}レース<br>${window.WK.text(g.dates,'レース')}`,gn/gneed)+crow('購入セット',`比較 ${pn}/${pneed}レース<br>${window.WK.text(pf.dates,'レース')}`,pn/pneed)+crow('2歳の初距離',`たまった馬 ${fn}/${fneed}頭<br>${window.WK.text(fe.dates,'頭')}`,fn/fneed);
   }).catch(()=>{});
 })();

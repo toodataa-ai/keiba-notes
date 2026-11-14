@@ -91,6 +91,9 @@ def main():
     registry = json.loads((ROOT / "e2e_validation/improvement_experiments_v1.json").read_text(encoding="utf-8"))
     reg = {e["id"]: e for e in registry.get("experiments", [])}
     for exp in status.get("experiments", []):
+        # 2026-11-15 ユーザー決定：ChatGPTの予想を基準にした比較は判定を求めない（記録だけ続ける）
+        if (reg.get(exp["id"]) or {}).get("issue_notice") is False:
+            continue
         if exp.get("ready_for_manual_review") and exp["prospective"].get("pairs", 0) >= exp["minimum_prospective_pairs"]:
             sys.stdout.write(json.dumps({"experiment_id": exp["id"], "title": title(exp["id"]),
                                          "body": body(exp, reg.get(exp["id"], {}))}, ensure_ascii=False) + "\n")
