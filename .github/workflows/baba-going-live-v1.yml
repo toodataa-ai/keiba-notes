@@ -3,7 +3,7 @@ name: Baba going prediction - race-day morning (record only)
 # Saves baba_models_v2/live/<date>_<track>.json; Claude's prediction procedure reads it.
 on:
   schedule:
-    - cron: '45 23 * * 5,6,0'   # 08:45 JST Sat/Sun/Mon
+    - cron: '0 0 * * 6,0,1'   # 09:00 JST Sat/Sun/Mon; the job waits for the JRA morning notice (about 09:15)
   workflow_dispatch:
     inputs:
       date: {description: 'JST date YYYY-MM-DD (blank = today)', required: false, default: ''}
@@ -16,7 +16,7 @@ concurrency:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     outputs:
       tracks: ${{ steps.p.outputs.tracks }}
     steps:
@@ -32,7 +32,7 @@ jobs:
           WANTDATE: ${{ inputs.date }}
         run: |
           D="${WANTDATE:-$(TZ=Asia/Tokyo date +%F)}"
-          if [ -n "${WANT:-}" ]; then T="[\"$WANT\"]"; else T=$(python -W ignore going_predict_live.py --list-today --date "$D"); fi
+          if [ -n "${WANT:-}" ]; then T="[\"$WANT\"]"; else T=$(python -W ignore going_predict_live.py --list-today --date "$D" --wait-minutes 45); fi
           echo "tracks=$T" >> "$GITHUB_OUTPUT"; echo "tracks today: $T"
   predict:
     needs: plan

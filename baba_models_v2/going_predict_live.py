@@ -238,7 +238,18 @@ def run_replay(track, day):
     return out
 
 
-def list_today(day):
+def list_today(day, wait_minutes=0):
+    """poll until the JRA pages show `day` (the morning notice appears about 09:15 JST) or the time runs out."""
+    t0 = time.time()
+    while True:
+        found = _list_today_once(day)
+        if found or time.time() - t0 >= wait_minutes * 60:
+            return found
+        print('JRA going page is not updated for', day, 'yet; waiting', file=sys.stderr)
+        time.sleep(120)
+
+
+def _list_today_once(day):
     """racecourses that hold racing on `day` according to the JRA going pages (index, index2, index3)."""
     from jra_going_now import parse_going_page
     ro = {v: k for k, v in sd.TRACK_RO.items()}; found = []
@@ -256,10 +267,10 @@ def list_today(day):
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--track', default=None); ap.add_argument('--date', default=None); ap.add_argument('--replay', default=None)
-    ap.add_argument('--list-today', action='store_true')
+    ap.add_argument('--list-today', action='store_true'); ap.add_argument('--wait-minutes', type=int, default=0)
     a = ap.parse_args()
     if a.list_today:
-        print(json.dumps(list_today(date.fromisoformat(a.date) if a.date else datetime.now(JST).date())))
+        print(json.dumps(list_today(date.fromisoformat(a.date) if a.date else datetime.now(JST).date(), a.wait_minutes)))
         sys.exit(0)
     if not a.track:
         ap.error('--track is required')
