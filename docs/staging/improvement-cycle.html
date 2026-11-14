@@ -80,6 +80,14 @@
 </div>
 
 <script>
+window.WK=(function(){
+  const wk=o=>{const n=new Date(Date.now()+9*3600e3);const dow=(n.getUTCDay()+6)%7;const mon=Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate()-dow-7*o);return [mon,mon+7*864e5]};
+  const inWeek=(dates,o)=>{const [a,b]=wk(o);return (dates||[]).filter(s=>{const t=Date.parse(String(s).slice(0,10)+'T00:00:00Z');return t>=a&&t<b}).length};
+  const text=(dates,unit)=>`今週 +${inWeek(dates,0)}${unit}（先週 +${inWeek(dates,1)}）`;
+  return {inWeek,text};
+})();
+</script>
+<script>
 (() => {
 const $ = id => document.getElementById(id);
 const RACES_PER_WEEK = 5; // 直近の開催週の正式メイン数（4〜6）の目安
@@ -202,7 +210,10 @@ Promise.all([
     const cnt={};us.forEach(u=>{cnt[u.state]=(cnt[u.state]||0)+1});
     const lead=us.slice().sort((x,y)=>stg(y)-stg(x)||y.frac-x.frac)[0];
     const line=us.length===1?us[0].text:ORDER.filter(k=>cnt[k]).map(k=>`${(SL[k]||[k])[0]} ${cnt[k]}件`).join('・');
-    return `<a class="sumlink" href="staging/improvement-cycle.html#t-${t.id}"><div class="pr"><span class="pl">${esc(t.title)}</span>${lead?bar(lead):''}<span class="pt">${esc(line)}${us.length>1?'（いちばん進んでいる単位のバー）':''}</span></div></a>`}).join('');
+    const ids=new Set(us.map(u=>u.experiment_id).filter(Boolean));
+    const dts=[];exps.filter(e=>ids.has(e.id)).forEach(e=>(e.races||[]).forEach(r=>{if(r.grade==='prospective_preregistered')dts.push(String(r.race_id).slice(0,10))}));
+    const wkTxt=ids.size?`<br>${esc(window.WK.text(dts,'レース'))}`:'';
+    return `<a class="sumlink" href="staging/improvement-cycle.html#t-${t.id}"><div class="pr"><span class="pl">${esc(t.title)}</span>${lead?bar(lead):''}<span class="pt">${esc(line)}${us.length>1?'（いちばん進んでいる単位のバー）':''}${wkTxt}</span></div></a>`}).join('');
 }).catch(()=>{$('themeList').innerHTML='<div class="empty">データを読み込めませんでした。</div>'});
 })();
 </script>
@@ -245,7 +256,7 @@ Promise.all([
     const cb=fr=>`<div class="pb" aria-hidden="true">${nm.map((x,i)=>i<2?'<i class="d"></i>':i===2?`<i class="n"><b style="width:${Math.max(0,Math.min(1,fr))*100}%"></b></i>`:'<i></i>').join('')}</div>`;
     const crow=(t,txt,fr)=>`<a class="sumlink" href="staging/improvement-cycle.html#claudeExp"><div class="pr"><span class="pl">${t}</span>${cb(fr)}<span class="pt">${txt}</span></div></a>`;
     document.getElementById('sumClaude').innerHTML=`<p class="tiny" style="margin:14px 0 2px"><b>Claudeの予想だけで進めている比較</b>（ChatGPTとは別枠・研究用）</p>`+
-      crow('位置取り',`比較 ${n}/${need}レース`,n/need)+crow('馬場補正',`比較 ${gn}/${gneed}レース`,gn/gneed)+crow('購入セット',`比較 ${pn}/${pneed}レース`,pn/pneed)+crow('2歳の初距離',`たまった馬 ${fn}/${fneed}頭`,fn/fneed);
+      crow('位置取り',`比較 ${n}/${need}レース<br>${window.WK.text(p.dates,'レース')}`,n/need)+crow('馬場補正',`比較 ${gn}/${gneed}レース<br>${window.WK.text(g.dates,'レース')}`,gn/gneed)+crow('購入セット',`比較 ${pn}/${pneed}レース<br>${window.WK.text(pf.dates,'レース')}`,pn/pneed)+crow('2歳の初距離',`たまった馬 ${fn}/${fneed}頭<br>${window.WK.text(fe.dates,'頭')}`,fn/fneed);
   }).catch(()=>{});
 })();
 </script>

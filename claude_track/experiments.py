@@ -179,7 +179,7 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
     pairs, going_pairs, port_rows = [], [], []
     exp = {k: {"horses": 0, "pred_wins": 0.0, "actual_wins": 0, "races": set()} for k in ("E0", "E1", "E2")}
     career_seen = 0
-    fd = {k: {"horses": 0, "pred": 0.0, "var": 0.0, "wins": 0, "races": set()} for k in ("extension", "shorten", "known", "debut")}
+    fd = {k: {"horses": 0, "pred": 0.0, "var": 0.0, "wins": 0, "races": set(), "dates": []} for k in ("extension", "shorten", "known", "debut")}
     for rid, slot in sc.load_race_files(pred_dir).items():
         rf = sc.resolve_result(rid, results_dir)
         if rf is None or slot["step1"] is None:
@@ -213,7 +213,7 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
                 fg = first_distance_group(card, h)
                 if fg and h["number"] in base:
                     q = base[h["number"]]; e = fd[fg]
-                    e["horses"] += 1; e["pred"] += q; e["var"] += q * (1 - q)
+                    e["horses"] += 1; e["pred"] += q; e["var"] += q * (1 - q); e["dates"].append(rid[:10])
                     e["wins"] += 1 if h["number"] == winner else 0; e["races"].add(rid)
                 g = regime(h.get("starts_before_race"))
                 if g and h["number"] in base:
@@ -223,24 +223,24 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
     n = len(pairs)
     deltas = [p["pace_ll"] - p["base_ll"] for p in pairs]
     out = {"schema_version": 1, "predictor": "claude", "research_only": True,
-           "pace": {"id": "claude+pace_v1", "pairs": n, "need_pairs": NEED_PAIRS,
+           "pace": {"id": "claude+pace_v1", "pairs": n, "dates": [p["race_id"][:10] for p in pairs], "need_pairs": NEED_PAIRS,
                     "mean_log_loss_base": mean(p["base_ll"] for p in pairs) if n else None,
                     "mean_log_loss_pace": mean(p["pace_ll"] for p in pairs) if n else None,
                     "races_improved": sum(1 for d in deltas if d < 0), "races_worse": sum(1 for d in deltas if d > 0),
                     "state": "collecting" if n < NEED_PAIRS else "ready_for_decision"},
-           "going": {"id": "claude+going_v1", "pairs": len(going_pairs), "need_pairs": NEED_PAIRS,
+           "going": {"id": "claude+going_v1", "pairs": len(going_pairs), "dates": [p["race_id"][:10] for p in going_pairs], "need_pairs": NEED_PAIRS,
                      "adjusted_runners": sum(p["adjusted"] for p in going_pairs),
                      "mean_log_loss_base": mean(p["base_ll"] for p in going_pairs) if going_pairs else None,
                      "mean_log_loss_going": mean(p["going_ll"] for p in going_pairs) if going_pairs else None,
                      "races_improved": sum(1 for p in going_pairs if p["going_ll"] < p["base_ll"]),
                      "races_worse": sum(1 for p in going_pairs if p["going_ll"] > p["base_ll"]),
                      "state": "collecting" if len(going_pairs) < NEED_PAIRS else "ready_for_decision"},
-           "portfolio": {"id": "claude+ticket_div_rule", "pairs": len(port_rows), "need_pairs": NEED_PAIRS,
+           "portfolio": {"id": "claude+ticket_div_rule", "pairs": len(port_rows), "dates": [p["race_id"][:10] for p in port_rows], "need_pairs": NEED_PAIRS,
                          "summary": _port_summary(port_rows),
                          "state": "collecting" if len(port_rows) < NEED_PAIRS else "ready_for_decision"},
            "first_distance": {"need_horses": NEED_FIRST_DIST, "target": "extension",
                               "state": "collecting" if fd["extension"]["horses"] < NEED_FIRST_DIST else "ready_for_review",
-                              "groups": {k: {"horses": v["horses"], "races": len(v["races"]), "predicted_wins": round(v["pred"], 3), "actual_wins": v["wins"],
+                              "groups": {k: {"horses": v["horses"], "races": len(v["races"]), "predicted_wins": round(v["pred"], 3), "actual_wins": v["wins"], "dates": v["dates"],
                                              "ratio": (round(v["wins"] / v["pred"], 3) if v["pred"] > 0 else None),
                                              "ratio_95": ([round(max(0.0, (v["wins"] - 1.96 * math.sqrt(v["var"])) / v["pred"]), 3), round((v["wins"] + 1.96 * math.sqrt(v["var"])) / v["pred"], 3)] if v["pred"] > 0 and v["var"] > 0 else None)}
                                          for k, v in fd.items()}},
