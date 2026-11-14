@@ -206,16 +206,17 @@ Promise.all([
   const head=`<div class="ph"><span></span><div class="pb ph-n">${names.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>`;
   (function(){
     const ADOPTED={fukushima:1,hanshin:1};
-    const nm2=['芝','ダート','採用判断','採用'];
-    const seg=(st)=>st==='d'?'<i class="d"></i>':st==='n0'?'<i class="n"><b style="width:0%"></b></i>':st==='n5'?'<i class="n"><b style="width:50%"></b></i>':'<i></i>';
-    const cell=g=>!g?'g':g.state==='usable'?'d':g.state==='waiting_forecast'?'n5':'n0';
+    const nm2=['予報あり','予報なし','判断','採用'];
+    const seg=x=>x==='d'?'<i class="d"></i>':x==='n'?'<i class="n"><b style="width:0%"></b></i>':'<i></i>';
+    // 状態→進み具合：まだ足りない＝①が現在地／予報待ち＝①済み②が現在地／使える見込み＝①②済み③（両方そろえば判断待ち）
+    const lv=g=>!g?0:g.state==='usable'?2:g.state==='waiting_forecast'?1:0;
+    const bar=(l,both,adopted)=>`<div class="pb" aria-hidden="true">${seg(l>=1?'d':'n')}${seg(l>=2?'d':l===1?'n':'g')}${seg(adopted?'d':l>=2&&both?'n':'g')}${seg(adopted?'d':'g')}</div>`;
     const rows=pipe.units.filter(u=>u.id.indexOf('track_condition:track:')===0&&u.detail&&u.detail.going).map(u=>{
       const key=u.id.split(':').pop(),g=u.detail.going,t=g.turf,d=g.dirt;
-      const both=cell(t)==='d'&&cell(d)==='d',adopted=!!ADOPTED[key];
-      const bars=`<div class="pb" aria-hidden="true">${seg(cell(t))}${seg(cell(d))}${seg(adopted?'d':both?'n0':'g')}${seg(adopted?'d':'g')}</div>`;
-      const tx=(n,x)=>x?`${n} ${esc(x.label)}（${x.races}レース）`:`${n} —`;
-      return `<div class="pr"><span class="pl">${esc(u.label)}</span>${bars}<span class="pt">${tx('芝',t)}<br>${tx('ダ',d)}${adopted?'<br><b>採用済み</b>':both?'<br><b>採用の判断待ち</b>':''}</span></div>`}).join('');
-    $('sumBaba').innerHTML=rows?`<div style="margin:8px 0 12px 12px;padding-left:10px;border-left:3px solid #dfe3ea"><p class="tiny" style="margin:0 0 4px"><b>馬場予測：競馬場ごとの進み具合</b><br>芝・ダートそれぞれが「使える見込み」になると濃くなります（予報待ち＝半分、まだ足りない＝空）。両方そろうと採用の判断、あなたが A と答えると採用です。</p><div class="ph"><span></span><div class="pb ph-n">${nm2.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>${rows}</div>`:'';
+      const adopted=!!ADOPTED[key],both=lv(t)>=2&&lv(d)>=2;
+      const line=(n,x)=>`<div class="pr"><span class="pl" style="font-weight:400">${n}</span>${bar(lv(x),both,adopted)}<span class="pt">${x?esc(x.label)+'（'+x.races+'レース）':'—'}</span></div>`;
+      return `<div style="margin-top:10px"><b style="font-size:14px">${esc(u.label)}</b>${adopted?' <b style="color:#1a7f4b;font-size:12px">採用済み</b>':both?' <b style="color:#b7791f;font-size:12px">採用の判断待ち</b>':''}</div>${line('芝',t)}${line('ダート',d)}`}).join('');
+    $('sumBaba').innerHTML=rows?`<div style="margin:8px 0 12px 12px;padding-left:10px;border-left:3px solid #dfe3ea"><p class="tiny" style="margin:0 0 4px"><b>馬場予測：競馬場ごとの進み具合</b><br>芝とダートを別々に、左から右へ進みます。<b>予報あり</b>＝天気予報が完全に当たれば、基準（朝の馬場がそのまま続く）に勝つ。<b>予報なし</b>＝予報がなくても基準に勝つ（＝「使える見込み」）。<b>判断</b>＝芝・ダートの両方がそろい、あなたの採用の判断を待つ。<b>採用</b>＝A と答えた状態。赤い枠が現在地です。</p><div class="ph"><span></span><div class="pb ph-n">${nm2.map(n=>`<i>${n}</i>`).join('')}</div><span></span></div>${rows}</div>`:'';
   })();
   $('sumList').innerHTML=head+cfg.themes.map(t=>{
     const us=pipe.units.filter(u=>u.theme===t.id);
