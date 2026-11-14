@@ -101,7 +101,7 @@
       var cl=key==='claude';
       kids.forEach(function(k){if(k.dataset.pvWas===undefined)k.dataset.pvWas=k.hidden?'1':'0';k.hidden=cl?true:k.dataset.pvWas==='1'});
       panel.hidden=!cl;bC.setAttribute('aria-pressed',String(!cl));bL.setAttribute('aria-pressed',String(cl));
-      try{history.replaceState(null,'',cl?'#claude':location.pathname+location.search)}catch(e){}
+      try{history.replaceState(null,'',location.pathname+location.search+(cl?'#claude':''))}catch(e){}
       if(cl&&!panel.dataset.loaded)load();
     }
     bC.addEventListener('click',function(){show('chatgpt')});bL.addEventListener('click',function(){show('claude')});
