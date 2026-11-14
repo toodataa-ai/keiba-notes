@@ -36,7 +36,7 @@ jobs:
           python - <<PY
           open('/tmp/range','w').write("${LO:0:4}${LO:5:2} ${D:0:4}${D:5:2}")
           PY
-          read A B2 < /tmp/range
+          read A B2 < /tmp/range || true
           python jra_going_labels.py index --start $A --end $B2 --out /tmp/days.json
           python - <<PY
           import json
