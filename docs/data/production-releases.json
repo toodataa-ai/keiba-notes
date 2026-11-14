@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.56-20261114",
-  "current_public_version": "1.56",
+  "current_public_release": "release/jra-site-v1.57-20261114",
+  "current_public_version": "1.57",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1190,6 +1190,28 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/people-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.57-20261114",
+      "branch": "release/jra-site-v1.57-20261114",
+      "commit_sha": "ff1dcfdde3005cfaf0955f8f432fee4eb140ccd9",
+      "deployed_at": "2026-11-14T10:35:40+09:00",
+      "workflow_run_id": 43541497226,
+      "validation_workflow_run_id": 43541497226,
+      "public_version": "1.57",
+      "note": "2026-11-14ユーザー明示承認済み。今週のAI予想：Claudeタブから結果の出たレースを外す：Claudeの『今週』タブに、結果が出たあとも先週のレース（11/7・11/8）が残っていた。結果が出たレースは『過去の成績』だけに表示し、今週タブには結果待ち・これからのレースだけを出す。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-thisweek-filter-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
