@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .parse import parse_race
-from .radar_cond import CONDS, MIN_COND, keys
+from .radar_cond import cell
 from .stats import corr
 
 SPLIT_YEAR = 2022
@@ -101,7 +101,7 @@ def load(data_dir: Path):
                     runs.append((jid, race["year"], iv / tot, fin,
                                  r["odds"] if fin == 1 else 0.0,
                                  pp.get(r["no"], 0.0) if fin <= 3 else 0.0,
-                                 100 * (1 - (fin - 1) / (n - 1)), fr, kk, race["klass"] == "OP・重賞", keys(race["surface"], race["venue"], r["sex"], race["date"])))
+                                 100 * (1 - (fin - 1) / (n - 1)), fr, kk, race["klass"] == "OP・重賞", cell(race["surface"], race["venue"], r["sex"], race["date"])))
                     lo, hi = span.get(jid, (race["year"],) * 2)
                     span[jid] = (min(lo, race["year"]), max(hi, race["year"]))
     return runs, names, span
@@ -135,7 +135,7 @@ def build(data_dir: Path) -> dict:
     for jid, y, p, fin, wr, pr, rk, fr, kk, op, ck in runs:
         e = E[bisect.bisect(cuts, p)]
         half = "h1" if y < SPLIT_YEAR else "h2"
-        for per in ("all", half, y, *ck):
+        for per in ("all", half, y, ("c", ck)):
             a = acc[(jid, per)]
             a.n["win"] += 1; a.v["win"] += wr
             a.n["p2"] += 1; a.v["p2"] += fin <= 2; a.e["p2"] += e["p2"]
@@ -189,16 +189,13 @@ def build(data_dir: Path) -> dict:
         by_year[str(y)] = [[j, acc[(j, y)].n["win"], [sy.get((j, ax)) for ax in AX],
                             [None if ry[j][ax] is None else round(ry[j][ax], 4) for ax in AX]]
                            for j in sorted(py, key=lambda j: -acc[(j, y)].n["win"])]
-    cond_out = {}
-    for ck_, lab, grp in CONDS:
-        pc = [j for j in people if acc[(j, ck_)].n["win"] >= MIN_COND]
-        if len(pc) < 20:
-            continue
-        rc, cc, sc = scored(pc, ck_)
-        cond_out[ck_] = {"label": lab, "group": grp, "min": MIN_COND, "jockeys": [
-            [j, acc[(j, ck_)].n["win"], [sc.get((j, ax)) for ax in AX],
-             [None if rc[j][ax] is None else round(rc[j][ax], 4) for ax in AX]]
-            for j in sorted(pc, key=lambda j: -acc[(j, ck_)].n["win"])]}
+    cells = {}
+    for (j, per), a in acc.items():
+        if isinstance(per, tuple) and j in people:
+            row = []
+            for ax in AX:
+                row += [a.n[ax], round(a.v[ax], 3), round(a.e[ax], 3)]
+            cells.setdefault(j, {})[per[1]] = row
     persist = {}
     for ax in AX:
         pairs = []
@@ -219,22 +216,20 @@ def build(data_dir: Path) -> dict:
     return {"version": 1, "generated": datetime.now(jst).strftime("%Y-%m-%d %H:%M"), "split_year": SPLIT_YEAR,
             "min_person": MIN_PERSON, "min_year": MIN_YEAR,
             "axes": [{"id": a, "label": l, "desc": d, "kind": KIND[a], "persist": persist[a]} for a, l, d in AXES],
-            "jockeys": out, "by_year": by_year, "_cond": cond_out}
+            "jockeys": out, "by_year": by_year, "_cells": cells}
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--cond-dir")
+    ap.add_argument("--cells-out")
     a = ap.parse_args()
     d = build(Path(a.data))
-    cd = d.pop("_cond")
-    if a.cond_dir:
-        Path(a.cond_dir).mkdir(parents=True, exist_ok=True)
-        for k, v in cd.items():
-            Path(a.cond_dir, "rel_%s.json" % k).write_text(json.dumps(v, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
-        d["conds"] = [{"key": k, "label": v["label"], "group": v["group"], "n": len(v["jockeys"])} for k, v in cd.items()]
+    cells = d.pop("_cells")
+    if a.cells_out:
+        Path(a.cells_out).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.cells_out).write_text(json.dumps({"order": "per axis: n,v,e", "cells": cells}, separators=(",", ":")) + "\n", encoding="utf-8")
     Path(a.out).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print("jockeys", len(d["jockeys"]), "bytes", Path(a.out).stat().st_size)
     for ax in d["axes"]:

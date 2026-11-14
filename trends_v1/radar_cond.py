@@ -17,3 +17,13 @@ def keys(surface, venue, sex, date):
     m = int(date[5:7])
     out.append("sea_spring" if 3 <= m <= 5 else "sea_summer" if 6 <= m <= 8 else "sea_autumn" if 9 <= m <= 11 else "sea_winter")
     return out
+
+
+SEASON_IDX = lambda m: 0 if 3 <= m <= 5 else 1 if 6 <= m <= 8 else 2 if 9 <= m <= 11 else 3
+VENUE_IDX = {j: i for i, (_, j) in enumerate(VENUES)}
+
+
+def cell(surface, venue, sex, date):
+    """（芝ダ, 競馬場, 性別, 季節）を 0〜159 の番号に。ページ側で同じ式をほどく"""
+    return ((((1 if surface != "芝" else 0) * 10 + VENUE_IDX[venue]) * 2 + (1 if sex == "牝" else 0)) * 4
+            + SEASON_IDX(int(date[5:7])))
