@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.57-20261114",
-  "current_public_version": "1.57",
+  "current_public_release": "release/jra-site-v1.58-20261114",
+  "current_public_version": "1.58",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1212,6 +1212,27 @@
       "scope_files": [
         "docs/this-week.html",
         "docs/assets/claude-view-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.58-20261114",
+      "branch": "release/jra-site-v1.58-20261114",
+      "commit_sha": "8c4bfa0359089af54afee8ed3ecdc20dd3478948",
+      "deployed_at": "2026-11-14T14:44:59+09:00",
+      "workflow_run_id": 43562998343,
+      "validation_workflow_run_id": 43562998343,
+      "public_version": "1.58",
+      "note": "2026-11-14ユーザー明示承認済み。騎手・調教師の成績：騎手のレーダーチャート：騎手の7軸（勝率・連対率・複勝率・着順・先行力・末脚・上級戦）を、人気（オッズ）を使わない絶対評価でレーダーチャート表示、2人を重ねて比較。前半→後半で続くか（続く度）も表示。 年ごとの選択と、人気（オッズ）に対する相対評価（単勝回収率・複勝回収率ほか）のレーダーも追加。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-jockey-radar-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/people-trends.html"
       ],
       "public_http_files_verified": null
     }
