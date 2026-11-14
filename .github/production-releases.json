@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.58-20261114",
-  "current_public_version": "1.58",
+  "current_public_release": "release/jra-site-v1.59-20261114",
+  "current_public_version": "1.59",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1233,6 +1233,28 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/people-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.59-20261114",
+      "branch": "release/jra-site-v1.59-20261114",
+      "commit_sha": "0e2ec578636ff45db5409544ab0150fd2784fe48",
+      "deployed_at": "2026-11-14T14:53:35+09:00",
+      "workflow_run_id": 43563670750,
+      "validation_workflow_run_id": 43563670750,
+      "public_version": "1.59",
+      "note": "2026-11-14ユーザー明示承認済み。今週のAI予想：カード左上の番号（0,1,2）を『AI予想公開済み』に直す：カードの状態表示に並び順の通し番号が出ていた不具合を修正。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-week-status-fix-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/assets/week.js"
       ],
       "public_http_files_verified": null
     }
