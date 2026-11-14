@@ -23,6 +23,7 @@ from .stats import corr
 
 SPLIT_YEAR = 2022
 MIN_PERSON = 300
+MIN_YEAR = 100      # 年別は、その年に100走以上した騎手だけ
 AXES = [
     ("win", "勝率", "出走のうち1着になった割合。"),
     ("p2", "連対率", "出走のうち2着以内に入った割合。"),
@@ -60,7 +61,7 @@ def build(data_dir: Path) -> dict:
             lo, hi = span.get(jid, (race["year"], race["year"]))
             span[jid] = (min(lo, race["year"]), max(hi, race["year"]))
             fin = r["finish"]
-            for per in ("all", half):
+            for per in ("all", half, race["year"]):
                 a = acc[(jid, per)]
                 if fin is not None:                       # 中止・除外は着順の軸に入れない（出走数にも数えない）
                     a.n += 1
@@ -85,24 +86,38 @@ def build(data_dir: Path) -> dict:
     def counts(a):
         return {"win": int(a.n), "p2": int(a.n), "p3": int(a.n), "rank": int(a.rkn), "front": int(a.frn), "kick": int(a.kkn), "top": int(a.tn)}
 
+    def scored(people, per):
+        raw = {j: vals(acc[(j, per)]) for j in people}
+        cn = {j: counts(acc[(j, per)]) for j in people}
+        shr = {}
+        for ax, *_ in AXES:
+            xs = [(raw[j][ax], cn[j][ax]) for j in people if raw[j][ax] is not None]
+            tot = sum(w for _, w in xs)
+            mu = sum(v * w for v, w in xs) / tot if tot else 0
+            for j in people:
+                v, w = raw[j][ax], cn[j][ax]
+                shr[(j, ax)] = None if v is None else mu + (v - mu) * w / (w + SHR[ax])
+        score = {}
+        for ax, *_ in AXES:
+            ok = sorted((shr[(j, ax)], j) for j in people if shr[(j, ax)] is not None)
+            vs = [v for v, _ in ok]
+            lo, hi = vs[int(len(vs) * 0.02)], vs[-1]      # 下位2%を0、最高の人を100にして、間を直線で結ぶ（順位ではなく、値の開きがそのまま見える）
+            for v, j in ok:
+                score[(j, ax)] = round(100 * min(1.0, max(0.0, (v - lo) / (hi - lo)))) if hi > lo else 50
+        return raw, cn, score
+
     people = [j for (j, per), a in acc.items() if per == "all" and a.n >= MIN_PERSON]
-    raw = {j: vals(acc[(j, "all")]) for j in people}
-    cn = {j: counts(acc[(j, "all")]) for j in people}
-    shr = {}
-    for ax, *_ in AXES:
-        xs = [(raw[j][ax], cn[j][ax]) for j in people if raw[j][ax] is not None]
-        tot = sum(w for _, w in xs)
-        mu = sum(v * w for v, w in xs) / tot if tot else 0
-        for j in people:
-            v, w = raw[j][ax], cn[j][ax]
-            shr[(j, ax)] = None if v is None else mu + (v - mu) * w / (w + SHR[ax])
-    score = {}
-    for ax, *_ in AXES:
-        ok = sorted((shr[(j, ax)], j) for j in people if shr[(j, ax)] is not None)
-        vs = [v for v, _ in ok]
-        lo, hi = vs[int(len(vs) * 0.02)], vs[-1]      # 下位2%を0、最高の人を100にして、間を直線で結ぶ（順位ではなく、値の開きがそのまま見える）
-        for v, j in ok:
-            score[(j, ax)] = round(100 * min(1.0, max(0.0, (v - lo) / (hi - lo)))) if hi > lo else 50
+    raw, cn, score = scored(people, "all")
+    years = sorted({per for (_, per) in acc if isinstance(per, int)})
+    by_year = {}
+    for y in years:
+        py = [j for j in people if acc[(j, y)].n >= MIN_YEAR]
+        if len(py) < 20:
+            continue
+        ry, cy, sy = scored(py, y)
+        by_year[str(y)] = [[j, int(acc[(j, y)].n), [sy.get((j, ax)) for ax, *_ in AXES],
+                            [None if ry[j][ax] is None else round(ry[j][ax], 4) for ax, *_ in AXES]] for j in
+                           sorted(py, key=lambda j: -acc[(j, y)].n)]
     persist = {}
     for ax, *_ in AXES:
         pairs = []
@@ -122,8 +137,8 @@ def build(data_dir: Path) -> dict:
                     "raw": {ax: (None if raw[j][ax] is None else round(raw[j][ax], 4)) for ax, *_ in AXES},
                     "count": cn[j], "score": {ax: score.get((j, ax)) for ax, *_ in AXES}})
     jst = timezone(timedelta(hours=9))
-    return {"version": 2, "generated": datetime.now(jst).strftime("%Y-%m-%d %H:%M"), "split_year": SPLIT_YEAR, "min_person": MIN_PERSON,
-            "axes": [{"id": a, "label": l, "desc": d, "persist": persist[a]} for a, l, d in AXES], "jockeys": out}
+    return {"version": 3, "min_year": MIN_YEAR, "generated": datetime.now(jst).strftime("%Y-%m-%d %H:%M"), "split_year": SPLIT_YEAR, "min_person": MIN_PERSON,
+            "axes": [{"id": a, "label": l, "desc": d, "persist": persist[a]} for a, l, d in AXES], "jockeys": out, "by_year": by_year}
 
 
 if __name__ == "__main__":
