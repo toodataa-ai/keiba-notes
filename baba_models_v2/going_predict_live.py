@@ -12,6 +12,8 @@ import numpy as np, pandas as pd
 import requests
 
 import jma_weather as jw
+import going_forecast as gf
+import going_unified as gu
 import stage_b_dataset as sd
 from stage_b_experiment import BASE, PREV, MORNING, MORNING_WX, design
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -127,19 +129,55 @@ def load_context():
     return labels, sd.load_obs('observations')
 
 
-def result_record(track, day, surface, info, rows, P, source):
+FC_URL = 'https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json'
+
+
+def fetch_forecast(track):
+    """latest JMA short-range forecast for the racecourse's prefecture/region (None when it cannot be read)."""
+    code = gf.AREA[track][:3] + '000'
+    try:
+        r = requests.get(FC_URL.format(code=code), timeout=30, headers={'User-Agent': jw.UA}); r.raise_for_status()
+        return r.json()
+    except Exception as e:
+        print('forecast fetch failed', track, e, file=sys.stderr); return None
+
+
+def baseline_matrix(df, surface):
+    """P(going at a race | going of the day's first race): the 'morning persists' reference."""
+    d = df[df.surface == surface]; C = np.ones((4, 4))
+    for m, a in zip(d.morning, d.going_n):
+        if m == m: C[int(m), int(a)] += 1
+    return C / C.sum(1, keepdims=True)
+
+
+def forecast_predictions(track, day, surface, rows, info, m5, base_C, pops):
+    """-> (P_final, P_no_forecast_placeholder is computed by caller, p_wet array)"""
+    pw = np.array([gf.p_wet_after_morning(pops, h) if pops else np.nan for h in rows.start_h])
+    if pops is None or np.isnan(pw).any():
+        return None, pw
+    return gu.mixed(m5[surface], rows, pw), pw
+
+
+def result_record(track, day, surface, info, rows, P, source, extra=None):
     races = []
     for (_, r), p in zip(rows.iterrows(), P):
         races.append({'race_no': int(r.race_no), 'start_h': round(float(r.start_h), 2),
                       'probs': {GOING_JA[i]: round(float(p[i]), 4) for i in range(4)},
                       'most_likely': GOING_JA[int(p.argmax())], 'p_change_from_morning': round(float(1 - p[int(info['morning'])]), 4)})
-    return {'surface': surface, 'morning_going': GOING_JA[int(info['morning'])], 'moist0': info['moist0'], 'source': source, 'races': races}
+    rec = {'surface': surface, 'morning_going': GOING_JA[int(info['morning'])], 'moist0': info['moist0'], 'source': source, 'races': races}
+    if extra:
+        rec.update(extra)
+    return rec
 
 
 def run_live(track, day, out_dir='live'):
     from jra_going_now import parse_going_page
     labels, obs = load_context()
-    models = fit_models(training_frame(before=day))
+    tf = training_frame(before=day)
+    models = fit_models(tf)
+    g5 = gu.training_frame(); g5 = g5[g5.date < pd.Timestamp(day)]
+    m5 = {s: gu.fit(g5[g5.surface == s], gu.NUMS5) for s in ('turf', 'dirt')}
+    fc = fetch_forecast(track); pops = gf.parse_pops(fc, track, day) if fc else None
     W = fetch_live_weather(track, day)
     sched = typical_schedule(labels, track, day)
     ja = {v: k for k, v in sd.TRACK_RO.items()}[track]
@@ -150,7 +188,8 @@ def run_live(track, day, out_dir='live'):
         if p['venue'] == ja and p['date'] == day.isoformat():
             page = p; break
     rec = {'track': track, 'date': day.isoformat(), 'generated_at_jst': datetime.now(JST).isoformat(timespec='seconds'),
-           'model': 'G2 (no forecast; observed weather up to now)', 'record_only': True, 'surfaces': []}
+           'model': 'G5 (rain scenario x JMA rain probability)' if pops else 'G2 (no forecast; forecast could not be read)',
+           'record_only': False, 'forecast': {'pops': pops, 'rule': 'p_wet = 1 - prod(1-p_block)^(overlap/6h), window = 08:00 .. race start'}, 'surfaces': []}
     if not page or page['turf_going'] is None:
         print('no official going page for', track, day, '- nothing saved'); return
     else:
@@ -161,7 +200,15 @@ def run_live(track, day, out_dir='live'):
         for s, o in (('turf', 'dirt'), ('dirt', 'turf')):
             info = {'morning': g[s], 'morning_other': g[o], 'moist0': float(m[s])}
             rows = build_rows(track, day, s, info, labels, obs, W, sched)
-            rec['surfaces'].append(result_record(track, day, s, info, rows, predict_probs(models, rows, s), 'official morning page'))
+            P2 = predict_probs(models, rows, s)
+            P5, pw = forecast_predictions(track, day, s, rows, info, m5, None, pops)
+            Pb = baseline_matrix(tf, s)[int(info['morning'])]
+            first = rows.iloc[0]
+            extra = {'probs_no_forecast': [{'race_no': int(n), **{GOING_JA[i]: round(float(p[i]), 4) for i in range(4)}} for n, p in zip(rows.race_no, P2)],
+                     'probs_morning_persists': {GOING_JA[i]: round(float(Pb[i]), 4) for i in range(4)},
+                     'p_wet_after_morning': [round(float(x), 4) if x == x else None for x in pw],
+                     'inputs': {k: (None if first.get(k) != first.get(k) else float(first.get(k))) for k in ('last_going', 'heavy_share', 'gap_prev_day', 'moist_prev', 'moist0', 'morning', 'morning_other', 'p_prev1', 'p_prev2_3', 'p_night')}}
+            rec['surfaces'].append(result_record(track, day, s, info, rows, P5 if P5 is not None else P2, 'official morning page', extra))
     import os; os.makedirs(out_dir, exist_ok=True)
     f = f'{out_dir}/{day.isoformat()}_{track}.json'
     json.dump(rec, open(f, 'w', encoding='utf-8'), ensure_ascii=False, indent=1); print('saved', f, rec['status'])
@@ -191,10 +238,31 @@ def run_replay(track, day):
     return out
 
 
+def list_today(day):
+    """racecourses that hold racing on `day` according to the JRA going pages (index, index2, index3)."""
+    from jra_going_now import parse_going_page
+    ro = {v: k for k, v in sd.TRACK_RO.items()}; found = []
+    for name in ('index.html', 'index2.html', 'index3.html'):
+        try:
+            r = requests.get('https://www.jra.go.jp/keiba/baba/' + name, timeout=30, headers={'User-Agent': jw.UA})
+            p = parse_going_page(r.content.decode('cp932', errors='replace'))
+        except Exception as e:
+            print('list_today failed', name, e, file=sys.stderr); continue
+        if p.get('date') == day.isoformat() and p.get('venue') in sd.TRACK_RO and sd.TRACK_RO[p['venue']] not in found:
+            found.append(sd.TRACK_RO[p['venue']])
+    return found
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('--track', required=True); ap.add_argument('--date', default=None); ap.add_argument('--replay', default=None)
+    ap.add_argument('--track', default=None); ap.add_argument('--date', default=None); ap.add_argument('--replay', default=None)
+    ap.add_argument('--list-today', action='store_true')
     a = ap.parse_args()
+    if a.list_today:
+        print(json.dumps(list_today(date.fromisoformat(a.date) if a.date else datetime.now(JST).date())))
+        sys.exit(0)
+    if not a.track:
+        ap.error('--track is required')
     if a.replay:
         for r in run_replay(a.track, date.fromisoformat(a.replay)): print(r)
     else:

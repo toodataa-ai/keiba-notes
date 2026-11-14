@@ -1,47 +1,59 @@
 name: Baba going prediction - race-day morning (record only)
-# Fukushima and Hanshin (user decision 2026-11-03: adopt; Hanshin added the same day). Saves a record; it does NOT change any official prediction.
+# All racecourses that race today (user decision 2026-11-15: one past-data model for every racecourse, using the JMA rain forecast).
+# Saves baba_models_v2/live/<date>_<track>.json; Claude's prediction procedure reads it.
 on:
   schedule:
     - cron: '45 23 * * 5,6,0'   # 08:45 JST Sat/Sun/Mon
   workflow_dispatch:
     inputs:
       date: {description: 'JST date YYYY-MM-DD (blank = today)', required: false, default: ''}
-      track: {description: 'blank = fukushima and hanshin; or one track name (testing)', required: false, default: ''}
+      track: {description: 'blank = every racecourse that races on the date; or one track name (testing)', required: false, default: ''}
 permissions:
   contents: write
 concurrency:
   group: baba-going-live-v1
   cancel-in-progress: false
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      tracks: ${{ steps.p.outputs.tracks }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 numpy pandas scikit-learn
+      - id: p
+        working-directory: baba_models_v2
+        env:
+          WANT: ${{ inputs.track }}
+          WANTDATE: ${{ inputs.date }}
+        run: |
+          D="${WANTDATE:-$(TZ=Asia/Tokyo date +%F)}"
+          if [ -n "${WANT:-}" ]; then T="[\"$WANT\"]"; else T=$(python -W ignore going_predict_live.py --list-today --date "$D"); fi
+          echo "tracks=$T" >> "$GITHUB_OUTPUT"; echo "tracks today: $T"
   predict:
+    needs: plan
+    if: needs.plan.outputs.tracks != '[]'
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        track: [fukushima, hanshin]
+        track: ${{ fromJSON(needs.plan.outputs.tracks) }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - name: Skip this track when a single track was requested
-        env:
-          WANT: ${{ inputs.track }}
-          MINE: ${{ matrix.track }}
-        run: |
-          if [ -n "${WANT:-}" ] && [ "$WANT" != "$MINE" ]; then echo "SKIP=1" >> "$GITHUB_ENV"; echo "skip $MINE"; fi
       - uses: actions/checkout@v4
-        if: env.SKIP != '1'
         with: {ref: main}
       - uses: actions/setup-python@v5
-        if: env.SKIP != '1'
         with: {python-version: '3.12'}
-      - if: env.SKIP != '1'
-        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 numpy pandas scikit-learn
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 numpy pandas scikit-learn
       - name: Tests
-        if: env.SKIP != '1'
         working-directory: baba_models_v2
-        run: python -W ignore -m unittest test_jra_going_now test_going_predict_live
+        run: python -W ignore -m unittest test_jra_going_now test_going_predict_live test_going_forecast
       - name: Refresh the last few race days' official results (previous-day features)
-        if: env.SKIP != '1'
         working-directory: baba_models_v2
         run: |
           D="${{ inputs.date }}"; if [ -z "$D" ]; then D=$(TZ=Asia/Tokyo date +%F); fi
@@ -60,19 +72,17 @@ jobs:
           TJ={'fukushima':'福島','tokyo':'東京','kyoto':'京都','nakayama':'中山','hanshin':'阪神','niigata':'新潟','chukyo':'中京','kokura':'小倉','sapporo':'札幌','hakodate':'函館'}['$T']
           x=json.load(open('/tmp/days.json',encoding='utf-8'))
           x['days']=[r for r in x['days'] if lo<=r['date']<=hi and r['track']==TJ]
-          print('recent Fukushima days', [r['date'] for r in x['days']])
+          print('recent days', [r['date'] for r in x['days']])
           json.dump(x,open('/tmp/days_recent.json','w',encoding='utf-8'),ensure_ascii=False)
           PY
           mkdir -p going_labels/recent
           python jra_going_labels.py collect --days /tmp/days_recent.json --year "${D:0:4}" --out going_labels/recent/recent.csv || true
       - name: Predict (record only)
-        if: env.SKIP != '1'
         working-directory: baba_models_v2
         run: python -W ignore going_predict_live.py --track "$TRACK" --date "$DAY"
       - name: Commit the record
-        if: env.SKIP != '1'
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add baba_models_v2/live
-          git commit -m "Going prediction record (Fukushima) $DAY" || exit 0
+          git commit -m "Going prediction record ($TRACK) $DAY" || exit 0
           for i in 1 2 3 4 5; do git fetch origin main && git rebase origin/main && git push origin HEAD:main && break; sleep 3; done
