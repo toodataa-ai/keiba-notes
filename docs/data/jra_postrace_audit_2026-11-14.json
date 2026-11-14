@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-14",
+  "meeting_id": "2026-11-14-to-2026-11-15",
+  "observed_at": "2026-11-14T09:53:16.886Z",
+  "status": "REVIEW_RECORDS_PREPARED_GRADE_A_CI_AND_PUBLIC_HTTP_PENDING",
+  "official_result_confirmed_races": [
+    "2026-11-14-fruits-line-cup",
+    "2026-11-14-daily-hai-2yo-stakes",
+    "2026-11-14-musashino-stakes"
+  ],
+  "grade_a_cases_created": [
+    "2026-11-14-fruits-line-cup",
+    "2026-11-14-daily-hai-2yo-stakes",
+    "2026-11-14-musashino-stakes"
+  ],
+  "today_reviewed_count": 3,
+  "expected_weekly_main_count": 6,
+  "immutable_prerace_predictions": true,
+  "immutable_final_bets": true,
+  "immutable_original_html_pdf": true,
+  "weekly_improvement_decision": "not_evaluated",
+  "conservative_model_action": "no_change",
+  "weekly_reason": "Sunday Nov 15 three JRA main races are not yet run; weekly formal improvement cannot be evaluated. Prior week legitimate no-bet Grade A gate remains pending. Do not automate A/B/C promotion or alter model based on these three outcomes.",
+  "improvement_policy": {
+    "approval_classes": "A/B/C manual",
+    "automatic_promotion": false,
+    "preserve_old_versions": true,
+    "preserve_inflight_e2e": true,
+    "overfit_prevention": true,
+    "formal_prompt_changed": false
+  },
+  "publication_verification": {
+    "source_prerace_proof_bets_unchanged": true,
+    "github_actions_result": "pending",
+    "public_http_byte_parity_verified": false
+  },
+  "blockers": [
+    "Weekly gate: Sunday 2026-11-15 JRA mains remain future and their provisional race IDs require canonical reconciliation.",
+    "Prior week no-bet Kibitaki lacks strict Grade A zero-ticket representation. Do not fabricate a bet.",
+    "GitHub Actions proof evaluator and public HTTP byte parity must complete after this data commit."
+  ]
+}
