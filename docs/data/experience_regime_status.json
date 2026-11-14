@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "model_version": "e012-shadow-v0.1",
-  "generated_at": "2026-11-08T09:41:36+00:00",
+  "generated_at": "2026-11-14T09:54:12+00:00",
   "mode": "shadow_observation_only",
   "production_effect": false,
   "collection": {
@@ -419,10 +419,10 @@
     },
     "v3.13": {
       "coverage": {
-        "prediction_entries": 23,
+        "prediction_entries": 26,
         "entries_with_experience": 0,
         "missing_experience": 0,
-        "required_entries": 23,
+        "required_entries": 26,
         "required_entries_with_experience": 0,
         "required_missing_experience": 0,
         "coverage_rate": 0.0,
@@ -1362,6 +1362,27 @@
     {
       "case": "e2e_validation/cases/2026-11-08-miyako-stakes/case.json",
       "race_id": "2026-11-08-miyako-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-11-14-daily-hai-2yo-stakes/case.json",
+      "race_id": "2026-11-14-daily-hai-2yo-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-11-14-fruits-line-cup/case.json",
+      "race_id": "2026-11-14-fruits-line-cup",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-11-14-musashino-stakes/case.json",
+      "race_id": "2026-11-14-musashino-stakes",
       "version": "v3.13",
       "grade": "prospective_strict",
       "error": "race_context.race_category is required"
