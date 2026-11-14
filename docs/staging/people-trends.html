@@ -65,6 +65,7 @@
 <p class="sub">7つの軸で、騎手の「強さ」を見ます。人気（オッズ）は使わず、<b>結果そのもの</b>（勝率・着順・位置取り・上がりの速さ）で評価します。得点は、通算では2018年以降に300走以上した騎手151人、年を選んだときはその年に100走以上した騎手（年ごとに約100人）の値の幅（下位2%〜最高）を0〜100に直したものです（100＝全騎手の最高、0＝下位2%の水準。表には元の数字も並べています）。プルダウンは、選んだ軸（合計得点、先行力など）の得点が高い順に並びます。2人を重ねて比べられます。</p>
 <div><label style="font-size:13px;color:#6d6e75">期間：</label><select class="pp-sel" id="radYear" aria-label="期間（通算か年）"></select> <div style="margin:2px 0 6px"><label style="font-size:13px;color:#6d6e75">条件（組み合わせOK）：</label><select class="pp-sel" id="radSf" aria-label="芝・ダート"><option value="">芝・ダート両方</option><option value="0">芝</option><option value="1">ダート</option></select><select class="pp-sel" id="radVn" aria-label="競馬場"><option value="">全競馬場</option><option value="0">札幌</option><option value="1">函館</option><option value="2">福島</option><option value="3">新潟</option><option value="4">東京</option><option value="5">中山</option><option value="6">中京</option><option value="7">京都</option><option value="8">阪神</option><option value="9">小倉</option></select><select class="pp-sel" id="radSx" aria-label="性別"><option value="">牡牝両方</option><option value="0">牡馬（せん馬を含む）</option><option value="1">牝馬</option></select><select class="pp-sel" id="radSn" aria-label="季節"><option value="">通年</option><option value="0">春（3〜5月）</option><option value="1">夏（6〜8月）</option><option value="2">秋（9〜11月）</option><option value="3">冬（12〜2月）</option></select></div> <label style="font-size:13px;color:#6d6e75">並べ方：</label><select class="pp-sel" id="radSort" aria-label="プルダウンの並べ方"></select></div>
 <p class="pp-note" id="radYearNote" style="margin:0 0 8px"></p>
+<label style="font-size:13px;display:block;margin:0 0 8px"><input type="checkbox" id="radOv" checked> 相対評価（人気に対して）を<b>点線</b>で重ねる</label>
 <div><select class="pp-sel" id="radA" aria-label="騎手1"></select><select class="pp-sel" id="radB" aria-label="騎手2（比べる）"></select></div>
 <div id="radSvg" style="max-width:420px"></div>
 <div class="pp-tbl" id="radTbl"></div>
@@ -206,6 +207,7 @@ var SHORT_A={win:'勝率',p2:'連対率',p3:'複勝率',rank:'着順',front:'先
 function rawf(id,v){if(v==null)return '—';return (id==='win'||id==='p2'||id==='p3'||id==='top')?(v*100).toFixed(1)+'%':v.toFixed(0)}
 function pt(cx,cy,r,i,n){var a=-Math.PI/2+2*Math.PI*i/n;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
 function rawk(a,v){if(v==null)return '—';if(a.kind==='mean')return Math.round(v*100)+'%';if(a.kind==='ratio')return v.toFixed(2);if(a.kind==='diff')return (v>=0?'+':'')+v.toFixed(1)+'点';return rawf(a.id,v)}
+var INST={};
 function radarInit(P,url,SHORT){var RD=null,CUR=[],PIN=[],CELLS=null,KIND=P==='rad'?'abs':'rel',VN='札幌 函館 福島 新潟 東京 中山 中京 京都 阪神 小倉'.split(' '),SN=['春','夏','秋','冬'];
 function radOpts(){
  var key=$(P+'Sort').value,ax=RD.axes.filter(function(a){return a.id===key})[0];
@@ -276,9 +278,21 @@ function radSetup(){
   $(P+'YearNote').textContent='読み込み中…';
   fetch('data/radar_cells/'+KIND+'.json?v=20261114k',{cache:'no-store'}).then(function(r){return r.json()}).then(function(x){CELLS=x.cells;go()}).catch(function(){$(P+'YearNote').textContent='この条件のデータを読み込めませんでした。'})}
  ['Sf','Vn','Sx','Sn'].forEach(function(k){$(P+k).onchange=onf});
- $(P+'A').onchange=$(P+'B').onchange=radRender;radRender();
+ $(P+'A').onchange=$(P+'B').onchange=radRender;if(P==='rad')$('radOv').onchange=radRender;radRender();
 }
+function peer(y,f,ids,cb){
+ var keep=PIN;PIN=ids;
+ function done(){var rows;
+  if(f.k){rows=fromCells(f)}
+  else if(y==='all'){rows=RD.jockeys}
+  else{rows=(RD.by_year[y]||[]).map(function(r){var sc={};RD.axes.forEach(function(a,i){sc[a.id]=r[2][i]});return {id:r[0],score:sc}})}
+  PIN=keep;var m={};rows.forEach(function(r){m[r.id]=r});cb(m)}
+ if(!RD){PIN=keep;setTimeout(function(){peer(y,f,ids,cb)},300);return}
+ if(f.k&&!CELLS){fetch('data/radar_cells/'+KIND+'.json?v=20261114k',{cache:'no-store'}).then(function(r){return r.json()}).then(function(x){CELLS=x.cells;done()}).catch(function(){PIN=keep;cb({})});return}
+ done()}
+INST[P]={peer:peer,filt:filt};
 var RK=20;
+function relTxt(M,J,a){var q=M&&M[J.id];if(!M)return '';var v=q&&q.score?q.score[a.id]:null;return '<div class="pp-note" style="margin:0;font-weight:400;font-size:11px;color:#8a5a00">相対 '+(v==null?'—':v)+'</div>'}
 function radRank(){
  var key=$(P+'Sort').value,ax=RD.axes;
  function val(j){return key==='total'?j.total:(j.score[key]==null?-1:j.score[key])}
@@ -293,6 +307,13 @@ function radRank(){
  var m=$(P+'More');if(m)m.onclick=function(){RK=9999;radRank()};var l=$(P+'Less');if(l)l.onclick=function(){RK=20;radRank()};
 }
 function radRender(){
+ var ov=P==='rad'&&$('radOv')&&$('radOv').checked&&INST.rl;
+ if(!ov){radDraw(null);return}
+ var A=CUR[+$(P+'A').value],bi=+$(P+'B').value,B=bi>=0?CUR[bi]:null;if(!A){radDraw(null);return}
+ var f=filt(),y=$(P+'Year').value;
+ INST.rl.peer(y,f,[A.id,B&&B.id],function(m){radDraw(m)});
+}
+function radDraw(M){
  var ax=RD.axes,n=ax.length,A=CUR[+$(P+'A').value],bi=+$(P+'B').value,B=bi>=0?CUR[bi]:null;
  var W=360,H=330,cx=180,cy=165,R=100,g='';
  [25,50,75,100].forEach(function(v){g+='<polygon points="'+ax.map(function(_,i){return pt(cx,cy,R*v/100,i,n).join(',')}).join(' ')+'" fill="none" stroke="#dcdee3" stroke-width="1"/>'});
@@ -300,12 +321,15 @@ function radRender(){
   var anc=q[0]<cx-8?'end':(q[0]>cx+8?'start':'middle');g+='<text x="'+q[0]+'" y="'+(q[1]+4)+'" font-size="12" text-anchor="'+anc+'" fill="#2b2c31">'+esc(SHORT[a.id]||a.label)+'</text>'});
  function poly(J,col){if(!J)return'';var pts=ax.map(function(a,i){var v=J.score[a.id];return pt(cx,cy,R*(v==null?0:v)/100,i,n).join(',')}).join(' ');
   return '<polygon points="'+pts+'" fill="'+col+'" fill-opacity="0.18" stroke="'+col+'" stroke-width="2.2"/>'+ax.map(function(a,i){var v=J.score[a.id];var p=pt(cx,cy,R*(v==null?0:v)/100,i,n);return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="'+col+'"/>'}).join('')}
+ function polyD(J,col){var q=M&&M[J.id];if(!q||!q.score)return'';var pts=ax.map(function(a,i){var v=q.score[a.id];return pt(cx,cy,R*(v==null?0:v)/100,i,n).join(',')}).join(' ');
+  return '<polygon points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-dasharray="5 4"/>'}
  g+=poly(B,'#d9731f')+poly(A,'#2f6fd0');
- var leg='<text x="8" y="'+(H-8)+'" font-size="12" fill="#2f6fd0">● '+esc(A.name)+'</text>'+(B?'<text x="'+(W-8)+'" y="'+(H-8)+'" font-size="12" text-anchor="end" fill="#d9731f">● '+esc(B.name)+'</text>':'');
+ if(M){g+=(B?polyD(B,'#d9731f'):'')+polyD(A,'#2f6fd0')}
+ var leg=(M?'<text x="8" y="14" font-size="11" fill="#6d6e75">実線＝絶対評価　点線＝相対評価（人気に対して）</text>':'')+'<text x="8" y="'+(H-8)+'" font-size="12" fill="#2f6fd0">● '+esc(A.name)+'</text>'+(B?'<text x="'+(W-8)+'" y="'+(H-8)+'" font-size="12" text-anchor="end" fill="#d9731f">● '+esc(B.name)+'</text>':'');
  $(P+'Svg').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="騎手のレーダーチャート">'+g+leg+'</svg>';
  function tag(c){return c==null?'—':(c>=0.5?'<span class="pp-tag on">よく続く</span>':(c>=0.2?'<span class="pp-tag">やや続く</span>':'<span class="pp-tag">続かない</span>'))}
  var h='<table><thead><tr><th>軸</th><th>'+esc(A.name.split(' ').pop())+'</th>'+(B?'<th>'+esc(B.name.split(' ').pop())+'</th>':'')+'<th>続く度</th></tr></thead><tbody>';
- ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawk(a,A.raw[a.id])+'</div></td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawk(a,B.raw[a.id])+'</div></td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
+ ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawk(a,A.raw[a.id])+'</div>'+relTxt(M,A,a)+'</td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawk(a,B.raw[a.id])+'</div>'+relTxt(M,B,a)+'</td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
  h+='<tr><td style="white-space:normal"><b>合計</b><div class="pp-note" style="margin:0;font-size:11px">7つの軸の得点の平均。</div></td><td style="vertical-align:top;font-weight:700">'+Math.round(A.total)+'</td>'+(B?'<td style="vertical-align:top;font-weight:700">'+Math.round(B.total)+'</td>':'')+'<td></td></tr>';
  $(P+'Tbl').innerHTML=h+'</tbody></table>';
  radRank();
