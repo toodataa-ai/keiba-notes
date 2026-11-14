@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "id": "kyoto_turf_inner_2000",
+  "blueprintId": "kyoto_turf_inner_A",
+  "label": "京都 芝2000m 内回り A",
+  "distanceM": 2000,
+  "surface": "turf",
+  "edgeIds": [
+    "race_trace"
+  ],
+  "startOffsetM": 0,
+  "endOffsetM": 0,
+  "runoff": {
+    "edgeIds": [
+      "runoff"
+    ],
+    "distanceM": 125,
+    "displayExtraM": 6,
+    "finishThresholdM": 32
+  },
+  "anchorsM": [
+    0,
+    308.7,
+    530,
+    720,
+    1270,
+    1435,
+    1671.6,
+    2000
+  ],
+  "sections": [
+    {
+      "from": 0,
+      "to": 308.7,
+      "kind": "straight",
+      "name": "スタート後の直線"
+    },
+    {
+      "from": 308.7,
+      "to": 530,
+      "kind": "turn",
+      "name": "1コーナー"
+    },
+    {
+      "from": 530,
+      "to": 720,
+      "kind": "turn",
+      "name": "2コーナー"
+    },
+    {
+      "from": 720,
+      "to": 1270,
+      "kind": "straight",
+      "name": "向正面"
+    },
+    {
+      "from": 1270,
+      "to": 1435,
+      "kind": "turn",
+      "name": "3コーナー"
+    },
+    {
+      "from": 1435,
+      "to": 1671.6,
+      "kind": "turn",
+      "name": "4コーナー"
+    },
+    {
+      "from": 1671.6,
+      "to": 2000,
+      "kind": "straight",
+      "name": "最後の直線"
+    }
+  ],
+  "finalStraightM": 328.4,
+  "mask": {
+    "raster": 3,
+    "clearance": 1.95,
+    "minInnerOffset": 1.6,
+    "maxSpan": 17.5,
+    "slope": 0.44,
+    "smoothRadius": 19,
+    "maxLane": 14,
+    "color": {
+      "minAlpha": 240,
+      "minG": 108,
+      "greenRedRatio": 1.4,
+      "greenBlueRatio": 1.4
+    },
+    "legacyCalibration": {
+      "innerTargetPx": 5,
+      "turnAnchorsM": [
+        1270,
+        1435,
+        1671.6
+      ],
+      "transitionM": 45
+    }
+  },
+  "camera": {
+    "goalSpanM": 100,
+    "legacyGoalSpanM": 290,
+    "switchBeforeM": 80,
+    "mobileZoom": 8.8,
+    "desktopZoom": 9.7,
+    "mobileBreakpoint": 540,
+    "focusOffsetM": 10,
+    "focusLane": 3,
+    "cx": 0.54,
+    "cy": 0.51,
+    "smoothTau": 0.2,
+    "finishSequenceMs": 3200,
+    "finishCoastM": 6,
+    "finishPullback": 0.22,
+    "lens": {
+      "spanM": 65,
+      "lane": 2,
+      "maxGain": 1.45,
+      "radiusM": 48,
+      "deadzone": 0.012,
+      "referenceFromM": 120,
+      "referenceToM": 1850,
+      "referenceQuantile": 0.88,
+      "fadeInM": 130,
+      "fadeOutM": 155,
+      "metrics": {
+        "thirdFourthTurn": [
+          1250,
+          1800
+        ],
+        "firstSecondTurn": [
+          310,
+          710
+        ],
+        "midStraight": [
+          770,
+          1190
+        ],
+        "fullRace": [
+          130,
+          1830
+        ]
+      }
+    }
+  },
+  "status": {
+    "numerical": true,
+    "replay": true,
+    "visualApproval": false,
+    "productionApproval": false
+  },
+  "adapter": "kyoto-compat-v1"
+}

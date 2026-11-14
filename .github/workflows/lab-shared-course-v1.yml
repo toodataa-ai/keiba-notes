@@ -1,0 +1,100 @@
+name: LAB shared course foundation
+on:
+  pull_request:
+    paths: ['docs/lab/**', 'tools/**shared-course**', 'tools/test_race_clean_course_v1.cjs', '.github/workflows/lab-shared-course-v1.yml']
+permissions:
+  contents: read
+jobs:
+  graph-and-kyoto-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: c653c23fc7d80745dce08e32b890cb92a846e2eb
+          path: .course-base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tools/build-shared-course-v1.cjs --check
+      - run: node tools/audit-shared-course-v1.cjs --check
+      - run: node tools/test-shared-course-v1.cjs
+      - run: node tools/test-shared-course-runtime-v1.cjs
+      - run: node tools/compare-shared-course-v1.cjs .course-base
+      - run: node tools/qa-shared-course-parity-v1.cjs .course-base /tmp/compatibility.json
+      - run: node tools/test_race_clean_course_v1.cjs
+      - run: node tools/test_race_clean_ability90_v1.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-course-fixed-baseline-parity
+          path: /tmp/compatibility.json
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [controlled, realtime]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: c653c23fc7d80745dce08e32b890cb92a846e2eb
+          path: .course-base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test dependency outside repository
+        run: |
+          mkdir -p /tmp/course-browser-deps
+          npm install --prefix /tmp/course-browser-deps playwright@1.58.0 --fetch-timeout=60000 --fetch-retries=2
+          echo "NODE_PATH=/tmp/course-browser-deps/node_modules" >> "$GITHUB_ENV"
+          if command -v google-chrome >/dev/null; then
+            echo "CHROMIUM_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+          elif command -v chromium >/dev/null; then
+            echo "CHROMIUM_PATH=$(command -v chromium)" >> "$GITHUB_ENV"
+          else
+            /tmp/course-browser-deps/node_modules/.bin/playwright install --with-deps chromium
+          fi
+      - name: Fixed baseline manifest
+        run: node tools/qa-shared-course-parity-v1.cjs .course-base /tmp/compatibility.json
+      - name: Exact baseline inside the same Chromium runtime
+        run: node tools/qa-shared-course-browser-baseline-v1.cjs .course-base /tmp/compatibility.json
+      - name: Existing 1270m physical and projection comparison
+        if: matrix.mode == 'controlled'
+        run: node tools/browser-shared-course-v1.cjs .course-base
+      - name: Entire browser replay matrix
+        env:
+          COURSE_QA_OUT: /tmp/course-browser-qa
+          COURSE_QA_MODE: ${{ matrix.mode }}
+        run: |
+          if [ "$COURSE_QA_MODE" = realtime ]; then
+            node tools/qa-shared-course-browser-v1.cjs --realtime
+          else
+            node tools/qa-shared-course-browser-v1.cjs
+          fi
+          node tools/summarize-shared-course-qa-v1.cjs /tmp/compatibility.json /tmp/course-browser-qa
+      - name: Offscreen entry and wire crossing
+        if: matrix.mode == 'controlled'
+        run: node tools/qa-shared-course-goal-v1.cjs
+      - name: Existing unchanged ability90 browser regression
+        if: matrix.mode == 'controlled'
+        run: |
+          python3 -m pip install playwright==1.58.0
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory docs > /tmp/course-http.log 2>&1 &
+          LAB_QA_OUT=/tmp/course-existing-browser python3 tools/test_race_clean_ability90_browser.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-course-${{ matrix.mode }}-browser-evidence
+          path: |
+            /tmp/course-browser-qa/
+            /tmp/keiba-pr1-goal/
+            /tmp/course-existing-browser/
+            /tmp/compatibility.json
+            /tmp/kyoto-*.png
+          retention-days: 14

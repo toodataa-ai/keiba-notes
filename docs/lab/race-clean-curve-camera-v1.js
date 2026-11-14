@@ -12,8 +12,10 @@
  * never falsify a horse's own position.
  */
 (function(root){'use strict';
-const N=1920,SPAN=65,LANE=2,
- MAX_GAIN=1.45,RADIUS=48,DEADZONE=0.012;
+const config=root.RaceSharedCourse?.active;
+const lens=config?.camera.lens;
+const N=config?config.distanceM-config.camera.switchBeforeM:1920,SPAN=lens?.spanM??65,LANE=lens?.lane??2,
+ MAX_GAIN=lens?.maxGain??1.45,RADIUS=lens?.radiusM??48,DEADZONE=lens?.deadzone??0.012;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let samples=null,summary=null;
 const sortNumbers=values=>values.slice().sort((a,b)=>a-b);
@@ -26,8 +28,8 @@ function profile(turf){
   chords[d]=Math.hypot(p.x-q.x,p.y-q.y);
   if(!(chords[d]>1))throw Error('CAMERA_COMP_DEGENERATE_COURSE_'+d);
  }
- const sorted=sortNumbers(Array.from(chords).slice(120,1850));
- const ref=sorted[Math.floor(sorted.length*.88)];
+ const sorted=sortNumbers(Array.from(chords).slice(lens?.referenceFromM??120,lens?.referenceToM??1850));
+ const ref=sorted[Math.floor(sorted.length*(lens?.referenceQuantile??.88))];
  const raw=Array.from(chords,chord=>{
   const ratio=ref/chord;
   return clamp(ratio>1+DEADZONE?ratio:1,1,MAX_GAIN);
@@ -48,7 +50,7 @@ function profile(turf){
  for(let d=0;d<=N;d++){
   // Fade in at the start; fade back to fixed camera before GOAL-board
   // takeover at 1920m, so the last-stage transition is stable.
-  const fade=easing(d/130)*easing((N-d)/155);
+  const fade=easing(d/(lens?.fadeInM??130))*easing((N-d)/(lens?.fadeOutM??155));
   samples[d]=1+(smooth(d)-1)*fade;
  }
  const metrics=(from=1250,to=1830)=>{
@@ -73,10 +75,10 @@ function profile(turf){
   imageUnmodified:true,physicsUnmodified:true,normalZoomUnchanged:false,
   maxGain,maxGainLimit:MAX_GAIN,maxGainStepPerMetre:maxStep,
   reference65mChordPx:ref,lookbackM:SPAN,smoothingRadiusM:RADIUS,
-  thirdFourthTurn:metrics(1250,1800),
-  firstSecondTurn:metrics(310,710),
-  midStraight:metrics(770,1190),
-  fullRace:metrics(130,1830)});
+  thirdFourthTurn:metrics(...(lens?.metrics.thirdFourthTurn??[1250,1800])),
+  firstSecondTurn:metrics(...(lens?.metrics.firstSecondTurn??[310,710])),
+  midStraight:metrics(...(lens?.metrics.midStraight??[770,1190])),
+  fullRace:metrics(...(lens?.metrics.fullRace??[130,1830]))});
  return summary;
 }
 function gain(distance){
