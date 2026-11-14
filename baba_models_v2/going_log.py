@@ -178,8 +178,13 @@ def main(argv=None):
     for d in days:
         outcomes = main_outcomes(d)
         new = rows_from_live(d)
-        if not new and a.backfill_from:
-            new = rows_from_archive(d, outcomes)
+        if a.backfill_from:                       # fill what the live file lacks (older files had no forecast) and add the other racecourses
+            arch = {(r['track'], r['surface']): r for r in rows_from_archive(d, outcomes)}
+            for r in new:
+                ar = arch.pop((r['track'], r['surface']), None)
+                if ar and r.get('forecast_pops') is None:
+                    r['forecast_pops'] = ar['forecast_pops']; r['p_wet_main'] = ar['p_wet_main']; r['forecast_file'] = ar['forecast_file']
+            new = new + list(arch.values())
         for r in new:
             key = (r['date'], r['track'], r['surface'])
             old = rows.get(key)
