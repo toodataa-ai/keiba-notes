@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.55-20261114",
-  "current_public_version": "1.55",
+  "current_public_release": "release/jra-site-v1.56-20261114",
+  "current_public_version": "1.56",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1169,6 +1169,27 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/track-trends.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.56-20261114",
+      "branch": "release/jra-site-v1.56-20261114",
+      "commit_sha": "ec40d2639003ac9c82093ccd4dda7e37b13cca34",
+      "deployed_at": "2026-11-14T10:05:04+09:00",
+      "workflow_run_id": 43538362029,
+      "validation_workflow_run_id": 43538362029,
+      "public_version": "1.56",
+      "note": "2026-11-14ユーザー明示承認済み。騎手・調教師の成績：コース別の得意不得意（コースから探す）：騎手・調教師ごとにコース別（競馬場×芝ダート×距離×内外）の成績を追加。『コースから探す』で、選んだコースの得意・不得意な人を並べる。各人の詳細にもコース別を追加。続くかの検証（騎手0.02・調教師0.11）も表示。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-people-course-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/people-trends.html"
       ],
       "public_http_files_verified": null
     }
