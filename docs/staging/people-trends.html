@@ -62,7 +62,7 @@
 
 <section aria-labelledby="radTitle">
 <h2 id="radTitle">騎手のレーダーチャート</h2>
-<p class="sub">7つの軸で、騎手の「強さ」を見ます。人気（オッズ）は使わず、<b>結果そのもの</b>（勝率・着順・位置取り・上がりの速さ）で評価します。得点は、2018年以降に300走以上した騎手151人の値の幅（下位2%〜最高）を0〜100に直したものです（100＝全騎手の最高、0＝下位2%の水準。表には元の数字も並べています）。2人を重ねて比べられます。</p>
+<p class="sub">7つの軸で、騎手の「強さ」を見ます。人気（オッズ）は使わず、<b>結果そのもの</b>（勝率・着順・位置取り・上がりの速さ）で評価します。得点は、2018年以降に300走以上した騎手151人の値の幅（下位2%〜最高）を0〜100に直したものです（100＝全騎手の最高、0＝下位2%の水準。表には元の数字も並べています）。プルダウンは合計得点（7軸の平均）の高い順です。2人を重ねて比べられます。</p>
 <div><select class="pp-sel" id="radA" aria-label="騎手1"></select><select class="pp-sel" id="radB" aria-label="騎手2（比べる）"></select></div>
 <div id="radSvg" style="max-width:420px"></div>
 <div class="pp-tbl" id="radTbl"></div>
@@ -179,7 +179,9 @@ $('crsVenue').onchange=crsCourses;$('crsCourse').onchange=crsRender;
 
 var RD=null,SHORT={win:'勝率',p2:'連対率',p3:'複勝率',rank:'着順',front:'先行力',kick:'末脚',top:'上級戦'};
 function radSetup(){
- var opts=RD.jockeys.map(function(j,i){return '<option value="'+i+'">'+esc(j.name)+'（'+num(j.n)+'走）</option>'}).join('');
+ RD.jockeys.forEach(function(j){var v=RD.axes.map(function(a){return j.score[a.id]}).filter(function(x){return x!=null});j.total=v.length?v.reduce(function(x,y){return x+y},0)/v.length:0});
+ var order=RD.jockeys.map(function(_,i){return i}).sort(function(a,b){return RD.jockeys[b].total-RD.jockeys[a].total});
+ var opts=order.map(function(i){var j=RD.jockeys[i];return '<option value="'+i+'">'+Math.round(j.total)+'点　'+esc(j.name)+'（'+num(j.n)+'走）</option>'}).join('');
  $('radA').innerHTML=opts;$('radB').innerHTML='<option value="-1">（比べない）</option>'+opts;
  var ia=0,ib=-1;RD.jockeys.forEach(function(j,i){if(j.name.indexOf('川田')>=0)ia=i;if(j.name.indexOf('ルメール')>=0)ib=i});
  $('radA').value=ia;$('radB').value=ib;$('radA').onchange=$('radB').onchange=radRender;radRender();
@@ -200,6 +202,7 @@ function radRender(){
  function tag(c){return c==null?'—':(c>=0.5?'<span class="pp-tag on">よく続く</span>':(c>=0.2?'<span class="pp-tag">やや続く</span>':'<span class="pp-tag">続かない</span>'))}
  var h='<table><thead><tr><th>軸</th><th>'+esc(A.name.split(' ').pop())+'</th>'+(B?'<th>'+esc(B.name.split(' ').pop())+'</th>':'')+'<th>続く度</th></tr></thead><tbody>';
  ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawf(a.id,A.raw[a.id])+'</div></td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawf(a.id,B.raw[a.id])+'</div></td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
+ h+='<tr><td style="white-space:normal"><b>合計</b><div class="pp-note" style="margin:0;font-size:11px">7つの軸の得点の平均。プルダウンはこの順に並べています。</div></td><td style="vertical-align:top;font-weight:700">'+Math.round(A.total)+'</td>'+(B?'<td style="vertical-align:top;font-weight:700">'+Math.round(B.total)+'</td>':'')+'<td></td></tr>';
  $('radTbl').innerHTML=h+'</tbody></table>';
 }
 fetch('data/jockey_radar_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){RD=d;radSetup()}).catch(function(){$('radTbl').textContent='レーダーチャートのデータを読み込めませんでした。'});
