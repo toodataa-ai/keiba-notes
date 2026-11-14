@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.59-20261114",
-  "current_public_version": "1.59",
+  "current_public_release": "release/jra-site-v1.60-20261114",
+  "current_public_version": "1.60",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1255,6 +1255,29 @@
       "scope_files": [
         "docs/this-week.html",
         "docs/assets/week.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.60-20261114",
+      "branch": "release/jra-site-v1.60-20261114",
+      "commit_sha": "f646f792d23342110e73d5a4e63ad774c06e0e31",
+      "deployed_at": "2026-11-14T15:23:36+09:00",
+      "workflow_run_id": 43566096625,
+      "validation_workflow_run_id": 43566096625,
+      "public_version": "1.60",
+      "note": "2026-11-14ユーザー明示承認済み。Claudeの予想：買い目を流し・フォーメーション・ボックスにまとめて表示：Claudeの仮想の買い目を、同じ券種・同じ金額で流し／フォーメーション／ボックスの形にまとめられるものはまとめて表示（表示のみ。買い目・金額・結果は変えない）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-bet-group-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/results.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
