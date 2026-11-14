@@ -74,6 +74,9 @@ def parse_card(html: str) -> dict:
         no, horse, jockey = tr.select_one("td.num"), tr.select_one("td.horse"), tr.select_one("td.jockey")
         if not (no and horse and jockey):
             continue
+        if not text(no).isdigit():
+            # Cards for a later day are published before the draw: 馬番/枠 cells are blank.
+            raise NotDrawnYet("horse numbers not drawn yet")
         ht_ = text(horse)
         name = ht_.split(" ")[0]
         body = BODY_RE.search(ht_)
@@ -107,6 +110,10 @@ def parse_card(html: str) -> dict:
             "going_cells": baba, "field_size": len(horses), "horses": sorted(horses, key=lambda h: h["number"])}
 
 
+class NotDrawnYet(ValueError):
+    """The race card is published but the post positions (馬番) are not drawn yet (usually the next day's card)."""
+
+
 class Client:
     def __init__(self, delay=2.5):
         import requests
@@ -123,7 +130,7 @@ def run(dates: list[str], out_root: Path, delay: float) -> int:
     c = Client(delay)
     dli = decode(c.post("pw01dli00/F3"))
     drl = sorted({cn for cn in CNAME_RE.findall(dli) if cn.startswith("pw01drl") and any(cn[-11:-3] == d.replace("-", "") for d in dates)})
-    written, done = 0, set()
+    written, done, errors = 0, set(), []
     for cn in drl:
         page = decode(c.post(cn))
         for m in DDE_RE.finditer(page):
@@ -131,7 +138,12 @@ def run(dates: list[str], out_root: Path, delay: float) -> int:
                 continue
             done.add(m.group(0))
             raw = c.post(m.group(0))
-            card = parse_card(decode(raw))
+            try:
+                card = parse_card(decode(raw))
+            except NotDrawnYet:
+                print("skip (馬番未確定 / numbers not drawn yet)", m.group(0)); continue
+            except ValueError as e:
+                print("ERROR parsing", m.group(0), "-", e); errors.append(m.group(0)); continue
             now = datetime.now(JST)
             if now.isoformat() >= card["start_at"]:
                 print("skip (already started)", card["race_name"]); continue
@@ -146,7 +158,9 @@ def run(dates: list[str], out_root: Path, delay: float) -> int:
             (d / f"{now.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}.json").write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
             written += 1
             print("saved", rid, card["race_name"], card["field_size"], "horses")
-    return written
+    if errors:
+        print("unparsed cards:", errors)
+    return written, errors
 
 
 def main():
@@ -157,10 +171,12 @@ def main():
     a = ap.parse_args()
     today = datetime.now(JST).date()
     dates = a.date or [today.isoformat(), (today + timedelta(days=1)).isoformat()]
-    n = run(dates, Path(a.out), a.delay)
+    n, errors = run(dates, Path(a.out), a.delay)
     print("done", n)
     if n == 0:
         print("no race card saved (not published yet, or no main race on these dates)")
+    if errors:
+        sys.exit(1)   # the workflow still commits the cards that were saved (commit step runs on failure too)
 
 
 if __name__ == "__main__":

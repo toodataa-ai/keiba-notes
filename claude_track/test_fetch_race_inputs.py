@@ -33,5 +33,15 @@ class ParseTests(unittest.TestCase):
         self.assertNotIn("93.1 (14", s)
 
 
+class NotDrawnTests(unittest.TestCase):
+    def test_blank_numbers_raise_not_drawn(self):
+        # next-day cards are published before the draw: the 馬番 cells are empty (seen 2026-11-14 for 11/15)
+        import re
+        html = f.decode(gzip.decompress(FIX.read_bytes()))
+        html = re.sub(r'(<td class="num"[^>]*>).*?(</td>)', r"\1\2", html, flags=re.S)
+        with self.assertRaises(f.NotDrawnYet):
+            f.parse_card(html)
+
+
 if __name__ == "__main__":
     unittest.main()

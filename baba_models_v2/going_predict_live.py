@@ -161,7 +161,8 @@ def run_live(track, day, out_dir='live'):
         for s, o in (('turf', 'dirt'), ('dirt', 'turf')):
             info = {'morning': g[s], 'morning_other': g[o], 'moist0': float(m[s])}
             rows = build_rows(track, day, s, info, labels, obs, W, sched)
-            rec['surfaces'].append(result_record(track, day, s, info, rows, predict_probs(models, rows, s), 'official morning page'))
+            rec['surfaces'].append(result_record(track, day, s, info, rows, predict_probs(models, rows, s),
+                                                 'official page (day-before announcement, not yet updated for race day)' if page.get('pre_day') else 'official morning page'))
     import os; os.makedirs(out_dir, exist_ok=True)
     f = f'{out_dir}/{day.isoformat()}_{track}.json'
     json.dump(rec, open(f, 'w', encoding='utf-8'), ensure_ascii=False, indent=1); print('saved', f, rec['status'])

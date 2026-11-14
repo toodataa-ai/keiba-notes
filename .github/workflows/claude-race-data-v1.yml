@@ -32,6 +32,7 @@ jobs:
           if [ -n "${DATES:-}" ]; then IFS=',' read -ra ds <<< "$DATES"; for d in "${ds[@]}"; do args+=(--date "$d"); done; fi
           python3 claude_track/fetch_race_inputs.py "${args[@]}"
       - name: Commit new race cards only (never overwrites)
+        if: ${{ !cancelled() }}   # keep the cards that were saved even when another card failed to parse
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
