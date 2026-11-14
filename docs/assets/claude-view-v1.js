@@ -1,3 +1,96 @@
+/* 買い目を 流し／フォーメーション／ボックス にまとめる表示用の部品（表示だけ。買い目・金額・結果は変えない）
+   BetGroup.group(bets) -> [{kind,type,head,points,total,tiers:[{stake,parts:[..]}],uniform,members:[元の番号]}]
+   BetGroup.text(g,yen) -> 券種名を除いた表示文 */
+(function(){
+  var ORDERED={'馬単':1,'三連単':1},K={'馬連':2,'ワイド':2,'馬単':2,'三連複':3,'三連単':3},TORDER=['単勝','複勝','馬連','ワイド','馬単','三連複','三連単'];
+  function key(a,t){return (ORDERED[t]?a:a.slice().sort(function(x,y){return x-y})).join(',')}
+  function perms(arr,k){if(k===0)return [[]];var out=[];arr.forEach(function(x,i){perms(arr.filter(function(_,j){return j!==i}),k-1).forEach(function(p){out.push([x].concat(p))})});return out}
+  function combs(arr,k){if(k===0)return [[]];if(arr.length<k)return [];var out=[];for(var i=0;i<=arr.length-k;i++)combs(arr.slice(i+1),k-1).forEach(function(c){out.push([arr[i]].concat(c))});return out}
+  function uniq(a){var s={};return a.filter(function(x){return s[x]?false:(s[x]=1)}).sort(function(x,y){return x-y})}
+  function J(a){return a.join('・')}
+  // cov＝まとめる買い目のキー、part＝キー→『内訳に出す呼び名』
+  function candidates(type,S){
+    var k=K[type],ord=!!ORDERED[type],out=[],sels=Object.keys(S).map(function(s){return s.split(',').map(Number)}),H=uniq([].concat.apply([],sels));
+    function has(a){return !!S[key(a,type)]}
+    var U=H.slice();
+    function cnt(h,u){return sels.filter(function(s){return s.indexOf(h)>=0&&s.every(function(x){return u.indexOf(x)>=0})}).length}
+    while(U.length>=k+1){
+      var all=(ord?perms(U,k):combs(U,k)),ok=all.every(has);
+      if(ok&&U.length>=3&&all.length>=3){out.push({cov:all.map(function(a){return key(a,type)}),kind:'box',pri:3,head:'ボックス '+U.join('-'),part:function(s){return s.split(',').join(ord?'→':'-')}});break}
+      var worst=U.slice().sort(function(a,b){return cnt(a,U)-cnt(b,U)})[0];U=U.filter(function(x){return x!==worst});
+    }
+    if(k===2&&!ord){
+      H.forEach(function(a){var P=uniq(sels.filter(function(s){return s.indexOf(a)>=0}).map(function(s){return s[0]===a?s[1]:s[0]}));
+        if(P.length>=3)out.push({cov:P.map(function(p){return key([a,p],type)}),kind:'nagashi',pri:2,head:a+'流し → '+J(P),part:function(s){return s.split(',').map(Number).filter(function(x){return x!==a})[0]}})})
+    }
+    if(k===2&&ord){
+      var f2s={},s2f={};sels.forEach(function(s){(f2s[s[0]]=f2s[s[0]]||[]).push(s[1]);(s2f[s[1]]=s2f[s[1]]||[]).push(s[0])});
+      function mk(map,firstCol){var grp={};Object.keys(map).forEach(function(a){var v=uniq(map[a]);(grp[v.join(',')]=grp[v.join(',')]||{v:v,keys:[]}).keys.push(+a)});
+        Object.keys(grp).forEach(function(g){var F=grp[g].keys.sort(function(x,y){return x-y}),V=grp[g].v,cov=[];
+          F.forEach(function(a){V.forEach(function(b){cov.push(firstCol?key([a,b],type):key([b,a],type))})});
+          if(cov.length<3)return;
+          var first=firstCol?F:V,second=firstCol?V:F,head,nag=first.length===1||second.length===1;
+          if(first.length===1)head='1着流し '+first[0]+' → '+J(second);
+          else if(second.length===1)head='2着流し '+J(first)+' → '+second[0];
+          else head='フォーメーション 1着 '+J(first)+' → 2着 '+J(second);
+          out.push({cov:cov,kind:nag?'nagashi':'formation',pri:2,head:head,part:function(s){var q=s.split(',');return first.length===1?q[1]:second.length===1?q[0]:q.join('→')}})})}
+      mk(f2s,true);mk(s2f,false);
+    }
+    if(k===3&&!ord){
+      var pairs={};sels.forEach(function(s){combs(s,2).forEach(function(p){var kk=p.join(',');(pairs[kk]=pairs[kk]||[]).push(s.filter(function(x){return p.indexOf(x)<0})[0])})});
+      Object.keys(pairs).forEach(function(kk){var P=uniq(pairs[kk]);if(P.length>=3){var ab=kk.split(',').map(Number);out.push({cov:P.map(function(p){return key(ab.concat([p]),type)}),kind:'nagashi',pri:2,head:'2頭軸流し '+ab.join('-')+' → '+J(P),part:function(s){return s.split(',').map(Number).filter(function(x){return ab.indexOf(x)<0})[0]}})}});
+      H.forEach(function(a){var pr=sels.filter(function(s){return s.indexOf(a)>=0}).map(function(s){return s.filter(function(x){return x!==a})});
+        var PH=uniq([].concat.apply([],pr)),V=PH.slice();
+        function c2(h,u){return pr.filter(function(p){return p.indexOf(h)>=0&&p.every(function(x){return u.indexOf(x)>=0})}).length}
+        while(V.length>=3){var all=combs(V,2);if(all.every(function(p){return has([a].concat(p))})){out.push({cov:all.map(function(p){return key([a].concat(p),type)}),kind:'nagashi',pri:1,head:'1頭軸流し '+a+' → '+J(V),part:function(s){return s.split(',').map(Number).filter(function(x){return x!==a}).join('-')}});break}
+          var w=V.slice().sort(function(x,y){return c2(x,V)-c2(y,V)})[0];V=V.filter(function(x){return x!==w})}})
+    }
+    if(k===3&&ord){
+      var byF={};sels.forEach(function(s){(byF[s[0]]=byF[s[0]]||[]).push([s[1],s[2]])});
+      var grp={};Object.keys(byF).forEach(function(f){var pk=byF[f].map(function(p){return p.join(',')}).sort().join('|');(grp[pk]=grp[pk]||{pairs:byF[f],F:[]}).F.push(+f)});
+      Object.keys(grp).forEach(function(g){var B=uniq(grp[g].pairs.map(function(p){return p[0]})),C=uniq(grp[g].pairs.map(function(p){return p[1]})),n=0;
+        B.forEach(function(b){C.forEach(function(c){if(b!==c)n++})});
+        if(n!==grp[g].pairs.length||n<2)return;var F=grp[g].F.sort(function(x,y){return x-y}),cov=[];
+        F.forEach(function(f){grp[g].pairs.forEach(function(p){cov.push(key([f,p[0],p[1]],type))})});
+        if(cov.length<3)return;
+        out.push({cov:cov,kind:'formation',pri:2,head:'フォーメーション 1着 '+J(F)+' → 2着 '+J(B)+' → 3着 '+J(C),part:function(s){return s.split(',').join('→')}})})
+    }
+    return out;
+  }
+  function tiersOf(items,part){var m={},ord=[];items.forEach(function(x){var s=x.stake;if(!m[s]){m[s]={stake:s,parts:[]};ord.push(s)}m[s].parts.push(part(x.key))});return ord.map(function(s){return m[s]}).sort(function(a,b){return b.stake-a.stake})}
+  function group(bets){
+    var res=[],by={};
+    (bets||[]).forEach(function(b,i){var t=b.type;(by[t]=by[t]||[]).push({sel:(b.selection||[]).map(Number),i:i,stake:Number(b.stake_yen||0)})});
+    Object.keys(by).forEach(function(t){var items=by[t];
+      function mkGroup(kind,head,its,part){var tiers=tiersOf(its,part),tot=its.reduce(function(a,x){return a+x.stake},0);
+        return {kind:kind,type:t,head:head,points:its.length,total:tot,tiers:tiers,uniform:tiers.length===1,members:its.map(function(x){return x.i})}}
+      if(!K[t]){res.push(mkGroup('single','',items.map(function(x){return {key:x.sel.join('-'),stake:x.stake,i:x.i}}),function(k){return k}));return}
+      var S={},at={};items.forEach(function(x){var k=key(x.sel,t);S[k]=x;at[k]=x});
+      for(var guard=0;guard<30;guard++){
+        var cs=candidates(t,S).map(function(c){c.cov=c.cov.filter(function(k){return S[k]});return c}).filter(function(c){return c.cov.length>=3});
+        if(!cs.length)break;
+        cs.sort(function(a,b){return b.cov.length-a.cov.length||b.pri-a.pri});
+        var c=cs[0];
+        res.push(mkGroup(c.kind,c.head,c.cov.map(function(k){return {key:k,stake:S[k].stake,i:S[k].i}}),c.part));
+        c.cov.forEach(function(k){delete S[k]});
+      }
+      var left=Object.keys(S).map(function(k){return {key:k,stake:S[k].stake,i:S[k].i}}).sort(function(a,b){return a.i-b.i});
+      if(left.length)res.push(mkGroup('single','',left,function(k){return k.split(',').join(ORDERED[t]?'→':'-')}));
+    });
+    return res.sort(function(a,b){var d=TORDER.indexOf(a.type)-TORDER.indexOf(b.type);return d||Math.min.apply(null,a.members)-Math.min.apply(null,b.members)});
+  }
+  function text(g,yen){
+    var amt=function(t,n){return (n>1?'各':'')+yen(t.stake)};
+    if(g.kind==='single'){
+      if(g.uniform)return g.tiers[0].parts.join('、')+'（'+amt(g.tiers[0],g.points)+'）';
+      return g.tiers.map(function(t){return t.parts.join('・')+'（'+amt(t,t.parts.length)+'）'}).join('、')}
+    var base=g.head+'（'+g.points+'点・'+(g.uniform?'各'+yen(g.tiers[0].stake)+'＝計':'計')+yen(g.total)+'）';
+    if(!g.uniform)base+='　内訳：'+g.tiers.map(function(t){return t.parts.join('・')+'＝'+amt(t,t.parts.length)}).join('／');
+    return base}
+  window.BetGroup={group:group,text:text};
+})();
+
+
 /* 「今週のAI予想」「過去の成績」に、ChatGPT / Claude の切り替えを足す。
    ChatGPT 側の表示は一切変えない（Claude 側は別のデータを読む）。成績は合算しない。 */
 (function(){
@@ -17,7 +110,7 @@
       var cl=key==='claude';
       kids.forEach(function(k){if(k.dataset.pvWas===undefined)k.dataset.pvWas=k.hidden?'1':'0';k.hidden=cl?true:k.dataset.pvWas==='1'});
       panel.hidden=!cl;bC.setAttribute('aria-pressed',String(!cl));bL.setAttribute('aria-pressed',String(cl));
-      try{history.replaceState(null,'',cl?'#claude':location.pathname+location.search)}catch(e){}
+      try{history.replaceState(null,'',location.pathname+location.search+(cl?'#claude':''))}catch(e){}
       if(cl&&!panel.dataset.loaded)load();
     }
     bC.addEventListener('click',function(){show('chatgpt')});bL.addEventListener('click',function(){show('claude')});
@@ -25,10 +118,11 @@
     function yen(n){return n==null?'—':Number(n).toLocaleString('ja-JP')+'円'}
     function pct(x){return x==null?'—':(x*100).toFixed(1)+'%'}
     function bet(b){return esc(b.type)+' '+esc(b.selection.join(b.type==='馬単'||b.type==='三連単'?'→':'-'))+'（'+yen(b.stake_yen)+'）'}
+    function groupedList(bets){try{var gs=window.BetGroup.group(bets);return '<ul class="pv-betlist" style="margin:4px 0 6px;padding-left:1.2em">'+gs.map(function(g){return '<li><b>'+esc(g.type)+'</b>　'+esc(window.BetGroup.text(g,yen))+'</li>'}).join('')+'</ul>'}catch(e){return '<p>'+bets.map(bet).join('、')+'</p>'}}
     function card(r){
       var h='<article class="pv-card"><h3>'+esc(r.race_name)+'</h3><p class="pv-meta">'+esc(r.date)+' '+esc(r.venue)+'　予想の版：'+esc(r.prompt_version||'—')+'</p>';
       h+='<ul class="pv-marks">'+r.marks.map(function(m){return '<li>'+esc(m.mark)+' '+esc(m.no)+' '+esc(m.name)+'</li>'}).join('')+'</ul>';
-      h+='<p class="pv-bets">'+(r.bets.length?'仮想の買い目：'+r.bets.map(bet).join('、')+'（合計'+yen(r.total_stake_yen)+'）':'見送り')+'</p>';
+      h+=(r.bets.length?'<p class="pv-bets" style="margin-bottom:0">仮想の買い目（合計'+yen(r.total_stake_yen)+'）</p>'+groupedList(r.bets):'<p class="pv-bets">見送り</p>');
       if(mode==='results'&&r.result){
         h+='<details class="spoiler-summary"><summary>結果を見る</summary><p class="pv-bets">3着内：'+r.result.finish_top3.join('・')+'　◎'+(r.result.honmei_win?'1着':r.result.honmei_top3?'3着内':'着外')+'　購入'+yen(r.result.stake_yen)+' → 払戻'+yen(r.result.payout_yen)+'</p></details>';
       }else if(mode==='results'){h+='<p class="pv-meta">結果の確認待ち</p>'}
@@ -64,10 +158,13 @@
       var stake=Number(r.result.stake_yen||0),payout=Number(r.result.payout_yen||0),profit=payout-stake;
       var counts={},order=[];rows.forEach(function(x){if(!counts[x.b.type]){counts[x.b.type]=0;order.push(x.b.type)}counts[x.b.type]++});
       var summary=order.map(function(t){return t+counts[t]+'点'}).join('・');
-      var list=rows.map(function(x){
-        var cls=x.hit?'hit':'miss',pay=x.payout!=null?'払戻 '+yenN(x.payout):'払戻 —';
-        var reason=x.b.reason?'<span>理由 '+esc(x.b.reason)+'</span>':'';
-        return '<div class="bet-row '+(x.hit?'is-hit':'')+'"><div class="bet-main"><span class="bet-type">'+esc(x.b.type)+'</span><span class="bet-selection">'+esc(selText(x.b))+'</span></div><span class="bet-status '+cls+'">'+(x.hit?'的中':'ハズレ')+'</span><div class="bet-money"><span>購入 '+yenN(x.b.stake_yen)+'</span><span class="'+(x.hit&&x.payout>0?'payout-hit':'')+'">'+esc(pay)+'</span>'+reason+'</div></div>'}).join('');
+      var groups;try{groups=window.BetGroup.group(r.bets)}catch(e){groups=rows.map(function(x,i){return{kind:'single',type:x.b.type,head:'',points:1,total:x.b.stake_yen,tiers:[{stake:x.b.stake_yen,parts:[selText(x.b)]}],uniform:true,members:[i]}})}
+      var list=groups.map(function(g){
+        var ms=g.members.map(function(i){return rows[i]}),hit=ms.some(function(x){return x.hit}),known=ms.every(function(x){return x.payout!=null}),pay0=ms.reduce(function(a,x){return a+(x.payout||0)},0),stk=ms.reduce(function(a,x){return a+Number(x.b.stake_yen||0)},0);
+        var cls=hit?'hit':'miss',pay=known?'払戻 '+yenN(pay0):'払戻 —';
+        var reason=(ms.length===1&&ms[0].b.reason)?'<span>理由 '+esc(ms[0].b.reason)+'</span>':'';
+        var sel=esc(window.BetGroup.text(g,yenN));
+        return '<div class="bet-row '+(hit?'is-hit':'')+'"><div class="bet-main"><span class="bet-type">'+esc(g.type)+'</span><span class="bet-selection">'+sel+'</span></div><span class="bet-status '+cls+'">'+(hit?'的中':'ハズレ')+'</span><div class="bet-money"><span>購入 '+yenN(stk)+'</span><span class="'+(hit&&pay0>0?'payout-hit':'')+'">'+esc(pay)+'</span>'+reason+'</div></div>'}).join('');
       return '<section class="bet-panel" aria-label="仮想の買い目"><div class="bet-panel-head"><strong>仮想の買い目（実際には購入していません）</strong><span>'+esc(summary)+' ／ '+rows.length+'点 / 発走前固定</span></div><div class="bet-list">'+list+'</div><div class="bet-total"><div><small>購入合計（仮想）</small><strong>'+yenN(stake)+'</strong></div><div><small>払戻合計</small><strong>'+yenN(payout)+'</strong></div><div><small>収支</small><strong class="'+(profit>0?'positive':profit<0?'negative':'')+'">'+yenN(profit)+'</strong></div></div></section>'}
     function reviewText(v){if(!v)return '';var t=v.summary||'';if(v.honmei_result)t+='\n\n◎の結果：'+v.honmei_result;if(v.failure_types&&v.failure_types.length)t+='\n失敗の分類：'+v.failure_types.join('、');if(v.lessons&&v.lessons.length)t+='\n\n学んだこと：\n'+v.lessons.map(function(x){return '・'+x}).join('\n');return t}
     function raceCardC(r){
