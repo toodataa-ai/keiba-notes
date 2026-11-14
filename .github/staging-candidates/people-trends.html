@@ -74,6 +74,23 @@
 <li>どの軸も、結果から見た過去の傾向で、次のレースを当てる保証ではありません。予想には使っていません。</li>
 </ul></div>
 </section>
+<section aria-labelledby="rlTitle">
+<h2 id="rlTitle">騎手のレーダーチャート（相対評価：人気に対して）</h2>
+<p class="sub">上の絶対評価と同じ7つの軸を、<b>人気（単勝オッズ）から見て期待される水準に対して</b>どれだけ上か、で見ます。<b>勝率×単勝オッズ＝単勝回収率</b>、<b>複勝率×複勝オッズ＝複勝回収率</b>（100円ずつ買い続けたときの戻り。人気に見合う強さなら約70〜80%）。連対率と上級戦は「実際の数÷オッズから見て期待される数」、着順・先行力・末脚は「同じ人気の馬の平均との差（点）」です。得点は絶対評価と同じく、騎手の値の下位2%〜最高を0〜100に直したものです。</p>
+<div><label style="font-size:13px;color:#6d6e75">期間：</label><select class="pp-sel" id="rlYear" aria-label="期間（通算か年）"></select> <label style="font-size:13px;color:#6d6e75">並べ方：</label><select class="pp-sel" id="rlSort" aria-label="プルダウンの並べ方"></select></div>
+<p class="pp-note" id="rlYearNote" style="margin:0 0 8px"></p>
+<div><select class="pp-sel" id="rlA" aria-label="騎手1"></select><select class="pp-sel" id="rlB" aria-label="騎手2（比べる）"></select></div>
+<div id="rlSvg" style="max-width:420px"></div>
+<div class="pp-tbl" id="rlTbl"></div>
+<div class="pp-box">
+<b>読み方の注意</b>
+<ul>
+<li><b>期待は単勝オッズ</b>から作っています。市場は人気馬を買いすぎる傾向があるので、人気馬に多く乗る騎手は「人気に対して」では低めに出やすく、穴馬で勝つ騎手は高めに出やすくなります。</li>
+<li><b>回収率は運に大きく左右</b>されます（大穴1回で大きく動く）。走数が少ない騎手や年は、平均に寄せて表示しています。</li>
+<li><b>「続く度」</b>は、前半（〜2021年）と後半（2022年〜）で騎手の並びがそろうかです。<b>着順・先行力・末脚の人気比はよく続く</b>一方、<b>単勝回収率・連対率・上級戦は続きにくい</b>（ほぼ運の幅）ので、強さというより「その期間の結果」として見てください。</li>
+<li>どの軸も、結果から見た過去の傾向で、次のレースを当てる保証ではありません。予想には使っていません。</li>
+</ul></div>
+</section>
 
 <section aria-labelledby="crsTitle">
 <h2 id="crsTitle">コースから探す</h2>
@@ -176,9 +193,13 @@ function bindBtns(attr,fn){Array.prototype.forEach.call(document.querySelectorAl
 bindBtns('data-ck',function(v){CK=v});bindBtns('data-co',function(v){CO=v});bindBtns('data-cm',function(v){CM=parseInt(v,10)});
 $('crsVenue').onchange=crsCourses;$('crsCourse').onchange=crsRender;
 
-var RD=null,CUR=[],SHORT={win:'勝率',p2:'連対率',p3:'複勝率',rank:'着順',front:'先行力',kick:'末脚',top:'上級戦'};
+var SHORT_A={win:'勝率',p2:'連対率',p3:'複勝率',rank:'着順',front:'先行力',kick:'末脚',top:'上級戦'},SHORT_R={win:'単勝回収',p2:'連対比',p3:'複勝回収',rank:'着順差',front:'先行差',kick:'末脚差',top:'上級比'};
+function rawf(id,v){if(v==null)return '—';return (id==='win'||id==='p2'||id==='p3'||id==='top')?(v*100).toFixed(1)+'%':v.toFixed(0)}
+function pt(cx,cy,r,i,n){var a=-Math.PI/2+2*Math.PI*i/n;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
+function rawk(a,v){if(v==null)return '—';if(a.kind==='mean')return Math.round(v*100)+'%';if(a.kind==='ratio')return v.toFixed(2);if(a.kind==='diff')return (v>=0?'+':'')+v.toFixed(1)+'点';return rawf(a.id,v)}
+function radarInit(P,url,SHORT){var RD=null,CUR=[];
 function radOpts(){
- var key=$('radSort').value,ax=RD.axes.filter(function(a){return a.id===key})[0];
+ var key=$(P+'Sort').value,ax=RD.axes.filter(function(a){return a.id===key})[0];
  function val(j){return key==='total'?j.total:(j.score[key]==null?-1:j.score[key])}
  var order=CUR.map(function(_,i){return i}).sort(function(a,b){return val(CUR[b])-val(CUR[a])});
  var lab=key==='total'?'合計':ax.label;
@@ -186,33 +207,31 @@ function radOpts(){
 }
 function radFill(ida,idb){
  var o=radOpts();
- $('radA').innerHTML=o;$('radB').innerHTML='<option value="-1">（比べない）</option>'+o;
+ $(P+'A').innerHTML=o;$(P+'B').innerHTML='<option value="-1">（比べない）</option>'+o;
  function idx(id){for(var i=0;i<CUR.length;i++)if(CUR[i].id===id)return i;return -1}
  var ia=idx(ida),ib=idx(idb);
- $('radA').value=ia>=0?ia:0;$('radB').value=ib;
+ $(P+'A').value=ia>=0?ia:0;$(P+'B').value=ib;
 }
-function radCur(){var y=$('radYear').value;
+function radCur(){var y=$(P+'Year').value;
  if(y==='all'){CUR=RD.jockeys}else{var nm={};RD.jockeys.forEach(function(j){nm[j.id]=j});
   CUR=RD.by_year[y].map(function(r){var j=nm[r[0]],sc={},rw={};RD.axes.forEach(function(a,i){sc[a.id]=r[2][i];rw[a.id]=r[3][i]});return {id:r[0],name:j.name,n:r[1],score:sc,raw:rw}})}
  CUR.forEach(function(j){var v=RD.axes.map(function(a){return j.score[a.id]}).filter(function(x){return x!=null});j.total=v.length?v.reduce(function(x,y){return x+y},0)/v.length:0});
- $('radYearNote').textContent=y==='all'?'':y+'年に100走以上した'+CUR.length+'人が対象です。得点はその年の騎手の中での値の幅（下位2%〜最高）で決めるので、年が違う得点どうしの大小は比べられません（年の途中の2026年は走数が少なめ）。';
+ $(P+'YearNote').textContent=y==='all'?'':y+'年に100走以上した'+CUR.length+'人が対象です。得点はその年の騎手の中での値の幅（下位2%〜最高）で決めるので、年が違う得点どうしの大小は比べられません（年の途中の2026年は走数が少なめ）。';
 }
 function radSetup(){
- $('radYear').innerHTML='<option value="all">通算（2018年〜）</option>'+Object.keys(RD.by_year).sort().reverse().map(function(y){return '<option value="'+y+'">'+y+'年'+(y==='2026'?'（途中）':'')+'</option>'}).join('');
+ $(P+'Year').innerHTML='<option value="all">通算（2018年〜）</option>'+Object.keys(RD.by_year).sort().reverse().map(function(y){return '<option value="'+y+'">'+y+'年'+(y==='2026'?'（途中）':'')+'</option>'}).join('');
  radCur();
- $('radSort').innerHTML='<option value="total">合計得点</option>'+RD.axes.map(function(a){return '<option value="'+a.id+'">'+esc(a.label)+'</option>'}).join('');
+ $(P+'Sort').innerHTML='<option value="total">合計得点</option>'+RD.axes.map(function(a){return '<option value="'+a.id+'">'+esc(a.label)+'</option>'}).join('');
  var ia=0,ib=-1;CUR.forEach(function(j,i){if(j.name.indexOf('川田')>=0)ia=i;if(j.name.indexOf('ルメール')>=0)ib=i});
- $('radA').innerHTML=radOpts();$('radB').innerHTML='<option value="-1">（比べない）</option>'+radOpts();
- $('radA').value=ia;$('radB').value=ib;
- function ids(){var a=CUR[+$('radA').value],b=CUR[+$('radB').value];return [a&&a.id,b&&b.id]}
- $('radSort').onchange=function(){var d=ids();radFill(d[0],d[1]);radRender()};
- $('radYear').onchange=function(){var d=ids();radCur();radFill(d[0],d[1]);radRender()};
- $('radA').onchange=$('radB').onchange=radRender;radRender();
+ $(P+'A').innerHTML=radOpts();$(P+'B').innerHTML='<option value="-1">（比べない）</option>'+radOpts();
+ $(P+'A').value=ia;$(P+'B').value=ib;
+ function ids(){var a=CUR[+$(P+'A').value],b=CUR[+$(P+'B').value];return [a&&a.id,b&&b.id]}
+ $(P+'Sort').onchange=function(){var d=ids();radFill(d[0],d[1]);radRender()};
+ $(P+'Year').onchange=function(){var d=ids();radCur();radFill(d[0],d[1]);radRender()};
+ $(P+'A').onchange=$(P+'B').onchange=radRender;radRender();
 }
-function rawf(id,v){if(v==null)return '—';return (id==='win'||id==='p2'||id==='p3'||id==='top')?(v*100).toFixed(1)+'%':v.toFixed(0)}
-function pt(cx,cy,r,i,n){var a=-Math.PI/2+2*Math.PI*i/n;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
 function radRender(){
- var ax=RD.axes,n=ax.length,A=CUR[+$('radA').value],bi=+$('radB').value,B=bi>=0?CUR[bi]:null;
+ var ax=RD.axes,n=ax.length,A=CUR[+$(P+'A').value],bi=+$(P+'B').value,B=bi>=0?CUR[bi]:null;
  var W=360,H=330,cx=180,cy=165,R=100,g='';
  [25,50,75,100].forEach(function(v){g+='<polygon points="'+ax.map(function(_,i){return pt(cx,cy,R*v/100,i,n).join(',')}).join(' ')+'" fill="none" stroke="#dcdee3" stroke-width="1"/>'});
  ax.forEach(function(a,i){var p=pt(cx,cy,R,i,n),q=pt(cx,cy,R+22,i,n);g+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p[0]+'" y2="'+p[1]+'" stroke="#dcdee3"/>';
@@ -221,14 +240,16 @@ function radRender(){
   return '<polygon points="'+pts+'" fill="'+col+'" fill-opacity="0.18" stroke="'+col+'" stroke-width="2.2"/>'+ax.map(function(a,i){var v=J.score[a.id];var p=pt(cx,cy,R*(v==null?0:v)/100,i,n);return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.2" fill="'+col+'"/>'}).join('')}
  g+=poly(B,'#d9731f')+poly(A,'#2f6fd0');
  var leg='<text x="8" y="'+(H-8)+'" font-size="12" fill="#2f6fd0">● '+esc(A.name)+'</text>'+(B?'<text x="'+(W-8)+'" y="'+(H-8)+'" font-size="12" text-anchor="end" fill="#d9731f">● '+esc(B.name)+'</text>':'');
- $('radSvg').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="騎手のレーダーチャート">'+g+leg+'</svg>';
+ $(P+'Svg').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="騎手のレーダーチャート">'+g+leg+'</svg>';
  function tag(c){return c==null?'—':(c>=0.5?'<span class="pp-tag on">よく続く</span>':(c>=0.2?'<span class="pp-tag">やや続く</span>':'<span class="pp-tag">続かない</span>'))}
  var h='<table><thead><tr><th>軸</th><th>'+esc(A.name.split(' ').pop())+'</th>'+(B?'<th>'+esc(B.name.split(' ').pop())+'</th>':'')+'<th>続く度</th></tr></thead><tbody>';
- ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawf(a.id,A.raw[a.id])+'</div></td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawf(a.id,B.raw[a.id])+'</div></td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
+ ax.forEach(function(a){h+='<tr><td style="white-space:normal;min-width:150px">'+esc(a.label)+'<div class="pp-note" style="margin:0;font-size:11px">'+esc(a.desc)+'</div></td><td style="vertical-align:top;font-weight:700">'+(A.score[a.id]==null?'—':A.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawk(a,A.raw[a.id])+'</div></td>'+(B?'<td style="vertical-align:top;font-weight:700">'+(B.score[a.id]==null?'—':B.score[a.id])+'<div class="pp-note" style="margin:0;font-weight:400;font-size:11px">'+rawk(a,B.raw[a.id])+'</div></td>':'')+'<td style="vertical-align:top;white-space:normal">'+tag(a.persist.corr)+'</td></tr>'});
  h+='<tr><td style="white-space:normal"><b>合計</b><div class="pp-note" style="margin:0;font-size:11px">7つの軸の得点の平均。</div></td><td style="vertical-align:top;font-weight:700">'+Math.round(A.total)+'</td>'+(B?'<td style="vertical-align:top;font-weight:700">'+Math.round(B.total)+'</td>':'')+'<td></td></tr>';
- $('radTbl').innerHTML=h+'</tbody></table>';
+ $(P+'Tbl').innerHTML=h+'</tbody></table>';
 }
-fetch('data/jockey_radar_v1.json?v=20261114y',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){RD=d;radSetup()}).catch(function(){$('radTbl').textContent='レーダーチャートのデータを読み込めませんでした。'});
+
+fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){RD=d;radSetup()}).catch(function(){$(P+'Tbl').textContent='レーダーチャートのデータを読み込めませんでした。'});}
+radarInit('rad','data/jockey_radar_v1.json?v=20261114y',SHORT_A);radarInit('rl','data/jockey_radar_rel_v1.json?v=20261114r',SHORT_R);
 fetch('data/people_courses_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){CD=d;['jockey','trainer'].forEach(function(k){d[k].forEach(function(p){CMAP[k][p.id]=p.c})});crsSetup();if(D)render()}).catch(function(){$('crsNote').textContent='コース別のデータを読み込めませんでした。'});
 fetch('data/people_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;findings();render()}).catch(function(){$('ppMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ppFind').textContent=''});
 })();
