@@ -1,4 +1,4 @@
-# Claude の予想の手順書 claude-v1.0（毎週 土日の朝に実行）
+# Claude の予想の手順書 claude-v1.1（毎週 土日の朝に実行）
 
 あなたは keiba-notes の「Claude の予想」担当です。ChatGPT の予想とは完全に別に、独立して予想します。
 報告は日本語・平易な言葉で。リポジトリは toodataa-ai/keiba-notes（main）。
@@ -28,6 +28,7 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
 - **馬場の予測（福島・阪神のみ。ファイルがあるときだけ）**：`git pull` のあと `baba_models_v2/live/<日付>_<競馬場>.json`（朝8:45 JST に自動で保存される、オッズを使わない馬場予測）を読む。`surfaces` のうち今回の芝/ダ（turf/dirt）の `races` から `race_no`=11 を探し、`probs`（良・稍重・重・不良の確率）と `most_likely`、`p_change_from_morning`（朝から変わる確率）を、**馬場の変化の見込みとして**評価に使う（道悪の確率が高いときは、道悪の実績を重く見る）。発走時刻は直近2年の中央値で代用しているので、確率は目安。ファイルが無い競馬場・日は使わず、従来どおり出馬表の馬場状態だけで評価する。使ったときは STEP1 の保存内容に `"going_forecast":{"file":"baba_models_v2/live/…","probs":{…},"most_likely":"…"}` を足す（使わなかったときは `null`）。
 - **前日の馬場傾向（記録のみ・勝率と印は変えない）**：前日が同じ開催（同じ競馬場・同じ回・日目が1つ前）のときだけ、`git pull` のあと `docs/data/baba_bias/<前日の日付>.json` のその競馬場・このレースの芝/ダートの speed・front・outer の z と label を読む。前日が別開催・ファイルが無いときは null。STEP1 に `bias_used` として {speed_z, front_z, outer_z, label} をそのまま記録する。**この数字で印・勝率を上げ下げしてはいけない**（過去4年の検証で、前日の傾向に合わせて先行馬・差し馬を評価しても当たり具合は良くならなかった）。|z|<0.5 は「ふつう」で言及しない。outer（外枠）は使わない。芝1400m以下の front は参考にしない。当日朝の公式馬場状態が前日と違うときは speed も「参考外」と書く。回顧のため、前日の傾向から有利そうな馬がいれば本文に1行だけ書いてよい（勝率は変えない）。
 - 若駒・休み明けは減点せず、不確実性として明記する
+- **初めての距離（特に2歳戦の距離延長）**（claude-v1.1・2026-11-15 追加）：その距離を走るのが初めての馬は、経験がないことを理由に確率を大きく下げない。距離延長の2歳馬は伸びしろがあるので、不確実性として `reason` に書き、近走の内容・血統・脚質から延長に向くかを評価する。他に評価できる材料が無いときも、同じ条件の馬より低く置くのは「やや」までにとどめる（きっかけ：11/14 東京8R で、1600mが初めての馬が2着・3着だったのに低く見ていた）。**1レースだけの観察なので、効果は20レースほど記録してから見直す**
 - 個別の好材料は、必ず総合順位へ反映する（書くだけで終わらせない）
 - 人気ではなく、能力・適性を評価する（オッズは見ていないので自然にそうなる）
 
@@ -36,7 +37,7 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
 保存先：`claude_track/predictions/<race_id>/step1-<UTC日時>.json`
 ```json
 {"schema_version":1,"predictor":"claude","stage":"step1","race_id":"<日付>-<競馬場コード>-11",
- "race_name":"…","venue":"東京","date":"2026-11-08","prompt_version":"claude-v1.0","model":"<実行したモデル名>",
+ "race_name":"…","venue":"東京","date":"2026-11-08","prompt_version":"claude-v1.1","model":"<実行したモデル名>",
  "generated_at":"<JSTの現在時刻 ISO>","information_cutoff_at":"<入力ファイルの captured_at>","odds_seen_before_step1":false,
  "input_file":"claude_track/inputs/<race_id>/<ファイル名>","input_sha256":"<そのファイルのsha256>",
  "going_forecast":null, "bias_used":null,
