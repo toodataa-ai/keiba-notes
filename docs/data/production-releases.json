@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.60-20261114",
-  "current_public_version": "1.60",
+  "current_public_release": "release/jra-site-v1.61-20261114",
+  "current_public_version": "1.61",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1278,6 +1278,27 @@
         "docs/this-week.html",
         "docs/results.html",
         "docs/assets/claude-view-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.61-20261114",
+      "branch": "release/jra-site-v1.61-20261114",
+      "commit_sha": "6ede8b9a068bef6fa5b8d855f375cd4d51f79a95",
+      "deployed_at": "2026-11-14T19:45:08+09:00",
+      "workflow_run_id": 43586732693,
+      "validation_workflow_run_id": 43586732693,
+      "public_version": "1.61",
+      "note": "2026-11-14ユーザー明示承認済み。競馬場の傾向：新潟芝1200m・3000m・3200mのスタートと、中京の3コーナーの道すじ：スタートの印が角のはじまりにかかっていて、カーブから始まって見えていた新潟芝1200m（内）を、直線から始まる道すじに修正（データは umapot-starts-arc12.json。変わるのはこの1コースだけ）。 追加（2026-11-14）：新潟芝3000m（外）・3200m（外）のスタートを、公式の平面図どおりゴール前の直線を左へ延ばした位置（2400m内・1000m直線と同じ地点）に直した。中京芝の周回線は、3コーナーが内に寄って見えたため、走路の中心線からのずれの上限を幅の4%に絞って描き直した（他の競馬場は変更なし）。データは umapot-starts-arc14.json。 追加（11/14 夕）：新潟芝の外回りで、2コーナーは半径を長くして内寄りに、4コーナーは半径を短めにして早めに内（経済コース）へ入る形にした（中心線からのずれは最大で幅の約19%＝規定の10%を超える例外）。データは umapot-starts-arc15.json。 更新（11/14 夕）：新潟外回りの1〜2コーナーは、内回り（2400m内など）と同じ半径129の半円に合わせた（arc15の内寄り調整を置き換え）。3〜4コーナーは従来の2つの円弧。データは umapot-starts-arc16.json。 更新（11/14 夕）：新潟外回りの周回線を、1〜2コーナーは2400m（内）の線、3〜4コーナーは1800m（外）の線に合わせて引き直した（arc16の半円方式を置き換え）。データは umapot-starts-arc17.json。 更新（11/14 夕）：1800m外・2400m内と3200m外の線がずれていたため、新潟外回りの周回線を『半径129の2つの半円＋2本の直線』に作り直した（2400m内の半円と同じ半径。1800m外の4コーナーともほぼ一致）。距離の測りも1800m外=1785m、3000m外=3004mと近くなった。データは umapot-starts-arc18.json。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-trends-niigata-1200-start-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/track-trends.html"
       ],
       "public_http_files_verified": null
     }
