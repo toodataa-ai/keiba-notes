@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-14T16:06:50+00:00",
+ "generated_at": "2026-11-14T16:37:11+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
@@ -2775,6 +2775,18 @@
   "jra-improvement-pipeline-v1.yml": {
    "label": "基準に届いたかの確認・通知",
    "runs": [
+    {
+     "id": 43616546263,
+     "event": "schedule",
+     "created_at": "2026-11-14T16:36:38Z",
+     "started_at": "2026-11-14T16:36:38Z",
+     "ended_at": "2026-11-14T16:36:51Z",
+     "status": "completed",
+     "conclusion": "failure",
+     "attempt": 1,
+     "by": "G",
+     "fail_kind": ""
+    },
     {
      "id": 43580167694,
      "event": "workflow_dispatch",
