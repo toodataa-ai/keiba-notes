@@ -5,10 +5,12 @@ from scipy.optimize import minimize
 from scipy.spatial import cKDTree
 from . import arc_spline as A
 
+START_FROM_MARK = {("niigata", 3000, "turf|outer"): ("turf", 2400, "内"), ("niigata", 3200, "turf|outer"): ("turf", 1000, None)}   # JRA公式の平面図で、新潟の3000m（外）は2400m（内）と、3200m（外）は1000m（直線）と同じ発走地点（ゴール前の直線を左へ延ばした引き込み線の上）。元図に印がある距離の位置を使う（ユーザー指摘 2026-11-14）
 HOME_EXTEND = {("hanshin", "turf|outer")}   # 2600mなど、発走地点がゴール前の直線の手前（4コーナーの中）になる距離を、直線の延長上（引き込み線）に置く
 SNAP_STRAIGHT = {("chukyo", 1300), ("chukyo", 3000)}   # JRAの図で発走が直線上にあるもの：目安の位置が円弧の途中なら、その円弧を出た所（直線のはじまり）に置く
 FORCE_CHUTE = {("tokyo", "1600")}; CHUTE_KEYS_FORCED = None   # 印が円弧の途中にあっても、発走は引き込み線（直線）から入る形にする
 CHUTE_KEYS = {("tokyo", "2000"): ("LAA", "LAAA")}   # 角ばって見える所は、最後の直線を大きな円弧に置き換える
+TOL_BY_VENUE = {"chukyo": 0.04}   # 中京は3コーナーが内に寄って見えたため、周回線のずれの上限を幅の4%に絞る（ユーザー指摘 2026-11-14）
 TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対する割合）
 LOOP_SHARE = {("hanshin", "turf|outer"): dict(**{"with": "turf|inner"}, arcs=((177.0, 305.0), (201.0, 155.0))),
               ("kyoto", "turf|outer"): dict(**{"with": "turf|inner"}, arcs=((209.0, 549.0), (159.0, 98.0)), R_last=250.0)}   # 京都外回りも同じ（2コーナー・4コーナーが外に膨れていた。ユーザー依頼 2026-11-14）   # 阪神外回りの1〜2コーナー（内回りと同じ走路）は内回りの線と同じ円弧を使い、向正面の直線へ接線でつなぐ（ユーザー依頼 2026-11-13「内回りと同じラインが理想」）
@@ -84,11 +86,11 @@ def arcify(code, out, centre, half, routes, log=print):
         th, _ = A.heading_curv(C, True)
         fy = 1.0 if (th[-1] - th[0]) > 0 else -1.0       # 曲がる向きが正になる座標系にそろえる
         Cf = C * [1.0, fy]
-        tol = TOL_RATIO * 2 * half[rk]
+        tol = TOL_BY_VENUE.get(code, TOL_RATIO) * 2 * half[rk]
         r = A.fit_closed(Cf, tol)
         if r is None:
             raise SystemExit(f"{code} {rk}: 直線と円弧の周回線が作れません")
-        fits[rk] = dict(sp=r[0], dev=r[1], fy=fy, C=C, Cf=Cf, tol=tol)
+        fits[rk] = dict(sp=r[0], dev=r[1], fy=fy, C=C, Cf=Cf, tol=tol, tolc=TOL_RATIO * 2 * half[rk])
     for (c_, rk), mg in LOOP_MERGE.items():
         f = fits.get(rk)
         if c_ == code and f and len(f["sp"].L) == mg["n"]:
@@ -99,13 +101,13 @@ def arcify(code, out, centre, half, routes, log=print):
             f["sp"] = _share_with_inner(f["sp"], fits[sh["with"]]["sp"], sh)
     loops = {}
     for rk, f in fits.items():
-        sp, C, Cf, fy, tol = f["sp"], f["C"], f["Cf"], f["fy"], f["tol"]
+        sp, C, Cf, fy, tol = f["sp"], f["C"], f["Cf"], f["fy"], f["tol"]; tolc = f["tolc"]
         dev = float(cKDTree(C).query(sp.sample(1.0) * [1.0, fy])[0].max()) if (code, rk) in LOOP_MERGE or (code, rk) in LOOP_SHARE else f["dev"]
         # ゴール線の位置（C の先頭）を道のりの始点にそろえる
         smp = sp.sample(0.25); k = int(np.argmin(np.linalg.norm(smp - Cf[0], axis=1)))
         sg = k * 0.25
         base = A.rebase(sp, sg)
-        loops[rk] = dict(sp=sp, base=base, fy=fy, tol=tol, dev=dev, C=C, Cf=Cf, tree=cKDTree(C))
+        loops[rk] = dict(sp=sp, base=base, fy=fy, tol=tolc, dev=dev, C=C, Cf=Cf, tree=cKDTree(C))
         log(f"  {code} {rk}: 周回 {sp.kinds()}（{len(sp.L)}部品）中心線からの最大ずれ {dev:.1f}px = 幅の{dev / (2 * half[rk]) * 100:.1f}%  半径 " + ",".join(f"{1 / k:.0f}" for k in sp.K if k > 0) + ("  ※10%超" if dev > tol else ""))
     res = []
     for o in out:
@@ -267,6 +269,20 @@ def approx_starts(code, loops, routes, cat_routes, have):
         for dist in r["distances_m"]:
             if any(s["surface"] == r["surface"] and s["dist"] == dist and s.get("inout") == io for s in have):
                 continue
+            if (code, dist, rk) in START_FROM_MARK:
+                sf, df, iof = START_FROM_MARK[(code, dist, rk)]
+                mo = next((t for t in have if t["surface"] == sf and t["dist"] == df and t.get("inout") == iof), None)
+                if mo is not None and base.K[-1] == 0:
+                    sj = base.cum[len(base.L) - 1]; xj, yj, thj = base.at(sj); dv = np.array([math.cos(thj), math.sin(thj)])
+                    mk = np.array([mo["x"], mo["y"]]) * [1, fy]; e = float(np.dot(np.array([xj, yj]) - mk, dv))
+                    if e > 0:
+                        S0 = np.array([xj, yj]) - e * dv; first = (L - sj) + e
+                        laps = max(0, round((dist - first * mpp) / lap)); vs = np.vstack([[S0], base.vertices(sj, L)])
+                        full = np.vstack([vs] + [base.vertices()[1:]] * laps) * [1.0, fy]
+                        new.append(dict(label=("D" if r["surface"] == "dirt" else "") + str(dist) + (io or ""), dist=dist, surface=r["surface"], inout=io, route=rk,
+                                        x=round(float(S0[0]), 2), y=round(float(S0[1] * fy), 2), path=[[round(float(a_), 2), round(float(b_), 2)] for a_, b_ in full],
+                                        prim="|" + base.kinds(), measured_m=int(round(laps * lap + first * mpp)), official=True, mx=round(float(mo["x"]), 2), my=round(float(mo["y"]), 2), laps=int(laps), approx=True, basis="shared_mark"))
+                        continue
             laps = max(0, math.ceil(dist / lap - 1e-9) - 1); rem = dist - laps * lap      # 0 < rem <= lap
             s0 = max(0.0, L - rem / mpp)
             if (code, dist) in SNAP_STRAIGHT:
