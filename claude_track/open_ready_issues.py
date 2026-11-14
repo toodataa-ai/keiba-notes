@@ -33,6 +33,15 @@ def needed(exp: dict) -> list[dict]:
                     "body": (f"Claudeの予想 {pf['pairs']} レースで、Claude自身が作った買い目と、同じ予想・同じオッズから機械ルールで作った買い目を比べました（仮想・購入なし）。\n\n"
                              f"- 回収率：Claude自身 {c['roi']} ／ 機械ルール {m['roi']}\n- 的中レース：Claude自身 {c['hit_races']} ／ 機械ルール {m['hit_races']}\n\n"
                              "チャットで A（機械ルールを採用）／B（もう少し続ける）／C（採用しない）のどれかを伝えてください。")})
+    fd = exp.get("first_distance", {})
+    if fd.get("state") == "ready_for_review":
+        e, kn = fd["groups"]["extension"], fd["groups"]["known"]
+        out.append({"title": "[Claude単独] 2歳・初めての距離（延長）：確認できます",
+                    "body": (f"Claudeの予想で、2歳戦の『初めての距離（延長）』の馬が {e['horses']} 頭分（{e['races']} レース）たまりました。\n\n"
+                             f"- 予想した勝ちの数（確率の合計）：{e['predicted_wins']}／実際の勝ち：{e['actual_wins']}（実際÷予想 {e['ratio']}、95%の幅 {e['ratio_95']}）\n"
+                             f"- 比べる相手（同じ距離を走ったことがある馬）：予想 {kn['predicted_wins']}／実際 {kn['actual_wins']}（実際÷予想 {kn['ratio']}）\n\n"
+                             "実際÷予想が1より大きく、幅も1を超えていれば、Claudeが割り引きすぎています（手順書 claude-v1.1 の効果の確認）。\n"
+                             "チャットで A（さらに強める）／B（このまま）／C（ルールを外す）のどれかを伝えてください。過去データでは、市場はこの条件をほぼ織り込み済みでした。")})
     for k, r in (exp.get("experience", {}).get("regimes") or {}).items():
         if r.get("state") == "ready_for_review":
             name = {"E0": "0戦", "E1": "1〜3戦", "E2": "4戦以上"}[k]

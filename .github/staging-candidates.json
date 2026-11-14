@@ -1,5 +1,16 @@
 {
-  "schema_version": 1,
-  "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+ "schema_version": 1,
+ "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
+ "candidates": [
+  {
+   "id": "ui-improvement-summary-v1",
+   "title": "改善状況ページ：一番上に各テーマの進捗まとめ＋『2歳・初めての距離』の追跡",
+   "pages": [
+    "improvement-cycle.html"
+   ],
+   "assets": [],
+   "status": "awaiting_user_approval",
+   "summary": "改善状況ページの一番上に、各テーマ（展開・馬場・若駒・購入セット）の段階と一言をまとめた一覧を追加（タップで下の詳しい説明へ移動）。Claudeの予想だけで進めている比較に『2歳・初めての距離（Claudeの予想）』を追加（100頭たまったら判定）。Claude側の比較は一覧にも1行で載る。"
+  }
+ ]
 }
