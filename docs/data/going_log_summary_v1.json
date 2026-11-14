@@ -1,16 +1,35 @@
 {
- "rows": 6,
+ "rows": 12,
  "days": 3,
  "tracks": [
-  "fukushima"
+  "fukushima",
+  "kyoto",
+  "tokyo"
  ],
- "with_outcome": 3,
- "changed_before_main": 0,
+ "with_outcome": 9,
+ "changed_before_main": 1,
  "wet_days": 1,
  "first_date": "2026-11-07",
  "last_date": "2026-11-14",
  "scored_main": 0,
  "forecast_check": {
-  "n": 0
+  "n": 6,
+  "wet_rate": 0.0,
+  "brier_forecast": 0.016333346729804462,
+  "brier_climatology": 0.0,
+  "reliability": [
+   {
+    "range": "0-10%",
+    "n": 3,
+    "mean_p": 0.0,
+    "observed": 0.0
+   },
+   {
+    "range": "10-30%",
+    "n": 3,
+    "mean_p": 0.17195709157951378,
+    "observed": 0.0
+   }
+  ]
  }
 }
