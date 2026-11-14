@@ -40,9 +40,22 @@ def _merge_corner(sp, mg):
     return mk(*sol)
 
 
-LOOP_CORNERS = {("niigata", "turf|outer"): dict(share_R=129.0, R2=110.0, R4=40.0, w2=7.0, w4=8.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
+LOOP_CORNERS = {("niigata", "turf|outer"): dict(targets=(dict(file="docs/lab/sim-v2/umapot-starts-arc14.json", venue="niigata", dist=1800, inout="外", x_min=0.0, x_max=450.0), dict(file="docs/lab/sim-v2/umapot-starts-arc14.json", venue="niigata", dist=2400, inout="内", x_min=845.0, x_max=2000.0)), R2=110.0, R4=40.0, w2=0.0, w4=0.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
 
-def _corners(sp, C, cr):
+def _targets(C, cr, fy):
+    """C のうち、指定した範囲（x_min〜x_max）の点を、ほかの距離（1800m外・2400m内）の線の同じ範囲の点に置き換えた目標の線を返す。"""
+    import json
+    for tg in cr.get("targets", []):
+        t = [t for t in json.load(open(tg["file"]))["venues"][tg["venue"]] if t["surface"] == "turf" and t["dist"] == tg["dist"] and t.get("inout") == tg["inout"]][0]
+        Q = np.array(t["path"], float); dn = []
+        for a_, c_ in zip(Q[:-1], Q[1:]):
+            n_ = max(1, int(np.linalg.norm(c_ - a_) / 0.5)); dn += [a_ + (c_ - a_) * i / n_ for i in range(n_)]
+        dn = np.array(dn); dn = dn[(dn[:, 0] >= tg["x_min"]) & (dn[:, 0] < tg["x_max"])] * [1.0, fy]
+        C = np.vstack([C[~((C[:, 0] >= tg["x_min"]) & (C[:, 0] < tg["x_max"]))], dn])
+    return C
+
+
+def _corners(sp, C, cr, fy=1.0):
     """7部品の周回線（円弧2つ・直線・円弧2つ・直線・円弧）の、2コーナー側の2つ目の円弧と4コーナー側の2つ目の円弧の半径を変えて作り直す。
     曲がり角の合計は変えない（向きがそろう）。閉じる条件（位置）を満たしながら、元の中心線からの距離の二乗和が最小になる長さを選ぶ。"""
     from scipy.optimize import minimize
@@ -55,7 +68,7 @@ def _corners(sp, C, cr):
             Lb, b1, Lc = v
             return A.Spline(x0, y0, th0, [(math.pi - t_pre) / kS, Lb, b1, (TB - b1 * K[3]) / kB2, Lc, t_pre / kS],
                             [kS, 0.0, K[3], kB2, 0.0, kS])
-        th, _ = A.heading_curv(C, True)
+        C = _targets(C, cr, fy)
         tree = cKDTree(C)
         def obj(v):
             try: return float((tree.query(mk(v).sample(2.0))[0] ** 2).mean())
@@ -82,7 +95,7 @@ def _corners(sp, C, cr):
     for (a_, b_), w in ((s2, cr["w2"]), (s4, cr["w4"])):
         m = np.clip(1.0 - np.maximum(np.maximum(a_ - 60 - sc, sc - b_ - 60), 0) / 60.0, 0, 1) * ((sc > a_ - 120) & (sc < b_ + 120))
         Ct = Ct + np.stack([-np.sin(th), np.cos(th)], axis=1) * (w * m)[:, None]
-    tree = cKDTree(Ct)
+    tree = cKDTree(_targets(Ct, cr, fy))
     def obj(v):
         try: return float((tree.query(mk(v).sample(2.0))[0] ** 2).mean())
         except Exception: return 1e9
@@ -154,7 +167,7 @@ def arcify(code, out, centre, half, routes, log=print):
     for (c_, rk), cr in LOOP_CORNERS.items():
         f = fits.get(rk)
         if c_ == code and f and len(f["sp"].L) == 7:
-            f["sp"] = _corners(f["sp"], f["Cf"], cr)
+            f["sp"] = _corners(f["sp"], f["Cf"], cr, f["fy"])
     for (c_, rk), sh in LOOP_SHARE.items():
         f = fits.get(rk)
         if c_ == code and f and sh["with"] in fits:
