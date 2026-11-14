@@ -63,7 +63,7 @@
 <section aria-labelledby="radTitle">
 <h2 id="radTitle">騎手のレーダーチャート</h2>
 <p class="sub">7つの軸で、騎手の「強さ」を見ます。人気（オッズ）は使わず、<b>結果そのもの</b>（勝率・着順・位置取り・上がりの速さ）で評価します。得点は、通算では2018年以降に300走以上した騎手151人、年を選んだときはその年に100走以上した騎手（年ごとに約100人）の値の幅（下位2%〜最高）を0〜100に直したものです（100＝全騎手の最高、0＝下位2%の水準。表には元の数字も並べています）。プルダウンは、選んだ軸（合計得点、先行力など）の得点が高い順に並びます。2人を重ねて比べられます。</p>
-<div><label style="font-size:13px;color:#6d6e75">期間：</label><select class="pp-sel" id="radYear" aria-label="期間（通算か年）"></select> <label style="font-size:13px;color:#6d6e75">並べ方：</label><select class="pp-sel" id="radSort" aria-label="プルダウンの並べ方"></select></div>
+<div><label style="font-size:13px;color:#6d6e75">期間：</label><select class="pp-sel" id="radYear" aria-label="期間（通算か年）"></select> <label style="font-size:13px;color:#6d6e75">条件：</label><select class="pp-sel" id="radCond" aria-label="条件（芝ダート・競馬場・性別・季節）"></select> <label style="font-size:13px;color:#6d6e75">並べ方：</label><select class="pp-sel" id="radSort" aria-label="プルダウンの並べ方"></select></div>
 <p class="pp-note" id="radYearNote" style="margin:0 0 8px"></p>
 <div><select class="pp-sel" id="radA" aria-label="騎手1"></select><select class="pp-sel" id="radB" aria-label="騎手2（比べる）"></select></div>
 <div id="radSvg" style="max-width:420px"></div>
@@ -80,7 +80,7 @@
 <section aria-labelledby="rlTitle">
 <h2 id="rlTitle">騎手のレーダーチャート（相対評価：人気に対して）</h2>
 <p class="sub">上の絶対評価と同じ7つの軸を、<b>人気（単勝オッズ）から見て期待される水準に対して</b>どれだけ上か、で見ます。<b>勝率×単勝オッズ＝単勝回収率</b>、<b>複勝率×複勝オッズ＝複勝回収率</b>（100円ずつ買い続けたときの戻り。人気に見合う強さなら約70〜80%）。連対率と上級戦は「実際の数÷オッズから見て期待される数」、着順・先行力・末脚は「同じ人気の馬の平均との差（点）」です。得点は絶対評価と同じく、騎手の値の下位2%〜最高を0〜100に直したものです。</p>
-<div><label style="font-size:13px;color:#6d6e75">期間：</label><select class="pp-sel" id="rlYear" aria-label="期間（通算か年）"></select> <label style="font-size:13px;color:#6d6e75">並べ方：</label><select class="pp-sel" id="rlSort" aria-label="プルダウンの並べ方"></select></div>
+<div><label style="font-size:13px;color:#6d6e75">期間：</label><select class="pp-sel" id="rlYear" aria-label="期間（通算か年）"></select> <label style="font-size:13px;color:#6d6e75">条件：</label><select class="pp-sel" id="rlCond" aria-label="条件（芝ダート・競馬場・性別・季節）"></select> <label style="font-size:13px;color:#6d6e75">並べ方：</label><select class="pp-sel" id="rlSort" aria-label="プルダウンの並べ方"></select></div>
 <p class="pp-note" id="rlYearNote" style="margin:0 0 8px"></p>
 <div><select class="pp-sel" id="rlA" aria-label="騎手1"></select><select class="pp-sel" id="rlB" aria-label="騎手2（比べる）"></select></div>
 <div id="rlSvg" style="max-width:420px"></div>
@@ -200,7 +200,7 @@ var SHORT_A={win:'勝率',p2:'連対率',p3:'複勝率',rank:'着順',front:'先
 function rawf(id,v){if(v==null)return '—';return (id==='win'||id==='p2'||id==='p3'||id==='top')?(v*100).toFixed(1)+'%':v.toFixed(0)}
 function pt(cx,cy,r,i,n){var a=-Math.PI/2+2*Math.PI*i/n;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]}
 function rawk(a,v){if(v==null)return '—';if(a.kind==='mean')return Math.round(v*100)+'%';if(a.kind==='ratio')return v.toFixed(2);if(a.kind==='diff')return (v>=0?'+':'')+v.toFixed(1)+'点';return rawf(a.id,v)}
-function radarInit(P,url,SHORT){var RD=null,CUR=[];
+function radarInit(P,url,SHORT){var RD=null,CUR=[],CD=null,KIND=P==='rad'?'abs':'rel';
 function radOpts(){
  var key=$(P+'Sort').value,ax=RD.axes.filter(function(a){return a.id===key})[0];
  function val(j){return key==='total'?j.total:(j.score[key]==null?-1:j.score[key])}
@@ -215,14 +215,19 @@ function radFill(ida,idb){
  var ia=idx(ida),ib=idx(idb);
  $(P+'A').value=ia>=0?ia:0;$(P+'B').value=ib;
 }
-function radCur(){var y=$(P+'Year').value;
- if(y==='all'){CUR=RD.jockeys}else{var nm={};RD.jockeys.forEach(function(j){nm[j.id]=j});
+function radCur(){var y=$(P+'Year').value,c=$(P+'Cond').value;
+ var nm={};RD.jockeys.forEach(function(j){nm[j.id]=j});
+ if(c&&CD){CUR=CD.jockeys.map(function(r){var j=nm[r[0]],sc={},rw={};RD.axes.forEach(function(a,i){sc[a.id]=r[2][i];rw[a.id]=r[3][i]});return {id:r[0],name:j.name,n:r[1],score:sc,raw:rw}})}
+ else if(y==='all'){CUR=RD.jockeys}else{
   CUR=RD.by_year[y].map(function(r){var j=nm[r[0]],sc={},rw={};RD.axes.forEach(function(a,i){sc[a.id]=r[2][i];rw[a.id]=r[3][i]});return {id:r[0],name:j.name,n:r[1],score:sc,raw:rw}})}
  CUR.forEach(function(j){var v=RD.axes.map(function(a){return j.score[a.id]}).filter(function(x){return x!=null});j.total=v.length?v.reduce(function(x,y){return x+y},0)/v.length:0});
- $(P+'YearNote').textContent=y==='all'?'':y+'年に100走以上した'+CUR.length+'人が対象です。得点はその年の騎手の中での値の幅（下位2%〜最高）で決めるので、年が違う得点どうしの大小は比べられません（年の途中の2026年は走数が少なめ）。';
+ $(P+'Year').disabled=!!c;
+ $(P+'YearNote').textContent=c?('「'+CD.label+'」で'+CD.min+'走以上した'+CUR.length+'人が対象です（通算2018年〜）。得点はこの条件の騎手の中での値の幅（下位2%〜最高）で決めるので、条件が違う得点どうしの大小は比べられません。走数が少ない騎手は平均に寄せて表示しています。'):y==='all'?'':y+'年に100走以上した'+CUR.length+'人が対象です。得点はその年の騎手の中での値の幅（下位2%〜最高）で決めるので、年が違う得点どうしの大小は比べられません（年の途中の2026年は走数が少なめ）。';
 }
 function radSetup(){
  $(P+'Year').innerHTML='<option value="all">通算（2018年〜）</option>'+Object.keys(RD.by_year).sort().reverse().map(function(y){return '<option value="'+y+'">'+y+'年'+(y==='2026'?'（途中）':'')+'</option>'}).join('');
+ var gs={};(RD.conds||[]).forEach(function(c){(gs[c.group]=gs[c.group]||[]).push(c)});
+ $(P+'Cond').innerHTML='<option value="">全レース</option>'+Object.keys(gs).map(function(g){return '<optgroup label="'+g+'">'+gs[g].map(function(c){return '<option value="'+c.key+'">'+esc(c.label)+'</option>'}).join('')+'</optgroup>'}).join('');
  radCur();
  $(P+'Sort').innerHTML='<option value="total">合計得点</option>'+RD.axes.map(function(a){return '<option value="'+a.id+'">'+esc(a.label)+'</option>'}).join('');
  var ia=0,ib=-1;CUR.forEach(function(j,i){if(j.name.indexOf('川田')>=0)ia=i;if(j.name.indexOf('ルメール')>=0)ib=i});
@@ -231,6 +236,11 @@ function radSetup(){
  function ids(){var a=CUR[+$(P+'A').value],b=CUR[+$(P+'B').value];return [a&&a.id,b&&b.id]}
  $(P+'Sort').onchange=function(){var d=ids();radFill(d[0],d[1]);radRender()};
  $(P+'Year').onchange=function(){var d=ids();radCur();radFill(d[0],d[1]);radRender()};
+ $(P+'Cond').onchange=function(){var d=ids(),c=$(P+'Cond').value;
+  function go(){radCur();radFill(d[0],d[1]);radRender()}
+  if(!c){CD=null;go();return}
+  $(P+'YearNote').textContent='読み込み中…';
+  fetch('data/radar_cond/'+KIND+'_'+c+'.json?v=20261114c',{cache:'no-store'}).then(function(r){return r.json()}).then(function(x){CD=x;go()}).catch(function(){$(P+'YearNote').textContent='この条件のデータを読み込めませんでした。'})};
  $(P+'A').onchange=$(P+'B').onchange=radRender;radRender();
 }
 function radRender(){
@@ -252,7 +262,7 @@ function radRender(){
 }
 
 fetch(url,{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){RD=d;radSetup()}).catch(function(){$(P+'Tbl').textContent='レーダーチャートのデータを読み込めませんでした。'});}
-radarInit('rad','data/jockey_radar_v1.json?v=20261114y',SHORT_A);radarInit('rl','data/jockey_radar_rel_v1.json?v=20261114r',SHORT_R);
+radarInit('rad','data/jockey_radar_v1.json?v=20261114c',SHORT_A);radarInit('rl','data/jockey_radar_rel_v1.json?v=20261114c',SHORT_R);
 fetch('data/people_courses_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){CD=d;['jockey','trainer'].forEach(function(k){d[k].forEach(function(p){CMAP[k][p.id]=p.c})});crsSetup();if(D)render()}).catch(function(){$('crsNote').textContent='コース別のデータを読み込めませんでした。'});
 fetch('data/people_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;findings();render()}).catch(function(){$('ppMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ppFind').textContent=''});
 })();
