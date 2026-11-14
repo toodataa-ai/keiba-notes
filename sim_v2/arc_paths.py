@@ -40,7 +40,7 @@ def _merge_corner(sp, mg):
     return mk(*sol)
 
 
-LOOP_CORNERS = {("niigata", "turf|outer"): dict(targets=(dict(file="docs/lab/sim-v2/umapot-starts-arc14.json", venue="niigata", dist=1800, inout="外", x_min=0.0, x_max=450.0), dict(file="docs/lab/sim-v2/umapot-starts-arc14.json", venue="niigata", dist=2400, inout="内", x_min=845.0, x_max=2000.0)), R2=110.0, R4=40.0, w2=0.0, w4=0.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
+LOOP_CORNERS = {("niigata", "turf|outer"): dict(stadium_R=129.0, targets=(dict(file="docs/lab/sim-v2/umapot-starts-arc14.json", venue="niigata", dist=1800, inout="外", x_min=0.0, x_max=450.0), dict(file="docs/lab/sim-v2/umapot-starts-arc14.json", venue="niigata", dist=2400, inout="内", x_min=845.0, x_max=2000.0)), R2=110.0, R4=40.0, w2=0.0, w4=0.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
 
 def _targets(C, cr, fy):
     """C のうち、指定した範囲（x_min〜x_max）の点を、ほかの距離（1800m外・2400m内）の線の同じ範囲の点に置き換えた目標の線を返す。"""
@@ -61,6 +61,29 @@ def _corners(sp, C, cr, fy=1.0):
     from scipy.optimize import minimize
     x0, y0, th0 = sp.st[0]
     L = list(sp.L); K = list(sp.K)
+    if cr.get("stadium_R"):   # 周回線を、半径Rの2つの半円と2本の直線だけにする（2400m内の半円・1800m外の4コーナーと同じ形）。直線の長さだけを、目標の線に近づくように選ぶ
+        from scipy.optimize import minimize_scalar
+        R = cr["stadium_R"]; kS = 1.0 / R; t_pre = L[6] * K[6]
+        def mk2(L1):
+            sp0 = A.Spline(x0, y0, th0, [(math.pi - t_pre) / kS, L1, math.pi / kS, 0.0, t_pre / kS], [kS, 0.0, kS, 0.0, kS])
+            e = sp0.st[-2]; dv = np.array([math.cos(e[2]), math.sin(e[2])])
+            L2 = float(np.dot(np.array([x0, y0]) - np.array(e[:2]) - 0.0, dv)) if False else None
+            # 4番目の直線の長さ：直線の終わりから最後の円弧を通って始点へ戻る条件で解く
+            from scipy.optimize import brentq
+            def f(L2):
+                q = A.Spline(x0, y0, th0, [(math.pi - t_pre) / kS, L1, math.pi / kS, L2, t_pre / kS], [kS, 0.0, kS, 0.0, kS]).end()
+                return (q[0] - x0) * math.cos(th0 + 0) + (q[1] - y0) * math.sin(th0 + 0)
+            L2 = brentq(f, 1.0, 3000.0)
+            return A.Spline(x0, y0, th0, [(math.pi - t_pre) / kS, L1, math.pi / kS, L2, t_pre / kS], [kS, 0.0, kS, 0.0, kS])
+        C = _targets(C, cr, fy); tree = cKDTree(C)
+        def ob(L1):
+            try: return float((tree.query(mk2(L1).sample(2.0))[0] ** 2).mean())
+            except Exception: return 1e9
+        r = minimize_scalar(ob, bounds=(300.0, 900.0), method="bounded")
+        out = mk2(r.x); e = out.end()
+        if abs(e[0] - x0) > 1e-3 or abs(e[1] - y0) > 1e-3:
+            raise SystemExit("新潟外回りの周回線が閉じません " + str(e) + str((x0, y0)))
+        return out
     if cr.get("share_R"):   # 1〜2コーナーは内回り（2400m内など）と同じ半径の半円にする。3〜4コーナーの2つの円弧は半径そのままで長さを解く
         kS = 1.0 / cr["share_R"]; t_pre = L[6] * K[6]
         TB = L[3] * K[3] + L[4] * K[4]; kB2 = 1.0 / cr["R4"]
