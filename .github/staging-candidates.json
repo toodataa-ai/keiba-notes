@@ -1,38 +1,28 @@
 {
- "schema_version": 1,
- "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
- "candidates": [
-  {
-   "id": "ui-sire-lineage-v1",
-   "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
-   "pages": [
-    "improvement-cycle.html"
-   ],
-   "assets": [],
-   "status": "awaiting_user_approval",
-   "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
-  },
-  {
-   "id": "ui-jockey-radar-v1",
-   "title": "騎手・調教師の成績：騎手のレーダーチャート",
-   "pages": [
-    "people-trends.html"
-   ],
-   "assets": [],
-   "status": "awaiting_user_approval",
-   "summary": "騎手の7軸（勝率・連対率・複勝率・着順・先行力・末脚・上級戦）を、人気（オッズ）を使わない絶対評価でレーダーチャート表示、2人を重ねて比較。前半→後半で続くか（続く度）も表示。 年ごとの選択と、人気（オッズ）に対する相対評価（単勝回収率・複勝回収率ほか）のレーダーも追加。"
-  },
-  {
-   "id": "ui-week-status-fix-v1",
-   "title": "今週のAI予想：カード左上の番号（0,1,2）を『AI予想公開済み』に直す",
-   "pages": [
-    "this-week.html"
-   ],
-   "assets": [
-    "assets/week.js"
-   ],
-   "status": "awaiting_user_approval",
-   "summary": "カードの状態表示に並び順の通し番号が出ていた不具合を修正。"
-  }
- ]
+  "schema_version": 1,
+  "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
+  "candidates": [
+    {
+      "id": "ui-sire-lineage-v1",
+      "title": "改善状況ページ：若駒・新馬戦の研究に『父の系統で見た結果』を追加",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "status": "awaiting_user_approval",
+      "summary": "若駒・新馬戦（父の血統データ）の欄に、父を系統（サンデーサイレンス系など）にまとめた結果を折りたたみで追加。系統ごとの頭数の割合、新馬戦でオッズ以上に勝つか（前半・後半）の表、改善が増えなかった結論を表示。数字は docs/data/sire_research_status_v1.json の lineage から読む（データは別PRで先に反映）。"
+    },
+    {
+      "id": "ui-week-status-fix-v1",
+      "title": "今週のAI予想：カード左上の番号（0,1,2）を『AI予想公開済み』に直す",
+      "pages": [
+        "this-week.html"
+      ],
+      "assets": [
+        "assets/week.js"
+      ],
+      "status": "awaiting_user_approval",
+      "summary": "カードの状態表示に並び順の通し番号が出ていた不具合を修正。"
+    }
+  ]
 }
