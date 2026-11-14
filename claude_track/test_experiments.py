@@ -21,6 +21,17 @@ class T(unittest.TestCase):
         self.assertAlmostEqual(sum(out.values()), 1.0)
         self.assertGreater(out[1], out[2])
 
+    def test_first_distance_group(self):
+        c = {"age_condition": "2歳", "distance_m": 1600}
+        past = lambda *ds: [{"distance_m": d} for d in ds]
+        g = lambda n, ps, cc=c: ex.first_distance_group(cc, {"starts_before_race": n, "past": ps})
+        self.assertEqual(g(2, past(1400, 1400)), "extension")
+        self.assertEqual(g(2, past(1800, 1800)), "shorten")
+        self.assertEqual(g(2, past(1400, 1600)), "known")
+        self.assertEqual(g(0, []), "debut")
+        self.assertIsNone(g(6, past(1400, 1400)))                       # 出走歴が全部は分からない
+        self.assertIsNone(g(2, past(1400, 1400), {"age_condition": "3歳以上", "distance_m": 1600}))   # 2歳戦だけ
+
     def test_regime(self):
         self.assertEqual([ex.regime(x) for x in (None, 0, 1, 3, 4)], [None, "E0", "E1", "E1", "E2"])
 

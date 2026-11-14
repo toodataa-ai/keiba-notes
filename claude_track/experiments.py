@@ -24,6 +24,25 @@ PARAMS = {"max_runs": 4, "front_max_ratio": 0.33, "closer_min_ratio": 0.67, "lea
                           "H": {"front": 0.85, "mid": 1.00, "closer": 1.15}}}
 NEED_PAIRS = 20
 NEED_HORSES = 30
+NEED_FIRST_DIST = 100   # 初めての距離（2歳戦の距離延長）の馬が、この頭数たまったら判定（過去データでは差が小さいため、偶然と区別できる数を要求）
+
+
+def first_distance_group(card: dict, h: dict):
+    """2歳戦で、前走までの出走歴がすべて分かる馬を『初めての距離・延長』『同じ距離を走ったことがある』『初出走』に分ける。
+    出走歴が全部分からない（starts_before_race より past が少ない）馬は判定できないので None。"""
+    if not str(card.get("age_condition") or "").startswith("2歳"):
+        return None
+    n, past, d = h.get("starts_before_race"), h.get("past") or [], card.get("distance_m")
+    if n is None or not d or len(past) < n:
+        return None
+    if n == 0:
+        return "debut"
+    ds = [p.get("distance_m") for p in past]
+    if any(x is None for x in ds):
+        return None
+    if d in ds:
+        return "known"
+    return "extension" if d > max(ds) else "shorten"
 
 
 def early_ratio(run: dict):
@@ -160,6 +179,7 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
     pairs, going_pairs, port_rows = [], [], []
     exp = {k: {"horses": 0, "pred_wins": 0.0, "actual_wins": 0, "races": set()} for k in ("E0", "E1", "E2")}
     career_seen = 0
+    fd = {k: {"horses": 0, "pred": 0.0, "var": 0.0, "wins": 0, "races": set()} for k in ("extension", "shorten", "known", "debut")}
     for rid, slot in sc.load_race_files(pred_dir).items():
         rf = sc.resolve_result(rid, results_dir)
         if rf is None or slot["step1"] is None:
@@ -190,6 +210,11 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
             ch = _norm(overlay(card["horses"], base))
             pairs.append({"race_id": rid, "base_ll": -math.log(base[winner]), "pace_ll": -math.log(ch[winner])})
             for h in card["horses"]:
+                fg = first_distance_group(card, h)
+                if fg and h["number"] in base:
+                    q = base[h["number"]]; e = fd[fg]
+                    e["horses"] += 1; e["pred"] += q; e["var"] += q * (1 - q)
+                    e["wins"] += 1 if h["number"] == winner else 0; e["races"].add(rid)
                 g = regime(h.get("starts_before_race"))
                 if g and h["number"] in base:
                     career_seen += 1
@@ -213,6 +238,12 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
            "portfolio": {"id": "claude+ticket_div_rule", "pairs": len(port_rows), "need_pairs": NEED_PAIRS,
                          "summary": _port_summary(port_rows),
                          "state": "collecting" if len(port_rows) < NEED_PAIRS else "ready_for_decision"},
+           "first_distance": {"need_horses": NEED_FIRST_DIST, "target": "extension",
+                              "state": "collecting" if fd["extension"]["horses"] < NEED_FIRST_DIST else "ready_for_review",
+                              "groups": {k: {"horses": v["horses"], "races": len(v["races"]), "predicted_wins": round(v["pred"], 3), "actual_wins": v["wins"],
+                                             "ratio": (round(v["wins"] / v["pred"], 3) if v["pred"] > 0 else None),
+                                             "ratio_95": ([round(max(0.0, (v["wins"] - 1.96 * math.sqrt(v["var"])) / v["pred"]), 3), round((v["wins"] + 1.96 * math.sqrt(v["var"])) / v["pred"], 3)] if v["pred"] > 0 and v["var"] > 0 else None)}
+                                         for k, v in fd.items()}},
            "experience": {"career_data_available": career_seen > 0, "need_horses": NEED_HORSES,
                           "regimes": {k: {"horses": v["horses"], "races": len(v["races"]),
                                           "predicted_wins": round(v["pred_wins"], 3), "actual_wins": v["actual_wins"],
