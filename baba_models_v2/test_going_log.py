@@ -4,7 +4,7 @@ import going_log as gl
 
 def row(d, track, pw, wet, actual, morning, pm, base, p_nf=None, changed=False):
     return {'date': d, 'track': track, 'surface': 'turf', 'morning_going': morning, 'p_wet_main': pw, 'wet': wet,
-            'actual_main': actual, 'changed': changed, 'changed_before_main': changed, 'probs_main': pm,
+            'actual_main': actual, 'changed_before_main': changed, 'probs_main': pm,
             'probs_morning_persists': base, 'probs_no_forecast_main': p_nf}
 
 
