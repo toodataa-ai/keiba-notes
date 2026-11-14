@@ -13,6 +13,7 @@ TOL_RATIO = 0.10     # 中心線からのずれの上限（走路の幅に対す
 LOOP_SHARE = {("hanshin", "turf|outer"): dict(**{"with": "turf|inner"}, arcs=((177.0, 305.0), (201.0, 155.0))),
               ("kyoto", "turf|outer"): dict(**{"with": "turf|inner"}, arcs=((209.0, 549.0), (159.0, 98.0)), R_last=250.0)}   # 京都外回りも同じ（2コーナー・4コーナーが外に膨れていた。ユーザー依頼 2026-11-14）   # 阪神外回りの1〜2コーナー（内回りと同じ走路）は内回りの線と同じ円弧を使い、向正面の直線へ接線でつなぐ（ユーザー依頼 2026-11-13「内回りと同じラインが理想」）
 LOOP_MERGE = {("hanshin", "turf|outer"): dict(parts=(4, 5, 6, 7), R=230.0, n=10)}   # 阪神外回りの3〜4コーナー：4つの円弧（半径177/321/131/137）を、手前の円弧（半径177のまま）＋半径230の1つの円弧にまとめる。最後の直線は元のまま（同じ線・同じ向き）。ユーザー依頼 2026-11-13「もっと内側・半径が長い円弧で、最後の直線はまっすぐ」。中心線からのずれは幅の約36%で、規定の10%を超える例外
+START_STRAIGHT = {("niigata", "1200内")}   # 印が角（円弧）のはじまりにかかっているとき、発走を次の直線のはじまりまで進める（円弧の中から発走して見えるため。ユーザー指摘 2026-11-14）
 OUTER_INNER_OFF = {"hanshin": 3.0}   # 外回り→内回りのつなぎが線から離れてよい上限（帯の許容 tol の倍数）。阪神は4コーナーを内寄りにしたため外回りの線と内回りの線の間が少し広がる
 SINGLE_ARC = {("tokyo", "2000")}   # 引き込み線を『直線＋円弧1つ＋向正面の直線の延長』にする距離（ユーザー依頼 2026-11-12）。中心線からのずれが幅の10%を超える（東京芝2000mは約16%）規定外の例外
 
@@ -118,8 +119,27 @@ def arcify(code, out, centre, half, routes, log=print):
         info = ""
         if j <= 3 and (code, str(o["label"])) not in FORCE_CHUTE:     # はじめから本線の上：印を新しい線の上へ
             smp = base.sample(0.25); k = int(np.argmin(np.linalg.norm(smp - np.array([o["x"], o["y"]]) * [1, fy], axis=1)))
-            s0 = k * 0.25; sx, sy = base.at(s0)[:2]
-            chute = None; first = L - s0; verts = base.vertices(s0, L)
+            s0 = k * 0.25
+            ext = 0.0
+            if (code, str(o["label"])) in START_STRAIGHT:   # 次の直線のはじまりを求め、印の位置までその直線を後ろへ延ばした所から発走する（円弧の中から発走して見えないように）
+                cum = np.concatenate([[0.0], np.cumsum(base.L)])
+                mk = np.array([o["x"], o["y"]]) * [1, fy]
+                for pi in range(len(base.L)):
+                    if base.K[pi] == 0 and cum[pi + 1] > s0 + 1e-6:
+                        P0 = np.array(base.at(float(cum[pi]))[:2]); th0 = base.at(float(cum[pi]))[2]
+                        dv = np.array([math.cos(th0), math.sin(th0)])
+                        d = float(np.dot(P0 - mk, dv))
+                        if d > 0:
+                            s0 = float(cum[pi]); ext = d
+                        break
+            if ext:
+                P0 = np.array(base.at(s0)[:2]); th0 = base.at(s0)[2]
+                S0 = P0 - ext * np.array([math.cos(th0), math.sin(th0)])
+                sx, sy = float(S0[0]), float(S0[1])
+                chute = None; first = L - s0 + ext; verts = np.vstack([[S0], base.vertices(s0, L)])
+            else:
+                sx, sy = base.at(s0)[:2]
+                chute = None; first = L - s0; verts = base.vertices(s0, L)
         else:
             ref = P[:min(len(P), j + 12)] * [1.0, fy]
             smp = base.sample(0.5)
