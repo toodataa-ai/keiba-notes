@@ -22,158 +22,69 @@
       "effective_prospective_from": "2026-11-02T13:00:00+09:00",
       "registration_commit_at": "2026-11-02T12:32:59+09:00",
       "minimum_prospective_pairs": 20,
-      "remaining_prospective_pairs": 15,
+      "remaining_prospective_pairs": 12,
       "ready_for_manual_review": false,
       "prospective": {
-        "pairs": 5,
+        "pairs": 8,
         "honmei_win": {
-          "formal": 0.2,
-          "challenger": 0.2,
-          "delta": 0.0
+          "formal": 0.25,
+          "challenger": 0.125,
+          "delta": -0.125
         },
         "honmei_top3": {
-          "formal": 0.2,
-          "challenger": 0.2,
-          "delta": 0.0
+          "formal": 0.25,
+          "challenger": 0.125,
+          "delta": -0.125
         },
         "win_brier": {
-          "formal": 0.8461,
-          "challenger": 0.8493,
-          "delta": 0.0032
+          "formal": 0.848,
+          "challenger": 0.8563,
+          "delta": 0.0083
         },
         "win_log_loss": {
-          "formal": 2.1554,
-          "challenger": 2.1673,
-          "delta": 0.0119
+          "formal": 2.173,
+          "challenger": 2.1969,
+          "delta": 0.0238
         },
         "top3_brier": {
-          "formal": 0.1483,
-          "challenger": 0.1481,
-          "delta": -0.0001
+          "formal": 0.1557,
+          "challenger": 0.1573,
+          "delta": 0.0016
         },
-        "challenger_better_log_loss_races": 1
+        "challenger_better_log_loss_races": 2
       },
       "prospective_breakdown": {
         "venue": {
           "京都": {
-            "pairs": 2,
+            "pairs": 3,
             "honmei_win": {
-              "formal": 0.0,
+              "formal": 0.3333,
               "challenger": 0.0,
-              "delta": 0.0
+              "delta": -0.3333
             },
             "honmei_top3": {
-              "formal": 0.0,
+              "formal": 0.3333,
               "challenger": 0.0,
-              "delta": 0.0
+              "delta": -0.3333
             },
             "win_brier": {
-              "formal": 0.8449,
-              "challenger": 0.8544,
-              "delta": 0.0094
+              "formal": 0.8096,
+              "challenger": 0.8322,
+              "delta": 0.0227
             },
             "win_log_loss": {
-              "formal": 2.0701,
-              "challenger": 2.119,
-              "delta": 0.0489
+              "formal": 1.9396,
+              "challenger": 2.0151,
+              "delta": 0.0755
             },
             "top3_brier": {
-              "formal": 0.1583,
-              "challenger": 0.1602,
-              "delta": 0.002
+              "formal": 0.1609,
+              "challenger": 0.1659,
+              "delta": 0.005
             },
             "challenger_better_log_loss_races": 0
           },
           "東京": {
-            "pairs": 2,
-            "honmei_win": {
-              "formal": 0.5,
-              "challenger": 0.5,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.5,
-              "challenger": 0.5,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8283,
-              "challenger": 0.8251,
-              "delta": -0.0032
-            },
-            "win_log_loss": {
-              "formal": 2.1919,
-              "challenger": 2.1622,
-              "delta": -0.0297
-            },
-            "top3_brier": {
-              "formal": 0.1365,
-              "challenger": 0.1348,
-              "delta": -0.0017
-            },
-            "challenger_better_log_loss_races": 1
-          },
-          "福島": {
-            "pairs": 1,
-            "honmei_win": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8841,
-              "challenger": 0.8874,
-              "delta": 0.0033
-            },
-            "win_log_loss": {
-              "formal": 2.253,
-              "challenger": 2.2741,
-              "delta": 0.0211
-            },
-            "top3_brier": {
-              "formal": 0.1518,
-              "challenger": 0.1507,
-              "delta": -0.0011
-            },
-            "challenger_better_log_loss_races": 0
-          }
-        },
-        "surface": {
-          "ダート": {
-            "pairs": 2,
-            "honmei_win": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8449,
-              "challenger": 0.8544,
-              "delta": 0.0094
-            },
-            "win_log_loss": {
-              "formal": 2.0701,
-              "challenger": 2.119,
-              "delta": 0.0489
-            },
-            "top3_brier": {
-              "formal": 0.1583,
-              "challenger": 0.1602,
-              "delta": 0.002
-            },
-            "challenger_better_log_loss_races": 0
-          },
-          "芝": {
             "pairs": 3,
             "honmei_win": {
               "formal": 0.3333,
@@ -186,52 +97,141 @@
               "delta": 0.0
             },
             "win_brier": {
-              "formal": 0.8469,
-              "challenger": 0.8459,
-              "delta": -0.001
+              "formal": 0.8358,
+              "challenger": 0.8316,
+              "delta": -0.0042
             },
             "win_log_loss": {
-              "formal": 2.2122,
-              "challenger": 2.1995,
-              "delta": -0.0127
+              "formal": 2.1749,
+              "challenger": 2.1414,
+              "delta": -0.0335
             },
             "top3_brier": {
-              "formal": 0.1416,
-              "challenger": 0.1401,
-              "delta": -0.0015
+              "formal": 0.1385,
+              "challenger": 0.1373,
+              "delta": -0.0012
+            },
+            "challenger_better_log_loss_races": 2
+          },
+          "福島": {
+            "pairs": 2,
+            "honmei_win": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.9239,
+              "challenger": 0.9295,
+              "delta": 0.0056
+            },
+            "win_log_loss": {
+              "formal": 2.5202,
+              "challenger": 2.5526,
+              "delta": 0.0324
+            },
+            "top3_brier": {
+              "formal": 0.1738,
+              "challenger": 0.1744,
+              "delta": 0.0006
+            },
+            "challenger_better_log_loss_races": 0
+          }
+        },
+        "surface": {
+          "ダート": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8761,
+              "challenger": 0.8812,
+              "delta": 0.0051
+            },
+            "win_log_loss": {
+              "formal": 2.2672,
+              "challenger": 2.2922,
+              "delta": 0.0251
+            },
+            "top3_brier": {
+              "formal": 0.1637,
+              "challenger": 0.1652,
+              "delta": 0.0015
+            },
+            "challenger_better_log_loss_races": 1
+          },
+          "芝": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.5,
+              "challenger": 0.25,
+              "delta": -0.25
+            },
+            "honmei_top3": {
+              "formal": 0.5,
+              "challenger": 0.25,
+              "delta": -0.25
+            },
+            "win_brier": {
+              "formal": 0.8199,
+              "challenger": 0.8314,
+              "delta": 0.0115
+            },
+            "win_log_loss": {
+              "formal": 2.0788,
+              "challenger": 2.1015,
+              "delta": 0.0226
+            },
+            "top3_brier": {
+              "formal": 0.1477,
+              "challenger": 0.1494,
+              "delta": 0.0016
             },
             "challenger_better_log_loss_races": 1
           }
         },
         "going": {
           "良": {
-            "pairs": 4,
+            "pairs": 7,
             "honmei_win": {
-              "formal": 0.25,
-              "challenger": 0.25,
-              "delta": 0.0
+              "formal": 0.2857,
+              "challenger": 0.1429,
+              "delta": -0.1429
             },
             "honmei_top3": {
-              "formal": 0.25,
-              "challenger": 0.25,
-              "delta": 0.0
+              "formal": 0.2857,
+              "challenger": 0.1429,
+              "delta": -0.1429
             },
             "win_brier": {
-              "formal": 0.8366,
-              "challenger": 0.8397,
-              "delta": 0.0031
+              "formal": 0.8428,
+              "challenger": 0.8519,
+              "delta": 0.009
             },
             "win_log_loss": {
-              "formal": 2.131,
-              "challenger": 2.1406,
-              "delta": 0.0096
+              "formal": 2.1616,
+              "challenger": 2.1858,
+              "delta": 0.0242
             },
             "top3_brier": {
-              "formal": 0.1474,
-              "challenger": 0.1475,
-              "delta": 0.0001
+              "formal": 0.1563,
+              "challenger": 0.1582,
+              "delta": 0.002
             },
-            "challenger_better_log_loss_races": 1
+            "challenger_better_log_loss_races": 2
           },
           "道悪（稍重〜不良）": {
             "pairs": 1,
@@ -1218,6 +1218,99 @@
             "win_log_loss": 2.171817,
             "top3_brier": 0.153384
           }
+        },
+        {
+          "race_id": "2026-11-14-daily-hai-2yo-stakes",
+          "grade": "prospective_preregistered",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
+          "challenger_summary": {
+            "pace_forecast": "H",
+            "habitual_leaders": 4
+          },
+          "formal": {
+            "honmei": 5,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.186625,
+            "win_brier": 0.738851,
+            "win_log_loss": 1.678652,
+            "top3_brier": 0.166128
+          },
+          "challenger": {
+            "honmei": 1,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.164087,
+            "win_brier": 0.787973,
+            "win_log_loss": 1.807357,
+            "top3_brier": 0.17724
+          }
+        },
+        {
+          "race_id": "2026-11-14-fruits-line-cup",
+          "grade": "prospective_preregistered",
+          "segments": {
+            "venue": "福島",
+            "surface": "ダート",
+            "going": "良"
+          },
+          "challenger_summary": {
+            "pace_forecast": "H",
+            "habitual_leaders": 8
+          },
+          "formal": {
+            "honmei": 2,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.061578,
+            "win_brier": 0.963617,
+            "win_log_loss": 2.787453,
+            "top3_brier": 0.195854
+          },
+          "challenger": {
+            "honmei": 2,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.058952,
+            "win_brier": 0.971548,
+            "win_log_loss": 2.831039,
+            "top3_brier": 0.198187
+          }
+        },
+        {
+          "race_id": "2026-11-14-musashino-stakes",
+          "grade": "prospective_preregistered",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "良"
+          },
+          "challenger_summary": {
+            "pace_forecast": "M",
+            "habitual_leaders": 3
+          },
+          "formal": {
+            "honmei": 7,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.117538,
+            "win_brier": 0.85092,
+            "win_log_loss": 2.140991,
+            "top3_brier": 0.142485
+          },
+          "challenger": {
+            "honmei": 7,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.122469,
+            "win_brier": 0.844666,
+            "win_log_loss": 2.099901,
+            "top3_brier": 0.142234
+          }
         }
       ],
       "skipped": [
@@ -1252,158 +1345,40 @@
       "effective_prospective_from": "2026-11-02T13:00:00+09:00",
       "registration_commit_at": "2026-11-02T12:43:48+09:00",
       "minimum_prospective_pairs": 20,
-      "remaining_prospective_pairs": 15,
+      "remaining_prospective_pairs": 12,
       "ready_for_manual_review": false,
       "prospective": {
-        "pairs": 5,
+        "pairs": 8,
         "honmei_win": {
-          "formal": 0.2,
-          "challenger": 0.2,
+          "formal": 0.25,
+          "challenger": 0.25,
           "delta": 0.0
         },
         "honmei_top3": {
-          "formal": 0.2,
-          "challenger": 0.2,
+          "formal": 0.25,
+          "challenger": 0.25,
           "delta": 0.0
         },
         "win_brier": {
-          "formal": 0.8461,
-          "challenger": 0.8589,
-          "delta": 0.0128
+          "formal": 0.848,
+          "challenger": 0.8596,
+          "delta": 0.0116
         },
         "win_log_loss": {
-          "formal": 2.1554,
-          "challenger": 2.1983,
-          "delta": 0.0429
+          "formal": 2.173,
+          "challenger": 2.2219,
+          "delta": 0.0489
         },
         "top3_brier": {
-          "formal": 0.1483,
-          "challenger": 0.152,
-          "delta": 0.0037
+          "formal": 0.1557,
+          "challenger": 0.1592,
+          "delta": 0.0034
         },
         "challenger_better_log_loss_races": 1
       },
       "prospective_breakdown": {
         "venue": {
           "京都": {
-            "pairs": 2,
-            "honmei_win": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8449,
-              "challenger": 0.8668,
-              "delta": 0.0219
-            },
-            "win_log_loss": {
-              "formal": 2.0701,
-              "challenger": 2.1632,
-              "delta": 0.0931
-            },
-            "top3_brier": {
-              "formal": 0.1583,
-              "challenger": 0.1614,
-              "delta": 0.0032
-            },
-            "challenger_better_log_loss_races": 0
-          },
-          "東京": {
-            "pairs": 2,
-            "honmei_win": {
-              "formal": 0.5,
-              "challenger": 0.5,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.5,
-              "challenger": 0.5,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8283,
-              "challenger": 0.8357,
-              "delta": 0.0075
-            },
-            "win_log_loss": {
-              "formal": 2.1919,
-              "challenger": 2.2051,
-              "delta": 0.0132
-            },
-            "top3_brier": {
-              "formal": 0.1365,
-              "challenger": 0.142,
-              "delta": 0.0055
-            },
-            "challenger_better_log_loss_races": 1
-          },
-          "福島": {
-            "pairs": 1,
-            "honmei_win": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8841,
-              "challenger": 0.8892,
-              "delta": 0.0051
-            },
-            "win_log_loss": {
-              "formal": 2.253,
-              "challenger": 2.2546,
-              "delta": 0.0017
-            },
-            "top3_brier": {
-              "formal": 0.1518,
-              "challenger": 0.1531,
-              "delta": 0.0014
-            },
-            "challenger_better_log_loss_races": 0
-          }
-        },
-        "surface": {
-          "ダート": {
-            "pairs": 2,
-            "honmei_win": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "honmei_top3": {
-              "formal": 0.0,
-              "challenger": 0.0,
-              "delta": 0.0
-            },
-            "win_brier": {
-              "formal": 0.8449,
-              "challenger": 0.8668,
-              "delta": 0.0219
-            },
-            "win_log_loss": {
-              "formal": 2.0701,
-              "challenger": 2.1632,
-              "delta": 0.0931
-            },
-            "top3_brier": {
-              "formal": 0.1583,
-              "challenger": 0.1614,
-              "delta": 0.0032
-            },
-            "challenger_better_log_loss_races": 0
-          },
-          "芝": {
             "pairs": 3,
             "honmei_win": {
               "formal": 0.3333,
@@ -1416,50 +1391,168 @@
               "delta": 0.0
             },
             "win_brier": {
-              "formal": 0.8469,
-              "challenger": 0.8536,
-              "delta": 0.0067
+              "formal": 0.8096,
+              "challenger": 0.8258,
+              "delta": 0.0162
             },
             "win_log_loss": {
-              "formal": 2.2122,
-              "challenger": 2.2216,
-              "delta": 0.0094
+              "formal": 1.9396,
+              "challenger": 2.0053,
+              "delta": 0.0656
             },
             "top3_brier": {
-              "formal": 0.1416,
-              "challenger": 0.1457,
-              "delta": 0.0041
+              "formal": 0.1609,
+              "challenger": 0.1649,
+              "delta": 0.004
+            },
+            "challenger_better_log_loss_races": 0
+          },
+          "東京": {
+            "pairs": 3,
+            "honmei_win": {
+              "formal": 0.3333,
+              "challenger": 0.3333,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.3333,
+              "challenger": 0.3333,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8358,
+              "challenger": 0.8422,
+              "delta": 0.0064
+            },
+            "win_log_loss": {
+              "formal": 2.1749,
+              "challenger": 2.1917,
+              "delta": 0.0168
+            },
+            "top3_brier": {
+              "formal": 0.1385,
+              "challenger": 0.142,
+              "delta": 0.0035
+            },
+            "challenger_better_log_loss_races": 1
+          },
+          "福島": {
+            "pairs": 2,
+            "honmei_win": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.9239,
+              "challenger": 0.9365,
+              "delta": 0.0126
+            },
+            "win_log_loss": {
+              "formal": 2.5202,
+              "challenger": 2.592,
+              "delta": 0.0718
+            },
+            "top3_brier": {
+              "formal": 0.1738,
+              "challenger": 0.1763,
+              "delta": 0.0025
+            },
+            "challenger_better_log_loss_races": 0
+          }
+        },
+        "surface": {
+          "ダート": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.0,
+              "challenger": 0.0,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8761,
+              "challenger": 0.8932,
+              "delta": 0.0171
+            },
+            "win_log_loss": {
+              "formal": 2.2672,
+              "challenger": 2.3552,
+              "delta": 0.088
+            },
+            "top3_brier": {
+              "formal": 0.1637,
+              "challenger": 0.1661,
+              "delta": 0.0024
+            },
+            "challenger_better_log_loss_races": 0
+          },
+          "芝": {
+            "pairs": 4,
+            "honmei_win": {
+              "formal": 0.5,
+              "challenger": 0.5,
+              "delta": 0.0
+            },
+            "honmei_top3": {
+              "formal": 0.5,
+              "challenger": 0.5,
+              "delta": 0.0
+            },
+            "win_brier": {
+              "formal": 0.8199,
+              "challenger": 0.8261,
+              "delta": 0.0062
+            },
+            "win_log_loss": {
+              "formal": 2.0788,
+              "challenger": 2.0885,
+              "delta": 0.0097
+            },
+            "top3_brier": {
+              "formal": 0.1477,
+              "challenger": 0.1522,
+              "delta": 0.0045
             },
             "challenger_better_log_loss_races": 1
           }
         },
         "going": {
           "良": {
-            "pairs": 4,
+            "pairs": 7,
             "honmei_win": {
-              "formal": 0.25,
-              "challenger": 0.25,
+              "formal": 0.2857,
+              "challenger": 0.2857,
               "delta": 0.0
             },
             "honmei_top3": {
-              "formal": 0.25,
-              "challenger": 0.25,
+              "formal": 0.2857,
+              "challenger": 0.2857,
               "delta": 0.0
             },
             "win_brier": {
-              "formal": 0.8366,
-              "challenger": 0.8513,
-              "delta": 0.0147
+              "formal": 0.8428,
+              "challenger": 0.8554,
+              "delta": 0.0126
             },
             "win_log_loss": {
-              "formal": 2.131,
-              "challenger": 2.1842,
-              "delta": 0.0532
+              "formal": 2.1616,
+              "challenger": 2.2172,
+              "delta": 0.0556
             },
             "top3_brier": {
-              "formal": 0.1474,
-              "challenger": 0.1517,
-              "delta": 0.0043
+              "formal": 0.1563,
+              "challenger": 0.16,
+              "delta": 0.0037
             },
             "challenger_better_log_loss_races": 1
           },
@@ -2471,6 +2564,102 @@
             "win_log_loss": 2.279379,
             "top3_brier": 0.154226
           }
+        },
+        {
+          "race_id": "2026-11-14-daily-hai-2yo-stakes",
+          "grade": "prospective_preregistered",
+          "segments": {
+            "venue": "京都",
+            "surface": "芝",
+            "going": "良"
+          },
+          "challenger_summary": {
+            "official_going_prestart": "良",
+            "race_category": "dry",
+            "adjusted_runners": 6
+          },
+          "formal": {
+            "honmei": 5,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.186625,
+            "win_brier": 0.738851,
+            "win_log_loss": 1.678652,
+            "top3_brier": 0.166128
+          },
+          "challenger": {
+            "honmei": 5,
+            "honmei_win": 1,
+            "honmei_top3": 1,
+            "winner_probability": 0.184637,
+            "win_brier": 0.743619,
+            "win_log_loss": 1.689363,
+            "top3_brier": 0.171845
+          }
+        },
+        {
+          "race_id": "2026-11-14-fruits-line-cup",
+          "grade": "prospective_preregistered",
+          "segments": {
+            "venue": "福島",
+            "surface": "ダート",
+            "going": "良"
+          },
+          "challenger_summary": {
+            "official_going_prestart": "良",
+            "race_category": "dry",
+            "adjusted_runners": 11
+          },
+          "formal": {
+            "honmei": 2,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.061578,
+            "win_brier": 0.963617,
+            "win_log_loss": 2.787453,
+            "top3_brier": 0.195854
+          },
+          "challenger": {
+            "honmei": 11,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.053428,
+            "win_brier": 0.983737,
+            "win_log_loss": 2.929427,
+            "top3_brier": 0.199462
+          }
+        },
+        {
+          "race_id": "2026-11-14-musashino-stakes",
+          "grade": "prospective_preregistered",
+          "segments": {
+            "venue": "東京",
+            "surface": "ダート",
+            "going": "良"
+          },
+          "challenger_summary": {
+            "official_going_prestart": "良",
+            "race_category": "dry",
+            "adjusted_runners": 13
+          },
+          "formal": {
+            "honmei": 7,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.117538,
+            "win_brier": 0.85092,
+            "win_log_loss": 2.140991,
+            "top3_brier": 0.142485
+          },
+          "challenger": {
+            "honmei": 7,
+            "honmei_win": 0,
+            "honmei_top3": 0,
+            "winner_probability": 0.114753,
+            "win_brier": 0.855221,
+            "win_log_loss": 2.164971,
+            "top3_brier": 0.142066
+          }
         }
       ],
       "skipped": [
@@ -2506,30 +2695,30 @@
       "effective_prospective_from": "2026-11-03T12:00:00+09:00",
       "registration_commit_at": "2026-11-03T11:02:10+09:00",
       "minimum_prospective_pairs": 20,
-      "remaining_prospective_pairs": 16,
+      "remaining_prospective_pairs": 14,
       "ready_for_manual_review": false,
       "prospective": {
-        "pairs": 4,
+        "pairs": 6,
         "formal": {
-          "stake_yen": 21500,
+          "stake_yen": 33100,
           "payout_yen": 3170,
-          "net_yen": -18330,
-          "roi": 0.1474,
+          "net_yen": -29930,
+          "roi": 0.0958,
           "hit_races": 1,
-          "loss_races": 4,
-          "avg_max_exposure": 0.6598
+          "loss_races": 6,
+          "avg_max_exposure": 0.6434
         },
         "challenger": {
-          "stake_yen": 21500,
+          "stake_yen": 33100,
           "payout_yen": 2062750,
-          "net_yen": 2041250,
-          "roi": 95.9419,
+          "net_yen": 2029650,
+          "roi": 62.3187,
           "hit_races": 1,
-          "loss_races": 3,
-          "avg_max_exposure": 0.5902
+          "loss_races": 5,
+          "avg_max_exposure": 0.5918
         },
-        "roi_delta": 95.7945,
-        "roi_delta_without_biggest_gap_race": -0.1933,
+        "roi_delta": 62.2229,
+        "roi_delta_without_biggest_gap_race": -0.1132,
         "biggest_gap_race": "2026-11-08-argentina-republic-cup",
         "challenger_better_net_races": 1,
         "challenger_worse_net_races": 1
@@ -2841,6 +3030,42 @@
             "hit": 0,
             "max_exposure": 0.6
           }
+        },
+        {
+          "race_id": "2026-11-14-daily-hai-2yo-stakes",
+          "grade": "prospective_preregistered",
+          "formal": {
+            "stake_yen": 5900,
+            "payout_yen": 0,
+            "net_yen": -5900,
+            "hit": 0,
+            "max_exposure": 0.6949
+          },
+          "challenger": {
+            "stake_yen": 5900,
+            "payout_yen": 0,
+            "net_yen": -5900,
+            "hit": 0,
+            "max_exposure": 0.5932
+          }
+        },
+        {
+          "race_id": "2026-11-14-fruits-line-cup",
+          "grade": "prospective_preregistered",
+          "formal": {
+            "stake_yen": 5700,
+            "payout_yen": 0,
+            "net_yen": -5700,
+            "hit": 0,
+            "max_exposure": 0.5263
+          },
+          "challenger": {
+            "stake_yen": 5700,
+            "payout_yen": 0,
+            "net_yen": -5700,
+            "hit": 0,
+            "max_exposure": 0.5965
+          }
         }
       ],
       "skipped": [
@@ -2866,6 +3091,10 @@
         },
         {
           "race_id": "2026-11-08-michinoku-stakes",
+          "reason": "sealed purchase file not found"
+        },
+        {
+          "race_id": "2026-11-14-musashino-stakes",
           "reason": "sealed purchase file not found"
         }
       ]
