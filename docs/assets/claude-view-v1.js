@@ -116,6 +116,7 @@
       fetch('data/predictors/claude_status_v1.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
         var rows=d.races||[];var s=d.summary||{};
         if(mode==='results'){renderResults(rows.filter(function(r){return r.result}));return}
+        rows=rows.filter(function(r){return !r.result});/* 今週：結果が出たレースは過去の成績へ */
         var h='<p class="pv-note">これは <strong>Claude</strong> の予想です。ChatGPT の成績とは合算せず、別々に集計します。対象は、JRAの毎開催日のメインレース（11R）です。買い目は「もし買ったら」の仮想で、実際には購入しません。発走前に保存し、あとから変えません。</p>';
         h+=rows.length?rows.map(card).join(''):'<div class="pv-empty">いま公開している Claude の予想はありません。ChatGPT と同じレースを対象に、次の開催から発走前に保存して、ここに表示します。</div>';
         panel.innerHTML=h;
