@@ -40,6 +40,43 @@ def _merge_corner(sp, mg):
     return mk(*sol)
 
 
+LOOP_CORNERS = {("niigata", "turf|outer"): dict(R2=110.0, R4=40.0, w2=7.0, w4=8.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
+
+def _corners(sp, C, cr):
+    """7部品の周回線（円弧2つ・直線・円弧2つ・直線・円弧）の、2コーナー側の2つ目の円弧と4コーナー側の2つ目の円弧の半径を変えて作り直す。
+    曲がり角の合計は変えない（向きがそろう）。閉じる条件（位置）を満たしながら、元の中心線からの距離の二乗和が最小になる長さを選ぶ。"""
+    from scipy.optimize import minimize
+    x0, y0, th0 = sp.st[0]
+    L = list(sp.L); K = list(sp.K)
+    TA = L[0] * K[0] + L[1] * K[1]; TB = L[3] * K[3] + L[4] * K[4]
+    kA2 = 1.0 / cr["R2"]; kB2 = 1.0 / cr["R4"]
+    def mk(v):
+        a1, b1, Lb, Lc = v
+        LL = [a1, (TA - a1 * K[0]) / kA2, Lb, b1, (TB - b1 * K[3]) / kB2, Lc, L[6]]
+        KK = [K[0], kA2, 0.0, K[3], kB2, 0.0, K[6]]
+        return A.Spline(x0, y0, th0, LL, KK)
+    # 目標の線：2コーナー・4コーナーの付近だけ、中心線を内側へ w2 / w4 ずらす（左回りなので進行方向の左が内側）
+    th, _ = A.heading_curv(C, True)
+    sc = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(C, axis=0), axis=1))])
+    s2 = (L[0], L[0] + L[1]); s4 = (L[0] + L[1] + L[2] + L[3], L[0] + L[1] + L[2] + L[3] + L[4])
+    Ct = C.copy()
+    for (a_, b_), w in ((s2, cr["w2"]), (s4, cr["w4"])):
+        m = np.clip(1.0 - np.maximum(np.maximum(a_ - 60 - sc, sc - b_ - 60), 0) / 60.0, 0, 1) * ((sc > a_ - 120) & (sc < b_ + 120))
+        Ct = Ct + np.stack([-np.sin(th), np.cos(th)], axis=1) * (w * m)[:, None]
+    tree = cKDTree(Ct)
+    def obj(v):
+        try: return float((tree.query(mk(v).sample(2.0))[0] ** 2).mean())
+        except Exception: return 1e9
+    def clo(v):
+        e = mk(v).end(); return [e[0] - x0, e[1] - y0]
+    v0 = [L[0], L[3], L[2], L[5]]
+    bnds = [(1.0, TA / K[0] - 1e-3), (1.0, TB / K[3] - 1e-3), (50.0, 2000.0), (50.0, 2000.0)]
+    r = minimize(obj, v0, method="SLSQP", bounds=bnds, constraints=[dict(type="eq", fun=clo)], options=dict(maxiter=300, ftol=1e-9))
+    if not r.success or max(abs(np.array(clo(r.x)))) > 1e-3:
+        raise SystemExit("新潟外回りのコーナーの置き換えが解けません " + str(r.message))
+    return mk(r.x)
+
+
 def _share_with_inner(sp, spi, sh):
     """外回りの『ゴール→1〜2コーナー→向正面の直線』を、内回りの線と同じ円弧にする。
     内回りの2つの円弧（半径127・348）はそのまま使い、3〜4コーナーの2つの円弧（半径は変えない）は、
@@ -95,6 +132,10 @@ def arcify(code, out, centre, half, routes, log=print):
         f = fits.get(rk)
         if c_ == code and f and len(f["sp"].L) == mg["n"]:
             f["sp"] = _merge_corner(f["sp"], mg)
+    for (c_, rk), cr in LOOP_CORNERS.items():
+        f = fits.get(rk)
+        if c_ == code and f and len(f["sp"].L) == 7:
+            f["sp"] = _corners(f["sp"], f["Cf"], cr)
     for (c_, rk), sh in LOOP_SHARE.items():
         f = fits.get(rk)
         if c_ == code and f and sh["with"] in fits:
@@ -102,7 +143,7 @@ def arcify(code, out, centre, half, routes, log=print):
     loops = {}
     for rk, f in fits.items():
         sp, C, Cf, fy, tol = f["sp"], f["C"], f["Cf"], f["fy"], f["tol"]; tolc = f["tolc"]
-        dev = float(cKDTree(C).query(sp.sample(1.0) * [1.0, fy])[0].max()) if (code, rk) in LOOP_MERGE or (code, rk) in LOOP_SHARE else f["dev"]
+        dev = float(cKDTree(C).query(sp.sample(1.0) * [1.0, fy])[0].max()) if (code, rk) in LOOP_MERGE or (code, rk) in LOOP_SHARE or (code, rk) in LOOP_CORNERS else f["dev"]
         # ゴール線の位置（C の先頭）を道のりの始点にそろえる
         smp = sp.sample(0.25); k = int(np.argmin(np.linalg.norm(smp - Cf[0], axis=1)))
         sg = k * 0.25
