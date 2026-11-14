@@ -40,7 +40,7 @@ def _merge_corner(sp, mg):
     return mk(*sol)
 
 
-LOOP_CORNERS = {("niigata", "turf|outer"): dict(R2=110.0, R4=40.0, w2=7.0, w4=8.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
+LOOP_CORNERS = {("niigata", "turf|outer"): dict(share_R=129.0, R2=110.0, R4=40.0, w2=7.0, w4=8.0)}   # 新潟外回り：2コーナーは半径の長い円弧で内寄りに、4コーナーは半径の短めな円弧で早めに内（経済コース）へ（ユーザー依頼 2026-11-14）。形は AALAALA の7部品のまま、各コーナーの2つ目の円弧の半径を変え、円弧の長さと直線の長さを周回が閉じる条件で解く
 
 def _corners(sp, C, cr):
     """7部品の周回線（円弧2つ・直線・円弧2つ・直線・円弧）の、2コーナー側の2つ目の円弧と4コーナー側の2つ目の円弧の半径を変えて作り直す。
@@ -48,6 +48,25 @@ def _corners(sp, C, cr):
     from scipy.optimize import minimize
     x0, y0, th0 = sp.st[0]
     L = list(sp.L); K = list(sp.K)
+    if cr.get("share_R"):   # 1〜2コーナーは内回り（2400m内など）と同じ半径の半円にする。3〜4コーナーの2つの円弧は半径そのままで長さを解く
+        kS = 1.0 / cr["share_R"]; t_pre = L[6] * K[6]
+        TB = L[3] * K[3] + L[4] * K[4]; kB2 = 1.0 / cr["R4"]
+        def mk(v):
+            Lb, b1, Lc = v
+            return A.Spline(x0, y0, th0, [(math.pi - t_pre) / kS, Lb, b1, (TB - b1 * K[3]) / kB2, Lc, t_pre / kS],
+                            [kS, 0.0, K[3], kB2, 0.0, kS])
+        th, _ = A.heading_curv(C, True)
+        tree = cKDTree(C)
+        def obj(v):
+            try: return float((tree.query(mk(v).sample(2.0))[0] ** 2).mean())
+            except Exception: return 1e9
+        def clo(v):
+            e = mk(v).end(); return [e[0] - x0, e[1] - y0]
+        r = minimize(obj, [L[2], L[3], L[5]], method="SLSQP", bounds=[(50, 2000), (1.0, TB / K[3] - 1e-3), (50, 2000)],
+                     constraints=[dict(type="eq", fun=clo)], options=dict(maxiter=300, ftol=1e-9))
+        if not r.success or max(abs(np.array(clo(r.x)))) > 1e-3:
+            raise SystemExit("新潟外回りのコーナーの置き換えが解けません " + str(r.message))
+        return mk(r.x)
     TA = L[0] * K[0] + L[1] * K[1]; TB = L[3] * K[3] + L[4] * K[4]
     kA2 = 1.0 / cr["R2"]; kB2 = 1.0 / cr["R4"]
     def mk(v):
