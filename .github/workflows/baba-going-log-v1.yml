@@ -1,0 +1,59 @@
+name: Baba going log - morning record + official outcome (research A)
+# Collects, for every racecourse that raced: what was known in the morning (official going, moisture, JMA rain probabilities,
+# model output) and what the going really was (official going of every race, observed rain after the morning).
+# Research only. Nothing here changes a prediction.
+on:
+  schedule:
+    - cron: '50 9 * * 0,1,6'   # 18:50 JST Sat/Sun/Mon (after the last race)
+  workflow_dispatch:
+    inputs:
+      date: {description: 'JST date YYYY-MM-DD (blank = today)', required: false, default: ''}
+      backfill_from: {description: 'rebuild past days from the forecast archive, from this date (YYYY-MM-DD). blank = no', required: false, default: ''}
+permissions:
+  contents: write
+concurrency:
+  group: baba-going-log-v1
+  cancel-in-progress: false
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 numpy pandas scikit-learn
+      - name: Tests
+        working-directory: baba_models_v2
+        run: python -W ignore -m unittest test_going_log test_going_forecast
+      - name: Official going of the race days (JRA result pages)
+        working-directory: baba_models_v2
+        run: |
+          D="${{ inputs.date }}"; if [ -z "$D" ]; then D=$(TZ=Asia/Tokyo date +%F); fi
+          B="${{ inputs.backfill_from }}"; LO="${B:-$D}"
+          echo "DAY=$D" >> "$GITHUB_ENV"; echo "BACKFILL=$B" >> "$GITHUB_ENV"
+          python - <<PY
+          open('/tmp/range','w').write("${LO:0:4}${LO:5:2} ${D:0:4}${D:5:2}")
+          PY
+          read A B2 < /tmp/range
+          python jra_going_labels.py index --start $A --end $B2 --out /tmp/days.json
+          python - <<PY
+          import json
+          x=json.load(open('/tmp/days.json',encoding='utf-8'))
+          x['days']=[r for r in x['days'] if "$LO"<=r['date']<="$D"]
+          print('days', sorted({r['date'] for r in x['days']}))
+          json.dump(x,open('/tmp/days_log.json','w',encoding='utf-8'),ensure_ascii=False)
+          PY
+          mkdir -p going_labels/recent
+          python jra_going_labels.py collect --days /tmp/days_log.json --year "${D:0:4}" --out going_labels/recent/log_outcomes.csv || true
+      - name: Build the log and the summary
+        working-directory: baba_models_v2
+        run: |
+          if [ -n "$BACKFILL" ]; then python -W ignore going_log.py --date "$DAY" --backfill-from "$BACKFILL"; else python -W ignore going_log.py --date "$DAY"; fi
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baba_models_v2/going_log baba_models_v2/going_labels/recent docs/data/going_log_summary_v1.json
+          git commit -m "Going log $DAY" || exit 0
+          for i in 1 2 3 4 5; do git fetch origin main && git rebase origin/main && git push origin HEAD:main && break; sleep 3; done
