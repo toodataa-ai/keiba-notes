@@ -142,7 +142,7 @@ function selectNextBlock(days,rows){
     const dateSet=new Set(days.map(d=>d.date));
     const rows=allRows.filter(r=>dateSet.has(r.date)&&r.status!=='reviewed').sort((a,b)=>`${a.date}-${a.id}`.localeCompare(`${b.date}-${b.id}`));
     if(rows.length){
-      root.innerHTML=rows.map(card).join('');
+      root.innerHTML=rows.map(r=>card(r)).join('');
     }else if(days.length){
       const first=days[0];
       const label=policy?.publish_window?.label||'8:00〜9:00頃';
