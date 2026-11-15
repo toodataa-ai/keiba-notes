@@ -163,6 +163,8 @@
 
 - **共通手順書を ChatGPT の正式プロンプトに取り込み（2026-11-15、ユーザー承認「正式にして」）**：`docs/data/latest_prompt.json` の `rule` の末尾に「SHARED STEP1 PROCEDURE」の一節と、トップキー `shared_step1_procedure_v1` を追加（版は v3.13 のまま。`prompt_version=='v3.13'` を検査する多数のワークフローを壊さないため、v3.14・v3.15 と同じ『追記』の形）。手順書はSHAで固定しない（Claudeが承認後に直すため）。ChatGPT は STEP1 の自由記述欄に手順書の版を書く（新しいキーは足さない）。`validate-jra-prompt-v313.mjs` は `validate-jra-pdf-layout.py` のSHA不一致で以前から失敗（今回とは無関係）。
 
+- **共通手順書の適用開始（2026-11-15、ユーザー決定）**：共通手順書に沿った予想として数えるのは**次の開催日から**。11/15 までの分は旧手順（ChatGPT は 11/15 の予想を 09:59 に旧手順で実施。正式プロンプトへの取り込みは 10:35 ごろ）。ChatGPT と Claude を比べるときは、この線で区別する。確認方法＝次の開催日の夕方に、ChatGPT の STEP1 の自由記述欄に手順書の版（shared-v1.1 など）と馬場予測ファイルの使用有無の記録があるか見る。無ければ ChatGPT に直接確認する。
+
 ## 作業上の注意
 - GitHub の GraphQL はこの環境から使えない（`gh workflow run` や `gh pr` 系も失敗する）。PR作成・マージ・ワークフロー起動は REST（`gh api repos/toodataa-ai/keiba-notes/pulls ...`、起動は `gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>.yml/dispatches -f ref=main -f 'inputs[キー]=値'`）。
 - GITHUB_TOKEN でのpushは他のワークフローを起動しない。自動処理の後続はワークフロー内で直接実行する。
