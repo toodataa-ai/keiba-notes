@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.63-20261115",
-  "current_public_version": "1.63",
+  "current_public_release": "release/jra-site-v1.64-20261115",
+  "current_public_version": "1.64",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1342,6 +1342,27 @@
       "scope_files": [
         "docs/improvement-cycle.html",
         "docs/improvement-archive.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.64-20261115",
+      "branch": "release/jra-site-v1.64-20261115",
+      "commit_sha": "a979811edba1068ad14b7b25d417997e486e7691",
+      "deployed_at": "2026-11-15T14:12:34+09:00",
+      "workflow_run_id": 43680064979,
+      "validation_workflow_run_id": 43680064979,
+      "public_version": "1.64",
+      "note": "2026-11-15ユーザー明示承認済み。自動運用ページ：廃止した若駒の記述を削除：若駒（経験数の区分）の研究を止めたため、自動運用ページの説明文から若駒の記述を削除。記録の表からも若駒の機械採点の行を外す（記録側の変更は反映済み）。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-operations-wakakoma-removed-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
