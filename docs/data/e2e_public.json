@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-15T10:02:45.798672+00:00",
+  "generated_at": "2026-11-15T10:07:04.512625+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-11-15T10:02:43.825165+00:00",
+    "generated_at": "2026-11-15T10:07:03.133711+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -495,9 +495,9 @@
           "2026-11-14",
           "2026-11-15"
         ],
-        "registered_races": 5,
+        "registered_races": 6,
         "expected_races": 6,
-        "formal_grade_a_review_state": "pending",
+        "formal_grade_a_review_state": "complete",
         "races": [
           {
             "race_id": "2026-11-14-musashino-stakes",
@@ -524,12 +524,10 @@
             "reasons": []
           },
           {
-            "race_id": "2026-11-15-queen-elizabeth-cup",
-            "date": null,
-            "formal_state": "pending",
-            "reasons": [
-              "missing_registry_entry"
-            ]
+            "race_id": "2026-11-15-elizabeth-queen-cup",
+            "date": "2026-11-15",
+            "formal_state": "complete",
+            "reasons": []
           },
           {
             "race_id": "2026-11-15-fukushima-minyu-cup",
@@ -538,8 +536,8 @@
             "reasons": []
           }
         ],
-        "weekly_improvement_decision": "not_evaluated",
-        "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
+        "weekly_improvement_decision": "no_change",
+        "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
       }
     ]
   },
