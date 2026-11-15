@@ -327,7 +327,8 @@ def parse_official(soup, p):
                 special = "競走中止"
                 raw_rank = f"競走中止（着差欄:{margin}）"
         if rank is None and special is None:
-            raise Blocked("BLOCKED_PARSE", f"Unrecognized finish status: {raw_rank}")
+            cells_txt = " | ".join(clean(c.get_text(" ", strip=True)) for c in cells)
+            raise Blocked("BLOCKED_PARSE", f"Unrecognized finish status: {raw_rank} [row #{horse_number}: {cells_txt}]")
         rows.append({"horse_no": int(horse_number), "horse_name": name, "finish_position": rank,
                      "official_disposition": special, "raw_finish": raw_rank,
                      "finish_time": cells[10].get_text(" ", strip=True) if len(cells) > 10 else None})
