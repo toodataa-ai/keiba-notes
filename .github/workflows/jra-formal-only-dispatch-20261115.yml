@@ -1,0 +1,55 @@
+name: JRA formal-only invoke immutable v3.13 prediction from audited input
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/jra-formal-only-dispatch/*.json'
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: jra-formal-only-dispatch-v313
+  cancel-in-progress: false
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Validate exactly one new prestart v3.13 official input
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE=$(jq -r .before "$GITHUB_EVENT_PATH")
+          mapfile -t NEW < <(git diff --diff-filter=A --name-only "$BEFORE" "$GITHUB_SHA" -- e2e_validation/requests/jra-formal-only-dispatch)
+          [[ ${#NEW[@]} -eq 1 ]] || { echo '::error::Exactly one dispatch request expected'; exit 1; }
+          REQUEST="${NEW[0]}"
+          python3 - "$REQUEST" <<'PY'
+          import json,re,sys
+          from pathlib import Path
+          d=json.loads(Path(sys.argv[1]).read_text())
+          rid=d['race_id']; src=d['input_path']
+          assert re.fullmatch(r'2026-11-15-[a-z0-9-]+',rid)
+          assert src=='e2e_validation/inputs/v313/'+rid+'.json'
+          doc=json.loads(Path(src).read_text())
+          assert doc['race_id']==rid and doc['prompt_version']=='v3.13'
+          assert doc['race_context']['start_at']>'2026-11-15T14:00:00+09:00'
+          print(src)
+          PY
+          echo "REQUEST=$REQUEST" >> "$GITHUB_ENV"
+      - name: Trigger only original versioned v3.13 official predictor and PDF validation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          INPUT=$(python3 - "$REQUEST" <<'PY'
+          import json,sys
+          print(json.load(open(sys.argv[1]))['input_path'])
+          PY
+          )
+          gh workflow run jra-prestart-pipeline-fresh-v313.yml --ref main -f input_path="$INPUT"
+          echo "JRA_FORMAL_V313_DISPATCHED_FROM_AUDITED_INPUT $INPUT"
