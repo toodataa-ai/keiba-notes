@@ -31,6 +31,19 @@
 <h2 id="doneTitle">これまでの判定</h2>
 <div id="decided" class="empty">読み込み中…</div>
 </section>
+<section aria-labelledby="glossTitle">
+<details>
+<summary id="glossTitle">成績の見方（くわしく知りたい方へ）</summary>
+<dl>
+<dt>勝つ確率の見積もり</dt>
+<dd>AIは各馬が勝つ確率を数字で出しています。実際に勝った馬に高い確率を付けていたほど「見積もりが正確」です（専門的には log loss という指標で、小さいほど良い）。採用判定はこの指標を一番重視します。</dd>
+<dt>◎の3着内率</dt>
+<dd>本命（◎）の馬が3着以内に入った割合です。改善案を採用しても、ここが悪くならないことを条件にしています。</dd>
+<dt>過去のレースでの試算</dt>
+<dd>改善案を作る前のレースに当てはめた参考値です。後から当てはめたものなので、判定の件数には数えません。</dd>
+</dl>
+</details>
+</section>
 <section><details open>
 <summary>旧方式の比較記録（参考）</summary>
 <p>改良前と改良後のプロンプトを同じレースで走らせる、以前の方式の記録です。比較の設定が古い版（v3.0 と v3.1）のまま止まっているため、いまの判定には使っていません。<a href="e2e.html">旧方式の比較記録を見る</a></p>

@@ -54,19 +54,6 @@
 
 
 
-<section aria-labelledby="glossTitle">
-<details>
-<summary id="glossTitle">成績の見方（くわしく知りたい方へ）</summary>
-<dl>
-<dt>勝つ確率の見積もり</dt>
-<dd>AIは各馬が勝つ確率を数字で出しています。実際に勝った馬に高い確率を付けていたほど「見積もりが正確」です（専門的には log loss という指標で、小さいほど良い）。採用判定はこの指標を一番重視します。</dd>
-<dt>◎の3着内率</dt>
-<dd>本命（◎）の馬が3着以内に入った割合です。改善案を採用しても、ここが悪くならないことを条件にしています。</dd>
-<dt>過去のレースでの試算</dt>
-<dd>改善案を作る前のレースに当てはめた参考値です。後から当てはめたものなので、判定の件数には数えません。</dd>
-</dl>
-</details>
-</section>
 
 <p class="tiny" style="margin:16px 0"><a href="staging/improvement-archive.html">停止した比較・旧モデルの競馬場別評価・これまでの判定（アーカイブ）</a></p>
 <footer>この画面は自動で集計されたデータ（data/jra_experiment_status_v1.json）を表示しています。既存の正式予想・買い目・PDF原本は変更しません。</footer>
