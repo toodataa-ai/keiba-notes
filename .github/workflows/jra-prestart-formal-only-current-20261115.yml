@@ -148,7 +148,17 @@ jobs:
           git add -- "$SNAPSHOT" "$RECOVERED_INPUT"
           if [[ -d "$RECOVERED_EVIDENCE" ]] && find "$RECOVERED_EVIDENCE" -type f -print -quit | grep -q .; then git add -- "$RECOVERED_EVIDENCE"; fi
           git commit -m "Freeze prereace JRA v3.13 complete quote evidence, purchase audit and final_bets"
-          git push origin HEAD:main
+          for push_attempt in 1 2 3 4 5 6 7 8; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo '::error::Overlapping concurrent main edits cannot safely rebase; no force push'; exit 1
+            fi
+            if git push origin HEAD:main; then break; fi
+            if [[ "$push_attempt" -eq 8 ]]; then
+              echo '::error::Concurrent main update retries exhausted; no force push'; exit 1
+            fi
+          done
           PROOF=$(git rev-parse HEAD)
           echo "PROOF=$PROOF" >> "$GITHUB_ENV"
           echo "Recorded immutable prereace snapshot $SNAPSHOT in $PROOF"
@@ -179,7 +189,17 @@ jobs:
           if actual!=expected:raise SystemExit('BLOCKER: unexpected historical file changes: '+str(actual^expected))
           PY
           git commit -m "Publish validated v3.13 full JRA original prediction HTML PDF and public registry"
-          git push origin HEAD:main
+          for push_attempt in 1 2 3 4 5 6 7 8; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo '::error::Overlapping concurrent main edits cannot safely rebase; no force push'; exit 1
+            fi
+            if git push origin HEAD:main; then break; fi
+            if [[ "$push_attempt" -eq 8 ]]; then
+              echo '::error::Concurrent main update retries exhausted; no force push'; exit 1
+            fi
+          done
           echo "JRA_V313_COMMITTED_AWAITING_PUBLIC_HTTP_VERIFICATION $RACE_ID proof=$PROOF"
       - name: Independently compare deployed website HTML PDF and public race registry
         run: |
