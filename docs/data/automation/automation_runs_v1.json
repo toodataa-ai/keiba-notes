@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-14T23:30:55+00:00",
+ "generated_at": "2026-11-15T00:11:54+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 43656911153,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-15T00:11:09Z",
+     "started_at": "2026-11-15T00:11:09Z",
+     "ended_at": "2026-11-15T00:11:34Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 43641444032,
      "event": "workflow_dispatch",
@@ -1062,29 +1073,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "手"
-    },
-    {
-     "id": 41251643370,
-     "event": "push",
-     "created_at": "2026-10-31T23:13:55Z",
-     "started_at": "2026-10-31T23:13:55Z",
-     "ended_at": "2026-10-31T23:15:50Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 41251367439,
-     "event": "push",
-     "created_at": "2026-10-31T23:10:04Z",
-     "started_at": "2026-10-31T23:10:04Z",
-     "ended_at": "2026-10-31T23:11:45Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "手",
-     "fail_kind": ""
     }
    ]
   },
@@ -1400,17 +1388,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "手"
-    },
-    {
-     "id": 41251346207,
-     "event": "push",
-     "created_at": "2026-10-31T23:09:48Z",
-     "started_at": "2026-10-31T23:09:48Z",
-     "ended_at": "2026-10-31T23:11:17Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
     }
    ]
   },
@@ -1511,6 +1488,28 @@
   "baba-going-live-v1.yml": {
    "label": "馬場の朝の予測",
    "runs": [
+    {
+     "id": 43656913039,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-15T00:11:11Z",
+     "started_at": "2026-11-15T00:11:11Z",
+     "ended_at": null,
+     "status": "pending",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "O"
+    },
+    {
+     "id": 43653688773,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-14T23:31:47Z",
+     "started_at": "2026-11-14T23:31:47Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 43653530875,
      "event": "workflow_dispatch",
