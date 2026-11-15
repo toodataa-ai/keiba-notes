@@ -326,6 +326,11 @@ def parse_official(soup, p):
             if margin in ("中止", "競走中止"):
                 special = "競走中止"
                 raw_rank = f"競走中止（着差欄:{margin}）"
+            elif margin == "失格":
+                # Disqualified horse: rank cell blank, "失格" in the margin column
+                # (seen at Obihiro 2026-11-14 R2, finish time still shown).
+                special = "失格"
+                raw_rank = f"失格（着差欄:{margin}）"
         if rank is None and special is None:
             cells_txt = " | ".join(clean(c.get_text(" ", strip=True)) for c in cells)
             raise Blocked("BLOCKED_PARSE", f"Unrecognized finish status: {raw_rank} [row #{horse_number}: {cells_txt}]")
