@@ -14,11 +14,7 @@ on:
   # Fallback for GitHub Actions commits: GITHUB_TOKEN pushes do not trigger
   # downstream push workflows. Only the current JST request is processed.
   # 08:15 / 08:45 JST on Sat/Sun/Mon.
-  schedule:
-    - cron: '15,45 23 * * 5,6,0'
-    # 09:15 / 12:15 / 14:15 / 14:45 / 15:15 JST on Sat/Sun/Mon.
-    - cron: '15 0,3,5,6 * * 6,0,1'
-    - cron: '45 5 * * 6,0,1'
+  # 2026-11-15 定時を停止（若駒の経験数区分の研究は 11/7 に中止。手動起動・push は残す）
 permissions:
   contents: write
 concurrency:
