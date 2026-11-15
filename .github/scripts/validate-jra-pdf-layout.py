@@ -67,7 +67,23 @@ def validate(html_path, pdf_path, policy_path):
             adopted = [x for x in tail if x.startswith('採用買い目｜')]
             rejected = [x for x in tail if x.startswith('不採用買い目｜')]
             audit = [x for x in tail if x.startswith('購入最適化監査｜')]
-            if len(adopted)<1 or len(rejected)<1 or len(audit)!=1 or (
+            # The approved v3.11 historical one-audit layout remains valid.
+            # Formal v3.12/v3.13 adds three or more substantive audit pages:
+            # baseline/scenarios, every numbered purchase-mode comparison, and
+            # the final quote-coverage/search diagnostic. Check all in strict order.
+            mode_pages = audit[1:-1]
+            expected_modes = [
+                f"購入最適化監査｜方式別セット比較 {i}/{len(mode_pages)}"
+                for i in range(1, len(mode_pages)+1)
+            ]
+            ordered_dynamic_audit = (
+                len(audit) >= 3
+                and audit[0] == '購入最適化監査｜基準解と集合的中率'
+                and mode_pages == expected_modes
+                and audit[-1] == '購入最適化監査｜探索と価格網羅性'
+            )
+            valid_audit = len(audit) == 1 or ordered_dynamic_audit
+            if len(adopted)<1 or len(rejected)<1 or not valid_audit or (
                 tail != adopted+rejected+audit):
                 errors.append("Dynamic PDF has missing or misordered selected/rejected/risk pages")
     elif base_pages != len(PAGE_TAG.findall(html)):
