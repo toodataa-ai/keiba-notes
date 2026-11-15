@@ -1,16 +1,5 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-operations-wakakoma-removed-v1",
-      "title": "自動運用ページ：廃止した若駒の記述を削除",
-      "pages": [
-        "operations.html"
-      ],
-      "assets": [],
-      "status": "awaiting_user_approval",
-      "summary": "若駒（経験数の区分）の研究を止めたため、自動運用ページの説明文から若駒の記述を削除。記録の表からも若駒の機械採点の行を外す（記録側の変更は反映済み）。"
-    }
-  ]
+  "candidates": []
 }
