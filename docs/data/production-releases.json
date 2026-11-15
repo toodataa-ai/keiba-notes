@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.62-20261114",
-  "current_public_version": "1.62",
+  "current_public_release": "release/jra-site-v1.63-20261115",
+  "current_public_version": "1.63",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1320,6 +1320,28 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.63-20261115",
+      "branch": "release/jra-site-v1.63-20261115",
+      "commit_sha": "a54920b0ca06d47be533b910bdc3837eba3103c4",
+      "deployed_at": "2026-11-15T10:14:34+09:00",
+      "workflow_run_id": 43662130869,
+      "validation_workflow_run_id": 43662130869,
+      "public_version": "1.63",
+      "note": "2026-11-15ユーザー明示承認済み。改善状況ページ：一番上に各テーマの進捗まとめ（研究→登録→比較→判定のバーつき）＋『2歳・初めての距離』の追跡：改善状況ページの一番上に、各テーマ（展開・馬場・若駒・購入セット）の段階を、下のテーマ欄と同じ『研究→登録→比較→判定』の横バーで並べた一覧を追加（タップで下の詳しい説明へ移動）。Claudeの予想だけで進めている比較（位置取り・馬場補正・購入セット・2歳の初距離）も同じバーで載せる。さらに、Claudeの比較に『2歳・初めての距離』のカードを追加（100頭たまったら判定）。 併せて、重複していた「Claudeの予想で進めている比較」を上の進捗まとめの中に折りたたみ、停止した比較（ChatGPT基準）・これまでの判定・旧方式の記録を新しいアーカイブページ（improvement-archive.html）へ移した。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-improvement-summary-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/improvement-cycle.html",
+        "docs/improvement-archive.html"
       ],
       "public_http_files_verified": null
     }
