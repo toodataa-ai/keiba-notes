@@ -36,6 +36,17 @@ def unit(res, uid):
 
 
 class PipelineTest(unittest.TestCase):
+    def setUp(self):
+        # 本物の claude_track/reviews を読まない（データが増えるとテストが崩れるため）
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self._old_reviews = p.CLAUDE_REVIEWS
+        p.CLAUDE_REVIEWS = Path(self._tmp.name)
+
+    def tearDown(self):
+        p.CLAUDE_REVIEWS = self._old_reviews
+        self._tmp.cleanup()
+
     def test_baseline_everything_in_research(self):
         r = run(base_inputs())
         self.assertFalse(r["automatic_promotion"])
