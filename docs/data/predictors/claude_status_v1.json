@@ -4,33 +4,33 @@
  "as_of": "2026-11-15T09:22:16+09:00",
  "note": "ChatGPT の成績とは合算しません。対象は、JRAの毎開催日のメインレース（11R）です。買い目は仮想で、実際には購入しません。",
  "summary": {
-  "races": 9,
+  "races": 12,
   "excluded_not_prospective": 0,
   "honmei_win_rate": 0.3333333333333333,
-  "honmei_top3_rate": 0.4444444444444444,
-  "avg_marked_in_top3": 1.1111111111111112,
-  "log_loss": 2.249755240918846,
-  "brier": 0.8476453333333334,
-  "stake_yen": 11300,
+  "honmei_top3_rate": 0.5,
+  "avg_marked_in_top3": 1.0833333333333333,
+  "log_loss": 2.225108097914513,
+  "brier": 0.8492756666666668,
+  "stake_yen": 11900,
   "payout_yen": 8960,
-  "roi": 0.7929203539823009,
+  "roi": 0.7529411764705882,
   "by_bet_type": {
    "ワイド": {
-    "bets": 35,
+    "bets": 39,
     "hits": 2,
-    "stake_yen": 6800,
+    "stake_yen": 7200,
     "payout_yen": 4560
    },
    "単勝": {
-    "bets": 10,
+    "bets": 11,
     "hits": 1,
-    "stake_yen": 1600,
+    "stake_yen": 1700,
     "payout_yen": 4400
    },
    "馬連": {
-    "bets": 15,
+    "bets": 16,
     "hits": 0,
-    "stake_yen": 1700,
+    "stake_yen": 1800,
     "payout_yen": 0
    },
    "三連複": {
@@ -122,7 +122,40 @@
     }
    ],
    "total_stake_yen": 200,
-   "result": null,
+   "result": {
+    "finish_top3": [
+     15,
+     7,
+     16
+    ],
+    "prospective": true,
+    "honmei_win": false,
+    "honmei_top3": true,
+    "stake_yen": 200,
+    "payout_yen": 0,
+    "bet_results": [
+     {
+      "type": "ワイド",
+      "selection": [
+       1,
+       13
+      ],
+      "stake_yen": 100,
+      "hit": false,
+      "payout_yen": 0
+     },
+     {
+      "type": "馬連",
+      "selection": [
+       7,
+       13
+      ],
+      "stake_yen": 100,
+      "hit": false,
+      "payout_yen": 0
+     }
+    ]
+   },
    "review": null,
    "report": "claude-reports/2026-11-15-08-11.html"
   },
@@ -167,7 +200,19 @@
    ],
    "bets": [],
    "total_stake_yen": 0,
-   "result": null,
+   "result": {
+    "finish_top3": [
+     15,
+     14,
+     10
+    ],
+    "prospective": true,
+    "honmei_win": true,
+    "honmei_top3": true,
+    "stake_yen": 0,
+    "payout_yen": 0,
+    "bet_results": []
+   },
    "review": null,
    "report": "claude-reports/2026-11-15-05-11.html"
   },
@@ -264,7 +309,59 @@
     }
    ],
    "total_stake_yen": 400,
-   "result": null,
+   "result": {
+    "finish_top3": [
+     7,
+     15,
+     4
+    ],
+    "prospective": true,
+    "honmei_win": false,
+    "honmei_top3": false,
+    "stake_yen": 400,
+    "payout_yen": 0,
+    "bet_results": [
+     {
+      "type": "ワイド",
+      "selection": [
+       5,
+       9
+      ],
+      "stake_yen": 100,
+      "hit": false,
+      "payout_yen": 0
+     },
+     {
+      "type": "ワイド",
+      "selection": [
+       1,
+       9
+      ],
+      "stake_yen": 100,
+      "hit": false,
+      "payout_yen": 0
+     },
+     {
+      "type": "単勝",
+      "selection": [
+       9
+      ],
+      "stake_yen": 100,
+      "hit": false,
+      "payout_yen": 0
+     },
+     {
+      "type": "ワイド",
+      "selection": [
+       6,
+       9
+      ],
+      "stake_yen": 100,
+      "hit": false,
+      "payout_yen": 0
+     }
+    ]
+   },
    "review": null,
    "report": "claude-reports/2026-11-15-03-11.html"
   },
