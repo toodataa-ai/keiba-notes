@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T09:54:13.984046+00:00",
+  "generated_at": "2026-11-15T10:02:45.798672+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-11-14T09:54:12.367695+00:00",
+    "generated_at": "2026-11-15T10:02:43.825165+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -40,12 +40,12 @@
     "latest_formal_prompt_version": "v3.13",
     "formal_grade_a": {
       "passed": true,
-      "validated_case_count": 30,
+      "validated_case_count": 33,
       "errors": []
     },
     "shadow_research": {
       "state": "evidence_incomplete",
-      "prerace_evidence_gap_count": 29,
+      "prerace_evidence_gap_count": 32,
       "evidence_gaps": [
         {
           "race_id": "2026-10-10-mimuro-stakes",
@@ -217,6 +217,24 @@
         },
         {
           "race_id": "2026-11-14-musashino-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-15-elizabeth-queen-cup",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-15-fukushima-minyu-cup",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-15-oro-cup",
           "version": "v3.13",
           "cause": "race_context.race_category is required",
           "source": "sealed_prediction_missing_prerace_fields"
@@ -477,7 +495,7 @@
           "2026-11-14",
           "2026-11-15"
         ],
-        "registered_races": 3,
+        "registered_races": 5,
         "expected_races": 6,
         "formal_grade_a_review_state": "pending",
         "races": [
@@ -501,11 +519,9 @@
           },
           {
             "race_id": "2026-11-15-oro-cup",
-            "date": null,
-            "formal_state": "pending",
-            "reasons": [
-              "missing_registry_entry"
-            ]
+            "date": "2026-11-15",
+            "formal_state": "complete",
+            "reasons": []
           },
           {
             "race_id": "2026-11-15-queen-elizabeth-cup",
@@ -517,11 +533,9 @@
           },
           {
             "race_id": "2026-11-15-fukushima-minyu-cup",
-            "date": null,
-            "formal_state": "pending",
-            "reasons": [
-              "missing_registry_entry"
-            ]
+            "date": "2026-11-15",
+            "formal_state": "complete",
+            "reasons": []
           }
         ],
         "weekly_improvement_decision": "not_evaluated",
@@ -530,12 +544,895 @@
     ]
   },
   "totals": {
-    "prospective_strict_races": 30,
+    "prospective_strict_races": 33,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 30,
-    "prospective_results_joined": 30
+    "prospective_prediction_entries": 33,
+    "prospective_results_joined": 33
   },
   "races": [
+    {
+      "race_id": "2026-11-15-oro-cup",
+      "date": "2026-11-15",
+      "venue": "東京",
+      "surface": "turf",
+      "race_name": "オーロカップ",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-15T15:20:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-15-oro-cup/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-15-oro-cup.json",
+      "official_result_at": "2026-11-15T10:02:06.461Z",
+      "official_going": "良",
+      "finish_order": [
+        15,
+        14,
+        10,
+        11,
+        18,
+        8,
+        3,
+        5,
+        16,
+        13,
+        7,
+        1,
+        12,
+        4,
+        9,
+        2,
+        6,
+        17
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-15T02:00:59.775Z",
+          "information_cutoff_at": "2026-11-15T02:00:59.775Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "オーロカップ",
+          "marks": {
+            "win": 14,
+            "second": 5,
+            "third": 15
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "馬単",
+              "selection": [
+                14,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "ワイド",
+              "selection": [
+                7,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "単勝",
+              "selection": [
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "馬連",
+              "selection": [
+                7,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "馬単",
+              "selection": [
+                7,
+                14
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "f2149b2ec492a845b3fd2e9bb802310a6cca722e",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-15-oro-cup/v315-initial-run43665442104-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-15-oro-cup/v315-initial-run43665442104-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-11-15-fukushima-minyu-cup",
+      "date": "2026-11-15",
+      "venue": "福島",
+      "surface": "dirt",
+      "race_name": "福島民友カップ",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-15T15:10:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-15-fukushima-minyu-cup/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-15-fukushima-minyu-cup.json",
+      "official_result_at": "2026-11-15T10:02:06.461Z",
+      "official_going": "稍重",
+      "finish_order": [
+        7,
+        15,
+        4,
+        3,
+        5,
+        12,
+        6,
+        9,
+        11,
+        13,
+        14,
+        8,
+        10,
+        1,
+        2
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-15T01:57:29.998Z",
+          "information_cutoff_at": "2026-11-15T01:57:29.998Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "福島民友カップ",
+          "marks": {
+            "win": 14,
+            "second": 1,
+            "third": 6
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "ワイド",
+              "selection": [
+                1,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "ワイド",
+              "selection": [
+                13,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "ワイド",
+              "selection": [
+                2,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "ワイド",
+              "selection": [
+                6,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "ワイド",
+              "selection": [
+                7,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B06",
+              "type": "馬連",
+              "selection": [
+                2,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B07",
+              "type": "枠連",
+              "selection": [
+                2,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B08",
+              "type": "ワイド",
+              "selection": [
+                2,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B09",
+              "type": "馬単",
+              "selection": [
+                2,
+                6
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "7dfc6acb7b594dfbaf8a7d801353c67d4960e3e9",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-15-fukushima-minyu-cup/v315-initial-run43665379129-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-15-fukushima-minyu-cup/v315-initial-run43665379129-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-11-15-elizabeth-queen-cup",
+      "date": "2026-11-15",
+      "venue": "京都",
+      "surface": "turf",
+      "race_name": "エリザベス女王杯",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-15T15:40:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-15-elizabeth-queen-cup/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-15-elizabeth-queen-cup.json",
+      "official_result_at": "2026-11-15T10:02:06.461Z",
+      "official_going": "重",
+      "finish_order": [
+        15,
+        7,
+        16,
+        2,
+        10,
+        6,
+        13,
+        9,
+        12,
+        17,
+        11,
+        1,
+        18,
+        14,
+        8,
+        4,
+        3,
+        5
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-15T02:04:32.080Z",
+          "information_cutoff_at": "2026-11-15T02:04:32.080Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "エリザベス女王杯",
+          "marks": {
+            "win": 16,
+            "second": 11,
+            "third": 9
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "三連複",
+              "selection": [
+                1,
+                11,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "三連複",
+              "selection": [
+                1,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "三連複",
+              "selection": [
+                1,
+                12,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "三連複",
+              "selection": [
+                1,
+                7,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "三連複",
+              "selection": [
+                1,
+                7,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B06",
+              "type": "三連複",
+              "selection": [
+                1,
+                7,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B07",
+              "type": "三連複",
+              "selection": [
+                1,
+                7,
+                9
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B08",
+              "type": "三連複",
+              "selection": [
+                1,
+                9,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B09",
+              "type": "三連複",
+              "selection": [
+                1,
+                9,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B10",
+              "type": "三連複",
+              "selection": [
+                1,
+                9,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B11",
+              "type": "三連複",
+              "selection": [
+                11,
+                12,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B12",
+              "type": "三連複",
+              "selection": [
+                7,
+                11,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B13",
+              "type": "三連複",
+              "selection": [
+                7,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B14",
+              "type": "三連複",
+              "selection": [
+                7,
+                12,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B15",
+              "type": "三連複",
+              "selection": [
+                7,
+                9,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B16",
+              "type": "三連複",
+              "selection": [
+                7,
+                9,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B17",
+              "type": "三連複",
+              "selection": [
+                7,
+                9,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B18",
+              "type": "三連複",
+              "selection": [
+                9,
+                11,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B19",
+              "type": "三連複",
+              "selection": [
+                9,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B20",
+              "type": "三連複",
+              "selection": [
+                9,
+                12,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B21",
+              "type": "馬単",
+              "selection": [
+                1,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B22",
+              "type": "馬単",
+              "selection": [
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B23",
+              "type": "馬単",
+              "selection": [
+                12,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B24",
+              "type": "馬単",
+              "selection": [
+                16,
+                1
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B25",
+              "type": "馬単",
+              "selection": [
+                16,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B26",
+              "type": "馬単",
+              "selection": [
+                16,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B27",
+              "type": "馬単",
+              "selection": [
+                16,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B28",
+              "type": "馬単",
+              "selection": [
+                16,
+                9
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B29",
+              "type": "馬単",
+              "selection": [
+                7,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B30",
+              "type": "馬単",
+              "selection": [
+                9,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B31",
+              "type": "枠連",
+              "selection": [
+                1,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B32",
+              "type": "枠連",
+              "selection": [
+                3,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B33",
+              "type": "枠連",
+              "selection": [
+                4,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B34",
+              "type": "枠連",
+              "selection": [
+                5,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B35",
+              "type": "枠連",
+              "selection": [
+                6,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B36",
+              "type": "枠連",
+              "selection": [
+                1,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B37",
+              "type": "三連単",
+              "selection": [
+                1,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B38",
+              "type": "三連単",
+              "selection": [
+                1,
+                16,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B39",
+              "type": "三連単",
+              "selection": [
+                11,
+                1,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B40",
+              "type": "三連単",
+              "selection": [
+                11,
+                12,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B41",
+              "type": "三連単",
+              "selection": [
+                11,
+                16,
+                1
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B42",
+              "type": "三連単",
+              "selection": [
+                11,
+                16,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B43",
+              "type": "三連単",
+              "selection": [
+                11,
+                16,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B44",
+              "type": "三連単",
+              "selection": [
+                11,
+                16,
+                9
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B45",
+              "type": "三連単",
+              "selection": [
+                11,
+                7,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B46",
+              "type": "三連単",
+              "selection": [
+                11,
+                9,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B47",
+              "type": "三連単",
+              "selection": [
+                12,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B48",
+              "type": "三連単",
+              "selection": [
+                12,
+                16,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B49",
+              "type": "三連単",
+              "selection": [
+                16,
+                1,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B50",
+              "type": "三連単",
+              "selection": [
+                16,
+                11,
+                1
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B51",
+              "type": "三連単",
+              "selection": [
+                16,
+                11,
+                12
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B52",
+              "type": "三連単",
+              "selection": [
+                16,
+                11,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B53",
+              "type": "三連単",
+              "selection": [
+                16,
+                11,
+                9
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B54",
+              "type": "三連単",
+              "selection": [
+                16,
+                12,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B55",
+              "type": "三連単",
+              "selection": [
+                16,
+                7,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B56",
+              "type": "三連単",
+              "selection": [
+                16,
+                9,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B57",
+              "type": "三連単",
+              "selection": [
+                7,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B58",
+              "type": "三連単",
+              "selection": [
+                7,
+                16,
+                11
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B59",
+              "type": "三連単",
+              "selection": [
+                9,
+                11,
+                16
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B60",
+              "type": "三連単",
+              "selection": [
+                9,
+                16,
+                11
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "f7a713495f6e8f35b44808ad435429840ade0c1f",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-15-elizabeth-queen-cup/v315-initial-run43665651002-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-15-elizabeth-queen-cup/v315-initial-run43665651002-attempt1-sealed.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-11-14-musashino-stakes",
       "date": "2026-11-14",
