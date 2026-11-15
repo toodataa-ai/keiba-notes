@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-11-15T10:58:31.149+09:00",
+  "updated_at": "2026-11-15T11:02:06.456+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -36377,6 +36377,237 @@
         "modeled_low_expected_net_profit_yen": 408.1684,
         "modeled_union_hit_probability": 0.4947,
         "modeled_net_loss_probability": 0.6582
+      }
+    },
+    {
+      "id": "2026-11-15-oro-cup",
+      "date": "2026-11-15",
+      "venue": "東京",
+      "race": "オーロカップ",
+      "scope": "jra-main",
+      "prompt_version": "v3.13",
+      "status": "predicted",
+      "source": "immutable-jra-live-source-prerace-fixed",
+      "eligible_for_learning": false,
+      "field_size": 18,
+      "report": "reports/2026-11-15-oro-cup-v315-initial-run43665442104-attempt1.html",
+      "pdf": "pdfs/2026-11-15-oro-cup-v315-initial-run43665442104-attempt1.pdf",
+      "pdf_mode": "full",
+      "full_report_pages": 52,
+      "marks": {
+        "win": "14 ロジケープ",
+        "second": "5 マイネルチケット",
+        "third": "15 エコロアルバ"
+      },
+      "bets": [
+        "馬単 14-7",
+        "ワイド 7-14",
+        "単勝 14",
+        "馬連 7-14",
+        "馬単 7-14"
+      ],
+      "purchase_decision": "buy",
+      "purchase_reason_code": "v315_grouped_verified_positive_edge",
+      "total_stake_yen": 500,
+      "final_bets": [
+        {
+          "type": "馬単",
+          "selection": [
+            14,
+            7
+          ],
+          "stake_yen": 100,
+          "market_odds": 115.5,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050411?ninki=0",
+          "observed_at": "2026-11-15T02:00:06.891+00:00",
+          "quote_verified": true,
+          "market_selection_id": "馬単:[14,7]"
+        },
+        {
+          "type": "ワイド",
+          "selection": [
+            7,
+            14
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            20.7,
+            21.7
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2605050411?ninki=0",
+          "observed_at": "2026-11-15T02:00:07.167+00:00",
+          "quote_verified": true,
+          "market_selection_id": "ワイド:[7,14]"
+        },
+        {
+          "type": "単勝",
+          "selection": [
+            14
+          ],
+          "stake_yen": 100,
+          "market_odds": 8.4,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050411?ninki=0",
+          "observed_at": "2026-11-15T02:00:06.349+00:00",
+          "quote_verified": true,
+          "market_selection_id": "単勝:[14]"
+        },
+        {
+          "type": "馬連",
+          "selection": [
+            7,
+            14
+          ],
+          "stake_yen": 100,
+          "market_odds": 62.9,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2605050411?ninki=0",
+          "observed_at": "2026-11-15T02:00:06.596+00:00",
+          "market_selection_id": "馬連:[7,14]",
+          "quote_verified": true
+        },
+        {
+          "type": "馬単",
+          "selection": [
+            7,
+            14
+          ],
+          "stake_yen": 100,
+          "market_odds": 131.2,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2605050411?ninki=0",
+          "observed_at": "2026-11-15T02:00:06.891+00:00",
+          "market_selection_id": "馬単:[7,14]",
+          "quote_verified": true
+        }
+      ],
+      "final_bets_fixed_at": "2026-11-15T02:00:59.775Z",
+      "step1_fixed_at": "2026-11-15T09:58:03.507+09:00",
+      "e2e_prediction": "e2e_validation/predictions/2026-11-15-oro-cup/v315-initial-run43665442104-attempt1-sealed.json",
+      "proof_commit": "b9da75737aedded42040792d5772868994c1b7ab",
+      "purchase_budget_yen": 6000,
+      "purchase_strategy_version": "v3.15",
+      "purchase_commands": [
+        {
+          "type": "単勝",
+          "method": "single",
+          "definition": {
+            "selection": [
+              14
+            ]
+          },
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "単勝:[14]"
+          ],
+          "source_strategy_id": "S01",
+          "row": 1,
+          "category": "通常",
+          "jra_input": "14"
+        },
+        {
+          "type": "馬単",
+          "method": "single",
+          "definition": {
+            "selection": [
+              14,
+              7
+            ]
+          },
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "馬単:[14,7]"
+          ],
+          "source_strategy_id": "single:馬単:[14,7]",
+          "row": 2,
+          "category": "通常",
+          "jra_input": "14→7"
+        },
+        {
+          "type": "ワイド",
+          "method": "single",
+          "definition": {
+            "selection": [
+              7,
+              14
+            ]
+          },
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "ワイド:[7,14]"
+          ],
+          "source_strategy_id": "single:ワイド:[7,14]",
+          "row": 3,
+          "category": "通常",
+          "jra_input": "7－14"
+        }
+      ],
+      "medium_command": {
+        "row": 4,
+        "category": "中穴",
+        "type": "馬連",
+        "method": "single",
+        "definition": {
+          "selection": [
+            7,
+            14
+          ]
+        },
+        "jra_input": "7－14",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "馬連:[7,14]"
+        ],
+        "minimum_verified_odds": 62.9,
+        "maximum_verified_odds": 62.9,
+        "indicative_minimum_payout_yen": 6290,
+        "model_expected_profit_yen": 70.4682,
+        "pricing_source": "verified-single",
+        "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+      },
+      "large_command": {
+        "row": 5,
+        "category": "大穴",
+        "type": "馬単",
+        "method": "single",
+        "definition": {
+          "selection": [
+            7,
+            14
+          ]
+        },
+        "jra_input": "7→14",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[7,14]"
+        ],
+        "minimum_verified_odds": 131.2,
+        "maximum_verified_odds": 131.2,
+        "indicative_minimum_payout_yen": 13119,
+        "model_expected_profit_yen": 67.5703,
+        "pricing_source": "verified-single",
+        "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+      },
+      "purchase_comparison": {
+        "expected_profit_yen": -1696.1911,
+        "union_hit_pp": -67.29,
+        "net_loss_pp": 1.46
+      },
+      "purchase_risk_metrics": {
+        "stake_yen": 500,
+        "ticket_count": 5,
+        "command_count": 5,
+        "modeled_expected_net_profit_yen": 306.0391,
+        "modeled_low_expected_net_profit_yen": 63.5961,
+        "modeled_union_hit_probability": 0.2189,
+        "modeled_net_loss_probability": 0.7811
       }
     }
   ]
