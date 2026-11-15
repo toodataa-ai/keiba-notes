@@ -25,7 +25,8 @@
       "path": "e2e_validation/validate_manifests.py",
       "original_blob_sha": "12feea5ae57f6c0a338a492a40b82de2ee0fd1f6",
       "manifest_blob_sha": "9939d10a7303af778f580602c750e90edc16915e",
-      "current_blob_sha": "56027938dd844c2664f47d475ab54ce9933c4983"
+      "current_blob_sha": "18e01f87ca78b8f6e57ead1a573b58eedba2cb65",
+      "previous_current_blob_sha": "56027938dd844c2664f47d475ab54ce9933c4983"
     }
   ],
   "safeguards": {
@@ -78,5 +79,13 @@
     "review_date": "2026-11-02",
     "audit_path": "docs/data/jra_postrace_audit_2026-11-01.json",
     "preserve_original_pinned_ledger": true
+  },
+  "reader_v1_forward_pdf_validation": {
+    "scope": "Validation-only approved dynamic audit pagination correction with unchanged legacy manifest, CSS, policy, source forecasts, bets, historical PDF",
+    "record_path": "docs/data/jra_reader_v1_audit_pagination_validator_supersession_20261115.json",
+    "original_reader_validator_blob_sha": "ce07e779e652e465d35a3bbc9d5941355c6c5fa6",
+    "current_reader_validator_blob_sha": "26518797a80f36d162278a8d99164b9dce654d7d",
+    "preserved_original_validator_history": true,
+    "no_forecast_or_research_workflows_changed": true
   }
 }
