@@ -1,0 +1,101 @@
+name: JRA formal-only v3.13 real-input intake, no Shadow or E0 research
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/jra-formal-only/*.json'
+permissions:
+  contents: write
+concurrency:
+  group: jra-formal-only-source-intake
+  cancel-in-progress: false
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Resolve exactly one newly requested JRA main without any research sidecars
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE=$(jq -r .before "$GITHUB_EVENT_PATH")
+          mapfile -t ADDED < <(git diff --diff-filter=A --name-only "$BEFORE" "$GITHUB_SHA" -- e2e_validation/requests/jra-formal-only/)
+          [[ ${#ADDED[@]} -eq 1 ]] || { echo '::error::Exactly one new formal-only request is required'; exit 1; }
+          REQUEST="${ADDED[0]}"
+          [[ "$REQUEST" == e2e_validation/requests/jra-formal-only/*.json ]] || { echo '::error::Unsafe request'; exit 1; }
+          python3 - "$REQUEST" <<'PY'
+          import json,sys
+          from pathlib import Path
+          o=json.loads(Path(sys.argv[1]).read_text())
+          assert o['date']=='2026-11-15'
+          assert o['preview_path']=='docs/research/2026-11-15-jra-main-step1-v313.json'
+          assert o['race']['venue'] in ('福島','東京','京都')
+          assert o['race']['race_no']==11
+          assert o['race']['slug'].startswith('2026-11-15-')
+          assert o['market_open_at']=='2026-11-14T19:30:00+09:00'
+          assert o['market_open_source_url']=='https://www.jra.go.jp/dento/direct/instructions/hatsubai.html'
+          PY
+          TARGET="e2e_validation/requests/v314/$(basename "$REQUEST")"
+          [[ ! -e "$TARGET" ]] || { echo '::error::Existing historical v314 request cannot be replaced'; exit 1; }
+          cp "$REQUEST" "$TARGET"
+          echo "TEMP_VALIDATION_REQUEST=$TARGET" >> "$GITHUB_ENV"
+      - name: Independently validate the prereace roster, official timetable and market availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q requests beautifulsoup4
+          python3 .github/scripts/jra-gather-live-v314.py --request "$TEMP_VALIDATION_REQUEST" --validate-only
+      - name: Gather original official race card and all live eight-type odds without E0 or Shadow work
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/jra-gather-live-v314.py --request "$TEMP_VALIDATION_REQUEST"
+          INPUT=$(python3 - "$TEMP_VALIDATION_REQUEST" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          print('e2e_validation/inputs/v313/'+d['race']['slug']+'.json')
+          PY
+          )
+          test -s "$INPUT"
+          echo "INPUT=$INPUT" >> "$GITHUB_ENV"
+          echo "RACE_ID=$(python3 - "$TEMP_VALIDATION_REQUEST" <<'PY'
+          import json,sys
+          print(json.load(open(sys.argv[1]))['race']['slug'])
+          PY
+          )" >> "$GITHUB_ENV"
+      - name: Freeze independently auditable actual input; leave full forecasting to SHA-pinned v3.13 workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$INPUT" "e2e_validation/quote-evidence/$RACE_ID"
+          mapfile -t CHANGED < <(git diff --cached --name-only)
+          [[ ${#CHANGED[@]} -gt 0 ]] || { echo '::error::No audited input to commit'; exit 1; }
+          for f in "${CHANGED[@]}"; do
+            case "$f" in
+              "$INPUT"|"e2e_validation/quote-evidence/$RACE_ID/"*) ;;
+              *) echo "::error::Forbidden staged path: $f"; exit 1 ;;
+            esac
+          done
+          git commit -m "Collect official prestart JRA inputs only, without E0 or research side effects"
+          for attempt in 1 2 3 4 5; do
+            git fetch --no-tags origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo '::error::Non-fast-forward conflict; no history rewritten'; exit 1
+            fi
+            if git push origin HEAD:main; then
+              echo 'FORMAL_ONLY_INPUT_COMMITTED_WAIT_FOR_VERSIONED_V313_PREDICTION'
+              exit 0
+            fi
+            if [[ "$attempt" -eq 5 ]]; then echo '::error::Concurrent push exhausted'; exit 1; fi
+          done
