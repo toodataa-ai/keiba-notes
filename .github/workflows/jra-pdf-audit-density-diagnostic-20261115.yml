@@ -1,0 +1,70 @@
+name: JRA formal 11/15 approved reader-v1 single-audit density preflight (no publish)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'e2e_validation/requests/jra-pdf-density-diagnostic-20261115/*.json'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install exact approved PDF environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk poppler-utils
+          python -m pip install -q weasyprint==68.0 pymupdf==1.26.4
+      - name: Test full strategy comparison on exactly one A4 audit page with unchanged CSS
+        shell: bash
+        run: |
+          set -euo pipefail
+          INPUT="e2e_validation/snapshots/2026-11-15-fukushima-minyu-cup/v3.13-run43661398158-attempt1.json"
+          test -s "$INPUT"
+          python3 - "$INPUT" /tmp/jra-density-prediction.json <<'PY'
+          import json,sys
+          from pathlib import Path
+          data=json.loads(Path(sys.argv[1]).read_text())
+          assert data.get('stage')=='pending_git_proof'
+          data['stage']='formal_prestart'
+          data['proof_commit']='a'*40
+          Path(sys.argv[2]).write_text(json.dumps(data,ensure_ascii=False))
+          PY
+          passed=0
+          for density in 60 50 40 35 34 30 25 20 14; do
+            echo "TRY_SINGLE_AUDIT density=$density"
+            if ! JRA_SELECTED_ROWS_PER_PAGE=14 JRA_REJECTED_ROWS_PER_PAGE=12 JRA_AUDIT_ROWS_PER_PAGE="$density" \
+                python3 .github/scripts/jra-render-live-v313.py /tmp/jra-density-prediction.json /tmp/jra-density.html; then
+              echo "AUTHORING_FAIL $density"; continue
+            fi
+            if ! JRA_COVER_BETS_PER_TYPE=6 python3 .github/scripts/jra-pdf-presentation-overlay-v1.py \
+                /tmp/jra-density.html --prediction /tmp/jra-density-prediction.json; then
+              echo "PRESENTATION_FAIL $density"; continue
+            fi
+            if ! python3 -m weasyprint /tmp/jra-density.html /tmp/jra-density.pdf; then
+              echo "RENDER_FAIL $density"; continue
+            fi
+            python3 - "$density" <<'PY'
+          import re,sys
+          import fitz
+          from pathlib import Path
+          html=Path('/tmp/jra-density.html').read_text()
+          sections=re.findall(r'<section class="page"><div class="chapter">(.*?)</div>',html,re.S)
+          audit=[x for x in sections if x.startswith('購入最適化監査｜')]
+          doc=fitz.open('/tmp/jra-density.pdf')
+          print('DENSITY_RECORDED',sys.argv[1],'audit_sections',len(audit),'html_sections',len(sections),'pdf_pages',len(doc))
+          PY
+            if python3 .github/scripts/validate-jra-pdf-content-v313.py \
+                 --html /tmp/jra-density.html --pdf /tmp/jra-density.pdf --prediction /tmp/jra-density-prediction.json &&
+               python3 .github/scripts/validate-jra-pdf-layout.py \
+                 --html /tmp/jra-density.html --pdf /tmp/jra-density.pdf --policy docs/data/jra_pdf_layout_policy_v1.json; then
+               echo "SINGLE_AUDIT_READER_V1_STRICT_PASS $density"
+               passed=1; break
+            fi
+          done
+          test "$passed" -eq 1 || { echo "::error::None of the unchanged-CSS single-audit layouts passed strict reader-v1"; exit 1; }
