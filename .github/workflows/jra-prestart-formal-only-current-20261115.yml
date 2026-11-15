@@ -9,7 +9,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: jra-v313-prestart-proof
+  group: jra-v313-prestart-proof-${{ inputs.input_path }}
   cancel-in-progress: false
 jobs:
   prestart:
