@@ -161,6 +161,8 @@
 
 - **改善状況ページの整理（v1.63・2026-11-15 本番リリース済み `ui-improvement-summary-v1`）**：`improvement-cycle.html` は「各テーマの進捗まとめ（位置取り・馬場補正・購入セット・2歳の初距離・馬場の変化の5本のバー）＋各研究の目的と内容（折りたたみ。馬場予測の説明もここ）＋自動運用ページへのリンク＋アーカイブへのリンク」だけにした。停止したChatGPT基準の比較・旧モデルの競馬場別評価・これまでの判定・成績の見方・旧方式の記録は新ページ `improvement-archive.html` へ移動（トップにはカードを置かない）。若駒・新馬戦の行は削除（父データの取得状況は `collection-status.html`）。ページ内の JS は、無い要素を無視できるよう `$` が代わりの要素を返す。馬場の変化の進捗は `going_log_summary_v1.json` の `changed_before_main`／目標30件（Claudeが置いた目安で、判定の条件ではない）。新ページ追加の3か所（staging-baseline-v2.py・release-guard・mirror workflow）は更新済み。
 
+- **共通手順書を ChatGPT の正式プロンプトに取り込み（2026-11-15、ユーザー承認「正式にして」）**：`docs/data/latest_prompt.json` の `rule` の末尾に「SHARED STEP1 PROCEDURE」の一節と、トップキー `shared_step1_procedure_v1` を追加（版は v3.13 のまま。`prompt_version=='v3.13'` を検査する多数のワークフローを壊さないため、v3.14・v3.15 と同じ『追記』の形）。手順書はSHAで固定しない（Claudeが承認後に直すため）。ChatGPT は STEP1 の自由記述欄に手順書の版を書く（新しいキーは足さない）。`validate-jra-prompt-v313.mjs` は `validate-jra-pdf-layout.py` のSHA不一致で以前から失敗（今回とは無関係）。
+
 ## 作業上の注意
 - GitHub の GraphQL はこの環境から使えない（`gh workflow run` や `gh pr` 系も失敗する）。PR作成・マージ・ワークフロー起動は REST（`gh api repos/toodataa-ai/keiba-notes/pulls ...`、起動は `gh api -X POST repos/toodataa-ai/keiba-notes/actions/workflows/<名前>.yml/dispatches -f ref=main -f 'inputs[キー]=値'`）。
 - GITHUB_TOKEN でのpushは他のワークフローを起動しない。自動処理の後続はワークフロー内で直接実行する。
