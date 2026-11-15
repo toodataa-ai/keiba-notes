@@ -35,6 +35,29 @@ def main() -> int:
     current_ci = json.loads((repo_root / "docs/data/jra_current_e2e_ci_supersession_v1.json").read_text(encoding="utf-8"))
     current_exceptions = {item["path"]:item for item in current_ci["superseded_components"]}
 
+    # Authorized reader-v1 compatibility: retain the manifest-pinned original
+    # and fail closed unless the current validator matches a separately SHA-pinned,
+    # validation-only correction for v3.12/v3.13's multiple substantive audit pages.
+    reader_fix = json.loads((
+        repo_root / "docs/data/jra_reader_v1_audit_pagination_validator_supersession_20261115.json"
+    ).read_text(encoding="utf-8"))
+    if (reader_fix.get("schema_version") != 1
+            or reader_fix.get("path") != ".github/scripts/validate-jra-pdf-layout.py"
+            or reader_fix.get("scope", "").split(";")[0] != "reader-v1 validation-only forward compatibility"
+            or git_hash_object(repo_root, reader_fix["path"]) != reader_fix["current_blob_sha"]):
+        raise RuntimeError("unapproved JRA reader-v1 PDF validator change")
+    historic_reader = subprocess.run(
+        ["git", "rev-parse", reader_fix["historical_anchor_commit"] + ":" + reader_fix["path"]],
+        cwd=repo_root, capture_output=True, text=True,
+    )
+    if historic_reader.returncode or historic_reader.stdout.strip() != reader_fix["original_blob_sha"]:
+        raise RuntimeError("original SHA-pinned reader-v1 validator not preserved")
+    if (git_hash_object(repo_root, "docs/assets/jra-pdf-reader-v1.css")
+            != reader_fix["unchanged"]["css_git_blob_sha"]
+        or git_hash_object(repo_root, "docs/data/jra_pdf_layout_policy_v1.json")
+            != reader_fix["unchanged"]["layout_policy_git_blob_sha"]):
+        raise RuntimeError("reader-v1 approved CSS or layout policy changed")
+
     # A separately pinned v3.13 bridge verifies exact approved legacy Git blobs.
     # No previous manifest is rewritten; checks run against the real original commit.
     formal_version = json.loads((repo_root / "docs/data/latest_prompt.json").read_text(encoding="utf-8")).get("version")
@@ -122,6 +145,9 @@ def main() -> int:
             override = grandfathered.get(component_path)
             if actual != expected and override:
                 if expected == override["original_blob_sha"] and actual == override["current_blob_sha"]:
+                    continue
+            if actual != expected and component_path == reader_fix["path"]:
+                if expected == reader_fix["original_blob_sha"] and actual == reader_fix["current_blob_sha"]:
                     continue
             if actual != expected:
                 errors.append(

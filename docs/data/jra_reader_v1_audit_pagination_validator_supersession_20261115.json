@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "scope": "reader-v1 validation-only forward compatibility; no change to actual PDF style, prompt, model, final_bets or past reports",
+  "path": ".github/scripts/validate-jra-pdf-layout.py",
+  "historical_anchor_commit": "e8e0bec266cb8ed66c485989dc3852cb5abdebd4",
+  "original_blob_sha": "ce07e779e652e465d35a3bbc9d5941355c6c5fa6",
+  "current_blob_sha": "26518797a80f36d162278a8d99164b9dce654d7d",
+  "reason": "v3.12/v3.13 SHA-pinned renderer writes one substantive scenario audit, one or more numbered complete purchase-mode audit pages and a final quote-coverage audit. Original validator incorrectly enforced exactly one audit page, contradicting approved unlimited dynamic pagination and rejecting complete valid PDFs.",
+  "unchanged": {
+    "css_path": "docs/assets/jra-pdf-reader-v1.css",
+    "css_git_blob_sha": "290f9cd673371bff5cce61f5a682fd84ddb05822",
+    "layout_policy_path": "docs/data/jra_pdf_layout_policy_v1.json",
+    "layout_policy_git_blob_sha": "4c935f56b8249a022f1e41bb56c62349f82f23ef",
+    "historical_manifest_immutable": true
+  },
+  "validator_requires": [
+    "all original PDF/HTML checks including A4, font, page count, every horse, color chips, SHA omission and no blank pages",
+    "audit sections remain in adopted/rejected/audit order",
+    "v3.12/v3.13 audit must have baseline, sequential numbered full mode pages and quote coverage",
+    "legacy single-page audit remains accepted without rewriting historical reports"
+  ],
+  "prohibited": [
+    "no missing-mode suppression",
+    "no CSS/font or approved layout change",
+    "no source forecast or historical final_bets change",
+    "no disabling CI on audit failure",
+    "no E0/E1/E2 research or Shadow workflow operations"
+  ]
+}
