@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-18T21:17:19+00:00",
+ "generated_at": "2026-11-19T02:30:03+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 44444649867,
+     "event": "schedule",
+     "created_at": "2026-11-19T02:29:07Z",
+     "started_at": "2026-11-19T02:29:07Z",
+     "ended_at": "2026-11-19T02:29:39Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 44398784250,
      "event": "workflow_dispatch",
@@ -655,17 +666,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "手"
-    },
-    {
-     "id": 42320674505,
-     "event": "schedule",
-     "created_at": "2026-11-07T00:50:34Z",
-     "started_at": "2026-11-07T00:50:34Z",
-     "ended_at": "2026-11-07T00:50:57Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -1070,76 +1070,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 41927942802,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T22:44:52Z",
-     "started_at": "2026-11-04T22:44:52Z",
-     "ended_at": "2026-11-04T22:47:44Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 41927455988,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T22:41:24Z",
-     "started_at": "2026-11-04T22:41:24Z",
-     "ended_at": "2026-11-04T22:44:23Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "手",
-     "fail_kind": ""
-    },
-    {
-     "id": 41927440794,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T22:41:18Z",
-     "started_at": "2026-11-04T22:41:18Z",
-     "ended_at": "2026-11-04T22:43:36Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 41921975739,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T22:04:39Z",
-     "started_at": "2026-11-04T22:04:39Z",
-     "ended_at": "2026-11-04T22:05:21Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "手",
-     "fail_kind": ""
-    },
-    {
-     "id": 41912513216,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T21:03:56Z",
-     "started_at": "2026-11-04T21:03:56Z",
-     "ended_at": "2026-11-04T21:04:58Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "H",
-     "fail_kind": ""
-    },
-    {
-     "id": 41754511528,
-     "event": "schedule",
-     "created_at": "2026-11-04T01:30:25Z",
-     "started_at": "2026-11-04T01:30:25Z",
-     "ended_at": "2026-11-04T01:31:16Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "G",
-     "fail_kind": ""
     }
    ]
   },
@@ -1451,28 +1381,6 @@
      "created_at": "2026-11-05T02:42:02Z",
      "started_at": "2026-11-05T02:42:02Z",
      "ended_at": "2026-11-05T02:43:38Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 41912518072,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T21:03:58Z",
-     "started_at": "2026-11-04T21:03:58Z",
-     "ended_at": "2026-11-04T21:06:43Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "H"
-    },
-    {
-     "id": 41761842923,
-     "event": "schedule",
-     "created_at": "2026-11-04T02:36:24Z",
-     "started_at": "2026-11-04T02:36:24Z",
-     "ended_at": "2026-11-04T02:37:50Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
@@ -2394,17 +2302,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 41878162110,
-     "event": "schedule",
-     "created_at": "2026-11-04T17:30:50Z",
-     "started_at": "2026-11-04T17:30:50Z",
-     "ended_at": "2026-11-04T17:43:47Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -2719,17 +2616,6 @@
      "created_at": "2026-11-05T18:00:45Z",
      "started_at": "2026-11-05T18:00:45Z",
      "ended_at": "2026-11-05T18:01:00Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 41882409905,
-     "event": "schedule",
-     "created_at": "2026-11-04T17:59:01Z",
-     "started_at": "2026-11-04T17:59:01Z",
-     "ended_at": "2026-11-04T17:59:35Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
@@ -3245,51 +3131,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 41885231015,
-     "event": "schedule",
-     "created_at": "2026-11-04T18:14:55Z",
-     "started_at": "2026-11-04T18:14:55Z",
-     "ended_at": "2026-11-04T18:15:13Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 41857087811,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-04T15:22:39Z",
-     "started_at": "2026-11-04T15:22:39Z",
-     "ended_at": "2026-11-04T15:23:03Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 41771927199,
-     "event": "push",
-     "created_at": "2026-11-04T04:13:54Z",
-     "started_at": "2026-11-04T04:13:54Z",
-     "ended_at": "2026-11-04T04:14:07Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "手",
-     "fail_kind": ""
-    },
-    {
-     "id": 41770073282,
-     "event": "push",
-     "created_at": "2026-11-04T03:55:40Z",
-     "started_at": "2026-11-04T03:55:40Z",
-     "ended_at": "2026-11-04T03:55:54Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
     }
    ]
   }
