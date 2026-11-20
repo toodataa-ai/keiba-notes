@@ -256,6 +256,9 @@ def parse_official(soup, p):
         if clean(MANUAL_NAME_ALLOW.get(p.get("race_id"), "")) == clean(official_name):
             pass
         elif (standard_name != card_name and
+                # 括弧つきの資格表記を残したまま、回数（第N回）を除くと完全一致
+                # （2026-11-15 金沢8R「第74回 北國王冠…（地方全国交流）」）。
+                full_official_key != full_card_key and
                 not clipped_final_paren and
                 not clipped_age_suffix and
                 not clipped_age_title(standard_name, card_name) and
