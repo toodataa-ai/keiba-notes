@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "meeting_id": "2026-11-21-to-2026-11-23",
+  "observed_at": "2026-11-21T09:43:14.402Z",
+  "status": "REVIEW_RECORDS_PREPARED_GRADE_A_CI_AND_PUBLIC_HTTP_PENDING",
+  "official_result_confirmed_races": [
+    "2026-11-21-citrine-stakes",
+    "2026-11-21-fukushima-kinen"
+  ],
+  "grade_a_cases_created": [
+    "2026-11-21-citrine-stakes",
+    "2026-11-21-fukushima-kinen"
+  ],
+  "today_reviewed_count": 2,
+  "expected_weekly_main_count": 6,
+  "immutable_prerace_predictions": true,
+  "immutable_final_bets": true,
+  "immutable_original_html_pdf": true,
+  "official_result_sources": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D"
+  ],
+  "refund_source_reviewed": true,
+  "weekly_improvement_decision": "not_evaluated",
+  "conservative_model_action": "no_change",
+  "weekly_reason": "Sunday 2026-11-22 and Monday public holiday 2026-11-23 each have two JRA 11R mains not yet run; all 6 mains must be reviewed including passes before A/B/C improvement gate. Future slugs are provisional; no retrospective model alterations.",
+  "improvement_policy": {
+    "approval_classes": "A/B/C manual",
+    "automatic_promotion": false,
+    "preserve_old_versions": true,
+    "preserve_inflight_e2e": true,
+    "overfit_prevention": true,
+    "formal_prompt_changed": false
+  },
+  "publication_verification": {
+    "source_prerace_proof_bets_unchanged": true,
+    "github_actions_result": "pending",
+    "public_http_byte_parity_verified": false
+  },
+  "blockers": [
+    "Four future Nov 22/23 official mains are not yet run and canonical registry slugs require verification.",
+    "Postrace workflow strict Grade A validation, derived status and GitHub Pages HTTP byte parity must complete after this commit."
+  ]
+}

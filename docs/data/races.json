@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-11-21T08:21:32.022+09:00",
+  "updated_at": "2026-11-21T09:43:14.402Z",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -38931,7 +38931,7 @@
       "race": "シトリンステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 16,
@@ -39153,7 +39153,140 @@
         "modeled_low_expected_net_profit_yen": 308.1161,
         "modeled_union_hit_probability": 0.1705,
         "modeled_net_loss_probability": 0.8295
-      }
+      },
+      "result": {
+        "summary": "JRA公式結果・全着順と払戻を検証済み",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 12,
+            "horse": "メルカントゥール"
+          },
+          {
+            "pos": 2,
+            "no": 10,
+            "horse": "テーオーマルコーニ"
+          },
+          {
+            "pos": 3,
+            "no": 9,
+            "horse": "レッドプロフェシー"
+          }
+        ],
+        "finish_order": [
+          12,
+          10,
+          9,
+          3,
+          14,
+          2,
+          15,
+          11,
+          1,
+          5,
+          6,
+          8,
+          7,
+          4,
+          13
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1",
+        "verified_at": "2026-11-21T09:43:14.402Z",
+        "verified_at_basis": "review_observation_not_JRA_initial_publication_timestamp",
+        "non_runner_horse_numbers": [
+          16
+        ],
+        "refunded_bracket_numbers": [
+          8
+        ]
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "馬単",
+          "selection": [
+            3,
+            14
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1"
+        },
+        {
+          "bet_id": "B02",
+          "type": "枠連",
+          "selection": [
+            2,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1"
+        },
+        {
+          "bet_id": "B03",
+          "type": "枠連",
+          "selection": [
+            2,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1"
+        },
+        {
+          "bet_id": "B04",
+          "type": "枠連",
+          "selection": [
+            2,
+            7
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1"
+        },
+        {
+          "bet_id": "B05",
+          "type": "馬単",
+          "selection": [
+            3,
+            1
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0108202605051120261121%2FE1"
+        }
+      ],
+      "performance": {
+        "stake_yen": 500,
+        "payout_yen": 0,
+        "profit_yen": -500,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 5,
+        "honmei_win": false,
+        "honmei_place": false,
+        "second_mark_finish": 2,
+        "third_mark_finish": 1,
+        "top_marks_in_top3": 2,
+        "hit_bets": [],
+        "miss_bets": [
+          "馬単 3-14",
+          "枠連 2-5",
+          "枠連 2-6",
+          "枠連 2-7",
+          "馬単 3-1"
+        ]
+      },
+      "review": "京都ダート1900mの発走前固定評価◎14・○10・▲12と公式結果を照合。上位印の一部は好走したが、◎の勝ち切り想定と購入組合せの実現性に課題が残った。隊列、先行負荷、差し脚の持続性と軸馬依存を今後の発走前根拠で再検証する。競走除外に伴う返還対象も公式情報と照合し、固定済み購入には返還対象なし。結果を利用した印・買い目・オッズの事後変更や、単日成績によるモデル改善は行わない。",
+      "review_at": "2026-11-21T09:43:14.402Z",
+      "e2e_case": "e2e_validation/cases/2026-11-21-citrine-stakes/case.json"
     },
     {
       "id": "2026-11-21-fukushima-kinen",
@@ -39162,7 +39295,7 @@
       "race": "福島記念",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 16,
@@ -39388,7 +39521,140 @@
         "modeled_low_expected_net_profit_yen": 132.8137,
         "modeled_union_hit_probability": 0.3109,
         "modeled_net_loss_probability": 0.6891
-      }
+      },
+      "result": {
+        "summary": "JRA公式結果・全着順と払戻を検証済み",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 13,
+            "horse": "マリアイリダータ"
+          },
+          {
+            "pos": 2,
+            "no": 3,
+            "horse": "ゼンダンハヤブサ"
+          },
+          {
+            "pos": 3,
+            "no": 1,
+            "horse": "カラマティアノス"
+          }
+        ],
+        "finish_order": [
+          13,
+          3,
+          1,
+          10,
+          4,
+          15,
+          11,
+          12,
+          8,
+          6,
+          2,
+          16,
+          9,
+          7,
+          14
+        ],
+        "going": "稍重",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D",
+        "verified_at": "2026-11-21T09:43:14.402Z",
+        "verified_at_basis": "review_observation_not_JRA_initial_publication_timestamp",
+        "non_runner_horse_numbers": [
+          5
+        ],
+        "refunded_bracket_numbers": [
+          3
+        ]
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "枠連",
+          "selection": [
+            2,
+            7
+          ],
+          "stake_yen": 100,
+          "hit": true,
+          "payout_yen": 3230,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D"
+        },
+        {
+          "bet_id": "B02",
+          "type": "ワイド",
+          "selection": [
+            11,
+            14
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D"
+        },
+        {
+          "bet_id": "B03",
+          "type": "複勝",
+          "selection": [
+            14
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D"
+        },
+        {
+          "bet_id": "B04",
+          "type": "枠連",
+          "selection": [
+            2,
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D"
+        },
+        {
+          "bet_id": "B05",
+          "type": "馬単",
+          "selection": [
+            14,
+            1
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603051120261121%2F0D"
+        }
+      ],
+      "performance": {
+        "stake_yen": 500,
+        "payout_yen": 3230,
+        "profit_yen": 2730,
+        "roi_pct": 646,
+        "ticket_hit": true,
+        "honmei_finish": 1,
+        "honmei_win": true,
+        "honmei_place": true,
+        "second_mark_finish": 3,
+        "third_mark_finish": 7,
+        "top_marks_in_top3": 2,
+        "hit_bets": [
+          "枠連 2-7"
+        ],
+        "miss_bets": [
+          "ワイド 11-14",
+          "複勝 14",
+          "枠連 2-8",
+          "馬単 14-1"
+        ]
+      },
+      "review": "福島芝2000mの発走前固定評価◎13・○1・▲11と公式結果を比較。馬場状態は発走前の重から確定結果の稍重に変化したため、当日馬場変化と持続力・進路選択が評価へ与える影響を次回以降の独立事例で検証する。出走取消に伴う返還対象も公式情報と照合し、固定済み購入には返還対象なし。予想、印、購入組合せや購入時オッズは事後的に変更せず、今週の全開催メイン回顧が揃うまで改善判定を実施しない。",
+      "review_at": "2026-11-21T09:43:14.402Z",
+      "e2e_case": "e2e_validation/cases/2026-11-21-fukushima-kinen/case.json"
     }
   ]
 }
