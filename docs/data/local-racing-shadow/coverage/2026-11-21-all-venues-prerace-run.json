@@ -2,8 +2,8 @@
   "schema_version": 1,
   "date": "2026-11-21",
   "scope": "PRE-RACE_ALL_OFFICIAL_VENUES",
-  "status": "PARTIAL_WITH_COVERAGE_GAPS",
-  "generated_at": "2026-11-21T06:15:40+09:00",
+  "status": "COMPLETE",
+  "generated_at": "2026-11-21T12:24:02+09:00",
   "official_total_races": 35,
   "official_races_by_venue": {
     "oi": 0,
@@ -40,6 +40,7 @@
     "himeji": "https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/RaceList?k_babaCode=28&k_raceDate=2026%2F11%2F21"
   },
   "created_race_ids": [
+    "20261121-kochi-01",
     "20261121-kochi-02",
     "20261121-kochi-03",
     "20261121-kochi-04",
@@ -53,25 +54,39 @@
     "20261121-kochi-12",
     "20261121-obihiro-01",
     "20261121-obihiro-02",
+    "20261121-obihiro-03",
     "20261121-obihiro-04",
     "20261121-obihiro-05",
     "20261121-obihiro-06",
     "20261121-obihiro-07",
     "20261121-obihiro-08",
+    "20261121-obihiro-09",
     "20261121-obihiro-10",
     "20261121-obihiro-11",
     "20261121-obihiro-12",
+    "20261121-saga-01",
     "20261121-saga-02",
+    "20261121-saga-03",
     "20261121-saga-04",
     "20261121-saga-05",
     "20261121-saga-06",
     "20261121-saga-07",
     "20261121-saga-08",
     "20261121-saga-09",
-    "20261121-saga-10"
+    "20261121-saga-10",
+    "20261121-saga-11"
   ],
-  "created_count": 29,
+  "created_count": 35,
   "newly_created_race_ids": [
+    "20261121-obihiro-03",
+    "20261121-obihiro-09",
+    "20261121-kochi-01",
+    "20261121-saga-01",
+    "20261121-saga-03",
+    "20261121-saga-11"
+  ],
+  "newly_created_count": 6,
+  "already_frozen_race_ids": [
     "20261121-obihiro-01",
     "20261121-obihiro-02",
     "20261121-obihiro-04",
@@ -102,48 +117,9 @@
     "20261121-saga-09",
     "20261121-saga-10"
   ],
-  "newly_created_count": 29,
-  "already_frozen_race_ids": [],
-  "already_frozen_count": 0,
-  "coverage_gaps": [
-    {
-      "venue": "obihiro",
-      "race_id": "20261121-obihiro-03",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "HTTPError: 403 Client Error: Forbidden for url: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=3&k_raceDate=2026%2F11%2F21&k_raceNo=3"
-    },
-    {
-      "venue": "obihiro",
-      "race_id": "20261121-obihiro-09",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "HTTPError: 403 Client Error: Forbidden for url: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=3&k_raceDate=2026%2F11%2F21&k_raceNo=9"
-    },
-    {
-      "venue": "kochi",
-      "race_id": "20261121-kochi-01",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "HTTPError: 403 Client Error: Forbidden for url: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=31&k_raceDate=2026%2F11%2F21&k_raceNo=1"
-    },
-    {
-      "venue": "saga",
-      "race_id": "20261121-saga-01",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "HTTPError: 403 Client Error: Forbidden for url: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=32&k_raceDate=2026%2F11%2F21&k_raceNo=1"
-    },
-    {
-      "venue": "saga",
-      "race_id": "20261121-saga-03",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "HTTPError: 403 Client Error: Forbidden for url: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=32&k_raceDate=2026%2F11%2F21&k_raceNo=3"
-    },
-    {
-      "venue": "saga",
-      "race_id": "20261121-saga-11",
-      "status": "BLOCKED_CAPTURE",
-      "reason": "HTTPError: 403 Client Error: Forbidden for url: https://www.keiba.go.jp/KeibaWeb/TodayRaceInfo/DebaTable?k_babaCode=32&k_raceDate=2026%2F11%2F21&k_raceNo=11"
-    }
-  ],
-  "gap_count": 6,
+  "already_frozen_count": 29,
+  "coverage_gaps": [],
+  "gap_count": 0,
   "minimum_precommit_lead_minutes": 12,
   "prediction_commit_sha": "Must be resolved independently from Git history AFTER push; this diagnostic file is not temporal proof.",
   "production_effect": false,
