@@ -1,18 +1,18 @@
 {
  "schema_version": 1,
- "races": 12,
+ "races": 14,
  "claude": {
-  "stake_yen": 11900,
-  "payout_yen": 8960,
-  "profit_yen": -2940,
-  "roi": 0.7529411764705882,
+  "stake_yen": 14400,
+  "payout_yen": 11690,
+  "profit_yen": -2710,
+  "roi": 0.8118055555555556,
   "skipped_races": 3
  },
  "chatgpt": {
-  "stake_yen": 50300,
-  "payout_yen": 3170,
-  "profit_yen": -47130,
-  "roi": 0.06302186878727634,
+  "stake_yen": 51300,
+  "payout_yen": 6400,
+  "profit_yen": -44900,
+  "roi": 0.12475633528265107,
   "skipped_races": 1
  },
  "verdict": "参考表示（回収率の優劣は100レースたまるまで結論を出さない）",
@@ -22,18 +22,7 @@
   "回収率の優劣は100レースまで結論を出さない"
  ],
  "excluded": {
-  "claude_only": [
-   {
-    "date": "2026-11-21",
-    "venue": "京都",
-    "race_name": "シトリンステークス"
-   },
-   {
-    "date": "2026-11-21",
-    "venue": "福島",
-    "race_name": "福島記念"
-   }
-  ],
+  "claude_only": [],
   "chatgpt_only": [
    {
     "date": "2026-09-05",
@@ -396,6 +385,36 @@
    "chatgpt": {
     "stake_yen": 900,
     "payout_yen": 0,
+    "skipped": false
+   }
+  },
+  {
+   "date": "2026-11-21",
+   "venue": "京都",
+   "race_name": "シトリンステークス",
+   "claude": {
+    "stake_yen": 400,
+    "payout_yen": 0,
+    "skipped": false
+   },
+   "chatgpt": {
+    "stake_yen": 500,
+    "payout_yen": 0,
+    "skipped": false
+   }
+  },
+  {
+   "date": "2026-11-21",
+   "venue": "福島",
+   "race_name": "福島記念",
+   "claude": {
+    "stake_yen": 2100,
+    "payout_yen": 2730,
+    "skipped": false
+   },
+   "chatgpt": {
+    "stake_yen": 500,
+    "payout_yen": 3230,
     "skipped": false
    }
   }
