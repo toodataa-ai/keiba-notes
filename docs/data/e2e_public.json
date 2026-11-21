@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-15T10:07:04.512625+00:00",
+  "generated_at": "2026-11-21T09:44:20.315953+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-11-15T10:07:03.133711+00:00",
+    "generated_at": "2026-11-21T09:44:18.531505+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -40,12 +40,12 @@
     "latest_formal_prompt_version": "v3.13",
     "formal_grade_a": {
       "passed": true,
-      "validated_case_count": 33,
+      "validated_case_count": 35,
       "errors": []
     },
     "shadow_research": {
       "state": "evidence_incomplete",
-      "prerace_evidence_gap_count": 32,
+      "prerace_evidence_gap_count": 34,
       "evidence_gaps": [
         {
           "race_id": "2026-10-10-mimuro-stakes",
@@ -235,6 +235,18 @@
         },
         {
           "race_id": "2026-11-15-oro-cup",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-21-citrine-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-21-fukushima-kinen",
           "version": "v3.13",
           "cause": "race_context.race_category is required",
           "source": "sealed_prediction_missing_prerace_fields"
@@ -538,16 +550,276 @@
         ],
         "weekly_improvement_decision": "no_change",
         "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
+      },
+      {
+        "meeting_id": "2026-11-21-to-2026-11-23",
+        "dates": [
+          "2026-11-21",
+          "2026-11-22",
+          "2026-11-23"
+        ],
+        "registered_races": 2,
+        "expected_races": 6,
+        "formal_grade_a_review_state": "pending",
+        "races": [
+          {
+            "race_id": "2026-11-21-citrine-stakes",
+            "date": "2026-11-21",
+            "formal_state": "complete",
+            "reasons": []
+          },
+          {
+            "race_id": "2026-11-21-fukushima-kinen",
+            "date": "2026-11-21",
+            "formal_state": "complete",
+            "reasons": []
+          },
+          {
+            "race_id": "2026-11-22-shimotsuki-stakes",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          },
+          {
+            "race_id": "2026-11-22-mile-championship",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          },
+          {
+            "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          },
+          {
+            "race_id": "2026-11-23-ou-stakes",
+            "date": null,
+            "formal_state": "pending",
+            "reasons": [
+              "missing_registry_entry"
+            ]
+          }
+        ],
+        "weekly_improvement_decision": "not_evaluated",
+        "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
       }
     ]
   },
   "totals": {
-    "prospective_strict_races": 33,
+    "prospective_strict_races": 35,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 33,
-    "prospective_results_joined": 33
+    "prospective_prediction_entries": 35,
+    "prospective_results_joined": 35
   },
   "races": [
+    {
+      "race_id": "2026-11-21-fukushima-kinen",
+      "date": "2026-11-21",
+      "venue": "福島",
+      "surface": "turf",
+      "race_name": "福島記念",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-21T15:20:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-21-fukushima-kinen/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-21-fukushima-kinen.json",
+      "official_result_at": "2026-11-21T09:43:14.402Z",
+      "official_going": "稍重",
+      "finish_order": [
+        13,
+        3,
+        1,
+        10,
+        4,
+        15,
+        11,
+        12,
+        8,
+        6,
+        2,
+        16,
+        9,
+        7,
+        14
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-20T23:18:13.250Z",
+          "information_cutoff_at": "2026-11-20T23:18:13.250Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "福島記念",
+          "marks": {
+            "win": 13,
+            "second": 1,
+            "third": 11
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "枠連",
+              "selection": [
+                2,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "ワイド",
+              "selection": [
+                11,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "複勝",
+              "selection": [
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "枠連",
+              "selection": [
+                2,
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "馬単",
+              "selection": [
+                14,
+                1
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "b99094184227f188f53e1719443f7b225f7c1766",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-21-fukushima-kinen/v3.15-run44835428519-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-21-fukushima-kinen/v3.15-run44835428519-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-11-21-citrine-stakes",
+      "date": "2026-11-21",
+      "venue": "京都",
+      "surface": "dirt",
+      "race_name": "シトリンステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-21T15:40:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-21-citrine-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-21-citrine-stakes.json",
+      "official_result_at": "2026-11-21T09:43:14.402Z",
+      "official_going": "良",
+      "finish_order": [
+        12,
+        10,
+        9,
+        3,
+        14,
+        2,
+        15,
+        11,
+        1,
+        5,
+        6,
+        8,
+        7,
+        4,
+        13
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-20T23:11:53.758Z",
+          "information_cutoff_at": "2026-11-20T23:11:53.758Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "シトリンステークス",
+          "marks": {
+            "win": 14,
+            "second": 10,
+            "third": 12
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "馬単",
+              "selection": [
+                3,
+                14
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "枠連",
+              "selection": [
+                2,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "枠連",
+              "selection": [
+                2,
+                6
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "枠連",
+              "selection": [
+                2,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "馬単",
+              "selection": [
+                3,
+                1
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "016247286f756d8347b7e3716c946d710568e3cc",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-21-citrine-stakes/v3.15-run44834868186-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-21-citrine-stakes/v3.15-run44834868186-attempt1-sealed.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-11-15-oro-cup",
       "date": "2026-11-15",

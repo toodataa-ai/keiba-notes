@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-15T10:02:41+00:00",
+  "generated_at": "2026-11-21T09:44:16+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 33,
+    "strict": 35,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 33
+    "prediction_entries": 35
   },
   "versions": {
     "v3.12": {
@@ -57,11 +57,11 @@
     },
     "v3.13": {
       "all_non_synthetic": {
-        "cases": 29,
-        "honmei_win_rate": 0.206897,
-        "honmei_top3_rate": 0.448276,
-        "top3_marks_capture_rate": 0.413793,
-        "winner_in_top3_marks_rate": 0.586207,
+        "cases": 31,
+        "honmei_win_rate": 0.225806,
+        "honmei_top3_rate": 0.451613,
+        "top3_marks_capture_rate": 0.430107,
+        "winner_in_top3_marks_rate": 0.612903,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -69,21 +69,21 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 102000,
-        "payout_yen": 62860,
-        "roi_pct": 61.627,
-        "bet_cases": 29,
+        "stake_yen": 103000,
+        "payout_yen": 66090,
+        "roi_pct": 64.165,
+        "bet_cases": 31,
         "probability_cases": {
           "win": 0,
           "top3": 0
         }
       },
       "strict": {
-        "cases": 29,
-        "honmei_win_rate": 0.206897,
-        "honmei_top3_rate": 0.448276,
-        "top3_marks_capture_rate": 0.413793,
-        "winner_in_top3_marks_rate": 0.586207,
+        "cases": 31,
+        "honmei_win_rate": 0.225806,
+        "honmei_top3_rate": 0.451613,
+        "top3_marks_capture_rate": 0.430107,
+        "winner_in_top3_marks_rate": 0.612903,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -91,10 +91,10 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 102000,
-        "payout_yen": 62860,
-        "roi_pct": 61.627,
-        "bet_cases": 29,
+        "stake_yen": 103000,
+        "payout_yen": 66090,
+        "roi_pct": 64.165,
+        "bet_cases": 31,
         "probability_cases": {
           "win": 0,
           "top3": 0
@@ -169,7 +169,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 33
+    "strict_bet_cases": 35
   },
   "errors": [],
   "entries": [
@@ -1484,6 +1484,86 @@
         "stake_yen": 500,
         "payout_yen": 0,
         "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-11-21-citrine-stakes",
+      "date": "2026-11-21",
+      "venue": "京都",
+      "surface": "dirt",
+      "race": "シトリンステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-11-21-citrine-stakes/v3.15-run44834868186-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "016247286f756d8347b7e3716c946d710568e3cc",
+        "proof_commit_at": "2026-11-20T23:21:32+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 0,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 500,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-11-21-fukushima-kinen",
+      "date": "2026-11-21",
+      "venue": "福島",
+      "surface": "turf",
+      "race": "福島記念",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-11-21-fukushima-kinen/v3.15-run44835428519-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "b99094184227f188f53e1719443f7b225f7c1766",
+        "proof_commit_at": "2026-11-20T23:19:37+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 1,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 500,
+        "payout_yen": 3230,
+        "roi_pct": 646.0,
         "going_log_loss": null,
         "pace_log_loss": null,
         "win_brier": null,

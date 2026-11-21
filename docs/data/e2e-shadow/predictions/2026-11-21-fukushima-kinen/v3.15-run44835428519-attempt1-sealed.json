@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "purchase_strategy_version": "v3.15",
+  "model_version": "v3.13",
+  "status": "formal_prestart",
+  "source_race_id": "2026-11-21-fukushima-kinen",
+  "source_prediction_sha256": "653db47896d329ab5f00bebc590408d2472eb9e64f6720d2fe0066d0924c4e00",
+  "source_prediction_proof": "8fa6530597b9beab2e69779b019fc069ab5ebb5f",
+  "source_prediction_path": "e2e_validation/predictions/2026-11-21-fukushima-kinen/v3.13-run44835044804-attempt1.json",
+  "race_context": {
+    "date": "2026-11-21",
+    "venue": "福島",
+    "race_no": 11,
+    "race_name": "福島記念",
+    "start_at": "2026-11-21T15:20:00+09:00",
+    "surface": "芝",
+    "distance_m": 2000,
+    "official_source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0103202603051120261121%2F51",
+    "official_form_sha256": "5a34cf98dfb4c5556356ef76bf9c7e656ab83f0c9ce63a06da5c87678d8a11e6",
+    "official_going": "重",
+    "going_observed_at": "2026-11-21T08:12:34.701+09:00",
+    "sale_field_size": 16,
+    "place_paid_positions": 3,
+    "offered_types": [
+      "単勝",
+      "複勝",
+      "枠連",
+      "馬連",
+      "馬単",
+      "ワイド",
+      "三連複",
+      "三連単"
+    ]
+  },
+  "step1_fixed_at": "2026-11-21T08:12:34.701+09:00",
+  "source_final_bets_fixed_at": "2026-11-20T23:13:29.529Z",
+  "final_bets_fixed_at": "2026-11-20T23:18:13.250Z",
+  "proof_commit": "69e2f8a99e40f60a374b17553236c18f9ea7094e",
+  "quote_age_max_seconds": 304.611,
+  "quote_capture_span_seconds": 3.439,
+  "formal_bets": [
+    {
+      "type": "枠連",
+      "selection": [
+        2,
+        7
+      ],
+      "stake_yen": 100,
+      "market_odds": 34.7,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2603030511?ninki=0",
+      "observed_at": "2026-11-20T23:13:11.416+00:00",
+      "quote_verified": true,
+      "market_selection_id": "枠連:[2,7]"
+    },
+    {
+      "type": "ワイド",
+      "selection": [
+        11,
+        14
+      ],
+      "stake_yen": 100,
+      "market_odds": [
+        26.9,
+        28.8
+      ],
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2603030511?ninki=0",
+      "observed_at": "2026-11-20T23:13:12.078+00:00",
+      "quote_verified": true,
+      "market_selection_id": "ワイド:[11,14]"
+    },
+    {
+      "type": "複勝",
+      "selection": [
+        14
+      ],
+      "stake_yen": 100,
+      "market_odds": [
+        5.4,
+        7.4
+      ],
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2603030511?ninki=0",
+      "observed_at": "2026-11-20T23:13:11.416+00:00",
+      "quote_verified": true,
+      "market_selection_id": "複勝:[14]"
+    },
+    {
+      "type": "枠連",
+      "selection": [
+        2,
+        8
+      ],
+      "stake_yen": 100,
+      "market_odds": 51.9,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2603030511?ninki=0",
+      "observed_at": "2026-11-20T23:13:11.416+00:00",
+      "market_selection_id": "枠連:[2,8]",
+      "quote_verified": true
+    },
+    {
+      "type": "馬単",
+      "selection": [
+        14,
+        1
+      ],
+      "stake_yen": 100,
+      "market_odds": 150.5,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2603030511?ninki=0",
+      "observed_at": "2026-11-20T23:13:11.869+00:00",
+      "market_selection_id": "馬単:[14,1]",
+      "quote_verified": true
+    }
+  ],
+  "regular_commands": [
+    {
+      "type": "複勝",
+      "method": "single",
+      "definition": {
+        "selection": [
+          14
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "複勝:[14]"
+      ],
+      "source_strategy_id": "single:複勝:[14]",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "14"
+    },
+    {
+      "type": "枠連",
+      "method": "single",
+      "definition": {
+        "selection": [
+          2,
+          7
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "枠連:[2,7]"
+      ],
+      "source_strategy_id": "single:枠連:[2,7]",
+      "row": 2,
+      "category": "通常",
+      "jra_input": "2－7"
+    },
+    {
+      "type": "ワイド",
+      "method": "single",
+      "definition": {
+        "selection": [
+          11,
+          14
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "ワイド:[11,14]"
+      ],
+      "source_strategy_id": "single:ワイド:[11,14]",
+      "row": 3,
+      "category": "通常",
+      "jra_input": "11－14"
+    }
+  ],
+  "medium_command": {
+    "row": 4,
+    "category": "中穴",
+    "type": "枠連",
+    "method": "single",
+    "definition": {
+      "selection": [
+        2,
+        8
+      ]
+    },
+    "jra_input": "2－8",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "枠連:[2,8]"
+    ],
+    "minimum_verified_odds": 51.9,
+    "maximum_verified_odds": 51.9,
+    "indicative_minimum_payout_yen": 5190,
+    "model_expected_profit_yen": 58.0155,
+    "pricing_source": "verified-single",
+    "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+  },
+  "large_command": {
+    "row": 5,
+    "category": "大穴",
+    "type": "馬単",
+    "method": "single",
+    "definition": {
+      "selection": [
+        14,
+        1
+      ]
+    },
+    "jra_input": "14→1",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "馬単:[14,1]"
+    ],
+    "minimum_verified_odds": 150.5,
+    "maximum_verified_odds": 150.5,
+    "indicative_minimum_payout_yen": 15050,
+    "model_expected_profit_yen": 40.3257,
+    "pricing_source": "verified-single",
+    "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+  },
+  "total_stake_yen": 500,
+  "purchase_decision": "buy",
+  "command_count": 5,
+  "ticket_count": 5,
+  "purchase_metrics": {
+    "stake_yen": 500,
+    "ticket_count": 5,
+    "command_count": 5,
+    "modeled_expected_net_profit_yen": 228.0687,
+    "modeled_low_expected_net_profit_yen": 132.8137,
+    "modeled_union_hit_probability": 0.3109,
+    "modeled_net_loss_probability": 0.6891
+  },
+  "exacta_coverage_audit": [],
+  "comparison_to_v313": {
+    "expected_profit_yen": -384.7718,
+    "union_hit_pp": -45.97,
+    "net_loss_pp": -5.33
+  },
+  "risk_disclosure": "3+2 actions may significantly lower union hit probability compared with original 60-ticket source. No guaranteed profit. Original odds and v3.13 score are unchanged.",
+  "selection_method": "bounded priced complete command sets, exact tuple expansion, 0 duplicated tickets, max 6000 yen. Not a proof of global optimum.",
+  "old_original_immutable": true
+}

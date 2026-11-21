@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-15T10:07:03.133711+00:00",
+  "generated_at": "2026-11-21T09:44:18.531505+00:00",
   "policy": {
     "formal_grade_a_independent_of_research": true,
     "never_reconstruct_missing_prerace_experience": true,
@@ -11,12 +11,12 @@
   "latest_formal_prompt_version": "v3.13",
   "formal_grade_a": {
     "passed": true,
-    "validated_case_count": 33,
+    "validated_case_count": 35,
     "errors": []
   },
   "shadow_research": {
     "state": "evidence_incomplete",
-    "prerace_evidence_gap_count": 32,
+    "prerace_evidence_gap_count": 34,
     "evidence_gaps": [
       {
         "race_id": "2026-10-10-mimuro-stakes",
@@ -206,6 +206,18 @@
       },
       {
         "race_id": "2026-11-15-oro-cup",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-11-21-citrine-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-11-21-fukushima-kinen",
         "version": "v3.13",
         "cause": "race_context.race_category is required",
         "source": "sealed_prediction_missing_prerace_fields"
@@ -509,6 +521,65 @@
       ],
       "weekly_improvement_decision": "no_change",
       "decision_reason": "all_main_races_reviewed_but_insufficient_paired_e2e_evidence"
+    },
+    {
+      "meeting_id": "2026-11-21-to-2026-11-23",
+      "dates": [
+        "2026-11-21",
+        "2026-11-22",
+        "2026-11-23"
+      ],
+      "registered_races": 2,
+      "expected_races": 6,
+      "formal_grade_a_review_state": "pending",
+      "races": [
+        {
+          "race_id": "2026-11-21-citrine-stakes",
+          "date": "2026-11-21",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-11-21-fukushima-kinen",
+          "date": "2026-11-21",
+          "formal_state": "complete",
+          "reasons": []
+        },
+        {
+          "race_id": "2026-11-22-shimotsuki-stakes",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        },
+        {
+          "race_id": "2026-11-22-mile-championship",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        },
+        {
+          "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        },
+        {
+          "race_id": "2026-11-23-ou-stakes",
+          "date": null,
+          "formal_state": "pending",
+          "reasons": [
+            "missing_registry_entry"
+          ]
+        }
+      ],
+      "weekly_improvement_decision": "not_evaluated",
+      "decision_reason": "all_registered_main_races_including_holiday_monday_must_be_reviewed_before_weekly_decision"
     }
   ]
 }
