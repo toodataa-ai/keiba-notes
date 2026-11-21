@@ -74,6 +74,8 @@ def parse_card(html: str) -> dict:
         no, horse, jockey = tr.select_one("td.num"), tr.select_one("td.horse"), tr.select_one("td.jockey")
         if not (no and horse and jockey):
             continue
+        if not text(no).isdigit():             # horse numbers not drawn yet (e.g. tomorrow's card)
+            continue
         ht_ = text(horse)
         name = ht_.split(" ")[0]
         body = BODY_RE.search(ht_)
@@ -131,7 +133,10 @@ def run(dates: list[str], out_root: Path, delay: float) -> int:
                 continue
             done.add(m.group(0))
             raw = c.post(m.group(0))
-            card = parse_card(decode(raw))
+            try:
+                card = parse_card(decode(raw))
+            except ValueError as e:            # card not ready yet (no horse numbers etc.): skip, keep others
+                print("skip (card not ready)", m.group(0), e); continue
             now = datetime.now(JST)
             if now.isoformat() >= card["start_at"]:
                 print("skip (already started)", card["race_name"]); continue
