@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "purchase_strategy_version": "v3.15",
+  "model_version": "v3.13",
+  "status": "pending_git_proof",
+  "source_race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
+  "source_prediction_sha256": "b04a4b24d840ee77e3f9d9edc9c507b100473f7192b74275e95f33095ca22796",
+  "source_prediction_proof": "d30a4842facb12c1e4ed5716daa1e93344f35aff",
+  "source_prediction_path": "e2e_validation/predictions/2026-11-23-tokyo-sports-hai-2yo-stakes/v3.13-run45081987681-attempt1.json",
+  "race_context": {
+    "date": "2026-11-23",
+    "venue": "東京",
+    "race_no": 11,
+    "race_name": "東京スポーツ杯2歳ステークス",
+    "start_at": "2026-11-23T15:30:00+09:00",
+    "surface": "芝",
+    "distance_m": 1800,
+    "official_source_url": "https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202605061120261123%2F34",
+    "official_form_sha256": "0c9bf0bb50e70389785084cccf56ff16ca431cc2943787b6cb65e9ed9bb83331",
+    "official_going": "良",
+    "going_observed_at": "2026-11-23T08:12:48.113+09:00",
+    "sale_field_size": 12,
+    "place_paid_positions": 3,
+    "offered_types": [
+      "単勝",
+      "複勝",
+      "枠連",
+      "馬連",
+      "馬単",
+      "ワイド",
+      "三連複",
+      "三連単"
+    ]
+  },
+  "step1_fixed_at": "2026-11-23T08:12:48.113+09:00",
+  "source_final_bets_fixed_at": "2026-11-22T23:13:39.031Z",
+  "final_bets_fixed_at": "2026-11-22T23:15:51.197Z",
+  "proof_commit": null,
+  "quote_age_max_seconds": 149.06,
+  "quote_capture_span_seconds": 2.784,
+  "formal_bets": [
+    {
+      "type": "枠連",
+      "selection": [
+        6,
+        7
+      ],
+      "stake_yen": 100,
+      "market_odds": 12,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050611?ninki=0",
+      "observed_at": "2026-11-22T23:13:24.482+00:00",
+      "quote_verified": true,
+      "market_selection_id": "枠連:[6,7]"
+    },
+    {
+      "type": "単勝",
+      "selection": [
+        8
+      ],
+      "stake_yen": 100,
+      "market_odds": 8,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050611?ninki=0",
+      "observed_at": "2026-11-22T23:13:24.482+00:00",
+      "quote_verified": true,
+      "market_selection_id": "単勝:[8]"
+    },
+    {
+      "type": "枠連",
+      "selection": [
+        5,
+        6
+      ],
+      "stake_yen": 100,
+      "market_odds": 23.1,
+      "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050611?ninki=0",
+      "observed_at": "2026-11-22T23:13:24.482+00:00",
+      "market_selection_id": "枠連:[5,6]",
+      "quote_verified": true
+    }
+  ],
+  "regular_commands": [
+    {
+      "type": "単勝",
+      "method": "single",
+      "definition": {
+        "selection": [
+          8
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "単勝:[8]"
+      ],
+      "source_strategy_id": "single:単勝:[8]",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "8"
+    },
+    {
+      "type": "枠連",
+      "method": "single",
+      "definition": {
+        "selection": [
+          7,
+          6
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "枠連:[6,7]"
+      ],
+      "source_strategy_id": "S05",
+      "row": 2,
+      "category": "通常",
+      "jra_input": "6－7"
+    }
+  ],
+  "medium_command": {
+    "row": 4,
+    "category": "中穴",
+    "type": "枠連",
+    "method": "single",
+    "definition": {
+      "selection": [
+        5,
+        6
+      ]
+    },
+    "jra_input": "5－6",
+    "points": 1,
+    "unit_stake_yen": 100,
+    "stake_yen": 100,
+    "ticket_keys": [
+      "枠連:[5,6]"
+    ],
+    "minimum_verified_odds": 23.1,
+    "maximum_verified_odds": 23.1,
+    "indicative_minimum_payout_yen": 2310,
+    "model_expected_profit_yen": 41.3231,
+    "pricing_source": "verified-single",
+    "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+  },
+  "large_command": {
+    "row": 5,
+    "category": "大穴",
+    "method": "pass",
+    "type": "見送り",
+    "jra_input": "100倍以上で期待値がプラスの購入セットなし",
+    "points": 0,
+    "unit_stake_yen": 0,
+    "stake_yen": 0,
+    "ticket_keys": [],
+    "reason": "条件に合わないため購入を強制しない。"
+  },
+  "total_stake_yen": 300,
+  "purchase_decision": "buy",
+  "command_count": 3,
+  "ticket_count": 3,
+  "purchase_metrics": {
+    "stake_yen": 300,
+    "ticket_count": 3,
+    "command_count": 3,
+    "modeled_expected_net_profit_yen": 57.7874,
+    "modeled_low_expected_net_profit_yen": -7.0144,
+    "modeled_union_hit_probability": 0.2223,
+    "modeled_net_loss_probability": 0.7777
+  },
+  "exacta_coverage_audit": [],
+  "comparison_to_v313": {
+    "expected_profit_yen": -324.7154,
+    "union_hit_pp": -41.91,
+    "net_loss_pp": -3.56
+  },
+  "risk_disclosure": "3+2 actions may significantly lower union hit probability compared with original 60-ticket source. No guaranteed profit. Original odds and v3.13 score are unchanged.",
+  "selection_method": "bounded priced complete command sets, exact tuple expansion, 0 duplicated tickets, max 6000 yen. Not a proof of global optimum.",
+  "old_original_immutable": true
+}
