@@ -4,7 +4,7 @@
  "research_only": true,
  "pace": {
   "id": "claude+pace_v1",
-  "pairs": 14,
+  "pairs": 16,
   "dates": [
    "2026-11-07",
    "2026-11-07",
@@ -19,18 +19,20 @@
    "2026-11-15",
    "2026-11-15",
    "2026-11-21",
-   "2026-11-21"
+   "2026-11-21",
+   "2026-11-22",
+   "2026-11-22"
   ],
   "need_pairs": 20,
-  "mean_log_loss_base": 2.2249616865823274,
-  "mean_log_loss_pace": 2.236026659789081,
+  "mean_log_loss_base": 2.3213080099537855,
+  "mean_log_loss_pace": 2.340275092631094,
   "races_improved": 4,
-  "races_worse": 10,
+  "races_worse": 12,
   "state": "collecting"
  },
  "going": {
   "id": "claude+going_v1",
-  "pairs": 14,
+  "pairs": 16,
   "dates": [
    "2026-11-07",
    "2026-11-07",
@@ -45,19 +47,21 @@
    "2026-11-15",
    "2026-11-15",
    "2026-11-21",
-   "2026-11-21"
+   "2026-11-21",
+   "2026-11-22",
+   "2026-11-22"
   ],
   "need_pairs": 20,
-  "adjusted_runners": 115,
-  "mean_log_loss_base": 2.2249616865823274,
-  "mean_log_loss_going": 2.266525484119314,
+  "adjusted_runners": 136,
+  "mean_log_loss_base": 2.3213080099537855,
+  "mean_log_loss_going": 2.3723754733783484,
   "races_improved": 4,
-  "races_worse": 10,
+  "races_worse": 12,
   "state": "collecting"
  },
  "portfolio": {
   "id": "claude+ticket_div_rule",
-  "pairs": 10,
+  "pairs": 12,
   "dates": [
    "2026-11-07",
    "2026-11-07",
@@ -68,18 +72,20 @@
    "2026-11-15",
    "2026-11-15",
    "2026-11-21",
-   "2026-11-21"
+   "2026-11-21",
+   "2026-11-22",
+   "2026-11-22"
   ],
   "need_pairs": 20,
   "summary": {
    "claude_own": {
-    "stake_yen": 14300,
+    "stake_yen": 16200,
     "payout_yen": 11690,
-    "roi": 0.8175,
+    "roi": 0.7216,
     "hit_races": 4
    },
    "mechanical_rule": {
-    "stake_yen": 14300,
+    "stake_yen": 16200,
     "payout_yen": 0,
     "roi": 0.0,
     "hit_races": 0
@@ -146,10 +152,10 @@
   "need_horses": 30,
   "regimes": {
    "E0": {
-    "horses": 0,
-    "races": 0,
-    "predicted_wins": 0.0,
-    "actual_wins": 0,
+    "horses": 1,
+    "races": 1,
+    "predicted_wins": 0.1,
+    "actual_wins": 1,
     "state": "collecting"
    },
    "E1": {
@@ -160,10 +166,10 @@
     "state": "collecting"
    },
    "E2": {
-    "horses": 200,
-    "races": 14,
-    "predicted_wins": 12.12,
-    "actual_wins": 12,
+    "horses": 233,
+    "races": 16,
+    "predicted_wins": 14.02,
+    "actual_wins": 13,
     "state": "ready_for_review"
    }
   }
