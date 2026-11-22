@@ -1,0 +1,92 @@
+name: JRA formal main day-level publication coverage (read-only)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/scripts/jra-formal-coverage-guard-v1.py'
+      - '.github/scripts/test-jra-formal-coverage-guard-v1.py'
+      - '.github/workflows/jra-formal-coverage-guard-v1.yml'
+      - 'e2e_validation/requests/jra-formal-coverage-v1/*.json'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'JST race date YYYY-MM-DD, e.g. 2026-11-23'
+        required: true
+        type: string
+      check_public:
+        description: 'Also compare Git checkout to published GitHub Pages bytes'
+        required: false
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test no fabricated bets, no skipped venues, no poststart revision
+        run: python3 -m unittest discover -s .github/scripts -p 'test-jra-formal-coverage-guard-v1.py' -v
+      - name: Resolve optional explicit daily coverage request
+        id: request
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_FILE: ${{ github.event_path }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,re,subprocess
+          from pathlib import Path
+          event=os.environ['EVENT_NAME']
+          if event == 'workflow_dispatch':
+              inp=json.loads(Path(os.environ['EVENT_FILE']).read_text())['inputs']
+              day=inp['date']
+              public=str(inp.get('check_public','false')).lower()=='true'
+          else:
+              before=os.environ['BEFORE_SHA']
+              after=os.environ['AFTER_SHA']
+              names=subprocess.check_output(
+                  ['git','diff','--diff-filter=A','--name-only',before,after,'--',
+                   'e2e_validation/requests/jra-formal-coverage-v1/'],
+                  text=True).splitlines() if re.fullmatch(r'[0-9a-f]{40}',before or '') else []
+              if not names:
+                  print('TEST_ONLY: no newly added coverage request; publication NOT claimed')
+                  with open(os.environ['GITHUB_OUTPUT'],'a') as o:o.write('requested=false\n')
+                  raise SystemExit(0)
+              assert len(names)==1,'exactly one date-scoped coverage request per commit'
+              path=names[0]
+              assert path.startswith('e2e_validation/requests/jra-formal-coverage-v1/')
+              inp=json.loads(Path(path).read_text())
+              day=inp['date']
+              public=inp.get('check_public',False)
+              assert isinstance(public,bool)
+          assert re.fullmatch(r'\d{4}-\d{2}-\d{2}',day),'invalid date'
+          with open(os.environ['GITHUB_OUTPUT'],'a') as o:
+              o.write('requested=true\n')
+              o.write('day='+day+'\n')
+              o.write('public='+str(public).lower()+'\n')
+          print('COVERAGE_REQUESTED date='+day+' public='+str(public))
+          PY
+      - name: Confirm every JRA 11R has sealed prestart bets/proof and HTML/PDF
+        if: ${{ steps.request.outputs.requested == 'true' }}
+        env:
+          AUDIT_DAY: ${{ steps.request.outputs.day }}
+          PUBLIC_CHECK: ${{ steps.request.outputs.public }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$PUBLIC_CHECK" == true ]]; then
+            python3 .github/scripts/jra-formal-coverage-guard-v1.py --date "$AUDIT_DAY" --check-public
+          else
+            python3 .github/scripts/jra-formal-coverage-guard-v1.py --date "$AUDIT_DAY"
+          fi
