@@ -7,7 +7,8 @@ import {runInNewContext} from 'node:vm';
 const source=readFileSync('docs/staging/assets/results.js','utf8');
 const previewHtml=readFileSync('docs/staging/results.html','utf8');
 const productionHtml=readFileSync('docs/results.html','utf8');
-assert(previewHtml.includes('src="assets/results.js?v=20261013-settlement-v104"'),
+const liveRenderer=productionHtml.match(/<script\s+src="(assets\/results\.js\?v=[^"]+)"/)?.[1];
+assert(liveRenderer && previewHtml.includes(`src="${liveRenderer}"`),
   'staging must load the exact production-mirror renderer, not unapproved stage-only script');
 assert(!previewHtml.includes('src="staging/assets/results.js'),
   'staging must not activate lab-only JRA readable-alias renderer');
