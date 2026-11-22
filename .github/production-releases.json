@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.64-20261115",
-  "current_public_version": "1.64",
+  "current_public_release": "release/jra-site-v1.65-20261122",
+  "current_public_version": "1.65",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1363,6 +1363,29 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.65-20261122",
+      "branch": "release/jra-site-v1.65-20261122",
+      "commit_sha": "7014d15a5d9ce30771c7bdb89232c5eb299d04f6",
+      "deployed_at": "2026-11-22T22:45:52+09:00",
+      "workflow_run_id": 45029172724,
+      "validation_workflow_run_id": 45029172724,
+      "public_version": "1.65",
+      "note": "2026-11-22ユーザー明示承認済み。今週のAI予想・過去の成績：最初に Claude の予想を表示：ChatGPT／Claude の切り替えの初期表示を Claude にする。ChatGPT は切り替えボタンで表示（#chatgpt）。データ・成績・買い目は変更なし。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-claude-default-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/this-week.html",
+        "docs/results.html",
+        "docs/assets/claude-view-v1.js"
       ],
       "public_http_files_verified": null
     }
