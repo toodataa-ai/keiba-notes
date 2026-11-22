@@ -23,11 +23,11 @@ const w=vmSource(week,['jraReadableLinks']);
 assert(!prod.includes('JRA_V102_READABLE_REPORT_ALIASES'),
   'production must remain untouched until user approves the stage');
 const preview=read('docs/staging/results.html');
-assert(preview.includes('src="assets/results.js?v=20261013-settlement-v104"'),
-  'production-mirror staging must not enable the unapproved lab-only renderer');
+const liveRenderer=read('docs/results.html').match(/<script\s+src="(assets\/results\.js\?v=[^"]+)"/)?.[1];
+assert(liveRenderer && preview.includes(`src="${liveRenderer}"`),
+  'production-mirror staging must load the exact approved production renderer');
 assert(!preview.includes('src="staging/assets/results.js'),
   'lab-only renderer should remain inert in staging');
-assert(read('docs/results.html').includes('src="assets/results.js?v=20261013-settlement-v104"'));
 const links=[];
 for(const [id,perf] of Object.entries(expected)){
   const r=db.races.find(x=>x.id===id);
