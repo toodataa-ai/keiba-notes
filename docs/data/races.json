@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-11-23T08:16:51.307+09:00",
+  "updated_at": "2026-11-23T08:22:26.584+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -39822,6 +39822,239 @@
         "modeled_low_expected_net_profit_yen": -7.0144,
         "modeled_union_hit_probability": 0.2223,
         "modeled_net_loss_probability": 0.7777
+      }
+    },
+    {
+      "id": "2026-11-23-ouu-stakes",
+      "date": "2026-11-23",
+      "venue": "福島",
+      "race": "奥羽ステークス",
+      "scope": "jra-main",
+      "prompt_version": "v3.13",
+      "status": "predicted",
+      "source": "immutable-jra-live-source-prerace-fixed",
+      "eligible_for_learning": false,
+      "field_size": 15,
+      "report": "reports/2026-11-23-ouu-stakes-v315-initial-run45082669474-attempt1.html",
+      "pdf": "pdfs/2026-11-23-ouu-stakes-v315-initial-run45082669474-attempt1.pdf",
+      "pdf_mode": "full",
+      "full_report_pages": 53,
+      "marks": {
+        "win": "3 ジェイエルモーダル",
+        "second": "8 ディーズゴールド",
+        "third": "4 プライベートアイズ"
+      },
+      "bets": [
+        "枠連 2-4",
+        "馬連 4-5",
+        "馬単 4-5",
+        "ワイド 4-5",
+        "馬単 5-4"
+      ],
+      "purchase_decision": "buy",
+      "purchase_reason_code": "v315_grouped_verified_positive_edge",
+      "total_stake_yen": 500,
+      "final_bets": [
+        {
+          "type": "枠連",
+          "selection": [
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 39.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/tfw/2603030611?ninki=0",
+          "observed_at": "2026-11-22T23:21:01.005+00:00",
+          "quote_verified": true,
+          "market_selection_id": "枠連:[2,4]"
+        },
+        {
+          "type": "馬連",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": 64.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ur/2603030611?ninki=0",
+          "observed_at": "2026-11-22T23:21:01.604+00:00",
+          "quote_verified": true,
+          "market_selection_id": "馬連:[4,5]"
+        },
+        {
+          "type": "馬単",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": 120.6,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2603030611?ninki=0",
+          "observed_at": "2026-11-22T23:21:02.056+00:00",
+          "quote_verified": true,
+          "market_selection_id": "馬単:[4,5]"
+        },
+        {
+          "type": "ワイド",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "market_odds": [
+            28.7,
+            30.3
+          ],
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/wide/2603030611?ninki=0",
+          "observed_at": "2026-11-22T23:21:02.338+00:00",
+          "market_selection_id": "ワイド:[4,5]",
+          "quote_verified": true
+        },
+        {
+          "type": "馬単",
+          "selection": [
+            5,
+            4
+          ],
+          "stake_yen": 100,
+          "market_odds": 146.1,
+          "source_url": "https://sports.yahoo.co.jp/keiba/race/odds/ut/2603030611?ninki=0",
+          "observed_at": "2026-11-22T23:21:02.056+00:00",
+          "market_selection_id": "馬単:[5,4]",
+          "quote_verified": true
+        }
+      ],
+      "final_bets_fixed_at": "2026-11-22T23:21:27.291Z",
+      "step1_fixed_at": "2026-11-23T08:15:18.913+09:00",
+      "e2e_prediction": "e2e_validation/predictions/2026-11-23-ouu-stakes/v315-initial-run45082669474-attempt1-sealed.json",
+      "proof_commit": "a1cf772201a25ba3620210d92f46e538923bc5b4",
+      "purchase_budget_yen": 6000,
+      "purchase_strategy_version": "v3.15",
+      "purchase_commands": [
+        {
+          "type": "枠連",
+          "method": "single",
+          "definition": {
+            "selection": [
+              2,
+              4
+            ]
+          },
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "枠連:[2,4]"
+          ],
+          "source_strategy_id": "single:枠連:[2,4]",
+          "row": 1,
+          "category": "通常",
+          "jra_input": "2－4"
+        },
+        {
+          "type": "馬連",
+          "method": "single",
+          "definition": {
+            "selection": [
+              4,
+              5
+            ]
+          },
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "馬連:[4,5]"
+          ],
+          "source_strategy_id": "single:馬連:[4,5]",
+          "row": 2,
+          "category": "通常",
+          "jra_input": "4－5"
+        },
+        {
+          "type": "馬単",
+          "method": "single",
+          "definition": {
+            "selection": [
+              4,
+              5
+            ]
+          },
+          "points": 1,
+          "unit_stake_yen": 100,
+          "stake_yen": 100,
+          "ticket_keys": [
+            "馬単:[4,5]"
+          ],
+          "source_strategy_id": "single:馬単:[4,5]",
+          "row": 3,
+          "category": "通常",
+          "jra_input": "4→5"
+        }
+      ],
+      "medium_command": {
+        "row": 4,
+        "category": "中穴",
+        "type": "ワイド",
+        "method": "single",
+        "definition": {
+          "selection": [
+            4,
+            5
+          ]
+        },
+        "jra_input": "4－5",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "ワイド:[4,5]"
+        ],
+        "minimum_verified_odds": 28.7,
+        "maximum_verified_odds": 28.7,
+        "indicative_minimum_payout_yen": 2870,
+        "model_expected_profit_yen": 73.6445,
+        "pricing_source": "verified-single",
+        "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+      },
+      "large_command": {
+        "row": 5,
+        "category": "大穴",
+        "type": "馬単",
+        "method": "single",
+        "definition": {
+          "selection": [
+            5,
+            4
+          ]
+        },
+        "jra_input": "5→4",
+        "points": 1,
+        "unit_stake_yen": 100,
+        "stake_yen": 100,
+        "ticket_keys": [
+          "馬単:[5,4]"
+        ],
+        "minimum_verified_odds": 146.1,
+        "maximum_verified_odds": 146.1,
+        "indicative_minimum_payout_yen": 14610,
+        "model_expected_profit_yen": 43.2825,
+        "pricing_source": "verified-single",
+        "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+      },
+      "purchase_comparison": {
+        "expected_profit_yen": -189.139,
+        "union_hit_pp": -54.6,
+        "net_loss_pp": 8.18
+      },
+      "purchase_risk_metrics": {
+        "stake_yen": 500,
+        "ticket_count": 5,
+        "command_count": 5,
+        "modeled_expected_net_profit_yen": 226.4539,
+        "modeled_low_expected_net_profit_yen": 404.7632,
+        "modeled_union_hit_probability": 0.1006,
+        "modeled_net_loss_probability": 0.8994
       }
     }
   ]
