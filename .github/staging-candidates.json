@@ -1,5 +1,19 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-claude-default-v1",
+      "title": "今週のAI予想・過去の成績：最初に Claude の予想を表示",
+      "pages": [
+        "this-week.html",
+        "results.html"
+      ],
+      "assets": [
+        "assets/claude-view-v1.js"
+      ],
+      "summary": "ChatGPT／Claude の切り替えの初期表示を Claude にする。ChatGPT は切り替えボタンで表示（#chatgpt）。データ・成績・買い目は変更なし。",
+      "status": "awaiting_user_approval"
+    }
+  ]
 }
