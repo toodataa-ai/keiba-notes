@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-21T21:20:17+00:00",
+ "generated_at": "2026-11-22T00:12:12+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 44965412007,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-22T00:11:31Z",
+     "started_at": "2026-11-22T00:11:31Z",
+     "ended_at": "2026-11-22T00:11:53Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 44950168058,
      "event": "workflow_dispatch",
@@ -655,17 +666,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "H"
-    },
-    {
-     "id": 42553657714,
-     "event": "schedule",
-     "created_at": "2026-11-09T02:56:45Z",
-     "started_at": "2026-11-09T02:56:45Z",
-     "ended_at": "2026-11-09T02:57:09Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -1080,28 +1080,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 42414637131,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T21:11:08Z",
-     "started_at": "2026-11-07T21:11:08Z",
-     "ended_at": "2026-11-07T21:13:00Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "H"
-    },
-    {
-     "id": 42321524381,
-     "event": "schedule",
-     "created_at": "2026-11-07T00:59:42Z",
-     "started_at": "2026-11-07T00:59:42Z",
-     "ended_at": "2026-11-07T01:01:35Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -1417,28 +1395,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 42414642280,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T21:11:11Z",
-     "started_at": "2026-11-07T21:11:11Z",
-     "ended_at": "2026-11-07T21:14:55Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "H"
-    },
-    {
-     "id": 42328347642,
-     "event": "schedule",
-     "created_at": "2026-11-07T02:15:48Z",
-     "started_at": "2026-11-07T02:15:48Z",
-     "ended_at": "2026-11-07T02:17:17Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -1568,34 +1524,23 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 42332748618,
-     "event": "schedule",
-     "created_at": "2026-11-07T03:10:24Z",
-     "started_at": "2026-11-07T03:10:24Z",
-     "ended_at": "2026-11-07T03:11:21Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42329513321,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T02:29:39Z",
-     "started_at": "2026-11-07T02:29:39Z",
-     "ended_at": "2026-11-07T02:30:40Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
     }
    ]
   },
   "baba-going-live-v1.yml": {
    "label": "馬場の朝の予測",
    "runs": [
+    {
+     "id": 44965413994,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-22T00:11:32Z",
+     "started_at": "2026-11-22T00:11:32Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "O"
+    },
     {
      "id": 44873929695,
      "event": "schedule",
@@ -1749,28 +1694,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "O"
-    },
-    {
-     "id": 42332863081,
-     "event": "schedule",
-     "created_at": "2026-11-07T03:11:48Z",
-     "started_at": "2026-11-07T03:11:48Z",
-     "ended_at": "2026-11-07T03:14:45Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42329616654,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T02:30:50Z",
-     "started_at": "2026-11-07T02:30:50Z",
-     "ended_at": "2026-11-07T02:33:44Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
     }
    ]
   },
@@ -1952,39 +1875,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "O"
-    },
-    {
-     "id": 42348963374,
-     "event": "schedule",
-     "created_at": "2026-11-07T06:53:42Z",
-     "started_at": "2026-11-07T06:53:42Z",
-     "ended_at": "2026-11-07T06:53:58Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42347130958,
-     "event": "schedule",
-     "created_at": "2026-11-07T06:28:03Z",
-     "started_at": "2026-11-07T06:28:03Z",
-     "ended_at": "2026-11-07T06:30:01Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42329768457,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T02:32:37Z",
-     "started_at": "2026-11-07T02:32:37Z",
-     "ended_at": "2026-11-07T02:35:36Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
     }
    ]
   },
@@ -2162,50 +2052,6 @@
      "created_at": "2026-11-08T09:17:41Z",
      "started_at": "2026-11-08T09:17:41Z",
      "ended_at": "2026-11-08T09:18:03Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
-    },
-    {
-     "id": 42385018588,
-     "event": "schedule",
-     "created_at": "2026-11-07T15:09:43Z",
-     "started_at": "2026-11-07T15:09:43Z",
-     "ended_at": "2026-11-07T15:09:59Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42383829518,
-     "event": "schedule",
-     "created_at": "2026-11-07T14:55:02Z",
-     "started_at": "2026-11-07T14:55:02Z",
-     "ended_at": "2026-11-07T14:55:15Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42359919938,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T09:29:07Z",
-     "started_at": "2026-11-07T09:29:07Z",
-     "ended_at": "2026-11-07T09:29:27Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
-    },
-    {
-     "id": 42359171740,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T09:18:26Z",
-     "started_at": "2026-11-07T09:18:26Z",
-     "ended_at": "2026-11-07T09:18:44Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
@@ -2479,39 +2325,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "手"
-    },
-    {
-     "id": 42388666834,
-     "event": "schedule",
-     "created_at": "2026-11-07T15:54:55Z",
-     "started_at": "2026-11-07T15:54:55Z",
-     "ended_at": "2026-11-07T15:55:12Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42369117961,
-     "event": "push",
-     "created_at": "2026-11-07T11:39:50Z",
-     "started_at": "2026-11-07T11:39:50Z",
-     "ended_at": "2026-11-07T11:41:17Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42359973744,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T09:29:57Z",
-     "started_at": "2026-11-07T09:29:57Z",
-     "ended_at": "2026-11-07T09:30:14Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
     }
    ]
   },
@@ -2819,39 +2632,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "手"
-    },
-    {
-     "id": 42391279219,
-     "event": "schedule",
-     "created_at": "2026-11-07T16:26:11Z",
-     "started_at": "2026-11-07T16:26:11Z",
-     "ended_at": "2026-11-07T16:26:36Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42360038454,
-     "event": "push",
-     "created_at": "2026-11-07T09:30:44Z",
-     "started_at": "2026-11-07T09:30:44Z",
-     "ended_at": "2026-11-07T09:30:58Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42359975198,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T09:29:58Z",
-     "started_at": "2026-11-07T09:29:58Z",
-     "ended_at": "2026-11-07T09:30:26Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
     }
    ]
   },
@@ -3359,83 +3139,6 @@
      "created_at": "2026-11-08T00:16:04Z",
      "started_at": "2026-11-08T00:16:04Z",
      "ended_at": "2026-11-08T00:16:19Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42392281942,
-     "event": "schedule",
-     "created_at": "2026-11-07T16:38:07Z",
-     "started_at": "2026-11-07T16:38:07Z",
-     "ended_at": "2026-11-07T16:38:25Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42369117905,
-     "event": "push",
-     "created_at": "2026-11-07T11:39:50Z",
-     "started_at": "2026-11-07T11:39:50Z",
-     "ended_at": "2026-11-07T11:40:13Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42360038449,
-     "event": "push",
-     "created_at": "2026-11-07T09:30:44Z",
-     "started_at": "2026-11-07T09:30:44Z",
-     "ended_at": "2026-11-07T09:31:04Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42359972324,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T09:29:55Z",
-     "started_at": "2026-11-07T09:29:55Z",
-     "ended_at": "2026-11-07T09:30:14Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
-    },
-    {
-     "id": 42359938728,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-07T09:29:24Z",
-     "started_at": "2026-11-07T09:29:24Z",
-     "ended_at": "2026-11-07T09:29:41Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
-    },
-    {
-     "id": 42330126715,
-     "event": "push",
-     "created_at": "2026-11-07T02:37:00Z",
-     "started_at": "2026-11-07T02:37:00Z",
-     "ended_at": "2026-11-07T02:37:15Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42329765188,
-     "event": "push",
-     "created_at": "2026-11-07T02:32:35Z",
-     "started_at": "2026-11-07T02:32:35Z",
-     "ended_at": "2026-11-07T02:32:51Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
