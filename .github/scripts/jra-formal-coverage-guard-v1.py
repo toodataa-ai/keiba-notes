@@ -39,7 +39,8 @@ def validate_day(root: Path, day: str, check_public=False):
                          if rid.startswith(day + "-")]
     expected = list(dict.fromkeys(expected))
     if not expected:
-        return {"date": day, "expected": [], "races": [],
+        return {"date": day, "expected": [], "races": [], "verified": 0,
+                "strictly_complete": False,
                 "errors": ["no calendar race coverage; check official JRA program before claiming completion"]}
 
     by_id = {r["id"]: r for r in registry["races"] if r.get("scope") == "jra-main"}
