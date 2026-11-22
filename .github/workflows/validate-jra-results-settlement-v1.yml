@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
           node --check docs/staging/assets/results.js
           node --check .github/scripts/test-jra-results-settlement-v1.mjs
-          grep -q 'assets/results.js?v=20261013-settlement-v104' docs/staging/results.html
+          grep -Fq 'src="assets/results.js?v=' docs/staging/results.html # exact parity with production is checked by the Node regression test
           ! grep -q 'src="staging/assets/results.js' docs/staging/results.html
           grep -q 'assets/results.js?v=' docs/results.html
           test -f docs/data/races.json
