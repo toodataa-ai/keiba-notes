@@ -104,13 +104,13 @@
     var panel=document.createElement('div');panel.id='claudePanel';panel.hidden=true;
     var tabs=document.createElement('div');tabs.className='pv-tabs';tabs.setAttribute('role','group');tabs.setAttribute('aria-label','予想者の切り替え');
     function mk(label,key){var b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.key=key;return b}
-    var bC=mk('ChatGPTの予想','chatgpt'),bL=mk('Claudeの予想','claude');tabs.appendChild(bC);tabs.appendChild(bL);
+    var bC=mk('ChatGPTの予想','chatgpt'),bL=mk('Claudeの予想','claude');tabs.appendChild(bL);tabs.appendChild(bC);/* 左＝Claude、右＝ChatGPT（ユーザー指示 2026-11-22） */
     main.insertBefore(tabs,main.firstChild);main.appendChild(panel);
     function show(key){
       var cl=key==='claude';
       kids.forEach(function(k){if(k.dataset.pvWas===undefined)k.dataset.pvWas=k.hidden?'1':'0';k.hidden=cl?true:k.dataset.pvWas==='1'});
       panel.hidden=!cl;bC.setAttribute('aria-pressed',String(!cl));bL.setAttribute('aria-pressed',String(cl));
-      try{history.replaceState(null,'',location.pathname+location.search+(cl?'#claude':''))}catch(e){}
+      try{history.replaceState(null,'',location.pathname+location.search+(cl?'':'#chatgpt'))}catch(e){}
       if(cl&&!panel.dataset.loaded)load();
     }
     bC.addEventListener('click',function(){show('chatgpt')});bL.addEventListener('click',function(){show('claude')});
@@ -219,6 +219,6 @@
         panel.innerHTML=h;
       }).catch(function(){panel.innerHTML='<div class="pv-empty">Claude のデータを読み込めませんでした。</div>'});
     }
-    show(location.hash==='#claude'?'claude':'chatgpt');
+    show(location.hash==='#chatgpt'?'chatgpt':'claude');/* 初期表示は Claude（ユーザー指示 2026-11-22）。ChatGPT は #chatgpt */
   }catch(e){}
 })();
