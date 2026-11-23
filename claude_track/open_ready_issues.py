@@ -29,17 +29,17 @@ def needed(exp: dict) -> list[dict]:
     pf = exp.get("portfolio", {})
     if pf.get("state") == "ready_for_decision" and pf.get("summary"):
         c, m = pf["summary"]["claude_own"], pf["summary"]["mechanical_rule"]
-        out.append({"title": "[Claude単独] 購入セット：判定できます",
+        out.append({"title": "[Claude単独] 1頭への偏り是正：判定できます",
                     "body": (f"Claudeの予想 {pf['pairs']} レースで、Claude自身が作った買い目と、同じ予想・同じオッズから機械ルールで作った買い目を比べました（仮想・購入なし）。\n\n"
                              f"- 回収率：Claude自身 {c['roi']} ／ 機械ルール {m['roi']}\n- 的中レース：Claude自身 {c['hit_races']} ／ 機械ルール {m['hit_races']}\n\n"
                              "チャットで A（機械ルールを採用）／B（もう少し続ける）／C（採用しない）のどれかを伝えてください。")})
     mw = exp.get("marks_wide", {})
     if mw.get("state") == "ready_for_decision" and mw.get("summary"):
         c, m = mw["summary"]["claude_own"], mw["summary"]["marks_wide"]
-        out.append({"title": "[Claude単独] 印を軸にしたワイド：判定できます",
+        out.append({"title": "[Claude単独] 上位3頭のワイド：判定できます",
                     "body": (f"Claudeの予想 {mw['pairs']} レースで、Claude自身の買い目と、◎○▲のワイド3点（各100円）を比べました（仮想・購入なし）。\n\n"
-                             f"- 回収率：Claude自身 {c['roi']} ／ ◎○▲ワイド {m['roi']}\n- 的中レース：Claude自身 {c['hit_races']} ／ ◎○▲ワイド {m['hit_races']}\n"
-                             f"- 使った金額：Claude自身 {c['stake_yen']}円 ／ ◎○▲ワイド {m['stake_yen']}円\n\n"
+                             f"- 回収率：Claude自身 {c['roi']} ／ 上位3頭のワイド {m['roi']}\n- 的中レース：Claude自身 {c['hit_races']} ／ 上位3頭のワイド {m['hit_races']}\n"
+                             f"- 使った金額：Claude自身 {c['stake_yen']}円 ／ 上位3頭のワイド {m['stake_yen']}円\n\n"
                              "チャットで A（買い方に取り入れる案を作る）／B（もう少し続ける）／C（採用しない）のどれかを伝えてください。")})
     fd = exp.get("first_distance", {})
     if fd.get("state") == "ready_for_review":
