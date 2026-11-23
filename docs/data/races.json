@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "updated_at": "2026-11-23T08:22:26.584+09:00",
+  "updated_at": "2026-11-23T19:13:00+09:00",
   "scope": "JRA main races only",
   "full_report_policy": {
     "required_from": "2026-10-04",
@@ -39663,7 +39663,7 @@
       "race": "東京スポーツ杯2歳ステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "jra-live-source-capture-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 12,
@@ -39822,7 +39822,106 @@
         "modeled_low_expected_net_profit_yen": -7.0144,
         "modeled_union_hit_probability": 0.2223,
         "modeled_net_loss_probability": 0.7777
-      }
+      },
+      "result": {
+        "summary": "JRA公式結果・全着順と払戻を検証済み",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 12,
+            "horse": "オンユアマークス"
+          },
+          {
+            "pos": 2,
+            "no": 10,
+            "horse": "ショウナンガレオン"
+          },
+          {
+            "pos": 3,
+            "no": 8,
+            "horse": "コラリオン"
+          }
+        ],
+        "finish_order": [
+          12,
+          10,
+          8,
+          7,
+          5,
+          11,
+          4,
+          9,
+          6,
+          1,
+          2,
+          3
+        ],
+        "going": "良",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202605061120261123%2FF0",
+        "verified_at": "2026-11-23T10:13:00Z",
+        "verified_at_basis": "review_observation_not_JRA_initial_publication_timestamp",
+        "non_runner_horse_numbers": [],
+        "refunded_bracket_numbers": []
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "枠連",
+          "selection": [
+            6,
+            7
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202605061120261123%2FF0"
+        },
+        {
+          "bet_id": "B02",
+          "type": "単勝",
+          "selection": [
+            8
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202605061120261123%2FF0"
+        },
+        {
+          "bet_id": "B03",
+          "type": "枠連",
+          "selection": [
+            5,
+            6
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202605061120261123%2FF0"
+        }
+      ],
+      "performance": {
+        "stake_yen": 300,
+        "payout_yen": 0,
+        "profit_yen": -300,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 2,
+        "honmei_win": false,
+        "honmei_place": true,
+        "second_mark_finish": 3,
+        "third_mark_finish": 10,
+        "top_marks_in_top3": 2,
+        "hit_bets": [],
+        "miss_bets": [
+          "枠連 6-7",
+          "単勝 8",
+          "枠連 5-6"
+        ]
+      },
+      "review": "東京芝1800mの発走前固定評価◎10・○8・▲1とJRA公式結果を照合。◎・○は上位に来た一方、最後方付近から末脚を伸ばした12の勝ち切りを捉えられず、▲の想定も届かなかった。レース中盤の緩みから上がり重視へ変化した展開、差し馬の瞬発力、人気や走破時計だけに寄らない新馬・2歳馬の能力評価を、将来の独立標本で点検する。購入3券は発走前の枠連・単勝の選択を固定したまま、公式払戻と照合した。結果から印・購入馬券・オッズを修正せず、週内全メイン未回顧のため週次改善・自動昇格は行わない。",
+      "review_at": "2026-11-23T10:13:00Z",
+      "e2e_case": "e2e_validation/cases/2026-11-23-tokyo-sports-hai-2yo-stakes/case.json"
     },
     {
       "id": "2026-11-23-ouu-stakes",
@@ -39831,7 +39930,7 @@
       "race": "奥羽ステークス",
       "scope": "jra-main",
       "prompt_version": "v3.13",
-      "status": "predicted",
+      "status": "reviewed",
       "source": "immutable-jra-live-source-prerace-fixed",
       "eligible_for_learning": false,
       "field_size": 15,
@@ -40055,7 +40154,136 @@
         "modeled_low_expected_net_profit_yen": 404.7632,
         "modeled_union_hit_probability": 0.1006,
         "modeled_net_loss_probability": 0.8994
-      }
+      },
+      "result": {
+        "summary": "JRA公式結果・全着順と払戻を検証済み",
+        "finish": [
+          {
+            "pos": 1,
+            "no": 3,
+            "horse": "ジェイエルモーダル"
+          },
+          {
+            "pos": 2,
+            "no": 8,
+            "horse": "ディーズゴールド"
+          },
+          {
+            "pos": 3,
+            "no": 10,
+            "horse": "プロミシングスター"
+          }
+        ],
+        "finish_order": [
+          3,
+          8,
+          10,
+          12,
+          5,
+          11,
+          9,
+          6,
+          14,
+          7,
+          13,
+          4,
+          15,
+          2,
+          1
+        ],
+        "going": "稍重",
+        "official_url": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA",
+        "verified_at": "2026-11-23T10:13:00Z",
+        "verified_at_basis": "review_observation_not_JRA_initial_publication_timestamp",
+        "non_runner_horse_numbers": [],
+        "refunded_bracket_numbers": []
+      },
+      "settlements": [
+        {
+          "bet_id": "B01",
+          "type": "枠連",
+          "selection": [
+            2,
+            4
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA"
+        },
+        {
+          "bet_id": "B02",
+          "type": "馬連",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA"
+        },
+        {
+          "bet_id": "B03",
+          "type": "馬単",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA"
+        },
+        {
+          "bet_id": "B04",
+          "type": "ワイド",
+          "selection": [
+            4,
+            5
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA"
+        },
+        {
+          "bet_id": "B05",
+          "type": "馬単",
+          "selection": [
+            5,
+            4
+          ],
+          "stake_yen": 100,
+          "hit": false,
+          "payout_yen": 0,
+          "official_payout_evidence": "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA"
+        }
+      ],
+      "performance": {
+        "stake_yen": 500,
+        "payout_yen": 0,
+        "profit_yen": -500,
+        "roi_pct": 0,
+        "ticket_hit": false,
+        "honmei_finish": 1,
+        "honmei_win": true,
+        "honmei_place": true,
+        "second_mark_finish": 2,
+        "third_mark_finish": 12,
+        "top_marks_in_top3": 2,
+        "hit_bets": [],
+        "miss_bets": [
+          "枠連 2-4",
+          "馬連 4-5",
+          "馬単 4→5",
+          "ワイド 4-5",
+          "馬単 5→4"
+        ]
+      },
+      "review": "福島ダート1700mの発走前固定評価◎3・○8・▲4をJRA公式結果と比較。主軸と相手の先行・差し評価には根拠があった一方、▲の逃げ残り想定は実現せず、購入セットは印の上位組合せを含まない選択へ偏っていた。能力・展開評価とv3.15の少数点数・中穴大穴購入選択との接続、上位印を含む候補との期待値比較・集合的中率低下を、今後の発走前時点で検証する。確定馬場は稍重。購入5券は発走前の枠連・馬連・馬単・ワイド選択を固定し公式払戻と照合した。後知恵で予想、印、買い目、購入時オッズを変えず、全メイン回顧未完了のため週次改善は実施しない。",
+      "review_at": "2026-11-23T10:13:00Z",
+      "e2e_case": "e2e_validation/cases/2026-11-23-ouu-stakes/case.json"
     }
   ]
 }

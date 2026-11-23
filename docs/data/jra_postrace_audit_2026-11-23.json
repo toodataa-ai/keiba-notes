@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-23",
+  "meeting_id": "2026-11-21-to-2026-11-23",
+  "observed_at": "2026-11-23T10:13:00Z",
+  "status": "REVIEW_RECORDS_PREPARED_GRADE_A_CI_AND_PUBLIC_HTTP_PENDING",
+  "official_result_confirmed_races": [
+    "2026-11-23-tokyo-sports-hai-2yo-stakes",
+    "2026-11-23-ouu-stakes"
+  ],
+  "grade_a_cases_created": [
+    "2026-11-23-tokyo-sports-hai-2yo-stakes",
+    "2026-11-23-ouu-stakes"
+  ],
+  "today_reviewed_count": 2,
+  "expected_weekly_main_count": 6,
+  "immutable_prerace_predictions": true,
+  "immutable_final_bets": true,
+  "immutable_original_html_pdf": true,
+  "official_result_sources": [
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0105202605061120261123%2FF0",
+    "https://www.jra.go.jp/JRADB/accessS.html?CNAME=pw01sde0103202603061120261123%2FFA"
+  ],
+  "refund_source_reviewed": true,
+  "weekly_improvement_decision": "not_evaluated",
+  "conservative_model_action": "no_change",
+  "weekly_reason": "Nov 22 Tokyo 11R Shimotsuki Stakes and Kyoto 11R Mile Championship lack sealed and publicly archived canonical formal prereace evidence. Never reconstruct postrace predictions or retrospectively award Grade A. All six official main races must be reviewed before manual A/B/C improvement assessment.",
+  "improvement_policy": {
+    "approval_classes": "A/B/C manual",
+    "automatic_promotion": false,
+    "preserve_old_versions": true,
+    "preserve_inflight_e2e": true,
+    "overfit_prevention": true,
+    "formal_prompt_changed": false
+  },
+  "publication_verification": {
+    "source_prerace_proof_bets_unchanged": true,
+    "github_actions_result": "pending",
+    "public_http_byte_parity_verified": false
+  },
+  "blockers": [
+    "2026-11-22-shimotsuki-stakes and 2026-11-22-mile-championship have no immutable prereace canonical prediction HTML/PDF or Grade A source proof.",
+    "Grade A CI, derived status publication and Pages HTTP byte parity await follow-up verification after data commit."
+  ]
+}
