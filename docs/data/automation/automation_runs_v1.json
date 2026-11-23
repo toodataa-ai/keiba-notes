@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-23T09:20:12+00:00",
+ "generated_at": "2026-11-23T09:21:21+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
@@ -2152,6 +2152,17 @@
    "label": "改善案と今の予想の採点",
    "runs": [
     {
+     "id": 45146221809,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-23T09:21:06Z",
+     "started_at": "2026-11-23T09:21:06Z",
+     "ended_at": null,
+     "status": "queued",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "O"
+    },
+    {
      "id": 45049188312,
      "event": "schedule",
      "created_at": "2026-11-22T17:23:35Z",
@@ -2398,6 +2409,28 @@
   "jra-improvement-pipeline-v1.yml": {
    "label": "基準に届いたかの確認・通知",
    "runs": [
+    {
+     "id": 45146199040,
+     "event": "push",
+     "created_at": "2026-11-23T09:20:57Z",
+     "started_at": "2026-11-23T09:20:57Z",
+     "ended_at": "2026-11-23T09:21:16Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
+    {
+     "id": 45146170134,
+     "event": "push",
+     "created_at": "2026-11-23T09:20:45Z",
+     "started_at": "2026-11-23T09:20:45Z",
+     "ended_at": "2026-11-23T09:21:01Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 45146007603,
      "event": "push",
@@ -2716,6 +2749,28 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 45146199037,
+     "event": "push",
+     "created_at": "2026-11-23T09:20:57Z",
+     "started_at": "2026-11-23T09:20:57Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "手"
+    },
+    {
+     "id": 45146169960,
+     "event": "push",
+     "created_at": "2026-11-23T09:20:45Z",
+     "started_at": "2026-11-23T09:20:45Z",
+     "ended_at": "2026-11-23T09:21:06Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 45146007599,
      "event": "push",
