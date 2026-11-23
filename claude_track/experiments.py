@@ -24,6 +24,10 @@ PARAMS = {"max_runs": 4, "front_max_ratio": 0.33, "closer_min_ratio": 0.67, "lea
                           "H": {"front": 0.85, "mid": 1.00, "closer": 1.15}}}
 NEED_PAIRS = 20
 NEED_HORSES = 30
+# ◎○▲のワイド3点（各100円）を仮想の比較相手にする（ユーザー回答A：Issue #461・#454、2026-11-24）。
+# 規則は今週の結果を見たあとで決めたので、登録より後に作った予想（STEP1）のレースだけを数える。それ以前は参考の再現。
+MARKS_WIDE_REGISTERED_AT = "2026-11-24T06:30:00+09:00"
+MARKS_WIDE_STAKE = 100
 NEED_FIRST_DIST = 100   # 初めての距離（2歳戦の距離延長）の馬が、この頭数たまったら判定（過去データでは差が小さいため、偶然と区別できる数を要求）
 
 
@@ -166,6 +170,28 @@ def captured_going(race_id: str, root: Path):
     return None
 
 
+def _after_registration(generated_at) -> bool:
+    from datetime import datetime
+    try:
+        return datetime.fromisoformat(generated_at) >= datetime.fromisoformat(MARKS_WIDE_REGISTERED_AT)
+    except (TypeError, ValueError):
+        return False
+
+
+def marks_wide_set(horses: list[dict]) -> list[dict]:
+    """◎○▲の3頭のワイド3点（各100円）。3つの印がそろわないときは作らない。"""
+    m = {h.get("mark"): h["no"] for h in horses if h.get("mark") in ("◎", "○", "▲")}
+    if len(m) < 3:
+        return []
+    a, b, c = sorted(m.values())
+    return [{"type": "ワイド", "selection": list(x), "stake_yen": MARKS_WIDE_STAKE} for x in ((a, b), (a, c), (b, c))]
+
+
+def _side_sum(rows, k):
+    st = sum(r[k]["stake_yen"] for r in rows); py = sum(r[k]["payout_yen"] for r in rows)
+    return {"stake_yen": st, "payout_yen": py, "roi": round(py / st, 4) if st else None, "hit_races": sum(r[k]["hit"] for r in rows)}
+
+
 def _port_summary(rows):
     if not rows:
         return None
@@ -176,7 +202,7 @@ def _port_summary(rows):
 
 
 def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
-    pairs, going_pairs, port_rows = [], [], []
+    pairs, going_pairs, port_rows, mw_rows = [], [], [], []
     exp = {k: {"horses": 0, "pred_wins": 0.0, "actual_wins": 0, "races": set()} for k in ("E0", "E1", "E2")}
     career_seen = 0
     fd = {k: {"horses": 0, "pred": 0.0, "var": 0.0, "wins": 0, "races": set(), "dates": []} for k in ("extension", "shorten", "known", "debut")}
@@ -201,6 +227,12 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
                 pay = result["official_payouts_yen_per_100"]
                 port_rows.append({"race_id": rid, "claude": pe.settle(s2["bets"], pay), "mechanical": pe.settle(mech, pay),
                                   "claude_tickets": len(s2["bets"]), "mechanical_tickets": len(mech)})
+        if s2 is not None and result.get("official_payouts_yen_per_100"):
+            mw = marks_wide_set(horses)
+            if mw:
+                pay = result["official_payouts_yen_per_100"]
+                mw_rows.append({"race_id": rid, "prospective": _after_registration(step1.get("generated_at")),
+                                "claude": pe.settle(s2.get("bets") or [], pay), "marks_wide": pe.settle(mw, pay)})
         card = load_card(step1, root)
         if card:
             gv = captured_going(rid, root)
@@ -238,6 +270,14 @@ def run(pred_dir: Path, results_dir: Path, root: Path = ROOT) -> dict:
            "portfolio": {"id": "claude+ticket_div_rule", "pairs": len(port_rows), "dates": [p["race_id"][:10] for p in port_rows], "need_pairs": NEED_PAIRS,
                          "summary": _port_summary(port_rows),
                          "state": "collecting" if len(port_rows) < NEED_PAIRS else "ready_for_decision"},
+           "marks_wide": (lambda pr, rp: {"id": "claude+marks_wide_v1", "registered_at": MARKS_WIDE_REGISTERED_AT,
+                          "rule": "◎○▲の3頭のワイド3点・各100円（発走前に保存した印だけで決まる。仮想・購入なし）",
+                          "pairs": len(pr), "dates": [r["race_id"][:10] for r in pr], "need_pairs": NEED_PAIRS,
+                          "summary": ({"claude_own": _side_sum(pr, "claude"), "marks_wide": _side_sum(pr, "marks_wide")} if pr else None),
+                          "replay_reference": ({"races": len(rp), "claude_own": _side_sum(rp, "claude"), "marks_wide": _side_sum(rp, "marks_wide"),
+                                                "note": "登録前のレース。規則を決めるときに見た結果を含むので、判定には数えない"} if rp else None),
+                          "state": "collecting" if len(pr) < NEED_PAIRS else "ready_for_decision"})(
+                              [r for r in mw_rows if r["prospective"]], [r for r in mw_rows if not r["prospective"]]),
            "first_distance": {"need_horses": NEED_FIRST_DIST, "target": "extension",
                               "state": "collecting" if fd["extension"]["horses"] < NEED_FIRST_DIST else "ready_for_review",
                               "groups": {k: {"horses": v["horses"], "races": len(v["races"]), "predicted_wins": round(v["pred"], 3), "actual_wins": v["wins"], "dates": v["dates"],

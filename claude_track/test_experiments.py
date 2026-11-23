@@ -70,3 +70,29 @@ class TestGoingAndPortfolio(unittest.TestCase):
         kept = ex.mechanical_set({1: 0.6, 2: 0.4}, odds, 300)
         self.assertTrue(all(b["stake_yen"] == 100 for b in kept))
         self.assertLessEqual(sum(b["stake_yen"] for b in kept), 300)
+
+
+class TestMarksWide(unittest.TestCase):
+    def test_set(self):
+        hs = [{"no": 1, "mark": "○"}, {"no": 5, "mark": "◎"}, {"no": 3, "mark": "▲"}, {"no": 2, "mark": "△"}]
+        self.assertEqual([b["selection"] for b in ex.marks_wide_set(hs)], [[1, 3], [1, 5], [3, 5]])
+        self.assertEqual(ex.marks_wide_set(hs[:2]), [])
+
+    def test_prospective_split(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d); (d / "res").mkdir()
+            pay = {"ワイド": {"1-2": 300, "1-3": 500, "2-3": 900}}
+            for rid, gen in (("r-old", "2026-11-23T09:00:00+09:00"), ("r-new", "2026-11-28T09:00:00+09:00")):
+                (d / f"p/{rid}").mkdir(parents=True)
+                (d / f"res/{rid}.json").write_text(json.dumps({"race_id": rid, "scheduled_start_at": gen[:10] + "T15:00:00+09:00",
+                    "finish_order": [1, 2, 3, 4], "official_payouts_yen_per_100": pay}), encoding="utf-8")
+                hs = [{"no": n, "win_prob": 0.25, "mark": m} for n, m in ((1, "◎"), (2, "○"), (3, "▲"), (4, None))]
+                (d / f"p/{rid}/step1-a.json").write_text(json.dumps({"schema_version": 1, "predictor": "claude", "stage": "step1", "race_id": rid,
+                    "generated_at": gen, "odds_seen_before_step1": False, "horses": hs}), encoding="utf-8")
+                (d / f"p/{rid}/step2-a.json").write_text(json.dumps({"schema_version": 1, "predictor": "claude", "stage": "step2", "race_id": rid,
+                    "generated_at": gen, "decision": "skip", "bets": []}), encoding="utf-8")
+            r = ex.run(d / "p", d / "res", root=d)["marks_wide"]
+            self.assertEqual(r["pairs"], 1)
+            self.assertEqual(r["summary"]["marks_wide"], {"stake_yen": 300, "payout_yen": 1700, "roi": round(1700 / 300, 4), "hit_races": 1})
+            self.assertEqual(r["summary"]["claude_own"]["stake_yen"], 0)
+            self.assertEqual(r["replay_reference"]["races"], 1)

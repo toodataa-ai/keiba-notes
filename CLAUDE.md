@@ -180,3 +180,4 @@
 - `.github/scripts/jra-release-guard-v1.py` はv1.47以降の全リリースで、記録された新入口とGit差分が一致するかをチェックする。漏れ・不一致ならリリースを失敗させる。バッジ表示は予想データに触れない。
 - **Claudeは新しいトップ入口を追加・公開するたびに、STAGINGのNEW表示を確認し、正式UIリリースは必ず `jra-ui-promote-v1.yml` を使う。** 直接 `docs/index.html` を本番に書き換えてリリース手順を迂回しない。 `new_entry_pages` を手入力で偽装しない。
 
+- **印のワイドの比較（2026-11-24、ユーザー回答A：Issue #461・#454）**：`claude_track/experiments.py` の `marks_wide`（Claude自身の買い目 vs 同じレースの ◎○▲ ワイド3点・各100円、同じ公式払戻で回収率を比べる。仮想・購入なし）。規則は11/21〜23の結果を見てから決めたため、**STEP1 が `MARKS_WIDE_REGISTERED_AT`（2026-11-24 06:30 JST）以降のレースだけ**数える（実質 11/28 から）。それ以前は `replay_reference`（参考・判定外。登録前18レースで Claude自身58%／印のワイド113%）。20レースで Issue「[Claude単独] 印を軸にしたワイド：判定できます」（`open_ready_issues.py`）。STEP2 がないレースは数えない、見送りは0円として数える。競走除外の返還は考慮しない（両方とも同じ扱い）。画面は変更案 `ui-marks-wide-progress-v1`（improvement-cycle.html の進捗まとめに『印のワイド』の行と説明。承認待ち）。

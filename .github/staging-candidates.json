@@ -1,5 +1,16 @@
 {
   "schema_version": 1,
   "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "ui-marks-wide-progress-v1",
+      "title": "改善状況ページ：印のワイドの比較の進捗を表示",
+      "pages": [
+        "improvement-cycle.html"
+      ],
+      "assets": [],
+      "summary": "各テーマの進捗まとめに『印のワイド』の行（比較 n/20レース・回収率）を追加し、各研究の目的と内容に説明と登録前の参考値を追加。データは claude_experiments_v1.json の marks_wide。予想・買い目は変更なし。",
+      "status": "awaiting_user_approval"
+    }
+  ]
 }
