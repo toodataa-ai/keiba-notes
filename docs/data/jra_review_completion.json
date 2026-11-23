@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-21T09:44:18.531505+00:00",
+  "generated_at": "2026-11-23T10:23:00.124656+00:00",
   "policy": {
     "formal_grade_a_independent_of_research": true,
     "never_reconstruct_missing_prerace_experience": true,
@@ -11,12 +11,12 @@
   "latest_formal_prompt_version": "v3.13",
   "formal_grade_a": {
     "passed": true,
-    "validated_case_count": 35,
+    "validated_case_count": 37,
     "errors": []
   },
   "shadow_research": {
     "state": "evidence_incomplete",
-    "prerace_evidence_gap_count": 34,
+    "prerace_evidence_gap_count": 36,
     "evidence_gaps": [
       {
         "race_id": "2026-10-10-mimuro-stakes",
@@ -218,6 +218,18 @@
       },
       {
         "race_id": "2026-11-21-fukushima-kinen",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-11-23-ouu-stakes",
+        "version": "v3.13",
+        "cause": "race_context.race_category is required",
+        "source": "sealed_prediction_missing_prerace_fields"
+      },
+      {
+        "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
         "version": "v3.13",
         "cause": "race_context.race_category is required",
         "source": "sealed_prediction_missing_prerace_fields"
@@ -529,7 +541,7 @@
         "2026-11-22",
         "2026-11-23"
       ],
-      "registered_races": 2,
+      "registered_races": 4,
       "expected_races": 6,
       "formal_grade_a_review_state": "pending",
       "races": [
@@ -563,19 +575,15 @@
         },
         {
           "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
-          "date": null,
-          "formal_state": "pending",
-          "reasons": [
-            "missing_registry_entry"
-          ]
+          "date": "2026-11-23",
+          "formal_state": "complete",
+          "reasons": []
         },
         {
-          "race_id": "2026-11-23-ou-stakes",
-          "date": null,
-          "formal_state": "pending",
-          "reasons": [
-            "missing_registry_entry"
-          ]
+          "race_id": "2026-11-23-ouu-stakes",
+          "date": "2026-11-23",
+          "formal_state": "complete",
+          "reasons": []
         }
       ],
       "weekly_improvement_decision": "not_evaluated",

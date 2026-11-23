@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-21T09:44:16+00:00",
+  "generated_at": "2026-11-23T10:22:57+00:00",
   "mode": "report_only",
   "case_counts": {
-    "strict": 35,
+    "strict": 37,
     "historical_replay": 0,
     "synthetic": 0,
-    "prediction_entries": 35
+    "prediction_entries": 37
   },
   "versions": {
     "v3.12": {
@@ -57,11 +57,11 @@
     },
     "v3.13": {
       "all_non_synthetic": {
-        "cases": 31,
-        "honmei_win_rate": 0.225806,
-        "honmei_top3_rate": 0.451613,
-        "top3_marks_capture_rate": 0.430107,
-        "winner_in_top3_marks_rate": 0.612903,
+        "cases": 33,
+        "honmei_win_rate": 0.242424,
+        "honmei_top3_rate": 0.484848,
+        "top3_marks_capture_rate": 0.444444,
+        "winner_in_top3_marks_rate": 0.606061,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -69,21 +69,21 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 103000,
+        "stake_yen": 103800,
         "payout_yen": 66090,
-        "roi_pct": 64.165,
-        "bet_cases": 31,
+        "roi_pct": 63.671,
+        "bet_cases": 33,
         "probability_cases": {
           "win": 0,
           "top3": 0
         }
       },
       "strict": {
-        "cases": 31,
-        "honmei_win_rate": 0.225806,
-        "honmei_top3_rate": 0.451613,
-        "top3_marks_capture_rate": 0.430107,
-        "winner_in_top3_marks_rate": 0.612903,
+        "cases": 33,
+        "honmei_win_rate": 0.242424,
+        "honmei_top3_rate": 0.484848,
+        "top3_marks_capture_rate": 0.444444,
+        "winner_in_top3_marks_rate": 0.606061,
         "winner_mean_rank": null,
         "winner_mrr": null,
         "win_brier": null,
@@ -91,10 +91,10 @@
         "top3_brier": null,
         "going_log_loss": null,
         "pace_log_loss": null,
-        "stake_yen": 103000,
+        "stake_yen": 103800,
         "payout_yen": 66090,
-        "roi_pct": 64.165,
-        "bet_cases": 31,
+        "roi_pct": 63.671,
+        "bet_cases": 33,
         "probability_cases": {
           "win": 0,
           "top3": 0
@@ -169,7 +169,7 @@
   "coverage": {
     "strict_probability_win_cases": 0,
     "strict_probability_top3_cases": 0,
-    "strict_bet_cases": 35
+    "strict_bet_cases": 37
   },
   "errors": [],
   "entries": [
@@ -1564,6 +1564,86 @@
         "stake_yen": 500,
         "payout_yen": 3230,
         "roi_pct": 646.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-11-23-ouu-stakes",
+      "date": "2026-11-23",
+      "venue": "福島",
+      "surface": "dirt",
+      "race": "奥羽ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-11-23-ouu-stakes/v315-initial-run45082669474-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "180109743a00eeb75fc2e6165793185524e7349d",
+        "proof_commit_at": "2026-11-22T23:22:27+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 1,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 1,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 500,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
+        "going_log_loss": null,
+        "pace_log_loss": null,
+        "win_brier": null,
+        "win_log_loss": null,
+        "top3_brier": null,
+        "win_probability_coverage": false,
+        "top3_probability_coverage": false
+      }
+    },
+    {
+      "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
+      "date": "2026-11-23",
+      "venue": "東京",
+      "surface": "turf",
+      "race": "東京スポーツ杯2歳ステークス",
+      "grade": "prospective_strict",
+      "version": "v3.13",
+      "prediction_path": "e2e_validation/predictions/2026-11-23-tokyo-sports-hai-2yo-stakes/v3.15-run45082209047-attempt1-sealed.json",
+      "proof": {
+        "grade": "prospective_strict",
+        "proof_commit": "190c07690423012d814a32f88a3b42e854055312",
+        "proof_commit_at": "2026-11-22T23:16:52+00:00",
+        "read_from_proof_commit": true
+      },
+      "manifest": {
+        "present": true,
+        "valid": true,
+        "path": "e2e_validation/manifests/v3.13.json",
+        "component_count": 104
+      },
+      "metrics": {
+        "honmei_win": 0,
+        "honmei_top3": 1,
+        "top3_marks_capture": 0.666667,
+        "winner_in_top3_marks": 0,
+        "winner_rank": null,
+        "winner_mrr": null,
+        "stake_yen": 300,
+        "payout_yen": 0,
+        "roi_pct": 0.0,
         "going_log_loss": null,
         "pace_log_loss": null,
         "win_brier": null,

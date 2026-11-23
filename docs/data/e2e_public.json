@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-21T09:44:20.315953+00:00",
+  "generated_at": "2026-11-23T10:23:01.767513+00:00",
   "mode": "jra_e2e_shadow_public",
   "production_effect": false,
   "policy": {
@@ -29,7 +29,7 @@
   },
   "review_completion": {
     "schema_version": 1,
-    "generated_at": "2026-11-21T09:44:18.531505+00:00",
+    "generated_at": "2026-11-23T10:23:00.124656+00:00",
     "policy": {
       "formal_grade_a_independent_of_research": true,
       "never_reconstruct_missing_prerace_experience": true,
@@ -40,12 +40,12 @@
     "latest_formal_prompt_version": "v3.13",
     "formal_grade_a": {
       "passed": true,
-      "validated_case_count": 35,
+      "validated_case_count": 37,
       "errors": []
     },
     "shadow_research": {
       "state": "evidence_incomplete",
-      "prerace_evidence_gap_count": 34,
+      "prerace_evidence_gap_count": 36,
       "evidence_gaps": [
         {
           "race_id": "2026-10-10-mimuro-stakes",
@@ -247,6 +247,18 @@
         },
         {
           "race_id": "2026-11-21-fukushima-kinen",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-23-ouu-stakes",
+          "version": "v3.13",
+          "cause": "race_context.race_category is required",
+          "source": "sealed_prediction_missing_prerace_fields"
+        },
+        {
+          "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
           "version": "v3.13",
           "cause": "race_context.race_category is required",
           "source": "sealed_prediction_missing_prerace_fields"
@@ -558,7 +570,7 @@
           "2026-11-22",
           "2026-11-23"
         ],
-        "registered_races": 2,
+        "registered_races": 4,
         "expected_races": 6,
         "formal_grade_a_review_state": "pending",
         "races": [
@@ -592,19 +604,15 @@
           },
           {
             "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
-            "date": null,
-            "formal_state": "pending",
-            "reasons": [
-              "missing_registry_entry"
-            ]
+            "date": "2026-11-23",
+            "formal_state": "complete",
+            "reasons": []
           },
           {
-            "race_id": "2026-11-23-ou-stakes",
-            "date": null,
-            "formal_state": "pending",
-            "reasons": [
-              "missing_registry_entry"
-            ]
+            "race_id": "2026-11-23-ouu-stakes",
+            "date": "2026-11-23",
+            "formal_state": "complete",
+            "reasons": []
           }
         ],
         "weekly_improvement_decision": "not_evaluated",
@@ -613,12 +621,192 @@
     ]
   },
   "totals": {
-    "prospective_strict_races": 35,
+    "prospective_strict_races": 37,
     "historical_replay_races": 0,
-    "prospective_prediction_entries": 35,
-    "prospective_results_joined": 35
+    "prospective_prediction_entries": 37,
+    "prospective_results_joined": 37
   },
   "races": [
+    {
+      "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
+      "date": "2026-11-23",
+      "venue": "東京",
+      "surface": "turf",
+      "race_name": "東京スポーツ杯2歳ステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-23T15:30:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-23-tokyo-sports-hai-2yo-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-23-tokyo-sports-hai-2yo-stakes.json",
+      "official_result_at": "2026-11-23T10:13:00Z",
+      "official_going": "良",
+      "finish_order": [
+        12,
+        10,
+        8,
+        7,
+        5,
+        11,
+        4,
+        9,
+        6,
+        1,
+        2,
+        3
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-22T23:15:51.197Z",
+          "information_cutoff_at": "2026-11-22T23:15:51.197Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "東京スポーツ杯2歳ステークス",
+          "marks": {
+            "win": 10,
+            "second": 8,
+            "third": 1
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "枠連",
+              "selection": [
+                6,
+                7
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "単勝",
+              "selection": [
+                8
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "枠連",
+              "selection": [
+                5,
+                6
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "190c07690423012d814a32f88a3b42e854055312",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-23-tokyo-sports-hai-2yo-stakes/v3.15-run45082209047-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-23-tokyo-sports-hai-2yo-stakes/v3.15-run45082209047-attempt1-sealed.json"
+        }
+      ]
+    },
+    {
+      "race_id": "2026-11-23-ouu-stakes",
+      "date": "2026-11-23",
+      "venue": "福島",
+      "surface": "dirt",
+      "race_name": "奥羽ステークス",
+      "race_no": 11,
+      "grade": "prospective_strict",
+      "status": "reviewed",
+      "cutoff_at": "2026-11-23T15:15:00+09:00",
+      "case_path": "data/e2e-shadow/cases/2026-11-23-ouu-stakes/case.json",
+      "result_path": "data/e2e-shadow/results/2026-11-23-ouu-stakes.json",
+      "official_result_at": "2026-11-23T10:13:00Z",
+      "official_going": "稍重",
+      "finish_order": [
+        3,
+        8,
+        10,
+        12,
+        5,
+        11,
+        9,
+        6,
+        14,
+        7,
+        13,
+        4,
+        15,
+        2,
+        1
+      ],
+      "predictions": [
+        {
+          "version": "v3.13",
+          "generated_at": "2026-11-22T23:21:27.291Z",
+          "information_cutoff_at": "2026-11-22T23:21:27.291Z",
+          "sample_origin": null,
+          "race_no": 11,
+          "race_name": "奥羽ステークス",
+          "marks": {
+            "win": 3,
+            "second": 8,
+            "third": 4
+          },
+          "pace": null,
+          "going_probabilities": {},
+          "step1_ranking": [],
+          "bets": [
+            {
+              "id": "B01",
+              "type": "枠連",
+              "selection": [
+                2,
+                4
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B02",
+              "type": "馬連",
+              "selection": [
+                4,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B03",
+              "type": "馬単",
+              "selection": [
+                4,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B04",
+              "type": "ワイド",
+              "selection": [
+                4,
+                5
+              ],
+              "stake_yen": 100
+            },
+            {
+              "id": "B05",
+              "type": "馬単",
+              "selection": [
+                5,
+                4
+              ],
+              "stake_yen": 100
+            }
+          ],
+          "proof_commit": "180109743a00eeb75fc2e6165793185524e7349d",
+          "prompt_manifest": null,
+          "prediction_path": "data/e2e-shadow/predictions/2026-11-23-ouu-stakes/v315-initial-run45082669474-attempt1-sealed.json",
+          "source_prediction_path": "e2e_validation/predictions/2026-11-23-ouu-stakes/v315-initial-run45082669474-attempt1-sealed.json"
+        }
+      ]
+    },
     {
       "race_id": "2026-11-21-fukushima-kinen",
       "date": "2026-11-21",

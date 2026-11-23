@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "model_version": "e012-shadow-v0.1",
-  "generated_at": "2026-11-21T09:44:18+00:00",
+  "generated_at": "2026-11-23T10:22:59+00:00",
   "mode": "shadow_observation_only",
   "production_effect": false,
   "collection": {
@@ -419,10 +419,10 @@
     },
     "v3.13": {
       "coverage": {
-        "prediction_entries": 31,
+        "prediction_entries": 33,
         "entries_with_experience": 0,
         "missing_experience": 0,
-        "required_entries": 31,
+        "required_entries": 33,
         "required_entries_with_experience": 0,
         "required_missing_experience": 0,
         "coverage_rate": 0.0,
@@ -1418,6 +1418,20 @@
     {
       "case": "e2e_validation/cases/2026-11-21-fukushima-kinen/case.json",
       "race_id": "2026-11-21-fukushima-kinen",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-11-23-ouu-stakes/case.json",
+      "race_id": "2026-11-23-ouu-stakes",
+      "version": "v3.13",
+      "grade": "prospective_strict",
+      "error": "race_context.race_category is required"
+    },
+    {
+      "case": "e2e_validation/cases/2026-11-23-tokyo-sports-hai-2yo-stakes/case.json",
+      "race_id": "2026-11-23-tokyo-sports-hai-2yo-stakes",
       "version": "v3.13",
       "grade": "prospective_strict",
       "error": "race_context.race_category is required"
