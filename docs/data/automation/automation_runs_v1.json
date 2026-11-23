@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-23T09:19:05+00:00",
+ "generated_at": "2026-11-23T09:20:12+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
@@ -2399,6 +2399,28 @@
    "label": "基準に届いたかの確認・通知",
    "runs": [
     {
+     "id": 45146007603,
+     "event": "push",
+     "created_at": "2026-11-23T09:19:42Z",
+     "started_at": "2026-11-23T09:19:42Z",
+     "ended_at": "2026-11-23T09:20:07Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
+    {
+     "id": 45145986119,
+     "event": "push",
+     "created_at": "2026-11-23T09:19:33Z",
+     "started_at": "2026-11-23T09:19:33Z",
+     "ended_at": "2026-11-23T09:19:52Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
+    {
      "id": 45051640096,
      "event": "schedule",
      "created_at": "2026-11-22T17:50:01Z",
@@ -2695,13 +2717,46 @@
    "label": "Claudeの予想の採点・公開",
    "runs": [
     {
+     "id": 45146007599,
+     "event": "push",
+     "created_at": "2026-11-23T09:19:42Z",
+     "started_at": "2026-11-23T09:19:42Z",
+     "ended_at": "2026-11-23T09:20:10Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
+    {
+     "id": 45145985944,
+     "event": "push",
+     "created_at": "2026-11-23T09:19:33Z",
+     "started_at": "2026-11-23T09:19:33Z",
+     "ended_at": "2026-11-23T09:19:51Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
+    {
+     "id": 45145907870,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-23T09:19:01Z",
+     "started_at": "2026-11-23T09:19:01Z",
+     "ended_at": "2026-11-23T09:19:28Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "O"
+    },
+    {
      "id": 45145858860,
      "event": "workflow_dispatch",
      "created_at": "2026-11-23T09:18:41Z",
      "started_at": "2026-11-23T09:18:41Z",
-     "ended_at": null,
-     "status": "in_progress",
-     "conclusion": null,
+     "ended_at": "2026-11-23T09:19:12Z",
+     "status": "completed",
+     "conclusion": "success",
      "attempt": 1,
      "by": "O"
     },
