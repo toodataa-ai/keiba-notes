@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.65-20261122",
-  "current_public_version": "1.65",
+  "current_public_release": "release/jra-site-v1.66-20261124",
+  "current_public_version": "1.66",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1386,6 +1386,27 @@
         "docs/this-week.html",
         "docs/results.html",
         "docs/assets/claude-view-v1.js"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.66-20261124",
+      "branch": "release/jra-site-v1.66-20261124",
+      "commit_sha": "68552a2264f90649d8d9045448bf52251ecd7924",
+      "deployed_at": "2026-11-24T06:31:32+09:00",
+      "workflow_run_id": 45270438865,
+      "validation_workflow_run_id": 45270438865,
+      "public_version": "1.66",
+      "note": "2026-11-24ユーザー明示承認済み。改善状況ページ：上位3頭のワイドの比較の進捗を表示＋購入セットの表示名を変更：各テーマの進捗まとめに『上位3頭のワイド』の行（比較 n/20レース・回収率）と説明・登録前の参考値を追加。『購入セット』の表示名を『1頭への偏り是正』に変更。データは claude_experiments_v1.json の marks_wide。予想・買い目は変更なし。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-marks-wide-progress-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/improvement-cycle.html"
       ],
       "public_http_files_verified": null
     }
