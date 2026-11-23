@@ -3,7 +3,7 @@
   "date": "2026-11-23",
   "meeting_id": "2026-11-21-to-2026-11-23",
   "observed_at": "2026-11-23T10:13:00Z",
-  "status": "REVIEW_RECORDS_PREPARED_GRADE_A_CI_AND_PUBLIC_HTTP_PENDING",
+  "status": "REVIEWED_GRADE_A_PUBLISHED_PUBLIC_HTTP_PARITY_VERIFIED",
   "official_result_confirmed_races": [
     "2026-11-23-tokyo-sports-hai-2yo-stakes",
     "2026-11-23-ouu-stakes"
@@ -35,11 +35,37 @@
   },
   "publication_verification": {
     "source_prerace_proof_bets_unchanged": true,
-    "github_actions_result": "pending",
-    "public_http_byte_parity_verified": false
+    "formal_grade_a_strict_cases_validated": true,
+    "jra_postrace_action_run_id": 45155534350,
+    "github_actions_result": "success",
+    "public_http_byte_parity_verified": true,
+    "pages_deployment_run_id": 45155595669,
+    "pages_deployment_result": "success",
+    "pdf_reader_guard_run_id": 45155534578,
+    "pdf_reader_guard_result": "success",
+    "review_coverage_run_id": 45155534480,
+    "review_coverage_result": "success",
+    "settlement_validation_run_id": 45155534325,
+    "settlement_validation_result": "success",
+    "independent_general_e2e_run_id": 45155534692,
+    "independent_general_e2e_result": "failure_shadow_research_error_ledger",
+    "independent_general_e2e_formal_prediction_step": "success",
+    "proof_commit_retrieval": true
   },
   "blockers": [
-    "2026-11-22-shimotsuki-stakes and 2026-11-22-mile-championship have no immutable prereace canonical prediction HTML/PDF or Grade A source proof.",
-    "Grade A CI, derived status publication and Pages HTTP byte parity await follow-up verification after data commit."
-  ]
+    "The Nov 22 Shimotsuki Stakes and Mile Championship have no sealed canonical formal prereace prediction; never backfill retrospectively; six-of-six completion/weekly A/B/C approval is blocked.",
+    "The unrelated general E2E workflow's E0/E1/E2 Shadow known-error ledger is stale (new entries without matching ledger); do not weaken research evidence gate or rewrite historical sealed predictions."
+  ],
+  "validation_verification": {
+    "formal_main_grade_a_verified_cases": [
+      "2026-11-23-ouu-stakes",
+      "2026-11-23-tokyo-sports-hai-2yo-stakes"
+    ],
+    "formal_case_count_after": 37,
+    "expected_weekly_main_count": 6,
+    "reviewed_weekly_main_count": 4,
+    "weekly_improvement_decision": "not_evaluated",
+    "conservative_model_action": "no_change",
+    "source_review_commit": "5f399b59c4b89f088b4cce4c8fbdaeaf2055982f"
+  }
 }
