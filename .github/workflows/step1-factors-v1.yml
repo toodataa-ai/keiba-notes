@@ -1,0 +1,47 @@
+name: STEP1 factors (trainer strength / last-3F rank / distance aptitude, per race day)
+on:
+  workflow_dispatch:
+    inputs:
+      dates:
+        description: 'Comma-separated YYYY-MM-DD (default: today JST)'
+        required: false
+  schedule:
+    # 土日月 08:55 JST（出馬表の保存 08:40 のあと。保険。Claude の T2 からも起動して待つ）
+    - cron: '55 23 * * 5,6,0'
+permissions:
+  contents: write
+concurrency:
+  group: step1-factors
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check private data token
+        env:
+          T: ${{ secrets.PRIVATE_DATA_TOKEN }}
+        run: test -n "$T" || { echo 'PRIVATE_DATA_TOKEN is not set'; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install numpy requests beautifulsoup4
+      - name: Build step1 factors
+        run: |
+          set -euo pipefail
+          D="${{ github.event.inputs.dates }}"
+          [ -n "$D" ] || D=$(TZ=Asia/Tokyo date +%F)
+          python3 -m sim_v2.step1_factors --data private/data_v2 --dates "$D"
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/step1_factors 2>/dev/null || true
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -m "STEP1の補助データ（調教師の強さ・上がり順位・距離帯）を更新"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep 5; done

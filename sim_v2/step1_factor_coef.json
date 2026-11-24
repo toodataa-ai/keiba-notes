@@ -1,0 +1,281 @@
+{
+ "races_train": 6713,
+ "races_test": 7710,
+ "split": "2024-07-01",
+ "train_fit": {
+  "T1": 2.613,
+  "K2": 1.6071
+ },
+ "items": [
+  {
+   "name": "speed",
+   "label": "走破タイムの指数",
+   "coef_per_unit": 0.571,
+   "sd": 0.7483,
+   "mean": -0.3475,
+   "mult_per_sd": 1.533,
+   "added": false
+  },
+  {
+   "name": "peak",
+   "label": "過去最高の指数",
+   "coef_per_unit": 0.1819,
+   "sd": 1.0839,
+   "mean": -0.144,
+   "mult_per_sd": 1.218,
+   "added": false
+  },
+  {
+   "name": "kick",
+   "label": "上がりの指数",
+   "coef_per_unit": 0.3596,
+   "sd": 0.5266,
+   "mean": -0.1708,
+   "mult_per_sd": 1.209,
+   "added": false
+  },
+  {
+   "name": "early",
+   "label": "序盤の位置取り",
+   "coef_per_unit": -1.9811,
+   "sd": 0.1455,
+   "mean": 0.4668,
+   "mult_per_sd": 0.75,
+   "added": false
+  },
+  {
+   "name": "wet_power",
+   "label": "道悪の適性",
+   "coef_per_unit": -0.1577,
+   "sd": 0.0779,
+   "mean": 0.0003,
+   "mult_per_sd": 0.988,
+   "added": false
+  },
+  {
+   "name": "stamina_fit",
+   "label": "距離への適性（スタミナ）",
+   "coef_per_unit": 0.1568,
+   "sd": 0.1775,
+   "mean": 0.0993,
+   "mult_per_sd": 1.028,
+   "added": false
+  },
+  {
+   "name": "debut",
+   "label": "初出走",
+   "coef_per_unit": -0.5588,
+   "sd": 0.3109,
+   "mean": 0.1084,
+   "mult_per_sd": 0.841,
+   "added": false
+  },
+  {
+   "name": "log_runs",
+   "label": "出走数",
+   "coef_per_unit": -0.191,
+   "sd": 0.9965,
+   "mean": 1.8083,
+   "mult_per_sd": 0.827,
+   "added": false
+  },
+  {
+   "name": "finpct3",
+   "label": "近3走の着順",
+   "coef_per_unit": -0.9383,
+   "sd": 0.222,
+   "mean": 0.4602,
+   "mult_per_sd": 0.812,
+   "added": false
+  },
+  {
+   "name": "margin3",
+   "label": "近3走の着差",
+   "coef_per_unit": -0.0941,
+   "sd": 0.7082,
+   "mean": 1.1861,
+   "mult_per_sd": 0.936,
+   "added": false
+  },
+  {
+   "name": "lninki3",
+   "label": "近3走の人気",
+   "coef_per_unit": -0.2555,
+   "sd": 0.6377,
+   "mean": 1.7437,
+   "mult_per_sd": 0.85,
+   "added": false
+  },
+  {
+   "name": "level_diff",
+   "label": "前走からのクラス差",
+   "coef_per_unit": 0.1759,
+   "sd": 0.8551,
+   "mean": 0.011,
+   "mult_per_sd": 1.162,
+   "added": false
+  },
+  {
+   "name": "log_days",
+   "label": "前走からの間隔",
+   "coef_per_unit": 0.0029,
+   "sd": 1.3875,
+   "mean": 3.3118,
+   "mult_per_sd": 1.004,
+   "added": false
+  },
+  {
+   "name": "carried_diff",
+   "label": "斤量（平均との差）",
+   "coef_per_unit": 0.0195,
+   "sd": 0.8675,
+   "mean": -0.0258,
+   "mult_per_sd": 1.017,
+   "added": false
+  },
+  {
+   "name": "draw",
+   "label": "馬番（内→外）",
+   "coef_per_unit": 0.101,
+   "sd": 0.3133,
+   "mean": 0.5038,
+   "mult_per_sd": 1.032,
+   "added": false
+  },
+  {
+   "name": "age_diff",
+   "label": "年齢（平均との差）",
+   "coef_per_unit": -0.3023,
+   "sd": 0.679,
+   "mean": 0.0,
+   "mult_per_sd": 0.814,
+   "added": false
+  },
+  {
+   "name": "sd",
+   "label": "能力のばらつき",
+   "coef_per_unit": 0.1509,
+   "sd": 0.4821,
+   "mean": 0.9592,
+   "mult_per_sd": 1.075,
+   "added": false
+  },
+  {
+   "name": "jockey",
+   "label": "騎手",
+   "coef_per_unit": 0.6212,
+   "sd": 0.3755,
+   "mean": -0.0101,
+   "mult_per_sd": 1.263,
+   "added": false
+  },
+  {
+   "name": "dist_up",
+   "label": "距離延長",
+   "coef_per_unit": -1.3206,
+   "sd": 0.0838,
+   "mean": 0.0396,
+   "mult_per_sd": 0.895,
+   "added": false
+  },
+  {
+   "name": "dist_down",
+   "label": "距離短縮",
+   "coef_per_unit": 0.3403,
+   "sd": 0.0832,
+   "mean": 0.0385,
+   "mult_per_sd": 1.029,
+   "added": false
+  },
+  {
+   "name": "surf_switch",
+   "label": "芝ダートの替わり",
+   "coef_per_unit": -0.1032,
+   "sd": 0.3125,
+   "mean": 0.1097,
+   "mult_per_sd": 0.968,
+   "added": false
+  },
+  {
+   "name": "bw_diff_abs",
+   "label": "馬体重の増減幅",
+   "coef_per_unit": -0.0484,
+   "sd": 0.4314,
+   "mean": 0.4342,
+   "mult_per_sd": 0.979,
+   "added": false
+  },
+  {
+   "name": "bw_diff",
+   "label": "馬体重の増減",
+   "coef_per_unit": -0.0041,
+   "sd": 0.6107,
+   "mean": 0.042,
+   "mult_per_sd": 0.997,
+   "added": false
+  },
+  {
+   "name": "sire_surf",
+   "label": "父の芝ダート傾向",
+   "coef_per_unit": 0.2327,
+   "sd": 0.1638,
+   "mean": 0.0793,
+   "mult_per_sd": 1.039,
+   "added": false
+  },
+  {
+   "name": "sire_debut_x_debut",
+   "label": "父の初出走成績×初出走",
+   "coef_per_unit": 1.8137,
+   "sd": 0.0337,
+   "mean": 0.0016,
+   "mult_per_sd": 1.063,
+   "added": false
+  },
+  {
+   "name": "sire_surf_x_young",
+   "label": "父の芝ダート傾向×若駒",
+   "coef_per_unit": 0.7512,
+   "sd": 0.0941,
+   "mean": 0.0231,
+   "mult_per_sd": 1.073,
+   "added": false
+  },
+  {
+   "name": "T1",
+   "label": "調教師の強さ",
+   "coef_per_unit": 2.2909,
+   "sd": 0.0643,
+   "mean": 0.0032,
+   "mult_per_sd": 1.159,
+   "added": true
+  },
+  {
+   "name": "K2",
+   "label": "上がり順位のよさ",
+   "coef_per_unit": 1.4076,
+   "sd": 0.2013,
+   "mean": 0.3713,
+   "mult_per_sd": 1.328,
+   "added": true
+  }
+ ],
+ "T1": {
+  "name": "T1",
+  "label": "調教師の強さ",
+  "coef_per_unit": 2.2909,
+  "sd": 0.0643,
+  "mean": 0.0032,
+  "mult_per_sd": 1.159,
+  "added": true
+ },
+ "K2": {
+  "name": "K2",
+  "label": "上がり順位のよさ",
+  "coef_per_unit": 1.4076,
+  "sd": 0.2013,
+  "mean": 0.3713,
+  "mult_per_sd": 1.328,
+  "added": true
+ }
+}
