@@ -186,6 +186,22 @@
 </style>
 <link rel="stylesheet" href="assets/type-scale-v1.css?v=20261102-1">
 <link rel="stylesheet" href="assets/theme-light-v1.css?v=20261102-1">
+<style id="step1-factors-style">
+.sf-box{border:1px solid #d8dee8;border-radius:12px;background:#f6f7f9;padding:11px 13px;line-height:1.75;margin:12px 0}
+.sf-row{display:grid;grid-template-columns:minmax(8em,11em) 1fr 4.2em;gap:8px;align-items:center;margin:4px 0}
+.sf-row .sf-name{line-height:1.4}
+.sf-track{position:relative;height:16px;background:#eef0f3;border-radius:8px}
+.sf-track:before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:#8b919b}
+.sf-fill{position:absolute;top:2px;bottom:2px;border-radius:6px;background:#9aa3b0}
+.sf-row.sf-new .sf-fill{background:#2f5f94}
+.sf-row.sf-new .sf-name{font-weight:800;color:#1d4f9f}
+.sf-val{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.sf-scale{display:flex;justify-content:space-between;font-size:12px;color:#6d6e75;margin:2px 0 0;padding-left:calc(min(11em,28%) + 8px);padding-right:calc(4.2em + 8px)}
+.sf-tbl{width:100%;border-collapse:collapse;border:1px solid #d8dee8;background:#fff;margin:8px 0}
+.sf-tbl th,.sf-tbl td{padding:7px 10px;border-top:1px solid #edf0f4;text-align:left;vertical-align:top;line-height:1.55}
+.sf-tbl th{background:#f3f4f6;font-weight:800;color:#4d5663;white-space:nowrap}
+.sf-wrap{overflow-x:auto}
+</style>
 </head>
 <body>
 <header class="method-hero">
@@ -208,9 +224,9 @@
     <p class="toc-note">統計やAIの用語は、使うところで短く説明します。分からない言葉は <a href="#glossary">用語集</a> から引けます。</p>
     <div class="toc-grid">
       <a href="#flow">01　全体の流れ</a><a href="#axes">02　①〜⑨の見方</a>
-      <a href="#time">03　時計・上がり・ムラ</a><a href="#track">04　馬場と展開</a>
-      <a href="#betting">05　強い馬と買う馬を分ける</a><a href="#proof">06　後出しを防ぐしくみ</a>
-      <a href="#limits">07　まだ解けていない問題</a><a href="#glossary">08　用語集</a>
+      <a href="#datafactors">03　過去データから加えた要素</a><a href="#time">04　時計・上がり・ムラ</a>
+      <a href="#track">05　馬場と展開</a><a href="#betting">06　強い馬と買う馬を分ける</a>
+      <a href="#proof">07　後出しを防ぐしくみ</a><a href="#limits">08　まだ解けていない問題</a><a href="#glossary">09　用語集</a>
     </div>
   </section>
 
@@ -236,7 +252,7 @@
     </div>
     <div class="m-flow-notes">
       <div><b>なぜ印と買い目を分けるのか</b>人気を見てから能力を評価すると、「強いから人気」なのか「人気だから強く見える」のかが混ざります。だから先にオッズを見ずに印を固定し、価格はその後にだけ使います（STEP1の印はオッズを見ても変えません）。</div>
-      <div><b>「強い馬」と「買う馬」は別</b>◎でも単勝1.5倍なら、能力評価は◎のまま買わないことがあります。逆に△でも、価格が十分なら買い目の相手になります。詳しくは <a href="#betting">05章</a>。</div>
+      <div><b>「強い馬」と「買う馬」は別</b>◎でも単勝1.5倍なら、能力評価は◎のまま買わないことがあります。逆に△でも、価格が十分なら買い目の相手になります。詳しくは <a href="#betting">06章</a>。</div>
     </div>
   </section>
 
@@ -304,8 +320,27 @@
     <p class="m-rule-note">総合評価（A+〜C）は9項目の<strong>単純平均にはしません</strong>。①〜⑨に固定の配点や割合はなく、<strong>どれをどれだけ重く見るかも、AIがレースごとに考えて決めます</strong>。上の重視度は、その考える向きを4段階で示した目安で、機械的に計算する決まりではありません。<a href="roadmap.html">これまでの経緯は「改善の歩み（履歴）」へ</a>。</p>
   </section>
 
+  <section class="chapter anchor" id="datafactors">
+    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>過去データ分析から加えた要素と、その強さ</h2><p class="chapter-lead">前章の①〜⑨に加えて、過去のレースを分析して「確かに効く」と確かめられた3つを、<strong>計算済みの倍率</strong>として勝率に掛けています（2026年11月28日の予想から）。</p></div></div>
+    <p>ここで言う「強さ」は、<strong>その要素が標準偏差1つ分（その要素の「普通の違い」ひとつ分）だけ良いとき、勝つ確率が何倍になるか</strong>です。1.00倍が影響なし。1.33倍なら、同じ条件の馬より勝つ確率が約3割高くなる、という意味です。</p>
+    <div id="sfAdded">読み込み中…</div>
+    <h3 class="m-wt-title">既存の要素との強さの比べ方</h3>
+    <p>下の棒は、過去のレースから作った<b>能力モデル</b>（今回のオッズは使わない。LABのシミュレータの能力値と同じもの）の中で、各要素を同じ物差し（標準偏差1つ分で勝つ確率が何倍か）にそろえたものです。<span style="color:#1d4f9f;font-weight:800">青</span>が<b>今回、予想の確率に実際に掛ける3つ</b>。<span style="color:#6b7280;font-weight:800">灰色</span>はこのモデルがもともと持っている要素で、<b>予想の確率にそのまま掛ける倍率ではありません</b>（AIの予想では、①〜⑨の形で総合的に判断しています）。強さを同じ物差しで比べるための参考です。中央の線が1.00倍（影響なし）で、右へ伸びるほど「数字が大きいほど有利」、左へ伸びるほど「数字が大きいほど不利」を表します（例：序盤の位置取りは、数字が大きいほど後方から行く馬なので、左＝後ろから行く馬ほど不利）。各要素の意味は下の「各要素の意味」を開いてください。</p>
+    <details class="sf-box" id="sfGloss"><summary style="cursor:pointer;font-weight:800">各要素の意味（タップで開く）</summary><div id="sfGlossBody" style="margin-top:8px">読み込み中…</div></details>
+    <div class="sf-box" id="sfBars">読み込み中…</div>
+    <h3 class="m-wt-title">既存の要素との重なり（二重に数えない工夫）</h3>
+    <div class="sf-box" id="sfOverlap">読み込み中…</div>
+    <p class="m-rule-note">実際の予想（STEP1）はAIがレースごとに判断し、この3つは「AIの見積もりの勝率に、計算済みの倍率を掛ける」形で加えます。<strong>AIは「上がりが速い」「厩舎が強い」だけを理由に、勝率をさらに上げません</strong>（その理由は倍率に入っているため）。</p>
+    <h3 class="m-wt-title">注意</h3>
+    <ul class="m-rule-note" style="padding-left:18px">
+      <li>この3つはオッズにも一部織り込まれています。<strong>確率の見積もりの精度を上げるための補正</strong>で、「人気より妙味がある」という根拠にはしません。</li>
+      <li>9項目を試して2項目が残った（距離帯を含めると全体で3項目）ため、偶然の可能性は残ります。実際の効き方は、通常の確率の当たり具合の記録で見ていきます。</li>
+      <li>試して採用しなかった要素（延長・短縮・得意距離、淀みないペースで先行して上がりも速い馬、前走のペース補正 など）は <a href="factor-screen.html#data-adopt">要素の検証ページ</a> に記録しています。調教師の強さの一覧は <a href="people-trends.html#trainer-strength">騎手・調教師の成績ページ</a> にあります。</li>
+    </ul>
+  </section>
+
   <section class="chapter anchor" id="time">
-    <div class="chapter-head"><div class="chapter-no">03</div><div><h2>時計・上がり・ムラは、そのまま読まない</h2><p class="chapter-lead">数字は条件をそろえてから比べます。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>時計・上がり・ムラは、そのまま読まない</h2><p class="chapter-lead">数字は条件をそろえてから比べます。</p></div></div>
     <div class="m-cards">
       <div class="m-card m-card-a">
         <h3>時計：条件をそろえて比べる</h3>
@@ -329,7 +364,7 @@
   </section>
 
   <section class="chapter anchor" id="track">
-    <div class="chapter-head"><div class="chapter-no">04</div><div><h2>馬場と展開は、ひとつに決めず「確率」で持つ</h2><p class="chapter-lead">当てる対象であると同時に、外れる可能性のある変数だからです。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>馬場と展開は、ひとつに決めず「確率」で持つ</h2><p class="chapter-lead">当てる対象であると同時に、外れる可能性のある変数だからです。</p></div></div>
     <p class="answer">発走時の馬場は「良100%」と決め打ちせず、良・稍重・重・不良の確率を合計100%で持ちます。本線が良でも、稍重の可能性は捨てません。</p>
     <p class="micro" style="margin:0">例（イメージ）：発走時の馬場の確率</p>
     <div class="m-bar" role="img" aria-label="例：良55%、稍重35%、重9%、不良1%">
@@ -365,7 +400,7 @@
   </section>
 
   <section class="chapter anchor" id="betting">
-    <div class="chapter-head"><div class="chapter-no">05</div><div><h2>強い馬と買う馬を分ける（購入セット）</h2><p class="chapter-lead">◎を当てることと、価値のある買い方を設計することは別の判断です。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>強い馬と買う馬を分ける（購入セット）</h2><p class="chapter-lead">◎を当てることと、価値のある買い方を設計することは別の判断です。</p></div></div>
     <div class="m-ladder">
       <div class="l1"><b>① 能力本線</b>STEP1で高く評価した◎○▲を中心に検討する。価格だけの理由で、能力上位をまるごと消さない。</div>
       <div class="l2"><b>② 期待値の追加</b>能力に対して価格がズレている馬（条件が合う、巻き返し候補、直接実績のある低人気馬）を、本線を壊さない範囲で足す。</div>
@@ -383,7 +418,7 @@
   </section>
 
   <section class="chapter anchor" id="proof">
-    <div class="chapter-head"><div class="chapter-no">06</div><div><h2>後出しを防ぐしくみ</h2><p class="chapter-lead">「結果を知ってから賢くなったAI」にならないための約束です。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">07</div><div><h2>後出しを防ぐしくみ</h2><p class="chapter-lead">「結果を知ってから賢くなったAI」にならないための約束です。</p></div></div>
     <p class="answer">過去のレースで試して当たっても、結果を知らなかった証明にはなりません。そこで、予想を<strong>発走前に公開の場所へ保存</strong>し、その記録（コミットSHA＝内容を一意に表すID）で固定します。</p>
     <ol class="m-rail">
       <li><span class="m-dot">1</span><div><b>情報の時点をそろえる</b><p>発走前に公開された公式の資料だけを使い、結果や払戻は混ぜない。</p></div></li>
@@ -409,7 +444,7 @@
   </section>
 
   <section class="chapter anchor" id="limits">
-    <div class="chapter-head"><div class="chapter-no">07</div><div><h2>まだ解けていない問題</h2><p class="chapter-lead">完成した予想法ではなく、検証できる研究として公開しています。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">08</div><div><h2>まだ解けていない問題</h2><p class="chapter-lead">完成した予想法ではなく、検証できる研究として公開しています。</p></div></div>
     <ul class="m-open">
       <li><span class="m-dot">1</span><div><b>評価から勝率への変換が未校正</b>印や評価は丁寧でも、「A+なら勝率何%」はまだ統計的に固まっていません。<a class="term" href="#term-calibration">確率校正</a>が次の大きな課題です。</div></li>
       <li><span class="m-dot">2</span><div><b>展開の確率分布が未完成</b>馬場は確率で持てていますが、展開はまだ主なシナリオが中心です。</div></li>
@@ -421,7 +456,7 @@
   </section>
 
   <section class="chapter anchor glossary" id="glossary">
-    <div class="chapter-head"><div class="chapter-no">08</div><div><h2>用語集</h2><p class="chapter-lead">このサイト独自の言葉と、統計・開発の言葉を短く説明します。</p></div></div>
+    <div class="chapter-head"><div class="chapter-no">09</div><div><h2>用語集</h2><p class="chapter-lead">このサイト独自の言葉と、統計・開発の言葉を短く説明します。</p></div></div>
     <details class="m-gloss" id="glossary-box">
       <summary>用語を開く（14語）</summary>
       <div class="glossary-grid">
@@ -446,6 +481,39 @@
   <div class="simple-home-bottom"><a href="index.html">トップページに戻る</a></div>
 </main>
 <footer class="wrap foot">AIによる競馬予想研究所 — JRAのメインレースを対象に、予想・検証・改善の過程を公開しています。</footer>
+<script>
+(function(){
+  function f2(x){return Number(x).toFixed(2);}
+  fetch('data/step1_factor_strength_v1.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+    var tb=document.getElementById('sfAdded'),h='';
+    d.added.forEach(function(a){
+      h+='<div class="sf-box"><b style="color:#1d4f9f">'+a.label+'</b>　<b>約'+f2(a.mult_per_sd)+'倍</b>（標準偏差1つ分）<br>'+a.what+'<br><span style="font-size:13px">掛ける倍率の範囲：'+f2(a.cap_min)+'〜'+f2(a.cap_max)+'倍／検証での改善（対数損失）：'+a.gain+'</span></div>';
+    });
+    tb.innerHTML=h;
+    var rows=d.existing.filter(function(x){return Math.abs(Math.log(x.mult_per_sd))>=0.1;}).map(function(x){return {label:x.label,m:x.mult_per_sd,n:false};})
+      .concat(d.added.map(function(a){return {label:a.label,m:a.mult_per_sd,n:true};}));
+    rows.sort(function(a,b){return Math.abs(Math.log(b.m))-Math.abs(Math.log(a.m));});
+    var max=Math.log(1.6),out='';
+    rows.forEach(function(r){
+      var v=Math.log(r.m),w=Math.min(50,Math.abs(v)/max*50),left=v>=0?50:50-w;
+      out+='<div class="sf-row'+(r.n?' sf-new':'')+'"><span class="sf-name">'+r.label+(r.n?'（追加）':'')+'</span><div class="sf-track" aria-hidden="true"><div class="sf-fill" style="left:'+left+'%;width:'+w+'%"></div></div><span class="sf-val">'+f2(r.m)+'倍</span></div>';
+    });
+    out+='<p class="m-rule-note" style="margin:8px 0 0">影響が小さい要素（1.10倍未満・0.91倍より上）は省いています。</p>';
+    document.getElementById('sfBars').innerHTML=out;
+    var G={'走破タイムの指数':'過去の走破タイムを、同じ競馬場・距離・馬場の基準タイムと比べた速さ（近走ほど重く平均）。大きいほど速い。','過去最高の指数':'過去の走で出した走破タイム指数のいちばん高い値。「出せる上限」を表す。大きいほど有利。','上がりの指数':'上がり3Fが同じ条件の基準よりどれだけ速かったか（近走ほど重く平均）。大きいほど末脚が速い。','序盤の位置取り':'過去の1コーナーでの位置（先頭＝0、最後方＝1）。数字が大きいほど後方から行く馬。後ろから行く馬ほど不利に出る。','道悪の適性':'重・不良のときの指数が、良のときよりどれだけ良いか。道悪の日だけ効く。','距離への適性（スタミナ）':'長い距離での指数と短い距離での指数の差。今回の距離が長いほど効く。','初出走':'デビュー戦なら1。過去のデータが無いぶんの割り引き。','出走数':'これまでの出走回数（対数）。多いほど数字が大きい。','近3走の着順':'近3走の着順の位置（1着＝0、最下位＝1）の平均。大きいほど成績が悪い。','近3走の着差':'近3走の勝ち馬との着差の平均。大きいほど離されている。','近3走の人気':'近3走の人気（対数）の平均。大きいほど人気が無かった。','前走からのクラス差':'前走のクラスが今回より高いほど大きい。上のクラスから来た馬ほど有利。','前走からの間隔':'前走から今回までの日数（対数）。','斤量（平均との差）':'今回のメンバーの平均斤量との差。重いほど大きい。','馬番（内→外）':'馬番の位置（1番＝0、最大頭数＝1）。','年齢（平均との差）':'今回のメンバーの平均年齢との差。高いほど大きい。','能力のばらつき':'近走の指数のムラの大きさ。','騎手':'その騎手の過去の勝ち数が、人気から見た期待をどれだけ上回っているか（A/E）。','距離延長':'前走より距離が延びた度合い（延びた分だけ大きい。短縮は0）。能力モデルにもともと入っている小さな要素。','距離短縮':'前走より距離が縮んだ度合い。','芝ダートの替わり':'前走と芝・ダートが違えば1。','馬体重の増減幅':'前走からの馬体重の増減の大きさ（絶対値）。','馬体重の増減':'前走からの馬体重の増減（増えるほど大きい）。','父の芝ダート傾向':'その父の産駒が今回の芝・ダートで、人気から見た期待をどれだけ上回るか。','父の初出走成績×初出走':'デビュー戦のときだけ、その父の産駒の初出走成績を見る。','父の芝ダート傾向×若駒':'3戦以下の若い馬のときだけ、父の芝ダート傾向を見る。'};
+    var gl='<dl style="margin:0">';
+    d.existing.forEach(function(x){gl+='<dt style="font-weight:800;margin-top:6px">'+x.label+'　<span style="font-weight:400;color:#6d6e75">'+f2(x.mult_per_sd)+'倍</span></dt><dd style="margin:0 0 0 0">'+(G[x.label]||'（説明準備中）')+'</dd>';});
+    gl+='</dl>';
+    document.getElementById('sfGlossBody').innerHTML=gl;
+    var ov=d.overlap,eb=document.getElementById('sfOverlap');
+    if(ov){
+      var k=ov.K2,t=ov.T1;
+      eb.innerHTML='<b>上がり順位 と 既存の「上がりの指数」</b>：似た情報で、数字の関係（相関。0＝無関係、1＝同じ）は<b>'+k.ref_corr.toFixed(2)+'</b>。もし上がりの指数を外すと、上がり順位の強さは約'+f2(k.mult_without_ref)+'倍に上がります。逆に、上がり順位を足すと、既存の上がりの指数の強さは約'+f2(k.ref_mult_before)+'倍→'+f2(k.ref_mult_after)+'倍に下がります。つまり<b>重なっている分は、上の「約'+f2(k.joint_mult)+'倍」にすでに差し引かれています</b>。<br><br><b>調教師の強さ と 既存の「騎手」</b>：相関は<b>'+t.ref_corr.toFixed(2)+'</b>。騎手を外すと調教師の強さは約'+f2(t.mult_without_ref)+'倍に上がり、足すと騎手の強さは約'+f2(t.ref_mult_before)+'倍→'+f2(t.ref_mult_after)+'倍に下がります。調教師の強さの「約'+f2(t.joint_mult)+'倍」も、重なりを差し引いたあとの数字です。<br><br><b>上がり順位と調教師の強さ どうしの重なり</b>は小さく（単独で足したときの強さと一緒に足したときの強さがほぼ同じ：上がり順位 '+f2(k.alone_mult)+'→'+f2(k.joint_mult)+'倍、調教師 '+f2(t.alone_mult)+'→'+f2(t.joint_mult)+'倍）、3つの倍率はそのまま掛け合わせます。<br><br><b>数字の例</b>（2026-11-23 東京11R）：調教師 1.25倍 × 上がり順位 1.44倍 × 距離帯 1.08倍 ＝ 約1.94倍。AIの見積もり10%の馬は約19%に上がり、全頭の合計が100%になるよう直します（他の馬の倍率しだいで、最終の数字は動きます）。';
+    }
+
+  }).catch(function(){document.getElementById('sfBars').textContent='データを読み込めませんでした。';});
+})();
+</script>
 <script>
 fetch('data/latest_prompt.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(p){
   document.getElementById('livePrompt').textContent=p.version||'—';

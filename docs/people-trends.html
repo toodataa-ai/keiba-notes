@@ -48,6 +48,30 @@
 <p class="lead">2018年以降のJRAの平地レースで、<strong>騎手・調教師ごとの成績と、条件別（芝ダート・距離・競馬場・コース・人気）の得意不得意、騎手のレーダーチャート</strong>をまとめました。人気（オッズ）の影響は除いてあります。</p>
 </header>
 
+<style>
+.pp-toc{border:1px solid #e3e4e8;border-radius:12px;background:#f6f7f9;padding:12px 14px;margin:14px 0}
+.pp-toc b{font-size:15px}
+.pp-toc h3{margin:10px 0 2px;font-size:12px;font-weight:400;color:#6d6e75}
+.pp-toc ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:0}
+.pp-toc li{margin:0;padding:0}
+.pp-toc li a{display:block;padding:7px 0;color:#1d4f9f;font-weight:700;font-size:14px;text-decoration:none;border-bottom:1px solid #e9eaee}
+</style>
+<div class="pp-toc" role="navigation" aria-label="このページの目次">
+<b>目次</b>
+<h3>予想に使う</h3>
+<ul><li><a href="#trainer-strength">調教師の強さ</a></li></ul>
+<h3>研究（予想には使っていない）</h3>
+<ul><li><a href="#howTitle">数字の読み方</a></li><li><a href="#radTitle">騎手のレーダー</a></li><li><a href="#rlTitle">レーダー（人気に対して）</a></li><li><a href="#crsTitle">コースから探す</a></li><li><a href="#listTitle">騎手・調教師の一覧</a></li><li><a href="#noteTitle">注意</a></li></ul>
+</div>
+<section aria-labelledby="tsTitle" id="trainer-strength">
+<h2 id="tsTitle">調教師の強さ（予想に使う指標）</h2>
+<p class="sub" id="tsMeta">読み込み中…</p>
+<div class="pp-note" style="margin:0 0 8px">レースの条件によらない、<b>調教師そのものの強さ</b>です。2018年以降のJRAの全出走での<b>3着内率</b>を、全体の3着内率と比べた差＝「強さ」（走数が少ない人は全体に近づけて計算）。「3着内」は3着内率、「倍率」は予想で勝率に掛ける倍率。予想では、この差から計算した<b>倍率（約0.80〜1.25倍）</b>を、その厩舎の馬の勝率に掛けます（2026年11月28日の予想から）。強さの比べ方は <a href="methodology.html#datafactors">AI予想のしくみ 03章</a>、試して採用しなかった要素は <a href="factor-screen.html#data-adopt">要素の検証</a>。</div>
+<input class="pp-search" id="tsQ" type="search" placeholder="調教師名で探す（例：友道）" aria-label="調教師名で探す">
+<div id="tsList" style="overflow-x:auto"></div>
+<p class="pp-note" id="tsMore"></p>
+</section>
+
 <section aria-labelledby="howTitle">
 <h2 id="howTitle">数字の読み方</h2>
 <div class="pp-box">
@@ -121,7 +145,7 @@
 
 <section aria-labelledby="noteTitle">
 <h2 id="noteTitle">注意</h2>
-<p class="pp-note">過去の成績であって、次のレースを当てる保証ではありません。予想には使っていません（使えるかを研究するための材料です）。出走数が少ない人（2018年以降で300走未満）は載せていません。条件別は60走以上の条件だけを載せています。</p>
+<p class="pp-note">過去の成績であって、次のレースを当てる保証ではありません。騎手と条件別の成績は予想には使っていません（使えるかを研究するための材料です）。上の「調教師の強さ」だけは、2026年11月28日の予想から確率の補正に使います。出走数が少ない人（2018年以降で300走未満）は載せていません。条件別は60走以上の条件だけを載せています。</p>
 </section>
 </div>
 <script>
@@ -338,6 +362,29 @@ fetch('data/people_courses_v1.json',{cache:'no-store'}).then(function(r){return 
 fetch('data/people_trends_v1.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){D=d;findings();render()}).catch(function(){$('ppMeta').textContent='データを読み込めませんでした。時間をおいて開き直してください。';$('ppFind').textContent=''});
 })();
 </script>
-  <script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
+  <script>
+(function(){
+  var TS=null,SHOW=30;
+  function pc(x,d){return (x*100).toFixed(d==null?1:d)+'%';}
+  function sg(x){return (x>=0?'+':'−')+Math.abs(x*100).toFixed(1)+'pt';}
+  function rend(){
+    if(!TS)return;
+    var q=(document.getElementById('tsQ').value||'').replace(/\s/g,'');
+    var rows=TS.trainers.map(function(t,i){return {t:t,rank:i+1};}).filter(function(r){return !q||r.t.name.replace(/\s/g,'').indexOf(q)>=0;});
+    var more=rows.length>SHOW&&!q; var list=q?rows:rows.slice(0,SHOW);
+    var h='<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:right;color:#6d6e75;font-size:12px"><th style="font-weight:400;white-space:nowrap">順位</th><th style="text-align:left;font-weight:400;white-space:nowrap">調教師</th><th style="font-weight:400;white-space:nowrap">強さ</th><th style="font-weight:400;white-space:nowrap">3着内</th><th style="font-weight:400;white-space:nowrap">走数</th><th style="font-weight:400;white-space:nowrap">倍率</th></tr></thead><tbody>';
+    list.forEach(function(r){var t=r.t;h+='<tr style="border-top:1px solid #f0f0f3;text-align:right;font-variant-numeric:tabular-nums"><td style="padding:6px 4px">'+r.rank+'</td><td style="text-align:left;white-space:nowrap">'+t.name+(t.loc?'<small style="color:#6d6e75">（'+t.loc+'）</small>':'')+'</td><td>'+sg(t.t1)+'</td><td>'+pc(t.top3)+'</td><td>'+t.runs+'</td><td><b>'+t.mult.toFixed(2)+'倍</b></td></tr>';});
+    h+='</tbody></table>';
+    document.getElementById('tsList').innerHTML=h;
+    document.getElementById('tsMore').textContent=more?('上位'+SHOW+'人を表示しています（全'+rows.length+'人）。名前で探すと全員から選べます。'):'';
+  }
+  fetch('data/trainer_strength_v1.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+    TS=d;
+    document.getElementById('tsMeta').textContent='直近1年に'+30+'走以上した調教師'+d.trainers.length+'人。2018年以降の全体の3着内率は'+pc(d.base_top3)+'。更新：'+d.generated+'（自動更新はなし。取得が進んだら作り直します）';
+    document.getElementById('tsQ').addEventListener('input',rend);rend();
+  }).catch(function(){document.getElementById('tsMeta').textContent='データを読み込めませんでした。';});
+})();
+</script>
+<script src="assets/visitor-counter.js?v=20261031-analytics-v1" defer></script>
 </body>
 </html>
