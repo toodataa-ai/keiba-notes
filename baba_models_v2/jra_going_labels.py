@@ -224,7 +224,21 @@ def cmd_update(a):
 
 def cmd_probe(a):
     cl = Client(a.delay)
-    html = cl.post(a.cname)
+    if a.cname == 'LAST':          # 種の月から次の月へたどれるところまで行き、最後の月のページの中身を見る
+        known = {SEED_MONTH[0]: SEED_MONTH[1]}; ym = SEED_MONTH[0]; html = ''
+        while True:
+            html = cl.post(known[ym])
+            months, _ = parse_month(html)
+            for k, v in months.items():
+                known.setdefault(k, v)
+            nx = '%04d%02d' % ((int(ym[:4]) + 1, 1) if ym[4:] == '12' else (int(ym[:4]), int(ym[4:]) + 1))
+            if nx not in known:
+                break
+            ym = nx
+        print('last reachable month', ym, 'known months', sorted(known))
+        a.cname = known[ym]
+    else:
+        html = cl.post(a.cname)
     names = sorted(set(re.findall(r"accessS\.html['\"]\s*,\s*['\"]([^'\"]+)['\"]", html)))
     print('cname', a.cname, 'len', len(html), 'links', len(names))
     byp = {}
