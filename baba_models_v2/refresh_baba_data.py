@@ -1,7 +1,7 @@
 """馬場の学習データを最新にする（週1回の自動更新用。方法は変えず、足りない最近分だけ取り直して結合し、学習用の表を作り直す）。
 
 流れ：①気象庁の時間別データ（直近 SINCE_DAYS 日ぶんを取り直して結合）②JRA公式の含水率・クッション値・使用コース（今年ぶんを取り直して結合）
-③芝のA〜D（今年ぶんを取り直して結合）④stage_b_dataset 作り直し ⑤馬場の状態判定（使える見込み／予報待ち／まだ足りない）の再計算と画面用データの作り直し。
+③芝のA〜D（今年ぶんを取り直して結合）④stage_b_dataset 作り直し （競馬場ごとの判定の再計算は、全競馬場共通の方式にしたため行わない）
 全部できたときだけ置き換える（途中で失敗したら、作業中の変更を元に戻して失敗を記録）。記録：docs/data/derived_refresh_v1.json の baba_data。
 使い方：cd baba_models_v2 && python3 refresh_baba_data.py [--today YYYY-MM-DD] [--skip-fetch]"""
 from __future__ import annotations
@@ -125,11 +125,9 @@ def rebuild(today: date, check_recent: bool = True):
         note["recent_moisture_missing"] = round(float(recent["moist0"].isna().mean()), 3)
         if check_recent and note["recent_weather_missing"] > 0.2:
             raise RuntimeError(f"直近60日のレースで気象データが欠けている（{note['recent_weather_missing']:.0%}）。取り直しが足りない")
-    run([sys.executable, "stage_b_status.py"])
-    run([sys.executable, "apply_going_status.py"])
-    run([sys.executable, "build_dashboard_data.py"])
-    st = json.loads((HERE / "stage_b/status_v1.json").read_text(encoding="utf-8"))
-    return {"rows": len(d1), "through": str(d1["date"].max())[:10], "rows_before": before[0] if before else None, "status_as_of": st.get("as_of"), **note}
+    # 競馬場ごとの「使える見込み／予報待ち」の判定は、馬場予測を全10競馬場共通の方式にした（2026-11-15）ため、使うかどうかを決めるものではなくなった。
+    # 作り直さない（stage_b_status.py などは手動で実行できるまま残す）。
+    return {"rows": len(d1), "through": str(d1["date"].max())[:10], "rows_before": before[0] if before else None, **note}
 
 
 def record(entry):
@@ -152,7 +150,7 @@ def main():
     a = ap.parse_args()
     today = date.fromisoformat(a.today) if a.today else datetime.now(JST).date()
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M")
-    label = "馬場の学習データ（気象・含水率・コース）と馬場予測の判定"
+    label = "馬場の学習データ（気象・含水率・コース）"
     try:
         info = {}
         with tempfile.TemporaryDirectory() as td:
@@ -160,7 +158,7 @@ def main():
                 info = fetch_and_merge(today, Path(td))
             res = rebuild(today, check_recent=not a.skip_fetch)
         entry = {"id": "baba_data", "label": label, "status": "ok", "at": now, "data_through": res["through"],
-                 "note": f"表 {res['rows_before']}→{res['rows']}行（含水率がまだ無い直近{res.get('held_back_no_moisture')}レースは次回に回す）、直近60日{res.get('recent_rows', 0)}レースの欠け（気象 {res.get('recent_weather_missing')}・含水率 {res.get('recent_moisture_missing')}）", "outputs": ["baba_models_v2/stage_b/stage_b_dataset.csv.gz", "baba_models_v2/model_registry.json"]}
+                 "note": f"表 {res['rows_before']}→{res['rows']}行（含水率がまだ無い直近{res.get('held_back_no_moisture')}レースは次回に回す）、直近60日{res.get('recent_rows', 0)}レースの欠け（気象 {res.get('recent_weather_missing')}・含水率 {res.get('recent_moisture_missing')}）", "outputs": ["baba_models_v2/stage_b/stage_b_dataset.csv.gz"]}
         record(entry)
         print("OK", entry["note"])
         return 0
