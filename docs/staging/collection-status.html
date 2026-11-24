@@ -43,7 +43,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/sire-map.html">種牡馬の初勝利マップ</a></nav>
 
@@ -61,7 +61,7 @@
 
 <section aria-labelledby="progTitle">
 <h2 id="progTitle">どこまで進んだか</h2>
-<p class="sub">集める目標は、2018年以降にJRAが開催した全レースです。</p>
+<p class="sub">集める目標は、2018年以降にJRAが開催した全レースです。新しく開催されたレースは、毎日朝に一覧へ自動で足して取得します（目標の数も、そのぶん増えます）。</p>
 <div class="cs-bar"><div class="cs-bar-head"><b>馬ごとの過去の成績（出走履歴）</b><span id="pPastTxt"></span></div><div class="cs-track"><div class="cs-fill a" id="pPastBar"></div></div></div>
 <div class="cs-years" id="csYears" aria-label="年ごとの進み具合"></div>
 <div class="cs-bar" style="margin-top:20px"><div class="cs-bar-head"><b>レースごとの詳細（ラップ・通過順位・払戻）</b><span id="pPageTxt"></span></div><div class="cs-track"><div class="cs-fill b" id="pPageBar"></div></div></div>
@@ -83,6 +83,14 @@
 <li>ラップや通過順位など、レース展開の研究の材料</li>
 </ul>
 <p class="cs-note">いまのところ、予想には使っていません。研究の結果は<a href="staging/improvement-cycle.html">予想の改善状況</a>と<a href="staging/sire-map.html">種牡馬の初勝利マップ</a>で見られます。</p>
+</section>
+
+<section aria-labelledby="refTitle">
+<h2 id="refTitle">各ページ・予想で使う数字の更新</h2>
+<p class="sub">集めたデータをもとに作る数字（調教師の強さなど）は、毎週水曜の朝に、最新のデータで同じ方法のまま作り直します。</p>
+<ul class="cs-list" id="csRefresh"><li>読み込み中…</li></ul>
+<p class="cs-note" id="csRefreshMeta"></p>
+<p class="cs-note">STEP1の係数が前回から大きく動いたときは、自動では置き換えず、確認のため止めて記録します。</p>
 </section>
 
 <section aria-labelledby="keepTitle">
@@ -134,12 +142,29 @@ function years(){
   $('csYears').innerHTML=h;
 }
 function pace(){
-  var g=S.growth,el=$('csPace');
-  if(!g){el.hidden=true;return}
-  var t='直近'+g.days+'日の平均で、<b>1日に約'+fmt(g.per_day.run_rows)+'件</b>（'+fmt(g.per_day.races_done)+'レース分）ずつ増えています。';
-  if(g.eta_days_past_races!=null)t+=' このペースなら、出走履歴の取得は<b>あと約'+fmt(g.eta_days_past_races)+'日</b>で全レースに届く見込みです。';
-  if(g.eta_days_race_pages!=null)t+=' レースの詳細は<b>あと約'+fmt(g.eta_days_race_pages)+'日</b>です。';
+  var g=S.growth,el=$('csPace'),pd=S.past_races,done=pd.done>=pd.total,t='';
+  if(done){
+    t='いまは取得済みのレースがすべて揃っています（'+fmt(pd.done)+'レース）。新しく開催されたレースは、毎日朝に自動で足して取得します。';
+  }else if(g&&g.per_day&&g.per_day.races_done>0){
+    t='直近'+g.days+'日の平均で、<b>1日に約'+fmt(g.per_day.races_done)+'レース分</b>（出走履歴で約'+fmt(g.per_day.run_rows)+'件）ずつ増えています。';
+    if(g.eta_days_past_races!=null)t+=' このペースなら、出走履歴の取得は<b>あと約'+fmt(g.eta_days_past_races)+'日</b>で全レースに届く見込みです。';
+    if(g.eta_days_race_pages!=null&&S.race_pages&&S.race_pages.done<S.race_pages.total)t+=' レースの詳細は<b>あと約'+fmt(g.eta_days_race_pages)+'日</b>です。';
+  }else{
+    t='取得は続いています（残り'+fmt(pd.total-pd.done)+'レース）。増え方は、数日たまると表示します。';
+  }
   el.innerHTML=t;el.hidden=false;
+}
+function refresh(){
+  var el=$('csRefresh');if(!el)return;
+  fetch('data/derived_refresh_v1.json',{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
+    var h='',bad=0;
+    (d.jobs||[]).forEach(function(j){
+      var ok=j.status==='ok';if(!ok)bad++;
+      h+='<li><b>'+j.label+'</b>：'+(ok?'更新済み（'+j.at+'、'+(j.data_through||'').replace(/-/g,'/')+'開催分まで）':'<span style="color:#b3261e">作り直せませんでした</span>'+(j.last_ok_at?'（前回成功：'+j.last_ok_at+'）':'')+(j.error?'。'+j.error:''))+'</li>';
+    });
+    el.innerHTML=h||'<li>まだ記録がありません（最初の実行は毎週水曜の朝です）</li>';
+    var m=$('csRefreshMeta');if(m)m.textContent=d.generated_at?'最終実行：'+d.generated_at+'　／　取得済みのデータは '+(d.data_through||'').replace(/-/g,'/')+' 開催分まで'+(bad?'　／　失敗 '+bad+' 件':''):'';
+  }).catch(function(){el.innerHTML='<li>記録を読み込めませんでした</li>'});
 }
 function chart(){
   var svg=$('csChart'),pts=(H&&H.points)||[],W=600,Hh=170,L=52,R=14,T=14,B=26;
@@ -170,7 +195,7 @@ function render(){
   meta();tiles();
   bar('pPastBar','pPastTxt',S.past_races.done,S.past_races.total);
   bar('pPageBar','pPageTxt',S.race_pages.done,S.race_pages.total);
-  years();pace();chart();
+  years();pace();chart();refresh();
 }
 Array.prototype.forEach.call(document.querySelectorAll('.cs-seg button'),function(b){b.onclick=function(){
   KEY=b.getAttribute('data-k');
