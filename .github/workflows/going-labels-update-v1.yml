@@ -34,7 +34,7 @@ jobs:
           git add baba_models_v2/going_labels
           git diff --cached --quiet && { echo 'nothing new'; exit 0; }
           git commit -q -m "取得対象のレース一覧に、新しく開催された分を追加（自動）"
-          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep $((i*3)); done
+          ok=0; for i in 1 2 3 4 5; do if git pull --rebase --autostash -q origin main && git push -q origin HEAD:main; then ok=1; break; fi; sleep $((i*3)); done; [ "$ok" = 1 ] || { echo 'push failed'; exit 1; }
       - name: Start the crawlers (horses and race pages) now instead of waiting for their 6-hour schedule
         if: ${{ steps.upd.outputs.new != '' && steps.upd.outputs.new != '0' }}
         env:

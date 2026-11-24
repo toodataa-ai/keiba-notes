@@ -30,7 +30,7 @@ jobs:
           path: private
       - uses: actions/setup-python@v5
         with: {python-version: '3.13'}
-      - run: pip install numpy==2.5.3 requests beautifulsoup4   # 係数の当てはめ結果が版の違いで動かないよう固定
+      - run: pip install numpy==2.5.3 pandas==3.0.5 scikit-learn==1.9.1 scipy==1.18.1 requests beautifulsoup4   # 係数の当てはめ結果が版の違いで動かないよう固定
       - run: python3 -m unittest sim_v2.test_step1_factors -v
       - name: Rebuild
         id: rb
@@ -46,7 +46,7 @@ jobs:
           git add docs/data/derived_refresh_v1.json docs/data/trainer_strength_v1.json docs/data/track_trends_v1.json docs/data/people_trends_v1.json docs/data/sire_firstwin_v1.json docs/data/step1_factor_strength_v1.json sim_v2/step1_factor_coef.json
           git diff --cached --quiet && { echo 'no change'; exit 0; }
           git commit -q -m "各ページ・予想で使う数字を最新のデータで作り直し（自動）"
-          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep $((i*3)); done
+          ok=0; for i in 1 2 3 4 5; do if git pull --rebase --autostash -q origin main && git push -q origin HEAD:main; then ok=1; break; fi; sleep $((i*3)); done; [ "$ok" = 1 ] || { echo 'push failed'; exit 1; }
       - name: Fail if any job failed (after committing what succeeded)
         if: ${{ steps.rb.outputs.code != '0' }}
         run: echo 'some jobs failed; see docs/data/derived_refresh_v1.json' && exit 1
