@@ -40,8 +40,11 @@ def main(argv=None):
     p.add_argument('--labels-dir', default='going_labels')
     p.add_argument('--out', required=True)
     p.add_argument('--workers', type=int, default=4)
+    p.add_argument('--since', default='', help='YYYY-MM-DD: この日以降の日付だけ取る（定期更新用。既存の保存分との結合は refresh_baba_data.py）')
     a = p.parse_args(argv)
     dates = race_dates(a.labels_dir, a.track)
+    if a.since:
+        dates = [d for d in dates if d >= date.fromisoformat(a.since)]
     st = stations_for(a.track)
     jobs = [(s, d) for s in st for d in dates]
     rows, failed = [], []
