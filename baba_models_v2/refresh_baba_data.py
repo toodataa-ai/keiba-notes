@@ -14,6 +14,8 @@ ROOT = HERE.parent
 LOG = ROOT / "docs/data/derived_refresh_v1.json"
 JST = timezone(timedelta(hours=9))
 SINCE_DAYS = 45
+MIN_ROWS = 30537            # 2026-11-03 時点の行数（これより減ったら失敗）
+NO_MOISTURE_HOLD_DAYS = 45   # 直近この日数のうち、朝の含水率がまだ無いレースは表に入れない
 TRACKS = ["sapporo", "hakodate", "fukushima", "niigata", "tokyo", "nakayama", "chukyo", "kyoto", "hanshin", "kokura"]
 
 
@@ -105,9 +107,17 @@ def rebuild(today: date, check_recent: bool = True):
         d0 = pd.read_csv(p); before = (len(d0), str(d0["date"].max()))
     run([sys.executable, "stage_b_dataset.py", "--out", "stage_b/stage_b_dataset.csv.gz"])
     d1 = pd.read_csv(p)
-    if before and (len(d1) < before[0] or str(d1["date"].max()) < before[1]):
-        raise RuntimeError(f"作り直した表が前より小さい／古い: {before} → {len(d1)}, {d1['date'].max()}")
-    note = {}
+    # JRAの含水率のPDFは開催が終わってからしか出ない。最近のレースで朝の含水率が無い行は、まだ材料がそろっていないので学習・判定の表から外す
+    # （そのまま入れると「含水率が欠けたレース」で外れが増え、馬場予測の判定が見かけ上悪くなる）。出そろった次の週に自動で入る。
+    cut = (today - timedelta(days=NO_MOISTURE_HOLD_DAYS)).isoformat()
+    hold = (d1["date"] >= cut) & d1["moist0"].isna()
+    held = int(hold.sum())
+    if held:
+        d1 = d1[~hold].reset_index(drop=True)
+        d1.to_csv(p, index=False)
+    if len(d1) < MIN_ROWS or str(d1["date"].max()) < "2026-10-31":     # 取り込みの失敗で表が縮んだり古くなったりしていないか
+        raise RuntimeError(f"作り直した表が小さい／古い: {len(d1)}行, {d1['date'].max()}")
+    note = {"held_back_no_moisture": held}
     recent = d1[d1["date"] >= (today - timedelta(days=60)).isoformat()]
     if len(recent):
         note["recent_rows"] = int(len(recent))
@@ -150,7 +160,7 @@ def main():
                 info = fetch_and_merge(today, Path(td))
             res = rebuild(today, check_recent=not a.skip_fetch)
         entry = {"id": "baba_data", "label": label, "status": "ok", "at": now, "data_through": res["through"],
-                 "note": f"表 {res['rows_before']}→{res['rows']}行、直近60日{res.get('recent_rows', 0)}レースの欠け（気象 {res.get('recent_weather_missing')}・含水率 {res.get('recent_moisture_missing')}）", "outputs": ["baba_models_v2/stage_b/stage_b_dataset.csv.gz", "baba_models_v2/model_registry.json"]}
+                 "note": f"表 {res['rows_before']}→{res['rows']}行（含水率がまだ無い直近{res.get('held_back_no_moisture')}レースは次回に回す）、直近60日{res.get('recent_rows', 0)}レースの欠け（気象 {res.get('recent_weather_missing')}・含水率 {res.get('recent_moisture_missing')}）", "outputs": ["baba_models_v2/stage_b/stage_b_dataset.csv.gz", "baba_models_v2/model_registry.json"]}
         record(entry)
         print("OK", entry["note"])
         return 0
