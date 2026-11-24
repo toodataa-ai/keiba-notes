@@ -190,7 +190,7 @@ def cmd_update(a):
         if re.fullmatch(r'jra_going_\d{4}\.csv', fn):
             with open(os.path.join(a.dir, fn), encoding='utf-8') as f:
                 have |= {(r['date'], r['track']) for r in csv.DictReader(f)}
-    print('index: days', len(days), 'latest', [(d['date'], d['track']) for d in days[-6:]], 'by month', {m: n for m, n in json.load(open(idx, encoding='utf-8'))['months'].items()})
+    print('index: days', len(days), 'latest', [(d['date'], d['track']) for d in days[-6:]], 'by month', {m: n for m, n in json.load(open(idx, encoding='utf-8')).get('months', {}).items()})
     todo = [d for d in days if d['date'] < today and (d['date'], d['track']) not in have]
     cl = Client(a.delay)
     added, failed = {}, []
