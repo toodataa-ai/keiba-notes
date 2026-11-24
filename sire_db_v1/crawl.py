@@ -175,6 +175,57 @@ def known_ids() -> set[str]:
     return s
 
 
+def known_index() -> dict:
+    """{馬ID: (ファイル, 最後に取った日)}"""
+    idx = {}
+    for p in DATA.glob("horses_*.jsonl"):
+        for line in p.open(encoding="utf-8"):
+            try:
+                r = json.loads(line)
+                idx[r["id"]] = (p, r.get("fetched") or "")
+            except Exception:
+                pass
+    return idx
+
+
+def refresh_stale(get, parse, ids, max_minutes, t0) -> tuple[int, set]:
+    """新しく走った既知の馬（stale_horses.txt に控えたもの）の出走履歴を取り直し、同じ行を置き換える。
+    -> (置き換えた数, まだ残っている馬ID)。時間が来たら途中で終え、残りは次回に続く。"""
+    idx = known_index()
+    left = set(ids)
+    by_file = {}
+    for hid in ids:
+        if hid in idx:
+            by_file.setdefault(idx[hid][0], set()).add(hid)
+        else:
+            left.discard(hid)                  # 台帳に無い馬は新規取得の対象（ここでは扱わない）
+    n = 0
+    today = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+    for p, want in by_file.items():
+        lines = p.read_text(encoding="utf-8").splitlines()
+        changed = False
+        for i, line in enumerate(lines):
+            try:
+                rec = json.loads(line)
+            except Exception:
+                continue
+            if rec.get("id") not in want:
+                continue
+            if (time.time() - t0) / 60 > max_minutes:
+                break
+            hs = get(HORSE.format(hid=rec["id"]))
+            if hs is None:
+                continue
+            h = parse(hs)
+            if not h["birth"] or not h["ped"]["sire"] or h["birth"][:4] != p.stem.split("_")[1]:
+                continue
+            lines[i] = json.dumps({"id": rec["id"], **h, "fetched": today, "parse_v": PARSE_V}, ensure_ascii=False)
+            left.discard(rec["id"]); changed = True; n += 1
+        if changed:
+            tmp = p.with_suffix(".tmp"); tmp.write_text("\n".join(lines) + "\n", encoding="utf-8"); tmp.replace(p)
+    return n, left
+
+
 PARSE_V = 3   # 2 = 2026-11-06 の読み取り修正（直線レースのタイム・上がり）／3 = 2026-11-13 初出走の馬体重（増減なし）を読む
 
 
@@ -228,7 +279,7 @@ def main():
     import requests
     from bs4 import BeautifulSoup
     ap = argparse.ArgumentParser()
-    ap.add_argument("--years", default="2026,2025,2024,2023,2022,2021,2020,2019,2018")
+    ap.add_argument("--years", default="2027,2026,2025,2024,2023,2022,2021,2020,2019,2018")
     ap.add_argument("--max-minutes", type=float, default=300)
     ap.add_argument("--max-races", type=int, default=0)
     ap.add_argument("--probe", default="", help="race code: parse only, print summary, save nothing")
@@ -257,10 +308,20 @@ def main():
     DATA.mkdir(parents=True, exist_ok=True)
     done_p = DATA / "races_done.txt"
     done = set(done_p.read_text().split()) if done_p.exists() else set()
-    seen = known_ids()
+    kidx = known_index(); seen = set(kidx)
+    stale_p = DATA / "stale_horses.txt"
+    stale = set(stale_p.read_text().split()) if stale_p.exists() else set()
     t0 = time.time(); nr = nh = 0
     nf = refetch(get, parse_horse, a.max_minutes, t0)
     print("refetched horses (parse fix):", nf, flush=True)
+    before_stale = set(stale)
+    ns, stale = refresh_stale(get, parse_horse, stale, a.max_minutes / 2, t0)
+    _today = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+    for hid in before_stale - stale:
+        if hid in kidx:
+            kidx[hid] = (kidx[hid][0], _today)
+    stale_p.write_text("".join(x + "\n" for x in sorted(stale)), encoding="utf-8")
+    print("refreshed known horses that ran since the last fetch:", ns, "left:", len(stale), flush=True)
     todo = [(d, c) for d, c in race_codes(a.years.split(",")) if c not in done]
     print("races todo:", len(todo), "horses known:", len(seen))
     for d, code in todo:
@@ -271,6 +332,11 @@ def main():
             continue                           # 取れなかったレースは done にしない（次回また試す）
         for hid in parse_denma_horses(soup):
             if hid in seen:
+                # 既知の馬でも、前回取った日より後に走ったなら履歴が古い＝取り直しの控えに入れる
+                if kidx.get(hid, (None, ""))[1] and kidx[hid][1] <= d and hid not in stale:
+                    stale.add(hid)
+                    with stale_p.open("a") as f:
+                        f.write(hid + "\n")
                 continue
             hs = get(HORSE.format(hid=hid))
             if hs is None:

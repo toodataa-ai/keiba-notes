@@ -1,0 +1,52 @@
+name: Derived numbers refresh v1 (rebuild the numbers shown on pages and used by STEP1 from the latest data; no Claude usage)
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Optional: comma-separated job ids (trainer_strength,track_trends,people_trends,sire_map,step1_coef)'
+        required: false
+  schedule:
+    # 毎週水曜 06:30 JST（週末の取得が終わったあと。土曜の予想より前に最新へ）
+    - cron: '30 21 * * 2'
+permissions:
+  contents: write
+concurrency:
+  group: derived-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check private data token
+        env:
+          T: ${{ secrets.PRIVATE_DATA_TOKEN }}
+        run: test -n "$T" || { echo 'PRIVATE_DATA_TOKEN is not set'; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          repository: toodataa-ai/keiba-notes-private-data
+          token: ${{ secrets.PRIVATE_DATA_TOKEN }}
+          path: private
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install numpy requests beautifulsoup4
+      - run: python3 -m unittest sim_v2.test_step1_factors -v
+      - name: Rebuild
+        id: rb
+        run: |
+          set +e
+          python3 -m sim_v2.refresh_derived --data private/data_v2 --only "${{ github.event.inputs.only }}"
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Commit (numbers only; no names or records from the private data are written beyond what the pages already show)
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/derived_refresh_v1.json docs/data/trainer_strength_v1.json docs/data/track_trends_v1.json docs/data/people_trends_v1.json docs/data/sire_firstwin_v1.json docs/data/step1_factor_strength_v1.json sim_v2/step1_factor_coef.json
+          git diff --cached --quiet && { echo 'no change'; exit 0; }
+          git commit -q -m "各ページ・予想で使う数字を最新のデータで作り直し（自動）"
+          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep $((i*3)); done
+      - name: Fail if any job failed (after committing what succeeded)
+        if: ${{ steps.rb.outputs.code != '0' }}
+        run: echo 'some jobs failed; see docs/data/derived_refresh_v1.json' && exit 1

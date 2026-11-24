@@ -157,6 +157,70 @@ def cmd_collect(a):
     print('year', a.year, 'days', len(days), 'races', len(rows), 'failed', len(failed), 'requests', cl.n)
 
 
+def last_known_date(dirpath):
+    """既存の年ごとのCSVのうち一番新しい日付（無ければ空）"""
+    import os
+    best = ''
+    for fn in os.listdir(dirpath):
+        m = re.fullmatch(r'jra_going_(\d{4})\.csv', fn)
+        if not m:
+            continue
+        with open(os.path.join(dirpath, fn), encoding='utf-8') as f:
+            for r in csv.DictReader(f):
+                if r['date'] > best:
+                    best = r['date']
+    return best
+
+
+def cmd_update(a):
+    """前回の続きから、まだ載っていない開催日（今日より前）だけを取り、年ごとのCSVの末尾に足す。
+    取れなかった日は足さない（次回また試す）。既にある日は足さない。"""
+    import os, datetime
+    today = a.today or (datetime.datetime.utcnow() + datetime.timedelta(hours=9)).strftime('%Y-%m-%d')
+    last = last_known_date(a.dir)
+    lo = (last[:7] if last else '2018-01').replace('-', '')
+    hi = today[:7].replace('-', '')
+    idx = os.path.join(a.work, 'days_update.json')
+    class A: pass
+    ia = A(); ia.start, ia.end, ia.out, ia.delay = lo, hi, idx, a.delay
+    cmd_index(ia)
+    days = json.load(open(idx, encoding='utf-8'))['days']
+    have = set()
+    for fn in os.listdir(a.dir):
+        if re.fullmatch(r'jra_going_\d{4}\.csv', fn):
+            with open(os.path.join(a.dir, fn), encoding='utf-8') as f:
+                have |= {(r['date'], r['track']) for r in csv.DictReader(f)}
+    todo = [d for d in days if d['date'] < today and (d['date'], d['track']) not in have]
+    cl = Client(a.delay)
+    added, failed = {}, []
+    for d in todo:
+        try:
+            ses = parse_day(cl.post(d['cname']))
+            if not ses:
+                raise RuntimeError('no result-list link on day page')
+            got = parse_results(cl.post(ses), d)
+            if not got:
+                raise RuntimeError('no races parsed')
+            added.setdefault(d['date'][:4], []).extend(got)
+        except Exception as e:
+            failed.append({'date': d['date'], 'track': d['track'], 'error': str(e)[:200]})
+    for y, rows in added.items():
+        p = os.path.join(a.dir, 'jra_going_%s.csv' % y)
+        new_file = not os.path.exists(p)
+        with open(p, 'a', encoding='utf-8', newline='') as f:
+            w = csv.DictWriter(f, fieldnames=FIELDS)
+            if new_file:
+                w.writeheader()
+            w.writerows(rows)
+        with open(p, encoding='utf-8') as f:
+            all_rows = list(csv.DictReader(f))
+        json.dump({'year': y, 'days': len({(r['date'], r['track']) for r in all_rows}), 'races': len(all_rows), 'failed': []},
+                  open(p.replace('.csv', '.summary.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    n = sum(len(v) for v in added.values())
+    print('update: last', last, 'today', today, 'new days', len(todo) - len(failed), 'new races', n, 'failed', len(failed), failed)
+    return {'new_races': n, 'failed': failed}
+
+
 def main(argv=None):
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -164,8 +228,10 @@ def main(argv=None):
     i.add_argument('--out', required=True); i.add_argument('--delay', type=float, default=2.5)
     c = sub.add_parser('collect'); c.add_argument('--days', required=True); c.add_argument('--year', required=True)
     c.add_argument('--out', required=True); c.add_argument('--delay', type=float, default=2.5)
+    u = sub.add_parser('update'); u.add_argument('--dir', required=True); u.add_argument('--work', default='/tmp')
+    u.add_argument('--today', default=''); u.add_argument('--delay', type=float, default=2.5)
     a = p.parse_args(argv)
-    {'index': cmd_index, 'collect': cmd_collect}[a.cmd](a)
+    {'index': cmd_index, 'collect': cmd_collect, 'update': cmd_update}[a.cmd](a)
 
 
 if __name__ == '__main__':
