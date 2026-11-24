@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--out-backtest", required=True)
     ap.add_argument("--out-public")
     ap.add_argument("--out-standards")
+    ap.add_argument("--with-hid", action="store_true", help="検証用の出力にだけ馬ID（hid）を入れる（公開用には入れない）")
     a = ap.parse_args()
     lab = F.load_labels()
     runs, horses = F.load_runs(a.data, lab)
@@ -73,7 +74,7 @@ def main():
                 continue
             rt = F.rating(byh[r["hid"]], lb["date"], lb["surface"], lb["dist"], lb["going"])
             h = horses.get(r["hid"], {})
-            runners.append({"no": r["horse_no"], "name": h.get("name"), "sire": h.get("sire"), "sex": h.get("sex"),
+            runners.append({"no": r["horse_no"], **({"hid": r["hid"]} if a.with_hid else {}), "name": h.get("name"), "sire": h.get("sire"), "sex": h.get("sex"),
                             "age_m": months(h["birth"], lb["date"]) if h.get("birth") else None,
                             "carried": r["carried"], "bw": r["body_weight"], "finish": r["finish"], "odds": r["odds"], "ninki": r["ninki"],
                             "time": r["time"], "last3f": r["last3f"], "pas": r["pas"], **rt,
