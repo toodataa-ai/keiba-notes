@@ -1,16 +1,26 @@
 {
-  "schema_version": 1,
-  "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
-  "candidates": [
-    {
-      "id": "ui-drop-first-distance-v1",
-      "title": "改善状況：2歳の初距離を見送りにする",
-      "pages": [
-        "improvement-cycle.html"
-      ],
-      "assets": [],
-      "summary": "2歳の初距離（100頭）は、対象が年に数レースしかなく届かないため、進捗バーとカードを外し、説明を「見送り」にする。記録の集計は裏で続ける。",
-      "status": "awaiting_user_approval"
-    }
-  ]
+ "schema_version": 1,
+ "how_it_works": "STAGING shows production pages, except pages listed here, which show the candidate source instead. Candidate sources are kept in production form under .github/staging-candidates/<same path as docs/>. After explicit user approval, .github/workflows/jra-ui-promote-v1.yml copies them byte-for-byte into docs/ and removes the entry.",
+ "candidates": [
+  {
+   "id": "ui-drop-first-distance-v1",
+   "title": "改善状況：2歳の初距離を見送りにする",
+   "pages": [
+    "improvement-cycle.html"
+   ],
+   "assets": [],
+   "summary": "2歳の初距離（100頭）は、対象が年に数レースしかなく届かないため、進捗バーとカードを外し、説明を「見送り」にする。記録の集計は裏で続ける。",
+   "status": "awaiting_user_approval"
+  },
+  {
+   "id": "ui-data-freshness-v1",
+   "title": "データ取得の状況：自動追加と数字の更新状況",
+   "pages": [
+    "collection-status.html"
+   ],
+   "assets": [],
+   "summary": "取得状況ページの「増え方」を実態に合わせ（全部そろっているときは0レース分と出さない）、新しいレースは毎日自動で足すことと、各ページ・予想で使う数字の週次の更新状況（いつ・どこまで・失敗の有無）を表示する。",
+   "status": "awaiting_user_approval"
+  }
+ ]
 }
