@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-24T09:04:50+00:00",
+ "generated_at": "2026-11-24T20:06:49+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 45477177323,
+     "event": "schedule",
+     "created_at": "2026-11-24T20:05:59Z",
+     "started_at": "2026-11-24T20:05:59Z",
+     "ended_at": "2026-11-24T20:06:25Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 45361629885,
      "event": "workflow_dispatch",
@@ -655,17 +666,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 43307730914,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-12T21:11:16Z",
-     "started_at": "2026-11-12T21:11:16Z",
-     "ended_at": "2026-11-12T21:11:39Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "H"
     }
    ]
   },
@@ -1717,6 +1717,22 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "O"
+    }
+   ]
+  },
+  "step1-factors-v1.yml": {
+   "label": "STEP1の補助データの作成",
+   "runs": [
+    {
+     "id": 45472423181,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-24T19:38:54Z",
+     "started_at": "2026-11-24T19:38:54Z",
+     "ended_at": "2026-11-24T19:43:06Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
     }
    ]
   },
