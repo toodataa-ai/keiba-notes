@@ -51,3 +51,29 @@ class T(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRefreshStale(unittest.TestCase):
+    def test_replaces_only_listed_known_horses(self):
+        import json, tempfile, pathlib
+        d = pathlib.Path(tempfile.mkdtemp())
+        old = c.DATA
+        c.DATA = d
+        try:
+            rows = [{"id": "1", "birth": "2022-03-21", "fetched": "2026-11-03", "history": []},
+                    {"id": "2", "birth": "2022-04-01", "fetched": "2026-11-03", "history": []}]
+            (d / "horses_2022.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+            calls = []
+            def get(u):
+                calls.append(u); return BeautifulSoup(PAGE, "html.parser")
+            n, left = c.refresh_stale(get, c.parse_horse, {"1", "999"}, 100, __import__("time").time())
+            self.assertEqual(n, 1)
+            self.assertEqual(len(calls), 1)
+            self.assertEqual(left, set())          # 台帳に無い 999 は対象外、1 は置き換え済み
+            out = [json.loads(x) for x in (d / "horses_2022.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(len(out), 2)
+            self.assertEqual(out[0]["id"], "1"); self.assertEqual(len(out[0]["history"]), 2)   # 取り直した
+            self.assertEqual(out[1]["history"], [])                                          # 2 はそのまま
+            self.assertNotEqual(out[0]["fetched"], "2026-11-03")
+        finally:
+            c.DATA = old

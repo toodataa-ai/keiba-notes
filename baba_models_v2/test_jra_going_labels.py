@@ -34,3 +34,36 @@ class T(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class TestUpdate(unittest.TestCase):
+    def test_update_appends_only_new_days(self):
+        import tempfile, os, json, csv
+        d = tempfile.mkdtemp()
+        with open(os.path.join(d, 'jra_going_2026.csv'), 'w', encoding='utf-8', newline='') as f:
+            w = csv.DictWriter(f, fieldnames=g.FIELDS); w.writeheader()
+            w.writerow({k: '' for k in g.FIELDS} | {'date': '2026-11-01', 'track': '東京', 'race_no': '1'})
+        days = [{'cname': 'old', 'date': '2026-11-01', 'track': '東京', 'track_code': '05', 'kai': 4, 'nichime': 11},
+                {'cname': 'new', 'date': '2026-11-07', 'track': '東京', 'track_code': '05', 'kai': 5, 'nichime': 1},
+                {'cname': 'fut', 'date': '2026-11-30', 'track': '中山', 'track_code': '06', 'kai': 5, 'nichime': 1}]
+        def fake_index(ia):
+            json.dump({'days': days}, open(ia.out, 'w'))
+        class FakeClient:
+            n = 0
+            def __init__(self, delay): pass
+            def post(self, c): return c
+        orig = (g.cmd_index, g.Client, g.parse_day, g.parse_results)
+        g.cmd_index = fake_index; g.Client = FakeClient
+        g.parse_day = lambda html: 'ses-' + html
+        g.parse_results = lambda html, meta: [{k: '' for k in g.FIELDS} | {'date': meta['date'], 'track': meta['track'], 'race_no': str(i)} for i in (1, 2)]
+        try:
+            A = type('A', (), dict(dir=d, work=d, today='2026-11-10', delay=0))
+            r = g.cmd_update(A)
+            r2 = g.cmd_update(A)
+        finally:
+            g.cmd_index, g.Client, g.parse_day, g.parse_results = orig
+        self.assertEqual(r['new_races'], 2)          # 11/7 だけ（既にある日と未来の日は足さない）
+        rows = list(csv.DictReader(open(os.path.join(d, 'jra_going_2026.csv'), encoding='utf-8')))
+        self.assertEqual([x['date'] for x in rows], ['2026-11-01', '2026-11-07', '2026-11-07'])
+        self.assertEqual(json.load(open(os.path.join(d, 'jra_going_2026.summary.json')))['races'], 3)
+        self.assertEqual(r2['new_races'], 0)   # 2回目は何も足さない

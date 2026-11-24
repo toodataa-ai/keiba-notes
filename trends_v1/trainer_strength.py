@@ -22,15 +22,12 @@ def main():
     hs = load_horses(a.data)
     trainers, _ = S.load_race_index(Path(a.data) / "race_pages")
     today = datetime.now(timezone(timedelta(hours=9))).date().isoformat()
-    cnt, allc = S.trainer_counts(hs, trainers, "9999-12-31")
+    cnt, allc = S.trainer_counts_from_runs(S.load_race_index.runs, "9999-12-31")
     since = (date.fromisoformat(today) - timedelta(days=365)).isoformat()
     n12 = defaultdict(int); last = {}
-    for h in hs.values():
-        for r in h.get("history") or []:
-            tr = (trainers.get(r.get("code")) or {}).get(h["id"])
-            if tr and r.get("date"):
-                if r["date"] >= since: n12[tr] += 1
-                if tr not in last or r["date"] > last[tr]: last[tr] = r["date"]
+    for dt, tr, _top in S.load_race_index.runs:      # レース結果ページから直接（最新のレースまで入る）
+        if dt >= since: n12[tr] += 1
+        if tr not in last or dt > last[tr]: last[tr] = dt
     names = {}
     for h in sorted(hs.values(), key=lambda h: h.get("fetched") or ""):
         p = h.get("profile") or {}; tid = p.get("調教師（所属）_id"); nm = p.get("調教師（所属）")

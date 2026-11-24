@@ -29,7 +29,11 @@ def main():
     ap.add_argument("--laps-cache", default="/tmp/dnw/laps.json"); ap.add_argument("--trainers-cache", default="/tmp/dnw/trainers.json")
     ap.add_argument("--out", default=str(ROOT / "sim_v2/step1_factor_coef.json"))
     a = ap.parse_args()
-    laps = json.loads(Path(a.laps_cache).read_text(encoding="utf-8"))
+    lp = Path(a.laps_cache)
+    if lp.exists(): laps = json.loads(lp.read_text(encoding="utf-8"))
+    else:                                    # キャッシュが無ければレース結果ページから作る（定期の自動更新では毎回ここを通る）
+        from sim_v2.pace_lap_features import extract
+        laps = extract(a.pages); lp.parent.mkdir(parents=True, exist_ok=True); lp.write_text(json.dumps(laps), encoding="utf-8")
     tp = Path(a.trainers_cache)
     trainers = json.loads(tp.read_text(encoding="utf-8")) if tp.exists() else extract_trainers(a.pages)
     hs = load_horses(a.data)

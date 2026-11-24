@@ -38,6 +38,7 @@ def last3f_list(tables):
 def load_race_index(pages_dir):
     """race_pages から 調教師（{code:{馬ID:調教師ID}}）と 上がり3Fの一覧（{code:[…]}）を一度に読む"""
     trainers, l3 = {}, {}
+    runs = []          # 調教師ごとの数え上げ用：(日付, 調教師ID, 3着内か)。レース結果ページから直接＝最新のレースまで入る
     for f in sorted(glob.glob(str(Path(pages_dir) / "*.jsonl"))):
         for line in open(f, encoding="utf-8"):
             d = json.loads(line); r = (d.get("pages") or {}).get("result") or {}
@@ -51,11 +52,25 @@ def load_race_index(pages_dir):
                             a = re.search(r"horse/(\d+)/", c or ""); b = re.search(r"trainer/(\d+)/", c or "")
                             if a: h = a.group(1)
                             if b: tr = b.group(1)
-                        if h and tr: m[h] = tr
+                        if h and tr:
+                            m[h] = tr
+                            fin = (row[0] or "").strip()
+                            if fin.isdigit() and d.get("date"):
+                                runs.append((d["date"], tr, 1 if int(fin) <= 3 else 0))
             if m: trainers[d["code"]] = m
             v = last3f_list(tb)
             if len(v) >= 5: l3[d["code"]] = v
+    load_race_index.runs = runs
     return trainers, l3
+
+
+def trainer_counts_from_runs(runs, before):
+    """{調教師ID:[3着内, 出走]} と全体 [3着内, 出走]（before より前の出走だけ）。runs は load_race_index.runs"""
+    cnt = collections.defaultdict(lambda: [0, 0]); allc = [0, 0]
+    for date, tr, top in runs:
+        if date >= before: continue
+        cnt[tr][0] += top; cnt[tr][1] += 1; allc[0] += top; allc[1] += 1
+    return cnt, allc
 
 
 def trainer_counts(hs, trainers, before):
@@ -163,7 +178,7 @@ def main():
 
     for c in cards:
         d = c["date"]; venue = c["venue"]; dist = c["distance_m"]
-        cnt, allc = trainer_counts(hs, trainers, d)
+        cnt, allc = trainer_counts_from_runs(load_race_index.runs, d)
         code = race_code(c["source_cname"])
         # 出馬表（Sportnavi）：馬番→馬ID・調教師
         by_no = {}
