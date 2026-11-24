@@ -36,7 +36,7 @@ details.fs-d summary:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/track-trends.html">競馬場の傾向</a><a href="staging/people-trends.html">騎手・調教師の成績</a></nav>
 
@@ -45,6 +45,39 @@ details.fs-d summary:focus-visible{outline:2px solid #2f6fd0;outline-offset:-2px
 <h1>要素の検証</h1>
 <p class="lead">発走前に分かる要素を、<strong>単独と2つの組み合わせ</strong>で調べ、<strong>勝率との関係</strong>と<strong>オッズ妙味</strong>（人気で説明できない上乗せ）が、<strong>前半の期間で見つけて後半でも続いたか</strong>を確かめた結果です。</p>
 </header>
+
+<section aria-labelledby="daTitle" id="data-adopt">
+<h2 id="daTitle">過去データ分析で試した要素：採用と不採用の記録</h2>
+<p class="sub">予想の確率（STEP1）に足す要素を、<b>今回のオッズを使わない能力モデル</b>に1つずつ足して、2024年7月以降の約7,700レースで「確率の当たり具合（対数損失）」がどれだけ良くなるかを調べた結果です（前半は2022年7月〜2024年6月の約6,700レースで係数を決定）。</p>
+<div class="fs-box">
+<b>改善（対数損失）</b>＝足さないときより、足したときのほうが確率の当たり具合がどれだけ良くなったか。大きいほど良く、0は効果なし。<b>95%幅</b>はレース単位でやり直し計算した誤差の目安で、<b>幅の下限が0より上</b>なら偶然とは考えにくい。<br>
+採用の条件（事前に決めた）：①95%幅が0より上 ②前半で決めた係数と後半だけで決め直した係数の向きが同じ ③後半を前後に分けても両方で正。<b>9項目を試して2項目が残った</b>ので、偶然が混ざる可能性は残ります（実際の効き方は通常の記録で見ていきます）。
+</div>
+<div class="fs-tbl"><table>
+<thead><tr><th>要素</th><th>改善</th><th>95%幅</th><th style="text-align:left">結論・理由</th></tr></thead>
+<tbody>
+<tr><td><b class="fs-up">採用</b>　この距離での過去の成績（同じ距離帯の3着内率−全体）</td><td>+0.0016</td><td>+0.0005〜+0.0027</td><td style="white-space:normal;text-align:left;min-width:12em">前半・後半とも同じ向き。2026-11-28〜（shared-v1.2）。倍率 約0.90〜1.11</td></tr>
+<tr><td><b class="fs-up">採用</b>　調教師の強さ（調教師の3着内率−全体、少ない走数は全体へ縮小）</td><td>+0.0044</td><td>+0.0015〜+0.0071</td><td style="white-space:normal;text-align:left;min-width:12em">後半を前後に分けても両方で正。2026-11-28〜（shared-v1.3）。倍率 約0.80〜1.25</td></tr>
+<tr><td><b class="fs-up">採用</b>　上がり順位のよさ（直近3走の上がり3Fが出走馬中で何番目か）</td><td>+0.0030</td><td>+0.0006〜+0.0053</td><td style="white-space:normal;text-align:left;min-width:12em">後半を前後に分けても両方で正。2026-11-28〜（shared-v1.3）。倍率 約0.65〜1.53</td></tr>
+<tr><td><b class="">不採用</b>　前走から200m以上の距離延長（オッズ比較での検証。能力モデルには距離の列としてすでに入っている）</td><td>+0.00004</td><td>−0.0001〜+0.0002</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし（オッズに織り込み済み）</td></tr>
+<tr><td><b class="">不採用</b>　前走から200m以上の距離短縮（オッズ比較での検証）</td><td>+0.0002</td><td>−0.0003〜+0.0007</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　過去の延長で成績が上がる癖</td><td>+0.0002</td><td>−0.0002〜+0.0005</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　過去の短縮で成績が上がる癖</td><td>−0.0004</td><td>−0.0012〜+0.0004</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　今回の距離が最も得意な距離帯</td><td>+0.0002</td><td>−0.0003〜+0.0006</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし。同じ距離帯の3着内率（採用）のほうが情報が多い</td></tr>
+<tr><td><b class="">不採用</b>　淀みない流れで先行し、上がりも速い（過去の走の平均）</td><td>−0.0001</td><td>−0.0004〜+0.0002</td><td style="white-space:normal;text-align:left;min-width:12em">該当が全レースの4.8%と少なく、効果を確認できない</td></tr>
+<tr><td><b class="">不採用</b>　同じ条件で、上がりが平均より速かった幅</td><td>−0.0003</td><td>−0.0005〜+0.0000</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　最後が加速したレースで先行し、上がりも速い</td><td>+0.0002</td><td>−0.0003〜+0.0008</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　流れを問わず先行し、上がりも速い</td><td>+0.0007</td><td>−0.0001〜+0.0014</td><td style="white-space:normal;text-align:left;min-width:12em">幅が0をまたぐ。既存の「序盤の位置取り」「上がりの指数」と重なる</td></tr>
+<tr><td><b class="">不採用</b>　前走のペースで補正した「展開で得した度合い」（直近3走）</td><td>+0.0012</td><td>−0.0001〜+0.0026</td><td style="white-space:normal;text-align:left;min-width:12em">幅が0をまたぐ（境界）</td></tr>
+<tr><td><b class="">不採用</b>　展開の得失×着順のよさ</td><td>+0.0011</td><td>−0.0001〜+0.0023</td><td style="white-space:normal;text-align:left;min-width:12em">幅が0をまたぐ（境界）</td></tr>
+<tr><td><b class="">不採用</b>　最後のコーナーからの順位上昇</td><td>+0.0000</td><td>−0.0002〜+0.0003</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　上がり順位が着順より良い幅</td><td>+0.0024</td><td>+0.0008〜+0.0041</td><td style="white-space:normal;text-align:left;min-width:12em">ルールは満たすが、上がり順位（採用）と同じ情報のため重ねない</td></tr>
+<tr><td><b class="">不採用</b>　騎手×調教師の組み合わせの上乗せ</td><td>+0.0001</td><td>−0.0001〜+0.0002</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　調教師の休み明け（90日以上）の上乗せ</td><td>+0.0002</td><td>−0.0006〜+0.0010</td><td style="white-space:normal;text-align:left;min-width:12em">効果なし</td></tr>
+<tr><td><b class="">不採用</b>　騎手の乗り替わり</td><td>+0.0014</td><td>+0.0005〜+0.0023</td><td style="white-space:normal;text-align:left;min-width:12em">後半の後ろ半分で −0.0002 となり、安定しない</td></tr>
+</tbody></table></div>
+<p class="fs-note">採用した3つの強さ（既存の要素との比較）は <a href="staging/methodology.html#datafactors">AI予想のしくみ 03章</a>、調教師の強さの一覧は <a href="staging/people-trends.html#trainer-strength">騎手・調教師の成績</a>。</p>
+</section>
 
 <section aria-labelledby="howTitle">
 <h2 id="howTitle">数字の読み方</h2>
