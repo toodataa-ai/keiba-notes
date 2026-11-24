@@ -91,12 +91,12 @@
             "state": "insufficient",
             "label": "まだ足りない",
             "without_forecast": {
-              "logloss_gain_pct": -24.1,
-              "brier_gain_pct": -29.6
+              "logloss_gain_pct": -22.1,
+              "brier_gain_pct": -26.4
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 21.2,
-              "brier_gain_pct": -8.0
+              "logloss_gain_pct": 21.1,
+              "brier_gain_pct": -6.8
             },
             "races": 340
           },
@@ -104,12 +104,12 @@
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 20.2,
-              "brier_gain_pct": 11.3
+              "logloss_gain_pct": 22.8,
+              "brier_gain_pct": 13.5
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 29.4,
-              "brier_gain_pct": 13.9
+              "logloss_gain_pct": 29.7,
+              "brier_gain_pct": 13.0
             },
             "races": 220
           }
@@ -146,12 +146,12 @@
             "state": "insufficient",
             "label": "まだ足りない",
             "without_forecast": {
-              "logloss_gain_pct": -3.0,
-              "brier_gain_pct": -19.6
+              "logloss_gain_pct": 8.0,
+              "brier_gain_pct": -4.3
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 9.7,
-              "brier_gain_pct": -6.7
+              "logloss_gain_pct": 12.3,
+              "brier_gain_pct": -3.3
             },
             "races": 292
           },
@@ -159,12 +159,12 @@
             "state": "insufficient",
             "label": "まだ足りない",
             "without_forecast": {
-              "logloss_gain_pct": 11.5,
-              "brier_gain_pct": 21.5
+              "logloss_gain_pct": 12.8,
+              "brier_gain_pct": 25.0
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 39.8,
-              "brier_gain_pct": 31.3
+              "logloss_gain_pct": 40.4,
+              "brier_gain_pct": 32.5
             },
             "races": 188
           }
@@ -176,13 +176,13 @@
       "id": "track_condition:track:fukushima",
       "theme": "track_condition",
       "label": "福島",
-      "stage": 1,
-      "stage_name": "登録",
-      "frac": 0.0,
-      "state": "ready_to_adopt",
-      "text": "採用できる状態（承認待ち）　芝：使える見込み／ダート：使える見込み",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.375,
+      "state": "research",
+      "text": "Stage A（翌朝の含水率）：芝候補・ダ候補 ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、20レースの比較を挟まず、その競馬場の馬場予測を採用できます（承認が必要）。",
-      "criteria_met": true,
+      "criteria_met": false,
       "experiment_id": null,
       "detail": {
         "turf": "backtesting",
@@ -198,33 +198,33 @@
         "in_production": false,
         "going": {
           "turf": {
-            "state": "usable",
-            "label": "使える見込み",
+            "state": "waiting_forecast",
+            "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": 6.3,
-              "brier_gain_pct": 18.2
+              "logloss_gain_pct": 1.0,
+              "brier_gain_pct": 13.3
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 67.3,
-              "brier_gain_pct": 63.1
+              "logloss_gain_pct": 61.0,
+              "brier_gain_pct": 53.1
             },
-            "races": 460
+            "races": 496
           },
           "dirt": {
-            "state": "usable",
-            "label": "使える見込み",
+            "state": "waiting_forecast",
+            "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": 10.9,
-              "brier_gain_pct": 19.5
+              "logloss_gain_pct": -17.5,
+              "brier_gain_pct": -6.0
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 54.6,
-              "brier_gain_pct": 54.2
+              "logloss_gain_pct": 57.6,
+              "brier_gain_pct": 53.9
             },
-            "races": 280
+            "races": 304
           }
         },
-        "going_text": "芝：使える見込み／ダート：使える見込み"
+        "going_text": "芝：予報待ち／ダート：予報待ち"
       }
     },
     {
@@ -256,12 +256,12 @@
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": -1.1,
-              "brier_gain_pct": 5.9
+              "logloss_gain_pct": -1.3,
+              "brier_gain_pct": 5.1
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 53.5,
-              "brier_gain_pct": 41.1
+              "logloss_gain_pct": 54.9,
+              "brier_gain_pct": 43.0
             },
             "races": 618
           },
@@ -269,12 +269,12 @@
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 7.6,
-              "brier_gain_pct": 9.6
+              "logloss_gain_pct": 7.8,
+              "brier_gain_pct": 9.3
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 73.6,
-              "brier_gain_pct": 67.3
+              "logloss_gain_pct": 72.8,
+              "brier_gain_pct": 66.8
             },
             "races": 401
           }
@@ -311,27 +311,27 @@
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 27.3,
-              "brier_gain_pct": 22.7
+              "logloss_gain_pct": 26.9,
+              "brier_gain_pct": 22.4
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 44.4,
-              "brier_gain_pct": 36.9
+              "logloss_gain_pct": 44.9,
+              "brier_gain_pct": 35.7
             },
-            "races": 822
+            "races": 862
           },
           "dirt": {
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": -0.2,
-              "brier_gain_pct": -8.3
+              "logloss_gain_pct": 4.0,
+              "brier_gain_pct": -6.1
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 50.8,
-              "brier_gain_pct": 34.5
+              "logloss_gain_pct": 50.6,
+              "brier_gain_pct": 33.9
             },
-            "races": 872
+            "races": 902
           }
         },
         "going_text": "芝：使える見込み／ダート：予報待ち"
@@ -366,12 +366,12 @@
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": -4.9,
-              "brier_gain_pct": -2.5
+              "logloss_gain_pct": -7.4,
+              "brier_gain_pct": -4.5
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 38.6,
-              "brier_gain_pct": 32.1
+              "logloss_gain_pct": 37.3,
+              "brier_gain_pct": 32.9
             },
             "races": 658
           },
@@ -379,12 +379,12 @@
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 17.6,
-              "brier_gain_pct": 16.7
+              "logloss_gain_pct": 19.0,
+              "brier_gain_pct": 18.5
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 37.5,
-              "brier_gain_pct": 31.9
+              "logloss_gain_pct": 37.8,
+              "brier_gain_pct": 31.1
             },
             "races": 932
           }
@@ -421,12 +421,12 @@
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": -7.7,
-              "brier_gain_pct": -0.5
+              "logloss_gain_pct": -7.6,
+              "brier_gain_pct": -0.7
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 50.2,
-              "brier_gain_pct": 48.2
+              "logloss_gain_pct": 50.5,
+              "brier_gain_pct": 46.5
             },
             "races": 542
           },
@@ -434,12 +434,12 @@
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": 15.1,
-              "brier_gain_pct": -0.5
+              "logloss_gain_pct": 15.3,
+              "brier_gain_pct": 0.8
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 20.9,
-              "brier_gain_pct": 8.9
+              "logloss_gain_pct": 19.9,
+              "brier_gain_pct": 8.5
             },
             "races": 578
           }
@@ -476,27 +476,27 @@
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": -1.8,
-              "brier_gain_pct": -6.9
+              "logloss_gain_pct": 0.0,
+              "brier_gain_pct": -6.1
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 47.3,
-              "brier_gain_pct": 37.9
+              "logloss_gain_pct": 46.5,
+              "brier_gain_pct": 35.2
             },
-            "races": 747
+            "races": 783
           },
           "dirt": {
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 24.1,
-              "brier_gain_pct": 17.8
+              "logloss_gain_pct": 23.4,
+              "brier_gain_pct": 17.6
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 50.1,
-              "brier_gain_pct": 39.0
+              "logloss_gain_pct": 54.9,
+              "brier_gain_pct": 43.7
             },
-            "races": 902
+            "races": 936
           }
         },
         "going_text": "芝：予報待ち／ダート：使える見込み"
@@ -506,13 +506,13 @@
       "id": "track_condition:track:hanshin",
       "theme": "track_condition",
       "label": "阪神",
-      "stage": 1,
-      "stage_name": "登録",
-      "frac": 0.0,
-      "state": "ready_to_adopt",
-      "text": "採用できる状態（承認待ち）　芝：使える見込み／ダート：使える見込み",
+      "stage": 0,
+      "stage_name": "研究",
+      "frac": 0.5,
+      "state": "research",
+      "text": "Stage A（翌朝の含水率）：芝検証済み・ダ検証済み ／ Stage B（発走時の馬場）：芝試作・ダ試作",
       "criteria_text": "芝・ダートの両方が「使える見込み」（天気予報なしでも、今のやり方より5%以上良い）になったら、20レースの比較を挟まず、その競馬場の馬場予測を採用できます（承認が必要）。",
-      "criteria_met": true,
+      "criteria_met": false,
       "experiment_id": null,
       "detail": {
         "turf": "backtesting",
@@ -528,15 +528,15 @@
         "in_production": false,
         "going": {
           "turf": {
-            "state": "usable",
-            "label": "使える見込み",
+            "state": "waiting_forecast",
+            "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": 8.5,
-              "brier_gain_pct": 11.2
+              "logloss_gain_pct": 4.9,
+              "brier_gain_pct": 9.2
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 54.6,
-              "brier_gain_pct": 52.4
+              "logloss_gain_pct": 55.2,
+              "brier_gain_pct": 53.6
             },
             "races": 581
           },
@@ -544,17 +544,17 @@
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 22.1,
-              "brier_gain_pct": 19.5
+              "logloss_gain_pct": 20.1,
+              "brier_gain_pct": 19.2
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 50.8,
-              "brier_gain_pct": 39.5
+              "logloss_gain_pct": 51.1,
+              "brier_gain_pct": 40.2
             },
             "races": 759
           }
         },
-        "going_text": "芝：使える見込み／ダート：使える見込み"
+        "going_text": "芝：予報待ち／ダート：使える見込み"
       }
     },
     {
@@ -586,12 +586,12 @@
             "state": "waiting_forecast",
             "label": "予報待ち",
             "without_forecast": {
-              "logloss_gain_pct": -9.8,
-              "brier_gain_pct": -9.3
+              "logloss_gain_pct": -7.5,
+              "brier_gain_pct": -5.5
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 33.0,
-              "brier_gain_pct": 26.7
+              "logloss_gain_pct": 33.1,
+              "brier_gain_pct": 26.1
             },
             "races": 600
           },
@@ -599,11 +599,11 @@
             "state": "usable",
             "label": "使える見込み",
             "without_forecast": {
-              "logloss_gain_pct": 12.6,
-              "brier_gain_pct": 15.1
+              "logloss_gain_pct": 11.2,
+              "brier_gain_pct": 11.9
             },
             "perfect_forecast": {
-              "logloss_gain_pct": 20.7,
+              "logloss_gain_pct": 21.0,
               "brier_gain_pct": 9.2
             },
             "races": 259
@@ -620,7 +620,7 @@
       "stage_name": "研究",
       "frac": 1.0,
       "state": "research",
-      "text": "過去レースの取得 100%（30,537/30,537レース・馬49,162頭）",
+      "text": "過去レースの取得 100%（30,777/30,777レース・馬49,635頭）",
       "criteria_text": "過去レースの取得がそろい、同じ検証をやり直して、新馬戦の外れ具合の改善が偶然と区別できたら（95%の幅が0より上）、新馬戦だけの小さな補正として改善案に登録できます。",
       "criteria_met": false,
       "experiment_id": null,
