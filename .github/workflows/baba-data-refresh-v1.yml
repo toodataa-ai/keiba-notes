@@ -36,7 +36,7 @@ jobs:
           git add baba_models_v2/weather baba_models_v2/observations baba_models_v2/going_labels baba_models_v2/stage_b baba_models_v2/model_registry.json docs/data/baba_model_registry.json docs/data/derived_refresh_v1.json
           git diff --cached --quiet && { echo 'no change'; exit 0; }
           git commit -q -m "馬場の学習データと馬場予測の判定を最新のデータで作り直し（自動）"
-          for i in 1 2 3 4 5; do git pull --rebase -q origin main && git push -q origin HEAD:main && break; sleep $((i*3)); done
+          ok=0; for i in 1 2 3 4 5; do if git pull --rebase --autostash -q origin main && git push -q origin HEAD:main; then ok=1; break; fi; sleep $((i*3)); done; [ "$ok" = 1 ] || { echo 'push failed'; exit 1; }
       - name: Fail if the refresh failed (the failure is recorded in derived_refresh_v1.json)
         if: ${{ steps.rb.outputs.code != '0' }}
         run: exit 1
