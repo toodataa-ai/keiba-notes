@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.66-20261124",
-  "current_public_version": "1.66",
+  "current_public_release": "release/jra-site-v1.67-20261125",
+  "current_public_version": "1.67",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1407,6 +1407,30 @@
       "new_entry_pages": [],
       "scope_files": [
         "docs/improvement-cycle.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.67-20261125",
+      "branch": "release/jra-site-v1.67-20261125",
+      "commit_sha": "1328078d1c6800464d6418d973299c36b2643321",
+      "deployed_at": "2026-11-25T05:52:51+09:00",
+      "workflow_run_id": 45485303441,
+      "validation_workflow_run_id": 45485303441,
+      "public_version": "1.67",
+      "note": "2026-11-25ユーザー明示承認済み。AI予想のしくみ・要素の検証・騎手調教師の成績：過去データ分析から加えた要素（調教師の強さ・上がり順位・距離帯）の強さと、不採用の記録：①AI予想のしくみに新章「過去データ分析から加えた要素と、その強さ」（既存の要素との強さの比較つき）②要素の検証に、採用・不採用の記録（検証での改善と95%幅つき）③騎手・調教師の成績に、調教師の強さの一覧（予想の倍率つき）。データ：docs/data/step1_factor_strength_v1.json・trainer_strength_v1.json。2026-11-28 の予想から適用。 ④自動運用の状況に「STEP1の補助データ」の行（一覧・1日の流れ・実行記録の表）を追加。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-step1-factors-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/methodology.html",
+        "docs/factor-screen.html",
+        "docs/people-trends.html",
+        "docs/operations.html"
       ],
       "public_http_files_verified": null
     }
