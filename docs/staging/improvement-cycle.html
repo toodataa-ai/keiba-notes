@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="staging/stage-indicator.css?v=20261012-1">
 </head>
 <body class="ic-light">
-<div class="staging-shell-marker" role="status" aria-label="ステージング版">STAGING <span>検証中</span></div>
+<div class="staging-shell-marker" role="status" aria-label="ステージング版・承認待ちの変更案">STAGING <span>変更案・承認待ち</span></div>
 <div class="wrap">
 <nav aria-label="ページ移動"><a href="staging/index.html">← トップページに戻る</a><a href="staging/roadmap.html">改善の歩み（履歴）</a></nav>
 
@@ -36,7 +36,7 @@
 <p class="tiny"><b>馬場補正</b>：発走前の公式の馬場状態と、各馬の良馬場・道悪での近走成績から、勝つ確率を補正します（20レース）。</p>
 <p class="tiny"><b>購入方法の変更（1頭への偏り是正）</b>：Claude自身が作った買い目と、同じ予想・同じオッズから機械のルール（1頭に偏りすぎないよう分散）で作り直した買い目を、同じ公式払戻で比べます。回収率で見ます（20レース）。</p>
 <p class="tiny"><b>購入方法の変更（上位3頭のワイド）</b>：Claude自身の買い目と、同じレースで「◎○▲（本命・対抗・単穴）の3頭のワイド3点（各100円）」を買った場合を、同じ公式払戻で比べます。印は当たるのに買い目が外れるレースが続いたため、2026-11-24 に追加しました（回収率で見ます・20レース）。規則は過去の結果を見てから決めたので、<b>11/28 以降の予想だけ</b>を数えます。<span id="mwRef"></span></p>
-<p class="tiny"><b>2歳の初距離</b>：2歳戦で、初めての距離（延長）になる馬の確率を、経験のなさだけで割り引きすぎていないかを確かめます。過去データでは市場はほぼ織り込み済みでした（100頭）。</p>
+<p class="tiny"><b>2歳の初距離</b>：見送りました（2024年以降の2歳のメインレースが年に数レースしかなく、100頭に届かないため。過去データでは市場にほぼ織り込み済み）。</p>
 <p class="tiny"><b>馬場の変化の記録</b>：毎朝の予報・朝の馬場と含水率と、メインレースの実際の馬場を、変わらない日も含めて記録しています。馬場が変わった事例が数十件たまったら、「どんな予報のとき、どちらに変わるか」を分析します（目安は半年）。</p>
 <p class="tiny"><b>馬場予測（採用済み・2026-11-15 から使用）</b>：前日・当日朝の馬場と含水率、前日までの天気、当日朝の気象庁の降水確率から、メインレースの時間帯の馬場（良・稍重・重・不良）の確率を毎朝出し、Claudeの予想に使っています。過去3万レースで学習した、全10競馬場共通のモデルです。<br>過去データでの確かめ（2023〜2026年・外れ具合。小さいほど良い）：芝は 朝の馬場のまま 0.295 → 予報なし 0.297 → 予報が半分ほど当たる想定 0.244 → 完全に当たる 0.214。ダートは 0.284 → 0.242 → 0.199 → 0.178。過去の予報は残っていないので、予報の当たり具合は「想定」です。本当の当たり具合は、上の馬場の変化の記録で確かめます。</p>
 </details>
@@ -238,23 +238,18 @@ Promise.all([
       <p class="tiny">${ps?`回収率：Claude自身 ${pct1(ps.claude_own.roi)} ／ 機械ルール ${pct1(ps.mechanical_rule.roi)}`:'まだ比較したレースはありません。最初のレースは次の開催週からです。'}</p></article>`;
     const fd=d.first_distance||{},fe=(fd.groups||{}).extension||{},fkn=(fd.groups||{}).known||{},fneed=fd.need_horses||100,fn=fe.horses||0,fp=Math.min(100,Math.round(fn/fneed*100));
     const rr=x=>x==null?'—':Number(x).toFixed(2);
-    const fdist=`<article class="tcard"><h3>2歳・初めての距離（Claudeの予想）</h3>
-      <p class="what">距離延長の2歳馬を、Claudeが割り引きすぎていないかを確かめます（手順書 claude-v1.1 で「経験のなさだけで確率を大きく下げない」と決めた、その効果の確認）。該当馬が${fneed}頭たまったら、判定のお知らせが立ちます。</p>
-      <p class="prog">たまった馬：<b>${fn} / ${fneed}頭</b></p>
-      <div class="pb" style="grid-template-columns:1fr;margin:6px 0"><i class="n"><b style="width:${fp}%"></b></i></div>
-      <p class="tiny">${fn?`予想した勝ちの数 ${rr(fe.predicted_wins)} に対して実際の勝ち ${fe.actual_wins}（実際÷予想 ${rr(fe.ratio)}）。比べる相手（同じ距離を走ったことのある2歳馬）は ${rr(fkn.ratio)}。頭数が少ないうちは、偶然のぶれが大きく結論は出せません。`:'まだ該当する馬がいません。2歳戦の開催のたびに少しずつたまります。メインレースだけが対象なので、たまるまでには時間がかかります。'}</p>
-      <p class="tiny">参考：過去の約8,900頭（2019年以降・2歳の延長）では、単勝オッズの期待に対する実際の勝ちの比は 1.04（95%の幅 0.98〜1.12）で、市場がほぼ織り込み済みでした。</p></article>`;
-    $('claudeExpBody').innerHTML=pace+going+port+fdist; $('claudeExp').hidden=false;
+
+    $('claudeExpBody').innerHTML=pace+going+port; $('claudeExp').hidden=false;
     const mw=d.marks_wide||{},mn=mw.pairs||0,mneed=mw.need_pairs||20,ms=mw.summary,mref=mw.replay_reference;
     if(mref)$('mwRef').textContent=`参考（登録前の${mref.races}レース・判定には数えません）：回収率 Claude自身 ${pct1(mref.claude_own.roi)} ／ 上位3頭のワイド ${pct1(mref.marks_wide.roi)}。`;
     const RPW=(typeof RACES_PER_WEEK==='number'?RACES_PER_WEEK:3);const left=[Math.max(0,need-n),Math.max(0,gneed-gn),Math.max(0,pneed-pn),Math.max(0,mneed-mn)];const minLeft=Math.min(...left);
-    $('sCount').textContent='6件';
+    $('sCount').textContent='5件';
     $('sEta').textContent=minLeft<=0?'判定できる案があります':`あと${minLeft}レース（あと約${Math.ceil(minLeft/RPW)}週）`;
     const nm=['研究','登録','比較','判定'];
     const cb=fr=>`<div class="pb" aria-hidden="true">${nm.map((x,i)=>i<2?'<i class="d"></i>':i===2?`<i class="n"><b style="width:${Math.max(0,Math.min(1,fr))*100}%"></b></i>`:'<i></i>').join('')}</div>`;
     const crow=(t,txt,fr)=>`<a class="sumlink" href="staging/improvement-cycle.html#claudeExp"><div class="pr"><span class="pl">${t}</span>${cb(fr)}<span class="pt">${txt}</span></div></a>`;
     $('sumClaude').innerHTML=`<div class="ph"><span></span><div class="pb ph-n">${nm.map(x=>`<i>${x}</i>`).join('')}</div><span></span></div>`+
-      crow('位置取り',`比較 ${n}/${need}レース<br>${window.WK.text(p.dates,'レース')}`,n/need)+crow('馬場補正',`比較 ${gn}/${gneed}レース<br>${window.WK.text(g.dates,'レース')}`,gn/gneed)+crow('<small class="pcat">購入方法の変更</small>1頭への偏り是正',`比較 ${pn}/${pneed}レース<br>${window.WK.text(pf.dates,'レース')}`,pn/pneed)+crow('<small class="pcat">購入方法の変更</small>上位3頭のワイド',`比較 ${mn}/${mneed}レース`+(ms?`（回収率 Claude ${pct1(ms.claude_own.roi)}／ワイド ${pct1(ms.marks_wide.roi)}）`:'')+`<br>${window.WK.text(mw.dates,'レース')}`,mn/mneed)+crow('2歳の初距離',`たまった馬 ${fn}/${fneed}頭<br>${window.WK.text(fe.dates,'頭')}`,fn/fneed);
+      crow('位置取り',`比較 ${n}/${need}レース<br>${window.WK.text(p.dates,'レース')}`,n/need)+crow('馬場補正',`比較 ${gn}/${gneed}レース<br>${window.WK.text(g.dates,'レース')}`,gn/gneed)+crow('<small class="pcat">購入方法の変更</small>1頭への偏り是正',`比較 ${pn}/${pneed}レース<br>${window.WK.text(pf.dates,'レース')}`,pn/pneed)+crow('<small class="pcat">購入方法の変更</small>上位3頭のワイド',`比較 ${mn}/${mneed}レース`+(ms?`（回収率 Claude ${pct1(ms.claude_own.roi)}／ワイド ${pct1(ms.marks_wide.roi)}）`:'')+`<br>${window.WK.text(mw.dates,'レース')}`,mn/mneed);
     fetch('data/going_log_summary_v1.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(G=>{if(!G)return;const ch=G.changed_before_main||0,NEED=30;$('sumClaude').insertAdjacentHTML('beforeend',`<a class="sumlink" href="staging/improvement-cycle.html#sumGoingLog"><div class="pr"><span class="pl">馬場の変化</span>${cb(ch/NEED)}<span class="pt">変化の事例 ${ch}/${NEED}件<br>記録 ${G.days||0}日分</span></div></a>`)}).catch(()=>{});
   }).catch(()=>{});
 })();

@@ -165,6 +165,7 @@ def score(rows):
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument('--date', default=None); ap.add_argument('--backfill-from', default=None)
+    ap.add_argument('--last-days', type=int, default=1, help='also process the N-1 days before --date (GitHub schedules run late, often on the next JST day)')
     a = ap.parse_args(argv)
     day = date.fromisoformat(a.date) if a.date else (date.today())
     sess = requests.Session()
@@ -174,7 +175,7 @@ def main(argv=None):
         d = date.fromisoformat(a.backfill_from)
         while d <= day: days.append(d); d += timedelta(days=1)
     else:
-        days = [day]
+        days = [day - timedelta(days=k) for k in range(max(1, a.last_days) - 1, -1, -1)]
     for d in days:
         outcomes = main_outcomes(d)
         new = rows_from_live(d)

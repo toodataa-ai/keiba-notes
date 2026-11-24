@@ -33,7 +33,7 @@ jobs:
           DAY="${{ inputs.date }}"; if [ -z "$DAY" ]; then DAY=$(TZ=Asia/Tokyo date +%F); fi
           BACKFILL="${{ inputs.backfill_from }}"
           echo "DAY=$DAY" >> "$GITHUB_ENV"
-          if [ -n "$BACKFILL" ]; then python -W ignore going_log.py --date "$DAY" --backfill-from "$BACKFILL"; else python -W ignore going_log.py --date "$DAY"; fi
+          if [ -n "$BACKFILL" ]; then python -W ignore going_log.py --date "$DAY" --backfill-from "$BACKFILL"; else python -W ignore going_log.py --date "$DAY" --last-days 4; fi
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
