@@ -15,6 +15,7 @@ TRACKED = [  # workflow file, label
     ("step1-factors-v1.yml", "STEP1の補助データの作成"),
     ("going-labels-update-v1.yml", "新しいレースの追加取得"),
     ("derived-refresh-v1.yml", "各ページ・予想の数字の作り直し（週次）"),
+    ("baba-data-refresh-v1.yml", "馬場の学習データの更新（週次）"),
     ("claude-odds-v1.yml", "Claude用のオッズ取得"),
     ("claude-results-v1.yml", "Claude用の結果取得"),
     ("jra-improvement-experiments-v1.yml", "改善案と今の予想の採点"),
