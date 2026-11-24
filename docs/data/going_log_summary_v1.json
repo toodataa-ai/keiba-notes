@@ -1,34 +1,54 @@
 {
- "rows": 12,
- "days": 3,
+ "rows": 30,
+ "days": 7,
  "tracks": [
   "fukushima",
   "kyoto",
   "tokyo"
  ],
- "with_outcome": 9,
- "changed_before_main": 1,
- "wet_days": 1,
+ "with_outcome": 18,
+ "changed_before_main": 4,
+ "wet_days": 3,
  "first_date": "2026-11-07",
- "last_date": "2026-11-14",
- "scored_main": 0,
+ "last_date": "2026-11-23",
+ "scored_main": 9,
+ "main_logloss": {
+  "final": 1.10737644059341,
+  "baseline_morning_persists": 1.3431949376738477,
+  "no_forecast": 1.6435437199725274
+ },
+ "main_hit": {
+  "final": 0.6666666666666666,
+  "baseline_morning_persists": 0.6666666666666666
+ },
+ "changed_cases": {
+  "n": 3,
+  "logloss_final": 2.9074644803161185,
+  "logloss_baseline": 3.879866502920089
+ },
  "forecast_check": {
-  "n": 6,
-  "wet_rate": 0.0,
-  "brier_forecast": 0.016333346729804462,
-  "brier_climatology": 0.0,
+  "n": 15,
+  "wet_rate": 0.13333333333333333,
+  "brier_forecast": 0.05844447602525511,
+  "brier_climatology": 0.11555555555555551,
   "reliability": [
    {
     "range": "0-10%",
-    "n": 3,
-    "mean_p": 0.0,
+    "n": 7,
+    "mean_p": 0.017714285714285714,
     "observed": 0.0
    },
    {
     "range": "10-30%",
-    "n": 3,
-    "mean_p": 0.17195709157951378,
+    "n": 5,
+    "mean_p": 0.17675425494770827,
     "observed": 0.0
+   },
+   {
+    "range": "50-70%",
+    "n": 3,
+    "mean_p": 0.6159666666666667,
+    "observed": 0.6666666666666666
    }
   ]
  }
