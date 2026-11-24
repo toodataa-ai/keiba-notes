@@ -25,6 +25,10 @@ class T(unittest.TestCase):
                 "doAction('/JRADB/accessS.html','pw01srl10082025031120251102/45')")
         months, days = g.parse_month(html)
         self.assertEqual(set(months), {'202510', '202512'})
+        # いまの月は pw01skl00（過去の月は pw01skl10）。999999 は月ではない
+        m2, _ = g.parse_month("doAction('/JRADB/accessS.html','pw01skl00202611/91') doAction('/JRADB/accessS.html','pw01skl00999999/B3') doAction('/JRADB/accessS.html','pw01skl10202610/AA')")
+        self.assertEqual(set(m2), {'202611', '202610'})
+        self.assertEqual(m2['202611'], 'pw01skl00202611/91')
         self.assertEqual(len(days), 2)
         self.assertEqual((days[0]['track'], days[0]['date'], days[0]['kai'], days[0]['nichime']), ('東京', '2025-11-02', 4, 11))
         self.assertEqual(days[1]['track'], '京都')

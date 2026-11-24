@@ -17,7 +17,7 @@ TRACKS = {'01': '札幌', '02': '函館', '03': '福島', '04': '新潟', '05': 
           '06': '中山', '07': '中京', '08': '京都', '09': '阪神', '10': '小倉'}
 SEED_MONTH = ('202511', 'pw01skl10202511/EC')
 DAY_RE = re.compile(r"pw01srl10(\d{2})(\d{4})(\d{2})(\d{2})(\d{8})/[0-9A-F]{2}")
-MONTH_RE = re.compile(r"pw01skl10(\d{6})/[0-9A-F]{2}")
+MONTH_RE = re.compile(r"pw01skl(?:10|00)(\d{6})/[0-9A-F]{2}")   # 10＝過去の月、00＝いまの月（11月分など）
 SES_RE = re.compile(r"pw01ses\d+/[0-9A-F]{2}")
 FIELDS = ['date', 'track', 'kai', 'nichime', 'race_no', 'start_time', 'surface', 'going',
           'weather', 'distance_m', 'course_detail', 'race_name', 'class', 'category', 'source_cname']
@@ -49,8 +49,9 @@ class Client:
 def parse_month(html):
     """-> (neighbour months {YYYYMM: cname}, meeting days [dict])."""
     months, days, seen = {}, [], set()
-    for m in re.finditer(r"pw01skl10(\d{6})/[0-9A-F]{2}", html):
-        months.setdefault(m.group(1), m.group(0))
+    for m in MONTH_RE.finditer(html):
+        if m.group(1) != '999999':
+            months.setdefault(m.group(1), m.group(0))
     for m in DAY_RE.finditer(html):
         if m.group(0) in seen:
             continue
@@ -190,6 +191,7 @@ def cmd_update(a):
         if re.fullmatch(r'jra_going_\d{4}\.csv', fn):
             with open(os.path.join(a.dir, fn), encoding='utf-8') as f:
                 have |= {(r['date'], r['track']) for r in csv.DictReader(f)}
+    print('index: days', len(days), 'latest', [(d['date'], d['track']) for d in days[-6:]], 'by month', {m: n for m, n in json.load(open(idx, encoding='utf-8')).get('months', {}).items()})
     todo = [d for d in days if d['date'] < today and (d['date'], d['track']) not in have]
     cl = Client(a.delay)
     added, failed = {}, []
@@ -221,6 +223,34 @@ def cmd_update(a):
     return {'new_races': n, 'failed': failed}
 
 
+def cmd_probe(a):
+    cl = Client(a.delay)
+    if a.cname == 'LAST':          # 種の月から次の月へたどれるところまで行き、最後の月のページの中身を見る
+        known = {SEED_MONTH[0]: SEED_MONTH[1]}; ym = SEED_MONTH[0]; html = ''
+        while True:
+            html = cl.post(known[ym])
+            months, _ = parse_month(html)
+            for k, v in months.items():
+                known.setdefault(k, v)
+            nx = '%04d%02d' % ((int(ym[:4]) + 1, 1) if ym[4:] == '12' else (int(ym[:4]), int(ym[4:]) + 1))
+            if nx not in known:
+                break
+            ym = nx
+        print('last reachable month', ym, 'known months', sorted(known))
+        a.cname = known[ym]
+    else:
+        html = cl.post(a.cname)
+    names = sorted(set(re.findall(r"accessS\.html['\"]\s*,\s*['\"]([^'\"]+)['\"]", html)))
+    print('cname', a.cname, 'len', len(html), 'links', len(names))
+    byp = {}
+    for n in names:
+        byp.setdefault(re.sub(r'\d', '#', n.split('/')[0]), []).append(n)
+    for k, v in byp.items():
+        print(k, len(v), v[:3], v[-2:])
+    for m in re.finditer(r'(次|翌|前)の?月[^<]{0,40}', html):
+        print('NAV', m.group(0)[:60])
+
+
 def main(argv=None):
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -230,8 +260,9 @@ def main(argv=None):
     c.add_argument('--out', required=True); c.add_argument('--delay', type=float, default=2.5)
     u = sub.add_parser('update'); u.add_argument('--dir', required=True); u.add_argument('--work', default='/tmp')
     u.add_argument('--today', default=''); u.add_argument('--delay', type=float, default=2.5)
+    pr = sub.add_parser('probe'); pr.add_argument('--cname', required=True); pr.add_argument('--delay', type=float, default=2.5)
     a = p.parse_args(argv)
-    {'index': cmd_index, 'collect': cmd_collect, 'update': cmd_update}[a.cmd](a)
+    {'probe': cmd_probe, 'index': cmd_index, 'collect': cmd_collect, 'update': cmd_update}[a.cmd](a)
 
 
 if __name__ == '__main__':
