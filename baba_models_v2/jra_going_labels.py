@@ -17,7 +17,7 @@ TRACKS = {'01': '札幌', '02': '函館', '03': '福島', '04': '新潟', '05': 
           '06': '中山', '07': '中京', '08': '京都', '09': '阪神', '10': '小倉'}
 SEED_MONTH = ('202511', 'pw01skl10202511/EC')
 DAY_RE = re.compile(r"pw01srl10(\d{2})(\d{4})(\d{2})(\d{2})(\d{8})/[0-9A-F]{2}")
-MONTH_RE = re.compile(r"pw01skl10(\d{6})/[0-9A-F]{2}")
+MONTH_RE = re.compile(r"pw01skl(?:10|00)(\d{6})/[0-9A-F]{2}")   # 10＝過去の月、00＝いまの月（11月分など）
 SES_RE = re.compile(r"pw01ses\d+/[0-9A-F]{2}")
 FIELDS = ['date', 'track', 'kai', 'nichime', 'race_no', 'start_time', 'surface', 'going',
           'weather', 'distance_m', 'course_detail', 'race_name', 'class', 'category', 'source_cname']
@@ -49,8 +49,9 @@ class Client:
 def parse_month(html):
     """-> (neighbour months {YYYYMM: cname}, meeting days [dict])."""
     months, days, seen = {}, [], set()
-    for m in re.finditer(r"pw01skl10(\d{6})/[0-9A-F]{2}", html):
-        months.setdefault(m.group(1), m.group(0))
+    for m in MONTH_RE.finditer(html):
+        if m.group(1) != '999999':
+            months.setdefault(m.group(1), m.group(0))
     for m in DAY_RE.finditer(html):
         if m.group(0) in seen:
             continue
