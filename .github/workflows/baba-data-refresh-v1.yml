@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: '3.12'}
-      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf numpy pandas scikit-learn scipy
+        with: {python-version: '3.13'}
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4 pypdf numpy==2.5.3 pandas==3.0.5 scikit-learn==1.9.1 scipy==1.18.1   # 判定の境目に近い競馬場が、ライブラリの版の違いで入れ替わらないよう、結果を確かめた版に固定
       - name: Unit tests
         working-directory: baba_models_v2
         run: python -m unittest test_refresh_baba_data test_jra_observations test_jra_course_overview test_jma_weather test_jra_going_labels

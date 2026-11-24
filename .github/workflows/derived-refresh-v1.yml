@@ -29,8 +29,8 @@ jobs:
           token: ${{ secrets.PRIVATE_DATA_TOKEN }}
           path: private
       - uses: actions/setup-python@v5
-        with: {python-version: '3.12'}
-      - run: pip install numpy requests beautifulsoup4
+        with: {python-version: '3.13'}
+      - run: pip install numpy==2.5.3 requests beautifulsoup4   # 係数の当てはめ結果が版の違いで動かないよう固定
       - run: python3 -m unittest sim_v2.test_step1_factors -v
       - name: Rebuild
         id: rb
