@@ -69,6 +69,7 @@ def day_status(date):
     st["claude_review"] = {"done": sum(1 for r in ids if os.path.exists(p("claude_track", "reviews", r + ".json"))), "expected": n}
     want = sum(1 for v in ids.values() if v in GOING_VENUES)
     st["going_live"] = {"done": len(glob.glob(p("baba_models_v2", "live", f"{date}_*.json"))), "expected": want}
+    st["step1_factors"] = {"done": len(glob.glob(p("docs", "data", "step1_factors", f"{date}_*.json"))), "expected": len(pdirs)}
     at = archive_times(date) + archive_times(nxt if nxt[:7] != date[:7] else date)
     am = [t for d, t in at if d == date and t < 830]
     off = [t for d, t in at if d == date and 830 <= t < 1700]

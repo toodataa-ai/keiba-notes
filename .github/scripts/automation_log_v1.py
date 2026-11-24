@@ -12,6 +12,7 @@ TRACKED = [  # workflow file, label
     ("local-racing-shadow-prerace-generic.yml", "地方競馬：予想の固定"),
     ("claude-race-data-v1.yml", "出馬表の取得"),
     ("baba-going-live-v1.yml", "馬場の朝の予測"),
+    ("step1-factors-v1.yml", "STEP1の補助データの作成"),
     ("claude-odds-v1.yml", "Claude用のオッズ取得"),
     ("claude-results-v1.yml", "Claude用の結果取得"),
     ("jra-improvement-experiments-v1.yml", "改善案と今の予想の採点"),
@@ -23,7 +24,7 @@ TRACKED = [  # workflow file, label
 # 実行の出どころ：G=GitHubの定時（遅れて動いた保険を含む）／H=Haikuの起動役（D1 6:03・D2 18:03）／O=OpusのClaudeタスク（T2・T3）／手=手動・復旧・ファイル更新（push）
 # 起動役とClaudeタスクは同じ権限でAPIから起動するため、「決まった時刻の窓＋決まった処理」で見分ける（窓の外の起動は手動）。
 D1_SET = {"baba-forecast-archive-v1.yml", "local-racing-shadow-postrace.yml", "local-racing-shadow-prerace-generic.yml"}
-T2_SET = {"claude-race-data-v1.yml", "claude-odds-v1.yml", "baba-going-live-v1.yml"}
+T2_SET = {"claude-race-data-v1.yml", "claude-odds-v1.yml", "baba-going-live-v1.yml", "step1-factors-v1.yml"}
 T3_SET = {"claude-results-v1.yml", "claude-wakakoma-v1.yml", "claude-track-publish-v1.yml", "jra-improvement-experiments-v1.yml", "jra-improvement-pipeline-v1.yml"}
 
 

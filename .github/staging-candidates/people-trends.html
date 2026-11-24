@@ -48,6 +48,21 @@
 <p class="lead">2018年以降のJRAの平地レースで、<strong>騎手・調教師ごとの成績と、条件別（芝ダート・距離・競馬場・コース・人気）の得意不得意、騎手のレーダーチャート</strong>をまとめました。人気（オッズ）の影響は除いてあります。</p>
 </header>
 
+<style>.pp-toc a{display:inline!important;background:none!important;border:0!important;padding:0!important;margin:0 2px!important;color:#1d4f9f!important;text-decoration:underline;font-weight:700;border-radius:0!important}</style>
+<nav class="pp-toc" aria-label="このページの目次" style="border:1px solid #e3e4e8;border-radius:12px;background:#f6f7f9;padding:10px 13px;margin:12px 0;font-size:14px;line-height:2">
+<b>目次</b><br>
+<span style="color:#6d6e75;font-size:12px">予想に使う</span>　<a href="#trainer-strength">調教師の強さ</a><br>
+<span style="color:#6d6e75;font-size:12px">研究（予想には使っていない）</span>　<a href="#howTitle">数字の読み方</a>・<a href="#radTitle">騎手のレーダー</a>・<a href="#rlTitle">レーダー（人気に対して）</a>・<a href="#crsTitle">コースから探す</a>・<a href="#listTitle">騎手・調教師の一覧</a>・<a href="#noteTitle">注意</a>
+</nav>
+<section aria-labelledby="tsTitle" id="trainer-strength">
+<h2 id="tsTitle">調教師の強さ（予想に使う指標）</h2>
+<p class="sub" id="tsMeta">読み込み中…</p>
+<div class="pp-note" style="margin:0 0 8px">レースの条件によらない、<b>調教師そのものの強さ</b>です。2018年以降のJRAの全出走での<b>3着内率</b>を、全体の3着内率と比べた差＝「強さ」（走数が少ない人は全体に近づけて計算）。「3着内」は3着内率、「倍率」は予想で勝率に掛ける倍率。予想では、この差から計算した<b>倍率（約0.80〜1.25倍）</b>を、その厩舎の馬の勝率に掛けます（2026年11月28日の予想から）。強さの比べ方は <a href="methodology.html#datafactors">AI予想のしくみ 03章</a>、試して採用しなかった要素は <a href="factor-screen.html#data-adopt">要素の検証</a>。</div>
+<input class="pp-search" id="tsQ" type="search" placeholder="調教師名で探す（例：友道）" aria-label="調教師名で探す">
+<div id="tsList" style="overflow-x:auto"></div>
+<p class="pp-note" id="tsMore"></p>
+</section>
+
 <section aria-labelledby="howTitle">
 <h2 id="howTitle">数字の読み方</h2>
 <div class="pp-box">
@@ -108,15 +123,6 @@
 <div class="pp-seg" role="group" aria-label="最小の走数"><button type="button" data-cm="30" aria-pressed="false">30走以上</button><button type="button" data-cm="60" aria-pressed="true">60走以上</button><button type="button" data-cm="100" aria-pressed="false">100走以上</button></div>
 <p class="pp-note" id="crsNote"></p>
 <div class="pp-tbl" id="crsTbl"></div>
-</section>
-
-<section aria-labelledby="tsTitle" id="trainer-strength">
-<h2 id="tsTitle">調教師の強さ（予想に使う指標）</h2>
-<p class="sub" id="tsMeta">読み込み中…</p>
-<div class="pp-note" style="margin:0 0 8px">レースの条件によらない、<b>調教師そのものの強さ</b>です。2018年以降のJRAの全出走での<b>3着内率</b>を、全体の3着内率と比べた差＝「強さ」（走数が少ない人は全体に近づけて計算）。「3着内」は3着内率、「倍率」は予想で勝率に掛ける倍率。予想では、この差から計算した<b>倍率（約0.80〜1.25倍）</b>を、その厩舎の馬の勝率に掛けます（2026年11月28日の予想から）。強さの比べ方は <a href="methodology.html#datafactors">AI予想のしくみ 03章</a>、試して採用しなかった要素は <a href="factor-screen.html#data-adopt">要素の検証</a>。</div>
-<input class="pp-search" id="tsQ" type="search" placeholder="調教師名で探す（例：友道）" aria-label="調教師名で探す">
-<div id="tsList" style="overflow-x:auto"></div>
-<p class="pp-note" id="tsMore"></p>
 </section>
 
 <section aria-labelledby="listTitle">

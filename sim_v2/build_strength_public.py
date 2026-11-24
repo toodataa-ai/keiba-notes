@@ -11,6 +11,6 @@ add = [
     {"label": "調教師の強さ", "key": "trainer", "mult_per_sd": c["T1"]["mult_per_sd"], "cap_min": 0.80, "cap_max": 1.25, "what": "その調教師の過去のJRA成績（3着内率−全体）。レースによらない絶対的な強さ", "gain": "+0.0044（95%幅 +0.0015〜+0.0071）"},
     {"label": "この距離での過去の成績", "key": "dist", "mult_per_sd": round(math.exp(0.7 * 0.08), 3), "cap_min": 0.90, "cap_max": 1.11, "what": "同じ距離帯（200mごと）での3着内率と、全体の3着内率の差", "gain": "+0.0016（95%幅 +0.0005〜+0.0027）"},
 ]
-out = {"version": 1, "races_train": c["races_train"], "races_test": c["races_test"], "existing": sorted(items, key=lambda x: -abs(math.log(x["mult_per_sd"]))), "added": add}
+out = {"version": 1, "races_train": c["races_train"], "races_test": c["races_test"], "existing": sorted(items, key=lambda x: -abs(math.log(x["mult_per_sd"]))), "added": add, "overlap": c.get("overlap")}
 (ROOT / "docs/data/step1_factor_strength_v1.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
 print(len(items), "既存", len(add), "追加")
