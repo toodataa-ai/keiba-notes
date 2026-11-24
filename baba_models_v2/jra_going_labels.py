@@ -222,6 +222,20 @@ def cmd_update(a):
     return {'new_races': n, 'failed': failed}
 
 
+def cmd_probe(a):
+    cl = Client(a.delay)
+    html = cl.post(a.cname)
+    names = sorted(set(re.findall(r"accessS\.html['\"]\s*,\s*['\"]([^'\"]+)['\"]", html)))
+    print('cname', a.cname, 'len', len(html), 'links', len(names))
+    byp = {}
+    for n in names:
+        byp.setdefault(re.sub(r'\d', '#', n.split('/')[0]), []).append(n)
+    for k, v in byp.items():
+        print(k, len(v), v[:3], v[-2:])
+    for m in re.finditer(r'(次|翌|前)の?月[^<]{0,40}', html):
+        print('NAV', m.group(0)[:60])
+
+
 def main(argv=None):
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -231,8 +245,9 @@ def main(argv=None):
     c.add_argument('--out', required=True); c.add_argument('--delay', type=float, default=2.5)
     u = sub.add_parser('update'); u.add_argument('--dir', required=True); u.add_argument('--work', default='/tmp')
     u.add_argument('--today', default=''); u.add_argument('--delay', type=float, default=2.5)
+    pr = sub.add_parser('probe'); pr.add_argument('--cname', required=True); pr.add_argument('--delay', type=float, default=2.5)
     a = p.parse_args(argv)
-    {'index': cmd_index, 'collect': cmd_collect, 'update': cmd_update}[a.cmd](a)
+    {'probe': cmd_probe, 'index': cmd_index, 'collect': cmd_collect, 'update': cmd_update}[a.cmd](a)
 
 
 if __name__ == '__main__':
