@@ -1,14 +1,14 @@
 {
  "version": 1,
- "generated_at": "2026-11-25 06:07",
- "data_through": "2026-10-31",
+ "generated_at": "2026-11-25 08:20",
+ "data_through": "2026-11-23",
  "jobs": [
   {
    "id": "trainer_strength",
    "label": "調教師の強さ（人の成績ページ・STEP1）",
    "status": "ok",
-   "at": "2026-11-25 06:07",
-   "data_through": "2026-10-31",
+   "at": "2026-11-25 08:20",
+   "data_through": "2026-11-23",
    "outputs": [
     "docs/data/trainer_strength_v1.json"
    ]
@@ -17,8 +17,8 @@
    "id": "track_trends",
    "label": "競馬場の傾向",
    "status": "ok",
-   "at": "2026-11-25 06:07",
-   "data_through": "2026-10-31",
+   "at": "2026-11-25 08:20",
+   "data_through": "2026-11-23",
    "outputs": [
     "docs/data/track_trends_v1.json"
    ]
@@ -27,8 +27,8 @@
    "id": "people_trends",
    "label": "騎手・調教師の条件別成績",
    "status": "ok",
-   "at": "2026-11-25 06:07",
-   "data_through": "2026-10-31",
+   "at": "2026-11-25 08:20",
+   "data_through": "2026-11-23",
    "outputs": [
     "docs/data/people_trends_v1.json"
    ]
@@ -37,8 +37,8 @@
    "id": "sire_map",
    "label": "種牡馬の初勝利マップ",
    "status": "ok",
-   "at": "2026-11-25 06:07",
-   "data_through": "2026-10-31",
+   "at": "2026-11-25 08:20",
+   "data_through": "2026-11-23",
    "outputs": [
     "docs/data/sire_firstwin_v1.json"
    ]
@@ -47,25 +47,13 @@
    "id": "step1_coef",
    "label": "STEP1の係数（調教師・上がり順位）と要素の強さ",
    "status": "ok",
-   "at": "2026-11-25 06:07",
-   "data_through": "2026-10-31",
+   "at": "2026-11-25 08:20",
+   "data_through": "2026-11-23",
    "outputs": [
     "sim_v2/step1_factor_coef.json",
     "docs/data/step1_factor_strength_v1.json"
    ],
-   "note": "T1 2.2909 → 2.2909、K2 1.4076 → 1.4076"
-  },
-  {
-   "id": "baba_data",
-   "label": "馬場の学習データ（気象・含水率・コース）と馬場予測の判定",
-   "status": "ok",
-   "at": "2026-11-25 08:00",
-   "data_through": "2026-11-01",
-   "note": "表 30561→30561行（含水率がまだ無い直近216レースは次回に回す）、直近60日360レースの欠け（気象 0.0・含水率 0.0）",
-   "outputs": [
-    "baba_models_v2/stage_b/stage_b_dataset.csv.gz",
-    "baba_models_v2/model_registry.json"
-   ]
+   "note": "T1 2.2909 → 2.3068、K2 1.4076 → 1.4186"
   }
  ]
 }

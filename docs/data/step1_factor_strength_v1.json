@@ -1,11 +1,11 @@
 {
  "version": 1,
  "races_train": 6713,
- "races_test": 7710,
+ "races_test": 7939,
  "existing": [
   {
    "label": "走破タイムの指数",
-   "mult_per_sd": 1.533,
+   "mult_per_sd": 1.55,
    "added": false
   },
   {
@@ -15,42 +15,42 @@
   },
   {
    "label": "騎手",
-   "mult_per_sd": 1.263,
-   "added": false
-  },
-  {
-   "label": "近3走の着順",
-   "mult_per_sd": 0.812,
+   "mult_per_sd": 1.265,
    "added": false
   },
   {
    "label": "年齢（平均との差）",
-   "mult_per_sd": 0.814,
+   "mult_per_sd": 0.813,
    "added": false
   },
   {
-   "label": "過去最高の指数",
-   "mult_per_sd": 1.218,
-   "added": false
-  },
-  {
-   "label": "出走数",
-   "mult_per_sd": 0.827,
+   "label": "近3走の着順",
+   "mult_per_sd": 0.815,
    "added": false
   },
   {
    "label": "上がりの指数",
-   "mult_per_sd": 1.209,
+   "mult_per_sd": 1.212,
+   "added": false
+  },
+  {
+   "label": "過去最高の指数",
+   "mult_per_sd": 1.199,
+   "added": false
+  },
+  {
+   "label": "出走数",
+   "mult_per_sd": 0.835,
    "added": false
   },
   {
    "label": "初出走",
-   "mult_per_sd": 0.841,
+   "mult_per_sd": 0.846,
    "added": false
   },
   {
    "label": "近3走の人気",
-   "mult_per_sd": 0.85,
+   "mult_per_sd": 0.849,
    "added": false
   },
   {
@@ -60,42 +60,47 @@
   },
   {
    "label": "距離延長",
-   "mult_per_sd": 0.895,
+   "mult_per_sd": 0.894,
    "added": false
   },
   {
    "label": "能力のばらつき",
-   "mult_per_sd": 1.075,
+   "mult_per_sd": 1.077,
    "added": false
   },
   {
    "label": "父の芝ダート傾向×若駒",
-   "mult_per_sd": 1.073,
+   "mult_per_sd": 1.075,
    "added": false
   },
   {
    "label": "近3走の着差",
-   "mult_per_sd": 0.936,
+   "mult_per_sd": 0.935,
    "added": false
   },
   {
    "label": "父の初出走成績×初出走",
-   "mult_per_sd": 1.063,
-   "added": false
-  },
-  {
-   "label": "父の芝ダート傾向",
-   "mult_per_sd": 1.039,
+   "mult_per_sd": 1.062,
    "added": false
   },
   {
    "label": "芝ダートの替わり",
-   "mult_per_sd": 0.968,
+   "mult_per_sd": 0.965,
+   "added": false
+  },
+  {
+   "label": "父の芝ダート傾向",
+   "mult_per_sd": 1.036,
    "added": false
   },
   {
    "label": "馬番（内→外）",
-   "mult_per_sd": 1.032,
+   "mult_per_sd": 1.035,
+   "added": false
+  },
+  {
+   "label": "距離への適性（スタミナ）",
+   "mult_per_sd": 1.03,
    "added": false
   },
   {
@@ -104,28 +109,23 @@
    "added": false
   },
   {
-   "label": "距離への適性（スタミナ）",
-   "mult_per_sd": 1.028,
-   "added": false
-  },
-  {
    "label": "馬体重の増減幅",
-   "mult_per_sd": 0.979,
+   "mult_per_sd": 0.978,
    "added": false
   },
   {
    "label": "斤量（平均との差）",
-   "mult_per_sd": 1.017,
+   "mult_per_sd": 1.016,
    "added": false
   },
   {
    "label": "道悪の適性",
-   "mult_per_sd": 0.988,
+   "mult_per_sd": 0.986,
    "added": false
   },
   {
    "label": "前走からの間隔",
-   "mult_per_sd": 1.004,
+   "mult_per_sd": 1.007,
    "added": false
   },
   {
@@ -138,7 +138,7 @@
   {
    "label": "上がり順位のよさ",
    "key": "kick",
-   "mult_per_sd": 1.328,
+   "mult_per_sd": 1.331,
    "cap_min": 0.65,
    "cap_max": 1.53,
    "what": "直近3走の上がり3Fが、そのレースの出走馬の中で何番目だったか",
@@ -147,7 +147,7 @@
   {
    "label": "調教師の強さ",
    "key": "trainer",
-   "mult_per_sd": 1.159,
+   "mult_per_sd": 1.16,
    "cap_min": 0.8,
    "cap_max": 1.25,
    "what": "その調教師の過去のJRA成績（3着内率−全体）。レースによらない絶対的な強さ",
@@ -165,8 +165,8 @@
  ],
  "overlap": {
   "T1": {
-   "alone_mult": 1.159,
-   "joint_mult": 1.159,
+   "alone_mult": 1.16,
+   "joint_mult": 1.16,
    "top_corr": [
     {
      "label": "近3走の人気",
@@ -183,13 +183,13 @@
    ],
    "ref_label": "騎手",
    "ref_corr": 0.37,
-   "mult_without_ref": 1.225,
-   "ref_mult_before": 1.298,
-   "ref_mult_after": 1.264
+   "mult_without_ref": 1.227,
+   "ref_mult_before": 1.301,
+   "ref_mult_after": 1.266
   },
   "K2": {
-   "alone_mult": 1.327,
-   "joint_mult": 1.328,
+   "alone_mult": 1.331,
+   "joint_mult": 1.331,
    "top_corr": [
     {
      "label": "初出走",
@@ -206,9 +206,9 @@
    ],
    "ref_label": "上がりの指数",
    "ref_corr": 0.36,
-   "mult_without_ref": 1.379,
-   "ref_mult_before": 1.247,
-   "ref_mult_after": 1.206
+   "mult_without_ref": 1.383,
+   "ref_mult_before": 1.25,
+   "ref_mult_after": 1.209
   }
  }
 }
