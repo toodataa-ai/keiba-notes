@@ -60,6 +60,23 @@ def main():
         items.append({"name": n, "label": JP.get(n, {"T1": "調教師の強さ", "K2": "上がり順位のよさ"}.get(n, n)), "coef_per_unit": round(float(b[i] / sd[i]), 4),
                       "sd": round(float(sd[i]), 4), "mean": round(float(mu[i]), 4), "mult_per_sd": round(per_sd, 3), "added": n in ("T1", "K2")})
     out["items"] = items
+    # 既存の要素との重なり：追加した要素と既存の各列の相関、単独で足したときと既存と一緒にしたときの強さ
+    Xall = np.vstack([d[0] for d in allr]); ov = {}
+    for key, col in (("T1", t1), ("K2", k2)):
+        cs = sorted([(float(np.corrcoef(Xall[:, col], Xall[:, i])[0, 1]), JP.get(FEATS[i], FEATS[i])) for i in range(nf)], key=lambda x: -abs(x[0]))[:3]
+        m1, s1, b_1 = newton(allr, b1 + [col])
+        ov[key] = {"alone_mult": round(float(np.exp(b_1[-1])), 3), "joint_mult": round(float(np.exp(b[(len(names) - 2) + (0 if key == "T1" else 1)])), 3),
+                   "top_corr": [{"label": l, "r": round(r, 2)} for r, l in cs]}
+    # 最も近い既存要素との重なり（K2↔上がりの指数、T1↔騎手）：相関と、その既存要素を外したときの強さ
+    for key, col, ref in (("K2", k2, FEATS.index("kick")), ("T1", t1, FEATS.index("jockey"))):
+        r = float(np.corrcoef(Xall[:, col], Xall[:, ref])[0, 1])
+        no_ref = [c for c in b1 if c != ref] + [col]
+        _, _, bn = newton(allr, no_ref)
+        _, _, bw = newton(allr, [c for c in b1] )
+        _, _, bwith = newton(allr, b1 + [col])
+        ov[key].update({"ref_label": JP[FEATS[ref]], "ref_corr": round(r, 2), "mult_without_ref": round(float(np.exp(bn[-1])), 3),
+                        "ref_mult_before": round(float(np.exp(bw[ref])), 3), "ref_mult_after": round(float(np.exp(bwith[ref])), 3)})
+    out["overlap"] = ov
     out["T1"] = {k: v for k, v in items[-2].items()}
     out["K2"] = {k: v for k, v in items[-1].items()}
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
