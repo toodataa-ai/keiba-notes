@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-23T22:03:17+00:00",
+ "generated_at": "2026-11-24T00:12:25+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 45295118666,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-24T00:11:30Z",
+     "started_at": "2026-11-24T00:11:30Z",
+     "ended_at": "2026-11-24T00:11:55Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 45267521798,
      "event": "schedule",
@@ -655,17 +666,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "H"
-    },
-    {
-     "id": 43139754921,
-     "event": "schedule",
-     "created_at": "2026-11-12T02:12:17Z",
-     "started_at": "2026-11-12T02:12:17Z",
-     "ended_at": "2026-11-12T02:12:38Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -1080,28 +1080,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 42704498405,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-09T21:39:03Z",
-     "started_at": "2026-11-09T21:39:03Z",
-     "ended_at": "2026-11-09T21:41:28Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42543459810,
-     "event": "schedule",
-     "created_at": "2026-11-09T01:03:11Z",
-     "started_at": "2026-11-09T01:03:11Z",
-     "ended_at": "2026-11-09T01:05:00Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -1417,34 +1395,23 @@
      "attempt": 1,
      "by": "G",
      "fail_kind": ""
-    },
-    {
-     "id": 42704502657,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-09T21:39:05Z",
-     "started_at": "2026-11-09T21:39:05Z",
-     "ended_at": "2026-11-09T21:43:34Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 42547770421,
-     "event": "schedule",
-     "created_at": "2026-11-09T01:51:45Z",
-     "started_at": "2026-11-09T01:51:45Z",
-     "ended_at": "2026-11-09T01:53:33Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
   "claude-race-data-v1.yml": {
    "label": "出馬表の取得",
    "runs": [
+    {
+     "id": 45295124794,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-24T00:11:32Z",
+     "started_at": "2026-11-24T00:11:32Z",
+     "ended_at": "2026-11-24T00:11:55Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 45109036611,
      "event": "schedule",
@@ -1557,34 +1524,23 @@
      "attempt": 1,
      "by": "O",
      "fail_kind": ""
-    },
-    {
-     "id": 42553644058,
-     "event": "schedule",
-     "created_at": "2026-11-09T02:56:35Z",
-     "started_at": "2026-11-09T02:56:35Z",
-     "ended_at": "2026-11-09T02:56:56Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42538856851,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-09T00:11:47Z",
-     "started_at": "2026-11-09T00:11:47Z",
-     "ended_at": "2026-11-09T00:12:07Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
     }
    ]
   },
   "baba-going-live-v1.yml": {
    "label": "馬場の朝の予測",
    "runs": [
+    {
+     "id": 45295121992,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-24T00:11:31Z",
+     "started_at": "2026-11-24T00:11:31Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 45123997612,
      "event": "schedule",
@@ -1735,28 +1691,6 @@
      "created_at": "2026-11-14T00:12:29Z",
      "started_at": "2026-11-14T00:12:29Z",
      "ended_at": "2026-11-14T00:15:03Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "O"
-    },
-    {
-     "id": 42553745791,
-     "event": "schedule",
-     "created_at": "2026-11-09T02:57:48Z",
-     "started_at": "2026-11-09T02:57:48Z",
-     "ended_at": "2026-11-09T03:00:49Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42538920328,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-09T00:12:29Z",
-     "started_at": "2026-11-09T00:12:29Z",
-     "ended_at": "2026-11-09T00:15:25Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
@@ -1953,28 +1887,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "O"
-    },
-    {
-     "id": 42581179087,
-     "event": "schedule",
-     "created_at": "2026-11-09T07:44:05Z",
-     "started_at": "2026-11-09T07:44:05Z",
-     "ended_at": "2026-11-09T07:44:22Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42576862389,
-     "event": "schedule",
-     "created_at": "2026-11-09T07:03:25Z",
-     "started_at": "2026-11-09T07:03:25Z",
-     "ended_at": "2026-11-09T07:03:40Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -2167,28 +2079,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "O"
-    },
-    {
-     "id": 42680687652,
-     "event": "schedule",
-     "created_at": "2026-11-09T19:09:48Z",
-     "started_at": "2026-11-09T19:09:48Z",
-     "ended_at": "2026-11-09T19:10:11Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42677607276,
-     "event": "schedule",
-     "created_at": "2026-11-09T18:50:22Z",
-     "started_at": "2026-11-09T18:50:22Z",
-     "ended_at": "2026-11-09T18:50:42Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -2454,17 +2344,6 @@
      "created_at": "2026-11-10T17:17:43Z",
      "started_at": "2026-11-10T17:17:43Z",
      "ended_at": "2026-11-10T17:17:59Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42689612692,
-     "event": "schedule",
-     "created_at": "2026-11-09T20:05:40Z",
-     "started_at": "2026-11-09T20:05:40Z",
-     "ended_at": "2026-11-09T20:06:00Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
@@ -2820,23 +2699,23 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 42695731836,
-     "event": "schedule",
-     "created_at": "2026-11-09T20:43:52Z",
-     "started_at": "2026-11-09T20:43:52Z",
-     "ended_at": "2026-11-09T20:44:10Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 45277778275,
+     "event": "schedule",
+     "created_at": "2026-11-23T22:14:38Z",
+     "started_at": "2026-11-23T22:14:38Z",
+     "ended_at": "2026-11-23T22:14:58Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 45268788456,
      "event": "push",
@@ -3404,17 +3283,6 @@
      "created_at": "2026-11-10T18:17:25Z",
      "started_at": "2026-11-10T18:17:25Z",
      "ended_at": "2026-11-10T18:17:44Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
-    },
-    {
-     "id": 42699298556,
-     "event": "schedule",
-     "created_at": "2026-11-09T21:06:22Z",
-     "started_at": "2026-11-09T21:06:22Z",
-     "ended_at": "2026-11-09T21:06:43Z",
      "status": "completed",
      "conclusion": "success",
      "attempt": 1,
