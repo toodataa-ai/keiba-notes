@@ -1,0 +1,1123 @@
+{
+ "schema": "step1_factors_v1",
+ "date": "2026-11-23",
+ "venue": "福島",
+ "race_name": "奥羽ステークス",
+ "race_no": 11,
+ "distance_m": 1700,
+ "coef_version": "step1_factor_coef.json",
+ "generated_at": "2026-11-25T04:42:30+09:00",
+ "usage": "勝率に mult_total を掛けて全頭の合計を1に直す。kick_reference は各馬の reason に必ず書く",
+ "horses": [
+  {
+   "no": 1,
+   "name": "マーシヴィガラス",
+   "horse_id": "2020104099",
+   "trainer": "的場 均",
+   "trainer_id": "01063",
+   "trainer_factor": {
+    "t1": -0.1635,
+    "runs": 1744,
+    "top3": 92,
+    "top3_rate_raw": 0.053,
+    "base": 0.219,
+    "mult": 0.802
+   },
+   "kick_factor": {
+    "k2": 0.2275,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-22",
+      "code": "2606040711",
+      "venue": "中山",
+      "race": "Jアニ",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 40.2,
+      "rank": 16,
+      "field": 16,
+      "finish": 16,
+      "share_faster": 0.938
+     },
+     {
+      "date": "2026-08-23",
+      "code": "2601020210",
+      "venue": "札幌",
+      "race": "WA3",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.7,
+      "rank": 4,
+      "field": 14,
+      "finish": 1,
+      "share_faster": 0.214
+     },
+     {
+      "date": "2025-12-20",
+      "code": "2507050510",
+      "venue": "中京",
+      "race": "Y名2",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 39.2,
+      "rank": 16,
+      "field": 16,
+      "finish": 16,
+      "share_faster": 0.938
+     }
+    ],
+    "mult": 0.817
+   },
+   "dist_factor": {
+    "apt": -0.002,
+    "bucket_m": 1600,
+    "runs_in_bucket": 6,
+    "top3_in_bucket": 1,
+    "mult": 0.999
+   },
+   "mult_trainer": 0.802,
+   "mult_kick": 0.817,
+   "mult_dist": 0.999,
+   "mult_total": 0.655,
+   "kick_reference": "上がり3F順位（新しい順）：16位/16頭(40.2)・4位/14頭(37.7)・16位/16頭(39.2)",
+   "notes": []
+  },
+  {
+   "no": 2,
+   "name": "メイショウカシワデ",
+   "horse_id": "2021103154",
+   "trainer": "角田 晃一",
+   "trainer_id": "01121",
+   "trainer_factor": {
+    "t1": 0.0291,
+    "runs": 2362,
+    "top3": 587,
+    "top3_rate_raw": 0.249,
+    "base": 0.219,
+    "mult": 1.069
+   },
+   "kick_factor": {
+    "k2": 0.5155,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-08-22",
+      "code": "2607030107",
+      "venue": "中京",
+      "race": "伊賀S",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 37.8,
+      "rank": 13,
+      "field": 16,
+      "finish": 14,
+      "share_faster": 0.75
+     },
+     {
+      "date": "2026-04-18",
+      "code": "2603010311",
+      "venue": "福島",
+      "race": "ラジ福",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.2,
+      "rank": 1,
+      "field": 15,
+      "finish": 1,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-03-28",
+      "code": "2606030112",
+      "venue": "中山",
+      "race": "4歳上",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 38.3,
+      "rank": 4,
+      "field": 16,
+      "finish": 2,
+      "share_faster": 0.188
+     }
+    ],
+    "mult": 1.225
+   },
+   "dist_factor": {
+    "apt": -0.1701,
+    "bucket_m": 1600,
+    "runs_in_bucket": 5,
+    "top3_in_bucket": 1,
+    "mult": 0.9
+   },
+   "mult_trainer": 1.069,
+   "mult_kick": 1.225,
+   "mult_dist": 0.9,
+   "mult_total": 1.179,
+   "kick_reference": "上がり3F順位（新しい順）：13位/16頭(37.8)・1位/15頭(37.2)・4位/16頭(38.3)",
+   "notes": []
+  },
+  {
+   "no": 3,
+   "name": "ジェイエルモーダル",
+   "horse_id": "2023106313",
+   "trainer": "松尾 卓哉",
+   "trainer_id": "01220",
+   "trainer_factor": {
+    "t1": 0.0136,
+    "runs": 110,
+    "top3": 26,
+    "top3_rate_raw": 0.236,
+    "base": 0.219,
+    "mult": 1.032
+   },
+   "kick_factor": {
+    "k2": 0.714,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-13",
+      "code": "2606040412",
+      "venue": "中山",
+      "race": "3歳上",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 37.1,
+      "rank": 2,
+      "field": 13,
+      "finish": 1,
+      "share_faster": 0.077
+     },
+     {
+      "date": "2026-08-15",
+      "code": "2604020708",
+      "venue": "新潟",
+      "race": "三国特",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 37.5,
+      "rank": 1,
+      "field": 15,
+      "finish": 1,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-06-14",
+      "code": "2605030406",
+      "venue": "東京",
+      "race": "3歳上",
+      "surface": "ダート",
+      "dist": 2100,
+      "last3f": 38.1,
+      "rank": 2,
+      "field": 15,
+      "finish": 2,
+      "share_faster": 0.067
+     }
+    ],
+    "mult": 1.53
+   },
+   "dist_factor": {
+    "apt": -0.1406,
+    "bucket_m": 1600,
+    "runs_in_bucket": 1,
+    "top3_in_bucket": 0,
+    "mult": 0.906
+   },
+   "mult_trainer": 1.032,
+   "mult_kick": 1.53,
+   "mult_dist": 0.906,
+   "mult_total": 1.431,
+   "kick_reference": "上がり3F順位（新しい順）：2位/13頭(37.1)・1位/15頭(37.5)・2位/15頭(38.1)",
+   "notes": []
+  },
+  {
+   "no": 4,
+   "name": "プライベートアイズ",
+   "horse_id": "2022101572",
+   "trainer": "小栗 実",
+   "trainer_id": "01194",
+   "trainer_factor": {
+    "t1": 0.0323,
+    "runs": 927,
+    "top3": 234,
+    "top3_rate_raw": 0.252,
+    "base": 0.219,
+    "mult": 1.077
+   },
+   "kick_factor": {
+    "k2": 0.5685,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-08-09",
+      "code": "2601010610",
+      "venue": "札幌",
+      "race": "富良野",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.5,
+      "rank": 3,
+      "field": 14,
+      "finish": 1,
+      "share_faster": 0.143
+     },
+     {
+      "date": "2026-07-19",
+      "code": "2602011210",
+      "venue": "函館",
+      "race": "駒場特",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 38.2,
+      "rank": 8,
+      "field": 14,
+      "finish": 3,
+      "share_faster": 0.5
+     },
+     {
+      "date": "2026-06-06",
+      "code": "2609030110",
+      "venue": "阪神",
+      "race": "加古川",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 37.0,
+      "rank": 2,
+      "field": 12,
+      "finish": 2,
+      "share_faster": 0.083
+     }
+    ],
+    "mult": 1.32
+   },
+   "dist_factor": {
+    "apt": 0.0333,
+    "bucket_m": 1600,
+    "runs_in_bucket": 6,
+    "top3_in_bucket": 3,
+    "mult": 1.024
+   },
+   "mult_trainer": 1.077,
+   "mult_kick": 1.32,
+   "mult_dist": 1.024,
+   "mult_total": 1.456,
+   "kick_reference": "上がり3F順位（新しい順）：3位/14頭(37.5)・8位/14頭(38.2)・2位/12頭(37.0)",
+   "notes": []
+  },
+  {
+   "no": 5,
+   "name": "アレナパラシオ",
+   "horse_id": "2021100752",
+   "trainer": "四位 洋文",
+   "trainer_id": "01184",
+   "trainer_factor": {
+    "t1": 0.0731,
+    "runs": 1283,
+    "top3": 377,
+    "top3_rate_raw": 0.294,
+    "base": 0.219,
+    "mult": 1.182
+   },
+   "kick_factor": {
+    "k2": 0.449,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-07-19",
+      "code": "2610020810",
+      "venue": "小倉",
+      "race": "宮崎S",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 39.1,
+      "rank": 11,
+      "field": 16,
+      "finish": 8,
+      "share_faster": 0.625
+     },
+     {
+      "date": "2026-06-27",
+      "code": "2610020111",
+      "venue": "小倉",
+      "race": "薩摩S",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.2,
+      "rank": 5,
+      "field": 15,
+      "finish": 4,
+      "share_faster": 0.267
+     },
+     {
+      "date": "2026-05-30",
+      "code": "2608031110",
+      "venue": "京都",
+      "race": "桃山S",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 35.8,
+      "rank": 6,
+      "field": 16,
+      "finish": 2,
+      "share_faster": 0.312
+     }
+    ],
+    "mult": 1.116
+   },
+   "dist_factor": {
+    "apt": 0.0481,
+    "bucket_m": 1600,
+    "runs_in_bucket": 10,
+    "top3_in_bucket": 5,
+    "mult": 1.034
+   },
+   "mult_trainer": 1.182,
+   "mult_kick": 1.116,
+   "mult_dist": 1.034,
+   "mult_total": 1.364,
+   "kick_reference": "上がり3F順位（新しい順）：11位/16頭(39.1)・5位/15頭(37.2)・6位/16頭(35.8)",
+   "notes": []
+  },
+  {
+   "no": 6,
+   "name": "ハリウッドブルース",
+   "horse_id": "2021104514",
+   "trainer": "浜田 多実雄",
+   "trainer_id": "01138",
+   "trainer_factor": {
+    "t1": -0.0141,
+    "runs": 2291,
+    "top3": 469,
+    "top3_rate_raw": 0.205,
+    "base": 0.219,
+    "mult": 0.968
+   },
+   "kick_factor": {
+    "k2": 0.6833,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-06-07",
+      "code": "2609030209",
+      "venue": "阪神",
+      "race": "洲本特",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 35.8,
+      "rank": 3,
+      "field": 16,
+      "finish": 9,
+      "share_faster": 0.125
+     },
+     {
+      "date": "2026-05-23",
+      "code": "2608030912",
+      "venue": "京都",
+      "race": "オース",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 36.3,
+      "rank": 2,
+      "field": 14,
+      "finish": 5,
+      "share_faster": 0.071
+     },
+     {
+      "date": "2026-05-10",
+      "code": "2608030612",
+      "venue": "京都",
+      "race": "4歳上",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 36.2,
+      "rank": 2,
+      "field": 14,
+      "finish": 3,
+      "share_faster": 0.071
+     }
+    ],
+    "mult": 1.53
+   },
+   "dist_factor": {
+    "apt": -0.162,
+    "bucket_m": 1600,
+    "runs_in_bucket": 3,
+    "top3_in_bucket": 0,
+    "mult": 0.9
+   },
+   "mult_trainer": 0.968,
+   "mult_kick": 1.53,
+   "mult_dist": 0.9,
+   "mult_total": 1.333,
+   "kick_reference": "上がり3F順位（新しい順）：3位/16頭(35.8)・2位/14頭(36.3)・2位/14頭(36.2)",
+   "notes": []
+  },
+  {
+   "no": 7,
+   "name": "クロースコンバット",
+   "horse_id": "2019105188",
+   "trainer": "青木 孝文",
+   "trainer_id": "01156",
+   "trainer_factor": {
+    "t1": -0.0627,
+    "runs": 2436,
+    "top3": 379,
+    "top3_rate_raw": 0.156,
+    "base": 0.219,
+    "mult": 0.866
+   },
+   "kick_factor": {
+    "k2": 0.162,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-06-28",
+      "code": "2603020210",
+      "venue": "福島",
+      "race": "鶴ヶ城",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 39.1,
+      "rank": 9,
+      "field": 11,
+      "finish": 8,
+      "share_faster": 0.727
+     },
+     {
+      "date": "2026-04-05",
+      "code": "2606030410",
+      "venue": "中山",
+      "race": "アリエ",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 40.2,
+      "rank": 15,
+      "field": 16,
+      "finish": 15,
+      "share_faster": 0.875
+     },
+     {
+      "date": "2026-02-07",
+      "code": "2610010511",
+      "venue": "小倉",
+      "race": "豊前S",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 38.1,
+      "rank": 13,
+      "field": 16,
+      "finish": 9,
+      "share_faster": 0.75
+     }
+    ],
+    "mult": 0.745
+   },
+   "dist_factor": {
+    "apt": 0.1374,
+    "bucket_m": 1600,
+    "runs_in_bucket": 10,
+    "top3_in_bucket": 5,
+    "mult": 1.101
+   },
+   "mult_trainer": 0.866,
+   "mult_kick": 0.745,
+   "mult_dist": 1.101,
+   "mult_total": 0.71,
+   "kick_reference": "上がり3F順位（新しい順）：9位/11頭(39.1)・15位/16頭(40.2)・13位/16頭(38.1)",
+   "notes": []
+  },
+  {
+   "no": 8,
+   "name": "ディーズゴールド",
+   "horse_id": "2022105847",
+   "trainer": "三樹 祐輔",
+   "trainer_id": "01223",
+   "trainer_factor": {
+    "t1": 0.0591,
+    "runs": 8,
+    "top3": 4,
+    "top3_rate_raw": 0.5,
+    "base": 0.219,
+    "mult": 1.145
+   },
+   "kick_factor": {
+    "k2": 0.5,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-22",
+      "code": "2606040711",
+      "venue": "中山",
+      "race": "Jアニ",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 37.4,
+      "rank": 8,
+      "field": 16,
+      "finish": 2,
+      "share_faster": 0.438
+     },
+     {
+      "date": "2026-07-04",
+      "code": "2603020310",
+      "venue": "福島",
+      "race": "横手特",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 36.7,
+      "rank": 1,
+      "field": 10,
+      "finish": 1,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-05-24",
+      "code": "2605021008",
+      "venue": "東京",
+      "race": "三峰山",
+      "surface": "ダート",
+      "dist": 1600,
+      "last3f": 36.3,
+      "rank": 10,
+      "field": 16,
+      "finish": 4,
+      "share_faster": 0.562
+     }
+    ],
+    "mult": 1.199
+   },
+   "dist_factor": {
+    "apt": 0.029,
+    "bucket_m": 1600,
+    "runs_in_bucket": 5,
+    "top3_in_bucket": 3,
+    "mult": 1.021
+   },
+   "mult_trainer": 1.145,
+   "mult_kick": 1.199,
+   "mult_dist": 1.021,
+   "mult_total": 1.402,
+   "kick_reference": "上がり3F順位（新しい順）：8位/16頭(37.4)・1位/10頭(36.7)・10位/16頭(36.3)",
+   "notes": []
+  },
+  {
+   "no": 9,
+   "name": "マンオブザマッチ",
+   "horse_id": "2022101677",
+   "trainer": "高橋 義忠",
+   "trainer_id": "01129",
+   "trainer_factor": {
+    "t1": 0.0066,
+    "runs": 2312,
+    "top3": 522,
+    "top3_rate_raw": 0.226,
+    "base": 0.219,
+    "mult": 1.015
+   },
+   "kick_factor": {
+    "k2": 0.188,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-27",
+      "code": "2609040910",
+      "venue": "阪神",
+      "race": "堺S",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 38.7,
+      "rank": 12,
+      "field": 12,
+      "finish": 11,
+      "share_faster": 0.917
+     },
+     {
+      "date": "2026-08-15",
+      "code": "2601010711",
+      "venue": "札幌",
+      "race": "大雪H",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 40.0,
+      "rank": 11,
+      "field": 13,
+      "finish": 10,
+      "share_faster": 0.769
+     },
+     {
+      "date": "2026-05-30",
+      "code": "2608031110",
+      "venue": "京都",
+      "race": "桃山S",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 36.2,
+      "rank": 10,
+      "field": 16,
+      "finish": 8,
+      "share_faster": 0.562
+     }
+    ],
+    "mult": 0.773
+   },
+   "dist_factor": {
+    "apt": 0.1579,
+    "bucket_m": 1600,
+    "runs_in_bucket": 8,
+    "top3_in_bucket": 5,
+    "mult": 1.111
+   },
+   "mult_trainer": 1.015,
+   "mult_kick": 0.773,
+   "mult_dist": 1.111,
+   "mult_total": 0.872,
+   "kick_reference": "上がり3F順位（新しい順）：12位/12頭(38.7)・11位/13頭(40.0)・10位/16頭(36.2)",
+   "notes": []
+  },
+  {
+   "no": 10,
+   "name": "プロミシングスター",
+   "horse_id": "2021103073",
+   "trainer": "高橋 義忠",
+   "trainer_id": "01129",
+   "trainer_factor": {
+    "t1": 0.0066,
+    "runs": 2312,
+    "top3": 522,
+    "top3_rate_raw": 0.226,
+    "base": 0.219,
+    "mult": 1.015
+   },
+   "kick_factor": {
+    "k2": 0.4918,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-08-15",
+      "code": "2601010711",
+      "venue": "札幌",
+      "race": "大雪H",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 38.0,
+      "rank": 5,
+      "field": 13,
+      "finish": 5,
+      "share_faster": 0.308
+     },
+     {
+      "date": "2026-07-19",
+      "code": "2610020810",
+      "venue": "小倉",
+      "race": "宮崎S",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.9,
+      "rank": 3,
+      "field": 16,
+      "finish": 3,
+      "share_faster": 0.125
+     },
+     {
+      "date": "2026-06-27",
+      "code": "2610020111",
+      "venue": "小倉",
+      "race": "薩摩S",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 38.0,
+      "rank": 10,
+      "field": 15,
+      "finish": 10,
+      "share_faster": 0.6
+     }
+    ],
+    "mult": 1.185
+   },
+   "dist_factor": {
+    "apt": -0.0532,
+    "bucket_m": 1600,
+    "runs_in_bucket": 3,
+    "top3_in_bucket": 1,
+    "mult": 0.963
+   },
+   "mult_trainer": 1.015,
+   "mult_kick": 1.185,
+   "mult_dist": 0.963,
+   "mult_total": 1.158,
+   "kick_reference": "上がり3F順位（新しい順）：5位/13頭(38.0)・3位/16頭(37.9)・10位/15頭(38.0)",
+   "notes": []
+  },
+  {
+   "no": 11,
+   "name": "ハイクオリティ",
+   "horse_id": "2022106924",
+   "trainer": "今野 貞一",
+   "trainer_id": "01128",
+   "trainer_factor": {
+    "t1": -0.0049,
+    "runs": 2191,
+    "top3": 469,
+    "top3_rate_raw": 0.214,
+    "base": 0.219,
+    "mult": 0.989
+   },
+   "kick_factor": {
+    "k2": 0.3147,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-11-08",
+      "code": "2603030210",
+      "venue": "福島",
+      "race": "河北新",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.5,
+      "rank": 5,
+      "field": 15,
+      "finish": 1,
+      "share_faster": 0.267
+     },
+     {
+      "date": "2026-08-23",
+      "code": "2601020210",
+      "venue": "札幌",
+      "race": "WA3",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 41.3,
+      "rank": 14,
+      "field": 14,
+      "finish": 13,
+      "share_faster": 0.929
+     },
+     {
+      "date": "2026-07-25",
+      "code": "2601010112",
+      "venue": "札幌",
+      "race": "桑園特",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 36.6,
+      "rank": 7,
+      "field": 11,
+      "finish": 5,
+      "share_faster": 0.545
+     }
+    ],
+    "mult": 0.923
+   },
+   "dist_factor": {
+    "apt": 0.1641,
+    "bucket_m": 1600,
+    "runs_in_bucket": 7,
+    "top3_in_bucket": 4,
+    "mult": 1.111
+   },
+   "mult_trainer": 0.989,
+   "mult_kick": 0.923,
+   "mult_dist": 1.111,
+   "mult_total": 1.014,
+   "kick_reference": "上がり3F順位（新しい順）：5位/15頭(37.5)・14位/14頭(41.3)・7位/11頭(36.6)",
+   "notes": []
+  },
+  {
+   "no": 12,
+   "name": "モリノアミーゴ",
+   "horse_id": "2022106328",
+   "trainer": "鈴木 伸尋",
+   "trainer_id": "01026",
+   "trainer_factor": {
+    "t1": -0.0041,
+    "runs": 2164,
+    "top3": 465,
+    "top3_rate_raw": 0.215,
+    "base": 0.219,
+    "mult": 0.991
+   },
+   "kick_factor": {
+    "k2": 0.65,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-07-18",
+      "code": "2603020710",
+      "venue": "福島",
+      "race": "米沢特",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.3,
+      "rank": 2,
+      "field": 15,
+      "finish": 1,
+      "share_faster": 0.067
+     },
+     {
+      "date": "2026-05-16",
+      "code": "2605020710",
+      "venue": "東京",
+      "race": "立川特",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 35.8,
+      "rank": 5,
+      "field": 12,
+      "finish": 6,
+      "share_faster": 0.333
+     },
+     {
+      "date": "2026-03-29",
+      "code": "2607010612",
+      "venue": "中京",
+      "race": "鈴鹿特",
+      "surface": "ダート",
+      "dist": 1400,
+      "last3f": 35.9,
+      "rank": 1,
+      "field": 16,
+      "finish": 7,
+      "share_faster": 0.0
+     }
+    ],
+    "mult": 1.48
+   },
+   "dist_factor": {
+    "apt": 0.0937,
+    "bucket_m": 1600,
+    "runs_in_bucket": 5,
+    "top3_in_bucket": 3,
+    "mult": 1.068
+   },
+   "mult_trainer": 0.991,
+   "mult_kick": 1.48,
+   "mult_dist": 1.068,
+   "mult_total": 1.566,
+   "kick_reference": "上がり3F順位（新しい順）：2位/15頭(37.3)・5位/12頭(35.8)・1位/16頭(35.9)",
+   "notes": []
+  },
+  {
+   "no": 13,
+   "name": "プルートマスター",
+   "horse_id": "2019104632",
+   "trainer": "今野 貞一",
+   "trainer_id": "01128",
+   "trainer_factor": {
+    "t1": -0.0049,
+    "runs": 2191,
+    "top3": 469,
+    "top3_rate_raw": 0.214,
+    "base": 0.219,
+    "mult": 0.989
+   },
+   "kick_factor": {
+    "k2": 0.3615,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-12",
+      "code": "2609040310",
+      "venue": "阪神",
+      "race": "竹田城",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 38.5,
+      "rank": 11,
+      "field": 15,
+      "finish": 10,
+      "share_faster": 0.667
+     },
+     {
+      "date": "2026-08-23",
+      "code": "2604030206",
+      "venue": "新潟",
+      "race": "古町S",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 38.8,
+      "rank": 12,
+      "field": 15,
+      "finish": 10,
+      "share_faster": 0.733
+     },
+     {
+      "date": "2026-02-21",
+      "code": "2610010911",
+      "venue": "小倉",
+      "race": "小倉城",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.4,
+      "rank": 3,
+      "field": 13,
+      "finish": 2,
+      "share_faster": 0.154
+     }
+    ],
+    "mult": 0.986
+   },
+   "dist_factor": {
+    "apt": 0.2789,
+    "bucket_m": 1600,
+    "runs_in_bucket": 2,
+    "top3_in_bucket": 2,
+    "mult": 1.111
+   },
+   "mult_trainer": 0.989,
+   "mult_kick": 0.986,
+   "mult_dist": 1.111,
+   "mult_total": 1.083,
+   "kick_reference": "上がり3F順位（新しい順）：11位/15頭(38.5)・12位/15頭(38.8)・3位/13頭(37.4)",
+   "notes": []
+  },
+  {
+   "no": 14,
+   "name": "ドゥラリス",
+   "horse_id": "2022102885",
+   "trainer": "吉岡 辰弥",
+   "trainer_id": "01176",
+   "trainer_factor": {
+    "t1": 0.0856,
+    "runs": 1577,
+    "top3": 483,
+    "top3_rate_raw": 0.306,
+    "base": 0.219,
+    "mult": 1.217
+   },
+   "kick_factor": {
+    "k2": 0.415,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-05-02",
+      "code": "2604010111",
+      "venue": "新潟",
+      "race": "三条S",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 40.3,
+      "rank": 10,
+      "field": 15,
+      "finish": 11,
+      "share_faster": 0.6
+     },
+     {
+      "date": "2026-02-21",
+      "code": "2610010911",
+      "venue": "小倉",
+      "race": "小倉城",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 38.2,
+      "rank": 9,
+      "field": 13,
+      "finish": 10,
+      "share_faster": 0.615
+     },
+     {
+      "date": "2026-01-31",
+      "code": "2610010310",
+      "venue": "小倉",
+      "race": "平尾台",
+      "surface": "ダート",
+      "dist": 1700,
+      "last3f": 37.5,
+      "rank": 3,
+      "field": 16,
+      "finish": 1,
+      "share_faster": 0.125
+     }
+    ],
+    "mult": 1.063
+   },
+   "dist_factor": {
+    "apt": 0.1183,
+    "bucket_m": 1600,
+    "runs_in_bucket": 5,
+    "top3_in_bucket": 3,
+    "mult": 1.086
+   },
+   "mult_trainer": 1.217,
+   "mult_kick": 1.063,
+   "mult_dist": 1.086,
+   "mult_total": 1.405,
+   "kick_reference": "上がり3F順位（新しい順）：10位/15頭(40.3)・9位/13頭(38.2)・3位/16頭(37.5)",
+   "notes": []
+  },
+  {
+   "no": 15,
+   "name": "ケーヴァラ",
+   "horse_id": "2021106054",
+   "trainer": "羽月 友彦",
+   "trainer_id": "01091",
+   "trainer_factor": {
+    "t1": -0.0615,
+    "runs": 2183,
+    "top3": 342,
+    "top3_rate_raw": 0.157,
+    "base": 0.219,
+    "mult": 0.869
+   },
+   "kick_factor": {
+    "k2": 0.4168,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-24",
+      "code": "2604040310",
+      "venue": "新潟",
+      "race": "菅名岳",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 38.1,
+      "rank": 6,
+      "field": 15,
+      "finish": 1,
+      "share_faster": 0.333
+     },
+     {
+      "date": "2026-06-14",
+      "code": "2605030412",
+      "venue": "東京",
+      "race": "3歳上",
+      "surface": "ダート",
+      "dist": 1600,
+      "last3f": 38.2,
+      "rank": 7,
+      "field": 12,
+      "finish": 7,
+      "share_faster": 0.5
+     },
+     {
+      "date": "2026-05-24",
+      "code": "2608031008",
+      "venue": "京都",
+      "race": "4歳上",
+      "surface": "ダート",
+      "dist": 1800,
+      "last3f": 37.8,
+      "rank": 7,
+      "field": 12,
+      "finish": 4,
+      "share_faster": 0.5
+     }
+    ],
+    "mult": 1.066
+   },
+   "dist_factor": {
+    "apt": 0.1333,
+    "bucket_m": 1600,
+    "runs_in_bucket": 4,
+    "top3_in_bucket": 3,
+    "mult": 1.098
+   },
+   "mult_trainer": 0.869,
+   "mult_kick": 1.066,
+   "mult_dist": 1.098,
+   "mult_total": 1.017,
+   "kick_reference": "上がり3F順位（新しい順）：6位/15頭(38.1)・7位/12頭(38.2)・7位/12頭(37.8)",
+   "notes": []
+  }
+ ]
+}
