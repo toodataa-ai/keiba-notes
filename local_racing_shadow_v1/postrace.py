@@ -194,11 +194,14 @@ def parse_official(soup, p):
             name = re.sub(r"^(?:JRA認定|J認|J交)", "", name)
             name = re.sub(r"JRA選定馬$", "", name)
             name = re.sub(r"^第[0-9]+回", "", name)
-            name = re.sub(r"賞(?=[ABC][0-9])", "", name)
+            name = re.sub(r"賞(?=[ABC](?:[0-9]|特別))", "", name)
+            # 2026-11-25: official "…賞Ａ特別" vs card "…Ａ"; 指定交流の括弧 [..]
+            name = re.sub(r"(?<=[ABC])特別$", "", name)
+            name = re.sub(r"\[[^\]]{1,10}\]", "", name)
             name = re.sub(r"】2歳(?=オープン)", "】", name)
             # Verified 2026-10-15 Sonoda 5R official vs card abbreviation.
             name = name.replace("セレクションハンデ", "セレクショ")
-            name = re.sub(r"3歳以上特(?:別)?$", "", name)
+            name = re.sub(r"3歳以(?:上(?:特(?:別)?)?)?$", "", name)
             return name
         standard_name, card_name = title_key(normalized), title_key(abbreviated)
         def verified_short_title(full, shortened):
