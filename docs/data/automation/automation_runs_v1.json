@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-26T19:37:48+00:00",
+ "generated_at": "2026-11-26T21:11:45+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 45896317596,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-26T21:10:52Z",
+     "started_at": "2026-11-26T21:10:52Z",
+     "ended_at": "2026-11-26T21:11:15Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 45879904610,
      "event": "schedule",
@@ -655,23 +666,23 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "H"
-    },
-    {
-     "id": 43611774489,
-     "event": "schedule",
-     "created_at": "2026-11-14T15:44:18Z",
-     "started_at": "2026-11-14T15:44:18Z",
-     "ended_at": "2026-11-14T15:44:43Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
   "local-racing-shadow-postrace.yml": {
    "label": "地方競馬：前日の回顧",
    "runs": [
+    {
+     "id": 45896325995,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-26T21:10:56Z",
+     "started_at": "2026-11-26T21:10:56Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 45824298255,
      "event": "workflow_dispatch",
@@ -1107,6 +1118,17 @@
   "local-racing-shadow-prerace-generic.yml": {
    "label": "地方競馬：予想の固定",
    "runs": [
+    {
+     "id": 45896329326,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-26T21:10:58Z",
+     "started_at": "2026-11-26T21:10:58Z",
+     "ended_at": null,
+     "status": "pending",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 45754306649,
      "event": "schedule",
@@ -1747,6 +1769,17 @@
   "going-labels-update-v1.yml": {
    "label": "新しいレースの追加取得",
    "runs": [
+    {
+     "id": 45896314059,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-26T21:10:50Z",
+     "started_at": "2026-11-26T21:10:50Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "H"
+    },
     {
      "id": 45749404982,
      "event": "schedule",
@@ -2977,6 +3010,17 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 45886554375,
+     "event": "schedule",
+     "created_at": "2026-11-26T19:50:00Z",
+     "started_at": "2026-11-26T19:50:00Z",
+     "ended_at": "2026-11-26T19:50:18Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "G"
+    },
     {
      "id": 45692779914,
      "event": "schedule",
