@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "current_public_release": "release/jra-site-v1.67-20261125",
-  "current_public_version": "1.67",
+  "current_public_release": "release/jra-site-v1.68-20261126",
+  "current_public_version": "1.68",
   "policy": {
     "snapshot_scope": "successful_production_UI_deploys_only",
     "rollback_scope": "only_verified_release_branches",
@@ -1430,6 +1430,28 @@
         "docs/methodology.html",
         "docs/factor-screen.html",
         "docs/people-trends.html",
+        "docs/operations.html"
+      ],
+      "public_http_files_verified": null
+    },
+    {
+      "release_id": "release/jra-site-v1.68-20261126",
+      "branch": "release/jra-site-v1.68-20261126",
+      "commit_sha": "4b0dd891412b91a8a6c79698480ff06926aaf238",
+      "deployed_at": "2026-11-26T12:18:35+09:00",
+      "workflow_run_id": 45748053543,
+      "validation_workflow_run_id": 45748053543,
+      "public_version": "1.68",
+      "note": "2026-11-26ユーザー明示承認済み。データ取得の状況：自動追加と数字の更新状況：取得状況ページの「増え方」を実態に合わせ（全部そろっているときは0レース分と出さない）、新しいレースは毎日自動で足すことと、各ページ・予想で使う数字の週次の更新状況（いつ・どこまで・失敗の有無）を表示する。 自動運用ページには、新しいレースの追加取得（毎日）と数字の作り直し（毎週）を追加する。",
+      "user_approval_quote": "本番リリースOK",
+      "staging_candidate_id": "ui-data-freshness-v1",
+      "user_approved": true,
+      "immutable_prediction_source_preserved": true,
+      "presentation_only": true,
+      "staging_identity_not_in_production": true,
+      "new_entry_pages": [],
+      "scope_files": [
+        "docs/collection-status.html",
         "docs/operations.html"
       ],
       "public_http_files_verified": null
