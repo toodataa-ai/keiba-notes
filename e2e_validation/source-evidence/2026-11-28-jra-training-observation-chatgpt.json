@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-28",
+  "scope": "JRA formal main races, one-off publicly accessible training observation only; not E0/E1/E2 research, not a prediction, not a proof_commit for any forecast",
+  "status": "partial_observation_not_model_input",
+  "observation_window_jst": {
+    "from": "2026-11-28T08:55:00+09:00",
+    "to": "2026-11-28T08:58:06+09:00",
+    "precision": "session window; exact per-source retrieval second unavailable"
+  },
+  "races": [
+    {
+      "venue": "東京",
+      "race_no": 11,
+      "name": "キャピタルステークス",
+      "official_entry_url": "https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0105202605071120261128%2FE5",
+      "runners": 18,
+      "public_clock_name_matches": 18,
+      "with_date_course_going_and_applicable_clock_verified": 3,
+      "remaining_complete_fields_unverified": 15,
+      "official_clock_count": 0,
+      "primary_reason": "JRA出馬表には調教時計なし。公式の当該競走時計ページは確認できなかった。",
+      "sources": [
+        {
+          "name": "公営ギャンブル研究会",
+          "url": "https://white-green.jp/race/20261128-tokyo-11/",
+          "observation": "18頭の馬名・馬番とコースおよび4Fまたは6F・1F時計の掲載をJRA出馬表と照合。一覧は転載しない。日付・馬場の全頭照合は未実施。",
+          "observed_within_jst": "08:55–08:58"
+        },
+        {
+          "name": "netkeiba",
+          "url": "https://race.sp.netkeiba.com/?pid=oikiri&race_id=202605050711",
+          "observation": "無料公開の3頭のみ日付、コース、馬場、時計確認。残りはプレミアム表示のため取得せず。",
+          "observed_within_jst": "08:55–08:58"
+        },
+        {
+          "name": "東スポ競馬",
+          "url": "https://tospo-keiba.jp/race/202605050711/race-detail/training",
+          "observation": "直接ページはログイン表示。本文の数値を採用せず。",
+          "observed_within_jst": "08:55–08:58"
+        }
+      ],
+      "limited_numeric_examples": [
+        {
+          "horse_no": 3,
+          "horse": "アドマイヤクワッズ",
+          "training_date": "2026-11-25",
+          "course": "栗東坂路",
+          "going": "稍重",
+          "seconds": {
+            "f4": 55.8,
+            "f3": 41.8,
+            "f1": 13.1
+          },
+          "source": "netkeiba"
+        }
+      ],
+      "caveat": "レッドシュヴェルトの補助サイトは美浦W、netkeiba無料最終欄は美浦芝を示す。別調教の可能性があるため同一セッションの数値として統合しない。"
+    },
+    {
+      "venue": "京都",
+      "race_no": 11,
+      "name": "ラジオNIKKEI杯京都2歳ステークス",
+      "official_entry_url": "https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0108202605071120261128%2FC3",
+      "runners": 10,
+      "excluded_cancelled": [
+        "ネーロノワール"
+      ],
+      "public_clock_name_matches": 10,
+      "with_date_course_going_and_applicable_clock_verified": 10,
+      "remaining_complete_fields_unverified": 0,
+      "official_clock_count": 0,
+      "primary_reason": "JRA公式調教ページに動画リンクあり。本文の数値時計は確認できなかった。",
+      "sources": [
+        {
+          "name": "JRA",
+          "url": "https://www.jra.go.jp/keiba/race/107/movie.html",
+          "observed_within_jst": "08:55–08:58"
+        },
+        {
+          "name": "うましる",
+          "url": "https://umasiru.com/archives/22515",
+          "observation": "出走10頭の調教日・コース・馬場・距離に応じた時計の掲載を馬名と照合。取消馬を母数から除外。原記事の文章・評価・時計一覧は転載しない。",
+          "observed_within_jst": "08:55–08:58"
+        }
+      ],
+      "limited_numeric_examples": [
+        {
+          "horse_no": 11,
+          "horse": "サノノキセキ",
+          "training_date": "2026-11-25",
+          "course": "美浦W",
+          "going": "稍重",
+          "seconds": {
+            "f7": 94.1,
+            "f6": 80.7,
+            "f5": 68.4,
+            "f4": 55.4,
+            "f3": 41.7,
+            "f1": 14
+          },
+          "source": "うましる",
+          "note": "7F94.1は6Fではない。6F80.7は同記事本文で確認。"
+        }
+      ]
+    }
+  ],
+  "constraints": "No login or paywall bypass; no third-party grades or article text copied; no full clock table republished. No unapproved weight or score applied. Numeric examples are source observations, not independent confirmation by JRA.",
+  "blocker": "JRA entry page delivered current odds in the same response before independent STEP1 freeze. No independent pre-odds STEP1 can be certified in this run; no marks, probabilities, bets, official prediction, or publishing request created. This evidence record alone is not a forecast proof."
+}
