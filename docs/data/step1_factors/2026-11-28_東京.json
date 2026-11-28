@@ -1,0 +1,1345 @@
+{
+ "schema": "step1_factors_v1",
+ "date": "2026-11-28",
+ "venue": "東京",
+ "race_name": "フランスギャロ賞キャピタルステークス",
+ "race_no": 11,
+ "distance_m": 1600,
+ "coef_version": "step1_factor_coef.json",
+ "generated_at": "2026-11-28T09:15:55+09:00",
+ "usage": "勝率に mult_total を掛けて全頭の合計を1に直す。kick_reference は各馬の reason に必ず書く",
+ "horses": [
+  {
+   "no": 1,
+   "name": "シンフォーエバー",
+   "horse_id": "2022110114",
+   "trainer": "森 秀行",
+   "trainer_id": "00427",
+   "trainer_factor": {
+    "t1": 0.0136,
+    "runs": 2600,
+    "top3": 605,
+    "top3_rate_raw": 0.233,
+    "base": 0.219,
+    "mult": 1.032
+   },
+   "kick_factor": {
+    "k2": 0.15,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-17",
+      "code": "2605040611",
+      "venue": "東京",
+      "race": "富士S",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 39.9,
+      "rank": 13,
+      "field": 14,
+      "finish": 13,
+      "share_faster": 0.857
+     },
+     {
+      "date": "2026-06-21",
+      "code": "2609030611",
+      "venue": "阪神",
+      "race": "しらさ",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 36.0,
+      "rank": 15,
+      "field": 18,
+      "finish": 17,
+      "share_faster": 0.778
+     },
+     {
+      "date": "2026-05-31",
+      "code": "2608031210",
+      "venue": "京都",
+      "race": "安土城",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 33.2,
+      "rank": 14,
+      "field": 17,
+      "finish": 14,
+      "share_faster": 0.765
+     }
+    ],
+    "mult": 0.731
+   },
+   "dist_factor": {
+    "apt": 0.0506,
+    "bucket_m": 1600,
+    "runs_in_bucket": 11,
+    "top3_in_bucket": 3,
+    "mult": 1.036
+   },
+   "mult_trainer": 1.032,
+   "mult_kick": 0.731,
+   "mult_dist": 1.036,
+   "mult_total": 0.782,
+   "kick_reference": "上がり3F順位（新しい順）：13位/14頭(39.9)・15位/18頭(36.0)・14位/17頭(33.2)",
+   "notes": []
+  },
+  {
+   "no": 2,
+   "name": "レッドシュヴェルト",
+   "horse_id": "2020103517",
+   "trainer": "尾関 知人",
+   "trainer_id": "01103",
+   "trainer_factor": {
+    "t1": -0.0004,
+    "runs": 2301,
+    "top3": 503,
+    "top3_rate_raw": 0.219,
+    "base": 0.219,
+    "mult": 0.999
+   },
+   "kick_factor": {
+    "k2": 0.6697,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-27",
+      "code": "2609040911",
+      "venue": "阪神",
+      "race": "ポート",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.4,
+      "rank": 1,
+      "field": 16,
+      "finish": 3,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-08-22",
+      "code": "2604030107",
+      "venue": "新潟",
+      "race": "朱鷺S",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 34.0,
+      "rank": 4,
+      "field": 18,
+      "finish": 10,
+      "share_faster": 0.167
+     },
+     {
+      "date": "2026-06-14",
+      "code": "2605030411",
+      "venue": "東京",
+      "race": "パラダ",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 33.3,
+      "rank": 3,
+      "field": 13,
+      "finish": 6,
+      "share_faster": 0.154
+     }
+    ],
+    "mult": 1.528
+   },
+   "dist_factor": {
+    "apt": 0.2396,
+    "bucket_m": 1600,
+    "runs_in_bucket": 9,
+    "top3_in_bucket": 7,
+    "mult": 1.111
+   },
+   "mult_trainer": 0.999,
+   "mult_kick": 1.528,
+   "mult_dist": 1.111,
+   "mult_total": 1.696,
+   "kick_reference": "上がり3F順位（新しい順）：1位/16頭(33.4)・4位/18頭(34.0)・3位/13頭(33.3)",
+   "notes": []
+  },
+  {
+   "no": 3,
+   "name": "アドマイヤクワッズ",
+   "horse_id": "2023105311",
+   "trainer": "友道 康夫",
+   "trainer_id": "01061",
+   "trainer_factor": {
+    "t1": 0.1622,
+    "runs": 2506,
+    "top3": 960,
+    "top3_rate_raw": 0.383,
+    "base": 0.219,
+    "mult": 1.249
+   },
+   "kick_factor": {
+    "k2": 0.267,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-04",
+      "code": "2605040211",
+      "venue": "東京",
+      "race": "毎日王",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 34.0,
+      "rank": 14,
+      "field": 17,
+      "finish": 17,
+      "share_faster": 0.765
+     },
+     {
+      "date": "2026-05-10",
+      "code": "2605020611",
+      "venue": "東京",
+      "race": "NHK",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 34.2,
+      "rank": 6,
+      "field": 18,
+      "finish": 3,
+      "share_faster": 0.278
+     },
+     {
+      "date": "2026-04-19",
+      "code": "2606030811",
+      "venue": "中山",
+      "race": "皐月賞",
+      "surface": "芝",
+      "dist": 2000,
+      "last3f": 35.4,
+      "rank": 17,
+      "field": 18,
+      "finish": 15,
+      "share_faster": 0.889
+     }
+    ],
+    "mult": 0.863
+   },
+   "dist_factor": {
+    "apt": 0.2429,
+    "bucket_m": 1600,
+    "runs_in_bucket": 4,
+    "top3_in_bucket": 4,
+    "mult": 1.111
+   },
+   "mult_trainer": 1.249,
+   "mult_kick": 0.863,
+   "mult_dist": 1.111,
+   "mult_total": 1.198,
+   "kick_reference": "上がり3F順位（新しい順）：14位/17頭(34.0)・6位/18頭(34.2)・17位/18頭(35.4)",
+   "notes": []
+  },
+  {
+   "no": 4,
+   "name": "マジックサンズ",
+   "horse_id": "2022104772",
+   "trainer": "須貝 尚介",
+   "trainer_id": "01105",
+   "trainer_factor": {
+    "t1": 0.1001,
+    "runs": 2921,
+    "top3": 935,
+    "top3_rate_raw": 0.32,
+    "base": 0.219,
+    "mult": 1.249
+   },
+   "kick_factor": {
+    "k2": 0.6198,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-17",
+      "code": "2605040611",
+      "venue": "東京",
+      "race": "富士S",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 34.0,
+      "rank": 2,
+      "field": 14,
+      "finish": 4,
+      "share_faster": 0.071
+     },
+     {
+      "date": "2026-08-16",
+      "code": "2601010811",
+      "venue": "札幌",
+      "race": "札幌記",
+      "surface": "芝",
+      "dist": 2000,
+      "last3f": 35.3,
+      "rank": 5,
+      "field": 16,
+      "finish": 6,
+      "share_faster": 0.25
+     },
+     {
+      "date": "2026-06-28",
+      "code": "2602010611",
+      "venue": "函館",
+      "race": "函館記",
+      "surface": "芝",
+      "dist": 2000,
+      "last3f": 34.9,
+      "rank": 4,
+      "field": 15,
+      "finish": 5,
+      "share_faster": 0.2
+     }
+    ],
+    "mult": 1.423
+   },
+   "dist_factor": {
+    "apt": -0.0215,
+    "bucket_m": 1600,
+    "runs_in_bucket": 5,
+    "top3_in_bucket": 1,
+    "mult": 0.985
+   },
+   "mult_trainer": 1.249,
+   "mult_kick": 1.423,
+   "mult_dist": 0.985,
+   "mult_total": 1.751,
+   "kick_reference": "上がり3F順位（新しい順）：2位/14頭(34.0)・5位/16頭(35.3)・4位/15頭(34.9)",
+   "notes": []
+  },
+  {
+   "no": 5,
+   "name": "シャンパンカラー",
+   "horse_id": "2020103075",
+   "trainer": "田中 剛",
+   "trainer_id": "01119",
+   "trainer_factor": {
+    "t1": -0.0314,
+    "runs": 1844,
+    "top3": 345,
+    "top3_rate_raw": 0.187,
+    "base": 0.219,
+    "mult": 0.93
+   },
+   "kick_factor": {
+    "k2": 0.4118,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-11-01",
+      "code": "2605041111",
+      "venue": "東京",
+      "race": "天皇賞",
+      "surface": "芝",
+      "dist": 2000,
+      "last3f": 35.0,
+      "rank": 12,
+      "field": 17,
+      "finish": 13,
+      "share_faster": 0.647
+     },
+     {
+      "date": "2026-10-04",
+      "code": "2605040211",
+      "venue": "東京",
+      "race": "毎日王",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 33.5,
+      "rank": 6,
+      "field": 17,
+      "finish": 13,
+      "share_faster": 0.294
+     },
+     {
+      "date": "2026-06-07",
+      "code": "2605030211",
+      "venue": "東京",
+      "race": "安田記",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.6,
+      "rank": 8,
+      "field": 17,
+      "finish": 12,
+      "share_faster": 0.412
+     }
+    ],
+    "mult": 1.06
+   },
+   "dist_factor": {
+    "apt": 0.0652,
+    "bucket_m": 1600,
+    "runs_in_bucket": 14,
+    "top3_in_bucket": 4,
+    "mult": 1.047
+   },
+   "mult_trainer": 0.93,
+   "mult_kick": 1.06,
+   "mult_dist": 1.047,
+   "mult_total": 1.032,
+   "kick_reference": "上がり3F順位（新しい順）：12位/17頭(35.0)・6位/17頭(33.5)・8位/17頭(33.6)",
+   "notes": []
+  },
+  {
+   "no": 6,
+   "name": "キョウエイブリッサ",
+   "horse_id": "2020107001",
+   "trainer": "武市 康男",
+   "trainer_id": "01089",
+   "trainer_factor": {
+    "t1": -0.0631,
+    "runs": 2603,
+    "top3": 404,
+    "top3_rate_raw": 0.155,
+    "base": 0.219,
+    "mult": 0.865
+   },
+   "kick_factor": {
+    "k2": 0.7115,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-11-01",
+      "code": "2608041111",
+      "venue": "京都",
+      "race": "まほろ",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.2,
+      "rank": 3,
+      "field": 13,
+      "finish": 3,
+      "share_faster": 0.154
+     },
+     {
+      "date": "2026-07-12",
+      "code": "2602011011",
+      "venue": "函館",
+      "race": "巴賞",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 35.2,
+      "rank": 1,
+      "field": 14,
+      "finish": 5,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-04-26",
+      "code": "2608030211",
+      "venue": "京都",
+      "race": "読売マ",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 32.8,
+      "rank": 1,
+      "field": 18,
+      "finish": 10,
+      "share_faster": 0.0
+     }
+    ],
+    "mult": 1.535
+   },
+   "dist_factor": {
+    "apt": 0.0441,
+    "bucket_m": 1600,
+    "runs_in_bucket": 14,
+    "top3_in_bucket": 6,
+    "mult": 1.031
+   },
+   "mult_trainer": 0.865,
+   "mult_kick": 1.535,
+   "mult_dist": 1.031,
+   "mult_total": 1.369,
+   "kick_reference": "上がり3F順位（新しい順）：3位/13頭(33.2)・1位/14頭(35.2)・1位/18頭(32.8)",
+   "notes": []
+  },
+  {
+   "no": 7,
+   "name": "ウイントワイライト",
+   "horse_id": "2022106232",
+   "trainer": "西園 翔太",
+   "trainer_id": "01196",
+   "trainer_factor": {
+    "t1": 0.0386,
+    "runs": 931,
+    "top3": 241,
+    "top3_rate_raw": 0.259,
+    "base": 0.219,
+    "mult": 1.093
+   },
+   "kick_factor": {
+    "k2": 0.672,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-11",
+      "code": "2605040411",
+      "venue": "東京",
+      "race": "アイル",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 33.7,
+      "rank": 6,
+      "field": 16,
+      "finish": 14,
+      "share_faster": 0.312
+     },
+     {
+      "date": "2026-06-21",
+      "code": "2605030611",
+      "venue": "東京",
+      "race": "府中牝",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 33.9,
+      "rank": 1,
+      "field": 16,
+      "finish": 2,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-05-02",
+      "code": "2605020311",
+      "venue": "東京",
+      "race": "京王S",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 32.1,
+      "rank": 1,
+      "field": 18,
+      "finish": 16,
+      "share_faster": 0.0
+     }
+    ],
+    "mult": 1.533
+   },
+   "dist_factor": {
+    "apt": 0.0,
+    "bucket_m": 1600,
+    "runs_in_bucket": 0,
+    "top3_in_bucket": 0,
+    "mult": 1.0
+   },
+   "mult_trainer": 1.093,
+   "mult_kick": 1.533,
+   "mult_dist": 1.0,
+   "mult_total": 1.676,
+   "kick_reference": "上がり3F順位（新しい順）：6位/16頭(33.7)・1位/16頭(33.9)・1位/18頭(32.1)",
+   "notes": []
+  },
+  {
+   "no": 8,
+   "name": "クルゼイロドスル",
+   "horse_id": "2020101813",
+   "trainer": "高橋 義忠",
+   "trainer_id": "01129",
+   "trainer_factor": {
+    "t1": 0.0068,
+    "runs": 2329,
+    "top3": 526,
+    "top3_rate_raw": 0.226,
+    "base": 0.219,
+    "mult": 1.016
+   },
+   "kick_factor": {
+    "k2": 0.5337,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-04",
+      "code": "2605040211",
+      "venue": "東京",
+      "race": "毎日王",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 33.0,
+      "rank": 2,
+      "field": 17,
+      "finish": 12,
+      "share_faster": 0.059
+     },
+     {
+      "date": "2026-09-05",
+      "code": "2606040111",
+      "venue": "中山",
+      "race": "京成A",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.8,
+      "rank": 5,
+      "field": 16,
+      "finish": 10,
+      "share_faster": 0.25
+     },
+     {
+      "date": "2026-08-22",
+      "code": "2604030107",
+      "venue": "新潟",
+      "race": "朱鷺S",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 34.5,
+      "rank": 11,
+      "field": 18,
+      "finish": 14,
+      "share_faster": 0.556
+     }
+    ],
+    "mult": 1.26
+   },
+   "dist_factor": {
+    "apt": 0.0662,
+    "bucket_m": 1600,
+    "runs_in_bucket": 14,
+    "top3_in_bucket": 5,
+    "mult": 1.047
+   },
+   "mult_trainer": 1.016,
+   "mult_kick": 1.26,
+   "mult_dist": 1.047,
+   "mult_total": 1.34,
+   "kick_reference": "上がり3F順位（新しい順）：2位/17頭(33.0)・5位/16頭(33.8)・11位/18頭(34.5)",
+   "notes": []
+  },
+  {
+   "no": 9,
+   "name": "ファインライン",
+   "horse_id": "2021102419",
+   "trainer": "松永 幹夫",
+   "trainer_id": "01092",
+   "trainer_factor": {
+    "t1": 0.0858,
+    "runs": 2774,
+    "top3": 848,
+    "top3_rate_raw": 0.306,
+    "base": 0.219,
+    "mult": 1.219
+   },
+   "kick_factor": {
+    "k2": 0.514,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-27",
+      "code": "2609040911",
+      "venue": "阪神",
+      "race": "ポート",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.4,
+      "rank": 1,
+      "field": 16,
+      "finish": 7,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-06-21",
+      "code": "2609030611",
+      "venue": "阪神",
+      "race": "しらさ",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 34.9,
+      "rank": 10,
+      "field": 18,
+      "finish": 11,
+      "share_faster": 0.5
+     },
+     {
+      "date": "2026-04-26",
+      "code": "2608030211",
+      "venue": "京都",
+      "race": "読売マ",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.3,
+      "rank": 9,
+      "field": 18,
+      "finish": 15,
+      "share_faster": 0.444
+     }
+    ],
+    "mult": 1.225
+   },
+   "dist_factor": {
+    "apt": -0.1513,
+    "bucket_m": 1600,
+    "runs_in_bucket": 9,
+    "top3_in_bucket": 2,
+    "mult": 0.9
+   },
+   "mult_trainer": 1.219,
+   "mult_kick": 1.225,
+   "mult_dist": 0.9,
+   "mult_total": 1.344,
+   "kick_reference": "上がり3F順位（新しい順）：1位/16頭(33.4)・10位/18頭(34.9)・9位/18頭(33.3)",
+   "notes": []
+  },
+  {
+   "no": 10,
+   "name": "シュトラウス",
+   "horse_id": "2021105744",
+   "trainer": "武井 亮",
+   "trainer_id": "01147",
+   "trainer_factor": {
+    "t1": 0.0412,
+    "runs": 2436,
+    "top3": 635,
+    "top3_rate_raw": 0.261,
+    "base": 0.219,
+    "mult": 1.1
+   },
+   "kick_factor": {
+    "k2": 0.4308,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2025-08-10",
+      "code": "2507030607",
+      "venue": "中京",
+      "race": "CBC",
+      "surface": "芝",
+      "dist": 1200,
+      "last3f": 32.6,
+      "rank": 2,
+      "field": 17,
+      "finish": 3,
+      "share_faster": 0.059
+     },
+     {
+      "date": "2025-05-10",
+      "code": "2505020511",
+      "venue": "東京",
+      "race": "エプソ",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 36.7,
+      "rank": 16,
+      "field": 18,
+      "finish": 13,
+      "share_faster": 0.833
+     },
+     {
+      "date": "2025-02-01",
+      "code": "2505010111",
+      "venue": "東京",
+      "race": "白富士",
+      "surface": "芝",
+      "dist": 2000,
+      "last3f": 34.3,
+      "rank": 6,
+      "field": 13,
+      "finish": 1,
+      "share_faster": 0.385
+     }
+    ],
+    "mult": 1.088
+   },
+   "dist_factor": {
+    "apt": 0.0102,
+    "bucket_m": 1600,
+    "runs_in_bucket": 4,
+    "top3_in_bucket": 2,
+    "mult": 1.007
+   },
+   "mult_trainer": 1.1,
+   "mult_kick": 1.088,
+   "mult_dist": 1.007,
+   "mult_total": 1.205,
+   "kick_reference": "上がり3F順位（新しい順）：2位/17頭(32.6)・16位/18頭(36.7)・6位/13頭(34.3)",
+   "notes": []
+  },
+  {
+   "no": 11,
+   "name": "ディアナザール",
+   "horse_id": "2022104933",
+   "trainer": "斉藤 崇史",
+   "trainer_id": "01151",
+   "trainer_factor": {
+    "t1": 0.0912,
+    "runs": 2528,
+    "top3": 787,
+    "top3_rate_raw": 0.311,
+    "base": 0.219,
+    "mult": 1.234
+   },
+   "kick_factor": {
+    "k2": 0.4743,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-03",
+      "code": "2608040111",
+      "venue": "京都",
+      "race": "オパー",
+      "surface": "芝",
+      "dist": 1200,
+      "last3f": 33.2,
+      "rank": 7,
+      "field": 18,
+      "finish": 2,
+      "share_faster": 0.333
+     },
+     {
+      "date": "2026-08-09",
+      "code": "2607020607",
+      "venue": "中京",
+      "race": "CBC",
+      "surface": "芝",
+      "dist": 1200,
+      "last3f": 32.8,
+      "rank": 2,
+      "field": 18,
+      "finish": 9,
+      "share_faster": 0.056
+     },
+     {
+      "date": "2026-05-16",
+      "code": "2608030711",
+      "venue": "京都",
+      "race": "鞍馬S",
+      "surface": "芝",
+      "dist": 1200,
+      "last3f": 33.6,
+      "rank": 11,
+      "field": 14,
+      "finish": 3,
+      "share_faster": 0.714
+     }
+    ],
+    "mult": 1.158
+   },
+   "dist_factor": {
+    "apt": 0.1417,
+    "bucket_m": 1600,
+    "runs_in_bucket": 2,
+    "top3_in_bucket": 2,
+    "mult": 1.104
+   },
+   "mult_trainer": 1.234,
+   "mult_kick": 1.158,
+   "mult_dist": 1.104,
+   "mult_total": 1.578,
+   "kick_reference": "上がり3F順位（新しい順）：7位/18頭(33.2)・2位/18頭(32.8)・11位/14頭(33.6)",
+   "notes": []
+  },
+  {
+   "no": 12,
+   "name": "レディマリオン",
+   "horse_id": "2021105752",
+   "trainer": "長谷川 浩大",
+   "trainer_id": "01173",
+   "trainer_factor": {
+    "t1": 0.0292,
+    "runs": 1874,
+    "top3": 466,
+    "top3_rate_raw": 0.249,
+    "base": 0.219,
+    "mult": 1.07
+   },
+   "kick_factor": {
+    "k2": 0.297,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-08-22",
+      "code": "2604030107",
+      "venue": "新潟",
+      "race": "朱鷺S",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 34.4,
+      "rank": 10,
+      "field": 18,
+      "finish": 9,
+      "share_faster": 0.5
+     },
+     {
+      "date": "2026-07-26",
+      "code": "2604020207",
+      "venue": "新潟",
+      "race": "関屋記",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 36.5,
+      "rank": 8,
+      "field": 14,
+      "finish": 8,
+      "share_faster": 0.5
+     },
+     {
+      "date": "2026-04-19",
+      "code": "2603010411",
+      "venue": "福島",
+      "race": "福島牝",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 35.6,
+      "rank": 14,
+      "field": 16,
+      "finish": 14,
+      "share_faster": 0.812
+     }
+    ],
+    "mult": 0.9
+   },
+   "dist_factor": {
+    "apt": -0.0417,
+    "bucket_m": 1600,
+    "runs_in_bucket": 3,
+    "top3_in_bucket": 1,
+    "mult": 0.971
+   },
+   "mult_trainer": 1.07,
+   "mult_kick": 0.9,
+   "mult_dist": 0.971,
+   "mult_total": 0.935,
+   "kick_reference": "上がり3F順位（新しい順）：10位/18頭(34.4)・8位/14頭(36.5)・14位/16頭(35.6)",
+   "notes": []
+  },
+  {
+   "no": 13,
+   "name": "ブルーミンデザイン",
+   "horse_id": "2021105283",
+   "trainer": "宮本 博",
+   "trainer_id": "01073",
+   "trainer_factor": {
+    "t1": 0.0122,
+    "runs": 2226,
+    "top3": 515,
+    "top3_rate_raw": 0.231,
+    "base": 0.219,
+    "mult": 1.029
+   },
+   "kick_factor": {
+    "k2": 0.162,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-03-29",
+      "code": "2609020211",
+      "venue": "阪神",
+      "race": "六甲S",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 43.7,
+      "rank": 13,
+      "field": 13,
+      "finish": 13,
+      "share_faster": 0.923
+     },
+     {
+      "date": "2026-03-08",
+      "code": "2609010611",
+      "venue": "阪神",
+      "race": "大阪城",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 35.5,
+      "rank": 8,
+      "field": 12,
+      "finish": 6,
+      "share_faster": 0.583
+     },
+     {
+      "date": "2025-12-13",
+      "code": "2509050311",
+      "venue": "阪神",
+      "race": "リゲル",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 34.1,
+      "rank": 12,
+      "field": 13,
+      "finish": 8,
+      "share_faster": 0.846
+     }
+    ],
+    "mult": 0.743
+   },
+   "dist_factor": {
+    "apt": -0.0189,
+    "bucket_m": 1600,
+    "runs_in_bucket": 13,
+    "top3_in_bucket": 5,
+    "mult": 0.987
+   },
+   "mult_trainer": 1.029,
+   "mult_kick": 0.743,
+   "mult_dist": 0.987,
+   "mult_total": 0.755,
+   "kick_reference": "上がり3F順位（新しい順）：13位/13頭(43.7)・8位/12頭(35.5)・12位/13頭(34.1)",
+   "notes": []
+  },
+  {
+   "no": 14,
+   "name": "エンペラーズソード",
+   "horse_id": "2022106691",
+   "trainer": "高木 登",
+   "trainer_id": "01088",
+   "trainer_factor": {
+    "t1": 0.0497,
+    "runs": 2507,
+    "top3": 675,
+    "top3_rate_raw": 0.269,
+    "base": 0.219,
+    "mult": 1.121
+   },
+   "kick_factor": {
+    "k2": 0.149,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-10-17",
+      "code": "2605040611",
+      "venue": "東京",
+      "race": "富士S",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 40.2,
+      "rank": 14,
+      "field": 14,
+      "finish": 14,
+      "share_faster": 0.929
+     },
+     {
+      "date": "2026-04-04",
+      "code": "2606030311",
+      "venue": "中山",
+      "race": "ダCT",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 35.9,
+      "rank": 10,
+      "field": 15,
+      "finish": 8,
+      "share_faster": 0.6
+     },
+     {
+      "date": "2026-03-15",
+      "code": "2606020610",
+      "venue": "中山",
+      "race": "東風S",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 35.2,
+      "rank": 15,
+      "field": 16,
+      "finish": 7,
+      "share_faster": 0.875
+     }
+    ],
+    "mult": 0.73
+   },
+   "dist_factor": {
+    "apt": 0.0455,
+    "bucket_m": 1600,
+    "runs_in_bucket": 11,
+    "top3_in_bucket": 6,
+    "mult": 1.032
+   },
+   "mult_trainer": 1.121,
+   "mult_kick": 0.73,
+   "mult_dist": 1.032,
+   "mult_total": 0.845,
+   "kick_reference": "上がり3F順位（新しい順）：14位/14頭(40.2)・10位/15頭(35.9)・15位/16頭(35.2)",
+   "notes": []
+  },
+  {
+   "no": 15,
+   "name": "ダノンセンチュリー",
+   "horse_id": "2022104814",
+   "trainer": "宮田 敬介",
+   "trainer_id": "01175",
+   "trainer_factor": {
+    "t1": 0.1047,
+    "runs": 1356,
+    "top3": 442,
+    "top3_rate_raw": 0.326,
+    "base": 0.219,
+    "mult": 1.249
+   },
+   "kick_factor": {
+    "k2": 0.459,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-27",
+      "code": "2609040911",
+      "venue": "阪神",
+      "race": "ポート",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.5,
+      "rank": 4,
+      "field": 16,
+      "finish": 1,
+      "share_faster": 0.188
+     },
+     {
+      "date": "2026-07-26",
+      "code": "2604020207",
+      "venue": "新潟",
+      "race": "関屋記",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 37.1,
+      "rank": 10,
+      "field": 14,
+      "finish": 11,
+      "share_faster": 0.643
+     },
+     {
+      "date": "2026-05-02",
+      "code": "2605020311",
+      "venue": "東京",
+      "race": "京王S",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 33.0,
+      "rank": 7,
+      "field": 18,
+      "finish": 9,
+      "share_faster": 0.333
+     }
+    ],
+    "mult": 1.133
+   },
+   "dist_factor": {
+    "apt": 0.1806,
+    "bucket_m": 1600,
+    "runs_in_bucket": 6,
+    "top3_in_bucket": 5,
+    "mult": 1.111
+   },
+   "mult_trainer": 1.249,
+   "mult_kick": 1.133,
+   "mult_dist": 1.111,
+   "mult_total": 1.572,
+   "kick_reference": "上がり3F順位（新しい順）：4位/16頭(33.5)・10位/14頭(37.1)・7位/18頭(33.0)",
+   "notes": []
+  },
+  {
+   "no": 16,
+   "name": "カヴァレリッツォ",
+   "horse_id": "2023107153",
+   "trainer": "吉岡 辰弥",
+   "trainer_id": "01176",
+   "trainer_factor": {
+    "t1": 0.0874,
+    "runs": 1594,
+    "top3": 491,
+    "top3_rate_raw": 0.308,
+    "base": 0.219,
+    "mult": 1.223
+   },
+   "kick_factor": {
+    "k2": 0.375,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-05-10",
+      "code": "2605020611",
+      "venue": "東京",
+      "race": "NHK",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 35.0,
+      "rank": 14,
+      "field": 18,
+      "finish": 12,
+      "share_faster": 0.722
+     },
+     {
+      "date": "2026-04-19",
+      "code": "2606030811",
+      "venue": "中山",
+      "race": "皐月賞",
+      "surface": "芝",
+      "dist": 2000,
+      "last3f": 35.0,
+      "rank": 15,
+      "field": 18,
+      "finish": 13,
+      "share_faster": 0.778
+     },
+     {
+      "date": "2025-12-21",
+      "code": "2509050611",
+      "venue": "阪神",
+      "race": "朝FS",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 34.3,
+      "rank": 1,
+      "field": 14,
+      "finish": 1,
+      "share_faster": 0.0
+     }
+    ],
+    "mult": 1.006
+   },
+   "dist_factor": {
+    "apt": 0.1607,
+    "bucket_m": 1600,
+    "runs_in_bucket": 4,
+    "top3_in_bucket": 3,
+    "mult": 1.111
+   },
+   "mult_trainer": 1.223,
+   "mult_kick": 1.006,
+   "mult_dist": 1.111,
+   "mult_total": 1.367,
+   "kick_reference": "上がり3F順位（新しい順）：14位/18頭(35.0)・15位/18頭(35.0)・1位/14頭(34.3)",
+   "notes": []
+  },
+  {
+   "no": 17,
+   "name": "ガロンヌ",
+   "horse_id": "2021100494",
+   "trainer": "上村 洋行",
+   "trainer_id": "01168",
+   "trainer_factor": {
+    "t1": 0.1256,
+    "runs": 1681,
+    "top3": 583,
+    "top3_rate_raw": 0.347,
+    "base": 0.219,
+    "mult": 1.249
+   },
+   "kick_factor": {
+    "k2": 0.7323,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-11-01",
+      "code": "2608041111",
+      "venue": "京都",
+      "race": "まほろ",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 33.0,
+      "rank": 1,
+      "field": 13,
+      "finish": 4,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-08-22",
+      "code": "2604030107",
+      "venue": "新潟",
+      "race": "朱鷺S",
+      "surface": "芝",
+      "dist": 1400,
+      "last3f": 33.4,
+      "rank": 1,
+      "field": 18,
+      "finish": 2,
+      "share_faster": 0.0
+     },
+     {
+      "date": "2026-05-16",
+      "code": "2608030711",
+      "venue": "京都",
+      "race": "鞍馬S",
+      "surface": "芝",
+      "dist": 1200,
+      "last3f": 32.4,
+      "rank": 2,
+      "field": 14,
+      "finish": 11,
+      "share_faster": 0.071
+     }
+    ],
+    "mult": 1.535
+   },
+   "dist_factor": {
+    "apt": 0.1471,
+    "bucket_m": 1600,
+    "runs_in_bucket": 5,
+    "top3_in_bucket": 3,
+    "mult": 1.108
+   },
+   "mult_trainer": 1.249,
+   "mult_kick": 1.535,
+   "mult_dist": 1.108,
+   "mult_total": 2.124,
+   "kick_reference": "上がり3F順位（新しい順）：1位/13頭(33.0)・1位/18頭(33.4)・2位/14頭(32.4)",
+   "notes": []
+  },
+  {
+   "no": 18,
+   "name": "レディントン",
+   "horse_id": "2021105926",
+   "trainer": "杉山 晴紀",
+   "trainer_id": "01157",
+   "trainer_factor": {
+    "t1": 0.0983,
+    "runs": 3221,
+    "top3": 1025,
+    "top3_rate_raw": 0.318,
+    "base": 0.219,
+    "mult": 1.249
+   },
+   "kick_factor": {
+    "k2": 0.1655,
+    "runs_used": 3,
+    "recent": [
+     {
+      "date": "2026-09-27",
+      "code": "2609040911",
+      "venue": "阪神",
+      "race": "ポート",
+      "surface": "芝",
+      "dist": 1600,
+      "last3f": 34.6,
+      "rank": 14,
+      "field": 16,
+      "finish": 13,
+      "share_faster": 0.812
+     },
+     {
+      "date": "2026-07-12",
+      "code": "2602011011",
+      "venue": "函館",
+      "race": "巴賞",
+      "surface": "芝",
+      "dist": 1800,
+      "last3f": 37.1,
+      "rank": 11,
+      "field": 14,
+      "finish": 11,
+      "share_faster": 0.714
+     },
+     {
+      "date": "2026-05-30",
+      "code": "2605021111",
+      "venue": "東京",
+      "race": "アハル",
+      "surface": "ダート",
+      "dist": 1600,
+      "last3f": 37.8,
+      "rank": 14,
+      "field": 16,
+      "finish": 9,
+      "share_faster": 0.812
+     }
+    ],
+    "mult": 0.747
+   },
+   "dist_factor": {
+    "apt": 0.143,
+    "bucket_m": 1600,
+    "runs_in_bucket": 14,
+    "top3_in_bucket": 8,
+    "mult": 1.105
+   },
+   "mult_trainer": 1.249,
+   "mult_kick": 0.747,
+   "mult_dist": 1.105,
+   "mult_total": 1.031,
+   "kick_reference": "上がり3F順位（新しい順）：14位/16頭(34.6)・11位/14頭(37.1)・14位/16頭(37.8)",
+   "notes": []
+  }
+ ]
+}
