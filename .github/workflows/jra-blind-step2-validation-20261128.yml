@@ -21,60 +21,12 @@ jobs:
         with:
           node-version: '22'
       - run: pip install requests beautifulsoup4
-      - name: Commit price-independent strategy plans on validation branch
+      - name: Reuse only already-frozen plans
         run: |
-          python - <<'PY'
-          import json,importlib.util,subprocess
-          from datetime import datetime
-          from pathlib import Path
-          from zoneinfo import ZoneInfo
-          def module(name,path):
-            s=importlib.util.spec_from_file_location(name,path);o=importlib.util.module_from_spec(s);s.loader.exec_module(o);return o
-          old=module('collector','.github/scripts/jra-gather-live-v314.py')
-          root=Path('validation-only/jra-blind-intake/2026-11-28')
-          draft=root/'step1-draft.json'
-          fixed=subprocess.check_output(['git','log','-1','--format=%cI','--',str(draft)],text=True).strip()
-          assert fixed
-          doc=json.loads(draft.read_text())
-          output=root/'step2';output.mkdir(exist_ok=True)
-          for race in doc['races']:
-            tokyo=race['venue']=='東京';slug='tokyo' if tokyo else 'kyoto'
-            code='2605050711' if tokyo else '2608050711'
-            distance=1600 if tokyo else 2000
-            horses=race['horses']
-            raw=json.loads((root/'attempt4'/f'{slug}.json').read_text())
-            assert raw['status']=='allowlisted_intake_only'
-            ids={h['number'] for h in horses}
-            assert ids=={h['number'] for h in raw['horses']}
-            count=max(ids)
-            frame_list=old.frame_allocation(count)
-            frame={n:frame_list[n-1] for n in ids}
-            runners=[]
-            for h in horses:
-              past=[]
-              for p in h['prior']:
-                d=p['distance'] or ''
-                import re
-                match=re.search(r'(\d+)(芝|ダ)',d)
-                distance_p=int(match.group(1)) if match else None
-                surface='芝' if match and match.group(2)=='芝' else 'ダート' if match else None
-                date=re.sub(r'(\d{4})年(\d{1,2})月(\d{1,2})日',lambda m:f'{int(m[1]):04}-{int(m[2]):02}-{int(m[3]):02}',p['date'])
-                past.append(dict(date=date,course=p['venue'],distance_m=distance_p,surface=surface,finish=int(p['finish']) if p['finish'] else None,time=p['time'],class_name='未確認',same_condition=(p['venue']==race['venue'] and distance_p==distance and surface=='芝'),source_excerpt=f"{p['date']} {p['venue'] or '海外'} {d} {p['finish'] or '不明'}着"))
-              runners.append(dict(horse_number=h['number'],horse_name=h['name'],mark=h['mark'],overall_grade=h['overall_grade'],factor_grades=h['factor_grades'],weight_kg=h['weight_kg'],jockey=h['jockey'],evidence=h['judgement']+'。'+ '；'.join(h['factor_unknowns']),source_url=race['source_url'],past_performances=past,workout_data_status='unavailable',jockey_course_stats_status='unavailable',win_probability=h['win_prob']))
-            factors={}
-            for label,mult in [('low',.82),('high',1.18)]:
-              factors[label]=dict(assumption='同競馬場同距離の近4走3着内実績による相対18%感応度（未校正）',by_horse={str(h['horse_number']):mult if any(p['same_condition'] and p['finish'] and p['finish']<=3 for p in h['past_performances']) else 2-mult for h in runners})
-            planned=datetime.now(ZoneInfo('Asia/Tokyo')).isoformat(timespec='milliseconds')
-            assert datetime.fromisoformat(planned)<datetime.fromisoformat(f"2026-11-28T{race['post']}:00+09:00")
-            strategies=old.strategies([h['horse_number'] for h in runners],frame)
-            inp=dict(prompt_version='v3.13',race_id='2026-11-28-validation-'+slug,race_context=dict(date='2026-11-28',venue=race['venue'],race_no=11,race_name=race['race'],start_at=f"2026-11-28T{race['post']}:00+09:00",surface='芝',distance_m=distance,official_source_url=race['source_url'],official_form_sha256=raw['source_sha256'],official_going=race['going'],going_observed_at=race['source_observed_at'],sale_field_size=len(runners),place_paid_positions=3,offered_types=['単勝','複勝','枠連','馬連','馬単','ワイド','三連複','三連単']),frame_map={str(n):v for n,v in frame.items()},step1=dict(fixed_at=fixed,primary_source=race['source_url'],no_odds_used_to_change_marks=True,marks_source=str(draft),probability_method='validation-only grade × base mark proxy × shared-v1.3; earlier session exposure limitation',calibrated=False,runners=runners),scenario_factors=factors,strategy_plan_fixed_at=planned,strategies=strategies,mode_exclusions=[],market_quotes=[],input_source='VALIDATION ONLY. Not an independent certified formal forecast; no current odds used to change draft marks. No publishing.')
-            (output/f'{slug}-plan.json').write_text(json.dumps(inp,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- validation-only/jra-blind-intake/2026-11-28/step2/*-plan.json
-          git commit -m "Freeze isolated candidate plans before price collection"
-          git push origin HEAD:chatgpt/jra-blind-intake-20261128
+          mkdir -p validation-only/jra-blind-intake/2026-11-28/step2-retry1
+          cp validation-only/jra-blind-intake/2026-11-28/step2/*-plan.json validation-only/jra-blind-intake/2026-11-28/step2-retry1/
       - name: Evaluate exact market coverage and run unsealed v3.13 pipeline, separately per race
         run: |
           python - <<'PY'
@@ -86,7 +38,8 @@ jobs:
             s=importlib.util.spec_from_file_location(name,path);o=importlib.util.module_from_spec(s);s.loader.exec_module(o);return o
           parser=mod('old','.github/scripts/jra-gather-live-20261011-v310.py')
           refresh=mod('refresh','.github/scripts/jra-odds-full-refresh-v313-exec.py')
-          root=Path('validation-only/jra-blind-intake/2026-11-28/step2')
+          root=Path('validation-only/jra-blind-intake/2026-11-28/step2-retry1')
+          evidence=Path('e2e_validation/quote-evidence/validation-20261128-retry1');evidence.mkdir(parents=True,exist_ok=True)
           for slug,url in [('tokyo','https://sports.yahoo.co.jp/keiba/race/odds/tfw/2605050711'),('kyoto','https://sports.yahoo.co.jp/keiba/race/odds/tfw/2608050711')]:
             d=dict(status='blocked',scope='validation only; never a formal prediction or final_bets',race=slug)
             try:
@@ -96,7 +49,7 @@ jobs:
               frame={str(sel[0]):v for (t,sel),v in data.items() if t=='_frame'}
               assert all(frame.get(k)==v for k,v in inp['frame_map'].items()),'source frame allocation mismatch'
               d['frame_verified']=True
-              anchor_dir=root/f'{slug}-anchor';anchor_dir.mkdir()
+              anchor_dir=evidence/f'{slug}-anchor';anchor_dir.mkdir()
               quotes,meta=refresh.capture(r.content,r.url,'tfw',parser,anchor_dir,1)
               assert quotes and meta,'no actual anchor quote'
               key=next(k for k in quotes if k[0]=='単勝' and str(k[1][0]) in inp['frame_map'])
@@ -104,9 +57,11 @@ jobs:
               inp['market_quotes']=[dict(race_id=inp['race_id'],type=t,selection=list(sel),market_selection_id=t+':'+json.dumps(list(sel),separators=(',',':')),market_odds=quotes[key],source_url=meta['url'],observed_at=meta['at'],source_capture_path=meta['path'],source_capture_sha256=meta['sha'],quote_verified=True)]
               source=root/f'{slug}-anchor-input.json';source.write_text(json.dumps(inp,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
               recovered=root/f'{slug}-recovered.json'
-              refresh.recover(source,recovered,root/f'{slug}-quotes',refresh_all=True,max_capture_spread_seconds=180)
+              refresh.recover(source,recovered,evidence/f'{slug}-quotes',refresh_all=True,max_capture_spread_seconds=180)
               d['quote_count']=len(json.loads(recovered.read_text())['market_quotes'])
-              subprocess.run(['python','.github/scripts/jra-check-fresh-quotes-v313-exec.py','--input',str(recovered),'--fresh-seconds','600','--max-spread-seconds','180'],check=True)
+              gate=subprocess.run(['python','.github/scripts/jra-check-fresh-quotes-v313-exec.py','--input',str(recovered),'--fresh-seconds','600','--max-spread-seconds','180'],text=True,capture_output=True)
+              d['fresh_gate_log']=gate.stdout+gate.stderr
+              if gate.returncode: raise RuntimeError('fresh quote gate failed: '+gate.stderr)
               snapshot=root/f'{slug}-unsealed-snapshot.json'
               p=subprocess.run(['node','.github/scripts/jra-prestart-pipeline-v313.mjs','--input',str(recovered),'--output',str(snapshot)],text=True,capture_output=True)
               d['pipeline_log']=p.stdout[-1500:]+p.stderr[-1500:]
@@ -121,7 +76,7 @@ jobs:
       - name: Preserve validation evidence only
         if: always()
         run: |
-          git add -- validation-only/jra-blind-intake/2026-11-28/step2/
+          git add -- validation-only/jra-blind-intake/2026-11-28/step2-retry1/ e2e_validation/quote-evidence/validation-20261128-retry1/
           if ! git diff --cached --quiet; then
             git commit -m "Record actual STEP2 validation evidence; no seal or publication"
             git push origin HEAD:chatgpt/jra-blind-intake-20261128
