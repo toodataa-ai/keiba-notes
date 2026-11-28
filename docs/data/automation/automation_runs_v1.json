@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-28T00:21:23+00:00",
+ "generated_at": "2026-11-28T00:26:35+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
@@ -1937,6 +1937,17 @@
    "label": "Claude用のオッズ取得",
    "runs": [
     {
+     "id": 46087658260,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-28T00:23:54Z",
+     "started_at": "2026-11-28T00:23:54Z",
+     "ended_at": "2026-11-28T00:26:10Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "O"
+    },
+    {
      "id": 45140955202,
      "event": "schedule",
      "created_at": "2026-11-23T08:43:40Z",
@@ -2951,6 +2962,17 @@
   "claude-track-publish-v1.yml": {
    "label": "Claudeの予想の採点・公開",
    "runs": [
+    {
+     "id": 46087658499,
+     "event": "push",
+     "created_at": "2026-11-28T00:23:54Z",
+     "started_at": "2026-11-28T00:23:54Z",
+     "ended_at": "2026-11-28T00:24:13Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 46058247053,
      "event": "schedule",
