@@ -1,0 +1,116 @@
+name: JRA STEP1 odds-blind intake experiment (no publication)
+on:
+  push:
+    branches: [chatgpt/jra-blind-intake-20261128]
+    paths: ['.github/workflows/jra-blind-intake-experiment-20261128.yml']
+permissions:
+  contents: write
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/jra-blind-intake-20261128
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests beautifulsoup4
+      - name: Allowlisted pre-market data only (no prediction or research)
+        run: |
+          python - <<'PY'
+          import hashlib,json,re,sys
+          from datetime import datetime
+          from pathlib import Path
+          from urllib.parse import urlparse
+          from zoneinfo import ZoneInfo
+          import requests
+          from bs4 import BeautifulSoup
+          JST=ZoneInfo('Asia/Tokyo')
+          DATE='2026-11-28'
+          races=[
+              ('tokyo','東京','キャピタルステークス','15:25','https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0105202605071120261128%2FE5'),
+              ('kyoto','京都','京都2歳ステークス','15:40','https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0108202605071120261128%2FC3'),
+          ]
+          def txt(node):
+              return ' '.join(node.stripped_strings) if node else ''
+          def match(pattern,s):
+              m=re.search(pattern,s)
+              return m.group(1) if m else None
+          def num(pattern,s):
+              v=match(pattern,s)
+              return float(v) if v else None
+          def prior(cell):
+              t=txt(cell)
+              d=re.search(r'(\d{4})年(\d{1,2})月(\d{1,2})日',t)
+              dist=re.search(r'(\d{3,4})\s*(芝|ダ)',t)
+              if not dist:
+                  dist2=re.search(r'(芝|ダ)\s*(\d{3,4})',t)
+              else:
+                  dist2=None
+              return dict(date=('%04d-%02d-%02d'%tuple(map(int,d.groups()))) if d else None,
+                  venue=match(r'(東京|京都|中山|阪神|中京|新潟|福島|札幌|函館|小倉)',t),
+                  distance_m=int(dist.group(1)) if dist else int(dist2.group(2)) if dist2 else None,
+                  surface=dist.group(2) if dist else dist2.group(1) if dist2 else None,
+                  finish=num(r'(\d+)\s*着',t),field_size=num(r'(\d+)\s*頭',t),
+                  weight_kg=num(r'(\d{2}(?:\.\d)?)\s*kg',t),
+                  time=match(r'(\d+:\d+\.\d+)',t),
+                  closing_3f=num(r'(?:上がり|上り|3F)\s*(\d{2}\.\d)',t),
+                  passing=match(r'(?<!\d)(\d{1,2}(?:\s*-\s*\d{1,2}){1,3})(?!\d)',t),
+                  going=match(r'(良|稍重|重|不良)',t),
+                  race_class=match(r'(GⅠ|GⅡ|GⅢ|G1|G2|G3|リステッド|オープン|[123]勝クラス|新馬|未勝利)',t))
+          def extract(raw):
+              soup=BeautifulSoup(raw,'html.parser')
+              out=[]
+              for tr in soup.select('tr'):
+                  no,horse,jockey=(tr.select_one('td.'+k) for k in ('num','horse','jockey'))
+                  if not (no and horse and jockey): continue
+                  n=match(r'(\d+)',txt(no))
+                  name=match(r'^([ァ-ヺー・A-Za-z0-9]+)',txt(horse))
+                  kg=num(r'(\d{2}(?:\.\d)?)\s*kg',txt(jockey))
+                  rider=txt(jockey.select_one('a'))
+                  if not rider or not re.fullmatch(r'[\w.．・\s]+',rider): rider=None
+                  if not n or not name: raise ValueError('unrecognized horse identity')
+                  if kg is None and not re.search('取消|除外',txt(tr)): raise ValueError('missing weight')
+                  out.append(dict(number=int(n),name=name,weight_kg=kg,jockey=rider,
+                    cancelled=bool(re.search('取消|除外',txt(tr))),
+                    past=[prior(p) for p in tr.select('td.past')]))
+              if not out or len({x['number'] for x in out})!=len(out): raise ValueError('missing or duplicate roster')
+              return out
+          fixture='<table><tr><td class="num">1</td><td class="horse">テストホース</td><td class="odds">999.9 1番人気</td><td class="jockey">56.0kg <a>テスト騎手</a></td><td class="past">2026年10月10日 東京 1600芝 2着 12頭 1:33.0 56.0kg</td></tr></table>'
+          clean=extract(fixture.encode('utf-8'))
+          check=json.dumps(clean,ensure_ascii=False)
+          assert '999.9' not in check and '1番人気' not in check
+          assert clean[0]['weight_kg']==56 and clean[0]['past'][0]['finish']==2
+          print('PASS: synthetic current odds exclusion')
+          dest=Path('validation-only/jra-blind-intake/2026-11-28')
+          dest.mkdir(parents=True,exist_ok=True)
+          for slug,venue,name,start,url in races:
+              record=dict(date=DATE,venue=venue,name=name,source_url=url,observed_at=datetime.now(JST).isoformat(),purpose='intake experiment only; not formal STEP1 or proof')
+              try:
+                  if datetime.now(JST)>=datetime.fromisoformat(DATE+'T'+start+':00+09:00'):
+                      raise ValueError('past scheduled start')
+                  r=requests.get(url,timeout=20,headers={'User-Agent':'Mozilla/5.0 (JRA pre-race data audit)'})
+                  record['http_status']=r.status_code
+                  r.raise_for_status()
+                  if urlparse(r.url).hostname not in ('sp.jra.jp','www.jra.go.jp'): raise ValueError('unexpected host')
+                  doc=BeautifulSoup(r.content,'html.parser')
+                  page=txt(doc)
+                  if not re.search(r'2026年\s*11月\s*28日',page) or venue not in page or name not in page:
+                      raise ValueError('date/venue/race mismatch')
+                  horses=extract(r.content)
+                  if len(horses)<9 or len(horses)>18: raise ValueError('unexpected roster size')
+                  record.update(status='allowlisted_intake_only',sha256=hashlib.sha256(r.content).hexdigest(),going=match(r'芝\s*(良|稍重|重|不良)',page),horses=horses)
+              except (requests.RequestException,ValueError) as e:
+                  record.update(status='blocked',error_type=type(e).__name__,error=str(e)[:250])
+              (dest/(slug+'.json')).write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+              print(slug,record['status'],record.get('http_status','no HTTP status'))
+          PY
+      - name: Preserve only experimental sanitized evidence on isolated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- validation-only/jra-blind-intake/2026-11-28/
+          git commit -m "Save sanitized JRA intake experiment results; no forecast"
+          git push origin HEAD:chatgpt/jra-blind-intake-20261128
