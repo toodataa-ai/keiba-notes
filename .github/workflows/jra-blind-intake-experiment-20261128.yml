@@ -30,8 +30,8 @@ jobs:
           JST=ZoneInfo('Asia/Tokyo')
           DATE='2026-11-28'
           races=[
-            ('tokyo','東京','キャピタルステークス','15:25','https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0105202605071120261128%2FE5'),
-            ('kyoto','京都','京都2歳ステークス','15:40','https://sp.jra.jp/JRADB/accessD.html?CNAME=sw01dde0108202605071120261128%2FC3')]
+            ('tokyo','東京','キャピタルステークス','15:25','https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0105202605071120261128%2F58'),
+            ('kyoto','京都','京都2歳ステークス','15:40','https://www.jra.go.jp/JRADB/accessD.html?CNAME=pw01dde0108202605071120261128%2F36')]
           def norm(s): return unicodedata.normalize('NFKC',s)
           def txt(n): return norm(' '.join(n.stripped_strings)) if n is not None else ''
           def m(p,s):
@@ -80,23 +80,15 @@ jobs:
           test=extract(BeautifulSoup(fixture,'html.parser'))
           assert len(test)==1 and test[0]['weight_kg']==56
           assert '999.9' not in json.dumps(test) and '人気' not in json.dumps(test,ensure_ascii=False)
-          out=Path('validation-only/jra-blind-intake/2026-11-28/attempt3')
+          out=Path('validation-only/jra-blind-intake/2026-11-28/attempt4')
           out.mkdir(parents=True,exist_ok=True)
           for slug,venue,name,start,url in races:
             d=dict(date=DATE,venue=venue,name=name,source_url=url,observed_at=datetime.now(JST).isoformat(),purpose='experimental data intake only, not a formal forecast',synthetic_test='passed')
             try:
               if datetime.now(JST)>=datetime.fromisoformat(DATE+'T'+start+':00+09:00'): raise ValueError('past post')
-              if slug=='kyoto':
-                landing='https://www.jra.go.jp/keiba/race/107.html'
-                p=requests.get(landing,timeout=20);p.raise_for_status()
-                dom=BeautifulSoup(p.content,'html.parser')
-                links=[urljoin(landing,a.get('href','')) for a in dom.select('a[href]') if txt(a)=='出馬表']
-                links=[u for u in links if urlparse(u).hostname in ('www.jra.go.jp','sp.jra.jp') and 'accessD' in u]
-                d['advertised_links']=links[:3]
-                if links: url=links[0];d['source_url']=url
               r=requests.get(url,timeout=20)
               d['http_status']=r.status_code;r.raise_for_status()
-              if urlparse(r.url).hostname not in ('sp.jra.jp','www.jra.go.jp'): raise ValueError('unexpected host')
+              if urlparse(r.url).hostname not in ('www.jra.go.jp',): raise ValueError('unexpected host')
               doc=BeautifulSoup(r.content,'html.parser');s=txt(doc)
               d['metadata_checks']=dict(date=bool(re.search(r'2026年\s*11月\s*28日',s)),venue=venue in s,race=name in s)
               d['structure']=[dict(classes=t.get('class',[]),rows=len(t.select('tr')),headers=[txt(h)[:30] for h in t.select('th')[:20] if not re.search(r'\d',txt(h))],cell_classes=[x.get('class',[]) for x in t.select('td')[:24]]) for t in doc.select('table')[:6]]
@@ -114,6 +106,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- validation-only/jra-blind-intake/2026-11-28/attempt3/
-          git commit -m "Save blind intake attempt 3"
+          git add -- validation-only/jra-blind-intake/2026-11-28/attempt4/
+          git commit -m "Save uniform PC-form blind intake attempt 4"
           git push origin HEAD:chatgpt/jra-blind-intake-20261128
