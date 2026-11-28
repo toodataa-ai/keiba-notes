@@ -4,7 +4,7 @@
  "research_only": true,
  "pace": {
   "id": "claude+pace_v1",
-  "pairs": 18,
+  "pairs": 20,
   "dates": [
    "2026-11-07",
    "2026-11-07",
@@ -23,18 +23,20 @@
    "2026-11-22",
    "2026-11-22",
    "2026-11-23",
-   "2026-11-23"
+   "2026-11-23",
+   "2026-11-28",
+   "2026-11-28"
   ],
   "need_pairs": 20,
-  "mean_log_loss_base": 2.306388145793626,
-  "mean_log_loss_pace": 2.306830077763796,
-  "races_improved": 6,
-  "races_worse": 12,
-  "state": "collecting"
+  "mean_log_loss_base": 2.3032788614228648,
+  "mean_log_loss_pace": 2.3013720746089907,
+  "races_improved": 7,
+  "races_worse": 13,
+  "state": "ready_for_decision"
  },
  "going": {
   "id": "claude+going_v1",
-  "pairs": 18,
+  "pairs": 20,
   "dates": [
    "2026-11-07",
    "2026-11-07",
@@ -53,19 +55,21 @@
    "2026-11-22",
    "2026-11-22",
    "2026-11-23",
-   "2026-11-23"
+   "2026-11-23",
+   "2026-11-28",
+   "2026-11-28"
   ],
   "need_pairs": 20,
-  "adjusted_runners": 151,
-  "mean_log_loss_base": 2.306388145793626,
-  "mean_log_loss_going": 2.3578477079253455,
-  "races_improved": 4,
-  "races_worse": 14,
-  "state": "collecting"
+  "adjusted_runners": 165,
+  "mean_log_loss_base": 2.3032788614228648,
+  "mean_log_loss_going": 2.352697317425109,
+  "races_improved": 5,
+  "races_worse": 15,
+  "state": "ready_for_decision"
  },
  "portfolio": {
   "id": "claude+ticket_div_rule",
-  "pairs": 13,
+  "pairs": 15,
   "dates": [
    "2026-11-07",
    "2026-11-07",
@@ -79,18 +83,20 @@
    "2026-11-21",
    "2026-11-22",
    "2026-11-22",
-   "2026-11-23"
+   "2026-11-23",
+   "2026-11-28",
+   "2026-11-28"
   ],
   "need_pairs": 20,
   "summary": {
    "claude_own": {
-    "stake_yen": 19800,
+    "stake_yen": 22500,
     "payout_yen": 11690,
-    "roi": 0.5904,
+    "roi": 0.5196,
     "hit_races": 4
    },
    "mechanical_rule": {
-    "stake_yen": 19800,
+    "stake_yen": 22500,
     "payout_yen": 0,
     "roi": 0.0,
     "hit_races": 0
@@ -102,10 +108,26 @@
   "id": "claude+marks_wide_v1",
   "registered_at": "2026-11-24T06:30:00+09:00",
   "rule": "◎○▲の3頭のワイド3点・各100円（発走前に保存した印だけで決まる。仮想・購入なし）",
-  "pairs": 0,
-  "dates": [],
+  "pairs": 2,
+  "dates": [
+   "2026-11-28",
+   "2026-11-28"
+  ],
   "need_pairs": 20,
-  "summary": null,
+  "summary": {
+   "claude_own": {
+    "stake_yen": 2700,
+    "payout_yen": 0,
+    "roi": 0.0,
+    "hit_races": 0
+   },
+   "marks_wide": {
+    "stake_yen": 600,
+    "payout_yen": 610,
+    "roi": 1.0167,
+    "hit_races": 1
+   }
+  },
   "replay_reference": {
    "races": 18,
    "claude_own": {
@@ -130,17 +152,18 @@
   "state": "collecting",
   "groups": {
    "extension": {
-    "horses": 1,
-    "races": 1,
-    "predicted_wins": 0.05,
+    "horses": 2,
+    "races": 2,
+    "predicted_wins": 0.087,
     "actual_wins": 0,
     "dates": [
-     "2026-11-14"
+     "2026-11-14",
+     "2026-11-28"
     ],
     "ratio": 0.0,
     "ratio_95": [
      0.0,
-     8.543
+     6.492
     ]
    },
    "shorten": {
@@ -190,17 +213,17 @@
     "state": "collecting"
    },
    "E1": {
-    "horses": 32,
-    "races": 3,
-    "predicted_wins": 2.88,
-    "actual_wins": 3,
+    "horses": 41,
+    "races": 4,
+    "predicted_wins": 3.843,
+    "actual_wins": 4,
     "state": "ready_for_review"
    },
    "E2": {
-    "horses": 248,
-    "races": 17,
-    "predicted_wins": 15.02,
-    "actual_wins": 14,
+    "horses": 267,
+    "races": 19,
+    "predicted_wins": 16.057,
+    "actual_wins": 15,
     "state": "ready_for_review"
    }
   }
