@@ -23,7 +23,7 @@ GitHub Actions の定時実行は、数時間遅れることがある（2026-11-
 
 ## STEP1：全頭の評価（オッズは見ない）
 **評価の手順は共通の手順書 `shared_procedure/predict_common_v1.md`（shared-v1.3）。** ChatGPT も同じ手順書を読む。手順書の中身（馬場予測・初めての距離・斤量など）は、そちらが正。この手順書には書かない（二重にしない）。
-- 手順書の「馬場の予測」は、**STEP1 を書く前に** `baba_models_v2/live/<今日>_<競馬場>.json` があるか確認する。無ければ、`git pull` しながら2分おきに最大30分待つ（馬場予測の処理は9:15ごろの発表のあと動く）。それでも無いときは使わない（`going_forecast` は null、出馬表の馬場状態だけで評価）。使ったときは、STEP1 の保存内容に `"going_forecast":{"file":"baba_models_v2/live/…","model":"…","probs":{…},"most_likely":"…","p_wet":…}`（11R の probs と、その p_wet_after_morning）を足す（使わなかったときは `null`）。
+- 手順書の「馬場の予測」は、**STEP1 を書く前に** `baba_models_v2/live/<今日>_<競馬場>.json` があるか確認する。無ければ、`git pull` しながら2分おきに最大30分待つ（馬場予測の処理は9:15ごろの発表のあと動く）。それでも無いときは使わない（`going_forecast` は null、出馬表の馬場状態だけで評価）。使ったときは、STEP1 の保存内容に `"going_forecast":{"file":"baba_models_v2/live/…","model":"…","probs":{…},"most_likely":"…","p_wet":…}`（11R の probs と、その p_wet_after_morning）を足す（使わなかったときは `null`）。 **馬場の見込みは各馬の `reason` に書かない**（レース全体の数字で馬ごとの違いではない。`going_forecast` に1回だけ）。
 - **STEP1 の補助データ（shared-v1.3〜）**：STEP1 を書く前に `docs/data/step1_factors/<今日>_<競馬場>.json` を読む。無ければ `git pull` しながら2分おきに最大20分待つ。それでも無いときは補正なし（倍率1.0）で、各馬の `reason` に「補正データなし」と書く。ある場合は、勝率に `mult_total` を掛けて合計1に直し、各馬の `reason` に `kick_reference`（直近3走の上がり3F順位）を必ず書く（詳細は共通手順書）。STEP1 の保存内容に `"step1_factors":{"file":"docs/data/step1_factors/…","generated_at":"…"}`（使わなければ null）を足す。
 - 「前日の馬場傾向」は `bias_used` として {speed_z, front_z, outer_z, label} をそのまま記録する（前日が別開催・ファイルが無いときは null）。この数字で印・勝率を変えない。|z|<0.5 は言及しない。outer（外枠）は使わない。芝1400m以下の front は参考にしない。当日朝の公式馬場状態が前日と違うときは speed も「参考外」と書く。
 - `claude_track/handover_from_chatgpt.md` の A・B も参考にしてよい。C の数値基準は使わない。
