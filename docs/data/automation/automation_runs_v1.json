@@ -1,12 +1,23 @@
 {
  "schema_version": 2,
- "generated_at": "2026-11-27T21:19:12+00:00",
+ "generated_at": "2026-11-28T00:11:41+00:00",
  "keep_days": 14,
  "note": "GitHub Actionsの実行記録（開始・終了時刻は実際の値、UTC）。ClaudeのT2/T3・ChatGPTの手動実行は含まない。by＝G:GitHub定時／H:Haiku起動役／O:Opusタスク／手:手動・復旧・push。",
  "workflows": {
   "baba-forecast-archive-v1.yml": {
    "label": "予報・馬場ページの保存",
    "runs": [
+    {
+     "id": 46086497438,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-28T00:10:51Z",
+     "started_at": "2026-11-28T00:10:51Z",
+     "ended_at": "2026-11-28T00:11:19Z",
+     "status": "completed",
+     "conclusion": "success",
+     "attempt": 1,
+     "by": "手"
+    },
     {
      "id": 46068634179,
      "event": "workflow_dispatch",
@@ -655,17 +666,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 43697439328,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-15T09:04:17Z",
-     "started_at": "2026-11-15T09:04:17Z",
-     "ended_at": "2026-11-15T09:04:47Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "H"
     }
    ]
   },
@@ -1042,52 +1042,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 43514206925,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-13T21:50:21Z",
-     "started_at": "2026-11-13T21:50:21Z",
-     "ended_at": "2026-11-13T21:56:19Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 43514196080,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-13T21:50:16Z",
-     "started_at": "2026-11-13T21:50:16Z",
-     "ended_at": "2026-11-13T21:53:20Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "手"
-    },
-    {
-     "id": 43508444054,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-13T21:11:28Z",
-     "started_at": "2026-11-13T21:11:28Z",
-     "ended_at": "2026-11-13T21:12:21Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "H",
-     "fail_kind": ""
-    },
-    {
-     "id": 43348831468,
-     "event": "schedule",
-     "created_at": "2026-11-13T01:58:58Z",
-     "started_at": "2026-11-13T01:58:58Z",
-     "ended_at": "2026-11-13T01:59:56Z",
-     "status": "completed",
-     "conclusion": "failure",
-     "attempt": 1,
-     "by": "G",
-     "fail_kind": ""
     }
    ]
   },
@@ -1401,34 +1355,23 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "G"
-    },
-    {
-     "id": 43508448319,
-     "event": "workflow_dispatch",
-     "created_at": "2026-11-13T21:11:29Z",
-     "started_at": "2026-11-13T21:11:29Z",
-     "ended_at": "2026-11-13T21:14:20Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "H"
-    },
-    {
-     "id": 43354920469,
-     "event": "schedule",
-     "created_at": "2026-11-13T02:50:31Z",
-     "started_at": "2026-11-13T02:50:31Z",
-     "ended_at": "2026-11-13T02:52:23Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
   "claude-race-data-v1.yml": {
    "label": "出馬表の取得",
    "runs": [
+    {
+     "id": 46086506556,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-28T00:10:57Z",
+     "started_at": "2026-11-28T00:10:57Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "O"
+    },
     {
      "id": 45295124794,
      "event": "workflow_dispatch",
@@ -1558,6 +1501,17 @@
   "baba-going-live-v1.yml": {
    "label": "馬場の朝の予測",
    "runs": [
+    {
+     "id": 46086500402,
+     "event": "workflow_dispatch",
+     "created_at": "2026-11-28T00:10:53Z",
+     "started_at": "2026-11-28T00:10:53Z",
+     "ended_at": null,
+     "status": "in_progress",
+     "conclusion": null,
+     "attempt": 1,
+     "by": "O"
+    },
     {
      "id": 45295121992,
      "event": "workflow_dispatch",
@@ -2618,17 +2572,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "O"
-    },
-    {
-     "id": 43472288442,
-     "event": "schedule",
-     "created_at": "2026-11-13T17:23:15Z",
-     "started_at": "2026-11-13T17:23:15Z",
-     "ended_at": "2026-11-13T17:23:35Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -2991,17 +2934,6 @@
      "attempt": 1,
      "by": "手",
      "fail_kind": ""
-    },
-    {
-     "id": 43475664911,
-     "event": "schedule",
-     "created_at": "2026-11-13T17:43:52Z",
-     "started_at": "2026-11-13T17:43:52Z",
-     "ended_at": "2026-11-13T17:44:27Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   },
@@ -3590,17 +3522,6 @@
      "conclusion": "success",
      "attempt": 1,
      "by": "手"
-    },
-    {
-     "id": 43479277741,
-     "event": "schedule",
-     "created_at": "2026-11-13T18:05:59Z",
-     "started_at": "2026-11-13T18:05:59Z",
-     "ended_at": "2026-11-13T18:06:23Z",
-     "status": "completed",
-     "conclusion": "success",
-     "attempt": 1,
-     "by": "G"
     }
    ]
   }
