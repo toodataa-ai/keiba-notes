@@ -1,0 +1,207 @@
+{
+  "scope": "isolated validation only; not formal purchase or proof; no recommendation to place wagers",
+  "status": "v315_comparator_validated_not_formal",
+  "slug": "tokyo",
+  "checked_at": "2026-11-28T00:57:49.111Z",
+  "source_sha256": "eaa8e763af0e76bca1939d3b438cdf49c8c75794c1b7900033eaa2c7071e9bb2",
+  "source_stage": "pending_git_proof",
+  "formal_gate": "correctly rejected: JRA_V315_BLOCKER: sealed v3.13 prediction required",
+  "quote_observation": {
+    "submitted": 171,
+    "verified": 171,
+    "unused": [],
+    "missing_individual_lines": 0
+  },
+  "quote_snapshot_time": "2026-11-28T00:52:50.426Z",
+  "command_count": 5,
+  "line_count": 39,
+  "simulated_stake_yen": 3900,
+  "scenario_metrics": {
+    "hit": {
+      "low": 0.17877093883460976,
+      "central": 0.20260577095782328,
+      "high": 0.2322938960058176
+    },
+    "payout": {
+      "low": 4309.513326044003,
+      "central": 4672.684681666777,
+      "high": 5102.451844923334
+    },
+    "loss": {
+      "low": 0.8572569920505926,
+      "central": 0.8471419664056324,
+      "high": 0.8354542946944764
+    }
+  },
+  "tested_decision": "candidate",
+  "commands": [
+    {
+      "type": "馬連",
+      "method": "single",
+      "definition": {
+        "selection": [
+          3,
+          17
+        ]
+      },
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬連:[3,17]"
+      ],
+      "source_strategy_id": "single:馬連:[3,17]",
+      "row": 1,
+      "category": "通常",
+      "jra_input": "3－17"
+    },
+    {
+      "type": "三連複",
+      "method": "box",
+      "definition": {
+        "horses": [
+          4,
+          3,
+          15,
+          17,
+          16,
+          2
+        ]
+      },
+      "points": 20,
+      "unit_stake_yen": 100,
+      "stake_yen": 2000,
+      "ticket_keys": [
+        "三連複:[15,16,17]",
+        "三連複:[2,15,16]",
+        "三連複:[2,15,17]",
+        "三連複:[2,16,17]",
+        "三連複:[2,3,15]",
+        "三連複:[2,3,16]",
+        "三連複:[2,3,17]",
+        "三連複:[2,3,4]",
+        "三連複:[2,4,15]",
+        "三連複:[2,4,16]",
+        "三連複:[2,4,17]",
+        "三連複:[3,15,16]",
+        "三連複:[3,15,17]",
+        "三連複:[3,16,17]",
+        "三連複:[3,4,15]",
+        "三連複:[3,4,16]",
+        "三連複:[3,4,17]",
+        "三連複:[4,15,16]",
+        "三連複:[4,15,17]",
+        "三連複:[4,16,17]"
+      ],
+      "source_strategy_id": "S24",
+      "row": 2,
+      "category": "通常",
+      "jra_input": "2・3・4・15・16・17 BOX"
+    },
+    {
+      "type": "三連単",
+      "method": "formation",
+      "definition": {
+        "slots": [
+          [
+            4,
+            3
+          ],
+          [
+            3,
+            15,
+            17
+          ],
+          [
+            15,
+            17,
+            16,
+            2
+          ]
+        ]
+      },
+      "points": 16,
+      "unit_stake_yen": 100,
+      "stake_yen": 1600,
+      "ticket_keys": [
+        "三連単:[3,15,16]",
+        "三連単:[3,15,17]",
+        "三連単:[3,15,2]",
+        "三連単:[3,17,15]",
+        "三連単:[3,17,16]",
+        "三連単:[3,17,2]",
+        "三連単:[4,15,16]",
+        "三連単:[4,15,17]",
+        "三連単:[4,15,2]",
+        "三連単:[4,17,15]",
+        "三連単:[4,17,16]",
+        "三連単:[4,17,2]",
+        "三連単:[4,3,15]",
+        "三連単:[4,3,16]",
+        "三連単:[4,3,17]",
+        "三連単:[4,3,2]"
+      ],
+      "source_strategy_id": "S30",
+      "row": 3,
+      "category": "通常",
+      "jra_input": "（3・4）→（3・15・17）→（2・15・16・17）"
+    },
+    {
+      "row": 4,
+      "category": "中穴",
+      "type": "馬連",
+      "method": "single",
+      "definition": {
+        "selection": [
+          4,
+          17
+        ]
+      },
+      "jra_input": "4－17",
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬連:[4,17]"
+      ],
+      "minimum_verified_odds": 69.3,
+      "maximum_verified_odds": 69.3,
+      "indicative_minimum_payout_yen": 6930,
+      "model_expected_profit_yen": 133.744,
+      "pricing_source": "verified-single",
+      "reason": "実測20倍以上・100倍未満の組番だけを選定。モデル期待利益がプラス。"
+    },
+    {
+      "row": 5,
+      "category": "大穴",
+      "type": "馬単",
+      "method": "single",
+      "definition": {
+        "selection": [
+          17,
+          3
+        ]
+      },
+      "jra_input": "17→3",
+      "points": 1,
+      "unit_stake_yen": 100,
+      "stake_yen": 100,
+      "ticket_keys": [
+        "馬単:[17,3]"
+      ],
+      "minimum_verified_odds": 309.2,
+      "maximum_verified_odds": 309.2,
+      "indicative_minimum_payout_yen": 30920,
+      "model_expected_profit_yen": 221.7219,
+      "pricing_source": "verified-single",
+      "reason": "100円あたり1万円以上の的中払戻となる組番だけを選定。モデル期待利益がプラス。"
+    }
+  ],
+  "exacta_coverage": [],
+  "limitations": [
+    "source STEP1 is a validation draft; no independent pre-odds attestation",
+    "quotes are historical observations from this morning, not renewed here",
+    "no formal seal or PDF permitted",
+    "no E012 workflow invoked"
+  ]
+}
