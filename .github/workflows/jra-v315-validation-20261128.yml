@@ -1,0 +1,84 @@
+name: JRA v315 gate and candidate calculation - isolated verification
+on:
+  push:
+    branches: [chatgpt/jra-blind-intake-20261128]
+    paths: ['.github/workflows/jra-v315-validation-20261128.yml']
+permissions:
+  contents: write
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/jra-blind-intake-20261128
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Evaluate the existing v315 comparator from unsealed sources without fabricating a proof
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          import {compareThreePlusAna} from './.github/scripts/jra-three-plus-ana-shadow-v1.mjs';
+          import {buildFormalThreeCommandPlan} from './.github/scripts/jra-build-formal-3action-v315.mjs';
+          import {evaluateStrategy, expandStrategy, ticketKey} from './.github/scripts/jra-strategy-engine-v39.mjs';
+          const root='validation-only/jra-blind-intake/2026-11-28';
+          const dir=root+'/v315-check';fs.mkdirSync(dir,{recursive:true});
+          for(const slug of ['tokyo','kyoto']){
+            const record={scope:'isolated validation only; not formal purchase or proof; no recommendation to place wagers',status:'blocked',slug,checked_at:new Date().toISOString()};
+            try{
+              const path=root+'/step2-retry1/'+slug+'-unsealed-snapshot.json';
+              const b=fs.readFileSync(path),s=JSON.parse(b);
+              if(s.stage!=='pending_git_proof'||s.proof_commit!==null)throw Error('expected unsealed source');
+              record.source_sha256=crypto.createHash('sha256').update(b).digest('hex');
+              record.source_stage=s.stage;
+              try{
+                buildFormalThreeCommandPlan(s,b);
+                throw Error('unexpected formal admission');
+              }catch(e){
+                if(!String(e.message).includes('sealed v3.13 prediction required'))throw e;
+                record.formal_gate='correctly rejected: '+e.message;
+              }
+              const r=compareThreePlusAna({budget_yen:6000,strategies:s.purchase_strategy_evaluations,formal_final_bets:s.final_bets,frame_map:s.frame_map,outcome_distributions:s.outcome_distributions,race_context:s.race_context,freeze_at:s.final_bets_fixed_at});
+              const qualifies=r.status==='three_plus_two_holes_shadow_candidate'&&r.regular_commands.length>0;
+              const lines=qualifies?r.proposed_lines:[];
+              const commands=qualifies?[...r.regular_commands,r.medium_command,r.large_command].filter(c=>c.method!=='pass'):[];
+              const keys=lines.map(l=>ticketKey(l.type,l.selection));
+              if(new Set(keys).size!==keys.length)throw Error('duplicate lines');
+              if(lines.reduce((n,l)=>n+l.stake_yen,0)>6000)throw Error('overbudget');
+              for(const c of commands){
+                const expanded=expandStrategy(c.type,c.method,c.definition).map(l=>ticketKey(l.type,l.selection)).sort();
+                if(JSON.stringify(expanded)!==JSON.stringify([...c.ticket_keys].sort()))throw Error('command expansion mismatch');
+              }
+              const catalog=new Map(s.purchase_strategy_evaluations.flatMap(x=>x.lines||[]).map(l=>[ticketKey(l.type,l.selection),l]));
+              for(const l of lines){
+                const q=catalog.get(ticketKey(l.type,l.selection));
+                if(!q||q.quote_verified!==true||JSON.stringify(q.market_odds)!==JSON.stringify(l.market_odds)||q.source_url!==l.source_url||q.observed_at!==l.observed_at)throw Error('quote provenance mismatch');
+              }
+              const stats=lines.length?evaluateStrategy(lines,s.outcome_distributions,s.frame_map,s.race_context):null;
+              record.status='v315_comparator_validated_not_formal';
+              record.quote_observation=s.market_quote_audit;
+              record.quote_snapshot_time=s.final_bets_fixed_at;
+              record.command_count=commands.length;
+              record.line_count=lines.length;
+              record.simulated_stake_yen=lines.reduce((n,l)=>n+l.stake_yen,0);
+              record.scenario_metrics=stats?{hit:stats.hit_probability_scenarios,payout:stats.expected_payout_yen_scenarios,loss:stats.loss_probability_scenarios}:null;
+              record.tested_decision=qualifies?'candidate':'pass';
+              record.commands=commands;
+              record.exacta_coverage=r.exacta_coverage_audit;
+              record.limitations=['source STEP1 is a validation draft; no independent pre-odds attestation','quotes are historical observations from this morning, not renewed here','no formal seal or PDF permitted','no E012 workflow invoked'];
+            }catch(e){record.error=String(e.stack||e).slice(0,3000)}
+            fs.writeFileSync(dir+'/'+slug+'.json',JSON.stringify(record,null,2)+'\n');
+            console.log(slug,record.status,record.command_count,record.line_count,record.error||'');
+          }
+          JS
+      - name: Commit test results only on isolated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- validation-only/jra-blind-intake/2026-11-28/v315-check/
+          git commit -m "Validate v315 comparator and rejection of unsealed sources; never publish"
+          git push origin HEAD:chatgpt/jra-blind-intake-20261128
